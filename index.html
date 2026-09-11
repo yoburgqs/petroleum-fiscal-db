@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v776</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v777</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v776</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v777</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v776</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v777</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -50959,8 +50959,18 @@ function copyFCForIC(btn) {
   // Carried only when a row on THIS view actually blends fee-basis contracts. Where none does,
   // the column would repeat the one before it on every row — same rule as the Screener paste.
   var _anyFee = nFee > 0;
-  if (_anyFee) head.splice(5, 0, 'Comparable take % @$' + P
-    + ' — fee-basis contracts excluded (RANK AND CITE ON THIS where populated)');
+  // ── v777 (T5) ─ the ranked column carries the figure the rank is built on ─────────────
+  // v675 moved the on-screen rank to the comparable take; this paste kept the published blend in
+  // its first take column and told the reader the # column ranks on it. Walked cold at $75, the
+  // memo received "1 USA 23.4 / 2 Iraq 84.8 / 3 Somalia 36.9" under "ranked ... low → high" — six
+  // visible inversions in the 65 ranked rows, and a note disowning Iraq's (correct) placing. The
+  // take column is now the like-for-like figure as a plain number, so the column reads in the order
+  // it claims and Excel can sort it; the blend moves beside it, populated only where it differs.
+  if (_anyFee) {
+    head[4] = 'Govt Take % @$' + P + ' — ORCA database, like-for-like (CITABLE)';
+    head.splice(5, 0, 'Published all-contract take % @$' + P
+      + ' — blends TSC / RSC / Buy-back fee contracts, NOT comparable across rows (reference only)');
+  }
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
   var nProxy = 0, proxyNames = [];   // v596 (T5)
@@ -50993,7 +51003,7 @@ function copyFCForIC(btn) {
       c,
       r.region || meta.region || '',
       r.mechanic || '',
-      num(dv, 1),
+      num(_feeAt[c] ? _feeAt[c].cmp : dv, 1),   // v777 (T5): the figure the # rank is built on
       mono ? '' : num(meta['npv_' + P], 0),
       hasBe ? num(r.be_75, 1) : '',
       num(r.swing, 1),
@@ -51005,7 +51015,8 @@ function copyFCForIC(btn) {
     // v664 (T5): blank on a row whose headline needs no correction, so the analyst reads the
     // column as "these are the rows the rule applies to" rather than as a second take on all of
     // them. The marker is the Screener's, so the two shortlist pastes read the same way.
-    if (_anyFee) _row.splice(5, 0, _feeAt[c] ? _feeAt[c].cmp.toFixed(1) + ' ← cite this' : '');
+    // v777 (T5): the blend now sits beside the ranked figure rather than being the ranked figure.
+    if (_anyFee) _row.splice(5, 0, _feeAt[c] ? num(_feeAt[c].head, 1) : '');
     matrix.push(_row);
   }
   if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
@@ -51034,7 +51045,9 @@ function copyFCForIC(btn) {
       ? 'A selected shortlist of ' + N + ' countr' + (N === 1 ? 'y' : 'ies') + ', not the full table. The # column is each country\u2019s placing in the full ORCA ranking on ' + sortName + ' \u2014 NOT its position within this shortlist. '
         + (_selOffscreen ? _selOffscreen + ' of them ' + (_selOffscreen === 1 ? 'is' : 'are') + ' outside the region filter that was active on screen, so ' + (_selOffscreen === 1 ? 'its # cell reads' : 'their # cells read') + ' \u201c\u2014\u201d. ' : '')
       : 'Rows in the order shown on screen, ranked on ' + sortName + '. ')
-    + 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. '
+    + (_anyFee
+        ? 'Government take in the first numeric column and the ORCA database contractor NPV column are the ORCA contract-database figures — the same values Fiscal Compare ranks on, Country Profile and the row drilldown citation carry, and the ones to cite. '
+        : 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. ')
     + 'That contractor NPV is on a standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex), 10% WACC, 100% working interest — scale by your WI. It is a fixed basis and does not move with the profile selector. '
     + 'The last numeric column is this screen’s model NPV on the ' + profName + ' profile you had selected — the figure that was on screen when you copied. Cite the database column; the model column is for profile sensitivity only.'
     + ' Breakeven is populated for ' + nBe + ' of these ' + N + ' rows (it requires verified per-contract royalty and cost data).';
@@ -51065,11 +51078,13 @@ function copyFCForIC(btn) {
     + 'government take% on those rows measures the contract structure, not how hard the terms are: '
     + feeNames.join(', ') + (nFee > feeNames.length ? ' and ' + (nFee - feeNames.length) + ' more' : '')
     + '. Under the platform comparability rules (2026-08-26) their published headline may NOT be '
-    + 'ranked against the production-sharing and concession rows, and the # column ranks on exactly '
-    + 'that headline — so do not read their placing, or their take against another row, as a fiscal '
-    + 'finding. The Comparable take column carries the take on each of those countries’ '
-    + 'PSC/Concession contracts alone, which is the figure to rank and cite on. The headline is kept '
-    + 'because it is the correct all-contract average and is what the ORCA database and JSON API publish. '
+    + 'ranked against the production-sharing and concession rows. On those rows the government take '
+    + 'column therefore carries the take on the country’s PSC/Concession contracts alone — the figure '
+    + 'Fiscal Compare ranks and tiers on screen and Country Profile cites'
+    + (((window._fcSortState || 'take') === 'take') ? ', and the one the # column is built on, so their placing is like-for-like' : '')
+    + '. The published all-contract blend sits in the next column for reference only: it is the correct '
+    + 'all-contract average and what the ORCA database and JSON API publish, but it is not comparable '
+    + 'across rows and must not be ranked or cited against them. '
   if (nSignFlip) warn += 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
     + flipNames.join(', ') + (nSignFlip > flipNames.length ? ' and ' + (nSignFlip - flipNames.length) + ' more' : '')
     + '. Cite the database column and do not quote the model figure for these rows without saying which basis it is on. ';
@@ -51090,7 +51105,8 @@ function copyFCForIC(btn) {
     + '<table style="border-collapse:collapse;">'
     + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + thS + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
     + '<tbody>' + matrix.slice(1).map(function(row){
-        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+        // v777 (T5): the reference-only blend column is muted so it does not read as a second ranked take.
+        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + (_anyFee && ci === 5 ? 'color:#777;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>'
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
