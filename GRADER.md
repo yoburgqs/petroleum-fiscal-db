@@ -43890,3 +43890,70 @@ number instead of a 2,750-4,000px scroll through eight sections.
 **Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn; cycle 686 was T4.
 
 **Cycle 686 never shipped, even though its email said 300 PASS / 0 FAIL.** That figure was the live site's test result, not its own. It left its edits uncommitted, and its own test run died partway: 14 PASS / 24 FAIL, every failure "browser has been closed". The edit
+
+---
+## Cycle 688 — 2026-09-11 — T1, v781: ticking a Screener row now shows the shortlist where the analyst is looking
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn; the run since
+it was 683 T2, 684 T5, 685 T3, 686 T4, 687 T6.
+
+**Friction:** I walked it cold in Chromium: Home, then "open the screen →", which lands on IOC Capital Screen with 15 rows. The analyst's
+next move is to pick the ones going on the list. Each row's checkbox is labelled "Add Canada to the IC shortlist"
+(`input.sc-sel`, `scToggleSel()`). The only response to a tick was `#sc-sel-note` ("N selected") and the relabelled
+Copy / CSV / Excel buttons, all in the toolbar above the table. Once the analyst is down among the rows, that toolbar is
+out of sight: 6px under the sticky header after ticking row 11 at 1440x900, 10px under it after row 6 at 1280x800, and
+297px above the viewport after tapping row 5 at 390x844. The row's other control, "+", adds to the compare basket, a
+different feature, and opens a bar pinned to the bottom of the screen. So the one visible reaction came from the wrong
+control. On a phone the analyst could tick five countries without seeing any sign the list existed, or any way to take
+it anywhere.
+
+**Change:** new `#sc-sel-dock`, a bar fixed to the bottom of the Screener that shows while anything is ticked. It reads
+"IC shortlist · 2 ticked · Azerbaijan · United Kingdom", naming countries in the order the current screen ranks them.
+It carries Copy, CSV, Excel and Clear, which call the same `copyScreenerTable()` / `exportScreenerCSV()` /
+`exportScreenerExcel()` / `scClearSel()` as the toolbar, so they go through the same `_scExportRows()` choke point. If a
+preset change drops ticked countries, it reads "1 of 2 ticked in this screen · 1 not exported". If none remain, the
+export buttons disable and the names line reads "widen the screen or press Clear". The dock sits inside
+`#explorer-screen-mode`, so it disappears in Browse, in Bubble and on every other tab. It stacks above `#compare-basket`
+instead of under it, pads the Screener so the last row stays clear, and is hidden in print. It is class-styled rather
+than inline `display:flex`, so the v612 wrap rule does not touch it; it has its own ≤720px wrap. The toolbar badge and
+buttons are unchanged.
+
+**Result:** wherever the analyst ticks a country, the list they are building is on screen with its names and a way to
+export or copy it. Before, that meant scrolling back up to a toolbar they may never have noticed.
+
+| walk (IOC Capital Screen, cold) | shortlist feedback in viewport, before (v780) | after (v781) |
+|---|---|---|
+| tick row 11, 1440x900 | none (badge under sticky header) | dock at y 857-900, names + 4 actions |
+| tick row 6, 1280x800 | none (badge under sticky header) | dock at y 757-800 |
+| tap rows 5/9/15, 390x844 touch | none (badge 297px above viewport) | dock at y 758-844, buttons 44px |
+| tick 2, then load Primary-Source Evidence | toolbar only | "0 of 2 ticked in this screen · 2 not exported", exports disabled |
+
+**Verification (run this cycle on the final tree at 127.0.0.1:8911, all in the foreground):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Chromium probe: the dock is hidden cold, appears on a tick, lists names in screen order and hides on Clear, which also
+  resets the padding. At 1440 the last table row ends at y 835, above the dock top at 857. At 390 the last row sits
+  clear of the dock too. With the basket open, the dock sits at y 809-852 above a basket at 852-900 (1440), and at
+  686-772 above a basket from 772 (390), with no overlap at either size. Excel from the dock opens in openpyxl as
+  `Screener` with exactly the 2 ticked rows (Azerbaijan rank 3, United Kingdom rank 11), plus the `Screen & Basis`
+  sheet. The clipboard from dock Copy carries United Kingdom and neither Canada nor USA, and the dock renders 0px in
+  Browse and on Fiscal Compare. 0 page errors at 1440, 1280 and 390.
+- Step 5b: at 390x844 `hasTouch`, `pointer: coarse` is true. scrollWidth is 390/390 with the dock alone and with dock
+  plus basket, and all four dock buttons are 44px.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8911/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v781.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN is
+  `[ConsoleErrors]`, the localhost `sw.js` 404, as in cycles 675-687 locally.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8911/index.html`, baseline not updated: **PIXEL GATE PASS
+  — no surface got worse than baseline**.
+- STILL LOCKED respected: the v612 mobile layer and `#reference-panel` are untouched. Advanced filters stay collapsed
+  and presets stay a dropdown. There is no banner, tooltip, FAQ or citation work, no FC column change and no tab-order
+  change. Version v780 → v781 at the three display sites.
+
+**Deliberately NOT done:**
+- There are still two selection mechanisms per row, the checkbox (IC shortlist) and "+" (compare basket). Merging them
+  is a design decision, not a one-moment fix.
+- The `#screener-count` line is unchanged. It is ~709 characters of bold orange qualification, 292px tall on a phone, above the table.
+- On a phone the table still shows only Country and Govt Take before its internal horizontal scroll. NPV @$50, the
+  column that decides this screen, is off to the right.
+
+**Shipped:** petroleum-fiscal-db `38ecb71` (v781). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
