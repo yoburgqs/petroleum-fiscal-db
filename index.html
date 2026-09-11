@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v783</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v784</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v783</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v784</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v783</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v784</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -41651,7 +41651,12 @@ function _rrPaintObsSpread(c, d, obs) {
   }
 
   var score = document.getElementById('rr-fp-score');
-  if (score && !score.dataset.obsMarked) {
+  // v784 (T4): where the ceiling is material the slot's large number becomes the ceiling -- see
+  // _rrFpHeadlineCeiling(), called at the end of this function. Below materiality the printed
+  // number keeps the slot with its marker, as before.
+  var _cl784 = (fp == null) ? null : _fpObsCeilingFrom(d, obs, { iqr: 0, excess: obs.spread });
+  if (_cl784) _cl784.oneTerm = true;
+  if (score && !score.dataset.obsMarked && !(_cl784 && _cl784.material)) {
     score.dataset.obsMarked = '1';
     score.insertAdjacentHTML('beforeend',
       '<span style="font-size:10px;font-weight:800;color:var(--orange);margin-left:5px;" '
@@ -41705,7 +41710,35 @@ function _rrPaintObsSpread(c, d, obs) {
       + (bound == null ? '' : ', putting ' + _rrEsc(c) + ' near <strong>' + bound + ' &middot; ' + bLabel + '</strong> rather than ' + fp)
       + '. Carry the contract range into the IC memo, not the grade. ';
   }
+
+  if (_cl784 && _cl784.material) _rrFpHeadlineCeiling(score, _cl784, bnd ? bnd.title : '');
 }
+
+// ── v784 (T4): the slot's large number is the one the card tells the analyst to carry ──────
+// Walked T4 cold: Reform Risk -> "Check one country" -> Nigeria. The Fiscal Predictability slot
+// printed "73 MODERATE" at 18px in the band colour, and the number to carry -- "Carry <=46 · LOW,
+// not 73" -- sat under it at 10px, followed by a cohort paragraph ("3rd of 28 ... MODERATE here
+// outranks any UNGRADED score") and then a second paragraph withdrawing it. Measured across all
+// 185 lookups at cold load: 51 cards paint a ceiling, and on every one the large number was the
+// refuted score -- Uzbekistan 89 (carry <=49), Netherlands 84 (<=59), Thailand 80 (<=51). An
+// analyst with twenty minutes reads the large number. Where the correction is material (moves
+// the band or is worth 5+ points, the rule _fpObsCeilingFrom() already applies) the slot now
+// leads with the ceiling in its band colour and prints the refuted score struck through beneath
+// it, still marked "best case". Nothing is recomputed; the ceiling is the same object Country
+// Profile's IC paste and XLSX read.
+function _rrFpHeadlineCeiling(score, cl, why) {
+  if (!score || !cl || score.dataset.obsMarked) return;
+  score.dataset.obsMarked = '1';
+  var b = cl.bound;
+  score.style.color = b >= 75 ? 'var(--green)' : b >= 60 ? 'var(--yellow)' : b >= 45 ? 'var(--orange)' : 'var(--red)';
+  score.innerHTML = '<span id="rr-fp-carry">&le;' + b + '</span> '
+    + '<span id="rr-fp-grade" style="font-size:11px;font-weight:700;cursor:help;" title="' + _rrEsc(why) + '">'
+    + cl.band + ' ceiling</span>'
+    + '<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.4;margin-top:1px;">printed '
+    + '<span style="text-decoration:line-through;">' + cl.printed + ' &middot; ' + (cl.oneTerm ? 'UNGRADED' : cl.printedBand) + '</span> '
+    + '<span style="color:var(--orange);font-weight:800;">&#9650; best case</span></div>';
+}
+window._rrFpHeadlineCeiling = _rrFpHeadlineCeiling;
 
 // ── v719 (T4): the refutation stopped at the cohort that needed it least ─────────────────
 // v604 and v713 established that ORCA's own contract file can contradict the basis the Fiscal
@@ -41841,14 +41874,9 @@ function _rrPaintIqrUnderstated(c, d, obs, u) {
     basis.title = why;
   }
 
+  // v784 (T4): the "best case" marker now travels with the ceiling headline -- see
+  // _rrFpHeadlineCeiling(), called at the end of this function once the grade title is settled.
   var score = document.getElementById('rr-fp-score');
-  if (material && score && !score.dataset.obsMarked) {
-    score.dataset.obsMarked = '1';
-    score.insertAdjacentHTML('beforeend',
-      '<span style="font-size:10px;font-weight:800;color:var(--orange);margin-left:5px;" '
-      + 'title="Upper bound — the bundled take spread this grade was penalised on is contradicted by this country’s own contract table.">'
-      + '&#9650; best case</span>');
-  }
 
   // The grade slot's own tooltip asserted "the interquartile-range penalty was actually charged
   // and the band is earned". That is the sentence this country's contract table refutes, so it
@@ -41877,17 +41905,22 @@ function _rrPaintIqrUnderstated(c, d, obs, u) {
   // The cohort line's closing claim -- "MODERATE here outranks any UNGRADED score, however high
   // its number" -- is an instruction to prefer this row over a one-term one, and the rank inside
   // it was computed from the refuted score. Withdraw it where the ceiling lands in a lower band.
+  // v784 (T4): REPLACE the cohort paragraph instead of appending its retraction beneath it. The
+  // card printed "3rd of 28 ... MODERATE here outranks any UNGRADED score" and directly under it
+  // "That rank and that comparison do not hold" -- two paragraphs whose net content is one line.
   var coh = document.getElementById('rr-fp-cohort');
   if (coh && bandMoves && !coh.dataset.withdrawn) {
     coh.dataset.withdrawn = '1';
-    coh.insertAdjacentHTML('beforeend',
+    coh.innerHTML =
       '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
       + 'border-left:2px solid var(--orange);max-width:230px;">'
-      + '<strong style="color:var(--orange);">That rank and that comparison do not hold for ' + _rrEsc(c) + '.</strong> '
-      + 'Both are computed from the printed ' + fp + ', which this country’s own contract table bounds at '
+      + '<strong style="color:var(--orange);">No cohort rank for ' + _rrEsc(c) + '.</strong> '
+      + 'Its rank among the countries ORCA can measure is computed from the printed ' + fp + ', which this country’s own contract table bounds at '
       + bound + ' · ' + bLabel + '. At the ceiling ' + _rrEsc(c) + ' is no longer a ' + pLabel
-      + ', so do not rank it above an ungraded score on the strength of the band.</div>');
+      + ', so do not rank it above an ungraded score on the strength of the band.</div>';
   }
+
+  if (material) _rrFpHeadlineCeiling(score, _cl, why);
 }
 window._rrPaintIqrUnderstated = _rrPaintIqrUnderstated;
 
