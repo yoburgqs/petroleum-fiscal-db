@@ -45258,3 +45258,16 @@ moves the wrong scroller.
 
 **Shipped:** petroleum-fiscal-db `0aa3273` (v799). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 706 Log — 2026-09-11 17:27
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Nothing further to request — the change is shipped (`0aa3273`), the mirror matches, and the cycle log is pushed (`267368a`). Reporting.
+
+# Cycle 706 — T6, v799
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" — the task that had gone longest without a turn (last run cycle 700; since then T5, T1, T4, T3, T2).
+
+**Friction:** Walking cold from Home → Fiscal Compare → tap a row, the drilldown drawer is the tab's entire answer to "where did this come from" — it carries 
