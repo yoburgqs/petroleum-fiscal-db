@@ -44873,3 +44873,78 @@ I shipped v794 to petroleum-fiscal-db and pushed it (`1d55a88`), with the GRADER
 **Task:** T5, "Give me something I can paste straight into an IC memo." It was the task longest without a turn (last run in cycle 695).
 
 **Friction:** Starting from a cold lo
+
+---
+## Cycle 702 Log — 2026-09-11 — T1 (v795)
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn
+(last run cycle 696; since then 697 T4, 698 T3, 699 T2, 700 T6, 701 T5).
+
+**Friction:** walked cold at 1440 and at 390x844 `hasTouch`: Home → "15 countries pass the IOC capital screen —
+open the screen →" → 15-row shortlist → click Mexico (row 4) → Country Profile. Then back to the list, the move an
+analyst makes 15 times to vet a 15-country screen. None of the three ways back returned to the list the analyst was
+reading:
+
+| route back from the profile | before (v794) |
+|---|---|
+| browser Back / phone swipe | `hashchange` → `parseAndNavigate('#/explorer')` → `switchTab('texplorer')` forces **Browse** mode at y=0: the Screener panel is hidden and the unfiltered 185-row table shows instead. 1440 and 390 |
+| Screener tab | the list survives, but at y=0. First row at 841 of 900 at 1440; **2,158px** below the tab bar on a phone, behind every slider |
+| "← Screener" button (`_cpBackToList`, v769) | correct, but it renders at y=834 in a 900px window, and at **y=1,767** on a phone |
+
+The first two are what a first-time user reaches for, and on a phone Back is the only gesture there is.
+
+**Change:** `index.html`
+- Clicking a shortlist row now records which row was opened and where it sat on screen (`_scNoteDrill`).
+- `_cpBackToList()` finds that row by `data-country` after the Screener re-runs and scrolls it back to the same
+  viewport position, below the sticky header. It flashes the row once with the existing `tr.search-highlight`
+  rule. If the row is gone, it falls back to the saved offset.
+- In `parseAndNavigate`, a bare `#/explorer` arriving from another pane with a leave record goes through
+  `_cpBackToList()`. That can only be Back/Forward: every forward write of `#/explorer` is a `pushState`, which
+  fires no `hashchange`. Cold links (no leave record) and `?param` links keep the old path.
+- The Screener tab button (`_scTabEnter`) takes the same return after a drill from the shortlist. Otherwise it
+  behaves exactly as before.
+
+**Result:** the analyst opens a country from the shortlist, reads it, and swipes Back or taps the Screener tab.
+They land on the same 15-row list with the row they opened in the same place, flashed. Before, they got a
+different table (Browse, 185 rows) or the top of the slider stack. They can now work down a screen country by
+country without losing their place.
+
+| measured on the final tree, 127.0.0.1:8930 | before (v794) | after (v795) |
+|---|---|---|
+| Back from a shortlist-opened profile lands in Screener mode with the 15 rows | 0 of 4 (1440/390 × Mexico/Angola) | **4 of 4** |
+| Screener tab after a drill: opened row on screen | 0 of 2 at 390 (row 2,158px down) | **4 of 4** |
+| opened row's viewport top, before → after | — | 12 round trips (3 routes × 2 rows × 2 widths): 9 exact, 3 within 6px (Mexico at 1440, 425 → 431; not a scroll clamp, 558 of 693 max) |
+
+**Verification (run this cycle, foreground):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Ran after the edit and again after the version bump.
+- `/tmp/c702/verify.js`: the 12 round trips above. All end with pane `texplorer`, mode `screen`, 15 rows and the row
+  flashed; 0 page errors. Regressions: a cold `#/explorer` still opens Browse. Explorer (Browse) → Fiscal Compare →
+  Back still opens Browse. A cold Screener tab opens 185 rows. Screener → CP tab → Screener tab with no drill still
+  shows the Screener at 185 rows.
+- Step 5b, 390x844 `hasTouch`, `pointer: coarse` true: Screener tab button 44px (the one control touched).
+  scrollWidth 390/390 on the Screener, on Country Profile and after Back. Colombia came back at 595 of 844 in
+  screen mode.
+- Graded suite `runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8930/`, run once on the final bumped tree. Read
+  from its own report `/tmp/c702/rt_v795.txt`: **299 PASS / 0 FAIL / 1 WARN**. The one console error is the
+  localhost `sw.js` 404 recorded since cycle 684. (A first attempt wrapped in `timeout` never ran: exit 127, no such
+  command on macOS. The number above is from the re-run, not from it.)
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8930/index.html`, final tree, baseline not updated:
+  **PIXEL GATE PASS — no surface got worse than baseline**.
+- STILL LOCKED respected: tab order unchanged. No tooltip, FAQ, banner or citation-string change. The v612 mobile
+  layer, `#reference-panel`, the CP headline and the FC columns are untouched. Version v794 → v795 at the three
+  display sites.
+
+**Deliberately NOT done:**
+- A cold `#/explorer?mech=PSC` link lands on Home. `route.split('/')[0]` is `explorer?mech=PSC`, which matches no
+  branch. This was confirmed on the committed v794 file served side by side, so it predates this cycle. The
+  `copyExplorerLink()` share link is therefore dead on arrival. That is T1/T5 work for another cycle.
+- The "← Screener" button still sits below the headline stack on Country Profile (y=1,767 on a phone). Back and the
+  tab now cover the return, so moving it is not the worst moment any more.
+- The Screener's v481 intro strip ("Screener — set thresholds to filter 185 countries…") is an instructional
+  paragraph of the kind the v371/v373 declutter lock bans. It costs 124px on a phone. Not touched this cycle.
+- The Screener rows do not mark which countries were already opened, beyond the one flash on return.
+- The 2026-09-11 "petroleum overnight chain FAILED" email is in the inbox. It is chain work, not UX, and was not
+  investigated in this cycle.
+
+**Shipped:** petroleum-fiscal-db `9d3942d` (v795). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
