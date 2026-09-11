@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v791</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v792</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -507,6 +507,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
    .cp-spread-badge replaces the .mc-badge in the CP headline strip and carries the MEASURED
    contract-level take band (p25-p75) instead of a relabelled price range. */
 .cp-spread-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; margin-left: 8px; white-space: nowrap; }
+/* v792 (T2): the CP verdict reform control is inline text that wraps — 13px a line under a thumb */
+@media (pointer: coarse) { .cp-reform-cta { display: inline-block; min-height: 24px; padding: 4px 0; line-height: 1.4; } }
 /* v29: DD price curve */
 .dd-price-chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; height: 200px; position: relative; }
 /* ── v26: stability bar + 2-col layout + MC badge ── */
@@ -2312,7 +2314,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v791</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v792</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2382,7 +2384,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v791</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v792</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -37055,22 +37057,51 @@ function loadCountryProfile(country) {
     // arm that fires for the 164 unscored jurisdictions, and on the one line an analyst reads to
     // decide viability it has to say what the FC cell (n/c) and the RR lookup already say: there
     // is no log, and that is not a clean record.
-    var short = !v ? 'Reform risk not scored \u00b7 no sourced log \u2014 not a clean record'
-      : (v.icLabel === 'IC action'
-          ? 'Reform risk ' + v.score + '/100 · no frequency premium'
-          : 'Reform risk ' + v.score + '/100 · ' + v.icLabel.replace('IC action — ', ''));
+    // ── v792 (T2): the line read "Reform risk <score>/100", and the score runs the other way ──
+    // Score = 100 − 15 × fiscal law changes since 2010, so 100 is the FEWEST changes. Under the
+    // word "risk" every reading inverted, on the one line an analyst reads to decide whether a
+    // country can be defended at $75. Measured on this line, cold load, v791:
+    //   Guyana          0 changes, rank 1 of 21             -> "Reform risk 100/100"  (reads: maximum)
+    //   Libya           0 changes, pre-2010 rupture         -> "Reform risk 100/100"
+    //   United Kingdom  5 changes, rank 21 of 21, WACC +3–5 -> "Reform risk 25/100"   (reads: low)
+    // Guyana's own headline strip, 3 inches down, says "Stability ◆◆◆◆◆". Every other surface
+    // names this number Reform Frequency Score (SbS, IC memo copy, Reform Risk tab). The face now
+    // leads with the verdict token _rrClassify already derives — the same token, colour and filled
+    // WACC pill the Fiscal Compare Stability column prints (v744/v753), so the row the analyst
+    // drilled from and the profile say the same thing — then the count, which has no direction to
+    // misread. The score stays in the tooltip, with its formula. Nothing is recomputed and no
+    // threshold is added. Under a thumb the control was 13px a line; .cp-reform-cta gives it 24px.
+    var short, tokTxt, tokFill;
+    if (!v) {
+      tokTxt = 'n/c'; tokFill = false;
+      short = 'Reform not scored · no sourced log — not a clean record';
+    } else {
+      var tail = v.icLabel === 'IC action' ? '' : v.icLabel.replace(/^IC action\s*—\s*/, '');
+      // This arm's label refers to "score", which is no longer on the face.
+      if (tail === 'score is a window artefact') tail = 'last take rise pre-dates the 2010 count';
+      tokTxt = v.icToken; tokFill = /^WACC /.test(v.icToken);
+      // Lining figures: this box is set in an old-style serif, where a bare 0 reads as the letter o.
+      short = '<span style="font-variant-numeric:lining-nums tabular-nums;">' + v.since2010 + '</span>'
+        + ' fiscal law change' + (v.since2010 === 1 ? '' : 's') + ' since 2010'
+        + (tail ? ' · ' + tail : '');
+    }
     var col = v ? v.icColor : 'var(--muted)';
-    var tip = v ? 'Reform Frequency Score ' + v.score + '/100 — ' + v.scoreNote
-                + '. Click to open the full reform verdict for ' + cn + '.'
+    var tokStyle = 'display:inline-block;font-size:10px;font-weight:800;letter-spacing:.02em;white-space:nowrap;'
+      + 'padding:1px 5px;border-radius:3px;margin-right:5px;line-height:1.35;border:1px solid ' + col + ';'
+      + (tokFill ? 'background:' + col + ';color:#fff;' : 'color:' + col + ';');
+    var tip = v ? 'Reform Frequency Score ' + v.score + '/100 (100 − 15 × fiscal law changes since 2010, so 100 = no change) — '
+                + v.scoreNote + '. Click to open the full reform verdict for ' + cn + '.'
               : 'ORCA carries a sourced fiscal-reform event log for 21 of 185 jurisdictions and ' + cn
                 + ' is one of the 164 without one. This is NOT a Reform Frequency Score of 100 and it does'
                 + ' not support carrying a zero reform-frequency premium into an IC memo. Click to open the'
                 + ' lookup for ' + cn + ', which names the statute ORCA read its terms from as the place'
                 + ' the external check starts.';
-    return ' <span role="button" tabindex="0" onclick="event.stopPropagation();openReformRiskFor(\'' + js + '\')"'
+    return ' <span role="button" tabindex="0" class="cp-reform-cta" onclick="event.stopPropagation();openReformRiskFor(\'' + js + '\')"'
       + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openReformRiskFor(\'' + js + '\');}"'
-      + ' style="cursor:pointer;font-weight:700;color:' + col + ';border-bottom:1px dotted ' + col + ';"'
-      + ' title="' + String(tip).replace(/"/g, '&quot;') + '">' + short + ' ›</span>';
+      + ' style="cursor:pointer;font-weight:700;color:' + col + ';"'
+      + ' title="' + String(tip).replace(/"/g, '&quot;') + '">'
+      + '<span style="' + tokStyle + '">' + tokTxt + '</span>'
+      + '<span style="border-bottom:1px dotted ' + col + ';">' + short + ' ›</span></span>';
   };
   // v552 (T2): fee-basis state for THIS country, and the same 21-producer set re-ranked on the
   // comparable take. Declared here, ahead of every consumer of `take` on this tab, for the same
