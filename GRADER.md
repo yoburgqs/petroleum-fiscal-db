@@ -43446,3 +43446,73 @@ I'll pick up when the suite finishes.
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 682 — v775 (T1) + v774 (cycle 681's T6, verified and committed) — 2026-09-10
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn. The recent run
+was 678 T5, 679 T3, 680 T4, 681 T6.
+
+**Friction:** I opened the Screener cold from the nav tab and loaded IOC Capital Screen from the preset dropdown,
+the step the intro strip points to. It returned 15 countries. Seven of the 22 countries with verified field production
+were gone: Kazakhstan (69.9%), Libya (71.1%), Norway (68.0%), Oman (comparable 75.6%), Nigeria (81.1%) and Saudi
+Arabia (100.0%) failed the 65% take ceiling, and Malaysia failed NPV @$50 (−$33M). This preset excludes proxy
+economics, so none of the seven appears in `#tbl-screener`. The ~700-character `#screener-count` line (runScreener)
+names the proxy exclusion and the Iraq fee-basis admission, but not one of these seven. A shortlist without Norway or
+Nigeria gets the question "why isn't it on here?" first. On the page, the only way to answer it was to drag sliders
+until the row came back.
+
+**Change:** A new row, `#sc-prod-out`, sits under the count bar and is filled inside runScreener(). It reads
+"NOT ON THIS LIST · 7 of 22 verified-production countries removed:", then one chip per country with the threshold that
+removed it, e.g. `Norway take 68.0% > 65%` or `Malaysia NPV @$50 -$33M < $0M`. Chips are ordered by NPV at the deck,
+and each one opens that Country Profile. Reasons come from the same thresholds `_scPass()` tests: take or comparable
+take against the ceiling, NPV at the deck, NPV @$50, retention, tier-A share and fact depth. A country removed only by
+a scope the analyst chose (region, mechanic, named country set, reform log, IOC operator, R-factor) is not listed. The
+row is hidden cold, hidden after Reset All, and hidden when the screen returns nothing, where the zero-result diagnosis
+already speaks.
+
+**Result:** the analyst can see which producing jurisdictions a screen cut and the number that cut each one, next to
+the shortlist, with no slider changes. One click puts Norway's Country Profile on screen to argue the 68.0% against the
+ceiling. At the $50 deck the list updates to the four still cut (Nigeria 74.1%, Oman 72.2%, Saudi Arabia, Malaysia).
+
+| screen (verified-production universe) | producing countries removed | named on screen, before | after |
+|---|---|---|---|
+| IOC Capital Screen @$75 | 7 of 22 | 0 | 7 |
+| IOC Capital Screen @$50 | 4 of 22 | 0 | 4 |
+| Low Take · Positive NPV | 12 of 22 | 0 | 12 |
+| PSC Africa (region-scoped) | 1 of 3 in scope | 0 | 1 (Nigeria) |
+
+**Verification (run this cycle on the final tree at 127.0.0.1:8481):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures** (re-run after the last edit).
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `ORCA_REPORT_FILE=/tmp/rt_v775b.txt`, read from
+  its own report, run in the foreground on the final tree: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the one
+  console error are the localhost `sw.js` 404, as in cycles 675-680.
+- Pixel gate `pixel_audit.js`, baseline not updated: **PIXEL GATE PASS**.
+- Chromium walk: on IOC, the 7 listed are exactly the production countries absent from the table (0 unlisted, 0 listed
+  but present). The first draft printed Malaysia's reason twice at the $50 deck, because the deck leg and the $50 leg
+  are the same test there; reasons are now de-duplicated and re-checked. Chip click → `#/profile/kazakhstan`.
+- Step 5b: at 390x844 `hasTouch` (`pointer: coarse` true), scrollWidth is 390/390 cold, on IOC, at $50, on PSC Africa
+  and on Low Take. Chips are ≥24px tall and the rightmost chip edge is 356px. At 1440, 1440/1440. 0 page errors at
+  both sizes.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched. Advanced filters stay collapsed and
+  presets stay a dropdown. No banner (neutral chips, no amber fill), tooltip, FAQ or citation work. Tab order untouched.
+
+**v774 (cycle 681's T6 work).** Cycle 681 edited openFCDrilldown so that on the 10 fee-basis-blended rows the drawer
+cites the ⚖ comparable take the row is ranked on. Iraq had said "Cite the database figure (84.8%)"; it now cites
+34.1% on 195 PSC/Concession contracts. The session then started the suite in the background and ended its turn. The
+suite browser was killed mid-run (/tmp/rt_v774.txt: 61 PASS / 21 FAIL, all "Target page ... has been closed"), and
+the work sat uncommitted. This cycle added the item 681 had listed as remaining (NPV row labelled "all contracts" on
+blended rows) and bumped the display version. It then checked the drawer at 1440 and 390 touch: Iraq cites 34.1%,
+Norway still cites 68.0% database, no h-scroll, 0 page errors. Committed as v774. **Failure mode, second occurrence
+after 678:** a `claude -p` cycle that backgrounds a long step exits when it ends its turn, and the loop then tests and
+pushes a tree that holds that cycle's uncommitted edits. Gates run in the foreground.
+
+**Deliberately NOT done:**
+- The removed-country list is not carried into Copy for IC Memo or the XLSX. That belongs to T5, and one change per
+  cycle.
+- Proxy-economics countries a screen removes are not listed, whether or not the proxy box is ticked. They number up
+  to 163 and are not the rows an analyst expects to see.
+- The count line's length is unchanged.
+
+**Shipped:** petroleum-fiscal-db `main` (v774 + v775). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`.
