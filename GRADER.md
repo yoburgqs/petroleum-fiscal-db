@@ -44334,3 +44334,18 @@ project IRR comes from.
 
 **Shipped:** petroleum-fiscal-db `7c08892` (v787). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 694 Log — 2026-09-11 06:47
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 694, T6
+
+# Cycle 694: IOC Portfolio no longer shows an IRR the rest of the platform had already withdrawn (v787)
+
+v787 is pushed to petroleum-fiscal-db as `7c08892`, and the GRADER.md entry as `95fc382`. The Office mirror copy is identical to `index.html`.
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn; the last T6 was cycle 687.
+
+**Friction:** IOC Port
