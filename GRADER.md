@@ -44456,3 +44456,84 @@ Everything left (mirror copy, commit, push, GRADER entry) depends on the suite a
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 697 Log — 2026-09-11 — T4 (v790)
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn; the last
+five cycles were T3 (692), T2, T6, T5 and T1 (696).
+
+**Friction:** I walked it cold in Chromium at 127.0.0.1:8930 through the route the platform sends most analysts:
+Fiscal Compare, whose Stability column has one clickable reform cell on each of its 185 rows. I scrolled to Uganda
+(scrollY 523) and clicked its cell. `openReformRiskFor()` switched to Reform Risk and rendered Uganda's verdict.
+Then there was no way back:
+- The verdict card had no return control.
+- Browser Back left the tab on Reform Risk. Reform Risk is not in `switchTab()`'s `tabHashMap`, so the URL stayed
+  `#/compare` and Back only popped to a hash-less entry.
+- The Fiscal Compare tab button reopened the table at scrollY 0, with Uganda 1081px down and out of view.
+
+An analyst checking reform exposure for three shortlisted countries had to find their row in a 185-row table again
+after every single check. The lookup card itself has had a dozen T4 cycles. None of them looked at leaving it.
+
+**Change:** When Reform Risk is opened from a Stability or reform cell on another tab, the verdict card now leads
+with a **← Fiscal Compare** button, or the name of whichever tab the click came from: Country Profile, IOC Portfolio,
+and so on. It is styled like Country Profile's existing "← Screener" drill-back (`.cp-back-list`).
+- `openReformRiskFor()` records the origin pane and its tab button.
+- `_rrBackToOrigin()` switches back and restores the scroll offset `switchTab()` already stores per pane (v769
+  `_paneLeave`). Explorer and Screener origins go through the existing `_cpBackToList()`.
+- `switchTab()` clears the return when the analyst reaches Reform Risk by its own tab button, so no stale button
+  appears there.
+- The button stays when the analyst changes country in the lookup, and it is `no-print`.
+- With no origin, the card headline is unchanged (`_rrVerdictHead()`).
+
+**Result:** the analyst clicks a Stability cell, reads the verdict, presses ← Fiscal Compare, and is back on the
+same row with the next country under their thumb. Checking reform exposure across a shortlist is now click, read,
+back, rather than click, read, re-find.
+
+| measured (cold load, row clicked in FC Stability column) | before (v789) | after (v790) |
+|---|---|---|
+| return control on the verdict card | none | ← Fiscal Compare, on first screen (top 27px @1440, 129px @390) |
+| FC tab after returning, 1440 | scrollY 0, row 1081px down, out of view | scrollY 523 = before, row in view (3 of 3 rows) |
+| FC after returning, 390x844 touch | — | scrollY 1614 = before, row in view (3 of 3 rows) |
+| Country Profile chip route, 390 | — | "← Country Profile", scrollY 489 → 489 |
+| Reform Risk reached by its own tab button | no button | no button (also after a prior cell round-trip) |
+
+**Verification (run this cycle, foreground, final tree, 127.0.0.1:8930):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Run after the edit and again after the version bump.
+- `/tmp/c697/verify.js` at 1440x900 and at 390x844 `hasTouch` (`pointer: coarse` true): the rows in the table above,
+  0 page errors at both sizes.
+- Step 5b: scrollWidth 390/390 and 1440/1440. The one new control is 44px tall under `pointer: coarse` (24px with a
+  mouse).
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8930/`, read from
+  its own report `/tmp/c697/rt_v790.txt`: **299 PASS / 0 FAIL / 1 WARN**. The one console error is the localhost
+  `sw.js` 404 that cycles 684, 694 and 695 also recorded.
+  - My first attempts at the suite and pixel gate exited 127 because macOS has no `timeout`, so neither ran. Both
+    were re-run, and these are the numbers from the re-runs.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8930/index.html`, baseline not updated: **PIXEL GATE PASS**.
+- STILL LOCKED respected:
+  - No banner, tooltip, FAQ or citation change, and no FC column change.
+  - The v612 mobile layer and `#reference-panel` are untouched, and tab order is unchanged.
+  - Version v789 → v790 at the three display sites.
+
+**Also this cycle — cycle 696's stranded v789 (T1) verified and committed as `bf9229c`.** Its session exited while its
+suite and pixel runs were backgrounded, and the loop committed only the GRADER line, so `index.html` sat uncommitted.
+Before committing it I checked:
+- Syntax gate 0 failures.
+- At 390 `hasTouch` the pinned Screener country cell shows "NPV @$75 $3.9B" (Canada) and so on, and scrollWidth is
+  390/390.
+- At 1440 the line computes `display:none`.
+- 0 page errors.
+
+The loop's own suite (300/0/0) and pixel gate at 08:25 had already run on that tree, and the suite above covers it.
+
+**Deliberately NOT done:**
+- Browser Back from Reform Risk still does not return to the origin tab. Reform Risk has no route in
+  `tabHashMap`/`parseAndNavigate`, and adding one changes URL behaviour for every tab, which is broader than this
+  moment.
+- The Side-by-Side reform row (`_cmpReformCell`) goes through the same generic path but was not walked separately this
+  cycle.
+- Overnight chain email "FAILED — 2026-09-11" was not re-investigated; cycle 691 diagnosed it as harvest `NO-DELTA`
+  (exhausted contract list).
+
+**Shipped:** petroleum-fiscal-db `bf9229c` (v789, cycle 696 orphan) and `761a170` (v790). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
