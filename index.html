@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v780</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v781</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -213,6 +213,22 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-screener tr.sc-row-sel > td { background: rgba(176,104,0,0.09); }
+/* v781 (T1): IC shortlist dock -- see the markup comment above </div><!-- end screen mode -->.
+   z-index 999 sits just under #compare-basket (1000); _scDockPlace() lifts it above the basket. */
+#sc-sel-dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 999; display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -2px 8px rgba(0,0,0,0.08); padding: 8px 20px; }
+#sc-sel-dock[hidden] { display: none; }
+#sc-sel-dock .sc-dock-list { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--text); }
+#sc-sel-dock .sc-dock-list strong { flex: none; white-space: nowrap; }
+#sc-sel-dock .sc-dock-n { flex: none; white-space: nowrap; font-weight: 700; color: var(--accent); }
+#sc-sel-dock .sc-dock-names { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+#sc-sel-dock .sc-dock-actions { flex: none; display: flex; align-items: center; gap: 6px; }
+#sc-sel-dock button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 720px) {
+  #sc-sel-dock { flex-wrap: wrap; gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
+  #sc-sel-dock .sc-dock-list { flex-basis: 100%; }
+  #sc-sel-dock .sc-dock-actions { flex-wrap: wrap; }
+}
 #sc-mobile-cols-note { display: none; }
 /* v763 (T1) — the divider prose was setting the width of every column in the Screener.
    tbody td is white-space:nowrap, and the data-basis dividers are colspan=12 cells carrying up
@@ -1767,7 +1783,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 @media print {
   /* Hide everything except country profile content */
   .tab-nav, .site-header, .search-bar, .export-buttons, #loading-overlay,
-  #compare-basket, #data-vintage-footer,
+  #compare-basket, #sc-sel-dock, #data-vintage-footer,
   .scenario-modal, #reference-overlay, #reference-panel { display: none !important; }
 
   /* v535: print the tab the analyst is actually looking at. This was hard-coded to #t7, so
@@ -2282,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v780</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v781</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v780</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v781</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3467,6 +3483,29 @@ window.copyPlatformCitation = function(btn) {
      removed — the same defect v537 fixed here, a legend advertising a control that is gone. It now
      states what the Breakeven column can and cannot do, and names the axis that does the downside job. -->
 <strong>Downside is screened on Contractor NPV @$50</strong> — the column beside Contractor NPV, modelled for all 185 countries with no blanks, so a value there was always measured. Its second line is the share of the $75 NPV still standing at $50 (observed −14% to +75%, median 45%), which is the axis the <strong>Downside Resilience</strong> preset screens on. <strong>Breakeven is not a column on this table and not a filter.</strong> ORCA models one for <span id="be-legend-n">65</span> of 185 countries, every value between $27 and $34/bbl, so it could render only two states and could not rank any two rows — and 63 of those 65 countries hold no verified field production, so the column read as a low-price endorsement of Vanuatu and the Bahamas while the USA, Norway, Canada and Brazil showed a blank. The per-country figure is still on <strong>Country Profile</strong> and the <strong>Breakeven Map</strong>, and the export still carries <em>Breakeven_bbl</em> with a <em>Breakeven_Tested</em> flag beside it.</div>
+  </div>
+
+  <!-- v781 (T1): the IC shortlist dock. Walked T1 cold: Home -> "open the screen" -> IOC Capital
+       Screen, 15 rows. The analyst builds the list by ticking rows ("Add Canada to the IC
+       shortlist"), and the only response to a tick was "N selected" plus the relabelled
+       Copy/CSV/Excel buttons in the toolbar ABOVE the table. Tick row 11 at 1440x900 and that
+       toolbar sits under the sticky header; tick row 6 at 1280x800, same; tap row 5 on a phone and
+       it is 300px above the viewport. Meanwhile the row's "+" (the compare basket, a different
+       thing) opens a bar pinned to the bottom of the screen -- so the only visible reaction came
+       from the wrong control. This dock shows while anything is ticked, names the ticked countries
+       in the order the current screen ranks them, and carries the same Copy / CSV / Excel / Clear
+       the toolbar does (same functions, same _scExportRows() choke point). It lives inside
+       #explorer-screen-mode so it disappears with the Screener, and it stacks above the compare
+       basket instead of under it. Class-styled, not inline display:flex, so the v612 wrap rule
+       does not apply to it; its own narrow-screen rule wraps it deliberately. -->
+  <div id="sc-sel-dock" role="region" aria-label="IC shortlist — ticked countries" hidden>
+    <div class="sc-dock-list"><strong>IC shortlist</strong><span id="sc-dock-n" class="sc-dock-n"></span><span id="sc-dock-names" class="sc-dock-names"></span></div>
+    <div class="sc-dock-actions">
+      <button type="button" id="sc-dock-copy" class="btn btn-sm btn-outline" onclick="copyScreenerTable()" aria-label="Copy the ticked countries for an IC memo">&#9112; Copy</button>
+      <button type="button" id="sc-dock-csv" class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export the ticked countries as CSV">⬇ CSV</button>
+      <button type="button" id="sc-dock-xlsx" class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export the ticked countries as Excel">⬇ Excel</button>
+      <button type="button" class="btn btn-sm btn-outline" onclick="scClearSel()" aria-label="Clear the IC shortlist selection">Clear</button>
+    </div>
   </div>
 
   </div><!-- end screen mode -->
@@ -32512,8 +32551,45 @@ function _scSyncSelUI() {
     all.checked = vis > 0 && on === vis;
     all.indeterminate = on > 0 && on < vis;
   }
+  _scDockSync();
 }
 window._scSyncSelUI = _scSyncSelUI;
+
+// v781 (T1): keep the shortlist visible from wherever the tick happened. The toolbar badge above
+// the table is off-screen once the analyst is down among the rows (see the #sc-sel-dock markup).
+function _scDockSync() {
+  var dock = document.getElementById('sc-sel-dock');
+  if (!dock) return;
+  var n = window._scSelected.length;
+  var inScreen = _scSelOrdered() || [];
+  var nIn = inScreen.length, nOut = n - nIn;
+  dock.hidden = !n;
+  if (n) {
+    document.getElementById('sc-dock-n').textContent = nOut
+      ? nIn + ' of ' + n + ' ticked in this screen · ' + nOut + ' not exported'
+      : n + ' ticked';
+    document.getElementById('sc-dock-names').textContent = nIn ? inScreen.join(' · ') : 'widen the screen or press Clear';
+    ['sc-dock-copy', 'sc-dock-csv', 'sc-dock-xlsx'].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) b.disabled = !nIn;
+    });
+  }
+  _scDockPlace();
+}
+// Stack above the compare basket when both are open, and pad the Screener so the dock never
+// covers the last rows of the table. Skipped while the Screener is hidden (offsetHeight 0).
+function _scDockPlace() {
+  var dock = document.getElementById('sc-sel-dock');
+  var mode = document.getElementById('explorer-screen-mode');
+  if (!dock || !mode) return;
+  var basket = document.getElementById('compare-basket');
+  var lift = (basket && basket.style.display !== 'none') ? basket.offsetHeight : 0;
+  dock.style.bottom = lift + 'px';
+  if (dock.hidden) { mode.style.paddingBottom = ''; return; }
+  if (dock.offsetHeight) mode.style.paddingBottom = (dock.offsetHeight + lift + 12) + 'px';
+}
+window._scDockSync = _scDockSync; window._scDockPlace = _scDockPlace;
+window.addEventListener('resize', function () { _scDockPlace(); });
 
 function _scExportRows() {
   var data = window._screenerData || [];
@@ -51910,6 +51986,8 @@ function renderBasket() {
   const pillsDiv = document.getElementById('basket-pills');
   if (!basket || !pillsDiv) return;
   const items = [...window.compareBasket];
+  // v781: the Screener's IC shortlist dock stacks on top of this bar, so re-place it on every change.
+  setTimeout(function () { if (typeof _scDockPlace === 'function') _scDockPlace(); }, 0);
   if (items.length === 0) {
     basket.style.display = 'none';
     return;
