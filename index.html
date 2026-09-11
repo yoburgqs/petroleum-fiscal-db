@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v795</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v796</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2324,7 +2324,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v795</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v796</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2394,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v795</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v796</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -23228,6 +23228,8 @@ function switchTab(id, btn) {
   var _fromPane = document.querySelector('.tab-pane.active');
   var _fromId = _fromPane ? _fromPane.id : null;
   var _paneChanged = !!_fromId && _fromId !== id;
+  var _fromBtnEl = document.querySelector('.tab-btn.active');
+  var _fromBtnId = _fromBtnEl ? _fromBtnEl.id : null;
   if (_paneChanged) {
     if (!window._paneLeave) window._paneLeave = {};
     window._paneLeave[_fromId] = { y: window.pageYOffset || 0, mode: _fromId === 'texplorer' ? (window._explorerMode || 'browse') : null };
@@ -23283,6 +23285,8 @@ function switchTab(id, btn) {
       if (window.location.hash !== newHash) history.pushState(null, '', newHash);
     }
   }
+  // v796 (T4): Reform Risk has a URL of its own now. See _rrHistoryOnSwitch().
+  if (typeof _rrHistoryOnSwitch === 'function') _rrHistoryOnSwitch(id, _fromId, _fromBtnId, _paneChanged);
   // v219: Auto-run on first tab activation — no empty states for first-time users
   if (!window._autoRanOnce) window._autoRanOnce = {};
   if (!window._autoRanOnce[id]) {
@@ -41764,8 +41768,14 @@ function openReformRiskFor(country) {
     : null;
   try { switchTab('treformrisk', btn); } catch (e) {}
   if (_ret) window._rrReturn = _ret;
+  _rrSelectWhenReady(country, 30);
+}
+window.openReformRiskFor = openReformRiskFor;
+
+function _rrSelectWhenReady(country, maxTries) {
   var tries = 0;
   (function attempt() {
+    if (window._activeTab !== 'treformrisk') return;   // analyst left before the data landed
     var sel = document.getElementById('rr-country-lookup');
     if (sel && sel.querySelector('option[value="' + String(country).replace(/"/g, '\\"') + '"]')) {
       sel.value = country;
@@ -41773,10 +41783,9 @@ function openReformRiskFor(country) {
       _rrScrollVerdictToTop();
       return;
     }
-    if (++tries < 30) setTimeout(attempt, 200);
+    if (++tries < (maxTries || 30)) setTimeout(attempt, 200);
   })();
 }
-window.openReformRiskFor = openReformRiskFor;
 
 // ── v790 (T4): a way back to the row the analyst drilled from ─────────────────────────────
 // Every Stability / reform cell on the platform routes here: the Fiscal Compare Stability
@@ -41791,14 +41800,95 @@ window.openReformRiskFor = openReformRiskFor;
 function _rrBackToOrigin() {
   var r = window._rrReturn;
   if (!r) return;
+  // v796: while this visit's own history entry is still current, the button IS browser Back,
+  // so the two can never disagree and Back afterwards does not bounce into Reform Risk again.
+  var e = window._rrEntry;
+  if (e && e.pane === r.pane && _rrIsRoute(location.hash) && history.state && history.state.rrEntry === e.token) {
+    history.back();
+    return;
+  }
   window._rrReturn = null;
-  if (r.pane === 'texplorer' && typeof _cpBackToList === 'function') { _cpBackToList(); return; }
-  switchTab(r.pane, r.btnId ? document.getElementById(r.btnId) : null);
-  var l = (window._paneLeave || {})[r.pane];
-  var y = l ? l.y : 0;
-  if (y > 0) setTimeout(function () { if (window._activeTab === r.pane) window.scrollTo(0, y); }, 150);
+  _rrRestorePane(r.pane, r.btnId);
 }
 window._rrBackToOrigin = _rrBackToOrigin;
+
+function _rrRestorePane(pane, btnId) {
+  if (pane === 'texplorer' && typeof _cpBackToList === 'function') { _cpBackToList(); return; }
+  switchTab(pane, (btnId && document.getElementById(btnId)) || _tabBtnFor(pane));
+  var l = (window._paneLeave || {})[pane];
+  var y = l ? l.y : 0;
+  if (y > 0) setTimeout(function () { if (window._activeTab === pane) window.scrollTo(0, y); }, 150);
+}
+
+// ── v796 (T4): Reform Risk had no URL, so browser Back never returned where the analyst was ──
+// switchTab()'s tabHashMap covers Fiscal Compare, Country Profile, Explorer and IOC Portfolio.
+// Reform Risk was not in it, so arriving there pushed no history entry and the address bar kept
+// whatever the previous tab had written. Walked cold at 390x844 (hasTouch), Back from Reform Risk:
+//   Home card -> Reform Risk -> Nigeria -> Back         left ORCA entirely (about:blank)
+//   Fiscal Compare -> USA Stability cell -> Back         stayed on Reform Risk, jumped to the top
+//   Country Profile Nigeria -> "Reform Risk ->" -> Back   opened INDONESIA's profile (the cold
+//                                                        default), 0px, with nothing saying so
+// and a reload of any verdict dropped the analyst on Home with the lookup empty. On a phone,
+// Back is the swipe -- the one navigation an analyst makes without looking.
+// Now: entering the tab pushes #/reform[/country]; the lookup keeps it on the country shown
+// (replaceState, so checking five countries is still one Back); Back to the entry it came from
+// restores that tab at the scroll it was left at; leaving by a tab button writes the destination
+// its own URL so a reload there does not reopen Reform Risk.
+function _rrIsRoute(h) { return /^#\/reform(\/|$)/.test(h || ''); }
+function _rrHashFor(c) { return '#/reform' + (c ? '/' + toSlug(c) : ''); }
+
+function _rrHistoryOnSwitch(id, fromId, fromBtnId, changed) {
+  if (!changed) return;
+  if (id === 'treformrisk') {
+    if (_rrIsRoute(location.hash)) return;   // arrived BY the route: cold link, reload, Forward
+    var sel = document.getElementById('rr-country-lookup');
+    var tok = String(Date.now()) + ':' + Math.random();
+    var before = location.hash;
+    history.pushState({ rrEntry: tok }, '', _rrHashFor(sel && sel.value));
+    window._rrEntry = { pane: fromId, btnId: fromBtnId, hash: before, token: tok };
+    return;
+  }
+  if (fromId !== 'treformrisk') return;
+  window._rrEntry = null;
+  if (!_rrIsRoute(location.hash)) return;    // destination wrote its own hash, or this was Back
+  if (id === 't7') {
+    // loadCountryProfile() writes #/profile/<slug> itself when it runs -- on a first visit only after
+    // its Indonesia auto-load. Wait for a country rather than pushing a hash-less entry Back would hit.
+    var n = 0;
+    (function fill() {
+      if (window._activeTab !== 't7' || !_rrIsRoute(location.hash)) return;
+      var dd = document.getElementById('dd-country-select');
+      if (dd && dd.value) { history.pushState(null, '', '#/profile/' + toSlug(dd.value)); return; }
+      if (++n < 20) { setTimeout(fill, 150); return; }
+      history.pushState(null, '', location.pathname + location.search);
+    })();
+  } else {
+    history.pushState(null, '', location.pathname + location.search);
+  }
+}
+
+function _rrSyncHash() {
+  if (window._activeTab !== 'treformrisk' || !_rrIsRoute(location.hash)) return;
+  var sel = document.getElementById('rr-country-lookup');
+  var h = _rrHashFor(sel && sel.value);
+  if (location.hash !== h) history.replaceState(history.state, '', h);
+}
+
+// Runs before parseAndNavigate on every hashchange. true = handled.
+function _rrLeaveByHistory() {
+  if (window._activeTab !== 'treformrisk' || _rrIsRoute(location.hash)) return false;
+  var norm = function (h) { return (!h || h === '#' || h === '#/') ? '' : h; };
+  var e = window._rrEntry;
+  if (e && e.pane && norm(location.hash) === norm(e.hash)) {
+    window._rrEntry = null;
+    window._rrReturn = null;
+    _rrRestorePane(e.pane, e.btnId);
+    return true;
+  }
+  // No record of the origin (the page was reloaded on the verdict): a hash-less entry is Home.
+  if (!norm(location.hash)) { switchTab('thome', _tabBtnFor('thome')); return true; }
+  return false;
+}
 
 // The verdict card's headline. Byte-identical to the old one unless a return is armed.
 function _rrVerdictHead(title, mb) {
@@ -42286,6 +42376,7 @@ function renderReformCountryVerdict() {
   var out = document.getElementById('rr-country-verdict');
   var clr = document.getElementById('rr-lookup-clear');
   if (!sel || !out) return;
+  if (typeof _rrSyncHash === 'function') _rrSyncHash();   // v796 (T4): the URL names the country on screen
   var c = sel.value;
   if (!c) {
     out.style.display = 'none';
@@ -43845,6 +43936,14 @@ function parseAndNavigate(hash) {
   } else if (section === 'ioc') {
     var iocBtn = _tabBtnFor('t5');
     if (iocBtn) switchTab('t5', iocBtn);
+  } else if (section === 'reform') {
+    // v796 (T4): #/reform/<country> -- a reloaded, shared or Forward-navigated reform verdict.
+    // Called twice on a cold load (before and after COUNTRY_DATA); fromSlug is null the first time.
+    var rrBtn = _tabBtnFor('treformrisk');
+    if (window._activeTab !== 'treformrisk' && rrBtn) switchTab('treformrisk', rrBtn);
+    var rrC = param ? fromSlug(param) : null;
+    var rrSel = document.getElementById('rr-country-lookup');
+    if (rrC && !(rrSel && rrSel.value === rrC) && typeof _rrSelectWhenReady === 'function') _rrSelectWhenReady(rrC, 75);
   }
 }
 
@@ -44579,7 +44678,10 @@ document.addEventListener('DOMContentLoaded', function(){
     rfCountEl.textContent = '(' + rfCount + ')';
   }
 });
-window.addEventListener('hashchange', function(){ parseAndNavigate(window.location.hash); });
+window.addEventListener('hashchange', function(){
+  if (typeof _rrLeaveByHistory === 'function' && _rrLeaveByHistory()) return;   // v796 (T4)
+  parseAndNavigate(window.location.hash);
+});
 
 // ================================================================
 // v30 — JavaScript DCF Engine (Concession, PSC, TSC)
