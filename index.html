@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v787</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v788</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v787</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v788</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v787</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v788</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -51619,6 +51619,23 @@ function exportFCResults() {
   // A generic row is now unranked and sits below the ranked block, exactly as on screen. Its
   // database take, breakeven and tier are still exported and still citable -- only the claim
   // that it placed 1st is withdrawn.
+  // ── v788 (T5) — the workbook ranks and tiers on the number the screen ranks on ─────────
+  // v675 moved the on-screen # column and tier dividers to the COMPARABLE take, and v777 moved
+  // the "Copy for IC Memo" paste with it. This workbook kept ranking, ordering and tiering on the
+  // published fee-basis blend, and its Methodology sheet told the reader the two orders "agree row
+  // for row". Measured cold at $75 Deepwater, same screen, same moment: 61 of the 65 ranked rows
+  // carried a different Rank in the sheet than in the # column. Iraq read #2 on screen and in the
+  // memo paste, and Rank 63 / Tier "NOC" in the attachment; Ecuador 5 vs 6, South Sudan 11 vs 20,
+  // and every row between them shifted by one or two. An IC reader cross-checking the memo against
+  // its appendix found the two disagreeing on almost every line.
+  // Same helper, same price resolution, same exact-value tie key (toFixed(6)) as the screen.
+  const _xlFeeCache = {};
+  const _xlFeeSt = function(x) {
+    if (_xlFeeCache.hasOwnProperty(x.country)) return _xlFeeCache[x.country];
+    const st = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(_xlCD[x.country] || {}, _xlPP) : null;
+    return (_xlFeeCache[x.country] = (st && st.diverges && st.cmp != null) ? st : null);
+  };
+  const _xlRankTake = function(x) { const st = _xlFeeSt(x); return st ? Number(st.cmp) : _xlDbTake(x); };
   const _xlRankable = function(x) {
     var v = _xlDbTake(x);
     return v != null && !isStateMonopoly(v) && x.termsBasis !== 'default';
@@ -51631,14 +51648,14 @@ function exportFCResults() {
     if (at === 2) return a.country < b.country ? -1 : a.country > b.country ? 1 : 0;
     // Within both the ranked block and the unranked generic block, order on the citable database
     // take. Array.prototype.sort is stable, so equal takes keep the order the screen handed over.
-    var av = _xlDbTake(a), bv = _xlDbTake(b);
+    var av = _xlRankTake(a), bv = _xlRankTake(b);   // v788 (T5): comparable take, as the screen
     if (av == null && bv == null) return 0;
     if (av == null) return 1;
     if (bv == null) return -1;
     return av - bv;
   };
   const _xlSorted = rows.slice().sort(_xlCmp);
-  const _xlVal = function(x) { return _xlRankable(x) ? Number(_xlDbTake(x)).toFixed(6) : null; };
+  const _xlVal = function(x) { return _xlRankable(x) ? Number(_xlRankTake(x)).toFixed(6) : null; };
   const _xlFirst = {};
   const _xlCount = {};
   // v632 (T5): ranked over the pool, so a shortlist workbook carries each country's placing among
@@ -51719,8 +51736,8 @@ function exportFCResults() {
   const _xlFeeAt = {};
   let _xlNFee = 0; const _xlFeeNames = [];
   _xlSorted.forEach(function(r) {
-    const st = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(_xlCD[r.country] || {}, _xlPP) : null;
-    if (st && st.diverges && st.cmp != null) { _xlFeeAt[r.country] = st; _xlNFee++; _xlFeeNames.push(r.country); }
+    const st = _xlFeeSt(r);   // v788: one read point, shared with the rank and the tier
+    if (st) { _xlFeeAt[r.country] = st; _xlNFee++; _xlFeeNames.push(r.country); }
   });
   const _xlAnyFee = _xlNFee > 0;
   // Mechanic names for the blend, read off the same mech_mix the Side-by-Side and Country
@@ -51735,7 +51752,7 @@ function exportFCResults() {
     // contract average) are different figures and sat here unlabelled, up to 57.7pp apart.
     // v529: citable database block FIRST -- an analyst reads left to right and the leftmost
     // numbers are the ones that end up in the memo. The compare-model block follows, labelled.
-    ['Rank (database take @$' + _xlPP + ')', 'Tied_With', 'Country', 'Region', 'Mechanic', 'Terms_Basis', 'R_factor_Tiers',
+    ['Rank (database take @$' + _xlPP + (_xlAnyFee ? ', like-for-like — same as on-screen #)' : ')'), 'Tied_With', 'Country', 'Region', 'Mechanic', 'Terms_Basis', 'R_factor_Tiers',
      _xlSel('GovtTake_50 (database)', 50), _xlSel('GovtTake_75 (database)', 75),
      _xlSel('GovtTake_100 (database)', 100), _xlSel('GovtTake_125 (database)', 125),
      _xlSel('Contractor NPV_50 (database, $M)', 50), _xlSel('Contractor NPV_75 (database, $M)', 75),
@@ -51750,7 +51767,9 @@ function exportFCResults() {
       const _dbTake = _xlDbTake(r);
       // v529: Tier is now graded off the citable database take. Graded off liveTake it read
       // "Inv-Friendly" on all 153 generic-default rows, including the three 100%-take monopolies.
-      const tier = (_dbTake != null && !_mono) ? getTierInfo(_dbTake) : null;
+      // v788 (T5): on a fee-basis row the tier is graded off the comparable take, as the screen's
+      // tier dividers have been since v675. Graded off the blend Iraq exported as "NOC" at 84.8.
+      const tier = (_dbTake != null && !_mono) ? getTierInfo(_xlRankTake(r)) : null;
       // v529: on a GENERIC DEFAULT row these three are the same constant for every country of the
       // mechanic. A constant repeated 153 times is not data, and in a spreadsheet it is worse than
       // absent -- it sorts, it charts, and it averages. Terms_Basis already says why it is empty.
@@ -51821,8 +51840,8 @@ function exportFCResults() {
         + Number(_st.head).toFixed(1) + '% may NOT be ranked or compared against the PSC/Concession rows. '
         + 'Cite the comparable ' + Number(_st.cmp).toFixed(1) + '%'
         + (_st.n1 != null ? ' (this country’s ' + Number(_st.n1).toLocaleString() + ' PSC/Concession contracts)' : '')
-        + '. Where this row carries a Rank and a Tier, both are computed from the published headline so '
-        + 'that the sheet matches the on-screen table — do not read either as a fiscal finding.');
+        + '. Where this row carries a Rank and a Tier, both are computed from the comparable '
+        + Number(_st.cmp).toFixed(1) + '%, exactly as the on-screen # column and tier dividers are.');
     }
   }
   const wb = XLSX.utils.book_new();
@@ -51895,7 +51914,8 @@ function exportFCResults() {
     ['  Also citable: Breakeven and Tier (database take). These are the ORCA contract-database'],
     ['    averages — the same figures the Country Profile "Copy for IC Memo" string, the Screener'],
     ['    CSV and the public API carry.'],
-    ['  Rank and row order are computed from GovtTake_$' + _xlPP + ' (database), ascending.'],
+    ['  Rank and row order are computed from GovtTake_$' + _xlPP + ' (database), ascending'
+      + (_xlAnyFee ? ' — except on the fee-basis rows listed below, which rank on their Comparable take.' : '.')],
     // v622 (T5): the sheet ranked generic-default rows and put them on top; the screen has not
     // ranked them since v563. Say what the rank column now means, in the file that carries it.
     ['  ONLY countries ORCA models on their own fiscal terms are ranked. A GENERIC DEFAULT row'],
@@ -51938,10 +51958,14 @@ function exportFCResults() {
     ['    other country in this sheet\u2019s ranked block except the USA.'],
     ['  The correction is a basis, not a discount, and runs both ways: India publishes 61.9% and its'],
     ['    comparable take is HIGHER, at 63.2%.'],
-    ['  Rank, row order and Tier are computed from the PUBLISHED headline, so that this sheet and the'],
-    ['    on-screen Fiscal Compare table agree row for row. On a fee-basis row that placing and that'],
-    ['    tier are therefore not fiscal findings — the Take comparability column says so in the row'],
-    ['    itself. Re-rank on the Comparable take column before quoting a position for these countries.'],
+    // v788 (T5): this said Rank and Tier were on the published headline "so that this sheet and
+    // the on-screen table agree row for row". The screen had ranked on the comparable take since
+    // v675, so 61 of 65 Ranks disagreed with the # column. Both now use the comparable take.
+    ['  Rank, row order and Tier on these rows are computed from the COMPARABLE take, the same figure'],
+    ['    the on-screen Fiscal Compare # column, its tier dividers and "Copy for IC Memo" rank on, so a'],
+    ['    Rank in this sheet is the # the analyst read on screen.'
+      + (_xlFeeAt['Iraq'] ? ' In this sheet Iraq ranks on ' + Number(_xlFeeAt['Iraq'].cmp).toFixed(1) + '%, not '
+         + Number(_xlFeeAt['Iraq'].head).toFixed(1) + '%.' : '')],
     ['  The published headline is kept because it is the correct all-contract average and is what the'],
     ['    ORCA database and the public JSON API publish. This is the same treatment the Country Profile'],
     ['    IC citation, the Screener and this tab\u2019s "Copy for IC Memo" paste already give it.'],
