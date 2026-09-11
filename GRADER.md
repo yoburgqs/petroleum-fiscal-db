@@ -43695,3 +43695,20 @@ column without retyping ten cells. The memo no longer tells the committee to ign
 
 **Shipped:** petroleum-fiscal-db `d495026` (v777). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, `cmp` OK, byte-identical.
+
+---
+## Cycle 684 Log — 2026-09-10 21:56
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 684: Fiscal Compare's IC-memo paste now reads in the order it says it is ranked (v777)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It was the longest-unrun task; the last cycle was T2.
+
+**Friction:** I opened Fiscal Compare cold, pressed **⎘ Copy for IC Memo** and read the actual clipboard in Chromium. The pasted table started:
+
+```
+#  Country   Govt Take % @$75 — ORCA database (CITABLE)
+1  USA       23.4
+2  Iraq      84.8      34.1 ← cite this
+3  Somalia   3
