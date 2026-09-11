@@ -44433,3 +44433,14 @@ get the screen's order.
 
 **Shipped:** petroleum-fiscal-db `6382840` (v788). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, `cmp` OK, byte-identical.
+
+---
+## Cycle 695 Log — 2026-09-11 07:41
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 695: the Fiscal Compare Excel export now ranks countries the same way the screen does (v788)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn; the last T5 was cycle 684.
+
+**Friction:** The ⬇ Export XLSX button sits next to Copy for IC Memo in Fiscal Compare. It's the file an analyst attaches to the memo, and cycle 684 had left it untested. I opened Fiscal Compare with no saved state and exported the file. The screen ranked Iraq *
