@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v777</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v778</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v777</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v778</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v777</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v778</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28422,25 +28422,55 @@ function renderCompare() {
     // v697 (T3): was `d.take_75 != null`, which counts a state monopoly as a ranked column.
     // With Kuwait in the set this notice said UAE had the lowest take "of the 3 columns"
     // when only 2 carried a take at all. A monopoly is not an entry this comparison ranks.
-    const _rank = selected.filter(d => d.take_75 != null && !isStateMonopoly(d.take_75));
-    const _win = _rank.length ? _rank.reduce((a,b) => (b.take_75 < a.take_75 ? b : a)) : null;
+    // v778 (T3): `_rank` was every non-monopoly column, while the strip above the grid ranks through
+    // _cmpRankTake() -- which drops statutory-only columns whenever the set mixes producers with
+    // proxies (the v626 basis gate). So on a mixed set this notice crowned the very column the strip
+    // had set aside. Egypt / Algeria / Libya: the strip reads "NOTHING RANKS HERE ... Egypt — statutory
+    // terms ... not a rank position", and 1,300px lower this read "The column that wins this
+    // comparison is a proxy. Egypt shows the lowest government take (45.1%) of the 3 ranked columns".
+    // The cold-load North Sea Trio crowned Netherlands under a strip ranking only UK › Norway. 14 of 30
+    // common screening sets did this. Both now rank on one gate; a set-aside proxy that merely PRINTS
+    // the lowest take is named as exactly that, next to the ordering the set does establish.
+    const _rank = selected.filter(d => d && _cmpRankTake(d, 75) != null);
+    const _win = _rank.length ? _rank.reduce((a,b) => (_cmpRankTake(b, 75) < _cmpRankTake(a, 75) ? b : a)) : null;
     const _winProxy = _win && !_cmpDqOf(_win).hasProduction;
+    const _printed = selected.filter(d => d && d.take_75 != null && !isStateMonopoly(d.take_75));
+    const _printLow = _printed.length ? _printed.reduce((a,b) => (b.take_75 < a.take_75 ? b : a)) : null;
+    const _lowAside = !_winProxy && _printLow && !_cmpDqOf(_printLow).hasProduction && _cmpRankTake(_printLow, 75) == null
+      && (!_win || _printLow.take_75 < _cmpRankTake(_win, 75));
     const _backed = selected.filter(d => _cmpDqOf(d).hasProduction);
     const _nm = _cmpProxies.map(d => d.country);
     const _list = _nm.length === 1 ? _nm[0]
       : _nm.slice(0, -1).join(', ') + ' and ' + _nm[_nm.length - 1];
     let msg;
-    if (_winProxy) {
-      const _cmp = _backed.length
-        ? ' The strongest column here is ' + _backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).country
-          + ' — ' + Number(_backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).n_facts || 0).toLocaleString()
-          + ' facts at ' + ((_backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).prod_coverage_pct) || 0).toFixed(1)
-          + '% production coverage.'
-        : '';
+    const _cmp = _backed.length
+      ? ' The strongest column here is ' + _backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).country
+        + ' — ' + Number(_backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).n_facts || 0).toLocaleString()
+        + ' facts at ' + ((_backed.reduce((a,b) => ((b.n_facts||0) > (a.n_facts||0) ? b : a)).prod_coverage_pct) || 0).toFixed(1)
+        + '% production coverage.'
+      : '';
+    if (_lowAside) {
+      const _npvsA = selected.filter(d => d.npv_75 != null);
+      const _leadsNpvA = _npvsA.length > 1 && _npvsA.reduce((a,b) => (b.npv_75 > a.npv_75 ? b : a)).country === _printLow.country;
+      const _order = _vdRanked.length >= 2
+        ? 'The take ordering this set does establish is ' + _vdRanked.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> ' + x.v.toFixed(1) + '%').join(' › ') + ', lowest first.'
+        : (_vdRanked.length === 1
+            ? 'Only <strong style="color:var(--text);">' + _cmpEsc(_vdRanked[0].c) + '</strong> carries a comparable take in this set, so nothing here ranks.'
+            : 'No column in this set carries a comparable take, so nothing here ranks.');
+      msg = '<strong style="color:var(--text);">⚠ The lowest take printed in this grid is a proxy, and it is not a rank position.</strong> '
+        + _cmpEsc(_printLow.country) + ' prints ' + _printLow.take_75.toFixed(1) + '% at $75/bbl'
+        + (_leadsNpvA ? ' and the highest contractor NPV' : '')
+        + ', but ORCA holds no verified field production for it: its take is a simple average across '
+        + (_printLow.n != null ? Number(_printLow.n).toLocaleString() : '?') + ' contracts ('
+        + (_printLow.n_facts != null ? Number(_printLow.n_facts).toLocaleString() : '?')
+        + ' fiscal facts) on statutory terms, and its contractor NPV comes from the standardized deepwater profile, not from its own fields. '
+        + _order + _cmp
+        + ' Do not carry ' + _cmpEsc(_printLow.country) + ' into an IC memo as the lowest-take column; state it as a proxy beside the ordering.';
+    } else if (_winProxy) {
       const _npvs = selected.filter(d => d.npv_75 != null);
       const _leadsNpv = _npvs.length > 1 && _npvs.reduce((a,b) => (b.npv_75 > a.npv_75 ? b : a)).country === _win.country;
       msg = '<strong style="color:var(--text);">⚠ The column that wins this comparison is a proxy.</strong> '
-        + _win.country + ' shows the lowest government take (' + _win.take_75.toFixed(1) + '%) of the '
+        + _win.country + ' shows the lowest government take (' + _cmpRankTake(_win, 75).toFixed(1) + '%) of the '
         + _rank.length + ' ranked column' + (_rank.length === 1 ? '' : 's')
         + (_leadsNpv ? ' and the highest contractor NPV' : '')
         + ' — but ORCA holds no verified field '
