@@ -44775,3 +44775,86 @@ I shipped v793 to petroleum-fiscal-db and pushed it (`4d33ff3`), with the GRADER
 **Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn (last run cycle 694).
 
 **Friction:** I walked it from a cold l
+
+---
+## Cycle 701 Log — 2026-09-11 — T5 (v794)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn
+(last run cycle 695; since then 696 T1, 697 T4, 698 T3, 699 T2, 700 T6).
+
+**Friction:** I walked it cold at 127.0.0.1:8930, 1440x900, with no session or local storage. The path was Country
+Profile → **Copy for IC Memo**, and I read both clipboard flavours in Chromium for Indonesia, Norway, Iraq, Guyana,
+Somalia and the USA. The memo table's **Reform exposure** row printed the reform-frequency score, built in
+`_icReformHead()` from `_icReformLine()`:
+
+    Guyana  Reform exposure   100/100 · 0 sourced law changes since 2010     (rank 1 of 21 — least exposed)
+    USA     Reform exposure   100/100 · 0 sourced law changes since 2010
+    Norway  Reform exposure    70/100 · 2 sourced law changes since 2010
+    Iraq    Reform exposure    85/100 · 1 sourced law change since 2010
+    UK      Reform exposure    25/100 · 5 sourced law changes since 2010     (rank 21 of 21, WACC +3–5pp)
+
+The score is 100 − 15 × fiscal law changes since 2010, so in a row labelled *exposure* it reads backwards. The
+countries with the least exposure paste the maximum, and the most-reformed country pastes a low number. Note 4 opened
+the same way ("Reform exposure: 70/100 reform-frequency score"). Cycle 699 (v792) removed this exact inversion from the
+profile's verdict line on screen, but the table that leaves the tool still carried it. That table reaches committee
+with no tooltip and no page beside it. This was the worst moment in the walk because it gets read wrong silently: nothing
+looks broken, and a memo saying "Guyana, reform exposure 100/100" argues the opposite of the platform's finding. The CP
+XLSX carries no reform row and the one-line IC Citation carries no reform clause, so this table was the only artifact
+affected.
+
+**Change:**
+- `_icReformHead(txt, country)` now reads `_rrClassify()` directly. The cell pastes what v792's screen line shows:
+  the verdict token, the count and the IC-action label. For example:
+  - `NO LAW CHANGE · 0 fiscal law changes since 2010 · nothing in the post-2010 record is a fiscal change`
+  - `WACC +3–5pp · 5 fiscal law changes since 2010 · Actively Reforming`
+  - `SIZE UNKNOWN · 1 fiscal law change since 2010 · terms were rewritten inside the window, size never quantified`
+- It applies v792's substitution of "last take rise pre-dates the 2010 count" for "score is a window artefact".
+- The NOT SCORED / NOT READ cells are unchanged.
+- The note now opens "Reform exposure: <token> — N sourced fiscal law changes since 2010 (reform-frequency score
+  S/100, where 100 means no change since 2010, not the highest exposure; …)". The score stays in the artifact, with its
+  direction written out.
+- Nothing is recomputed and no threshold is added. The only caller is `copyICSummary()`.
+
+**Result:** the pasted row now says what the country's reform record means for the memo. Guyana reads "NO LAW CHANGE",
+the UK and Brazil read "WACC +3–5pp", Russia "TAKE +15pp", and Iraq and Nigeria "SIZE UNKNOWN". An editor who keeps the
+table and cuts the notes can no longer send a backwards exposure figure to committee. The pasted row and the profile's
+verdict line now agree word for word.
+
+| Copy for IC Memo, Reform exposure cell | before (v793) | after (v794) |
+|---|---|---|
+| scored countries whose cell prints a bare `N/100` score | 21 of 21 | **0 of 21** |
+| cell token = on-screen `.cp-reform-cta` token (12 checked across all 8 token types) | 0 of 12 | **12 of 12** |
+| Guyana / UK cell | 100/100 · 0 / 25/100 · 5 | NO LAW CHANGE · 0 / WACC +3–5pp · 5 |
+| unscored countries (164) | NOT SCORED | NOT SCORED (unchanged) |
+
+**Verification (run this cycle, foreground, 127.0.0.1:8930):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. It ran after the edit and again after the version bump.
+- `/tmp/c701/verify.js` covered Guyana, USA, Norway, Indonesia, Iraq, UK, Venezuela, Russia, Libya, Nigeria, Brazil and
+  Somalia. The pasted text/plain cell equals the screen token + count + label in every case. The text/html flavour
+  carries the same cell, and 0 page errors.
+- `/tmp/c701/sweep.js` ran `copyICSummary()` for all 185 countries on the bumped tree: 21 scored countries each paste
+  their own `_rrClassify` token (7 ↑ PRE-2010, 5 SIZE UNKNOWN, 2 TAKE +5pp, 2 WACC +3–5pp, 2 NO LAW CHANGE, 1 TAKE NET
+  +6pp, 1 TAKE NET 0pp, 1 TAKE +15pp). 164 paste NOT SCORED. 0 cells contain `/100`, 0 fall back, 0 page errors.
+- Step 5b, 390x844 `hasTouch`: scrollWidth 390/390 on Guyana, Iraq, UK, Libya and Somalia. Copy for IC Memo renders
+  44px. The paste is identical to desktop. No control was added.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8930/`, ran once on
+  the final bumped tree. Read from its own report `/tmp/c701/rt_v794.txt`: **299 PASS / 0 FAIL / 1 WARN**. The one
+  console error is the localhost `sw.js` 404 recorded since cycle 684.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8930/index.html`, on the final tree, baseline not updated:
+  **PIXEL GATE PASS — no surface got worse than baseline**.
+- STILL LOCKED respected: no tooltip, FAQ, banner, citation-string or FC column change. The v612 mobile layer,
+  `#reference-panel`, the CP headline and tab order are untouched. Version v793 → v794 at the three display sites.
+
+**Deliberately NOT done:**
+- On the same paste, Norway's and the USA's note on fiscal predictability still ends with "All 7,643 [37,222] of this
+  country's contracts price to one statutory term", two sentences after "ORCA's own contract file refutes the one-term
+  basis". `_fpCiteVerdict()`'s one-term branch is fixed for the regime-split case (v783), not for the
+  contract-sample-refuted case. This is the open cycle-691 item, re-confirmed in this walk. It is T5 work.
+- The Screener paste still carries "← cite this" (cycle 684), and the FC XLSX Tier bands still differ from the screen
+  dividers (cycle 695).
+- Copy for IC Memo renders 23px tall with a mouse at 1440. That is desktop, not `pointer: coarse`; it is 44px under
+  touch. Unchanged.
+- The `python -m http.server` processes from earlier cycles are still running. This cycle reused 8930 and started none.
+
+**Shipped:** petroleum-fiscal-db `1d55a88` (v794). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
