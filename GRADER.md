@@ -44565,3 +44565,96 @@ The suite and pixel gate are running in the background against the v791 tree; I'
 
 
 Pixel gate: pixel gat
+
+---
+# Cycle 699: T2, the profile's reform line no longer reads backwards (v792)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn
+(last run about cycle 693); the last cycle was T3.
+
+**Friction:** walked cold in a real browser (clean context, no storage) at 1440 and at 390x844 `hasTouch`: Home →
+Country Profile → Guyana, Tanzania, Norway. The verdict box above the headline is the one block an analyst reads to
+decide whether a country can be defended. Its last line (`_cpReformCta()`, CP render) printed **"Reform risk
+<score>/100"**. That score is the Reform Frequency Score, 100 − 15 × fiscal law changes since 2010, so **100 is the
+fewest changes**. Under the word "risk", every reading inverted:
+
+| country (v791, cold load) | fiscal law changes since 2010 | verdict line said | analyst reads |
+|---|---|---|---|
+| Guyana | 0, rank 1 of 21 | Reform risk 100/100 | maximum reform risk |
+| Libya | 0, pre-2010 rupture | Reform risk 100/100 | maximum reform risk |
+| Norway | 2 | Reform risk 70/100 | less risky than Guyana |
+| United Kingdom | 5, rank 21 of 21, WACC +3–5pp | Reform risk 25/100 | low reform risk |
+
+On Guyana's own screen, three inches down, the headline strip says "Stability ◆◆◆◆◆". Every other surface names the
+number Reform Frequency Score: Side-by-Side, the IC memo copy and the Reform Risk tab. The analyst who opened Guyana
+from the Fiscal Compare row they were screening saw "NO LAW CHANGE" in that row's Stability cell and "Reform risk
+100/100" on the profile. Under a thumb the control was also 13px a line.
+
+**Change:** the line now leads with the verdict token `_rrClassify()` already derives. It is the same token, colour
+and filled WACC pill the Fiscal Compare Stability column prints (v744/v753):
+- Tokens: NO LAW CHANGE, TAKE NET 0pp, WACC +3–5pp, SIZE UNKNOWN, ↑ PRE-2010, and n/c where there is no log.
+- After the token comes the count, "0 fiscal law changes since 2010", which has no direction to misread, then the
+  verdict tail as before.
+- The bare N/100 is off the face. The tooltip keeps it with its formula: "Reform Frequency Score 100/100 (100 − 15 ×
+  fiscal law changes since 2010, so 100 = no change)", then rank.
+- The count uses lining figures. The box is set in an old-style serif where a bare 0 rendered as "o fiscal law
+  changes".
+- Libya's arm label referred to "score", which is no longer shown, so it now reads "last take rise pre-dates the 2010
+  count".
+- New `.cp-reform-cta` rule under `pointer: coarse` only gives the control a 24px minimum box. Desktop is unchanged.
+- Nothing is recomputed, no threshold is added, and the click still opens the Reform Risk verdict.
+
+**Result:** the analyst defending Guyana at $75 reads "NO LAW CHANGE · 0 fiscal law changes since 2010 · nothing in
+the post-2010 record is a fiscal change", and the UK reads "WACC +3–5pp · 5 fiscal law changes since 2010 · Actively
+Reforming". The profile and the screening row they came from now say the same thing. Nobody walks into IC believing
+the most-reformed jurisdiction on file is the low-risk one.
+
+| measured (cold load, final v792 tree) | before (v791) | after (v792) |
+|---|---|---|
+| Guyana line face | Reform risk 100/100 · nothing in the post-2010 record… | NO LAW CHANGE · 0 fiscal law changes since 2010 · nothing in the post-2010 record… |
+| UK line face | Reform risk 25/100 · Actively Reforming | WACC +3–5pp (filled) · 5 fiscal law changes since 2010 · Actively Reforming |
+| token matches FC Stability cell | — | 8 of 8 walked (Guyana, Norway, Tanzania, UK, Indonesia, Libya, Iraq, Angola) |
+| "/100" on the face | 8 of 8 | 0 of 8 |
+| control height, 390 `pointer: coarse` | 13px a line | 44px (56px on the two-line Norway/Indonesia arm) |
+| control height, 1440 mouse | 13px | 12px (unchanged rule) |
+| click → Reform Risk on Guyana → "← Country Profile" | — | opens, returns to scrollY 313 = 313 (390) |
+
+**Verification (run this cycle, foreground, final tree, 127.0.0.1:8930):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Run after the edit and again after the version bump.
+- `/tmp/c699/cta.js` and `/tmp/c699/final.js` at 1440x900 and 390x844 `hasTouch` (`pointer: coarse` true): the rows
+  above, with **0 page errors** at both sizes.
+- Step 5b: scrollWidth 390/390 and 1440/1440. The touched control is 44px under `pointer: coarse`.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8930/`, ran in 196s,
+  read from its own report `/tmp/runtime_test_report.txt` (copy `/tmp/c699/rt_v792.txt`): **299 PASS / 0 FAIL / 1
+  WARN**. The one console error is the localhost `sw.js` 404 recorded since cycle 684.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8930/index.html`, baseline not updated: **PIXEL GATE PASS**.
+  Its remaining small-touch findings are pre-existing and none is this control.
+- STILL LOCKED respected:
+  - No banner, tooltip-only, FAQ or citation change, and no FC column change.
+  - The CP headline two-zone strip, take tier colour, the v612 mobile layer and `#reference-panel` are untouched.
+  - Tab order is unchanged.
+  - The verdict colour logic from v583 (orange for Guyana's exclusion-produced 100) is unchanged.
+
+**Also this cycle — cycle 698's stranded v791 (T3, Side-by-Side fixed column-name strip) verified and committed as
+`9887073`.** Its session exited while its suite ran in the background. That run's report
+(`/tmp/c698/rt_v791.txt`, 14 PASS / 24 FAIL, "browser has been closed") is from a killed run, not a result. The loop's
+own suite (300/0/0) and pixel gate had already run on the v791 tree. Before committing I:
+- Ran the syntax gate: 0 failures.
+- Re-ran cycle 698's `verify.js` against 8930 at 1440 and at 390 `hasTouch`, with the same results at both widths:
+  - The strip shows only while the header is above the fold and the grid is on screen, with names aligned ≤1.8px.
+  - It is hidden at the top of the tab, past the grid end, after a tab switch and in print media.
+  - scrollWidth held (1440/1440, 390/390), and there were 0 page errors.
+- The v792 suite above covers the combined tree.
+
+**Deliberately NOT done:**
+- The verdict box's long WACC/NPV paragraph above this line is still about 384px tall on a phone, pushing the big take
+  figure to y≈1000. It is a separate moment, and reworking it runs into the v371/v373 declutter lock.
+- CP's "← Explorer" drill-back is labelled Explorer on a cold load that never visited Explorer (`_cpBackLabel()`
+  default). It is minor next to an inverted risk reading.
+- The Reform Frequency Score's own name ("frequency 100" also reads as frequent) is unchanged on the Reform Risk tab,
+  Side-by-Side and the IC memo copy. Those surfaces state the formula beside it, which the CP line did not.
+- About a dozen `python -m http.server` processes from earlier cycles (ports 8211–8930) are still running. Not
+  created by this cycle; left alone.
+
+**Shipped:** petroleum-fiscal-db `9887073` (v791, cycle 698 orphan) and `ae66fbf` (v792). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
