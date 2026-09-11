@@ -44858,3 +44858,18 @@ verdict line now agree word for word.
 
 **Shipped:** petroleum-fiscal-db `1d55a88` (v794). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 701 Log — 2026-09-11 12:53
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 701, T5
+
+# Cycle 701: the IC-memo table no longer prints reform exposure backwards (v794)
+
+I shipped v794 to petroleum-fiscal-db and pushed it (`1d55a88`), with the GRADER.md entry as `c27b93e`. The Office mirror copy is identical to `index.html`.
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It was the task longest without a turn (last run in cycle 695).
+
+**Friction:** Starting from a cold lo
