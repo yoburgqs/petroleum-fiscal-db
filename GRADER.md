@@ -45046,3 +45046,18 @@ on Home.
 
 **Shipped:** petroleum-fiscal-db `9eee80f` (v796). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 703 Log — 2026-09-11 14:55
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 703, T4
+
+# Cycle 703: Back from Reform Risk now returns to where you came from (v796)
+
+This is v796, pushed as `9eee80f`, with the GRADER.md entry as `b66ea00`. The Office mirror copy matches `index.html` exactly.
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone the longest without a turn; the last T4 cycle was 697.
+
+**Friction:** On a phone, Back from Reform Risk never returned where t
