@@ -44669,3 +44669,94 @@ own suite (300/0/0) and pixel gate had already run on the v791 tree. Before comm
 **Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn, and the last cycle was T3.
 
 **Friction:** I walked it from a cold load in a real browser, at desktop and phone sizes, opening Guyana, Tanzania and Norway in Country Profile. The verdict box above the headline figures is where an analyst decides whether a country can be defended. Its last line print
+
+---
+## Cycle 700 Log — 2026-09-11 — T6 (v793)
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn
+(last run cycle 694; since then 695 T5, 696 T1, 697 T4, 698 T3, 699 T2).
+
+**Walk:** cold, no storage, 1440x900 and 390x844 `hasTouch` (`pointer: coarse` true), against 127.0.0.1:8930. First pass
+counted source-leading controls per tab (FC 705, CP 38, Explorer 370, SbS 10, IOC 76, Breakeven Map 11), with 0 page
+errors and no page-level sideways scroll at either size. Then I followed a Fiscal Compare number to its source. The
+cold default puts Somalia at #3: model take 53.4%, database take 36.9%, Quality **D**. The analyst's move is to open
+the row. The drilldown (`openFCDrilldown`) is the platform's answer to "where did this come from". It carries the
+grade-D warning, the `Src D · 0% primary law · 246 facts` badge, the `0 of 5 model terms cited →` chip (v679, the only
+control that opens the term-by-term Evidence Chain) and the "Cite the database figure (36.9%)" instruction.
+
+**Friction:** the drawer drew its own source route off the right edge of the table. It is a `colspan` cell inside
+`#tbl-fc`, and `tbody td { white-space: nowrap }` (line 316) is inherited by everything in it, so every sentence ran
+on one line. Auto table layout then widened the table until the longest one fit.
+*Where:* `index.html` `openFCDrilldown` → `newRow.innerHTML = '<td colspan=…>' + html`; the rule at line 316.
+*Measured (Somalia, before):*
+
+| | 1440 (window 1,318px) | 390 touch (window 280px) |
+|---|---|---|
+| `#tbl-fc` width, drawer closed → open | 1,805 → **2,244px** | 1,805 → **2,244px** |
+| drawer width | 2,242px | 2,242px |
+| `Src D` badge left edge | x=1,433 (window ends 1,378) | x=1,266 |
+| `0 of 5 model terms cited →` chip left edge | **x=1,634, off-screen** | **x=1,467, ~5 screens right** |
+| "…Cite the database figure (36.9%)…" sentence | cut by the frame mid-line | cut by the frame |
+
+Opening the row also re-widened every column of the ranked table behind it. An analyst who opened the drawer to ask
+"how solid is this?" saw the waterfall and a price table, but not the grade or the one link to the evidence. Reaching
+them meant swiping the whole 2,244px table sideways, and every sideways scroll moved the drawer's left half out of view.
+
+**Change:**
+- The drawer is pinned at the scroll window's left edge at that window's exact width, and its text wraps.
+  - `#fc-drawer-row > td > .fc-drawer` takes `contain: inline-size; white-space: normal; position: sticky; left: 0`,
+    and its width comes from `--fc-dr-w` (screen only). This is the rule v763 used for the Screener dividers.
+  - The new `_fcFitDrawer()` sets `--fc-dr-w` from the `.tbl-wrap` clientWidth when the drawer opens (the arrow-key
+    step-through re-enters the same path). A `ResizeObserver` keeps it matched on resize and rotation.
+- `.fc-drawer-actions` and the keyboard-hint footer wrap instead of running past the edge.
+- The 4-price table sits in its own `overflow-x: auto` box (`.fc-dd-price-scroll`). On a phone it needs 480px, and
+  once the drawer is pinned, swiping the ranked table can no longer reach its $100/$125 columns. Measured before
+  adding the box: 221px of the table was unreachable.
+- No text, grade, figure, badge, chip, column or tab changed.
+
+**Result:** an analyst who opens a Fiscal Compare row sees the evidence grade, the primary-law share and the "N of M model
+terms cited →" link inside the window, on a desktop and on a phone, without swiping. They are still in view after
+swiping the ranked table fully right. The link opens the Evidence Chain as before, and the "cite the database figure"
+instruction reads as a whole sentence.
+
+| after (v793), 4 countries x 2 sizes | 1440 | 390 touch |
+|---|---|---|
+| `#tbl-fc` width with drawer open / closed | 1,805 / 1,805 | 1,805 / 1,805 |
+| drawer width = window width | 1,318 = 1,318 | 280 = 280 |
+| Src badge and terms chip inside the window, Somalia / USA / Norway / Iraq | 4 / 4 | 4 / 4 |
+| same, after swiping the table to scrollLeft max | 4 / 4 | 4 / 4 |
+| drawer descendants past the drawer edge (outside the price scroller) | 0 | 0 |
+| 4-price table | fits | scrolls in itself, 480 / 238px |
+| chip → Country Profile Evidence Chain in view | yes | yes |
+
+**Verification (run this cycle, foreground, 127.0.0.1:8930):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. It ran after the edit, after the price-table wrap, and
+  after the version bump.
+- `/tmp/c700/verify.js`: the table above, at 1440x900 and 390x844 `hasTouch`, with **0 page errors** at both sizes.
+- Step 5b: scrollWidth 1440/1440 and 390/390, with the drawer open and after the swipe. No control inside the drawer
+  renders under 24px under `pointer: coarse` (the terms chip is 44px). No control was added.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8930/`, read from its
+  own report. It ran twice: pre-bump `/tmp/c700/rt_v793.txt` and on the final bumped tree `/tmp/c700/rt_v793_final.txt`.
+  Both read **299 PASS / 0 FAIL / 1 WARN**. The one console error is the localhost `sw.js` 404 recorded since cycle 684.
+  The suite's own drawer checks (Src badge for Kazakhstan/Norway/Nigeria, grade warning) pass.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8930/index.html`, baseline not updated: **PIXEL GATE PASS**. It
+  ran before the three-string version bump, not after.
+- STILL LOCKED respected:
+  - No banner, tooltip, FAQ or citation change, and no FC column change (the Govt NPV column stays removed).
+  - The v612 mobile layer, its `min-width: max-content` marker and `#reference-panel` are untouched.
+  - The CP headline and tab order are untouched.
+  - Version v792 → v793 at the three display sites.
+
+**Deliberately NOT done:**
+- On a phone the drawer is now 1,865–2,732px tall inside a `.tbl-wrap` capped at `calc(100vh - 150px)`, so it scrolls
+  vertically inside the table box. Before, it was ~850px tall but 2,242px wide. Tall-and-readable is the better trade,
+  but a drawer this long on a phone is its own moment.
+- On a phone, tapping a row opens the drawer at the bottom edge of the viewport (Somalia: drawer top y=826 of 844) and
+  the page does not scroll to it. That predates this cycle and is unchanged.
+- Explorer's table still prints the bundled per-contract-mean IRR (`fmtIrr(irr)`, hidden under 720px). It was flagged by
+  cycle 694 and is still open.
+- About a dozen `python -m http.server` processes from earlier cycles (ports 8211–8940) are still running. This cycle
+  reused 8930 and started none.
+
+**Shipped:** petroleum-fiscal-db `4d33ff3` (v793). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
