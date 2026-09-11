@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v790</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v791</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1826,6 +1826,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   #cmp-chart-png-btn, #cmp-npv-chart-png-btn { display: none !important; }
   /* v503: action buttons under the Side-by-Side grid are screen-only — keep them out of the PDF */
   .cmp-inline-copy-btn, .cmp-inline-print-btn, .cmp-inline-png-btn, .cmp-inline-share-btn { display: none !important; }
+  /* v791: the floating column-name strip is a screen aid — the printed grid carries its own header */
+  #cmp-colbar { display: none !important; }
 
   /* v723 (T3): the evidence-depth rows are collapsed on screen so the Govt Take block is on the
      first paint, but an IC pack PDF must carry the full provenance -- force them open and drop
@@ -2310,7 +2312,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v790</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v791</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2380,7 +2382,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v790</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v791</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -29242,6 +29244,7 @@ function renderCompare() {
   _sbsApplyObsSpread();   // v672 (T3)
   _sbsApplyTermsCited();  // v716 (T6) — must follow, it reads the token _sbsApplyObsSpread bumps
   _sbsScrollHint();       // v712 (T3)
+  try { _sbsColBar(); } catch (e) {}   // v791 (T3)
 }
 
 // ─── v712 (T3): name the columns that are off the right edge ──────────────────────────
@@ -29309,6 +29312,101 @@ function _sbsScrollHint() {
   if (typeof ResizeObserver === 'function') {
     var host = document.getElementById('cmp-output');
     if (host) new ResizeObserver(function () { _sbsScrollHint(); }).observe(host);
+  }
+})();
+
+// ─── v791 (T3): keep the column names on screen while the grid is read ─────────────────────
+// The grid's header row is the only place the country names appear, and it scrolls away with
+// the page. Walked cold on Guyana / Brazil / Namibia: at 1440x900 with the Contractor NPV @$75
+// row mid-screen, none of the three names is in the viewport; at 390x844 the entire screen is
+// the Economics block ($511M / $795M / $1.2B) with no name anywhere on it. The analyst either
+// scrolls back up to the header for every row or reads the columns from memory, on exactly the
+// rows the IC decision turns on. CSS `position: sticky` cannot fix it: .compare-grid is its own
+// overflow box (hidden on a desktop, overflow-x:auto on a phone since v712), so a sticky header
+// would stick to the grid, which never scrolls vertically. This mirrors the header as a fixed
+// strip, shown only while the real header is above the fold and the grid is still on screen,
+// aligned to the columns and following the grid's sideways scroll on a phone. It sits under
+// whatever chrome is pinned (the site header is sticky on a phone), is non-interactive and
+// aria-hidden — the real header stays the accessible one — and does not print.
+function _sbsColBar() {
+  var bar  = document.getElementById('cmp-colbar');
+  var out  = document.getElementById('cmp-output');
+  var grid = out && out.querySelector('.compare-grid');
+  var lbl  = grid && grid.querySelector('.cmp-hdr.row-label');
+  var hdrs = grid ? grid.querySelectorAll('.cmp-hdr[data-cmp-country]') : [];
+  var hide = function () { if (bar) bar.style.display = 'none'; };
+  if (!grid || !lbl || hdrs.length < 2 || !grid.clientWidth || !grid.offsetParent) return hide();
+
+  var top = 0;
+  document.querySelectorAll('.site-header, .tab-nav-wrapper').forEach(function (el) {
+    var pos = getComputedStyle(el).position;
+    if (pos !== 'sticky' && pos !== 'fixed') return;
+    var r = el.getBoundingClientRect();
+    if (r.top <= 1 && r.bottom > top) top = r.bottom;
+  });
+  var g = grid.getBoundingClientRect(), h = lbl.getBoundingClientRect();
+  // Real header still on screen, or the end of the grid is about to pass under the strip.
+  if (h.bottom > top || g.bottom < top + 110) return hide();
+
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'cmp-colbar';
+    bar.setAttribute('aria-hidden', 'true');
+    bar.style.cssText = 'position:fixed;display:none;z-index:990;overflow:hidden;pointer-events:none;'
+      + 'background:var(--surface);border:1px solid var(--border);box-shadow:0 3px 8px rgba(45,38,32,.16);';
+    document.body.appendChild(bar);
+  }
+  var gl = g.left + grid.clientLeft, minW = Infinity;
+  var cols = [].map.call(hdrs, function (c) {
+    var r = c.getBoundingClientRect();
+    if (r.width < minW) minW = r.width;
+    return { name: c.getAttribute('data-cmp-country'), x: Math.round(r.left - gl + grid.scrollLeft), w: Math.round(r.width) };
+  });
+  var narrow = minW < 110;
+  var sig = grid.scrollWidth + '|' + Math.round(h.width) + '|' + cols.map(function (c) { return c.name + '@' + c.x + '+' + c.w; }).join('|');
+  if (bar._sbsSig !== sig) {
+    bar._sbsSig = sig;
+    bar.textContent = '';
+    var track = document.createElement('div');
+    track.style.cssText = 'position:absolute;left:0;top:0;bottom:0;width:' + grid.scrollWidth + 'px;';
+    cols.forEach(function (c) {
+      var cell = document.createElement('div');
+      cell.textContent = c.name;
+      cell.style.cssText = 'position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;'
+        + 'text-align:center;box-sizing:border-box;padding:0 6px;font-weight:700;line-height:1.2;color:var(--text);'
+        + 'font-size:' + (narrow ? 11 : 12) + 'px;left:' + c.x + 'px;width:' + c.w + 'px;';
+      track.appendChild(cell);
+    });
+    var lab = document.createElement('div');
+    lab.textContent = 'Metric';
+    lab.style.cssText = 'position:absolute;left:0;top:0;bottom:0;z-index:1;display:flex;align-items:center;box-sizing:border-box;'
+      + 'padding:0 ' + (narrow ? 8 : 14) + 'px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);'
+      + 'background:var(--surface);border-right:1px solid var(--border);width:' + Math.round(h.width) + 'px;';
+    bar.appendChild(track);
+    bar.appendChild(lab);
+    bar._sbsTrack = track;
+  }
+  bar._sbsTrack.style.transform = 'translateX(' + (-Math.round(grid.scrollLeft)) + 'px)';
+  bar.style.top = Math.round(top) + 'px';
+  bar.style.left = Math.round(gl) + 'px';
+  bar.style.width = grid.clientWidth + 'px';
+  bar.style.height = (narrow ? 42 : 34) + 'px';
+  bar.style.display = 'block';
+}
+(function _sbsBindColBar() {
+  var queued = false;
+  var kick = function () {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; try { _sbsColBar(); } catch (e) {} });
+  };
+  // Capture catches the page scroll and the grid's own sideways scroll with one listener.
+  document.addEventListener('scroll', kick, { capture: true, passive: true });
+  window.addEventListener('resize', kick);
+  // Re-render, tab switch (the pane collapses to 0) and rotation all change #cmp-output's box.
+  if (typeof ResizeObserver === 'function') {
+    var host = document.getElementById('cmp-output');
+    if (host) new ResizeObserver(kick).observe(host);
   }
 })();
 
