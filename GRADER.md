@@ -44087,3 +44087,71 @@ Pushed to origin/main (`662ac9c..aa1d4fc`). The graded suite ran on the final tr
 **Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn.
 
 **Friction:** I walked it cold in a br
+
+---
+## Cycle 692 Log — 2026-09-11 — T3 (v785)
+
+**Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn: the last T3 was
+cycle 685, followed by 686 T4, 687 T6, 688 T1, 689 T2, 690 T5 and 691 T4.
+
+**Friction:** Walked cold in Chromium at 1440x900 with no storage: Side-by-Side, then typed Mexico, Colombia and
+Argentina, pressing Enter after each. The strip above the grid (`#cmp-verdict-fp`) read **"PREDICTABILITY, MOST STABLE
+FIRST: Mexico 51 › Colombia ≤40"**. Directly below it, the grid's Predictability Score row printed **Argentina
+84 · UNGRADED · one term**, the largest number on the row. Argentina was absent from the line that claims to list the
+set most stable first, and nothing on screen said whether it was forgotten, ranked off the end, or ruled out. An
+analyst either writes Argentina as the most stable (the badge's 84) or distrusts the strip.
+
+Cause: `_sbsBoundOrder()` builds the order from two kinds of column only, measured scores and withdrawn ceilings. A
+column on an unrefuted one-term basis, a not-scored column and a state-monopoly column were neither, so they fell out
+with no clause. `_sbsPaintVerdictFp()` never saw them.
+
+Census of 62 sets (4 quickstarts, 14 named screens, 44 regional trios), read right after render and before the spread
+fetches landed: **14 had a column absent from the strip, 7 of them two.** The drop persists once the fetches land:
+Mexico/Colombia/Argentina loses Argentina and Colombia/Peru/Ecuador loses Peru. Also dropped: Canada 80, Denmark 72,
+Australia 73, Russia 75 and Guyana 62 (in the Atlantic Frontier Quartet).
+
+**Change:**
+- The strip now accounts for every column. After the order it prints **"not placed: Argentina 84 (one term,
+  ungraded) — a one-term score skips the take-spread penalty, so it is not on this scale"**.
+- Not-scored columns read "(not scored)" and monopolies read "(no contractor position)".
+- The notice under the grid carries the same clause, so the two cannot disagree.
+- No score is recomputed and no comparison rule is added. A one-term score stays out of the order, as v610/v624
+  already rule (UNGRADED, comparable only within its own cohort); the change is that the strip now says so by name.
+
+**Result:** the analyst reads one line and knows where every country in the set stands on predictability. Two are
+ordered, and one is named as not placeable, with its printed figure and the reason. No column silently vanishes
+from the answer, so nobody can mistake the largest number in the grid for the most stable country.
+
+| | before (v784) | after (v785) |
+|---|---|---|
+| sets with a column absent from the predictability strip | 14 of 62 (read before paint) | 0 of 35 strips shown in 63 sets (read after paint) |
+| Mexico / Colombia / Argentina strip | Mexico 51 › Colombia ≤40 | Mexico 51 › Colombia ≤40 · not placed: Argentina 84 (one term, ungraded) |
+| Colombia / Peru / Ecuador strip | no order — Ecuador ≤41, Colombia ≤40 | same, plus not placed: Peru 76 (one term, ungraded) |
+
+**Verification (all run this cycle, in the foreground, at 127.0.0.1:8920 on the committed tree):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Census re-run after async paint over 63 sets: strip shown on 35, **0** with a set column absent, 0 page errors.
+- Step 5b:
+  - 390x844 `hasTouch` (`pointer: coarse` true), Mexico/Colombia/Argentina and Colombia/Peru/Ecuador: scrollWidth
+    390/390, strip 334px wide with 0 overflowing children, 0 page errors.
+  - 1440x900: 1440/1440 and the strip stays one 24px line.
+  - No control was added; the new content is a text span.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8920/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v785.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and its one
+  console error are the localhost `sw.js` 404 ("A bad HTTP response code (404) was received when fetching the script").
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8920/index.html`, baseline not updated: **PIXEL GATE PASS**.
+- STILL LOCKED respected:
+  - The v612 mobile layer and `#reference-panel` are untouched.
+  - There is no banner, tooltip, FAQ or citation work, no FC column change and no tab-order change.
+  - Version v784 → v785 at the three display sites.
+
+**Deliberately NOT done:**
+- Sets where nothing is withdrawn still show no predictability line at all (v772 design: the strip row appears only
+  once a ceiling exists). A set of only measured and one-term columns therefore has no line to omit anyone from. Left
+  as designed.
+- On a 390 phone the grid's Predictability Score badges clip inside ~87px columns ("72 · UNGRADEI"). This was seen in
+  this cycle's screenshot, predates v785, and was neither measured nor changed.
+- The first commit message said "3 dropped two"; that count was wrong (7). It was corrected by amend before push.
+
+**Shipped:** petroleum-fiscal-db `503afdd` (v785). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
