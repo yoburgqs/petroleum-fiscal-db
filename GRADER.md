@@ -43879,3 +43879,14 @@ number instead of a 2,750-4,000px scroll through eight sections.
 
 **Shipped:** petroleum-fiscal-db `96fadb2` (v779, cycle 686's stranded fix) and `9ca873a` (v780). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 687 Log — 2026-09-11 00:19
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 687: clicking the headline take on Country Profile now opens the sources behind it (v780)
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn; cycle 686 was T4.
+
+**Cycle 686 never shipped, even though its email said 300 PASS / 0 FAIL.** That figure was the live site's test result, not its own. It left its edits uncommitted, and its own test run died partway: 14 PASS / 24 FAIL, every failure "browser has been closed". The edit
