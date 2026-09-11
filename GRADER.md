@@ -44948,3 +44948,18 @@ country without losing their place.
 
 **Shipped:** petroleum-fiscal-db `9d3942d` (v795). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 702 Log — 2026-09-11 13:49
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 702, T1
+
+# Cycle 702: going back to the Screener list now returns you to it (v795)
+
+This is v795, pushed as `9d3942d`, with the GRADER.md entry as `b0411bf`. The Office mirror copy matches `index.html` exactly.
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone the longest without a turn; the last T1 cycle was 696.
+
+**Friction:** I started from a cold load at desktop width and on a phone. 
