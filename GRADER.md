@@ -44254,3 +44254,14 @@ Malaysia on its take and evidence tier and carry the downside as thin (+$46M), n
 
 **Shipped:** petroleum-fiscal-db `d60c232` (v786). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 693 Log — 2026-09-11 05:55
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 693 — T2
+
+# Cycle 693: Malaysia's "fails at $50" warning is gone, because it came from 11 fee-basis contracts (v786)
+
+v786 is pushed to petroleum-fiscal-db as `d60c232`, with the GRADER.md entry as `5f3172f`. The Office mirror copy is identical. I ran the runtime suite on the committed build, and its own report reads **299 PASS / 0 FAIL / 1 WARN**. The WARN is the missing `sw.js` (404), which only happens on localhost. 
