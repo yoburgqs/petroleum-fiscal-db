@@ -43527,3 +43527,93 @@ pushes a tree that holds that cycle's uncommitted edits. Gates run in the foregr
 **Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn; the last four cycles were T5, T3, T4 and T6.
 
 **Friction:** I opened the Screener cold and loaded IOC Capital Screen, which returns 15 countries. Seven of the 22 countries with verified field production were gone
+
+---
+## Cycle 683 — 2026-09-10 — T2, v776: the Country Profile's IRR button models the country, not a template
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn
+(last run 677; since then 678 T5, 679 T3, 680 T4, 681 T6, 682 T1).
+
+**Walk:** cold Chromium, no storage, 1440x900 and 390x844 `hasTouch`. Country Profile → Brazil, then Norway, Angola,
+Guyana, Nigeria. Read the headline, then followed the only IRR path the headline offers.
+
+**Friction:** The CP headline deliberately does not print an IRR, because the bundled per-country IRRs are unusable
+(Brazil `irr_75` = 280.5%). Its IRR cell is a button, **"IRR: → Model in Scenario Builder"**, whose tooltip says
+"pre-filled with Brazil's fiscal terms — mechanic, royalty, CIT, special tax and state equity". On Brazil it opened the
+Scenario Builder on **10% royalty / 25% CIT**, printed **22.2% govt take and a 138.4% IRR**, and carried a yellow
+"No Brazil-specific terms in ORCA — edit the fields before quoting this as Brazil". The Live DCF ~6,000px down the
+same page ran the same template ("119 of the 185 countries share that template"). Brazil's own Key Fiscal Parameters
+table on that page prints **Royalty 14.91% · Income Tax 34%** and says take, NPV and IRR are built from those. An
+analyst testing "attractive at $75" hit a dead end at the one click meant to answer it. They had to scroll to the
+evidence table, copy two rates by hand and re-run.
+Cause: `getDCFParams()` read COUNTRY_DATA only for the PSC family. Census over 185 countries: **117 non-monopoly
+countries on basis `default`, 116 of them Concession, and all 117 carry royalty and/or CIT in their own record.**
+Brazil, Canada (24.8%/27%), Russia (28.5%/24.7%), Mexico, Colombia, Argentina and Oman all printed the identical
+22.2% / $4.3B / 138.4%. This is the "Brazil's Live DCF is a generic template" item cycle 677 left open, found again
+from the IRR button.
+
+**Change:**
+- `getDCFParams(country, mechanic, {record:true})`: for a non-override, non-monopoly Concession country, reads
+  `royalty`, `cit` and `spt` from its COUNTRY_DATA record (new basis `record`, `_recordKeys`). **Opt-in.** Only the
+  two Country Profile what-if surfaces pass it: the IRR button's Scenario Builder pre-fill (`ddOpenScenarioBuilder`)
+  and the Live DCF (`runLiveDCF` / `_ldcfProvenance`). Fiscal Compare's engine sweep, its Quality column and every
+  census count keep their existing basis.
+- **State equity is not read.** `COUNTRY_DATA.state_eq` disagrees with the evidence table: Brazil 30 (the pre-salt
+  PSC Petrobras carry) vs NOT HELD, Oman 60 vs 10. A carried state share moves take more than any other term. It
+  runs at 0% and every surface says so.
+- One wording, `_dcfRecordTerms()`, shared by the Scenario Builder banner, its origin strip, its IC line and the Live
+  DCF scope line. Brazil reads: "Loaded from Brazil's record: royalty 14.9% and CIT 34.0% — this is one project, not
+  Brazil's published take. Special tax and state equity run at 0% — ORCA's Brazil record holds no rate for either of
+  the first two, so if Brazil's regime levies either, the take below is understated." Partial records name the
+  template term too (Namibia: "CIT is the 25.0% template"; UAE — Abu Dhabi: "royalty is the 10.0% template").
+- Form values read from the record keep one decimal (14.9, not 15), so the form matches the strip and the profile.
+- The evidence table's engine-rate checks (`_modelParam`, the NOT HELD substitution rows) read the same basis, so
+  "⚠ DCF USES" would fire if a record rate ever diverged from the printed ORCA Value.
+
+**Result:** An analyst on Brazil clicks the IRR button and gets a project run on Brazil's own royalty and CIT:
+**29.9% take, contractor NPV $3.5B, +$2.3B at a 15% hurdle**. The screen states which two terms are Brazil's and which
+two run at 0%, and the IC line carries the same clause. The Live DCF on the profile shows the same run. They no longer
+have to transcribe rates from the evidence table to test the country, and a template figure shared with 115 other
+countries can no longer be read as Brazil's.
+
+| 116 record-basis Concession countries, $75, Deepwater | before (v775) | after (v776) |
+|---|---|---|
+| Scenario Builder / Live DCF terms | 10% royalty / 25% CIT template on all 116 | country's own royalty/CIT (+ special tax where held) |
+| distinct modelled takes | 1 (22.2%) | per country |
+| median gap, modelled take vs published take | 4.7pp | **1.9pp** (82 of 116 closer) |
+| record rate vs evidence-table ORCA Value | — | 0 disagreements, 0 on NOT HELD rows |
+| Colombia | 22.2% vs published 33.5% | **32.2%** (royalty 12.5 / CIT 35 / special tax 7.5) |
+
+**Verification — run this cycle on the v776 tree at 127.0.0.1:8481, all in the foreground:**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures** (after the last code edit).
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8481/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v776.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the one
+  console error are the known localhost `sw.js` 404, as in cycles 675-682. Three SB-PROVENANCE assertions asserted
+  the old behaviour (Brazil strip "generic Concession default loaded", Brazil IC line "generic default", sweep
+  "default ≥100"). They were rewritten to assert the record basis: the strip must name royalty and CIT and the terms
+  at 0%, and the sweep must give ≥100 record and ≤5 default. The sweep reads **116 record · 1 default · 65 own · 3
+  monopoly**, with 0 strips disagreeing with engine or table across 185.
+- Pixel gate `pixel_audit.js` with `TEST_URL=http://127.0.0.1:8481/`, baseline not updated: **PIXEL GATE PASS**.
+  The first run omitted TEST_URL and silently checked the deployed v775; it was discarded and re-run locally.
+- Browser census via `ddOpenScenarioBuilder`: Brazil, Colombia, Namibia and UAE — Abu Dhabi on record basis with the
+  expected form values. Saudi Arabia stays on the monopoly branch on the generic default. Norway (`country`) and
+  Angola (`db`) are unchanged. 0 page errors.
+- Step 5b: at 390x844 `hasTouch` (`pointer: coarse` true), Brazil CP scrollWidth 390/390, Live DCF 0 elements past
+  the viewport. After the IRR click, 390/390 in the Scenario Builder with the banner at 337x88. The IRR button and
+  the banner close button are 44px tall. At 1440, 1440/1440 on both. 0 page errors at both sizes.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched; CP headline cells (v449/v451/v452)
+  untouched; no tab reorder; no new banner (the existing `#sb-prefill-banner` text branches on basis); no tooltip,
+  FAQ or citation work. Version v775 → v776 at the three display sites.
+
+**Deliberately NOT done:**
+- **Brazil's scenario still sits 25.7pp under its published 55.6%.** The headline weights 348 PSC contracts at 62.7%.
+  Brazil's Participação Especial is not held as a special-tax rate, so the Concession run cannot include it. The
+  strip says the take is understated if the regime levies it; the number is not forced toward the headline.
+- Fiscal Compare's engine NPV column and Quality column still run the generic template for these 116 countries.
+  Moving them changes ranked figures on a different tab and is a separate cycle.
+- PSC-family `db` countries still run the template 25% CIT, because the PSC branch never read `cd.cit` (Angola record
+  49.9%). This was observed in the census, not walked as a T2 friction, and its effect on the evidence table was not
+  measured.
+
+**Shipped:** petroleum-fiscal-db `946ea10` (v776). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
