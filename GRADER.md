@@ -44265,3 +44265,72 @@ Malaysia on its take and evidence tier and carry the downside as thin (+$46M), n
 # Cycle 693: Malaysia's "fails at $50" warning is gone, because it came from 11 fee-basis contracts (v786)
 
 v786 is pushed to petroleum-fiscal-db as `d60c232`, with the GRADER.md entry as `5f3172f`. The Office mirror copy is identical. I ran the runtime suite on the committed build, and its own report reads **299 PASS / 0 FAIL / 1 WARN**. The WARN is the missing `sw.js` (404), which only happens on localhost. 
+
+---
+## Cycle 694 Log — 2026-09-11 — T6 (v787)
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn
+(last run cycle 687; since then 688 T1, 689 T2, 690 T5, 691 T4, 692 T3, 693 T2).
+
+**Walk:** cold, no storage, 1440x900 and 390x844 `hasTouch`. I ran a first pass over Fiscal Compare, Side-by-Side,
+Breakeven Map and IOC Portfolio, counting the controls on each tab that lead to a source. IOC Portfolio had **0**
+such controls. FC, SbS and Breakeven Map each have a route. IOC Portfolio opens on Shell pre-loaded.
+
+**Friction:** the IOC country table's **IRR (%)** column. Shell's top row, its largest exposure, reads
+*USA · 474 contracts · 23.8% · $3.5B · **425.9%***. The cell tooltip (`fmtIrr`) calls it "Contractor IRR at reference
+project parameters". An analyst asking where 425.9% came from has one move, clicking the row, and it lands on a
+Country Profile that reports **no** IRR ("IRR: → Model in Scenario Builder", v516: "the bundled figure is an arithmetic
+mean of per-contract IRRs … not a project return"). Fiscal Compare dropped its IRR column at v525 for the same reason.
+This tab's own exposure annex, further down, also says IRR "is not reported at this level". So the number could not be
+traced, and everywhere the trace led said the number should not exist.
+*Where:* `index.html`, the `tbl` templates in the group roll-up (was line 33597/33617) and the single-entity `loadIOC`
+table (was 33739/33762), both `fmtIrr(r.irr_75)`.
+*Source confirmed:* `IOC_DATA.irr_75` = `AVG(CASE WHEN price_usd_bbl=75 THEN dr.irr_pct END)` per
+operator|country|mechanic (`office/tools/petroleum/build_pfdb_v13.py:71`). It is the same per-contract mean.
+*Scale (census of the 16 Quick brands, before):* 280 rows; **162 read >=100%**, 45 read "n/a*" (>=500%), 8 read
+-100.0%; brand medians run from 64.5% (Harbour) to 253.6% (Santos).
+
+**Change:**
+- The IRR (%) column is removed from both IOC tables. Columns are now Country / Mechanic / Contracts / Govt Take /
+  Evidence / Swing / NPV / Breakeven.
+- Each table's existing grey Note gains one sentence: "IRR is not shown: ORCA's contract IRR is an average of
+  per-contract IRRs, not a project return — open a row, then Model in Scenario Builder."
+- No control added, no tooltip, no banner. Breakeven is left as is, because CP and FC both still report it.
+
+**Result:** the analyst no longer sees a 425.9% IRR attributed to Shell's US book, with no way to defend it. Every
+number left in the IOC table is one the Country Profile it links to also reports, and the tab now says where a
+project IRR comes from.
+
+| | before (v786) | after (v787) |
+|---|---|---|
+| IOC tables with an IRR column (16 Quick brands + single entity) | 16 + 1 | 0 + 0 |
+| Shell row 1 | USA … $3.5B **425.9%** $31 | USA … $3.5B $31 |
+| IOC rows printing IRR >=100% / n/a* / -100% | 162 / 45 / 8 of 280 | 0 |
+| table width on a phone (Shell / Equinor / Kosmos) | 1,076 / 836 / 1,020px | 998 / 765 / 950px |
+
+**Verification (run this cycle, foreground, 127.0.0.1:8922):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**, after the version bump.
+- Census after: 0 of 16 brands render an IRR column. `loadIOC('Equinor Energy AS')` (single-entity path) renders
+  8 columns and the Note.
+- Step 5b: 1440x900 scrollWidth 1440/1440. 390x844 `hasTouch` (`pointer: coarse` true) 390/390, and both Notes
+  have no overflow. No control added or touched. 0 page errors at both sizes.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8922/`, read from
+  its own report `/tmp/rt_v787.txt`: **299 PASS / 0 FAIL / 1 WARN**. The WARN is the localhost `sw.js` 404.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8922/index.html`, baseline not updated: **PIXEL GATE PASS**.
+- STILL LOCKED respected:
+  - The v612 mobile layer and `#reference-panel` are untouched.
+  - The CP headline and FC columns are untouched, with no tab order change.
+  - There is no tooltip, FAQ or citation work.
+  - Version v786 → v787 at the three display sites.
+
+**Deliberately NOT done:**
+- **Explorer's table still prints the same bundled IRR** (`fmtIrr(irr)` at the `expl-sm-off` column, hidden under
+  720px). It is the same defect on a T1 surface. One change per cycle.
+- The IOC Breakeven column was not audited against CP/FC for per-mechanic rows.
+- **Brunei's Concession and PSC rows print identical take / swing / NPV / IRR / breakeven (42.1% · 16.6pp · $1.9B ·
+  $32).** Nigeria PSC and Nigeria "Other" match each other the same way. It looks like a per-mechanic figure copied
+  across rows in `IOC_DATA`. It was not traced this cycle, and it is a data question for the build, not the UX.
+- `fmtIrr`'s tooltip is unchanged; after this cycle its only remaining caller is Explorer.
+
+**Shipped:** petroleum-fiscal-db `7c08892` (v787). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
