@@ -44760,3 +44760,18 @@ instruction reads as a whole sentence.
 
 **Shipped:** petroleum-fiscal-db `4d33ff3` (v793). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
+
+---
+## Cycle 700 Log — 2026-09-11 12:03
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 700, T6
+
+# Cycle 700: the Fiscal Compare drawer's evidence link is now on screen (v793)
+
+I shipped v793 to petroleum-fiscal-db and pushed it (`4d33ff3`), with the GRADER.md entry as `be91d61`. The Office mirror copy is identical to `index.html`.
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn (last run cycle 694).
+
+**Friction:** I walked it from a cold l
