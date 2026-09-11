@@ -44166,3 +44166,91 @@ from the answer, so nobody can mistake the largest number in the grid for the mo
 Pushed to petroleum-fiscal-db as `503afdd` (the change) and `61e3262` (the GRADER.md entry). The runtime suite ran on the final build and read **299 PASS / 0 FAIL / 1 WARN** from its own report. The WARN is the missing `sw.js` (404) that only happens on localhost. The pixel gate passed and the JS syntax check had 0 failures.
 
 **Task:** T3, "How do these three countries compare side by side?" It ha
+
+---
+## Cycle 693 Log — 2026-09-11 — T2 (v786)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn
+(last run cycle 683; since then T5, T3, T6, T1, T5, T4, T3).
+
+**Walk:** cold Chromium with no storage, at 1440x900 and 390x844 `hasTouch`. Country Profile tab, then the country
+select to Malaysia, then Egypt. I read the verdict box, the headline strip and the IC MEMO strip.
+
+**Friction:** Malaysia's verdict box opened with **"Price-dependent entry — contractor NPV $627M @$75 but -$33M at
+$50/bbl: this regime does not survive a price break … Only 2 of 182 non-monopoly regimes in ORCA fail this (Malaysia,
+Yemen), so unlike the take reading it is genuinely discriminating. IC: carry a low-price case."** Every other surface
+agreed with it:
+- the IC MEMO strip said "IC: cite the NPV here";
+- the Downside chip said "fails at $50" in red;
+- the Fiscal Compare drilldown (`openFCDrilldown` `_hurdleNote`) carried the same amber flag.
+
+That is the page's one finding that separates Malaysia from the rest of the database, and it was an artefact. The
+same sentence had already moved take onto the 354 PSC/Concession contracts (58.3%) and named the 11 RSC contracts as
+a structural artefact. Its $50 test still read `d.npv_50`, a blend over all 365 contracts. `dcf_results` prices each
+RSC at **-$2,516M** at $50. On the 354 PSC/Concession contracts alone, contractor NPV at $50 is **+$46M**. An
+analyst would have taken a price-break red flag into IC, built from the contracts
+`~/MECHANIC_COMPARABILITY.md` says may not be compared.
+Cause: `country_data.json` held the Group-1 split at t50/t75/t100/t125 but NPV at v75 only, so no surface could test
+$50 on the comparable basis.
+
+**Change:**
+- **Data.** `tools/add_mech_mix.py` now writes `g1.v50/v100/v125` beside `v75`, from the same query.
+  `country_data.json` was patched additively: 33 keys on the 11 g1 blocks, and every pre-existing field is equal.
+  All 11 g1 blocks were first checked equal to the current `dcf_results`, so the new keys are the same vintage.
+- **`cpDownside50(d)`** returns the PSC/Concession $50 figure for a country that holds fee-basis contracts, where it
+  differs on screen (same rule as `cpFeeBasis().diverges`). The following read it:
+  - `cpFloorBase` pass/fail (r²/slope untouched);
+  - the verdict branch;
+  - the headline Downside chip;
+  - the IC MEMO strip;
+  - the FC drilldown flag.
+- **`cpDownside50Basis()`** prints both figures wherever the switched one appears. Malaysia's verdict now reads
+  "($46M on its 354 PSC/Concession contracts — the all-contract blend reads -$33M because it averages in 11 fee-basis
+  contracts (RSC 11), and that alone flips the sign)". The chip reads "Downside: $46M @$50 (survives $50) · PSC/Conc
+  354 · blend -$33M".
+- The $75 NPV is **not** switched. The headline NPV, the band pill and the band sentence all read `d.npv_75`, and a
+  paragraph quoting two $75 figures would be worse than the defect.
+
+**Result:** the analyst testing Malaysia at $75 is no longer told to put a price-break failure in the memo that
+Malaysia's PSC/Concession terms do not produce. The page says the blend goes negative, and it names the 11 contracts
+that cause it. The "fails a price break" set is now the one country whose own contracts fail. The analyst can defend
+Malaysia on its take and evidence tier and carry the downside as thin (+$46M), not as a failure.
+
+| | before (v785) | after (v786) |
+|---|---|---|
+| regimes the platform says fail at $50 | 2 of 182 (Malaysia, Yemen) | 1 of 182 (Yemen) |
+| Malaysia verdict / IC MEMO / chip | Price-dependent entry / "cite the NPV here" / fails at $50 | moderate tier, clears $50 at +$46M with blend named / progressive-regime line / survives $50 · blend -$33M |
+| CP $50 figure on the comparable basis | 0 of 11 fee-blended countries | 9 (Iraq $389M → $1.4B, Oman $118M → $364M, South Sudan $448M → $833M, Ecuador $1.2B → $871M, …); Azerbaijan, Mexico, Russia unchanged on screen |
+
+**Verification (run this cycle, in the foreground, at 127.0.0.1:8921):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**, re-run after the version bump.
+- 185-profile census: 9 countries switch basis, and Malaysia is the only sign flip. Verdict, chip and IC MEMO agree on
+  all 185, with **0** disagreements and 0 page errors. FC drilldown: Yemen flagged, Malaysia not.
+- Step 5b:
+  - 390x844 `hasTouch` (`pointer: coarse` true): Malaysia and Iraq scrollWidth 390/390, and the chip sits inside
+    14–333px.
+  - 1440x900: 1440/1440.
+  - No control was added (the basis note is a text span with a title).
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8921/`, read from
+  its own report. On the committed v786 tree (`/tmp/rt_v786_final.txt`): **299 PASS / 0 FAIL / 1 WARN**. The WARN and
+  its one console error are the localhost `sw.js` 404. The first launch exited 127 (macOS has no `timeout`) and was
+  re-run.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8921/index.html`, baseline not updated: **PIXEL GATE PASS**.
+- STILL LOCKED respected:
+  - The v612 mobile layer and `#reference-panel` are untouched.
+  - The CP headline take cell (v449/v451/v452) and the NPV cell are untouched.
+  - There is no banner, tooltip, FAQ or citation work and no tab change.
+  - Version v785 → v786 at the three display sites.
+
+**Deliberately NOT done:**
+- **Yemen's -$139M at $50 does not reproduce from the current `dcf_results`.** Its 58 PSCs average +$89M and its 4
+  Concessions +$1,871M at $50, and it holds no fee-basis contracts. The bundled `npv_50` appears to be a
+  survival from an earlier recompute. It is left as published (no `rebuild_country_data.py`), so "1 of 182 (Yemen)" is
+  the platform's figure, not one this cycle verified.
+- The $75 NPV, the NPV band pill and the band rank still read the blend for the 11 fee-blended countries.
+- Other surfaces that read `d.npv_50` (Screener "survives $50" filter, SbS, Home) were not walked and are unchanged.
+- The overnight chain email of 2026-09-11 is harvest `NO-DELTA` (550 records attempted, 0 new facts; the other 6
+  steps OK). That is the exhausted skip-list tension already recorded in ~/CLAUDE.md, not a UX defect.
+
+**Shipped:** petroleum-fiscal-db `d60c232` (v786). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
