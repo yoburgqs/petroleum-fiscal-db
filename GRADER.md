@@ -44074,3 +44074,16 @@ The graded suite above covers v783 too.
 
 **Shipped:** petroleum-fiscal-db `38b04f0` (v783) and `2678412` (v784). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 691 Log — 2026-09-11 04:05
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 691: Reform Risk's big predictability number is now the one you can carry (v784)
+
+Pushed to origin/main (`662ac9c..aa1d4fc`). The graded suite ran on the final tree: **299 PASS / 0 FAIL / 1 WARN**, read from its own report. The WARN is the `sw.js` 404 that only happens on localhost. The pixel gate passed and the JS syntax check had 0 failures.
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn.
+
+**Friction:** I walked it cold in a br
