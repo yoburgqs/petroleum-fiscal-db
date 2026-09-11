@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v773</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v774</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v773</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v774</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v773</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v774</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -48513,16 +48513,44 @@ function openFCDrilldown(country) {
   var _dbSel = _pricePoints[_selIdx][1];
   var _liveT = r.liveTake;
   var _dbIsMonopoly = isStateMonopoly(_dbSel);
-  var _recGap = (_liveT != null && _dbSel != null && !_dbIsMonopoly) ? Math.abs(_liveT - _dbSel) : null;
+  // v774 (T6): the drawer is where a row click lands, and on the 10 fee-basis-blended rows it told
+  // the analyst to cite a different number from the row they clicked. Iraq's cell reads ⚖ 34.1%
+  // and is ranked #2 and tiered investible on it (v675); the Country Profile verdict reads 34.1%
+  // (v552); the IC-memo clipboard and the XLSX head that column "RANK AND CITE ON THIS". The
+  // drawer's verdict said "Cite the database figure (84.8%) — it is what Country Profile, the API
+  // and the XLSX carry", its inline cite read 84.8% across 610 contracts, and ⎘ IC Citation
+  // pasted "Govt Take 84.8% ... contractor NPV $642M". 84.8% blends 415 TSC fee-basis contracts
+  // and MECHANIC_COMPARABILITY forbids comparing it across countries. _citeSel is now the one
+  // figure every cite in this drawer reads, and it is the figure the row is ranked on. The
+  // published blend stays on screen, labelled, as the figure the API and GovtTake_ column publish.
+  var _ddFee = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, String(_fcPricePts[_selIdx])) : null;
+  if (!_ddFee || !_ddFee.diverges) _ddFee = null;
+  var _citeSel = _ddFee ? _ddFee.cmp : _dbSel;
+  var _ddFeeNames = _ddFee ? (d.mech_mix || []).filter(function(x){ return x.g === 2; })
+    .map(function(x){ return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ') : '';
+  var _ddFeeN1 = (_ddFee && _ddFee.n1 != null) ? Number(_ddFee.n1).toLocaleString() : '';
+  // ORCA holds the PSC/Concession NPV split at $75 only (g1.v75) — the same rule CP and SbS use.
+  var _citeNpvSel = _ddFee ? ((_fcPricePts[_selIdx] === 75 && d.g1 && d.g1.v75 != null) ? d.g1.v75 : null) : _pricePoints[_selIdx][2];
+  var _recGap = (_liveT != null && _citeSel != null && !_dbIsMonopoly) ? Math.abs(_liveT - _citeSel) : null;
   var _selCell = function(i) { return i === _selIdx ? 'background:rgba(176,104,0,.09);border-left:2px solid var(--accent);border-right:2px solid var(--accent);' : ''; };
   var _takeCol = function(v) { return v == null ? 'var(--muted)' : v <= 40 ? 'var(--green)' : v <= 60 ? 'var(--yellow)' : v <= 75 ? 'var(--orange)' : 'var(--negative)'; };
   html += '<table style="width:100%;max-width:480px;border-collapse:collapse;margin-bottom:14px;">';
   html += '<thead><tr><th style="'+_pmLblStyle+'"></th>';
   _pricePoints.forEach(function(p, _i){ html += '<th style="'+_pmHdrStyle+_selCell(_i)+(_i===_selIdx?'color:var(--accent);font-weight:800;':'')+'"'+(_i===_selIdx?' title="This is the price selected in the controls above \u2014 the column your header figures correspond to."':'')+'>'+p[0]+'/bbl'+(_i===_selIdx?'<div style="font-size:10px;font-weight:700;letter-spacing:.06em;opacity:.9;">SELECTED</div>':'')+'</th>'; });
   html += '</tr></thead><tbody>';
+  // v774 (T6): fee-basis-blended rows lead with the comparable take, the figure the row was ranked
+  // on, and the published blend follows under its own name — same order as the table cell.
+  if (_ddFee) {
+    html += '<tr><td style="'+_pmLblStyle+'" title="COMPARABLE — ' + country + ' government take on its ' + _ddFeeN1 + ' PSC/Concession contracts alone, fee-basis contracts (' + _ddFeeNames + ') excluded. This is the figure the Fiscal Compare row is ranked and tiered on, the figure the Country Profile verdict reads, and the column the IC-memo clipboard and the XLSX head RANK AND CITE ON THIS.">Take% · <span style="color:var(--green);">⚖ comparable</span></td>';
+    _fcPricePts.forEach(function(pp, _i){ var v = (d.g1 && d.g1['t' + pp] != null) ? d.g1['t' + pp] : null; html += '<td style="'+_pmValStyle+_selCell(_i)+';color:'+_takeCol(v)+';">'+(v!=null?v.toFixed(1)+'%':'—')+'</td>'; });
+    html += '</tr>';
+  }
   // Take% row — v506: named as the database contract average, not just "Take%"
-  html += '<tr><td style="'+_pmLblStyle+'" title="ORCA contract-database average government take for ' + country + ' at each oil price, across ' + d.n + ' contracts. This is the figure behind Country Profile, the public API and the GovtTake_50/75/100/125 columns of the XLSX export. It is NOT the figure in the header strip above — see the row below.">Take% · <span style="color:var(--text);">database</span></td>';
-  _pricePoints.forEach(function(p, _i){ var v=p[1]; html += '<td style="'+_pmValStyle+_selCell(_i)+';color:'+_takeCol(v)+';">'+(v!=null?v.toFixed(1)+'%':'\u2014')+'</td>'; });
+  html += '<tr><td style="'+_pmLblStyle+'" title="' + (_ddFee
+      ? 'PUBLISHED BLEND — ORCA contract-database average across all ' + d.n + ' contracts, including ' + _ddFeeNames + ' fee-basis contracts where the contractor is paid a fixed $/bbl fee and take% is set by the contract structure, not the terms. The public API and the GovtTake_50/75/100/125 XLSX columns publish this figure. It may not be ranked or compared against other countries; cite the comparable row above.'
+      : 'ORCA contract-database average government take for ' + country + ' at each oil price, across ' + d.n + ' contracts. This is the figure behind Country Profile, the public API and the GovtTake_50/75/100/125 columns of the XLSX export. It is NOT the figure in the header strip above — see the row below.')
+    + '">Take% · <span style="color:' + (_ddFee ? 'var(--muted)' : 'var(--text)') + ';">' + (_ddFee ? 'published blend' : 'database') + '</span></td>';
+  _pricePoints.forEach(function(p, _i){ var v=p[1]; html += '<td style="'+_pmValStyle+_selCell(_i)+';color:'+(_ddFee ? 'var(--muted)' : _takeCol(v))+';'+(_ddFee ? 'font-weight:400;' : '')+'">'+(v!=null?v.toFixed(1)+'%':'\u2014')+'</td>'; });
   html += '</tr>';
   // v506: the compare-model take, in the column for the price actually selected, directly
   // beneath the database figure it contradicts. The header take, tier badge and rank all come
@@ -48532,9 +48560,9 @@ function openFCDrilldown(country) {
     if (_i === _selIdx && _liveT != null) {
       var _dTxt = '';
       if (_recGap != null) {
-        var _sign = (_liveT - _dbSel) > 0 ? '+' : '';
+        var _sign = (_liveT - _citeSel) > 0 ? '+' : '';
         var _dCol2 = _recGap < 3 ? 'var(--muted)' : _recGap < 10 ? 'var(--yellow)' : 'var(--negative)';
-        _dTxt = '<div style="font-size:10px;font-weight:700;color:'+_dCol2+';letter-spacing:.02em;">'+_sign+(_liveT-_dbSel).toFixed(1)+'pp vs db</div>';
+        _dTxt = '<div style="font-size:10px;font-weight:700;color:'+_dCol2+';letter-spacing:.02em;">'+_sign+(_liveT-_citeSel).toFixed(1)+'pp vs '+(_ddFee ? '⚖' : 'db')+'</div>';
       }
       html += '<td style="'+_pmValStyle+_selCell(_i)+';color:'+_takeCol(_liveT)+';">'+_liveT.toFixed(1)+'%'+_dTxt+'</td>';
     } else {
@@ -48543,7 +48571,8 @@ function openFCDrilldown(country) {
   });
   html += '</tr>';
   // NPV row
-  html += '<tr style="background:rgba(0,0,0,.03);"><td style="'+_pmLblStyle+'" title="Contractor NPV in $M — discounted at 10% WACC, 100% working interest, pre-financing. Scale by WI% for your equity stake.">NPV ($M)</td>';
+  // v774 (T6): on a fee-basis-blended row the NPV row is the all-contract figure, not the ⚖ comparable basis above it.
+  html += '<tr style="background:rgba(0,0,0,.03);"><td style="'+_pmLblStyle+'" title="Contractor NPV in $M — discounted at 10% WACC, 100% working interest, pre-financing. Scale by WI% for your equity stake.' + (_ddFee ? ' Averaged across all ' + d.n + ' contracts, including the fee-basis contracts; ORCA holds the PSC/Concession-only NPV split at $75 only.' : '') + '">NPV ($M)' + (_ddFee ? ' · <span style="color:var(--muted);">all contracts</span>' : '') + '</td>';
   _pricePoints.forEach(function(p){ var v=p[2]; html += '<td style="'+_pmValStyle+';color:'+(v==null?'var(--muted)':v>0?'var(--green)':'var(--negative)')+';">'+(v!=null?fmtNpvShared(v):'\u2014')+'</td>'; });
   html += '</tr>';
   // v523 (T5): the IRR row that sat here is REMOVED. It read d.irr_50/75/100/125 -- the same
@@ -48575,14 +48604,20 @@ function openFCDrilldown(country) {
   if (_recGap != null) {
     var _vCol = _recGap < 3 ? 'var(--green)' : _recGap < 10 ? 'var(--yellow)' : 'var(--negative)';
     var _vWord = _recGap < 3 ? 'CONSISTENT' : _recGap < 10 ? 'MODEST DIFFERENCE' : 'MATERIAL DIFFERENCE';
-    var _vTail = _recGap < 3
+    // v774 (T6): on a fee-basis-blended row the cite is the comparable take the row is ranked on.
+    var _vTail = _ddFee
+      ? 'Cite the <strong>⚖ comparable</strong> figure (' + _citeSel.toFixed(1) + '%, ' + _ddFeeN1 + ' PSC/Concession contracts) — it is what this row is ranked and tiered on, what the Country Profile verdict reads, and the column Copy for IC Memo and the XLSX head “rank and cite on this”. The published ' + _dbSel.toFixed(1) + '% blends ' + _ddFeeNames + ' fee-basis contracts, where take% is set by the fee structure rather than the terms; the API and the XLSX GovtTake_' + _ddPrice + ' column still publish it, and it may not be compared across countries.'
+        + (_recGap >= 10
+            ? ' <strong>Do not put any two of these figures in one sentence.</strong> The ' + _liveT.toFixed(1) + '% model figure is a single hypothetical ' + _ddProfileName.toLowerCase() + ' project, and the tier badge in the header is derived from it.'
+            : _recGap >= 3 ? ' Quote the ' + _liveT.toFixed(1) + '% model figure only as a ' + _ddProfileName.toLowerCase() + '-project scenario, and say so.' : '')
+      : _recGap < 3
       ? 'The two bases agree. Either figure is defensible; cite the database figure for consistency with Country Profile and the export.'
       : _recGap < 10
         ? 'Cite the <strong>database</strong> figure (' + _dbSel.toFixed(1) + '%) — it is what Country Profile, the API and the XLSX GovtTake_' + _ddPrice + ' column carry. Quote the model figure only as a ' + _ddProfileName.toLowerCase() + '-project scenario, and say so.'
         : '<strong>Do not put both numbers in one sentence.</strong> Cite the <strong>database</strong> figure (' + _dbSel.toFixed(1) + '%) — it is what Country Profile, the API and the XLSX GovtTake_' + _ddPrice + ' column carry. The ' + _liveT.toFixed(1) + '% above is a single hypothetical ' + _ddProfileName.toLowerCase() + ' project' + (r.termsBasis === 'default' ? ' on generic ' + r.mechanic + ' terms' : '') + ', and the tier badge and rank beside it are derived from it — not from the database.';
     html += '<div style="max-width:480px;font-size:11px;line-height:1.55;color:var(--text);margin:-6px 0 12px;padding:6px 9px;border-left:3px solid ' + _vCol + ';background:rgba(0,0,0,.02);">'
       + '<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:800;color:' + _vCol + ';font-size:10px;letter-spacing:.04em;">' + _vWord + ' · ' + _recGap.toFixed(1) + 'pp</span> '
-      + 'at $' + _ddPrice + '/bbl between the two rows above. ' + _vTail + '</div>';
+      + 'at $' + _ddPrice + '/bbl between ' + (_ddFee ? 'the model row and the ⚖ comparable row' : 'the two rows above') + '. ' + _vTail + '</div>';
   } else if (_dbIsMonopoly) {
     html += '<div style="max-width:480px;font-size:11px;line-height:1.55;color:var(--muted);margin:-6px 0 12px;padding:6px 9px;border-left:3px solid var(--muted);background:rgba(0,0,0,.02);">'
       + '<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:800;font-size:10px;letter-spacing:.04em;">NOT COMPARABLE</span> '
@@ -48603,25 +48638,34 @@ function openFCDrilldown(country) {
     // pasted IC table -- Cyprus pasted "-100.0%" beside a $2.4B NPV at the same price. Same
     // removal Country Profile's "Copy as IC table" took at v516; this button is the Fiscal
     // Compare twin of it and was missed.
-    var _tsvRows = [_contextHeader, 'Price\tGovt Take% (database)\t\u0394 vs $50\tContractor NPV ($M)\tBreakeven ($/bbl)'];
-    var _take50b = d.take_50;
+    // v774 (T6): on a fee-basis-blended row the pasted table leads with the comparable take \u2014 the
+    // figure the row is ranked on \u2014 and names the blend as the published figure beside it.
+    var _tsvRows = [_contextHeader, _ddFee
+      ? 'Price\tComparable take% (' + _ddFeeN1 + ' PSC/Concession contracts) \u2014 CITE THIS\tPublished take% (all ' + d.n + ' contracts, blends ' + _ddFeeNames + ' fee-basis \u2014 not comparable across countries)\t\u0394 vs $50 (comparable)\tContractor NPV ($M, all contracts)\tBreakeven ($/bbl)'
+      : 'Price\tGovt Take% (database)\t\u0394 vs $50\tContractor NPV ($M)\tBreakeven ($/bbl)'];
+    var _take50b = _ddFee ? (d.g1 ? d.g1.t50 : null) : d.take_50;
     var _be75 = d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '\u2014';
-    [['$50',d.take_50,d.npv_50,'\u2014'],['$75',d.take_75,d.npv_75,_be75],['$100',d.take_100,d.npv_100,'\u2014'],['$125',d.take_125,d.npv_125,'\u2014']].forEach(function(p){
+    [['$50',d.take_50,d.npv_50,'\u2014',50],['$75',d.take_75,d.npv_75,_be75,75],['$100',d.take_100,d.npv_100,'\u2014',100],['$125',d.take_125,d.npv_125,'\u2014',125]].forEach(function(p){
       var priceStr = p[0];
-      var takeStr = p[1]!=null ? p[1].toFixed(1)+'%' : '\u2014';
-      var delta = (p[1]!=null && _take50b!=null) ? (p[1]-_take50b) : null;
+      var _cmpV = (_ddFee && d.g1 && d.g1['t' + p[4]] != null) ? d.g1['t' + p[4]] : null;
+      var _lead = _ddFee ? _cmpV : p[1];
+      var takeStr = _lead!=null ? _lead.toFixed(1)+'%' : '\u2014';
+      var delta = (_lead!=null && _take50b!=null) ? (_lead-_take50b) : null;
       var deltaStr = delta===null ? '\u2014' : delta===0 ? '0.0pp' : (delta>0?'+':'')+delta.toFixed(1)+'pp';
       var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '\u2014';
-      _tsvRows.push(priceStr+'\t'+takeStr+'\t'+deltaStr+'\t'+npvStr+'\t'+p[3]);
+      _tsvRows.push(priceStr+'\t'+takeStr+'\t'+(_ddFee ? (p[1]!=null ? p[1].toFixed(1)+'%' : '\u2014')+'\t' : '')+deltaStr+'\t'+npvStr+'\t'+p[3]);
     });
+    if (_ddFee && d.g1 && d.g1.v75 != null) _tsvRows.push('Contractor NPV on the ' + _ddFeeN1 + ' PSC/Concession contracts alone @ $75/bbl: ' + fmtNpvShared(d.g1.v75) + ' (ORCA holds this split at $75 only).');
     if (_liveT != null) {
       _tsvRows.push('');
       _tsvRows.push('Compare model (' + _profileLabel + ' profile @ $' + _ddPrice + '/bbl, '
         + (r.termsBasis === 'default' ? 'generic ' + r.mechanic + ' default terms \u2014 directional only, not citable'
            : r.termsBasis === 'country' ? country + ' country-specific terms' : 'ORCA contract-database terms')
         + ')\tGovt Take% ' + _liveT.toFixed(1) + '%'
-        + (_recGap != null ? '\t' + ((_liveT - _dbSel) > 0 ? '+' : '') + (_liveT - _dbSel).toFixed(1) + 'pp vs database' : ''));
-      if (_recGap != null && _recGap >= 10) _tsvRows.push('NOTE: the two bases differ by ' + _recGap.toFixed(1) + 'pp at $' + _ddPrice + '/bbl. Cite the database figure; do not quote both as one number.');
+        + (_recGap != null ? '\t' + ((_liveT - _citeSel) > 0 ? '+' : '') + (_liveT - _citeSel).toFixed(1) + 'pp vs ' + (_ddFee ? 'comparable' : 'database') : ''));
+      if (_recGap != null && _recGap >= 10) _tsvRows.push(_ddFee
+        ? 'NOTE: the model and the comparable take differ by ' + _recGap.toFixed(1) + 'pp at $' + _ddPrice + '/bbl. Cite the comparable figure; the published blend and the model are not comparable across countries. Do not quote any two as one number.'
+        : 'NOTE: the two bases differ by ' + _recGap.toFixed(1) + 'pp at $' + _ddPrice + '/bbl. Cite the database figure; do not quote both as one number.');
     }
     // v523: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page
     // -- the same rule v516 applied to the Country Profile TSV.
@@ -48789,8 +48833,9 @@ function openFCDrilldown(country) {
         // the FC Stability column and v544 removed from the Country Profile reform context.
         // The cite is now built on ONE basis, the one the verdict prescribes.
         var _citeExactPrice = _fcPricePts.indexOf(_ddPrice) >= 0;
-        var _citeTake = (!_dbIsMonopoly && _dbSel != null && _citeExactPrice) ? _dbSel : null;
-        var _citeNPV  = _citeExactPrice ? _pricePoints[_selIdx][2] : null;
+        // v774 (T6): _citeSel / _citeNpvSel — the comparable basis on a fee-basis-blended row.
+        var _citeTake = (!_dbIsMonopoly && _citeSel != null && _citeExactPrice) ? _citeSel : null;
+        var _citeNPV  = _citeExactPrice ? _citeNpvSel : null;
         var _citeVer  = (typeof _orcaVerNow === 'function') ? _orcaVerNow() : '';
         var _aShare   = (d.a_pct != null) ? d.a_pct : null;
         var _bulkSh   = (typeof _bulkPct === 'function') ? _bulkPct(d) : 0;
@@ -48800,7 +48845,10 @@ function openFCDrilldown(country) {
             + '% government take @$' + _ddPrice + '/bbl'
             + (_citeNPV != null ? ' · contractor NPV ' + fmtNpvShared(_citeNPV) : '')
             + (d && d.be_75 && d.be_75 > 0 && d.be_75 < 999 ? ' · breakeven $' + d.be_75.toFixed(0) + '/bbl' : '')
-            + ', ORCA contract-database average across ' + (d.n || 0) + ' contracts, ' + _ddProfileName
+            + (_ddFee
+                ? ', ORCA comparable take across ' + _ddFeeN1 + ' PSC/Concession contracts (the published ' + _dbSel.toFixed(1)
+                  + '% across all ' + (d.n || 0) + ' blends ' + _ddFeeNames + ' fee-basis contracts and is not comparable across countries), '
+                : ', ORCA contract-database average across ' + (d.n || 0) + ' contracts, ') + _ddProfileName
             + ' profile, 10% WACC, 100% WI (ORCA ' + _citeVer + ')</strong>.”'
             + (_recGap != null && _recGap >= 3
                 ? ' <span style="color:var(--negative);font-weight:600;">The ' + _liveT.toFixed(1)
@@ -48921,7 +48969,17 @@ function openFCDrilldown(country) {
     var _cBe = (d.be_75 != null && d.be_75 > 0 && d.be_75 < 999) ? '$' + d.be_75.toFixed(0) + '/bbl' : 'not available';
     var _cN = d.n ? ', n=' + d.n.toLocaleString() + ' contracts' : '';
     var _lines = [];
-    if (_dbSel != null) {
+    // v774 (T6): a fee-basis-blended row pastes the comparable take it is ranked on, and the
+    // published blend follows on its own line, named as not comparable.
+    if (_ddFee && _citeSel != null) {
+      _lines.push(country + ': Govt Take ' + _citeSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
+        + ' (ORCA comparable take, n=' + _ddFeeN1 + ' PSC/Concession contracts; ' + _ddFeeNames + ' fee-basis contracts excluded)'
+        + (_citeNpvSel != null ? ', contractor NPV ' + fmtNpvShared(_citeNpvSel) + ' @$' + _ddPrice + ' on those contracts' : '')
+        + ' — ' + _ddProfileName + ' profile, 10% WACC, 100% WI.');
+      _lines.push('Published all-contract figure, not comparable across countries: Govt Take ' + _dbSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
+        + _cN + ', contractor NPV ' + (_dbNpv != null ? fmtNpvShared(_dbNpv) : 'n/a')
+        + ' — it blends fee-basis contracts where take% is set by the fee structure, not the terms. Do not quote it with the figure above in one sentence.');
+    } else if (_dbSel != null) {
       _lines.push(country + ': Govt Take ' + _dbSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
         + ' (ORCA contract-database average' + _cN + ')'
         + ', contractor NPV ' + (_dbNpv != null ? fmtNpvShared(_dbNpv) + ' @$' + _ddPrice : 'n/a')
@@ -48950,7 +49008,7 @@ function openFCDrilldown(country) {
       _lines.push('Model cross-check (not citable): a single hypothetical ' + _ddProfileName.toLowerCase() + ' project'
         + (r.termsBasis === 'default' ? ' on generic ' + r.mechanic + ' terms' : r.termsBasis === 'country' ? ' on ' + country + ' country-specific terms' : ' on ORCA contract-database terms')
         + ' returns ' + _liveT.toFixed(1) + '% take'
-        + (_recGap != null ? ' (' + ((_liveT - _dbSel) > 0 ? '+' : '') + (_liveT - _dbSel).toFixed(1) + 'pp vs database, ' + (_recGap < 3 ? 'consistent' : _recGap < 10 ? 'modest difference' : 'MATERIAL difference') + ')' : '')
+        + (_recGap != null ? ' (' + ((_liveT - _citeSel) > 0 ? '+' : '') + (_liveT - _citeSel).toFixed(1) + 'pp vs ' + (_ddFee ? 'comparable' : 'database') + ', ' + (_recGap < 3 ? 'consistent' : _recGap < 10 ? 'modest difference' : 'MATERIAL difference') + ')' : '')
         + '. Quote as a scenario only, in its own sentence.');
     }
     _lines.push('Source: ORCA Petroleum Fiscal Intelligence Platform ' + _citeVer + ' — yoburgqs.github.io/petroleum-fiscal-db/ (retrieved ' + _citeDate + ').');
