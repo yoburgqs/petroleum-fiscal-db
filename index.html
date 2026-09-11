@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v794</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v795</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2324,7 +2324,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v794</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v795</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2341,7 +2341,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
   <!-- v277 Issue 6: Explorer promoted to primary nav — tab-btn-texplorer now visible. Tab before Screener so test harness still finds it first (browse-mode). -->
   <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Browse all 185 countries in map and table views">Explorer</button>
-  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" aria-label="Screener — filter all 185 countries by take, IRR, NPV, breakeven, mechanic, and region" onclick="switchTab('texplorer',this);setTimeout(function(){if(typeof switchExplorerMode==='function')switchExplorerMode('screen');},50);" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region — opens in Screener mode">Screener</button>
+  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" aria-label="Screener — filter all 185 countries by take, IRR, NPV, breakeven, mechanic, and region" onclick="_scTabEnter(this);" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region — opens in Screener mode">Screener</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 5 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" onclick="switchTab('tbreakevenmap',this)" title="Interactive world map of oil price breakeven by country">Breakeven Map</button>
@@ -2394,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v794</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v795</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32325,7 +32325,7 @@ function runScreener() {
     // re-sort and a price-deck change. The tick cell stops propagation so ticking a row
     // does not also navigate to that country's profile.
     const attrName = d.country.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-    return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
+    return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="_scNoteDrill(this);openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
@@ -43795,6 +43795,15 @@ function parseAndNavigate(hash) {
       if (cmpBtn) switchTab('t0', cmpBtn);
     }
   } else if (section === 'explorer') {
+    // v795 (T1): every forward write of #/explorer is a pushState, which fires no hashchange, so a
+    // bare #/explorer arriving here from another pane is Back/Forward. Return to the Explorer as it
+    // was left — the Screener shortlist, at the row that was opened — not a fresh Browse table.
+    // A cold load has no leave record and a filter link carries ?params, so both keep the old path.
+    if (!param && hash.indexOf('?') === -1 && window._activeTab !== 'texplorer'
+        && window._paneLeave && window._paneLeave.texplorer && typeof _cpBackToList === 'function') {
+      _cpBackToList();
+      return;
+    }
     var exBtn = _tabBtnFor('texplorer');
     if (exBtn) switchTab('texplorer', exBtn);
     if (param === 'rfactor') {
@@ -49926,14 +49935,58 @@ function _cpBackLabel() {
   var l = (window._paneLeave || {}).texplorer;
   return (l && l.mode === 'screen') ? '← Screener' : '← Explorer';
 }
+// v795 (T1): the round trip only worked from the button. Walked cold: Home -> "open the screen" ->
+// IOC Capital Screen (15 rows) -> Mexico (row 4) -> Country Profile. From there the three ways back:
+//   browser Back / phone swipe  #/explorer -> parseAndNavigate -> switchTab -> BROWSE mode, y=0: the
+//                               15-row shortlist replaced by the unfiltered 185-row table (1440 and 390)
+//   the Screener tab            the list survives, but at y=0: first row at 841 of 900 at 1440 and
+//                               2,158px below the tab bar on a phone, behind every slider
+//   "← Screener" (this button)  correct, but it renders at y=834 at 1440 and y=1,767 on a phone
+// Vetting a 15-country screen is 15 of these trips. Back and the tab now come through here, and the
+// landing is keyed on the row that was opened rather than a bare offset, so it still holds if the
+// table re-ran in between. The row flashes once so the analyst can see which one they had open.
+function _scNoteDrill(tr) {
+  try {
+    window._scDrill = { country: tr.getAttribute('data-country'), top: Math.round(tr.getBoundingClientRect().top) };
+  } catch (e) { window._scDrill = null; }
+}
 function _cpBackToList() {
   var l = (window._paneLeave || {}).texplorer;
   var screen = !!(l && l.mode === 'screen');
   switchTab('texplorer', document.getElementById(screen ? 'tab-btn-tscreener' : 'tab-btn-texplorer'));
   if (screen) switchExplorerMode('screen', document.getElementById('mode-btn-screen'));
   var y = l ? l.y : 0;
+  var drill = screen ? window._scDrill : null;
+  if (!(y > 0) && !drill) return;
   // Screen mode re-runs the Screener 150ms after activation; restore once that table is back.
-  if (y > 0) setTimeout(function () { if (window._activeTab === 'texplorer') window.scrollTo(0, y); }, screen ? 350 : 150);
+  setTimeout(function () {
+    if (window._activeTab !== 'texplorer') return;
+    var row = null;
+    if (drill && drill.country) {
+      row = Array.prototype.find.call(document.querySelectorAll('#tbody-screener tr[data-country]'),
+        function (r) { return r.getAttribute('data-country') === drill.country; }) || null;
+    }
+    if (!row || row.offsetParent === null) { if (y > 0) window.scrollTo(0, y); return; }
+    var cover = 0;
+    ['.site-header', '.tab-nav-wrapper'].forEach(function (sel) {
+      var el = document.querySelector(sel);
+      if (!el) return;
+      var cs = getComputedStyle(el);
+      if (cs.position === 'sticky' || cs.position === 'fixed') cover = Math.max(cover, (parseFloat(cs.top) || 0) + el.offsetHeight);
+    });
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var want = Math.min(Math.max(drill.top, cover + 8), Math.max(cover + 8, vh - row.offsetHeight - 8));
+    window.scrollTo(0, Math.max(0, row.getBoundingClientRect().top + window.pageYOffset - want));
+    row.classList.remove('search-highlight'); void row.offsetWidth; row.classList.add('search-highlight');
+    setTimeout(function () { row.classList.remove('search-highlight'); }, 2100);
+  }, screen ? 350 : 150);
+}
+// v795: the Screener tab after a drill from the shortlist is the same return trip as the button.
+function _scTabEnter(btn) {
+  var l = (window._paneLeave || {}).texplorer;
+  if (window._activeTab !== 'texplorer' && l && l.mode === 'screen' && window._scDrill) { _cpBackToList(); return; }
+  switchTab('texplorer', btn);
+  setTimeout(function () { if (typeof switchExplorerMode === 'function') switchExplorerMode('screen'); }, 50);
 }
 
 // v313: FC nav bar — step through ranked FC list from Country Profile
