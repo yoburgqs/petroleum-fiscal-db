@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v797</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v798</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -509,6 +509,11 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .cp-spread-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; margin-left: 8px; white-space: nowrap; }
 /* v792 (T2): the CP verdict reform control is inline text that wraps — 13px a line under a thumb */
 @media (pointer: coarse) { .cp-reform-cta { display: inline-block; min-height: 24px; padding: 4px 0; line-height: 1.4; } }
+/* v798 (T2): the CP verdict's band reasoning sits behind this toggle (_cpWhyToggle). */
+.cp-why-btn { background: transparent; border: 1px solid rgba(176,104,0,.35); border-radius: 10px; color: var(--accent); font-family: inherit; font-size: 10px; font-weight: 700; line-height: 1.5; padding: 0 7px; margin-left: 4px; cursor: pointer; white-space: nowrap; vertical-align: baseline; }
+.cp-why-body { display: block; margin: 4px 0 2px; padding-left: 8px; border-left: 2px solid var(--border); color: var(--muted); }
+.cp-why-body[hidden] { display: none; }
+@media (pointer: coarse) { .cp-why-btn { min-height: 24px; padding: 2px 9px; } }
 /* v29: DD price curve */
 .dd-price-chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; height: 200px; position: relative; }
 /* ── v26: stability bar + 2-col layout + MC badge ── */
@@ -2324,7 +2329,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v797</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v798</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2394,7 +2399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v797</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v798</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -36619,6 +36624,16 @@ function cpBandNpvNote(d, b) {
     + '. In this band the NPV genuinely restates the take and adds nothing to it.';
 }
 window.cpBandNpvNote = cpBandNpvNote;
+// v798 (T2): opens and closes cpBandNpvNote() under the Country Profile verdict.
+function _cpWhyToggle(btn) {
+  var body = btn && btn.nextElementSibling;
+  if (!body) return;
+  var open = body.hasAttribute('hidden');
+  if (open) body.removeAttribute('hidden'); else body.setAttribute('hidden', '');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  btn.textContent = btn.getAttribute('data-label') + (open ? ' \u2039' : ' \u203a');
+}
+window._cpWhyToggle = _cpWhyToggle;
 
 // v636 (T2) — the reconciliation note above was the page's one instruction for defending the
 // profit-oil split, and it quoted a number that is not printed anywhere on the page. It tested
@@ -37255,14 +37270,29 @@ function loadCountryProfile(country) {
           + ', and carry that NPV position separately \u2014 they are two findings, not one.</strong>'
         : '. <strong>Defend on the take and its evidence tier' + _nClause734
           + ', not on the NPV.</strong>';
+      // ── v798 (T2): the "one-line IC read" was 215–304 words ─────────────────────────────
+      // Walked cold at 390x844 touch. The verdict box ran 397–520px tall (Indonesia 241 words,
+      // Iraq 304), and the headline take landed at y=1,006–1,170, contractor NPV at 1,208–1,505.
+      // About 110 of those words were cpBandNpvNote() -- the band window, r², and why take% and a
+      // discounted NPV diverge -- set in the middle of the sentence, ahead of the conclusion it
+      // supports ("carries the 2nd-lowest contractor NPV of the 33 ... two findings, not one").
+      // The analyst had to read the method to reach the answer. The rank and the instruction stay
+      // in the sentence; the method is one tap away, right after the instruction it justifies.
+      // Where no band resolves, the short all-country clause stays inline as before.
+      var _whyLbl798 = _bandCarries734 ? 'Why two findings' : 'Why not the NPV';
+      var _why798 = _band734
+        ? ' <button type="button" class="cp-why-btn" aria-expanded="false" data-label="' + _whyLbl798
+          + '" onclick="event.stopPropagation();_cpWhyToggle(this)">' + _whyLbl798 + ' \u203a</button>'
+          + '<span class="cp-why-body" hidden>' + cpBandNpvNote(d, _band734) + '</span>'
+        : '';
       msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
           + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(npv)
           + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
-          + _baseClause589 + _dependClause589
+          + _baseClause589 + (_band734 ? '' : _dependClause589)
           // The contract count travels with the instruction, so "defend on the take" is
           // self-calibrating: Norway reads n=7,643, Vanuatu reads n=7. Same figure the
           // headline strip already prints as a chip; no new threshold, no new judgement.
-          + _defendInstr734 + beStr
+          + _defendInstr734 + _why798 + beStr
           // v715 (T2): the dispersion of the take this sentence just told the analyst to defend on.
           // Wrapper is always emitted so _cpApplyObsSpread() can fill it when the contract sample
           // lands after render; cpDefendDispersion() returns '' where the take really is one term.
