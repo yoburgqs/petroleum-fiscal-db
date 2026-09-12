@@ -47263,3 +47263,16 @@ never committed: 2-decimal contractor NPV formatting in the $1–10B range, acro
 It was present when every gate above ran, so it is what was verified, and it ships in
 `6e18527`. **A prior cycle bumped no version string and pushed nothing — worth a look at why.**
 This cycle therefore took **v817**, not v816, so the two are not conflated.
+
+---
+## Cycle 725 Log — 2026-09-12 14:33
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 724 complete — shipped **v817**, pushed to `main` (`6e18527` + `52b9412`), mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation (T3 last ran at v810, seven cycles ago). Last cycle was T5, not repeated.
+
+## Friction
+Walked Side-by-Side cold at 1440 and 390. The tab seeds an example set, so the first thing an analyst with their own countries in mind does is press **Clear** — landing on the empty state: *"Search above or start with a stand
