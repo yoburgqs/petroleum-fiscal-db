@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v807</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v808</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v807</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v808</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v807</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v808</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2849,7 +2849,7 @@ window._orcaStampCitations = function() {
 window.copyPlatformCitation = function(btn) {
   var el = document.getElementById('cite-text');
   var s = el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '';
-  if (!s) { if (typeof showCopyToast === 'function') showCopyToast('Citation unavailable — reload the page.'); return; }
+  if (!s) { if (typeof _icRefuse === 'function') _icRefuse('Citation unavailable — reload the page.'); return; }
   navigator.clipboard.writeText(s).then(function() {
     btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = 'Copy Citation'; }, 2000);
   }).catch(function() {
@@ -33182,7 +33182,7 @@ window._scEmptyMsg = _scEmptyMsg;
 
 function exportScreenerCSV() {
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast(_scEmptyMsg('export')); return; }
+  if (!rows.length) { _icRefuse(_scEmptyMsg('export')); return; }
   var hdr = Object.keys(rows[0]);
   // v517 — this CSV was malformed for 75 of the 185 countries. Mechanics is a comma-joined
   // string ("Concession,PSC") and the row was emitted with a bare r.join(','), so every column
@@ -33288,7 +33288,7 @@ function _scCopyColumns(rows, price) {
 function copyScreenerTable() {
   var btn  = document.getElementById('screener-copy-ic-btn');
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast(_scEmptyMsg('copy')); return; }
+  if (!rows.length) { _icRefuse(_scEmptyMsg('copy')); return; }
   var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   var b = window._screenerExportBasis;
 
@@ -33347,13 +33347,13 @@ function copyScreenerTable() {
       'text/plain': new Blob([tsv],  {type:'text/plain'})
     })]).then(function(){ flash(okMsg); }).catch(function(){
       navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-        .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Excel instead.'); });
+        .catch(function(){ _icRefuse('Clipboard unavailable — use ⬇ Excel instead.'); });
     });
   } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-      .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Excel instead.'); });
+      .catch(function(){ _icRefuse('Clipboard unavailable — use ⬇ Excel instead.'); });
   } else {
-    showCopyToast('Clipboard unavailable — use ⬇ Excel instead.');
+    _icRefuse('Clipboard unavailable — use ⬇ Excel instead.');
   }
 }
 window.copyScreenerTable = copyScreenerTable;
@@ -40223,12 +40223,12 @@ function _cpBasisSheet(d, country, region, prof, npvBasis, cmpNote) {
 
 // ─── EXPORT: Country Profile → Excel ─────────────────────────────────────────
 function exportCountryProfile() {
-  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
   const btn = document.getElementById('dd-export-btn');
   const country = btn ? btn._country : null;
-  if (!country) { showCopyToast('No country selected — open a Country Profile first.'); return; }
+  if (!country) { _icRefuse('No country selected — open a Country Profile first.'); return; }
   const d = COUNTRY_DATA.find(x => x.country === country);
-  if (!d) { showCopyToast('Country data not found.'); return; }
+  if (!d) { _icRefuse('Country data not found.'); return; }
 
   // ── v628 (T5): the workbook is the artifact that LEAVES the tool. It becomes the fiscal annex
   // of an IC memo and is read weeks later by people who never saw this screen. It carried four
@@ -40554,10 +40554,10 @@ function exportCountryProfile() {
 // v584 (T5): this used to be a second, independent query over COUNTRY_DATA. It now exports the
 // array renderExplorer() actually put on screen, in screen order, with the screen's rank.
 function exportExplorer() {
-  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
   if (!_explorerRendered) { if (typeof renderExplorer === 'function') renderExplorer(); }
   const R = _explorerRendered;
-  if (!R || !R.rows.length) { showCopyToast('Nothing to export — no countries match the current filters.'); return; }
+  if (!R || !R.rows.length) { _icRefuse('Nothing to export — no countries match the current filters.'); return; }
 
   const price   = R.price;                       // the price radio the table is rendered at
   const pk      = 'take_' + price;
@@ -41243,9 +41243,9 @@ function _iocExpBasisLines() {
 }
 
 function exportIOCPortfolio() {
-  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
   var rows = _iocExpRows();
-  if (!rows.length) { showCopyToast('Select an operator first — there is nothing to export.'); return; }
+  if (!rows.length) { _icRefuse('Select an operator first — there is nothing to export.'); return; }
   var st = window._iocExp;
   var wb = XLSX.utils.book_new();
   var ws = XLSX.utils.json_to_sheet(rows);
@@ -41260,7 +41260,7 @@ function exportIOCPortfolio() {
 function copyIOCPortfolio() {
   var btn = document.getElementById('ioc-copy-ic-btn');
   var rows = _iocExpRows();
-  if (!rows.length) { showCopyToast('Select an operator first — there is nothing to copy.'); return; }
+  if (!rows.length) { _icRefuse('Select an operator first — there is nothing to copy.'); return; }
   var st = window._iocExp;
 
   var caption = 'ORCA fiscal exposure — ' + st.operator + ', ' + rows.length
@@ -41343,13 +41343,13 @@ function copyIOCPortfolio() {
       'text/plain': new Blob([tsv],  {type:'text/plain'})
     })]).then(function(){ flash(okMsg); }).catch(function(){
       navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-        .catch(function(){ showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.'); });
+        .catch(function(){ _icRefuse('Clipboard unavailable — use \u2b07 XLSX instead.'); });
     });
   } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-      .catch(function(){ showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.'); });
+      .catch(function(){ _icRefuse('Clipboard unavailable — use \u2b07 XLSX instead.'); });
   } else {
-    showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.');
+    _icRefuse('Clipboard unavailable — use \u2b07 XLSX instead.');
   }
 }
 window.exportIOCPortfolio = exportIOCPortfolio;
@@ -43811,7 +43811,7 @@ function exportReformRiskCSV() {
       });
     });
   }
-  if (!recs.length) { showCopyToast('No reform data to export.'); return; }
+  if (!recs.length) { _icRefuse('No reform data to export.'); return; }
 
   // Country A–Z then year ascending — the layout this file has always had. _ALL_REFORMS is
   // sorted globally by year for the on-screen log, which is not the order a spreadsheet wants.
@@ -43946,7 +43946,7 @@ function copyAPIUrl() {
   const base = window.location.href.replace(/\/[^/]*$/, '/');
   navigator.clipboard.writeText(base + url)
     .then(() => { btn.textContent = '✓ Copied'; setTimeout(() => btn.textContent = '⎘ Copy API URL', 1500); })
-    .catch(() => { showCopyToast('Copy failed — URL: ' + (base + url).slice(0, 60) + '…'); });
+    .catch(() => { _icRefuse('Copy failed — URL: ' + (base + url).slice(0, 60) + '…'); });
 }
 
 function ddAddCompare(country, btn) {
@@ -43970,9 +43970,9 @@ function ddAddCompare(country, btn) {
 }
 
 function exportScreenerExcel() {
-  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast(_scEmptyMsg('export')); return; }
+  if (!rows.length) { _icRefuse(_scEmptyMsg('export')); return; }
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, _finishSheet(XLSX.utils.json_to_sheet(rows)), 'Screener');
   // v558 (T5): the basis travels with the file on its own sheet, so the data sheet stays a clean
@@ -43993,7 +43993,7 @@ function shareComparison() {
     var btn = document.querySelector('[onclick="shareComparison()"]');
     if (btn) { var o=btn.textContent; btn.textContent='\u2713 Copied!'; setTimeout(function(){btn.textContent=o;},2000); }
     showCopyToast();
-  }).catch(function(){ showCopyToast('Copy failed — open console or use Ctrl+C on the page URL.'); });
+  }).catch(function(){ _icRefuse('Copy failed — open console or use Ctrl+C on the page URL.'); });
 }
 
 function _canvasPng2x(canvas) {
@@ -44188,7 +44188,7 @@ function downloadCmpChart(which) {
   if (which === 'take' || which === 'npv') {
     var one = _cmpSavePng(which);
     if (!one) {
-      showCopyToast(_CMP_PNG_TARGETS[which].label + ' is not on screen \u2014 nothing exported.');
+      _icRefuse(_CMP_PNG_TARGETS[which].label + ' is not on screen \u2014 nothing exported.');
       return;
     }
     showCopyToast('Saved ' + one);
@@ -44197,7 +44197,7 @@ function downloadCmpChart(which) {
   var saved = [];
   ['take', 'npv'].forEach(function(k) { var n = _cmpSavePng(k); if (n) saved.push(n); });
   if (!saved.length) {
-    showCopyToast('No comparison chart is on screen \u2014 select at least 2 countries first.');
+    _icRefuse('No comparison chart is on screen \u2014 select at least 2 countries first.');
     return;
   }
   showCopyToast(saved.length === 2
@@ -44208,7 +44208,7 @@ function downloadCmpChart(which) {
 function downloadBubblePng() {
   var canvas = document.getElementById('explorer-bubble-canvas');
   if (!canvas) {
-    showCopyToast('Switch to Bubble Chart mode first, then download.');
+    _icRefuse('Switch to Bubble Chart mode first, then download.');
     return;
   }
   var a = document.createElement('a');
@@ -44220,7 +44220,7 @@ function downloadBubblePng() {
 function downloadIRRScatterPng() {
   var canvas = document.getElementById('irr-scatter-canvas');
   if (!canvas || !canvas.width) {
-    showCopyToast('IRR scatter chart not rendered yet — switch to Browse mode first.');
+    _icRefuse('IRR scatter chart not rendered yet — switch to Browse mode first.');
     return;
   }
   var a = document.createElement('a');
@@ -44233,7 +44233,7 @@ function downloadTornadoPng(country) {
   var slug = (country || '').replace(/[^a-z0-9]/gi, '_');
   var canvas = document.getElementById('tornado-canvas-' + slug);
   if (!canvas) {
-    showCopyToast('Sensitivity chart not rendered yet — open a Country Profile first.');
+    _icRefuse('Sensitivity chart not rendered yet — open a Country Profile first.');
     return;
   }
   var a = document.createElement('a');
@@ -44411,7 +44411,7 @@ function copyCurrentLink() {
   var url = window.location.href.split('#')[0] + window.location.hash;
   navigator.clipboard.writeText(url).then(function(){
     showCopyToast();
-  }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
+  }).catch(function(){ _icRefuse('Clipboard unavailable — copy from address bar.'); });
 }
 
 // v510: single source for the version string in every clipboard citation. These read
@@ -44428,10 +44428,10 @@ function _orcaVerNow() {
 function copyICCitation() {
   var sel = document.getElementById('dd-country-select');
   var country = sel ? sel.value : '';
-  if (!COUNTRY_DATA || !COUNTRY_DATA.length) { showCopyToast('Fiscal data is still loading — try again in a moment.'); return; }
-  if (!country) { showCopyToast('No country selected — pick one from the dropdown above.'); return; }
+  if (!COUNTRY_DATA || !COUNTRY_DATA.length) { _icRefuse('Fiscal data is still loading — try again in a moment.'); return; }
+  if (!country) { _icRefuse('No country selected — pick one from the dropdown above.'); return; }
   var d = COUNTRY_DATA.find(function(x){ return x.country === country; });
-  if (!d) { showCopyToast('Country data not found.'); return; }
+  if (!d) { _icRefuse('Country data not found.'); return; }
   var takeStr = (d.take_75 != null && d.take_75 > 0 && d.take_75 < 200) ? d.take_75.toFixed(1) + '%' : 'n/a';
   // v605 (T6): was a private copy of the ab_pct rule v551 deleted. It pasted "A-tier sourcing"
   // into an IC memo for Russia while the evidence badge on this same page read D.
@@ -44462,7 +44462,7 @@ function copyICCitation() {
     var btn = document.getElementById('dd-cite-btn');
     if (btn) { var orig = btn.innerHTML; btn.innerHTML = '&#x2713; Copied!'; setTimeout(function(){ btn.innerHTML = orig; }, 2000); }
     showCopyToast('IC citation copied — paste into your IC memo.');
-  }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
+  }).catch(function(){ _icRefuse('Clipboard unavailable — copy from address bar.'); });
 }
 
 // v690 (T5): split a verdict sentence into the cell and the note. Every caveat string on this
@@ -44546,7 +44546,7 @@ function _cpIcBe(d, country) {
 }
 function cpCopyICTable(safe) {
   var P = (window.__CP_IC_TBL || {})[safe];
-  if (!P) { if (typeof showCopyToast === 'function') showCopyToast('Table not ready — reopen this country and try again.'); return; }
+  if (!P) { if (typeof _icRefuse === 'function') _icRefuse('Table not ready — reopen this country and try again.'); return; }
   var _d = (window.COUNTRY_DATA || []).filter(function(x){ return x.country === P.country; })[0];
   if (_d) {
     var _be = _cpIcBe(_d, P.country);
@@ -44729,10 +44729,10 @@ function _icTakeDispersion(d, hd) {
 function copyICSummary() {
   var sel = document.getElementById('dd-country-select');
   var country = sel ? sel.value : '';
-  if (!COUNTRY_DATA || !COUNTRY_DATA.length) { showCopyToast('Fiscal data is still loading — try again in a moment.'); return; }
-  if (!country) { showCopyToast('No country selected — pick one from the dropdown above.'); return; }
+  if (!COUNTRY_DATA || !COUNTRY_DATA.length) { _icRefuse('Fiscal data is still loading — try again in a moment.'); return; }
+  if (!country) { _icRefuse('No country selected — pick one from the dropdown above.'); return; }
   var d = COUNTRY_DATA.find(function(x){ return x.country === country; });
-  if (!d) { showCopyToast('Country data not found.'); return; }
+  if (!d) { _icRefuse('Country data not found.'); return; }
   // v553 (T5): was d.mechanics.split(',')[0] -- the alphabetical read v548 replaced on 13
   // call sites and missed on this one, the only one whose output leaves the tool. It pasted
   // "Concession" into an IC memo for 53 of the 185 countries, Iraq and Indonesia included.
@@ -44908,13 +44908,13 @@ function copyICSummary() {
       'text/plain': new Blob([_tsv],  {type:'text/plain'})
     })]).then(function(){ _flash(_okMsg); }).catch(function(){
       navigator.clipboard.writeText(_tsv).then(function(){ _flash(_okMsg); })
-        .catch(function(){ showCopyToast('Clipboard unavailable.'); });
+        .catch(function(){ _icRefuse('Clipboard unavailable.'); });
     });
   } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(_tsv).then(function(){ _flash(_okMsg); })
-      .catch(function(){ showCopyToast('Clipboard unavailable.'); });
+      .catch(function(){ _icRefuse('Clipboard unavailable.'); });
   } else {
-    showCopyToast('Clipboard unavailable.');
+    _icRefuse('Clipboard unavailable.');
   }
 }
 
@@ -44930,7 +44930,10 @@ function copyICSummary() {
 function copyComparisonTable(btn) {
   var src = document.getElementById('cmp-data-table');
   if (!src || !src.rows || src.rows.length < 2) {
-    showCopyToast('Load at least 2 countries into Side-by-Side first.');
+    // v808 (T5): the walk that found the refusal-feedback gap started on exactly this
+    // line — one country loaded, "Copy for IC Memo" pressed, clipboard silently left
+    // holding whatever the analyst had copied before it.
+    _icRefuse('Load at least 2 countries into Side-by-Side first — nothing was copied, so your clipboard still holds what was in it before.');
     return;
   }
   // Strip help glyphs / footnote markers so the pasted header reads as a plain column name.
@@ -45069,13 +45072,13 @@ function copyComparisonTable(btn) {
       'text/plain': new Blob([tsv], {type:'text/plain'})
     })]).then(function(){ flash(okMsg); }).catch(function(){
       navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-        .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Save as PDF instead.'); });
+        .catch(function(){ _icRefuse('Clipboard unavailable — use ⬇ Save as PDF instead.'); });
     });
   } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-      .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Save as PDF instead.'); });
+      .catch(function(){ _icRefuse('Clipboard unavailable — use ⬇ Save as PDF instead.'); });
   } else {
-    showCopyToast('Clipboard unavailable — use ⬇ Save as PDF instead.');
+    _icRefuse('Clipboard unavailable — use ⬇ Save as PDF instead.');
   }
 }
 
@@ -45098,7 +45101,7 @@ function copyExplorerLink() {
     showCopyToast();
     var btn = document.getElementById('explorer-copy-link');
     if (btn) { var orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
-  }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
+  }).catch(function(){ _icRefuse('Clipboard unavailable — copy from address bar.'); });
 }
 
 function showCopyToast(msg) {
@@ -45117,6 +45120,70 @@ function showCopyToast(msg) {
   clearTimeout(toast._hideTimer);
   toast._hideTimer = setTimeout(function(){ toast.style.opacity = '0'; }, 2500);
 }
+
+// ── v808 (T5) — "give me something I can paste straight into an IC memo." ──────
+// A REFUSED copy or export must say so ON THE BUTTON. Walked T5 cold at 1440x900 and
+// again at 390x844 (hasTouch). Side-by-Side holding one country, click "⎘ Copy for IC
+// Memo": the clipboard is left UNCHANGED, the button does not move, and the only
+// explanation — "Load at least 2 countries into Side-by-Side first." — renders at 12px
+// in the opposite corner of the viewport, measured 693px from the button the analyst is
+// looking at, and is gone in 2.5s.
+//
+// The asymmetry is the defect, and it points the wrong way round. On SUCCESS every one
+// of these paths runs a local flash(), which writes "✓ Copied" onto the button itself
+// AND raises the toast. On REFUSAL they call showCopyToast() alone and the button stays
+// inert. So the tool reports at the point of action when it worked, and 693px away when
+// it did not — which is the case that actually needs reporting.
+//
+// On a CLIPBOARD button that is the dangerous direction, not merely the untidy one. A
+// refused copy leaves the analyst's PREVIOUS clipboard contents in place, so the next
+// Ctrl+V in Word still pastes something — just not this. There is no failed-paste moment
+// to catch the mistake: the IC memo quietly receives the wrong table. The ~20
+// "Clipboard unavailable" catch paths are the same shape and are the case the analyst
+// most needs told, because there the copy was attempted and lost.
+//
+// _icRefuse() leaves the toast exactly as it was and supplies the missing half: the
+// button that was just pressed reports its own refusal, in --negative, for 2.8s. The
+// pre-swap width is pinned so a longer label cannot shrink-jitter the toolbar, and the
+// label is kept short for the same reason. Verified at 1920/1440/1280/1024/768/390.
+window._icLastBtn = null; window._icLastBtnAt = 0;
+document.addEventListener('click', function (e) {
+  // Capture phase: this must record the button BEFORE the handler that may refuse runs.
+  var b = e.target && e.target.closest ? e.target.closest('button') : null;
+  if (b) { window._icLastBtn = b; window._icLastBtnAt = Date.now(); }
+}, true);
+
+function _icRefuseLabel(btn) {
+  var t = (btn.textContent || '').toLowerCase();
+  if (/copy|citation|ic line|clipboard/.test(t)) return '\u2715 Not copied';
+  if (/xlsx|excel|csv|export|pdf|download|save/.test(t)) return '\u2715 Not exported';
+  return '\u2715 Unavailable';
+}
+
+function _icRefuse(msg) {
+  showCopyToast(msg);
+  var b = window._icLastBtn;
+  if (!b || b.dataset.icRefusing || !document.body.contains(b)) return;
+  // Only speak for a button the analyst actually just pressed. Refusals reached any other
+  // way (a programmatic call, a deep link) fall back to the toast alone rather than
+  // relabelling whatever button happened to be pressed last.
+  if (Date.now() - window._icLastBtnAt > 1500) return;
+  var w = b.offsetWidth, oh = b.innerHTML;
+  var oCol = b.style.color, oBd = b.style.borderColor, oMw = b.style.minWidth, oWs = b.style.whiteSpace;
+  b.dataset.icRefusing = '1';
+  b.style.minWidth = w + 'px';
+  b.style.whiteSpace = 'nowrap';
+  b.innerHTML = _icRefuseLabel(b);
+  b.style.color = 'var(--negative)';
+  b.style.borderColor = 'var(--negative)';
+  setTimeout(function () {
+    b.innerHTML = oh;
+    b.style.color = oCol; b.style.borderColor = oBd;
+    b.style.minWidth = oMw; b.style.whiteSpace = oWs;
+    delete b.dataset.icRefusing;
+  }, 2800);
+}
+window._icRefuse = _icRefuse;
 
 function showRoutingHint() {
   if (localStorage.getItem('routing-hint-dismissed')) return;
@@ -45673,11 +45740,11 @@ function _esc594(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').rep
 // screen or re-keyed by hand.
 function _sbCopyICLine(btn) {
   var t = window._sbICLine;
-  if (!t) { showCopyToast('Run a DCF first.'); return; }
+  if (!t) { _icRefuse('Run a DCF first.'); return; }
   navigator.clipboard.writeText(t).then(function(){
     if (btn) { var o = btn.innerHTML; btn.innerHTML = '\u2713 Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
     showCopyToast('IC line copied — paste into your IC memo.');
-  }).catch(function(){ showCopyToast('Clipboard unavailable — select the line and copy manually.'); });
+  }).catch(function(){ _icRefuse('Clipboard unavailable — select the line and copy manually.'); });
 }
 
 
@@ -47100,9 +47167,9 @@ ${(function() {
 }
 
 function saveCustomScenario() {
-  if (!window._lastScenario) { showCopyToast('Run a DCF first, then save.'); return; }
+  if (!window._lastScenario) { _icRefuse('Run a DCF first, then save.'); return; }
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
-  if (saved.length >= 5) { showCopyToast('Max 5 saved scenarios — clear one first.'); return; }
+  if (saved.length >= 5) { _icRefuse('Max 5 saved scenarios — clear one first.'); return; }
   // Replace browser prompt() with inline name modal
   var defaultName = window._lastScenario.mech + ' @$' + window._lastScenario.price;
   var existing = document.getElementById('sb-save-modal');
@@ -47159,8 +47226,8 @@ function clearSavedScenarios() {
 
 function _exportScenariosXLSX() {
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
-  if (!saved.length) { showCopyToast('No saved scenarios to export.'); return; }
-  if (typeof XLSX === 'undefined') { showCopyToast('XLSX library not loaded — check your connection.'); return; }
+  if (!saved.length) { _icRefuse('No saved scenarios to export.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('XLSX library not loaded — check your connection.'); return; }
   // Build worksheet rows
   // v594 (T5): the IRR column shipped an EMPTY cell for every scenario where no IRR exists --
   // 7 of the 13 presets -- under a Methodology sheet whose only stated exclusion was ">=500%",
@@ -52287,7 +52354,7 @@ function renderDrawerWaterfall(canvasId, waterfallData) {
 function copyFCForIC(btn) {
   var tbl = document.getElementById('tbl-fc');
   var trs = tbl ? tbl.querySelectorAll('tbody tr[data-country]') : [];
-  if (!trs || !trs.length) { showCopyToast('Run Fiscal Compare first — there are no rows on screen to copy.'); return; }
+  if (!trs || !trs.length) { _icRefuse('Run Fiscal Compare first — there are no rows on screen to copy.'); return; }
   // ── v632 (T5) ────────────────────────────────────────────────────────────────
   // The shortlist, if the analyst built one. Each entry carries the country and the rank
   // EXACTLY as the # cell renders it ("=12", "—", "n/c"), so a hand-picked five-row paste
@@ -52434,7 +52501,7 @@ function copyFCForIC(btn) {
     if (_anyFee) _row.splice(5, 0, _feeAt[c] ? num(_feeAt[c].head, 1) : '');
     matrix.push(_row);
   }
-  if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
+  if (matrix.length < 2) { _icRefuse('No rows on screen to copy.'); return; }
   var N = matrix.length - 1;
 
   // v580 (T5): was 'the model take column, low → high'. The rank in the # column of this very
@@ -52548,21 +52615,21 @@ function copyFCForIC(btn) {
       'text/plain': new Blob([tsv], { type: 'text/plain' })
     })]).then(function(){ flash(okMsg); }).catch(function(){
       navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-        .catch(function(){ showCopyToast('Clipboard unavailable — use Export XLSX instead.'); });
+        .catch(function(){ _icRefuse('Clipboard unavailable — use Export XLSX instead.'); });
     });
   } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
-      .catch(function(){ showCopyToast('Clipboard unavailable — use Export XLSX instead.'); });
+      .catch(function(){ _icRefuse('Clipboard unavailable — use Export XLSX instead.'); });
   } else {
-    showCopyToast('Clipboard unavailable — use Export XLSX instead.');
+    _icRefuse('Clipboard unavailable — use Export XLSX instead.');
   }
 }
 
 function exportFCResults() {
-  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
   // v313: use filtered results if any filter is active, else fall back to full results
   let rows = (window._fcFilteredResults && window._fcFilteredResults.length) ? window._fcFilteredResults : window._fcResults;
-  if (!rows || !rows.length) { showCopyToast('Run Fiscal Compare first to generate results.'); return; }
+  if (!rows || !rows.length) { _icRefuse('Run Fiscal Compare first to generate results.'); return; }
   // v632 (T5): the shortlist ticks bind the workbook as well as the clipboard. Two export
   // affordances sit two inches apart on the same toolbar; if only one honoured the selection,
   // the analyst's shortlist would silently mean two different things depending which they pressed.
@@ -53881,7 +53948,7 @@ async function renderBreakevenMap() {
 }
 
 function exportBreakevenCSV() {
-  if (!COUNTRY_DATA) { showCopyToast('Data not loaded yet.'); return; }
+  if (!COUNTRY_DATA) { _icRefuse('Data not loaded yet.'); return; }
   // v608 (T5): this file is the Breakeven Map's only export, and it contradicted the tab it
   // came from. The screen states plainly that breakeven "does not rank them" -- 65 countries
   // across 8 distinct values, 43 of them on two integers -- and routes downside screening to
@@ -53931,7 +53998,7 @@ function exportBreakevenCSV() {
       (d.irr_75 != null && d.irr_75 < 500) ? d.irr_75.toFixed(1) : ''
     ]);
   });
-  if (rows.length <= 1) { showCopyToast('No breakeven data to export.'); return; }
+  if (rows.length <= 1) { _icRefuse('No breakeven data to export.'); return; }
   var N = rows.length - 1;
   var nDistinct = Object.keys(beVals).length;
   var lo = sorted[0].be_75, hi = sorted[sorted.length - 1].be_75;
@@ -53980,7 +54047,7 @@ function exportBreakevenCSV() {
 window.exportBreakevenCSV = exportBreakevenCSV;
 
 function exportVintageCSV() {
-  if (typeof VINTAGE_DATA === 'undefined' || !VINTAGE_DATA || !VINTAGE_DATA.length) { showCopyToast('Vintage data not loaded yet.'); return; }
+  if (typeof VINTAGE_DATA === 'undefined' || !VINTAGE_DATA || !VINTAGE_DATA.length) { _icRefuse('Vintage data not loaded yet.'); return; }
   const mechs = ['Concession','PSC','TSC','PRRT','RSC','Buy-back'];
   const decades = [...new Set(VINTAGE_DATA.map(d=>d.decade))].sort();
   const pivot = {};
