@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v803</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v804</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v803</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v804</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v803</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v804</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27059,17 +27059,68 @@ function _cmpPick(name) {
   _cmpCloseDrop();
   cmpSearch.focus();
 }
+/* v804 (T3) — DATA BASIS AT THE POINT OF CHOICE.
+   ─────────────────────────────────────────────────────────────────────────────
+   Walked "how do these three countries compare side by side?" cold. This picker is
+   the only country-selection surface in ORCA that did NOT show data basis, and it is
+   the one where the choice is actually made.
+
+   Every other tab marks it, because the whole platform turns on it:
+     Fiscal Compare  per-row PROXY pill  + "◇ Production-backed only" filter
+     Explorer        "Verified production first" ON by default + "Prod Data Only"
+     Screener        #sc-proxy-keep + a labelled divider drawn at the boundary
+     Side-by-Side    the grid's own first row is "Data basis: PROD-WTD / PROXY"
+   This dropdown rendered name + region + "54.1% take" and nothing else — a PROXY
+   country and a production-weighted one were typographically identical, and the take
+   figure shown for each was presented on the same footing.
+
+   It is not an edge case. 163 of 185 countries are PROXY and only 22 are
+   production-backed, so a three-country pick has a 99.9% chance of containing at
+   least one column the grid will then refuse to rank. What the analyst gets, one
+   scroll after choosing, is that column marked "not ranked · statutory terms" on all
+   four Govt Take rows, "not comparable · statutory terms" on all four Contractor NPV
+   rows, dropped from the take headline, dropped from the predictability headline,
+   and a "⚠ cannot be ranked against each other" notice under the grid explaining
+   after the fact that the set they just built does not compare.
+
+   The basis is now on the row being chosen, read from _dqTier — the same single
+   source of truth the grid's Data basis row, the FC pill and the Screener divider
+   all read, so the badge on the option and the badge on the resulting column can
+   never disagree. A PROXY row's take also reads "54.1% statutory" rather than
+   "54.1% take", in the grid's own vocabulary, because that number is a simple
+   average of statutory terms and not a production-weighted take.
+
+   No country is hidden or blocked — mixing bases is a legitimate thing to do
+   deliberately. It is now a decision made before the grid renders instead of a
+   surprise discovered after it. */
 function _cmpOptHTML(d, i, hint) {
   var already = compareList.indexOf(d.country) !== -1;
-  var take = (d.take_75 != null && typeof isStateMonopoly === 'function' && !isStateMonopoly(d.take_75))
-    ? d.take_75.toFixed(1) + '% take' : (d.take_75 != null ? 'state monopoly' : '');
+  var dq = (typeof _dqTier === 'function')
+    ? _dqTier(d)
+    : { label: 'PROXY', cls: 'dq-proxy', hasProduction: false };
+  var monopoly = d.take_75 != null && typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75);
+  var take = '';
+  if (d.take_75 != null) {
+    take = monopoly ? 'state monopoly'
+         : d.take_75.toFixed(1) + (dq.hasProduction ? '% take' : '% statutory');
+  }
+  var basisTitle = dq.hasProduction
+    ? (dq.label === 'PROD-WTD'
+        ? 'Verified field production — this column is production-weighted and is ranked in the comparison.'
+        : 'Partial verified production — this column is ranked in the comparison.')
+    : 'No verified field production. Take is a simple average of statutory terms, so this column '
+      + 'prints its own correct figures but is NOT ranked against production-backed columns, on '
+      + 'either the take rows or the NPV rows. 163 of 185 countries are on this basis.';
   return '<div class="cmp-opt" id="cmp-opt-' + i + '" role="option" aria-selected="false"'
     + ' data-country="' + d.country.replace(/"/g, '&quot;') + '"'
     + ' style="padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;'
     + 'align-items:baseline;gap:8px;' + (already ? 'opacity:.55;' : '') + '">'
     + '<span style="font-size:12px;color:var(--text);font-weight:600;">' + d.country + '</span>'
     + '<span style="font-size:10px;color:var(--muted);">' + (d.region || '') + '</span>'
-    + '<span style="margin-left:auto;font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">'
+    + '<span class="dq-badge ' + dq.cls + '" title="' + basisTitle + '"'
+    + ' style="margin-left:auto;font-size:8px;padding:1px 5px;letter-spacing:.02em;white-space:nowrap;">'
+    + dq.label + '</span>'
+    + '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;white-space:nowrap;">'
     + (already ? 'in comparison' : take) + '</span>'
     + (hint ? '<span style="font-size:10px;color:var(--accent);">' + hint + '</span>' : '')
     + '</div>';
