@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v812</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v813</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v812</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v813</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v812</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v813</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49334,6 +49334,8 @@ function renderFCResults(results, price) {
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th title="Fiscal mechanism \u2014 the structure governing how revenue is split between government and contractor, AND the mechanic this row\'s DCF was actually run on. It is the mechanic the PLURALITY of that country\'s contracts in ORCA use (the count under each tag), not the first one listed alphabetically: before v548 any country holding a single Concession contract read Concession, which named 39 of these 185 rows wrongly \u2014 Indonesia, Guyana, Iraq, Iran, India, China. Hover any tag for a full description.">Mechanic</th>';
   var priceTag = price ? ' <span style="font-size:10px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
+  // v813 (T6): built here, emitted straight after the citable-take column below.
+  var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. Since v580 this is NOT the column the # rank is built from \u2014 the rank follows the citable database take in the next column. Use this one only for profile sensitivity: it is the only take in the tool that moves with the profile selector. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
   // ── v547 (T5) ─────────────────────────────────────────────────
   // Measured on the cold default view: 154 of the 185 rows on this table render an IDENTICAL
@@ -49343,12 +49345,17 @@ function renderFCResults(results, price) {
   // the XLSX all carry it and instruct the analyst to cite it. The flagship table did not show it
   // anywhere, so the only way to read a citable take for a 10-country shortlist was ten drilldowns
   // or an XLSX download. It is now a column.
-  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
+  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>' + _fcQualTh + '<th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 65 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   // v551 (T6): the stated thresholds were never the ones in force. This header said the letter
   // meant "% of its fiscal facts primary-sourced" while getTierBadge() was fed a_pct + b_pct.
   // Both now describe the same two-legged test.
-  html += '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
+  // v813 (T6): the Quality column moved OUT of position 10 and now renders immediately
+  // after Take% db · citable — see _fcQualTh above. At 1440 this table is 1,805px inside a
+  // 1,320px window, so at position 10 the evidence letter drew at x=1,576: 256px past the
+  // right edge, reachable only by discovering the table's own horizontal scroll. The two
+  // rows the cold default ranks #2 and #3 — Iraq and Somalia — are graded D, which this
+  // platform's own Methodology tab says does not belong in a recommendation document.
   if (showStability) {
     html += '<th class="num" title="The reform verdict for this jurisdiction \u2014 what to carry into the memo, not a score to rank on. Scored ONLY where a sourced fiscal-reform event log exists; ORCA carries one for ' + stabCoveredN + ' of the 185 jurisdictions in this table. Seven states, and they are not interchangeable. EVERY TOKEN CARRYING A NUMBER NAMES ITS OWN UNIT, because two different units live in this column. WACC +3\u20135pp / WACC +5\u20138pp = Actively Reforming, 3+ fiscal law changes since 2010 \u2014 percentage points to ADD TO THE DISCOUNT RATE. These are the only verdicts that change a model input, and the only ones drawn as a filled pill. TAKE +Npp = percentage points of GOVERNMENT TAKE that were already raised inside the scoring window; TAKE NET +/-Npp = the same, net of take cuts inside the window (Norway: 2022 +12pp undid 2020 -12pp, NET 0pp); the count never reads size, so this is the number to size against \u2014 it is a fact about the fiscal terms and must never be added to a WACC. \u2191 PRE-2010 = the last take rise predates the 2010 window, so a high count is where the window starts, not a clean record. SIZE UNKNOWN = terms were rewritten inside the window and ORCA has not quantified the take effect \u2014 a zero premium here is an absence of measurement. NO LAW CHANGE = every post-2010 event on file is a discovery, first oil or a review that changed no terms. NO PREMIUM = no reform-frequency premium indicated. n/c = NOT SCORED: no reform log on file, which is not a clean record and is not a pass. The small second line is the raw count of fiscal law changes since 2010 \u2014 it is a fact, not the finding. Click any cell for the full event log. Distinct from the Fiscal Predictability Score (Explorer/Country Profile), which is computed from contract terms and exists for all 185.">Reform verdict \u24d8</th>';
   }
@@ -49739,45 +49746,8 @@ function renderFCResults(results, price) {
       + (_fcDbTake(r) != null ? Number(_fcDbTake(r)).toFixed(0) : '100') + '% at $' + _fcSelPrice + '/bbl. '
       + 'There is no contractor share to model, so take, NPV and breakeven are not comparable with the other rows. '
       + 'Open the row for the sourced position.';
-    if (_isMono) {
-      html += _monoCell('n/c', _monoWhy);
-      // v547 (T5): the database take IS the citable fact for a monopoly -- 100% -- so print it
-      // rather than n/c. n/c belongs on the model columns, which have no contractor position.
-      html += _monoCell((_fcDbTake(r) != null ? Number(_fcDbTake(r)).toFixed(1) + '%' : '\u2014'), _monoWhy);
-      html += _monoCell('n/c', _monoWhy);
-      html += _monoCell('n/c', _monoWhy);
-      html += _monoCell('\u2014', _monoWhy);
-    } else {
-      // ── v748 (T6): the two MODEL columns on a generic-default row ────────────────
-      // termsBasis === 'default' means the compare engine holds no country-specific terms,
-      // so BOTH model figures are the mechanic constant -- 116 of 189 rows print an
-      // identical 22.2% and an identical $4.3B. Through the tier-coloured take-val pill
-      // that constant rendered bold GREEN, because takeClass(22.2) returns 'take-if', the
-      // investible tier. Venezuela, UAE, Qatar and Russia therefore carried a green
-      // investible take against citable figures of 74.9 / 74.6 / 74.5 / 46.4.
-      // The only thing separating those rows was the v563 divider, and that is conditional
-      // on sort mode -- click the Country header for A-Z and the partition disappears and
-      // the constants interleave with real numbers in identical styling. Marking the cell
-      // itself holds in every sort.
-      if (r.termsBasis === 'default') {
-        var _genWhy = r.country + ': ORCA holds no country-specific terms for this row in the compare engine, '
-          + 'so this figure is the standard ' + r.mechanic + ' default and is identical on every G row of that '
-          + 'mechanic. It used none of ' + r.country + '\u2019s own fiscal record. Not citable \u2014 the citable '
-          + 'figure is the green db column beside it.';
-        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + r.liveTake.toFixed(1) + '%</span><span class="fc-gen-tag">default</span></td>';
-        html += _fcDbTakeCell(r);
-        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + npvStr + '</span><span class="fc-gen-tag">default</span></td>';
-        html += _fcDbNpvCell(r);
-        html += '<td class="num">' + beStr + '</td>';
-      } else {
-      html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
-      html += _fcDbTakeCell(r);
-      html += '<td class="num">' + npvStr + '</td>';
-      html += _fcDbNpvCell(r);
-      html += '<td class="num">' + beStr + '</td>';
-      }
-    }
-    html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
+    // v813 (T6): hoisted above the branch so the Quality letter can be emitted beside the
+    // citable take it grades, instead of six columns to its right.
     // v505: The Quality column used to show the country's A/B evidence tier on every row.
     // For the 153 countries with no country-specific terms in ORCA, that take never
     // touched those sourced facts — it came from the generic mechanic default. Showing a
@@ -49802,7 +49772,48 @@ function renderFCResults(results, price) {
       // letter means "% of its fiscal facts primary-sourced"; now it actually does.
       _qualCell = getTierBadge(r, _basisNote.trim());
     }
-    html += '<td class="num">' + _qualCell + '</td>';
+    if (_isMono) {
+      html += _monoCell('n/c', _monoWhy);
+      // v547 (T5): the database take IS the citable fact for a monopoly -- 100% -- so print it
+      // rather than n/c. n/c belongs on the model columns, which have no contractor position.
+      html += _monoCell((_fcDbTake(r) != null ? Number(_fcDbTake(r)).toFixed(1) + '%' : '\u2014'), _monoWhy);
+      html += '<td class="num">' + _qualCell + '</td>';
+      html += _monoCell('n/c', _monoWhy);
+      html += _monoCell('n/c', _monoWhy);
+      html += _monoCell('\u2014', _monoWhy);
+    } else {
+      // ── v748 (T6): the two MODEL columns on a generic-default row ────────────────
+      // termsBasis === 'default' means the compare engine holds no country-specific terms,
+      // so BOTH model figures are the mechanic constant -- 116 of 189 rows print an
+      // identical 22.2% and an identical $4.3B. Through the tier-coloured take-val pill
+      // that constant rendered bold GREEN, because takeClass(22.2) returns 'take-if', the
+      // investible tier. Venezuela, UAE, Qatar and Russia therefore carried a green
+      // investible take against citable figures of 74.9 / 74.6 / 74.5 / 46.4.
+      // The only thing separating those rows was the v563 divider, and that is conditional
+      // on sort mode -- click the Country header for A-Z and the partition disappears and
+      // the constants interleave with real numbers in identical styling. Marking the cell
+      // itself holds in every sort.
+      if (r.termsBasis === 'default') {
+        var _genWhy = r.country + ': ORCA holds no country-specific terms for this row in the compare engine, '
+          + 'so this figure is the standard ' + r.mechanic + ' default and is identical on every G row of that '
+          + 'mechanic. It used none of ' + r.country + '\u2019s own fiscal record. Not citable \u2014 the citable '
+          + 'figure is the green db column beside it.';
+        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + r.liveTake.toFixed(1) + '%</span><span class="fc-gen-tag">default</span></td>';
+        html += _fcDbTakeCell(r);
+      html += '<td class="num">' + _qualCell + '</td>';
+        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + npvStr + '</span><span class="fc-gen-tag">default</span></td>';
+        html += _fcDbNpvCell(r);
+        html += '<td class="num">' + beStr + '</td>';
+      } else {
+      html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
+      html += _fcDbTakeCell(r);
+      html += '<td class="num">' + _qualCell + '</td>';
+      html += '<td class="num">' + npvStr + '</td>';
+      html += _fcDbNpvCell(r);
+      html += '<td class="num">' + beStr + '</td>';
+      }
+    }
+    html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
     if (showStability) {
       html += '<td class="num">' + stabCell(r.country) + '</td>';
     }
