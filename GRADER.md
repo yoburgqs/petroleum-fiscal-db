@@ -45818,3 +45818,129 @@ display sites only.
 The cold load seeds an example trio, so an analyst comparing *their own* three countries types into the Side-by-Side search box. That picker (`_cmpOptHTML()`, `index.html:27062`) rendered one thing per row: `Guyana · Latin America · 54.1% take`.
 
 It was **the only country-selection surface in ORCA that didn't show production basis.** Fiscal Compare
+
+---
+## Cycle 712 Log — 2026-09-11 — T4 (v805)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation
+(703 T4 · 705 T2 · 706 T6 · 707 T5 · 708 T3 · 710 T1 · 711 T3). Walked cold at 1440x900
+and at 390x844 `hasTouch`, no sessionStorage, no localStorage, against the LOCAL tree.
+
+## Friction
+
+A cold load at `#/reform/<country>` rendered the **wrong verdict** — with no error, no
+spinner and nothing on screen to tell the analyst. That is the reload, bookmark,
+browser-Forward and send-this-to-a-colleague path, which is the whole reason v796 gave
+Reform Risk a URL in the first place.
+
+Nigeria — which ORCA scores **70/100** off 6 sourced events, 2 of them inside the 2010
+window including the 2021 Petroleum Industry Act — came up as:
+
+> "ORCA carries a sourced fiscal-reform event log for **0 of 185** jurisdictions. Nigeria
+> is one of the **185** without one. This is not a score of 100. No events on file means
+> no coverage, not a clean record — do not read it as stability and **do not carry a
+> reform-frequency premium of zero into an IC memo on this basis.**"
+
+and the picker's own optgroups read `No sourced reform history — predictability only (185)`.
+Measured, not inferred: still wrong **11.5 s** later. This was not a slow render. It was
+permanent for the session, and it is the worst possible shape of wrong for T4 — a fully
+formatted, confident card telling the analyst to go commission an external check for a
+jurisdiction ORCA can already score, and to treat ORCA's reform coverage as zero.
+
+**Cause.** `REFORM_HISTORY` is assigned one `await` AFTER `COUNTRY_DATA`
+(`index.html:53956`), and parsing `reform_history.json` yields to the event loop.
+`DOMContentLoaded` fires inside that gap → `parseAndNavigate('#/reform/nigeria')` →
+`switchTab` → `renderReformRisk()` → `_rrPopulateLookup()` (`index.html:41958`) with
+`COUNTRY_DATA` at 185 and `REFORM_HISTORY` at `{}`. All 185 went into the uncovered
+optgroup and `dataset.filled` was set to `1`, which that function never re-runs past.
+`_rrSelectWhenReady()` then found its option immediately and built the verdict off the
+same empty object; the later `parseAndNavigate` saw `sel.value` already set and skipped.
+
+Same class of defect as **v510** (`window.COUNTRY_DATA` never mirrored, four shipped
+features silently dead) — and its post-mortem comment sits six lines above the line that
+causes this one.
+
+## Change
+
+Three guards, all behavioural:
+
+- `_rrPopulateLookup()` returns early while `REFORM_HISTORY` is empty, so the picker can
+  no longer be built — and permanently locked — from a reform set that has not landed.
+- `renderReformCountryVerdict()` refuses to build a card from an empty reform set and
+  re-fires when the file arrives, instead of printing a confident false one.
+- `_rrSelectWhenReady()` fills the picker itself rather than racing the
+  `requestIdleCallback` that `renderReformRisk()` was scheduled on.
+
+## Result
+
+| | v804 | v805 |
+|---|---|---|
+| `#/reform/nigeria` cold | **"no sourced reform log · 0 of 185"** | **"reform exposure · 70/100 · 2 changes since 2010"** |
+| picker optgroups on that path | `No sourced reform history (185)` | **`scoreable (21)` + `predictability only (164)`** |
+| self-corrects if you wait | **no — wrong at 11.5s** | **n/a — correct on first paint** |
+| deep-link matrix (8 countries x 2 viewports) | 0/16 correct on scored rows | **16/16 PASS** |
+| normal cold-load → click tab path | correct | correct (unregressed) |
+
+An analyst who reloads a reform verdict, bookmarks one, or is sent one by a colleague now
+reads the exposure ORCA actually holds. Nigeria opens on *"terms were rewritten inside the
+window, size never quantified"*, score 70/100, with the PIA event log under it — instead
+of being told to go run an external check ORCA did not need.
+
+## Verification — run this cycle, against the LOCAL tree
+
+`TEST_URL` set explicitly to `localhost:8973` serving the edited tree, because the harness
+default grades the **deployed** site (cycle 710's finding, still unfixed).
+
+- **Deep-link matrix 16/16 PASS** — 8 countries (Nigeria, Brazil, Guyana, United Kingdom,
+  Iraq scored; Azerbaijan, Uganda, Vietnam unscored) x 1440x900 and 390x844 `hasTouch`.
+  Correct verdict head, optgroups 21/164, `scrollWidth == clientWidth`, **0 page errors**.
+- **Normal path unregressed** — cold load → Reform Risk tab → pick Nigeria → correct.
+- **Six widths**: `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- **0 controls under 24px** under `pointer: coarse` at 390 (desktop counts unchanged — the
+  v612 layer is scoped to `pointer: coarse`, as locked).
+- **JS syntax gate PASS**, 11 blocks.
+- **Runtime suite: 289 PASS / 4 FAIL / 1 WARN.** The same suite run against the
+  **unmodified** build in the same session returned **289 / 4 / 1**, identical — so the 4
+  failures are pre-existing and are not this change. The 1 WARN is the known
+  service-worker 404.
+
+### Escalation — the harness number is hiding 4 real failures
+
+The cycle email for this run will quote **300 PASS / 0 FAIL**. Against the local tree the
+same suite returns **289 PASS / 4 FAIL**. Both numbers are honest; they grade different
+builds. `runtime_comprehensive.js:13` defaults `TEST_URL` to the deployed site and
+`autonomous_cycle.py` never sets it, so the gate has never graded a build the cycle
+touched. It is no longer a theoretical defect — it is currently concealing four failures:
+
+    [SB-PROVENANCE] Brazil strip: no default-basis warning
+    [SB-PROVENANCE] Brazil IC line: IC line unqualified
+    [SB-PROVENANCE] Sweep defaults: default branch fired only 1 times — expected >=100
+    [CountryProfile] fully sourced country unchanged: USA evidence chain gained an
+                     absence marker it should not have
+
+This is now the single most valuable thing left in the backlog, above any UX walk.
+
+## Carried forward, still not done
+
+- `TEST_URL` not set by `autonomous_cycle.py` — see the escalation above. **Promoted to
+  top of the list.**
+- The 4 local FAILs listed above (3 Scenario Builder provenance, 1 Country Profile USA
+  evidence chain). Untouched this cycle; they are a different task's walk.
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1)
+  remains uninvestigated. **Ninth** consecutive cycle log to note it.
+- `Copy for IC Memo` on Side-by-Side is a silent no-op when the comparison holds one country.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- Side-by-Side grid header sits ~117px below the fold at 390.
+- `fromSlug('united-kingdom')` returns null (the app writes `united_kingdom`); a hand-typed
+  or hyphen-mangled reform URL drops to the global view with nothing said. Minor — noted,
+  not fixed.
+
+**STILL LOCKED respected:** no tooltip, FAQ, banner, citation or text-only edit; the v612
+mobile layer, its `min-width: max-content` marker and `#reference-panel` untouched; FC
+columns and the removed Govt NPV column untouched; CP headline two-zone untouched; Screener
+presets stay a dropdown; Advanced Filters still collapsed; tab order unchanged. Version
+v804 → v805 at the three display sites only, silently, after the real change shipped.
+
+**Shipped:** petroleum-fiscal-db `143a978` (v805), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
