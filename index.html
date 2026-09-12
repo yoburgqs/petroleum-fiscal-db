@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v806</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v807</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v806</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v807</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v806</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v807</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33833,6 +33833,80 @@ function _iocEvCell(country) {
   return '<td class="num">' + getEvidenceBar(e) + '</td>';
 }
 
+// ── v807 (T6) — THE BREAKEVEN COLUMN ON THIS TAB PRINTED A NUMBER THE PLATFORM DOES NOT HOLD ──
+// T6 is "where did this number come from and how solid is the evidence?" On the IOC Portfolio the
+// last column was Breakeven, rendered from IOC_DATA.be_75 — AVG(dcf_results.breakeven_price) per
+// operator | country | mechanic. It was the one figure on the row an analyst could not trace, in
+// three separate ways, measured against the shipped IOC_DATA (1,772 rows, 1,386 carrying a value):
+//
+//   1. 1,191 of those 1,386 rows (86%) print a breakeven for a country whose COUNTRY_DATA.be_75
+//      is NULL. The row is clickable and opens that country's profile — where Breakeven reads
+//      "—" and Data Completeness says "not yet computed for this regime". Shell / United Kingdom
+//      read $19 here and nothing at all there. Norway and USA, the two largest rows in the whole
+//      table, are both in this set.
+//   2. It spans $1 to $187.70. The Breakeven Map states, as its headline coverage note, that all
+//      65 modelled countries "fall between $27 and $34/bbl. That is the whole observed range."
+//      560 rows on this tab fall outside it.
+//   3. This tab's own XLSX Basis & Assumptions sheet and its clipboard artifact both say, in so
+//      many words, "IRR and breakeven are not reported at this level: the underlying country
+//      figures are arithmetic means of per-contract values, not project returns." The export has
+//      never carried a Breakeven column. Only the screen did.
+//
+// v787 removed the IRR column from these same two tables for exactly this reason and left the
+// breakeven beside it standing. This is that removal finished.
+//
+// It is replaced rather than deleted, because the column was being read for downside resilience
+// and that question has a defensible answer: npv_50 / npv_75, which the Breakeven Map's own
+// coverage note points the analyst at ("For downside screening use NPV @$50, modelled 185/185"),
+// which the Screener screens on, and which the Fiscal Compare drawer already prints as "% of NPV
+// kept at $50". Same helper, _npvRetention(), so the three surfaces cannot drift apart. It is a
+// property of the JURISDICTION, not of the operator's position in it, and the header says so.
+var _IOC_DS_TH = '<th class="num" title="' + _iocEvEsc(
+    'Share of the COUNTRY’s $75/bbl contractor NPV still standing at $50/bbl — the price-break '
+  + 'survival test, on the standardized Deepwater profile. A property of the jurisdiction, not of '
+  + 'this operator’s position in it: scale by your working interest and substitute your own '
+  + 'capex/opex before it goes near a valuation. Modelled for 182 of 185 countries; observed range '
+  + '−14% (Yemen, value turns negative through the break) to +75% (Turkmenistan), median 45%. '
+  + '≥50% is the axis the Screener’s Downside Resilience preset screens on. Identical figure to '
+  + 'the Breakeven Map’s Downside Resilience cards, the Screener’s "% of $75 kept" sub-cell and '
+  + 'the Fiscal Compare drawer’s "% of NPV kept at $50" — all four call _npvRetention(). '
+  + 'This column replaced Breakeven at v807: IOC_DATA.be_75 printed a figure for 1,191 rows whose '
+  + 'country holds no modelled breakeven at all, ranged $1–$188 against a platform-wide modelled '
+  + 'range of $27–$34, and was already disclaimed by this tab’s own export as "not reported at '
+  + 'this level".')
+  + '">$50 Downside<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 NPV kept</span></th>';
+// The cell. Reads the country record, never the operator row, and says which case a blank is.
+function _iocDownsideCell(country) {
+  var d = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+  if (!d) return '<td class="num"><span style="font-size:10px;color:var(--muted);" title="'
+    + _iocEvEsc('ORCA holds no country fiscal record for ' + country + ', so there is no $75 or $50 '
+      + 'contractor NPV to measure a price break against.')
+    + '">no record</span></td>';
+  var r = (typeof _npvRetention === 'function') ? _npvRetention(d) : null;
+  if (r === null || r === undefined) {
+    return '<td class="num"><span style="font-size:10px;color:var(--muted);" title="'
+      + _iocEvEsc('No downside figure is defined: contractor NPV at $75 is $0 or below for '
+        + country + ', so there is no contractor value for a price break to erode. This is a '
+        + 'state-monopoly regime — the question here is access, not price resilience. Treat it as '
+        + 'NOT PASSING a downside screen, not as a blank.')
+      + '">no position</span></td>';
+  }
+  var pct = r * 100;
+  var col = pct < 0 ? 'var(--red)' : pct >= 50 ? '#15803D' : pct >= 35 ? 'var(--muted)' : 'var(--orange)';
+  var wt  = (pct < 0 || pct >= 50) ? '700' : '400';
+  var tip = country + ' retains ' + pct.toFixed(0) + '% of its $75/bbl contractor NPV when oil '
+    + 'falls to $50 — '
+    + (pct < 0 ? 'value turns NEGATIVE through the price break; this jurisdiction does not survive a downturn.'
+      : pct >= 50 ? 'top of the range. Regimes that insulate contractor cash flow from price (service terms, high royalties) retain the most, which is why several high-take countries lead this column.'
+      : pct >= 35 ? 'around the 45% median of the 182 countries where the ratio is defined.'
+      : 'bottom of the range — most of the contractor position is price-dependent.')
+    + ' Measured, not estimated: npv_75 and npv_50 are modelled for 185 of 185. Jurisdiction '
+    + 'figure, not this operator’s position.';
+  return '<td class="num"><span style="font-weight:' + wt + ';color:' + col + ';cursor:help;" title="'
+    + _iocEvEsc(tip) + '">' + pct.toFixed(0) + '%</span></td>';
+}
+
 // ── v748 (T6) — THE MECHANIC COLUMN NAMED A DOCUMENT TYPE, NOT A FISCAL MODEL ────────────
 // The Mechanic column is this platform's own answer to "what produced this number". On the
 // IOC Portfolio it is the only thing on the row that says what kind of fiscal regime the take,
@@ -34065,7 +34139,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
       <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num">Swing</th><th class="num">NPV</th>
-      <th class="num">Breakeven</th>
+      ${_IOC_DS_TH}
     </tr></thead>
     <tbody>${rows.sort((a,b)=>b.n-a.n).map(r => {
       const cEsc = r.country.replace(/'/g,"\\'");
@@ -34085,7 +34159,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       ${_iocEvCell(r.country)}
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
-      <td class="num">${formatBreakeven(r.be_75)}</td>
+      ${_iocDownsideCell(r.country)}
       </tr>`;}).join('')}</tbody>
   </table></div>`;
   const disclosureBanner = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--muted);">
@@ -34206,7 +34280,7 @@ window.loadIOC = function(operator) {
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
       <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
-      <th class="num">Breakeven</th>
+      ${_IOC_DS_TH}
     </tr></thead>
     <tbody>${rows.sort((a,b)=>(b.n-a.n)).map(r => {
       const cEsc = r.country.replace(/'/g,"\\'");
@@ -34229,7 +34303,7 @@ window.loadIOC = function(operator) {
       <td class="num take-125-col" style="display:none">${fmtTake(r.take_125)}</td>
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
-      <td class="num">${formatBreakeven(r.be_75)}</td>
+      ${_iocDownsideCell(r.country)}
     </tr>`;}).join('')}</tbody>
   </table></div>`;
 
