@@ -46970,3 +46970,16 @@ unchanged. v813 → v814 at the three display sites only, silently, after the re
   to a 1:1 scale and renders at **300px centred inside a 1,050px card** — 71% of the card is blank
   and the axis labels sit at a literal 7px. Not this cycle's worst moment (it renders; Regional
   Peers did not), but it is the next one on this tab.
+
+---
+## Cycle 722 Log — 2026-09-12 09:14
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 722 complete — shipped as **v814**, pushed to `main` (`9f91991` + `51e3d5b`), mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation (v813 was T6, v812 T4, v811 T1, v810 T3, v808 T5; T2 last ran at v806). Last cycle was T6, not repeated.
+
+## Friction
+Walked cold at 1440×900 and 390×844 with touch, storage cleared. Every interactive affordance on the Country Profile walk worked — "See the 12 producers that take less", "Why t
