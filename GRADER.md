@@ -45957,3 +45957,96 @@ v804 → v805 at the three display sites only, silently, after the real change s
 **Task** — T4, "What is my fiscal-stability and reform exposure here?" Stalest by rotation (703 T4, 705 T2, 706 T6, 707 T5, 708 T3, 710 T1, 711 T3).
 
 **Friction** — A cold load at `#/reform/<country>` rendered the **wrong verdict**, silently. That URL is the reload, bookmark, browser-Forward and send-this-to-a-colleague path — the entire reason v796 gave the 
+
+---
+## Cycle 713 — 2026-09-12 — T2 — shipped v806
+
+**Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by
+rotation (705 T2, 706 T6, 707 T5, 708 T3, 710 T1, 711 T3, 712 T4).
+
+**Friction** — The defensibility step in T2 is the Peer Comparison table on Country Profile:
+these are the regimes my number sits among, load them and check. The table renders the country
+plus five peers. Its own button, `Load All Peers in Compare`, fired **six raw `addCompare()`
+calls into a five-slot comparison** (`CMP_MAX = 5`, index.html:27237) and switched tab in the
+same click (button built at index.html:39847). The sixth add always refused, and the refusal
+toast was raised on the tab the click was in the act of *leaving*. The analyst landed on
+Side-by-Side reading **"5/5 countries (full)"** — which reads like a completed load — one peer
+short of the table they had clicked from, with nothing on screen naming what was dropped.
+
+Walked cold on the default Indonesia profile: table shows Indonesia + Azerbaijan, Mauritania,
+Republic of the Congo, Tanzania, **Myanmar**. Myanmar never arrives. Confirmed by reading
+`compareList` after the click.
+
+Worse when the comparison was not empty. The button *appended*. With three countries the
+analyst had built themselves already loaded, it delivered the country plus **one** peer and
+discarded four — a set that was neither theirs nor the peer table's, with four stacked toasts
+on a tab being left. Verified live: pre-loaded Norway/Brazil/Guyana, clicked, got a 5-country
+hybrid.
+
+This is the same shape as the bug `fcOpenSbs()` was rewritten to fix (the Fiscal Compare
+"Load Top 5" that silently discarded the analyst's ticks). The Country Profile peer button was
+never given the same treatment.
+
+**Change** —
+- New `cpLoadPeersSbs(country, peers)`, built on the `fcOpenSbs()` pattern: cap the set at what
+  Side-by-Side actually holds, **replace rather than append**, hold `_cmpHashHold` so ONE
+  `#/compare` history entry is written instead of six, switch tab, then toast what was removed.
+  The toast is suppressed when the only thing cleared was an untouched seeded example — that is
+  not the analyst's work and its removal is not news.
+- The peer table now derives its load set from `CMP_MAX` itself, so the button and the table
+  cannot disagree: button reads **"⇌ Compare these 5 in Side-by-Side →"**, the peer that does
+  not fit is dimmed to `opacity:.55`, and a line beside the button names it — *"Side-by-Side
+  holds 5. Myanmar is outside that — load it with the + on that row."*
+
+**Result** — The analyst gets exactly the set the button names, every time. The one peer left
+out is identified **by name, before the click**, on the row it belongs to, instead of by a toast
+on a tab they are leaving. An analyst who had already built a comparison is told what was
+cleared rather than handed a silently truncated hybrid. No `Comparison is full` refusal can fire
+from this button any more.
+
+**Verified this cycle** (all run, none assumed):
+- Cold walk at 1440x900 on the default profile; both click paths (`compareList` read after each).
+- Edge cases Kuwait, Norway, USA, Iraq, Guyana, Oman, Japan — each renders exactly one dimmed
+  row and a correct note; **0 page errors**.
+- Six widths `scrollWidth == clientWidth`: 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- 390 `hasTouch`: 3 controls under 24px — **all three are pre-existing source-citation links**,
+  byte-identical on the stashed unmodified build, which was measured in the same session.
+- **JS syntax gate PASS**, 11 blocks.
+- **Runtime suite against the LOCAL tree: 299 PASS / 0 FAIL / 1 WARN** (known service-worker 404).
+- **PIXEL GATE PASS** — no surface got worse than baseline.
+
+### Correction to the cycle 712 escalation
+
+Cycle 712 escalated that `runtime_comprehensive.js:13` defaults `TEST_URL` to the deployed site
+and `autonomous_cycle.py` never sets it for `run_playwright()` (it *does* set it for the pixel
+gate, at autonomous_cycle.py:307). That wiring defect is still real and still unfixed — the
+harness number continues to grade the deployed build rather than the one the cycle touched.
+
+But the four failures it was said to be concealing **no longer reproduce**. Run against the
+local tree this cycle, the suite returned 299 PASS / **0 FAIL**. The three `[SB-PROVENANCE]`
+failures and the `[CountryProfile]` USA evidence-chain failure are gone. Recorded rather than
+carried forward, because carrying a stale failure list forward is how a backlog stops being
+read.
+
+## Carried forward, still not done
+- `TEST_URL` not set by `autonomous_cycle.py:136` for `run_playwright()`. Real, unfixed. No
+  longer concealing a known failure set, so it is a correctness-of-measurement item, not an
+  urgent one.
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) remains
+  uninvestigated. **Tenth** consecutive cycle log to note it.
+- `Copy for IC Memo` on Side-by-Side is a silent no-op when the comparison holds one country.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- Side-by-Side grid header sits ~117px below the fold at 390.
+- `fromSlug('united-kingdom')` returns null (the app writes `united_kingdom`).
+- `cp-run-fc-btn` reads `#cp-price-select` and writes `#price` — **neither element exists**. It
+  falls through to `#fc-price` and happens to behave, but its "at this price" label describes a
+  control that is not on the page. Noted this cycle, not fixed.
+
+**STILL LOCKED respected:** no tooltip, FAQ, banner, citation or text-only edit; the v612 mobile
+layer, its `min-width: max-content` marker and `#reference-panel` untouched; FC columns and the
+removed Govt NPV column untouched; CP headline two-zone untouched; Screener presets stay a
+dropdown; Advanced Filters still collapsed; tab order unchanged. Version v805 → v806 at the
+three display sites only, silently, after the real change shipped.
+
+**Shipped:** petroleum-fiscal-db `e21b555` (v806), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
