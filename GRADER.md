@@ -46637,3 +46637,125 @@ display sites only, silently, after the real change shipped.
 Walked cold: Home hero → "open the screen" → **IOC Capital Screen, 15 rows**. The analyst presses **$100** to check the upside — which the deck button's own tooltip invites. The list drops to 12, and the chip stays clean amber still asserting, verbatim:
 
 > ◆ IOC Capital Screen: verified production · Take ≤
+
+---
+## Cycle 720 Log — 2026-09-12 — T4 — shipped v812
+- Test before (harness, deployed build): 300 PASS / 0 FAIL
+- Test after (suite RUN this cycle, local tree): 289 PASS / 4 FAIL / 1 WARN — **identical to
+  pristine HEAD served from the same directory**, so FAIL-neutral. The 4 are pre-existing
+  (SB-PROVENANCE Brazil ×3, CountryProfile USA evidence chain); none is on this tab.
+- JS errors: 0 page errors. 1 console 404 = the known `sw.js` WARN, a local-static artifact
+  (`index.html:49` registers `/petroleum-fiscal-db/sw.js` by absolute path).
+- Pixel gate: **PASS** — no surface worse than baseline.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation: T4 last ran
+at cycle 712 (713 T2 · 714 T6 · 715 T5 · 716/718 T3 · 719 T1). Last cycle was T1, not repeated.
+Walked cold at 1440×900 and at 390×844 `hasTouch`, sessionStorage and localStorage cleared and
+reloaded, against the LOCAL tree.
+
+## Friction
+Home → Reform Risk card → the tab. The lookup at the top (*"Check one country"*) works and is
+good. But an analyst who does not already know their country **scrolls first**, past the regional
+tilt table, the top-15 table and the heatmap, to the tab's three findings cards — QUIET SINCE 2010
+(13) / REFORMED TWICE SINCE 2010 (6) / **ACTIVELY REFORMING (2)**. There is their country:
+*United Kingdom · 5 changes since 2010 · 2011, 2016, 2022, 2023, 2024 · score 25*. They press
+**"United Kingdom ›"** at y≈4,470.
+
+Measured landing: **tab `t7`, scrollY 0, hash `#/profile/united_kingdom`.** What is in the viewport
+is the Country Profile country picker and its XLSX / PDF / Compare / IC Citation buttons. The
+reform answer — *"IC action — Actively Reforming: 5 law changes since 2010 … add a 3–5pp WACC
+premium"* — is at **y=1042** on that page, below the fold, with nothing on screen naming it. The
+rankings they were reading are gone with the tab.
+
+This was not one button. **All 57 clickable countries in this tab's global view ran the same three
+statements** — set `#dd-country-select`, `loadCountryProfile(c)`, `switchTab('t7')`:
+
+| generator | line | targets |
+|---|---|---|
+| ranked-table `<tr>` + the country `<a>` inside it | `index.html:43499` | 15 |
+| heatmap row labels | `index.html:43531` | 20 |
+| `_rrRowBtn()` — the `name ›` buttons in the three partition cards | `index.html:43616` | 21 |
+
+One destination, and the destination was a different tab.
+
+And this tab **already builds the answer**. `renderReformCountryVerdict()` renders a
+1,100–1,721px verdict card carrying the IC action, the Reform Frequency Score and its rank, the
+reforms-since-2010 count, the direction split, the fiscal-predictability ceiling and the country's
+**own sourced event log split at the 2010 boundary**. Seven surfaces on *other* tabs route into it
+through `openReformRiskFor()` — Fiscal Compare's Stability cell, the CP headline chip, the CP
+sidebar Stability line, the CP "Full reform detail" button, the no-coverage panel, the peer block
+and the event-log button. **Not one control on the tab that owns it did.** The closing line of
+those same partition cards even reads *"use the lookup at the top of the tab"* — printed directly
+beneath 21 buttons that did something else.
+
+## Change
+New **`_rrOpenLocal(country, el)`** (`index.html`, after `_rrScrollVerdictToTop`): selects the
+country in this tab's own lookup, renders the verdict, and scrolls to its top with the same
+`_rrScrollVerdictToTop()` every other route uses. All three generators rewired to it. The ranked
+table's `country ↗` glyph is now `country ›`, because the click no longer leaves the tab.
+
+**Nothing is lost.** The verdict card already carries `Open <Country> Country Profile ›` as its own
+control (`:43134`), so the profile is one further click — and `_rrOpenProfile()` is kept as the
+fallback for a reform-log country `COUNTRY_DATA` does not carry an option for.
+
+**Return is anchored on the element, not on a scroll offset.** Selecting a country inserts the
+verdict card *above* the rankings, so every y below it moves by the card's height — returning to a
+remembered `pageYOffset` would land the analyst ~1,700px wrong. `_rrBackToOrigin()` gained an
+`inTab` branch that restores the clicked element to the viewport offset it had at click time, and
+`_rrVerdictHead()` renders it as **"← Back to the rankings"** rather than a tab name. The spent
+control is removed *before* the scroll is measured — removing it afterwards shortened the card and
+left the row 18px off, which the first build did.
+
+## Result
+Clicking a country on the Reform Risk tab now answers the reform question. The card lands with
+**"United Kingdom — reform exposure / IC action — Actively Reforming: 5 law changes since 2010…"**
+at viewport top **12** (114 on a phone, clear of the sticky header) instead of another tab's export
+buttons at scrollY 0 — and the analyst can check a second and third country without hunting for
+the row again 4,000px down.
+
+## Verification — the suite RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax (all inline `<script>` extracted, `node --check`) | **PASS** (11 blocks) |
+| Runtime suite, `TEST_URL=http://localhost:8931/index.html` | **289 PASS / 4 FAIL / 1 WARN** |
+| Same suite vs pristine `HEAD` written into the **real** repo directory | **289 / 4 / 1 — identical, same four names** |
+| Pixel gate, `pixel_audit.js` 10 tabs × 5 viewports | **PASS** — no surface worse than baseline |
+
+Round trip measured from all three entry points, and the drift is what matters:
+
+| entry point | row viewport top before | after ← Back | drift | verdict lead line |
+|---|---|---|---|---|
+| ACTIVELY REFORMING button (United Kingdom) | 438 | 438 | **0px** | IC action — Actively Reforming: 5 law changes since 2010 |
+| ranked-table row (Nigeria) | 428 | 428 | **0px** | IC action — terms were rewritten inside the window, size never quantified |
+| heatmap row label (Angola) | 444 | 444 | **0px** | IC action — terms were rewritten inside the window, size never quantified |
+| 390×844 `hasTouch` (United Kingdom) | 406 | 406 | **0px** | card top 114, under the sticky header |
+
+Tab stayed `treformrisk` in every case; hash tracked to `#/reform/united_kingdom`; the spent back
+control was gone after use each time.
+
+**Step 5b — checked on a phone.**
+
+| viewport | scrollWidth / clientWidth | sub-24px controls on this tab | page errors |
+|---|---|---|---|
+| 1920 | 1920 / 1920 | 23 (pre-existing, `pointer: fine` only — 13px heatmap text links, the 23px lookup Clear and the card's CP button) | 0 |
+| 1440 | 1440 / 1440 | same 23 | 0 |
+| 1280 | 1280 / 1280 | same 23 | 0 |
+| 1024 | 1024 / 1024 | same 23 | 0 |
+| 768 | 768 / 768 | 20 | 0 |
+| **390 `hasTouch`** | **390 / 390** | **0** | 0 |
+
+Zero horizontal scroll at all six. Under `pointer: coarse` the v612 mobile layer takes every one of
+those to ≥24px — measured 0 sub-24px across the whole tab at 390 — and the new back control is
+exactly 24px. The `_rrRowBtn` buttons this cycle touched gained `min-height:24px` and no longer
+appear in the sub-24 list at any width.
+
+**STILL LOCKED respected:** no new tooltip (two existing `title` strings were rewritten only
+because they named the wrong destination), no new FAQ, no banner, no citation micro-edit, no
+text-only change — the layout and the interactive behaviour of 57 controls both changed. The v612
+mobile layer, its `min-width: max-content` marker and `#reference-panel` untouched. Explorer
+analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. FC columns, the removed Govt NPV column and the CP two-zone headline untouched. Tab order
+unchanged. Version v811 → v812 at the three display sites only, silently, after the real change
+shipped.
