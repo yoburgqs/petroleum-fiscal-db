@@ -47576,3 +47576,187 @@ change shipped.
   touches `_fcGenericLast`, the tier dividers and the rank column, so it wants its own cycle.
 - Carried forward and still true, still not the worst moment: Country Profile's Price Sensitivity
   Curve renders 300px centred inside a 1,050px card (`viewBox="0 0 300 64"`), axis labels at 7px.
+
+---
+
+# CYCLE 728 — v820 (T6) — IOC Portfolio's Govt Take is the OPERATOR's figure, printed as if it were the country's
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"*
+
+**Walked cold** (no sessionStorage, no localStorage) at 1440 and at 390 x 844 `hasTouch`, on a
+local server against this tree. The T6 walk on Country Profile is in very good shape and was left
+alone — see *Also walked, found sound* below. The friction is on **IOC Portfolio**, the tab that
+loads Shell as a seeded example and is therefore the first table many analysts read.
+
+## Friction — `loadIOCAggregated()` / `loadIOC()`, the GOVT TAKE column
+
+`IOC_DATA.take_75` is `AVG(dcf_results.govt_take_pct)` per **operator | country | mechanic** — the
+take on *that operator's own contracts*. It is a real and defensible figure. What was wrong is that
+nothing on screen said so, and everything around it said the opposite:
+
+- It rendered through **`fmtTake()`**, the shared **country-level** formatter, whose tooltip reads
+  *"Government take on standardized $1.2B deepwater project. Production-weighted where coverage
+  data available."* — the identical string Fiscal Compare, the Explorer and the Screener print over
+  their **country** figures.
+- The two columns beside it both state their basis, and both are country-level. `_IOC_EV_TH`:
+  *"Evidence grade for the COUNTRY … **not** a grade of this operator's own contracts."*
+  `_IOC_DS_TH`: *"A property of the jurisdiction, **not** of this operator's position in it."*
+  So the analyst learns this table's columns are country-level from the only two columns that
+  bothered to say, and generalises it to the one that is not.
+- The whole row is a control — `onclick="openCountryProfileFromFC(...)"`. Clicking it lands on the
+  country page, which prints a **different number under the same label**, with nothing anywhere
+  reconciling the two.
+
+**Measured against the shipped `IOC_DATA` (1,772 rows) and `COUNTRY_DATA`:**
+
+| | |
+|---|---|
+| rows where operator take ≠ country take at 1 d.p. | **1,512 of 1,772** |
+| rows differing by > 10pp | **346** |
+| largest gap | **73pp** (Petroleos del Perù / Peru: 100% here, 27% there) |
+| rows that agree | 260 |
+
+Shell's own roll-up, as rendered: Nigeria **83.5%** here / 81.1% there · United Kingdom **44.0** /
+49.2 · Mexico **25.2** / 32.2 · Malaysia **53.5** / 59.4 · Brazil **50.4** / 55.6 · Norway **67.3**
+/ 68.0 · USA **23.8** / 23.4.
+
+This is the last column of a family already twice corrected on this tab and for this exact reason:
+**v787** removed the IRR column from both IOC tables, **v807** replaced Breakeven — both because the
+per-operator `IOC_DATA` average could not be traced to anything the analyst could open. Take was
+left standing.
+
+The distinction already existed on this tab — 2,000px below, in the **Exposure Analysis** annex,
+which marks its fallback rows `country avg` and whose footnote names which rows are the operator's
+own terms. The table at the top of the tab, which is what is actually read, said nothing.
+
+## Change
+
+Take is **not removed** — unlike a mean of per-contract IRRs, an operator's contract-weighted take
+is the number this tab exists to show. It is labelled, and the figure it will be checked against is
+printed beside it instead of discovered one click later.
+
+1. **New `_IOC_TAKE_TH`**, shared by the group roll-up and the single-entity table, replacing a bare
+   `<th>Govt Take</th>`. Renders a second header line on the column face:
+   `GOVT TAKE` / `this operator's contracts` — the same two-line header idiom `_IOC_DS_TH` uses.
+2. **New `_iocTakeCell(r)`**, replacing `fmtTake(r.take_75)` in both tables. Leads with the operator
+   figure, **unchanged**. Adds a muted 10px sub-line `country-wide 68.0%` **only when the two do not
+   print the same at one decimal place** — so the sub-line's presence is itself the signal that this
+   row will not reconcile with the page it links to, and its absence (Australia 38.5%, New Zealand
+   22.2%, Argentina 31.0%) means they agree. Per-row hover names both figures, the signed gap, the
+   contract count the operator figure is averaged over, the five surfaces that carry the country
+   figure, and that **neither is wrong** — a gap this size is normally licence vintage and block
+   terms against a national average including every other operator.
+   State-monopoly rows (`isStateMonopoly`, ≥99.5%) keep their suppressing dash and still get the
+   country figure underneath, with the suppression explained — that is the 73pp Peru case.
+3. **The `WTD AVG TAKE @$75` stat tile** at the top of the tab, in both code paths, now carries
+   `this operator's own contracts` under its key. It is the headline number of the tab and was
+   computed from exactly these operator rows.
+
+Same helper for both tables, so the roll-up and the single-entity view cannot fork.
+
+## Result
+
+An analyst reading Shell's exposure now sees, without leaving the row, that Shell's UK contracts
+carry **44.0%** government take against a **49.2%** UK national average — and knows which of those
+two numbers the Country Profile, Fiscal Compare, the Explorer, the Screener, the XLSX and the JSON
+API will show when they click through. Before, they read one number labelled the same way its two
+country-level neighbours were labelled, clicked the row, got a different number, and had no way to
+tell whether they had found an error, a different price deck, or a different basis. They can now
+cite the operator figure in a memo about Shell and the country figure in a memo about the UK, and
+say which one it is.
+
+## Verification — every number below was read from the run, not assumed
+
+| gate | result |
+|---|---|
+| JS syntax (11 inline blocks, `new Function`) | **PASS** |
+| `runtime_comprehensive.js` vs **this tree** (`TEST_URL=localhost:8941`) | **286 PASS / 7 FAIL / 1 WARN** |
+| Same suite vs **pristine `HEAD`** served from a separate tree (`localhost:8942`) | **289 PASS / 4 FAIL / 1 WARN** |
+| `pixel_audit.js` 10 tabs x 5 viewports, gated on `~/logs/pixel_audit/baseline.json` | **PIXEL GATE PASS** — no surface worse than baseline; IOC Portfolio `clean` at 1920 / 1440 / 1280 / 768 / 390 |
+
+**The 7 failures, resolved rather than waved past.** Four of them reproduce *identically* on
+pristine `HEAD` and therefore pre-date this cycle:
+
+- `[SB-PROVENANCE] Brazil strip` / `Brazil IC line` / `Sweep defaults` — Scenario Builder.
+- `[CountryProfile] fully sourced country unchanged` — checked directly, side by side on both
+  ports: **USA's Evidence Chain renders byte-identically on HEAD and on this tree**, both
+  carrying `Royalty Rate 17.62% ⚠ DCF USES 12.5%`. The assertion is stale: USA is no longer a
+  "fully sourced country with no absence markers", and has not been for some time.
+
+The remaining three are `[HomeICScreen]`, all reporting the Screener count line stuck on the
+*previous* test's preset (`Low Take · Positive NPV · 143` where `IOC Capital Screen · 15` was
+expected). They were **reproduced in isolation, 3 trials on each tree**, replicating the preceding
+preset-select step and calling `_homeOpenICScreen()`:
+
+    MINE  t1/t2/t3  home=15 last=15 rows=15  countLine="IOC Capital Screen · 15 countries match at"
+    BASE  t1/t2/t3  home=15 last=15 rows=15  countLine="IOC Capital Screen · 15 countries match at"
+
+6 of 6 correct. The assertion waits a fixed `waitForTimeout(1400)` after `_homeOpenICScreen()`;
+the host was heavily loaded (both suite runs took 45-90 min against a normal ~5), and the repaint
+did not land inside it. It is a load-induced flake, not a regression — and `testHomeICScreen()`
+runs at `:2498`, **before** `testIOC()` at `:2500`, so the only code this cycle changed had not
+executed when it fired.
+
+**A stale report was nearly read as this cycle's result.** `ORCA_REPORT_FILE` pointed at a scratch
+directory that a previous cycle had already used, and it still held that cycle's `report.txt` from
+2026-09-09 reading `296 PASS / 0 FAIL`. The wait-for-file guard was satisfied instantly by the
+leftover. Caught by checking the timestamp *inside* the report against the clock; the file was
+deleted and the gate re-armed on process exit instead of file existence. This is the same shape as
+the `REPORT_FILE never cleared` defect recorded in the root `CLAUDE.md` — the trap is still live
+for any cycle that reuses a temp path.
+
+**Step 5b — checked on a phone.**
+
+| viewport | `scrollWidth / clientWidth` | new sub-lines | sub-line height | page errors |
+|---|---|---|---|---|
+| 1920 | 1920 / 1920 | 32 | 13px | 0 |
+| 1440 | 1440 / 1440 | 32 | 13px | 0 |
+| 1280 | 1280 / 1280 | 32 | 13px | 0 |
+| 1024 | 1024 / 1024 | 32 | 13px | 0 |
+| 768 `hasTouch` | 768 / 768 | 32 | 13px | 0 |
+| **390 `hasTouch`** | **390 / 390** | 32 | 13px | **0** |
+
+Zero horizontal scroll at all six. **No control was added** — the sub-line is a caption with a
+`cursor:help` title, not a click target, so the 24px `pointer:coarse` floor does not apply and the
+pixel audit reports no new `small-touch-target` on this tab at 768 or 390. That was the design
+constraint, not an accident: on a phone the hover text is unreachable, so the *figure itself* is
+on the face of the cell and the tooltip only carries the explanation. The table lives in
+`.tbl-wrap` (`overflow-x:auto`), so ~55px of extra column width scrolls inside the wrapper and
+never reaches the document. The stat-tile second line fits at 390 (measured).
+
+**STILL LOCKED respected:** no new tooltip on a new surface — the take column's existing
+`fmtTake()` tooltip was *false* on this tab and is replaced by a header that states the basis; no
+new FAQ; no banner; no page-sub paragraph; no citation micro-edit; not a text-only change — the
+column gained a header line and 32 rendered sub-lines, and the rendered layout differs. The v612
+mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched. Explorer
+analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. CP two-zone headline and the removed FC Govt NPV column untouched. Tab order unchanged.
+v819 → v820 at the three display sites only (`:42`, `:2420`, `:2490`), silently, after the real
+change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+
+- **The Country Profile Evidence Chain is the strongest T6 surface in the product and was left
+  alone.** Walked cold across Nigeria, Norway, Somalia, Guyana, Suriname, Namibia, Tuvalu and
+  Vanuatu. It partitions correctly in every state: `LINK DEAD` on unreachable citations with the
+  measurement date named, `BULK` on the EY/IHS harvest, `NO SOURCE · contract average`,
+  `NOT HELD` with the model default that filled in, `⚠ DCF USES n%` where the engine overrides
+  both the contract average and the statute, `9 JURISDICTIONS` where one model act is shared, and
+  a divider for rows the country's mechanic does not read. Nigeria renders all of it plus three
+  verdict notes and a `Show what the DCF panel used →` control.
+- **The route into it works from a cold load.** `#cp-take-source` ("81.1% govt take @$75 sources
+  ↓") and `#cp-terms-chip` ("3 of 4 model terms cited →") both land at scrollY 3495, the Evidence
+  Chain heading at the top of the viewport.
+- **Vanuatu's two-citation case is handled with unusual care** — *"Both are the same document …
+  so that is one citation checked twice, not two independent ones."*
+- **The IOC export already knew what the screen did not.** `_iocExpRows()` has carried a
+  `Take basis` column since v599 — *"this operator's own contracts in ORCA"* vs *"COUNTRY AVERAGE
+  — ORCA holds no {operator} contract terms for {country}"* — and the Basis & Assumptions sheet
+  repeats it. So the XLSX, the clipboard artifact and the Exposure Analysis annex all stated the
+  basis; only the table at the top of the tab did not.
+- **Still open on this tab, not worth a cycle alone:** the export names the basis but does not
+  carry the country-wide take beside the operator take, so an IC reader holding only the sheet
+  still cannot reconcile it against a Country Profile. A one-column addition, but it changes the
+  shipped sheet shape and wants its own cycle.
+- **Also still open, carried forward:** the FC Reform verdict column has no `data-sort-key`;
+  Country Profile's Price Sensitivity Curve renders 300px centred inside a 1,050px card.

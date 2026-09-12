@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v819</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v820</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2417,7 +2417,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v819</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v820</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2487,7 +2487,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v819</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v820</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34186,6 +34186,87 @@ function _iocEvCell(country) {
   return '<td class="num">' + getEvidenceBar(e) + '</td>';
 }
 
+// ── v820 (T6) — GOVT TAKE ON THIS TAB IS THE OPERATOR'S FIGURE, RENDERED AS IF IT WERE THE COUNTRY'S ──
+// T6 is "where did this number come from?". IOC_DATA.take_75 is AVG(dcf_results.govt_take_pct)
+// per operator | country | mechanic — the take on THAT OPERATOR'S OWN CONTRACTS. It is a real and
+// defensible figure. What was wrong is that nothing on screen said so, and everything around it
+// said the opposite:
+//
+//   * It rendered through fmtTake(), the shared COUNTRY-level formatter, whose tooltip reads
+//     "Government take on standardized $1.2B deepwater project. Production-weighted where
+//     coverage data available." — the identical string Fiscal Compare, the Explorer and the
+//     Screener print over their country figures.
+//   * The two columns beside it both state their basis explicitly and both are country-level:
+//     _IOC_EV_TH says "Evidence grade for the COUNTRY ... not a grade of this operator's own
+//     contracts", and _IOC_DS_TH says "A property of the jurisdiction, not of this operator's
+//     position in it". So the analyst learns that this table's columns are country-level from
+//     the only two columns that bothered to say, and generalises it to the one that is not.
+//   * The whole row is a control: onclick="openCountryProfileFromFC(...)". Clicking it lands on
+//     the country page, which prints a different number for the same label, with nothing
+//     anywhere reconciling the two.
+//
+// Measured against the shipped IOC_DATA (1,772 rows) and COUNTRY_DATA:
+//   1,512 of 1,772 rows print a Govt Take that differs from the country figure the same row
+//   links to. 346 of them differ by more than 10pp; the largest gap is 73pp. Shell's own
+//   roll-up: Nigeria 83.5% here / 81.1% there, United Kingdom 44.0 / 49.2, Mexico 25.2 / 32.2,
+//   Malaysia 53.5 / 59.4, Brazil 50.4 / 55.6.
+//
+// v787 removed the IRR column from these two tables and v807 replaced Breakeven, both because
+// the per-operator IOC_DATA average could not be traced to anything the analyst could open.
+// Take is the last column of that family. It is NOT removed — unlike a mean of per-contract
+// IRRs, an operator's contract-weighted take is the number this tab exists to show — so it is
+// labelled instead, on the header face and in the cell, and the country figure it will be
+// checked against is printed beside it rather than discovered one click later.
+//
+// The distinction already existed on this tab, in the Exposure Analysis annex 2,000px below:
+// that table marks its fallback rows "country avg" and its footnote says which rows are the
+// operator's own terms. The table at the top of the tab, which is what is actually read, said
+// nothing.
+var _IOC_TAKE_TH = '<th class="num" title="' + _iocEvEsc(
+    'Government take at $75/bbl on THIS OPERATOR\u2019S OWN CONTRACTS in that country and mechanic '
+  + '\u2014 the contract-weighted average over the contracts counted in the column to the left, not '
+  + 'the country-wide figure. The Evidence and $50 Downside columns beside it ARE country-level '
+  + 'and say so in their own headers; this one is not. Where the two differ at one decimal place '
+  + 'the country figure is printed under the operator figure, because clicking this row opens '
+  + 'that country\u2019s profile and it is the country figure that appears there, in Fiscal Compare, '
+  + 'in the Explorer, in the Screener and in the JSON API. 1,512 of the 1,772 operator rows ORCA '
+  + 'holds differ from their country figure and 346 of those differ by more than 10pp, so the two '
+  + 'are not interchangeable. In an IC memo naming the operator, cite the operator figure and say '
+  + 'it is the operator\u2019s contracts; in one screening the jurisdiction, cite the country figure. '
+  + 'Standardized $1.2B deepwater profile either way; production-weighted where coverage data '
+  + 'exists.')
+  + '">Govt Take<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">this operator\u2019s contracts</span></th>';
+
+// The cell. Leads with the operator figure, unchanged. Adds the country figure underneath only
+// when the two do not print the same at one decimal place, so the sub-line's presence is itself
+// the signal that this row will not reconcile with the page it links to.
+function _iocTakeCell(r) {
+  var lead = fmtTake(r.take_75);
+  var d = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(x) { return x.country === r.country; }) : null;
+  if (!d || r.take_75 == null || d.take_75 == null) return '<td class="num">' + lead + '</td>';
+  var op = Number(r.take_75), ct = Number(d.take_75);
+  if (Math.abs(op - ct) < 0.05) return '<td class="num">' + lead + '</td>';
+  var gap = op - ct;
+  var tip = r.country + ': this row is ' + (r.n ? Number(r.n).toLocaleString() + ' of ' : '')
+    + 'the operator\u2019s own contracts, and government take across them is ' + op.toFixed(1)
+    + '% at $75/bbl. Across ALL operators in ' + r.country + ' it is ' + ct.toFixed(1) + '% \u2014 '
+    + (gap > 0 ? '+' : '') + gap.toFixed(1) + 'pp. '
+    + (typeof isStateMonopoly === 'function' && isStateMonopoly(op)
+        ? 'The operator figure is suppressed above because it reaches ' + op.toFixed(1)
+          + '%, at which point the contractor has no access to project economics at all. '
+        : '')
+    + 'Clicking this row opens ' + r.country + '\u2019s Country Profile, which prints '
+    + ct.toFixed(1) + '%; so do Fiscal Compare, the Explorer, the Screener, the XLSX export and '
+    + 'the JSON API. Neither figure is wrong. A gap this size is normally the licence vintage and '
+    + 'the block terms this operator actually holds, against a national average that includes '
+    + 'every other operator\u2019s. Cite whichever answers your question, and say which one it is.';
+  return '<td class="num">' + lead
+    + '<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;'
+    + 'white-space:nowrap;cursor:help;" title="' + _iocEvEsc(tip) + '">country-wide '
+    + ct.toFixed(1) + '%</div></td>';
+}
+
 // ── v807 (T6) — THE BREAKEVEN COLUMN ON THIS TAB PRINTED A NUMBER THE PLATFORM DOES NOT HOLD ──
 // T6 is "where did this number come from and how solid is the evidence?" On the IOC Portfolio the
 // last column was Breakeven, rendered from IOC_DATA.be_75 — AVG(dcf_results.breakeven_price) per
@@ -34472,7 +34553,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStrAgg}</div><div class="sk">Mechanic Mix</div></div>
-    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
+    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
     ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPctAgg > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — higher govt take at high oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPctAgg}%</div><div class="sk">R-factor PSC</div></div>` : ''}
@@ -34491,7 +34572,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num">Swing</th><th class="num">NPV</th>
+      ${_IOC_TAKE_TH}${_IOC_EV_TH}<th class="num">Swing</th><th class="num">NPV</th>
       ${_IOC_DS_TH}
     </tr></thead>
     <tbody>${rows.sort((a,b)=>b.n-a.n).map(r => {
@@ -34508,7 +34589,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagAgg}</td>
       ${_iocMechCell(r, _hasR)}
       <td class="num">${r.n}</td>
-      <td class="num">${fmtTake(r.take_75)}</td>
+      ${_iocTakeCell(r)}
       ${_iocEvCell(r.country)}
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
@@ -34618,7 +34699,7 @@ window.loadIOC = function(operator) {
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStr}</div><div class="sk">Mechanic Mix</div></div>
-    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
+    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
     ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPct > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — these positions have higher govt take at higher oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPct}%</div><div class="sk">R-factor PSC</div></div>` : ''}
@@ -34632,7 +34713,7 @@ window.loadIOC = function(operator) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
+      ${_IOC_TAKE_TH}${_IOC_EV_TH}<th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
       ${_IOC_DS_TH}
     </tr></thead>
     <tbody>${rows.sort((a,b)=>(b.n-a.n)).map(r => {
@@ -34649,7 +34730,7 @@ window.loadIOC = function(operator) {
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTag}</td>
       ${_iocMechCell(r, _hasR2)}
       <td class="num">${r.n}</td>
-      <td class="num">${fmtTake(r.take_75)}</td>
+      ${_iocTakeCell(r)}
       ${_iocEvCell(r.country)}
       <td class="num take-50-col" style="display:none">${fmtTake(r.take_50)}</td>
       <td class="num take-100-col" style="display:none">${fmtTake(r.take_100)}</td>
