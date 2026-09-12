@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v817</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v818</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -559,6 +559,14 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .cp-why-body { display: block; margin: 4px 0 2px; padding-left: 8px; border-left: 2px solid var(--border); color: var(--muted); }
 .cp-why-body[hidden] { display: none; }
 @media (pointer: coarse) { .cp-why-btn { min-height: 24px; padding: 2px 9px; } }
+/* v818 (T1): the Bubble Chart production-backed toggle. Inline-flex label + 16px box measures
+   18px tall, which is under a thumb's reach; the box itself grows under a coarse pointer. */
+.bub-basis-toggle { min-height: 24px; padding: 3px 0; }
+.bub-basis-toggle input[type="checkbox"] { width: 16px; height: 16px; flex: none; }
+@media (pointer: coarse) {
+  .bub-basis-toggle { min-height: 44px; padding: 6px 0; }
+  .bub-basis-toggle input[type="checkbox"] { width: 22px; height: 22px; }
+}
 /* v29: DD price curve */
 .dd-price-chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; height: 200px; position: relative; }
 /* ── v26: stability bar + 2-col layout + MC badge ── */
@@ -2409,7 +2417,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v817</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v818</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2487,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v817</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v818</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3659,6 +3667,26 @@ window.copyPlatformCitation = function(btn) {
         <input type="radio" name="bubble-price" id="bp125" value="125"><label for="bp125">$125</label>
       </div>
       <span style="font-size:11px;color:var(--muted);margin-left:8px;">Shift the frontier to see which countries become viable at different oil prices</span>
+    </div>
+    <!-- v818 (T1) — DATA BASIS ON THE SCATTER.
+         renderBubbleChart() coloured every bubble by region and by nothing else, so the chart
+         carried no trace of the one distinction the Screener table is built around: 163 of the
+         185 countries have NO verified field production and their take/NPV are regional proxy
+         estimates. The caption above tells the analyst the upper-left frontier is "the most
+         IOC-favorable regimes" -- and the top-left quadrant (take <35%, NPV >$2.5B) holds 100
+         countries of which 96 are PROXY. The frontier's own peak is Vanuatu, Bahamas,
+         Montenegro, Greenland, Faroe Islands. Filled bubble = verified production; hollow ring
+         = proxy estimate; and this toggle drops the chart to the production-backed set. -->
+    <div id="bubble-basis-wrap" style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+      <label id="bubble-verified-wrap" class="bub-basis-toggle" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text);font-weight:600;cursor:pointer;white-space:nowrap;" title="Plot only the countries whose take and NPV are weighted by verified field production. The other 163 are modelled on regional proxy terms &mdash; indicative, and not defensible as a screening shortlist on their own.">
+        <input type="checkbox" id="bubble-verified-only" style="cursor:pointer;">
+        <span id="bubble-verified-lbl">Verified production only</span>
+      </label>
+      <span id="bubble-basis-key" style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:#96570A;border:1px solid #96570A;display:inline-block;flex:none;"></span>verified field production</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:transparent;border:1.5px dashed #96570A;display:inline-block;flex:none;"></span>regional proxy estimate &mdash; indicative only</span>
+      </span>
+      <span id="bubble-basis-note" style="font-size:11px;color:var(--muted);" aria-live="polite"></span>
     </div>
     <!-- v809 (T1) — which countries this scatter plots. Hidden entirely until the Screener has
          narrowed something, so the cold view is byte-identical to before. -->
@@ -53821,8 +53849,62 @@ function renderBubbleChart() {
   var regionColors = {
     'Middle East': '#A16207', 'Africa': '#15803D', 'Asia': '#7C3AED',
     'Europe': '#96570A', 'North America': '#C2410C', 'Latin America': '#B91C1C',
-    'CIS/FSU': '#6B6560', 'Oceania': 'rgba(21,128,61,0.68)', 'Other': '#6B6560'
+    // v818: Oceania was 'rgba(21,128,61,0.68)'. Every fill below was built as
+    // regionColors[region] + '99', which produced the string "rgba(21,128,61,0.68)99" --
+    // not a colour. Canvas silently keeps the previous fillStyle on an invalid value, so all
+    // 16 Oceania countries (Australia, Vanuatu, Papua New Guinea ...) rendered BLACK, matching
+    // no swatch in the legend. Hex here, and _bubAlpha() below no longer concatenates.
+    'CIS/FSU': '#6B6560', 'Oceania': '#2F6B43', 'Other': '#6B6560'
   };
+
+  // Alpha applied properly, so a non-hex entry can never poison the fill again.
+  function _bubAlpha(col, a) {
+    var m = /^#([0-9a-f]{6})$/i.exec(col || '');
+    if (m) {
+      var v = parseInt(m[1], 16);
+      return 'rgba(' + ((v >> 16) & 255) + ',' + ((v >> 8) & 255) + ',' + (v & 255) + ',' + a + ')';
+    }
+    var r = /^rgba?\(([^)]+)\)$/i.exec(col || '');
+    if (r) {
+      var parts = r[1].split(',').map(function (x) { return x.trim(); });
+      return 'rgba(' + parts[0] + ',' + parts[1] + ',' + parts[2] + ',' + a + ')';
+    }
+    return 'rgba(107,101,96,' + a + ')';
+  }
+
+  // v818 (T1): the data-basis split, read from the SAME function the Screener ranks on, so a
+  // bubble and its Screener row can never disagree about whether the number is measured.
+  var _tierOf = (typeof _dqTier === 'function') ? _dqTier : (window._dqTier || function () { return { label: '\u2014', hasProduction: true }; });
+  var _verifiedOnly = !!(document.getElementById('bubble-verified-only') || {}).checked;
+  var _scopeTotal = _scoped.length;
+  var _verifiedTotal = _scoped.filter(function (d) { return _tierOf(d).hasProduction; }).length;
+  if (_verifiedOnly) {
+    var _vf = _scoped.filter(function (d) { return _tierOf(d).hasProduction; });
+    // Never hand back an empty canvas: a screen with no production-backed row keeps its bubbles
+    // and the note says why the toggle could not be honoured.
+    if (_vf.length) { _scoped = _vf; } else { _verifiedOnly = false; }
+    data = _scoped;
+    _truncated = isMobile && _scoped.length > 30;
+    if (_truncated) data = _scoped.slice().sort(function (a, b) { return (b.n || 0) - (a.n || 0); }).slice(0, 30);
+  }
+
+  (function () {
+    var lbl = document.getElementById('bubble-verified-lbl');
+    if (lbl) lbl.textContent = 'Verified production only (' + _verifiedTotal + ' of ' + _scopeTotal + ')';
+    var key = document.getElementById('bubble-basis-key');
+    if (key) key.style.display = _verifiedOnly ? 'none' : 'inline-flex';
+    var note = document.getElementById('bubble-basis-note');
+    if (note) {
+      var _proxyN = data.filter(function (d) { return !_tierOf(d).hasProduction; }).length;
+      note.textContent = _verifiedOnly
+        ? 'Proxy-economics countries hidden \u2014 every bubble plotted is production-backed.'
+        : (_proxyN > 0
+            ? '\u26a0 ' + _proxyN + ' of the ' + data.length + ' bubbles plotted are proxy estimates, not measurements.'
+            : '');
+      note.style.color = (!_verifiedOnly && _proxyN > 0) ? 'var(--accent)' : 'var(--muted)';
+      note.style.fontWeight = (!_verifiedOnly && _proxyN > 0) ? '600' : '400';
+    }
+  })();
 
   var regionGroups = {};
   data.forEach(function(d) {
@@ -53833,20 +53915,28 @@ function renderBubbleChart() {
 
   var datasets = Object.entries(regionGroups).map(function(entry) {
     var region = entry[0], countries = entry[1];
+    var base = regionColors[region] || '#6B6560';
     return {
       label: region,
-      backgroundColor: (regionColors[region] || '#6B6560') + '99',
-      borderColor: regionColors[region] || '#6B6560',
-      borderWidth: 1,
+      // Per-point, not per-dataset: the legend stays 8 regions rather than doubling to 16,
+      // but a filled disc and a hollow ring are separable at a glance without a hover.
+      backgroundColor: countries.map(function (d) {
+        return _tierOf(d).hasProduction ? _bubAlpha(base, 0.62) : _bubAlpha(base, 0.07);
+      }),
+      borderColor: countries.map(function () { return base; }),
+      borderWidth: countries.map(function (d) { return _tierOf(d).hasProduction ? 1 : 1.6; }),
       data: countries.map(function(d) {
         // On mobile, increase bubble radius slightly for easier tapping
         var baseR = Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5));
+        var _t = _tierOf(d);
         return {
           x: d[takeKey_b],
           y: d[npvKey_b],
           r: isMobile ? Math.min(24, baseR * 1.3) : baseR,
           country: d.country,
           mechanic: d.mechanics || d.mechanic || '\u2014',
+          basis: _t.label,
+          verified: !!_t.hasProduction,
           n: d.n || 0
         };
       })
@@ -53866,7 +53956,19 @@ function renderBubbleChart() {
       // Add touchstart/touchmove so mobile taps trigger tooltips and onClick
       events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
       plugins: {
-        legend: { position: isMobile ? 'bottom' : 'right', labels: { color: '#6B6560', font: { size: isMobile ? 10 : 11 } } },
+        // v818: backgroundColor is now a per-point array, so Chart.js drew each region's legend
+        // swatch from whichever country happened to sit at index 0 -- North America solid
+        // (Canada, verified), Asia hollow (Afghanistan, proxy). The swatch means REGION; the
+        // fill means DATA BASIS. Force the swatch back to a solid region colour so the two
+        // encodings stay separate and the key below the price row is the only place basis reads.
+        legend: { position: isMobile ? 'bottom' : 'right', labels: { color: '#6B6560', font: { size: isMobile ? 10 : 11 },
+          generateLabels: function (chart) {
+            return chart.data.datasets.map(function (ds, i) {
+              var col = regionColors[ds.label] || '#6B6560';
+              return { text: ds.label, fillStyle: _bubAlpha(col, 0.62), strokeStyle: col, lineWidth: 1,
+                       hidden: !chart.isDatasetVisible(i), datasetIndex: i, fontColor: '#6B6560' };
+            });
+          } } },
         // v809 (T1): the title names the population actually plotted. It used to say
         // "All Regimes" over a screened set's worth of context, and "Top 30 Regimes by Scale"
         // on a phone with no price and no hint that a screen had been replaced.
@@ -53875,6 +53977,7 @@ function renderBubbleChart() {
             ? _screenLabel + ' \u00b7 ' + data.length + ' of ' + allData.length
             : (_truncated ? 'Top ' + data.length + ' of ' + allData.length + ' by contract count' : 'All Regimes');
           if (_useScreen && _truncated) scope += ' (largest ' + data.length + ' shown)';
+          if (_verifiedOnly) scope = 'Verified production only \u00b7 ' + data.length + ' of ' + allData.length;
           return (isMobile ? '' : 'Govt Take vs Contractor NPV — ')
             + scope + ' @$' + bprice + '/bbl'
             + (isMobile ? '' : ' (bubble size = contract count)');
@@ -53883,7 +53986,12 @@ function renderBubbleChart() {
           callbacks: {
             label: function(ctx) {
               var d = ctx.raw;
-              return [d.country, 'Take: ' + ctx.parsed.x.toFixed(1) + '%', 'NPV: $' + Math.round(ctx.parsed.y) + 'M', 'Contracts: ' + d.n, 'Mechanic: ' + d.mechanic];
+              // v818: the basis line comes FIRST after the name. An analyst reading a
+              // frontier bubble must not learn the number is a regional estimate last.
+              return [d.country,
+                      d.verified ? 'Basis: ' + d.basis + ' \u2014 verified field production'
+                                 : 'Basis: PROXY \u2014 regional estimate, no verified production',
+                      'Take: ' + ctx.parsed.x.toFixed(1) + '%', 'NPV: $' + Math.round(ctx.parsed.y) + 'M', 'Contracts: ' + d.n, 'Mechanic: ' + d.mechanic];
             }
           }
         }
@@ -55654,6 +55762,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
       if (typeof renderBubbleChart === 'function') renderBubbleChart();
     });
+  });
+  // v818 (T1): production-backed-only toggle for the scatter.
+  var _bvo = document.getElementById('bubble-verified-only');
+  if (_bvo) _bvo.addEventListener('change', function () {
+    if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
+    if (typeof renderBubbleChart === 'function') renderBubbleChart();
   });
   // Bubble chart download PNG
   var bubblePngBtn = document.getElementById('download-bubble-png');
