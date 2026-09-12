@@ -47276,3 +47276,148 @@ This cycle therefore took **v817**, not v816, so the two are not conflated.
 
 ## Friction
 Walked Side-by-Side cold at 1440 and 390. The tab seeds an example set, so the first thing an analyst with their own countries in mind does is press **Clear** — landing on the empty state: *"Search above or start with a stand
+
+---
+## Cycle 726 Log — 2026-09-12 — T1 — shipped v818
+- Test before (harness, deployed build): 300 PASS / 0 FAIL / 0 WARN
+- Test after (suite **RAN this cycle**, local tree at `http://localhost:8899/index.html`):
+  **299 PASS / 0 FAIL / 1 WARN**. The WARN is the known `sw.js` 404 — `index.html:49`
+  registers `/petroleum-fiscal-db/sw.js` by absolute path, which does not exist when the tree
+  is served from root. Local-static artefact, identical to cycle 724's baseline.
+- JS syntax gate: **PASS** — all 11 inline `<script>` blocks extracted, `node --check`, re-run
+  after the version bump.
+- Pixel gate (`pixel_audit.js`, 10 tabs × 5 viewports): **PASS**, exit 0 — no surface worse
+  than baseline, **no finding on the Explorer / Bubble Chart surface**.
+- Page errors: **0** at all six viewports.
+- Pushed to `main` (`a22f662`), mirror `projects/oil-gas-expertise/fiscal_db_interface.html`
+  byte-identical.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest by rotation: v817 was
+T3, v815 T5, v814 T2, v813 T6, v812 T4 — T1 last ran at v811 (cycle 719). Last cycle was T3,
+not repeated. Walked cold at 1440×900 and 390×844 `hasTouch`, `sessionStorage` and
+`localStorage` cleared then reloaded, against the LOCAL tree.
+
+## Friction
+Screener → **Bubble Chart** (the third Explorer mode, and the one the Screener's own intro
+strip advertises as the way to *"visualize the take-vs-NPV landscape"* — i.e. the visual answer
+to T1). The caption above the canvas tells the analyst where to look, verbatim:
+
+> The **left frontier** (low take) with **high NPV** (upper position) represents the most
+> IOC-favorable regimes — low government capture and strong contractor returns.
+
+`renderBubbleChart()` (`index.html:53745`) grouped the data into one dataset per **region** and
+coloured each dataset by region — and by nothing else. It never called `_dqTier()`, which is
+the platform's single source of truth for data basis and is what `runScreener()` ranks on.
+
+Measured against `COUNTRY_DATA` in the live page:
+
+| population | n | PROD-WTD | PART-PROD | PROXY |
+|---|---|---|---|---|
+| all plotted countries | 185 | 10 | 12 | **163** |
+| the caption's frontier (take <35% **and** NPV >$2.5B) | 100 | 1 | 3 | **96** |
+
+The frontier's own peak, top-left first: **Vanuatu** (take 5.0%, NPV $5,102M, 7 contracts),
+**Bahamas** (10.0%, $4,671M, 4), **Montenegro** (10.5%, $4,631M, 10), **Greenland**, **Faroe
+Islands**, **Moldova**, **Sweden**. Every one PROXY. The only four production-backed countries
+anywhere in that quadrant are Canada, USA, Mexico and Argentina.
+
+The Screener **table** defends against exactly this mistake in five separate places — the
+`PROXY` badge on the row, the `BELOW THIS LINE — 163 COUNTRIES WITH NO VERIFIED FIELD
+PRODUCTION` divider, the `⚠ 163 of 185 are proxy` action, the "Rank verified-production
+countries first" default, and the count line that says *"not defensible as a screening
+shortlist on its own"*. The **scatter carried none of it**, and its tooltip
+(`country / Take / NPV / Contracts / Mechanic`) did not mention basis either. So the surface
+that most invites a shortlist to be read straight off the picture was the one surface with no
+guard on it. This is the same class of defect as v809, which found the scatter silently
+dropping the analyst's screen — that cycle fixed *which* countries are plotted; this one fixes
+*what the plotted countries are worth*.
+
+## Change
+1. **Per-point data-basis encoding.** Bubbles are now filled from
+   `_dqTier(d).hasProduction` — the same function the Screener ranks on, so a bubble and its
+   Screener row can never disagree. Verified production = filled disc (region colour at 62%);
+   proxy = hollow region-coloured ring (7% fill, 1.6px border). The encoding is **per point**,
+   not per dataset, so the legend stays 8 regions rather than doubling to 16.
+2. **A control that acts on it.** New always-visible toggle
+   **`Verified production only (22 of 185)`** in the price row. One click and the scatter
+   drops to the production-backed set; the chart title becomes *"Verified production only ·
+   22 of 185 @$75/bbl"*. Composes with the v809 screen scope — under `Low Take · Positive NPV`
+   it reads `(10 of 143)` and plots 10. It never returns an empty canvas: a screen with no
+   production-backed row keeps its bubbles and the toggle un-checks itself.
+3. **A live basis note**, amber and bold while proxy rows are on screen:
+   `⚠ 163 of the 185 bubbles plotted are proxy estimates, not measurements.` → flips to
+   `Proxy-economics countries hidden — every bubble plotted is production-backed.`
+4. **Tooltip carries the basis SECOND**, right after the country name — an analyst must not
+   learn the number is a regional estimate last:
+   `Vanuatu / Basis: PROXY — regional estimate, no verified production / Take: 5.0% / …`
+5. **A rendering bug fixed in the same two lines.** `regionColors['Oceania']` was
+   `'rgba(21,128,61,0.68)'` while every fill was composed as `regionColors[region] + '99'` —
+   producing the string `"rgba(21,128,61,0.68)99"`, which is not a colour. Canvas silently
+   keeps the previous `fillStyle` on an invalid value, so **all 16 Oceania countries rendered
+   BLACK** (Vanuatu was the stray black dot at the top-left of the frontier; Australia the
+   black bubble at 38%/$2.3B) against a **green** Oceania legend swatch. Hex now, and the new
+   `_bubAlpha()` composes alpha numerically instead of concatenating, so a non-hex entry can
+   never poison a fill again.
+6. **`legend.generateLabels`** forces solid region swatches. Without it Chart.js draws each
+   region's key from whichever country sits at index 0 — North America solid (Canada,
+   verified), Asia hollow (Afghanistan, proxy) — which would have made the legend read as if
+   it encoded basis. Swatch means REGION; fill means BASIS; the two stay separate.
+
+## Result
+The analyst who opens the scatter to answer *"which countries should even be on my list"* can
+see, **without hovering anything**, that the band the caption calls "the most IOC-favorable
+regimes" is drawn almost entirely in hollow rings — and can reduce the chart to the 22
+countries whose take and NPV are measured rather than modelled **in one click**, where the
+frontier is Canada, USA, Mexico and Argentina. Sixteen Oceania countries also stopped
+rendering in a colour that appears nowhere in the legend.
+
+## Step 5b — checked on a phone
+| viewport | horizontal scroll, all 8 tabs | toggle label | checkbox | page errors |
+|---|---|---|---|---|
+| 1920 | none (1920/1920) | 243 × 24px | 16 × 16px | 0 |
+| 1440 | none (1440/1440) | 243 × 24px | 16 × 16px | 0 |
+| 1280 | none (1280/1280) | 243 × 24px | 16 × 16px | 0 |
+| 1024 | none (1024/1024) | 243 × 24px | 16 × 16px | 0 |
+| 768 `hasTouch` | none (768/768) | **249 × 44px** | **22 × 22px** | 0 |
+| **390 `hasTouch`** | **none (390/390)** | **249 × 44px** | **22 × 22px** | **0** |
+
+The toggle needed its own rule: an `inline-flex` label around a 16px box measures 18px, under
+the 24px floor. `.bub-basis-toggle` is a **new** rule placed beside the other per-component
+coarse-pointer rules (next to `.cp-why-btn` at ~:561), **not** inside the v612 mobile layer —
+nothing in that block was touched, narrowed or weakened. The `bubble-basis-wrap` row is
+`flex-wrap:wrap`, so at 390 the toggle, the key and the note stack rather than widening the
+page.
+
+**STILL LOCKED respected:** no new tooltip (an existing tooltip callback gained a data line
+it did not have), no new FAQ, no banner, no page-sub paragraph, no citation micro-edit, no
+text-only change — the rendered canvas now draws two visually distinct bubble treatments where
+it drew one, and gained a control that changes what is plotted. The v612 mobile layer,
+`#reference-panel` and the `min-width: max-content` markers are untouched. Explorer analytics,
+Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. v809's scope radios are unchanged and compose with the new toggle. CP two-zone
+headline and the removed FC Govt NPV column untouched. Tab order unchanged. v817 → v818 at the
+three display sites only (`:42`, `:2420`, `:2490`), silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **Screener cold at 1440 and 390.** 185 rows, `All 185 countries — no filters applied yet`,
+  evidence-first ranking on by default, the 163-proxy divider and the 45-row
+  `COUNTRIES WHOSE TAKE IS A FLOOR, NOT A MEASUREMENT` divider both present. Tightening to
+  take ≤20% + NPV ≥$2B correctly returns *"none of these 38 countries has verified field
+  production … not defensible as a screening shortlist on its own"*. This is good and was left
+  alone.
+- **All 11 Screener presets fired**, each returning a plausible set with a chip naming its own
+  criteria: iochurdle 15, sweetspot 143, pscafrica 34, deepwater 22, lowrisk 11,
+  downsidereturns 5, highevidence 35, rfactor 70, atlanticfrontier 6, frontiermarkets 56,
+  downsideresilience 24.
+- **Shortlist ticking** — 3 ticks raise the `sc-sel-dock` (Copy / CSV / Excel / Side-by-Side)
+  and the SbS button relabels from *"Load top 5 in Side-by-Side"* to
+  *"Compare 3 ticked in Side-by-Side"*. Column sort works and the count line names the sort.
+- **Still the next one on this tab:** the mobile-only strip under the canvas reads *"Tap a
+  bubble … Showing top 30 regimes. Rotate to landscape"* — it is `display:none` at desktop so
+  it never renders, but the "top 30" claim is now false whenever a screen or the new toggle
+  has already thinned the set below 30. Minor, text-only, and not worth a cycle on its own;
+  fold it into the next change that touches this block.
+- Carried forward from v815 and still true, still not the worst moment: Country Profile's
+  Price Sensitivity Curve renders 300px centred inside a 1,050px card
+  (`viewBox="0 0 300 64"`), axis labels at a literal 7px.
