@@ -46468,3 +46468,20 @@ changed under them. The v612 mobile layer, its `min-width: max-content` marker a
 two-zone untouched. Screener presets stay a dropdown. Advanced Filters still collapsed. Tab
 order unchanged. Version v809 → v810 at the three display sites only, silently, after the real
 change shipped.
+
+---
+## Cycle 718 Log — 2026-09-12 05:11
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 716 complete — shipped as v810.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (last cycle was T5, not repeated.)
+
+## Friction
+The Side-by-Side tab stacks two charts 360px apart, drawn from one country set — Govt Take vs Oil Price, then Contractor NPV vs Oil Price. Both used a **dashed stroke**, and it meant opposite things:
+
+```
+take chart (index.html:29300):  dashed = country has NO R-factor tiers
+NPV  chart (index.html:29427):  dashed = statutory basis, no verifi
