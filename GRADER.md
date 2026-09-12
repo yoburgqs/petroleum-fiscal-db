@@ -47143,3 +47143,123 @@ the real change shipped.
 
 ## Friction
 Two places in the product tell the analyst, in these words: *"Before finalizing any IC memo: open **Reform Risk** and look up your country. It returns one IC action."* They follow it, pic
+
+---
+## Cycle 724 Log — 2026-09-12 — T3 — shipped v817
+- Test before: 300 PASS / 0 FAIL (reported by harness)
+- Test after (RAN this cycle, against this tree): **299 PASS / 0 FAIL / 1 WARN**
+- JS syntax gate: **PASS** (11 inline blocks, `node --check`, re-run after the version bump)
+- Pixel gate: **PASS** (exit 0) — no surface worse than baseline, no new finding on `t2`
+- JS errors: **0** page errors at all six viewports
+- Pushed to `main` (`6e18527`), mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation: v815 was T5,
+v814 T2, v813 T6, v812 T4, v811 T1 — T3 last ran at v810 (cycle 716), seven cycles ago. Last
+cycle was T5, not repeated.
+
+## Friction
+Walked cold at 1440x900 and 390x844 `hasTouch`, `sessionStorage` and `localStorage` cleared,
+served over HTTP. Home → Side-by-Side. The tab seeds the North Sea Trio example, so the first
+thing an analyst with their own countries in mind does is press **Clear** — which drops them onto
+the empty state: *"Compare up to 5 countries side-by-side across 4 price scenarios. Search above
+or start with a standard IOC benchmark set:"* and four preset buttons.
+
+For an analyst who does not already know what to type, **those four buttons are the tab.** They
+are the only cold-start path it offers. The figures used to choose between them were hand-written
+prose in each button's `title`, fixed when the preset was authored and never recomputed. **Every
+preset had drifted from what the grid then prints:**
+
+| preset | button claimed | grid prints | delta |
+|---|---|---|---|
+| Atlantic Frontier Quartet | Guyana ~52% | 54.1% *(set aside)* | +2.1pp |
+| Atlantic Frontier Quartet | Angola ~55% | 53.0% | −2.0pp |
+| Atlantic Frontier Quartet | **Brazil ~65%** | **55.6%** | **−9.4pp** |
+| Atlantic Frontier Quartet | **Nigeria ~58%** | **81.1%** | **+23.1pp** |
+| Atlantic Frontier Quartet | *"30pp take range"* | 28.1pp across the 3 that rank | |
+| North Sea Trio | Norway ~68% | 68.0% | ✓ |
+| North Sea Trio | UK ~49% | 49.2% | ✓ |
+| North Sea Trio | **Netherlands ~48%** | **23.4%** *(set aside)* | **−24.6pp** |
+| USA vs Iraq | USA ~23% | 23.4% | ✓ |
+| West Africa Trio | **Angola EPSA IV ~68%** | **53.0%** | **−15.0pp** |
+| West Africa Trio | **Nigeria PSC/PIA2021 ~58%** | **81.1%** | **+23.1pp** |
+| West Africa Trio | Ghana ~55% | 52.6% *(set aside)* | −2.4pp |
+| West Africa Trio | *"13pp take range"* | 28.1pp | |
+
+Two things make this the worst moment on the walk rather than a stale-copy nuisance:
+
+1. **The product contradicted itself on the same screen.** Angola was `~55%` on the Atlantic
+   button and `~68%` on the West Africa button *beside it*, and the grid prints 53.0%. Three
+   numbers for one country, two of them visible simultaneously.
+2. **Nigeria was ~58% on both buttons and prints 81.1%.** At a 20-minute screening that is the
+   difference between screening a country in and screening it out.
+
+And no preset said that a column gets **set aside** on load — which is exactly what happens to
+Guyana, Netherlands and Ghana. **Three of the four presets open with a column that carries no
+rank position**, and the analyst only learns it after the grid renders.
+
+## Change
+The face of each preset button now carries a second line — **the comparable take range and the
+set-aside count** — computed at paint time by new `_sbsPresetStat()` (index.html:27379) through
+`_sbsCmpTake()` and `_sbsHasProd()`, the *same two predicates* `_sbsApplyOrder()` buckets the
+grid on. `_sbsPaintQuickstart()` runs on the copy in the page's own markup once
+`COUNTRY_DATA` lands, and again whenever the empty state re-injects the presets via
+`_sbsQuickstartHTML()`. **Nothing numeric is hardcoded any more — not on the face, not in the
+title** — so a preset cannot advertise a figure the grid contradicts.
+
+| button face | live second line | matches grid strip |
+|---|---|---|
+| Atlantic Frontier Quartet | `53–81% take @ $75 · 1 of 4 set aside` | Angola 53.0 › Brazil 55.6 › Nigeria 81.1, Guyana aside ✓ |
+| ■ North Sea Trio | `49–68% take @ $75 · 1 of 3 set aside` | UK 49.2 › Norway 68.0, Netherlands aside ✓ |
+| USA vs Iraq | `23–34% take @ $75 · all 2 comparable` | USA 23.4 › Iraq 34.1, nothing aside ✓ |
+| ■ West Africa Trio | `53–81% take @ $75 · 1 of 3 set aside` | Angola 53.0 › Nigeria 81.1, Ghana aside ✓ |
+
+Same idiom as the existing `_labelScreenerPresets()` / `_labelScreenerReform()`. If the data
+will not resolve, the stat line is not drawn and the title is left alone — **a preset never
+states a range it cannot compute.** The four hardcoded titles were stripped of every numeric
+claim so the no-data fallback is honest rather than stale; `data-countries` is untouched, so
+the delegated click handler at :55688 is unaffected.
+
+## Result
+The analyst picks a benchmark set **on the numbers the grid will actually print**, and knows
+**before clicking** that three of the four sets open with a column that cannot be ranked.
+
+## Step 5b — checked on a phone
+| viewport | scrollWidth / clientWidth (8 tabs) | button box | under 24px | page errors |
+|---|---|---|---|---|
+| 1920 | 1920 / 1920 | 202 × 37px | none | 0 |
+| 1440 | 1440 / 1440 | 202 × 37px | none | 0 |
+| 1280 | 1280 / 1280 | 202 × 37px | none | 0 |
+| 1024 | 1024 / 1024 | 202 × 37px | none | 0 |
+| 768 | 768 / 768 | 202 × 37px | none | 0 |
+| **390 `hasTouch`** | **390 / 390** | **202 × 44px** | **none** | **0** |
+
+Zero horizontal scroll at all six across all eight tabs. The second line is `white-space:nowrap`
+at 10px and the buttons wrap as a flex row at 390 rather than widening the page. The added line
+makes the buttons *taller*, which is why they clear 24px under a thumb without any new
+`pointer: coarse` rule — nothing was added to the v612 mobile layer.
+
+**STILL LOCKED respected:** no new tooltip (an existing one was made live and de-numbered), no
+new FAQ, no banner, no page-sub paragraph, no citation micro-edit, no text-only change — the
+rendered button face gained a computed line it did not have. The v612 mobile layer,
+`#reference-panel` and the `min-width: max-content` markers are untouched. Explorer analytics,
+Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. CP two-zone headline and the removed FC Govt NPV column untouched. Tab order
+unchanged. Version bumped at the three display sites only, silently, after the real change.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- `#cmp-search` typed cold: Brazil / Guyana / Suriname all resolve, dropdown shows basis
+  (`PART-PROD` / `PROXY`) and take at selection time. Set correctly reported **"NOTHING RANKS
+  HERE: Only Brazil carries a comparable take"** — honest, not a defect.
+- `Clear` → empty state correctly tears down both chart wraps (`display:none`), the v620 fix
+  still holds. Chips, order dropdown, Export PDF, Share Link, Copy for IC Memo all present.
+- Grid at 1440 fits its container: `cmp-output` scrollWidth 1400 = clientWidth 1400, no
+  horizontal overflow inside the compare region.
+
+## ⚠ Carried in this commit but NOT this cycle's work
+This working tree already held an **uncommitted `v816 (T3)`** change from a prior cycle that
+never committed: 2-decimal contractor NPV formatting in the $1–10B range, across
+`fmtNpvShared()` and four private copies (index.html:23680, :39472, :39672, :51510, :52599).
+It was present when every gate above ran, so it is what was verified, and it ships in
+`6e18527`. **A prior cycle bumped no version string and pushed nothing — worth a look at why.**
+This cycle therefore took **v817**, not v816, so the two are not conflated.
