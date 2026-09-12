@@ -46861,3 +46861,112 @@ Zero horizontal scroll at all six. Every one of those counts is **identical to p
 Walked cold at 1440×900, storage cleared: Home → Fiscal Compare.
 
 The table is **1,805px wide inside a 1,320px window**. The **Quality** column — the only column on the flagship tab that says how well sourced a row is — was positi
+
+---
+## Cycle 722 Log — 2026-09-12 — T2 — shipped v814
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by
+rotation: v813 was T6, v812 T4, v811 T1, v810 T3, v808 T5 — T2 last ran at v806. Last cycle
+was T6, not repeated.
+
+## Friction
+Walked cold at 1440×900 and 390×844 `hasTouch`, `sessionStorage` and `localStorage` cleared,
+served over HTTP. Home → Country Profile (Indonesia loads as the PSC benchmark) → scrolled the
+full profile.
+
+Every interactive affordance on the walk was exercised and every one worked: "See the 12
+producers that take less →" (→ Screener), "Why two findings ›" (+513 chars in place), "See the
+spread →" (scrolls +4,647), "breakdown ↓", "sources ↓", "→ Model in Scenario Builder"
+(+4,903 chars), "Reform Risk →", "Full reform detail ›". No dead controls, 0 page errors.
+
+The worst moment is further down, in **Regional Peers** — the section headed *"Regional Peers ·
+Asia · govt take @ $75/bbl"*, which exists to answer the second half of T2's question. It renders
+a three-column grid `130px 1fr 60px`: **COUNTRY | TAKE (relative) | TAKE%**. The middle column is
+**836px of the 1,084px card, and it was completely blank on every row, for every country.**
+
+The bars were not missing. They were laid out and sized correctly and then painted transparent,
+for two independent reasons that land on the same result:
+
+| | cause | measured |
+|---|---|---|
+| **fill** | `'background:' + col + '55'` with `col = 'var(--yellow)'` (index.html:39222 / 39232 / 39246). A CSS custom property with a hex-alpha suffix glued onto it is not a valid `<color>`, so the parser drops the whole declaration. | `getComputedStyle(fill).backgroundColor` = `rgba(0, 0, 0, 0)` on all 7 rows |
+| **track** | `background:var(--surface)` = `#FFFFFF`, and `.dd-section` (index.html:534) is *also* `var(--surface)`. | white on white |
+
+The widths were right the whole time — Uzbekistan's fill measured **727px** against Indonesia's
+**162px**, a 4.5× gap that simply never appeared on screen. A column header reading
+**"TAKE (relative)"** sat above eight rows of nothing.
+
+The same invalid pattern also killed the row separators (`border-bottom:1px solid var(--border)22`)
+and the row hover (`this.style.background='var(--surface)44'`) — so the rows are click-to-load but
+returned no hover feedback.
+
+Isolated to this renderer: a repo-wide grep for the runtime form (`+ col + '55`) returns exactly
+three sites, all three inside Regional Peers.
+
+## Change
+- **Tier colours are literal hex** — `#15803D` / `#A16207` / `#C2410C` / `#B91C1C` — which makes
+  the alpha suffix legal. `--green/--yellow/--orange/--red` are each defined exactly once
+  (index.html:78-82) and never re-themed, so these are the *same four colours*, not a new palette.
+  The v449 tier thresholds are untouched.
+- **Track is `#D0CAC044`**, visible against the white card.
+- **Every peer row carries a 2px amber rule at the selected country's own position** on the same
+  relative scale. The scale has a padded origin, so a bar length alone means nothing; against the
+  rule a peer bar reads as *stops short of us* / *runs past us*. The column header carries the key
+  inline (`TAKE (relative) — ▎Indonesia`) — no new tooltip, no new text block.
+- Row separators and row hover now use valid colours, so click-to-load rows respond to the pointer.
+- **Dead `peersHtml` removed** — assigned at 39215, never read, carrying a third copy of the same
+  broken CSS.
+
+## Result
+The analyst screening Indonesia at $75/bbl reads its position against Asia in one glance:
+Sri Lanka and Malaysia **stop short** of the rule, Myanmar / China / India **clear it slightly**,
+Uzbekistan **runs 4.5× past it**. Indonesia sits at the low end of Asian producer take — which is
+the T2 answer, and it is now a picture rather than seven decimals the reader has to sort in their
+head under a header that promised a comparison the page never drew.
+
+## Verification — the suite RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax (all inline `<script>` extracted, `node --check`) | **PASS** (11 blocks) |
+| Runtime suite, `TEST_URL=http://localhost:8934/index.html` | **299 PASS / 0 FAIL / 1 WARN** |
+| Same suite vs pristine `HEAD` served as `_baseline_tmp.html` | **299 / 0 / 1 — reports identical modulo timestamp** |
+| Pixel gate, `pixel_audit.js` 10 tabs × 5 viewports | **PASS** — no surface worse than baseline |
+| Bars painting, Indonesia / Norway / Nigeria / Iraq | every fill a real `rgba` with a real width; marker at the self position; **0 page errors** |
+
+The 1 WARN is a `sw.js` 404 from serving over `python3 -m http.server`. It is present on **both**
+trees and is the entire delta from the 300 PASS / 0 FAIL / 0 WARN measured against the deployed
+URL — not a regression from this change.
+
+**Step 5b — checked on a phone.**
+
+| viewport | scrollWidth / clientWidth (10 tabs) | Regional Peers row height | rows <24px | errors |
+|---|---|---|---|---|
+| 1920 | 1920 / 1920 | 29px | 0 | 0 |
+| 1440 | 1440 / 1440 | 29px | 0 | 0 |
+| 1280 | 1280 / 1280 | 29px | 0 | 0 |
+| 1024 | 1024 / 1024 | 29px | 0 | 0 |
+| 768 | 768 / 768 | 29px | 0 | 0 |
+| **390 `hasTouch`** | **390 / 390** | **29px** | **0** | **0** |
+
+Zero horizontal scroll at all six, across all ten tabs. The 2px *intra-section* overflow at 768 is
+pre-existing and **identical on pristine HEAD** (`docOver` 0 on both), so it is not this cycle's.
+
+**STILL LOCKED respected:** no new tooltip, no new FAQ, no banner, no page-sub paragraph, no
+citation micro-edit, no text-only change — a column that painted nothing now paints. The v612
+mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched. Explorer
+analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. The CP two-zone headline and the removed FC Govt NPV column are untouched. Tab order
+unchanged. v813 → v814 at the three display sites only, silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **CP interactive affordances**, all eight exercised and all live (see Friction). No dead controls.
+- **Govt Take by Price Scenario** — the four $50/$75/$100/$125 cards render correct tier-coloured
+  figures; the standardized-project basis line ($1.2B capex · 50k bbl/d · $15/bbl opex · 25-yr,
+  10% WACC) is present directly beneath them.
+- **Price Sensitivity Curve** is *drawn* correctly but is worth a later look: `viewBox="0 0 300 64"`
+  with `width:100%;height:64px` and default `preserveAspectRatio`, so the content is height-limited
+  to a 1:1 scale and renders at **300px centred inside a 1,050px card** — 71% of the card is blank
+  and the axis labels sit at a literal 7px. Not this cycle's worst moment (it renders; Regional
+  Peers did not), but it is the next one on this tab.
