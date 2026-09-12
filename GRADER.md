@@ -45500,3 +45500,16 @@ v800 → v801 at the three display sites.
 
 **Shipped:** petroleum-fiscal-db `5fe0b6a` (v801), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 708 Log — 2026-09-11 19:29
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 708 complete and shipped as v801.
+
+## Task
+**T3** — "How do these three countries compare side by side?" Last run at cycle 692, the longest gap. The Side-by-Side tab auto-seeds its own North Sea Trio, so the three-country comparison *is* its cold state.
+
+## Friction
+The comparison logic underneath is genuinely good and I left it alone — the fee-basis re-basing (Iraq 84.8% headline → 34.1% comparable), the proxy set-aside, the "nothing ranks here" state, the v791 floating column-name bar, t
