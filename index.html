@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v814</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v815</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v814</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v815</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v814</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v815</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -23050,6 +23050,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <select id="rr-country-lookup" aria-label="Look up reform and fiscal-stability exposure for one country" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;font-size:12px;min-width:230px;">
         <option value="">Select a country…</option>
       </select>
+      <button id="rr-copy-verdict" class="btn btn-sm btn-outline" style="display:none;" title="Copy this country&#39;s reform verdict to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the IC action in full, the Reform Frequency Score with its rank and what the score does NOT read, the reforms-since-2010 count, the direction split, the Fiscal Predictability score with any ceiling correction, the take at $75, and every sourced event with its citation and whether it scored." aria-label="Copy this country&#39;s reform verdict for an IC memo">&#x2398; Copy for IC Memo</button>
       <button id="rr-lookup-clear" class="btn btn-sm btn-outline" style="display:none;" title="Clear the country lookup and return to the global view">Clear</button>
       <span style="font-size:11px;color:var(--muted);">Returns this country’s reform-frequency exposure, or says plainly when there is no sourced history to score.</span>
     </div>
@@ -42361,6 +42362,13 @@ function _rrPopulateLookup() {
     });
     clr.dataset.bound = '1';
   }
+  // v815 (T5): the verdict's own "Copy for IC Memo", bound beside Clear because it shares
+  // Clear's lifecycle exactly -- both are meaningless with no country selected.
+  var cpy = document.getElementById('rr-copy-verdict');
+  if (cpy && !cpy.dataset.bound) {
+    cpy.addEventListener('click', function() { copyReformVerdict(); });
+    cpy.dataset.bound = '1';
+  }
 }
 
 // ── v676 (T4): land the analyst on the VERDICT, not on the bottom of it ──────────
@@ -43115,10 +43123,188 @@ function _rrApplyObsSpread(c) {
 }
 window._rrApplyObsSpread = _rrApplyObsSpread;
 
+// ── v815 (T5) — "give me something I can paste straight into an IC memo." ─────────────────
+//
+// Walked T5 cold at 1440x900 and 390x844 (hasTouch), storage cleared. Every surface that
+// produces IC content on this platform can hand it over: Fiscal Compare, Screener,
+// Side-by-Side, IOC Portfolio and Country Profile each carry a "Copy for IC Memo" that writes
+// a real text/html table plus a text/plain TSV. One surface could not, and it is the one the
+// product itself nominates as the LAST GATE before the memo is filed:
+//
+//   Fiscal Compare, IC Analyst Guide:  "Before finalizing any IC memo: open Reform Risk and
+//                                       look up your country. It returns one IC action."
+//   Reform Risk, tab header:           "Use Stability Scores here alongside Country Profile
+//                                       take figures when building IC memos."
+//
+// The analyst follows that instruction, picks their country, and the card returns the single
+// densest piece of IC prose in the product -- an IC action naming the premium to carry, the
+// Reform Frequency Score with its rank and an explicit statement of what the score does NOT
+// read, the reforms-since-2010 count against the full record, the direction split, the Fiscal
+// Predictability score WITH its async ceiling correction, the take at $75, and the sourced
+// event log split at the 2010 boundary with a citation and an A/B confidence on every row.
+// Measured on the live page: 1,424px tall for Nigeria, 2,301px at 390.
+//
+// The tab's only export is "Export Reform Data (CSV)", which is a 83-row global event dump
+// across all 21 scoreable jurisdictions. It carries none of the above: not the IC action, not
+// the score, not the rank, not the direction split, not the predictability ceiling, not the
+// take. It is also a download, not a paste. So the analyst standing at the gate the product
+// sent them to had exactly two options: retype it, or screenshot it.
+//
+// Retyping is where this costs something real, because what gets dropped is load-bearing and
+// it drops in one direction -- toward a cleaner, more confident sentence than the data
+// supports. Nigeria's card says, after an asynchronous repaint:
+//
+//     "Carry <=46 . LOW, not 73 . MODERATE"
+//     "a zero premium here is an absence of measurement, not evidence of stability"
+//
+// A hand-copied version of that becomes "Nigeria, frequency score 70, predictability 73
+// MODERATE, no premium indicated" -- every word of which is on the card, and which inverts
+// the finding. The card is built to stop precisely that; it just had no way to travel.
+//
+// Reads the RENDERED card rather than recomputing, deliberately. Three of the numbers on it
+// (the IQR ceiling, the observed-spread refutation, the per-event source and confidence) are
+// painted asynchronously after the verdict HTML lands, so a payload built at render time
+// would omit the corrections and ship the pre-correction figure -- the exact failure the
+// corrections exist to prevent. What is on screen is what is copied.
+function _rrVerdictPayload() {
+  var out = document.getElementById('rr-country-verdict');
+  if (!out || out.style.display === 'none' || !out.children.length) return null;
+  var root = out.children[0];
+  if (!root || !root.children.length) return null;
+
+  function tx(e) { return e ? String(e.innerText || e.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
+
+  var kids = [].slice.call(root.children);
+  var title = tx(kids[0]);
+  if (!title) return null;
+
+  // The verdict prose. #rr-ic-action on the 21 scoreable jurisdictions; #rr-verdict-lead plus
+  // #rr-ext-check on the 164 with no sourced log, where "there is no score" IS the finding and
+  // must paste as prominently as a score would.
+  var prose = [];
+  ['rr-ic-action', 'rr-verdict-lead', 'rr-ext-check'].forEach(function (id) {
+    var e = document.getElementById(id);
+    if (e && out.contains(e)) { var t = tx(e); if (t) prose.push(t); }
+  });
+
+  // The stat strip is the card's only flex row. Anchoring on the computed display rather than
+  // on a child index keeps this working across all four verdict branches, which emit a
+  // different number of blocks above it.
+  var strip = null;
+  for (var i = 0; i < kids.length; i++) {
+    if (kids[i].children.length >= 2 && window.getComputedStyle(kids[i]).display === 'flex') { strip = kids[i]; break; }
+  }
+  var metrics = [];
+  if (strip) {
+    [].slice.call(strip.children).forEach(function (tile) {
+      var c = [].slice.call(tile.children);
+      if (c.length < 2) return;
+      var label = tx(c[0]), value = tx(c[1]);
+      var basis = c.slice(2).map(tx).filter(Boolean).join(' · ');
+      if (label || value) metrics.push([label, value, basis]);
+    });
+  }
+
+  // The event log, carrying the 2010 split as a column. The split is what the score is defined
+  // on and what three of the four verdict types turn on, so a paste that flattened it would
+  // let an analyst rebuild the wrong count offline -- the same defect v583 fixed in the CSV.
+  var events = [];
+  [].slice.call(root.querySelectorAll('.reform-timeline')).forEach(function (tl) {
+    var h = tl.previousElementSibling;
+    var scored = /before the window/i.test(tx(h)) ? 'No — pre-2010, not counted in the score' : 'Yes — in the 2010 scoring window';
+    [].slice.call(tl.querySelectorAll('.reform-event')).forEach(function (ev) {
+      events.push([
+        tx(ev.querySelector('.reform-year')),
+        tx(ev.querySelector('.reform-event-name')),
+        tx(ev.querySelector('.reform-mechanic')),
+        tx(ev.querySelector('.reform-take')),
+        scored,
+        tx(ev.querySelector('.reform-notes')),
+        tx(ev.querySelector('[id^="rr-src-"]')) || 'NOT RECORDED — no citation held for this event'
+      ]);
+    });
+  });
+
+  return { title: title, prose: prose, metrics: metrics, events: events };
+}
+
+function copyReformVerdict() {
+  var P = _rrVerdictPayload();
+  if (!P) { if (typeof _icRefuse === 'function') _icRefuse('No country verdict on screen — pick a country in "Check one country" first.'); return; }
+
+  var ver = (typeof _orcaVerNow === 'function') ? _orcaVerNow() : '';
+  var stamp = 'Source: ORCA Reform Risk' + (ver ? ' (' + ver + ')' : '')
+    + '. Reform Frequency Score = 100 − 15 × fiscal law changes dated 2010 or later, from ORCA’s '
+    + 'sourced event log. It is a count and never a magnitude: a +15pp windfall tax moves it exactly as '
+    + 'far as a 1pp administrative change. ORCA holds a sourced reform log for 21 of 185 jurisdictions.';
+
+  var MH = ['Metric', 'Value', 'Basis and caveats'];
+  var EH = ['Year', 'Event', 'Mechanic after reform', 'Take move', 'Counts in Reform Frequency Score', 'Notes', 'Source'];
+
+  var tsv = P.title + '\n';
+  if (P.prose.length) tsv += '\n' + P.prose.join('\n\n') + '\n';
+  if (P.metrics.length) {
+    tsv += '\n' + MH.join('\t') + '\n' + P.metrics.map(function (r) { return r.join('\t'); }).join('\n') + '\n';
+  }
+  if (P.events.length) {
+    tsv += '\nSourced fiscal-reform events — ' + P.events.length + '\n'
+        + EH.join('\t') + '\n' + P.events.map(function (r) { return r.join('\t'); }).join('\n') + '\n';
+  }
+  tsv += '\n' + stamp;
+
+  function _e(x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var _th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;vertical-align:top;';
+  var _td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:9pt;vertical-align:top;';
+  function tbl(head, rows) {
+    return '<table style="border-collapse:collapse;"><thead><tr>'
+      + head.map(function (h) { return '<th style="' + _th + '">' + _e(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c, ci) {
+            return '<td style="' + _td + (ci === 0 ? 'font-weight:bold;' : '') + '">' + _e(c) + '</td>';
+          }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 6px;">' + _e(P.title) + '</p>'
+    + P.prose.map(function (t) { return '<p style="font-size:10pt;margin:0 0 8px;">' + _e(t) + '</p>'; }).join('');
+  if (P.metrics.length) html += tbl(MH, P.metrics);
+  if (P.events.length) {
+    html += '<p style="font-size:10pt;font-weight:bold;margin:10px 0 4px;">'
+      + _e('Sourced fiscal-reform events — ' + P.events.length) + '</p>' + tbl(EH, P.events);
+  }
+  html += '<p style="font-size:8pt;color:#555;margin:8px 0 0;">' + _e(stamp) + '</p></div>';
+
+  var okMsg = 'Copied the ' + (P.metrics.length ? P.metrics.length + '-metric verdict' : 'verdict')
+    + (P.events.length ? ' + ' + P.events.length + ' sourced event' + (P.events.length === 1 ? '' : 's') : '')
+    + '. Pastes as a formatted table into Word/Docs, as columns into Excel.';
+  var btn = document.getElementById('rr-copy-verdict');
+  function done() {
+    if (btn) { btn.innerHTML = '✓ Copied!'; setTimeout(function () { btn.innerHTML = '⎘ Copy for IC Memo'; }, 2000); }
+    if (typeof showCopyToast === 'function') showCopyToast(okMsg);
+  }
+  function fail() {
+    if (btn) { btn.innerHTML = 'Clipboard unavailable'; setTimeout(function () { btn.innerHTML = '⎘ Copy for IC Memo'; }, 2000); }
+  }
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([tsv],  { type: 'text/plain' })
+    })]).then(done).catch(function () {
+      navigator.clipboard.writeText(tsv).then(done).catch(fail);
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(done).catch(fail);
+  } else { fail(); }
+}
+window.copyReformVerdict = copyReformVerdict;
+
 function renderReformCountryVerdict() {
   var sel = document.getElementById('rr-country-lookup');
   var out = document.getElementById('rr-country-verdict');
   var clr = document.getElementById('rr-lookup-clear');
+  var cpy = document.getElementById('rr-copy-verdict');   // v815 (T5)
   if (!sel || !out) return;
   if (typeof _rrSyncHash === 'function') _rrSyncHash();   // v796 (T4): the URL names the country on screen
   var c = sel.value;
@@ -43126,6 +43312,7 @@ function renderReformCountryVerdict() {
     out.style.display = 'none';
     out.innerHTML = '';
     if (clr) clr.style.display = 'none';
+    if (cpy) cpy.style.display = 'none';
     return;
   }
   // v805 (T4): a verdict built while REFORM_HISTORY is still empty reads as a fully formatted,
@@ -43137,6 +43324,7 @@ function renderReformCountryVerdict() {
     out.style.display = 'none';
     out.innerHTML = '';
     if (clr) clr.style.display = 'none';
+    if (cpy) cpy.style.display = 'none';
     if (!window._rrVerdictWaiting) {
       window._rrVerdictWaiting = setInterval(function () {
         var r = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
@@ -43150,6 +43338,7 @@ function renderReformCountryVerdict() {
     return;
   }
   if (clr) clr.style.display = '';
+  if (cpy) cpy.style.display = '';
   out.style.display = 'block';
   delete out.dataset.obsPainted;   // v604: re-arm the refutation for the newly selected country
   delete out.dataset.iqrPainted;   // v719: same, for the measured-cohort refutation
