@@ -45665,3 +45665,14 @@ v802 → v803 at the three display sites only.
 
 **Shipped:** petroleum-fiscal-db `bb90b0c` (v803), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 710 Log — 2026-09-11 21:24
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 710 shipped as **v803** — `bb90b0c` + `975f547`, pushed to origin/main, mirror copied and `cmp`-identical.
+
+## What happened first
+
+Cycle 709 **timed out** (`subprocess.TimeoutExpired` at its 1800s limit) after editing `index.html` but before committing, verifying, or logging. Its work — v802, 132 lines on the Screener's zero-result path — was sitting uncommitted in the tree. I walked the same task rather than starting a fresh one, because an unverified change to the core screening filter 
