@@ -46050,3 +46050,16 @@ three display sites only, silently, after the real change shipped.
 
 **Shipped:** petroleum-fiscal-db `e21b555` (v806), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 713 Log — 2026-09-12 00:09
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 713 — T2 walk, shipped v806
+
+## Cycle 713 — T2
+
+**Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by rotation (last used cycle 705).
+
+**Friction** — The defensibility step in T2 is the Peer Comparison table on Country Profile: *these are the regimes my number sits among — load them and check.* The table shows the country plus five peers. Its own button, **"Load All 
