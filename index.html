@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v808</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v810</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v808</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v810</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v808</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v810</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3637,6 +3637,7 @@ window.copyPlatformCitation = function(btn) {
       <button type="button" id="sc-dock-copy" class="btn btn-sm btn-outline" onclick="copyScreenerTable()" aria-label="Copy the ticked countries for an IC memo">&#9112; Copy</button>
       <button type="button" id="sc-dock-csv" class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export the ticked countries as CSV">⬇ CSV</button>
       <button type="button" id="sc-dock-xlsx" class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export the ticked countries as Excel">⬇ Excel</button>
+      <button type="button" id="sc-dock-sbs" class="btn btn-sm btn-outline" onclick="scOpenSbs()" aria-label="Open the ticked countries in Side-by-Side">&#8652; Side-by-Side</button>
       <button type="button" class="btn btn-sm btn-outline" onclick="scClearSel()" aria-label="Clear the IC shortlist selection">Clear</button>
     </div>
   </div>
@@ -3658,6 +3659,16 @@ window.copyPlatformCitation = function(btn) {
         <input type="radio" name="bubble-price" id="bp125" value="125"><label for="bp125">$125</label>
       </div>
       <span style="font-size:11px;color:var(--muted);margin-left:8px;">Shift the frontier to see which countries become viable at different oil prices</span>
+    </div>
+    <!-- v809 (T1) — which countries this scatter plots. Hidden entirely until the Screener has
+         narrowed something, so the cold view is byte-identical to before. -->
+    <div id="bubble-scope-wrap" style="display:none;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:var(--muted);font-weight:600;" id="bubble-scope-label">Plotting:</span>
+      <div class="price-radio" role="group" aria-labelledby="bubble-scope-label">
+        <input type="radio" name="bubble-scope" id="bscope-screen" value="screen" checked><label for="bscope-screen" id="bscope-screen-lbl">Your screen</label>
+        <input type="radio" name="bubble-scope" id="bscope-all" value="all"><label for="bscope-all" id="bscope-all-lbl">All countries</label>
+      </div>
+      <span id="bubble-scope-note" style="font-size:11px;color:var(--muted);"></span>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
@@ -3726,7 +3737,7 @@ window.copyPlatformCitation = function(btn) {
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" id="cmp-chart-png-btn" aria-label="Download Side-by-Side comparison chart as PNG image" title="Download chart as PNG">⬇ PNG</button>
     </div>
-    <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
+    <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Where the set mixes bases, a dashed line with hollow markers is a statutory-basis column ORCA holds no verified production for, and it is not rankable against the solid filled lines — the same meaning the dashed bar carries in the Contractor NPV chart below. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;position:relative;">
     <!-- v708 (T5): the returns chart had no export control of any kind. Mirrors the take chart's
@@ -29219,7 +29230,7 @@ function renderCompare() {
           + ', ' + Number(d.n || 0).toLocaleString() + ' contracts, '
           + Number(d.prod_coverage_pct || 0).toFixed(0) + '% production coverage)';
       }).join('; ')
-    + ' — drawn with <strong>hollow markers</strong> and tagged <strong>(statutory basis)</strong> in the legend. '
+    + ' — drawn as a <strong>dashed line with hollow markers</strong> and tagged <strong>(statutory basis)</strong> in the legend, the same dash the Contractor NPV bar carries below. '
     + 'ORCA holds no verified field production for '
     + (_cmpChartStat.length === 1 ? 'it' : 'them') + ', so '
     + (_cmpChartStat.length === 1 ? 'that line is' : 'those lines are')
@@ -29227,7 +29238,7 @@ function renderCompare() {
     + _cmpChartNProd + ' filled ' + (_cmpChartNProd === 1 ? 'line is' : 'lines are')
     + ' weighted by barrels. Across the database that difference alone is worth about 30 percentage points — the '
     + '160 countries with no production average 26.9% take against 57.0% for the 20 that have it, and all 20 of the '
-    + 'lowest takes in the database are no-production columns. <strong style="color:var(--accent);">A hollow line sitting below a filled one is '
+    + 'lowest takes in the database are no-production columns. <strong style="color:var(--accent);">A dashed hollow line sitting below a solid filled one is '
     + 'reporting the basis, not a better regime.</strong> This is the same exclusion the '
     + '<strong>Rank among producers</strong> row and the four <strong>Govt Take</strong> rows above already apply, where '
     + (_cmpChartStat.length === 1 ? 'this column reads' : 'these columns read')
@@ -29278,15 +29289,44 @@ function renderCompare() {
           pointRadius: 5,
           pointStyle: d.has_r_factor_tiers ? 'rectRot' : 'circle',
           // v684 (T3): point FILL carries the data basis. Hue is the country key shared with the
-          // NPV chart below (v614) and must not move; dash and marker shape both already mean
-          // R-factor. Hollow = statutory basis, filled = production-weighted, and the legend
-          // swatch inherits it, so the distinction survives the ⬇ Chart PNG export.
+          // NPV chart below (v614) and must not move. Hollow = statutory basis, filled =
+          // production-weighted, and the legend swatch inherits it, so the distinction survives
+          // the Chart PNG export.
+          //
+          // v810 (T3) -- dash now means the same thing in both charts. See borderDash below.
           pointBackgroundColor: _cmpStatSet[d.country] ? '#FFFFFF' : _cmpColorOf(d),
           pointBorderColor: _cmpColorOf(d),
           pointBorderWidth: _cmpStatSet[d.country] ? 2.5 : 1,
           fill: false,
           tension: .25,
-          borderDash: d.has_r_factor_tiers ? [] : [5,3],
+          /* v810 (T3) -- "how do these three countries compare side by side?"
+             Walked cold at 1440 and 390: Side-by-Side, Norway + Brazil + Guyana. These two charts
+             sit 360px apart on one screen, drawn from one country set, and they used the SAME
+             visual channel -- a dashed stroke -- to mean two OPPOSITE things:
+
+               take chart (here):   borderDash = d.has_r_factor_tiers ? [] : [5,3]   -> dashed = NO R-factor
+               NPV chart (below):   borderDash = _npvStatSet[d.country] ? [4,3] : [] -> dashed = statutory basis
+
+             The NPV chart DECLARES its meaning in its own subtitle -- "faded dashed bar = statutory
+             basis, no verified production". The take chart declared nothing about dashing at all;
+             its subtitle keys only the hollow marker. So the analyst learns "dashed = proxy column"
+             from the chart that explains itself, scrolls up, and applies it to the chart that does
+             not. On that set Norway drew DASHED and Guyana drew SOLID -- an exact inversion of the
+             truth. Norway is the most verified column on the screen (PROD-WTD, 7,643 contracts,
+             18.2% production coverage, and the grid's own notice calls it "the strongest column
+             here"); Guyana is the proxy one (PROXY, 0% production, "not ranked - statutory terms"
+             on all four take rows, and a faded dashed bar in the chart directly below).
+
+             v684 and v691 each read correctly on their own -- v691's comment even records that
+             borderDash "means R-factor on the take chart but is unused here" -- because each was
+             walked as a single chart. Nothing was looking at the pair.
+
+             Dash now keys off _cmpStatSet, the same predicate _npvStatSet is built from, so the
+             two charts cannot disagree by construction. Nothing is lost: R-factor is still carried
+             three times over on this chart -- rectRot marker, borderWidth 3, the "\u25c6" label suffix --
+             and is declared in the title, which dashing never was. Same gate as the hollow marker,
+             so a set that does not MIX bases draws every line solid, exactly as before. */
+          borderDash: _cmpStatSet[d.country] ? [5,3] : [],
         }))
       },
       options:{
@@ -29301,7 +29341,7 @@ function renderCompare() {
                 : (hasRFactor ? 'Govt Take vs Oil Price  ◆ = R-factor PSC' : 'Govt Take vs Oil Price')];
               if (_cmpChartRebased.length) _t.push('(PSC/Conc) = drawn on production-sharing & concession contracts only, not the blended headline');
               // v684 (T3): the second key the exported PNG has to carry with it.
-              if (_cmpChartStat.length) _t.push('hollow markers = statutory basis, no verified production — not rankable against the filled lines');
+              if (_cmpChartStat.length) _t.push((_cmpChartStat.length === 1 ? 'dashed line + hollow markers = statutory basis' : 'dashed lines + hollow markers = statutory basis') + ', no verified production — not rankable against the solid filled lines');
               return _t.length === 1 ? _t[0] : _t;
             })(),
             color:'#1C1A17',font:{size:14,weight:'bold'}},
@@ -32694,19 +32734,24 @@ function runScreener() {
     var countEl = document.getElementById('screener-count');
     if (countEl && countEl.parentNode) countEl.parentNode.insertBefore(screenerTop4Btn, countEl.nextSibling);
   }
+  // v809 (T1): the pool is published as state for scOpenSbs() to read at CLICK time. It used to
+  // be baked into this button's onclick as a literal addCompare() call list at RENDER time, which
+  // is why ticking rows could never change what the button opened. Label and names are written by
+  // _scSyncSbsBtn(), which reruns on every tick.
+  window._scSbsTop5 = top4.map(function(d) { return d.country; });
+  window._scSbsFromVerified = _sbsFromVerified;
+  window._scSbsAllProxy = !!_allProxy;
   if (top4.length >= 2) {
-    var top4safe = top4.map(function(d) { return d.country.replace(/'/g, "\\'"); });
-    var top4calls = 'clearCompare();' + top4safe.map(function(c) { return "addCompare('" + c + "');"; }).join('');
-    screenerTop4Btn.innerHTML = '<button onclick="(function(){' + top4calls + "var btn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Side-by-Side');});if(btn)switchTab('t2',btn);})()\""
-      + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;cursor:pointer;transition:.15s;margin-top:6px;"'
+    screenerTop4Btn.innerHTML = '<button type="button" id="sc-sbs-btn" onclick="scOpenSbs()"'
+      + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;min-height:24px;cursor:pointer;transition:.15s;margin-top:6px;font-family:inherit;"'
       + ' onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'"'
-      + ' title="Load ' + (_sbsFromVerified ? 'the top ' + top4.length + ' verified-production countries' : (_allProxy ? 'the top ' + top4.length + ' Screener results \u2014 ALL of them proxy-economics countries with no verified field production, indicative only' : 'the top ' + top4.length + ' Screener results')) + ' into Side-by-Side for detailed comparison: ' + top4.map(function(d){return d.country;}).join(', ') + '">'
-      + '&#x21cc; Load top ' + top4.length + (_sbsFromVerified ? ' verified-production' : (_allProxy ? ' \u2014 all proxy-economics' : '')) + ' in Side-by-Side &rarr;'
-      + '</button>'
-      + '<span style="font-size:10px;color:var(--muted);margin-left:8px;">' + top4.map(function(d){return d.country;}).join(' \u00b7 ') + '</span>';
+      + '></button>'
+      + '<span id="sc-sbs-names" style="font-size:10px;color:var(--muted);margin-left:8px;"></span>';
   } else {
     screenerTop4Btn.innerHTML = '';
+    window._scSbsTop5 = [];
   }
+  if (typeof _scSyncSbsBtn === 'function') _scSyncSbsBtn();
 
   // v730 (T6): hydrate the model-terms leg on the rows the analyst can actually see. Debounced:
   // entering this tab re-renders the body several times as the price deck and the grouping
@@ -33090,6 +33135,7 @@ function _scDockSync() {
       if (b) b.disabled = !nIn;
     });
   }
+  if (typeof _scSyncSbsBtn === 'function') _scSyncSbsBtn();
   _scDockPlace();
 }
 // Stack above the compare basket when both are open, and pad the Screener so the dock never
@@ -33106,6 +33152,97 @@ function _scDockPlace() {
 }
 window._scDockSync = _scDockSync; window._scDockPlace = _scDockPlace;
 window.addEventListener('resize', function () { _scDockPlace(); });
+
+// ── v809 (T1) — "which countries should even be on my screening list?" ────────────────
+// Walked cold at 1440 and again at 390 x 844 (hasTouch): Screener → preset "IOC Capital
+// Screen" (15 rows) → tick the four the analyst actually wants → press the one button on the
+// tab that says Side-by-Side.
+//
+// Ticked: USA · United Kingdom · Brazil · Indonesia.
+// Loaded: Canada · USA · Azerbaijan · Mexico · Argentina.
+//
+// Three countries the analyst never picked, three of their four picks silently dropped, and
+// clearCompare() ran first so the shortlist was gone. They land on a different tab holding a
+// five-column grid that looks authoritative and names nothing about the substitution.
+//
+// Cause: #screener-top4-btn was rebuilt on every render with the call list BAKED INTO an
+// inline onclick string -- "clearCompare();addCompare('Canada');addCompare('USA');..." -- fixed
+// at render time, before any row was ticked. Ticking a row runs _scSyncSelUI() → _scDockSync(),
+// neither of which has ever touched that button, so the string stayed stale by construction.
+// window._scSelected was populated and correct the whole time; nothing read it.
+//
+// Fiscal Compare fixed exactly this at v797 (fc-sbs-btn relabels, fcOpenSbs() reads the ticks).
+// The Screener -- the tab whose entire purpose is building the shortlist -- never got it, and
+// its dock carried Copy / CSV / Excel / Clear with no route to the comparison tab at all.
+//
+// The pool is now state read at CLICK time, not a string written at render time. Same contract
+// as Fiscal Compare: ticks win, no ticks falls back to the top 5 of the current screen, over
+// CMP_MAX names what did not load. Ranking, filters, exports and the top-5 fallback are
+// unchanged -- what changes is which countries the button opens when rows are ticked.
+function scOpenSbs() {
+  var sel = (typeof _scSelOrdered === 'function' ? _scSelOrdered() : null) || [];
+  var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var picks = (sel.length ? sel : (window._scSbsTop5 || [])).slice();
+  var left = picks.length > cap ? picks.splice(cap) : [];
+  if (!picks.length) return;
+  // One history entry for the whole set, not one per addCompare() -- same guard as fcOpenSbs().
+  _cmpHashHold = true;
+  try { clearCompare(); picks.forEach(function (c) { addCompare(c); }); }
+  finally { _cmpHashHold = false; }
+  switchTab('t2', document.getElementById('tab-btn-t2'));
+  if (typeof _updateCompareHash === 'function') _updateCompareHash();
+  if (left.length && typeof showCopyToast === 'function') {
+    showCopyToast('Side-by-Side holds ' + cap + ' countries \u2014 opened the first ' + cap
+      + ' ticked. Not loaded: ' + left.join(', ') + '.');
+  }
+}
+
+// Both doors to Side-by-Side say which countries they will open, recomputed on every tick.
+// _scSelOrdered() carries only ticks the CURRENT screen still returns, which is the same set
+// Copy/CSV/Excel carry -- so the comparison and the export can never disagree about the list.
+function _scSyncSbsBtn() {
+  var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var pool = window._scSbsTop5 || [];
+  var sel = (typeof _scSelOrdered === 'function' ? _scSelOrdered() : null) || [];
+  var shown = sel.length ? sel.slice(0, cap) : pool;
+  var btn = document.getElementById('sc-sbs-btn');
+  if (btn) {
+    if (sel.length) {
+      btn.innerHTML = '\u21cc ' + (sel.length > cap
+        ? 'Compare first ' + cap + ' of ' + sel.length + ' ticked in Side-by-Side \u2192'
+        : 'Compare ' + sel.length + ' ticked in Side-by-Side \u2192');
+      btn.title = 'Open the ' + (sel.length > cap ? 'first ' + cap + ' of the ' + sel.length : sel.length)
+        + ' ticked countr' + (sel.length === 1 ? 'y' : 'ies') + ' in Side-by-Side, in screen order: '
+        + shown.join(', ') + '. Replaces any existing comparison. Untick everything to load the top '
+        + pool.length + ' of this screen instead.';
+    } else {
+      var fromVerified = !!window._scSbsFromVerified, allProxy = !!window._scSbsAllProxy;
+      btn.innerHTML = '\u21cc Load top ' + pool.length
+        + (fromVerified ? ' verified-production' : (allProxy ? ' \u2014 all proxy-economics' : ''))
+        + ' in Side-by-Side \u2192';
+      btn.title = 'Load ' + (fromVerified
+          ? 'the top ' + pool.length + ' verified-production countries'
+          : (allProxy
+              ? 'the top ' + pool.length + ' Screener results \u2014 ALL of them proxy-economics countries with no verified field production, indicative only'
+              : 'the top ' + pool.length + ' Screener results'))
+        + ' into Side-by-Side for detailed comparison: ' + pool.join(', ')
+        + '. Tick rows first to compare your own choice instead.';
+    }
+  }
+  var names = document.getElementById('sc-sbs-names');
+  if (names) names.textContent = shown.join(' \u00b7 ');
+  var dockSbs = document.getElementById('sc-dock-sbs');
+  if (dockSbs) {
+    dockSbs.disabled = !sel.length;
+    dockSbs.innerHTML = sel.length > cap ? '\u21cc Side-by-Side (first ' + cap + ')' : '\u21cc Side-by-Side';
+    dockSbs.title = sel.length
+      ? 'Open the ' + (sel.length > cap ? 'first ' + cap + ' of the ' + sel.length : sel.length)
+        + ' ticked countr' + (sel.length === 1 ? 'y' : 'ies') + ' in Side-by-Side, in screen order: '
+        + shown.join(', ') + '.'
+      : 'Tick rows to open them in Side-by-Side.';
+  }
+}
+window.scOpenSbs = scOpenSbs; window._scSyncSbsBtn = _scSyncSbsBtn;
 
 function _scExportRows() {
   var data = window._screenerData || [];
@@ -53118,11 +53255,70 @@ function renderBubbleChart() {
   var allData = (COUNTRY_DATA || []).filter(function(d) { return d[takeKey_b] != null && d[npvKey_b] != null; });
   if (!allData.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
 
-  // Mobile: limit to top 30 countries by contract count (largest bubbles) to reduce clutter
+  // ── v809 (T1) — the scatter plots the Screener's result, not a different population ──────
+  // This function read COUNTRY_DATA directly and never looked at window._screenerData. An
+  // analyst who narrowed the Screener to 11 countries ("Stable Fiscal Record": <=1 sourced law
+  // change since 2010) and clicked Bubble Chart -- the obvious next move, since the scatter IS
+  // the visual answer to "which countries should be on my list" -- got all 185 plotted under a
+  // title that read "All Regimes". The Screener still held the 11; the mode button still read
+  // "Screener (11)"; switching back restored them. Nothing on the chart said the screen had
+  // been dropped, so the left frontier invited a pick from countries the analyst's own screen
+  // had just excluded. On a phone it was worse: the mobile branch silently replaced the screen
+  // with the top 30 by CONTRACT COUNT under the title "Top 30 Regimes by Scale", of which only
+  // 5 of the analyst's 11 survived, and the title named neither the price nor the substitution.
+  //
+  // The screen now wins by default, the title names it and its size, and a radio pair restores
+  // the full universe on one click. With no screen active the control stays hidden and every
+  // line below behaves exactly as it did, so the cold view is unchanged.
+  var _scrSet = Array.isArray(window._screenerData) ? window._screenerData : null;
+  var _screenActive = !!(_scrSet && _scrSet.length && _scrSet.length < (COUNTRY_DATA || []).length);
+  var _showAll = !!window._bubbleShowAll;
+  var _useScreen = _screenActive && !_showAll;
+  var _screenLabel = (typeof _activePresetName !== 'undefined' && _activePresetName)
+    ? (_activePresetName + ((typeof _activePresetModified !== 'undefined' && _activePresetModified) ? ' (modified)' : ''))
+    : 'Your Screener result';
+  var _scoped = allData;
+  var _droppedNoEcon = 0;
+  if (_useScreen) {
+    var _keep = {};
+    _scrSet.forEach(function (d) { _keep[d.country] = 1; });
+    _scoped = allData.filter(function (d) { return _keep[d.country]; });
+    // A screened country with no modelled take/NPV at THIS price deck cannot be plotted. Say how
+    // many rather than letting the bubble count quietly disagree with the Screener's row count.
+    _droppedNoEcon = _scrSet.length - _scoped.length;
+    if (!_scoped.length) { _useScreen = false; _scoped = allData; }
+  }
+
+  // Mobile: limit to top 30 countries by contract count (largest bubbles) to reduce clutter.
+  // v809: only when there are more than 30 to thin. A screen that returned 11 is plotted whole.
   var isMobile = window.innerWidth < 768;
-  var data = isMobile
-    ? allData.slice().sort(function(a, b) { return (b.n || 0) - (a.n || 0); }).slice(0, 30)
-    : allData;
+  var _truncated = isMobile && _scoped.length > 30;
+  var data = _truncated
+    ? _scoped.slice().sort(function(a, b) { return (b.n || 0) - (a.n || 0); }).slice(0, 30)
+    : _scoped;
+
+  // The control that makes the substitution visible and reversible.
+  (function () {
+    var wrap = document.getElementById('bubble-scope-wrap');
+    if (!wrap) return;
+    wrap.style.display = _screenActive ? 'flex' : 'none';
+    if (!_screenActive) return;
+    var sl = document.getElementById('bscope-screen-lbl');
+    var al = document.getElementById('bscope-all-lbl');
+    if (sl) sl.textContent = _screenLabel + ' (' + _scrSet.length + ')';
+    if (al) al.textContent = 'All ' + allData.length;
+    var rs = document.getElementById('bscope-screen'), ra = document.getElementById('bscope-all');
+    if (rs) rs.checked = !_showAll;
+    if (ra) ra.checked = _showAll;
+    var note = document.getElementById('bubble-scope-note');
+    if (note) {
+      note.textContent = _showAll
+        ? 'Showing every country \u2014 bubbles outside your screen are included.'
+        : (_droppedNoEcon > 0
+            ? _droppedNoEcon + ' of the ' + _scrSet.length + ' screened have no modelled economics at $' + bprice + '/bbl and cannot be plotted.'
+            : '');
+    }
+  })();
 
   var regionColors = {
     'Middle East': '#A16207', 'Africa': '#15803D', 'Asia': '#7C3AED',
@@ -53173,7 +53369,18 @@ function renderBubbleChart() {
       events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
       plugins: {
         legend: { position: isMobile ? 'bottom' : 'right', labels: { color: '#6B6560', font: { size: isMobile ? 10 : 11 } } },
-        title: { display: true, text: isMobile ? 'Top 30 Regimes by Scale' : 'Govt Take vs Contractor NPV — All Regimes @$' + bprice + '/bbl (bubble size = contract count)', color: '#1C1A17', font: { size: isMobile ? 13 : 12, weight: 'bold' } },
+        // v809 (T1): the title names the population actually plotted. It used to say
+        // "All Regimes" over a screened set's worth of context, and "Top 30 Regimes by Scale"
+        // on a phone with no price and no hint that a screen had been replaced.
+        title: { display: true, text: (function () {
+          var scope = _useScreen
+            ? _screenLabel + ' \u00b7 ' + data.length + ' of ' + allData.length
+            : (_truncated ? 'Top ' + data.length + ' of ' + allData.length + ' by contract count' : 'All Regimes');
+          if (_useScreen && _truncated) scope += ' (largest ' + data.length + ' shown)';
+          return (isMobile ? '' : 'Govt Take vs Contractor NPV — ')
+            + scope + ' @$' + bprice + '/bbl'
+            + (isMobile ? '' : ' (bubble size = contract count)');
+        })(), color: '#1C1A17', font: { size: isMobile ? 13 : 12, weight: 'bold' } },
         tooltip: {
           callbacks: {
             label: function(ctx) {
@@ -54934,6 +55141,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var radio = document.getElementById(id);
     if (radio) radio.addEventListener('change', function() {
       window._bubblePriceKey = this.value;
+      if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
+      if (typeof renderBubbleChart === 'function') renderBubbleChart();
+    });
+  });
+  // v809 (T1): scope radios — plot the Screener's result, or the full universe.
+  ['bscope-screen','bscope-all'].forEach(function (id) {
+    var r = document.getElementById(id);
+    if (r) r.addEventListener('change', function () {
+      window._bubbleShowAll = (this.value === 'all');
       if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
       if (typeof renderBubbleChart === 'function') renderBubbleChart();
     });
