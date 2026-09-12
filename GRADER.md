@@ -45676,3 +45676,130 @@ v802 → v803 at the three display sites only.
 ## What happened first
 
 Cycle 709 **timed out** (`subprocess.TimeoutExpired` at its 1800s limit) after editing `index.html` but before committing, verifying, or logging. Its work — v802, 132 lines on the Screener's zero-result path — was sitting uncommitted in the tree. I walked the same task rather than starting a fresh one, because an unverified change to the core screening filter 
+
+---
+## Cycle 711 Log — 2026-09-11
+
+**Task: T3 — "How do these three countries compare side by side?"** (previous cycle was T1; not repeated.)
+
+Walked cold at 1440 and at 390 with `hasTouch` — sessionStorage and localStorage cleared, then
+reloaded, then Side-by-Side. Read the real DOM and the real handlers, not the changelog.
+
+## Friction
+
+The cold load seeds Norway / UK / Netherlands as an example, so anyone comparing **their own**
+three countries types into `#cmp-search`. That picker is rendered by `_cmpOptHTML()`
+(`index.html:27062`), and it emitted exactly three things per row:
+
+    Guyana        Latin America                    54.1% take
+
+Name, region, take. **It was the only country-selection surface in ORCA that did not show
+production basis** — and the platform turns on that distinction everywhere else:
+
+| Surface | What it already does |
+|---|---|
+| Fiscal Compare | per-row PROXY pill + `◇ Production-backed only` filter (`#fc-filter-prod`) |
+| Explorer | `Verified production first` checked by default + `Prod Data Only` |
+| Screener | `#sc-proxy-keep` + a labelled divider drawn at the boundary |
+| Side-by-Side **grid** | leads with a `Data basis` row — PROD-WTD / PART-PROD / PROXY |
+| Side-by-Side **picker** | **nothing** |
+
+A PROXY country and a production-weighted one were typographically identical, and their take
+figures were presented on the same footing.
+
+This is not an edge case. Measured against `COUNTRY_DATA` through the platform's own `_dqTier()`:
+
+| basis | countries |
+|---|---|
+| PROD-WTD | 10 |
+| PART-PROD | 12 |
+| **PROXY** | **163** |
+
+**163 of 185.** A three-country pick has a **99.9%** chance of containing at least one column the
+grid will then refuse to rank. What the analyst gets, one scroll after choosing, is that column:
+
+- `not ranked · statutory terms` on all four Govt Take rows
+- `not comparable · statutory terms` on all four Contractor NPV rows
+- dropped from the `GOVT TAKE @$75, LOWEST FIRST` headline ("Set aside — 1 of 3 columns cannot
+  join that ordering")
+- dropped from the `PREDICTABILITY, MOST STABLE FIRST` headline ("cannot be placed")
+- plus a `⚠ … cannot be ranked against each other on either row` notice under the grid
+
+The tool's own seeded example set does it too: Netherlands is the set-aside column in the North
+Sea Trio. Walking Guyana / Brazil / Angola produced 811 words of caveat prose across four notices
+(415px at 1440) — all of it explaining, *after* the grid rendered, that the set the analyst had
+just built does not compare.
+
+The worst moment is therefore not in the grid. It is one step earlier: **the analyst commits to a
+set with no way to see that they are building an unrankable one.**
+
+## Change
+
+`_cmpOptHTML()` now renders the data-basis badge on the row being chosen:
+
+    Guyana          Latin America      [PROXY]      54.1% statutory
+    Iraq            Middle East        [PROD-WTD]   84.8% take
+    Iraq-Kurdistan  Middle East        [PROXY]      63.0% statutory
+    Saudi Arabia    Middle East        [PART-PROD]  state monopoly
+
+Read from `_dqTier()` — the same single source of truth the grid's Data basis row, the FC pill and
+the Screener divider all read, so the badge on the option and the badge on the resulting column
+can never disagree. Reuses the existing `.dq-badge` / `.dq-prodwtd` / `.dq-partprod` / `.dq-proxy`
+classes; no new stylesheet surface.
+
+A PROXY row's take now reads `54.1% statutory` rather than `54.1% take`, in the grid's own
+vocabulary, because that number is a simple average of statutory terms and not a production-weighted
+take. `margin-left:auto` moved from the take span to the badge so the pair right-aligns as a group.
+
+No country is hidden, blocked or reordered — mixing bases is a legitimate deliberate choice. It is
+now made *before* the grid renders instead of discovered after it.
+
+## Result
+
+| | v803 | v804 |
+|---|---|---|
+| basis visible while choosing | **no** | **yes, every row** |
+| `Iraq` vs `Iraq-Kurdistan` distinguishable at pick time | no — both "% take" | **PROD-WTD 84.8% take vs PROXY 63.0% statutory** |
+| PROXY take labelled as statutory | no | **yes** |
+| dropdown rows overflowing at 390 | 0 | **0** |
+| dropdown options under 24px under `pointer: coarse` | 0 | **0** (rows 34px) |
+| doc scrollWidth at 1920/1440/1280/1024/768/390 | = clientWidth | **= clientWidth, all six** |
+
+The analyst screening three countries either picks a comparable set in the first place, or mixes
+bases knowingly — instead of building three columns, scrolling, and finding a third of the
+comparison marked "not ranked" with 811 words explaining why.
+
+## Verification — run this cycle, against the LOCAL tree
+
+Cycle 710 flagged that `runtime_comprehensive.js:13` defaults `TEST_URL` to the **deployed** site
+and `autonomous_cycle.py` never sets it, so the harness grades a build the cycle has not touched.
+**This cycle set `TEST_URL` explicitly** and ran the suite against `localhost:8971` serving the
+edited tree:
+
+- **299 PASS / 0 FAIL / 1 WARN** — identical to the pre-change local baseline recorded at 710.
+- The 1 WARN is the pre-existing service-worker 404; reproduced on the unmodified backup build.
+- JS syntax gate: **PASS**, 11 blocks.
+- Page errors on the full T3 walk at 390: **0**.
+
+The harness-level number the cycle email will quote still grades the deployed site. That defect is
+unchanged and is still the single thing most worth fixing before a cycle trusts an unqualified
+number.
+
+## Carried forward, still not done
+
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) remains
+  uninvestigated. **Eighth** consecutive cycle log to note it.
+- `TEST_URL` not set by `autonomous_cycle.py` — the gate grades the deployed build.
+- `Copy for IC Memo` on Side-by-Side is a silent no-op when the comparison holds one country.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- Side-by-Side grid header sits ~117px below the fold at 390 (measured again this cycle: grid top
+  960px against an 844px viewport).
+
+**STILL LOCKED respected:** no tooltip layer, FAQ, banner text, citation or text-only edit; the
+v612 mobile layer, its `min-width: max-content` marker and `#reference-panel` untouched; FC columns
+and the removed Govt NPV column untouched; CP headline untouched; Screener presets stay a dropdown;
+Advanced Filters still collapsed by default; tab order unchanged. Version v803 → v804 at the three
+display sites only.
+
+**Shipped:** petroleum-fiscal-db `cc25098` (v804), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
