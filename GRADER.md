@@ -46774,3 +46774,75 @@ shipped.
 Walked cold at 1440×900, storage cleared. Home → Reform Risk → scroll to the tab's findings cards → **ACTIVELY REFORMING (2): United Kingdom · 5 changes since 2010 · score 25**. Pressed "United Kingdom ›".
 
 It threw the analyst out of 
+
+---
+## Cycle 721 Log — 2026-09-12
+- Test before: 300 PASS / 0 FAIL (reported by harness)
+- Test after (RAN this cycle, locally): 289 PASS / 4 FAIL / 1 WARN — **identical on pristine HEAD**, same four names, so zero regression from this change. The four are pre-existing locally and do not reproduce on the harness (same as cycle 715 recorded).
+- JS errors: 0 page errors. 1 console 404 (service-worker script fetch) — present on baseline too.
+- Shipped as **v813**, pushed to `main` (`659f681`), mirror in sync.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest by rotation (last run cycle 714). Cycle 720 was T4, not repeated.
+
+## Friction
+Walked cold at 1440x900, storage cleared, Home → Fiscal Compare.
+
+`#tbl-fc` is **1,805px wide inside a 1,320px `.tbl-wrap` window at 1440**. The **Quality** column — the only column on the flagship table that answers "how solid is this?" — was position 10 of 13 and drew at **x=1,576: 256px past the visible right edge**. At 1280 it was 416px out. The table scrolls horizontally inside its own container and nothing on screen signals that.
+
+So the analyst reads the citable take at x=835 with no grade anywhere in view. On the cold default sort that is actively misleading, because the rows that look most attractive are the worst evidenced:
+
+| rank | country | take (db · citable) | Quality (was off-screen) |
+|---|---|---|---|
+| 1 | USA | 23.4% | B |
+| **2** | **Iraq** | **⚖ 34.1%** | **D** |
+| **3** | **Somalia** PROXY | **36.9%** | **D** |
+| 4 | Australia | 38.5% | B |
+| **5** | **Ecuador** | **⚖ 39.3%** | **C** |
+
+D is the grade this platform's own Methodology tab says "does not belong in a recommendation document without establishing the terms from the country's own petroleum act." Six of the top ten carry a PROXY tag. The stats bar says "No verified production: 6 of the top 10" — the platform knows, but the per-row grade was unreachable.
+
+## Change
+The Quality column moved from **position 10 to position 6** — immediately right of `Take% db · citable`, the column whose own header tooltip names it "the one the drilldown tells you to cite in an IC memo". The grade now travels with the number it grades.
+
+Mechanically: the `<th>` is built once into `_fcQualTh` and spliced in after the citable-take header; the `_qualCell` computation is hoisted above the row branch so the `<td>` is emitted after the citable-take cell in **all three** branches — monopoly (`_isMono`), generic-default (`termsBasis === 'default'`), and country-terms. Column count, sort keys, the rank column, the drilldown colspan and the XLSX export are untouched.
+
+## Result
+At 1920, 1440 and 1280 the analyst reads the citable take and its evidence grade **in one eye movement**, instead of scrolling a table they had no reason to think scrolled. Iraq's **D** and Somalia's **D** now sit directly beside 34.1% and 36.9% at the head of the ranking, so a shortlist built off the top of this table cannot be built blind to sourcing. At 1024 the grade is still off-screen — but so is the take itself, so the two now move together instead of sitting 672px apart.
+
+## Verification — the suite RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax (all inline `<script>` extracted, `node --check`) | **PASS** (11 blocks) |
+| Runtime suite, `TEST_URL=http://localhost:8934/index.html` | **289 PASS / 4 FAIL / 1 WARN** |
+| Same suite vs pristine `HEAD` served alongside as `_baseline_tmp.html` | **289 / 4 / 1 — identical, same four names** |
+| Pixel gate, `pixel_audit.js` 10 tabs x 5 viewports | **PASS** — no surface worse than baseline |
+| Row/header cell alignment | **185/185 rows carry 13 cells against 13 headers**, no branch misaligned |
+| Quality column x-position at 1440 | **1,576 → 1,017** inside a 1,320px window |
+| Drilldown drawer (Somalia) | opens, 981px, leads with "grade D — 0.0% primary law" |
+| FC XLSX export | opens; `Evidence Grade` / `Primary Law (tier A, %)` / `Facts On File` intact |
+
+Branch spot-check after the move: Venezuela (monopoly/generic) **G**, Norway **A**, Guyana **B**, Somalia **D** — each in column 6.
+
+**Step 5b — checked on a phone.**
+
+| viewport | scrollWidth / clientWidth | sub-24px in `#tbl-fc` | page errors |
+|---|---|---|---|
+| 1920 | 1920 / 1920 | 740 (pre-existing, `pointer: fine`) | 0 |
+| 1440 | 1440 / 1440 | 740 | 0 |
+| 1280 | 1280 / 1280 | 740 | 0 |
+| 1024 | 1024 / 1024 | 740 | 0 |
+| 768 | 768 / 768 | 740 | 0 |
+| **390 `hasTouch`** | **390 / 390** | **186** | 0 |
+
+Zero horizontal scroll at all six. Every one of those counts is **identical to pristine HEAD measured the same way**, and the tier badge is 14px on both — this cycle neither added nor shrank a control, it moved one column.
+
+**STILL LOCKED respected:** no new tooltip, no new FAQ, no banner, no citation micro-edit, no text-only change — a column moved and 185 rows re-emit their cells in a new order. The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched. Explorer analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a dropdown. The removed Govt NPV column stays removed; the CP two-zone headline is untouched. Tab order unchanged. Version v812 → v813 at the three display sites only, silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **Country Profile Evidence Chain** across Norway / Namibia / Chad / Belize / Guyana / Suriname / Iraq / Nigeria / Vanuatu / Nauru: per-term ORCA value vs statutory vs source, `LINK DEAD` chips, `⚠ DCF USES …` override markers, `NOT HELD` / `NO SOURCE` states all render correctly and distinctly.
+- **`#cp-take-source`** ("59.5% govt take @$75 sources ↓") correctly scrolls to the Evidence Chain at 3,983.
+- **`#cp-evidence-panel`** does mark individual dead links — the chip is a sibling of the `<a>`, not inside it.
+- **CP XLSX export** carries a full `Fiscal Terms & Sources` provenance sheet (ORCA value / statutory / DCF engine / gap / cited source / tier / retrievable / read-by-model), correctly column-aligned.
+- **Side-by-Side** `Model terms cited` cells are live controls calling `_fcOpenTermChain()`. The two other rows reading "Evidence tier" on that tab are static illustrative tables inside FAQ answers about different countries, not a live contradiction.
