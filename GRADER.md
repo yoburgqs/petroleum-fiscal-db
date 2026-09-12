@@ -45513,3 +45513,155 @@ v800 → v801 at the three display sites.
 
 ## Friction
 The comparison logic underneath is genuinely good and I left it alone — the fee-basis re-basing (Iraq 84.8% headline → 34.1% comparable), the proxy set-aside, the "nothing ranks here" state, the v791 floating column-name bar, t
+
+---
+## Cycle 710 Log — 2026-09-11 21:0x — shipped as v803
+
+- Test before: 300 PASS / 0 FAIL (as handed to the cycle — see the gate note below, this number
+  grades the DEPLOYED site, not the edited tree)
+- Test after: **299 PASS / 0 FAIL / 1 WARN**, run this cycle in the foreground against the local
+  modified tree (`TEST_URL=http://127.0.0.1:8966/index.html`), number read from the suite's own
+  report at `/tmp/runtime_test_report.txt`
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures** (after the edit, and again
+  after the version bump)
+- Pixel gate: **PIXEL GATE PASS — no surface got worse than baseline**, baseline NOT updated
+
+### Situation at the start of this cycle
+
+**Cycle 709 timed out.** `autonomous_cycle.py` raised `subprocess.TimeoutExpired` after 1800s
+with the Claude call still running, so 709 edited `index.html` and then never committed, never
+verified in a browser, and never logged. Its work — tagged **v802** — was sitting uncommitted in
+the working tree, 132 lines across the Screener's zero-result path.
+
+This cycle did **not** start a fresh task on top of that. An unverified behaviour change to the
+core screening filter, left in the tree for the next cycle to inherit and possibly ship unseen,
+is the exact "stable but wrong" failure mode `CLAUDE.md` warns about. So: walk the same flow,
+verify v802 claim by claim against a real browser, and correct whatever does not hold.
+
+## Task
+
+**T1** — "Which countries should even be on my screening list?" Same task as the timed-out 709,
+deliberately, for the reason above. (708 was T3, 707 T5, 706 T6, 705 T2, 703 T4, 702 T1.) The
+rotation resumes from T4 next cycle, which now has the longest gap (703).
+
+## Friction
+
+Walked cold at 390x844 with `hasTouch`, then 768 / 1024 / 1280 / 1440 / 1920, `sessionStorage` and
+`localStorage` cleared with a reload before every walk, Home → Explorer → Screener mode.
+
+**v802's behaviour half was right, and is now verified rather than asserted.** Three findings held
+up under measurement:
+
+1. `runScreener()` had a `checkedMechs.length > 0` guard, so the mechanic control's two extremes —
+   all 9 ticked and 0 ticked — **both returned the full 185**. An include-set that includes
+   everything when you include nothing is not monotone. Worse, the page disagreed with itself
+   about which state it was in: the active-filter badge counted it, and the exported criteria
+   block asserted `Fiscal mechanics:  only` — a criterion naming no mechanic — above the complete
+   unfiltered universe, directly under the line "SCREEN APPLIED · these criteria produced this row
+   set". Measured after the guard removal: 9 ticked → **185**, PSC alone → **81**, 0 ticked → **0**.
+   Cold load is unaffected; all 9 boxes carry `checked` in the static markup at line 3400.
+2. `window._screenerData` is written near the end of `runScreener()`, which the zero-result branch
+   returns **before** reaching — so on an empty screen it still held **the rows of the last screen
+   that returned any**. All three export paths read it, and each already opens with
+   `if (!rows.length) { ... return; }` — a guard that had never once been reachable, because the
+   array it tests was never emptied. Narrow a 15-country screen to nothing, press Copy for IC Memo,
+   and you got a 15-row pasteable table captioned "15 of 185 countries" under the *current*
+   screen's criteria. Rows from one screen under the criteria of another, in the artefact that
+   goes into an IC document. Measured after: `_screenerData` **0** on empty, CSV export returns
+   without writing.
+3. The panel's own advice was wrong: "reduce the IRR minimum" points at a slider deleted at v517,
+   and "uncheck some mechanic filters" is the exact inverse of the fix in the state the panel most
+   often reaches.
+
+**v802's layout half did not work, and that was this cycle's find.** v802 hid the 12-cell
+`<thead>` (`#tbl-screener.sc-empty thead { display: none }`) to let the table collapse to its
+wrapper, and its comment claimed the panel now fits. It does not. Measured on the v802 tree at
+390x844:
+
+| | v802 as left by cycle 709 |
+|---|---|
+| `#tbl-screener` width | **881px**, inside a **362px** `.tbl-wrap` |
+| "Select all 9 mechanics" button | left **950** / right **1087** |
+| i.e. | ~**690px past the right edge of the phone** |
+
+Hiding the header was **necessary but not sufficient**. Line 348's global
+`tbody td { padding: 6px 10px; white-space: nowrap; }` is inherited straight down into the
+`colspan=12` empty cell and into every `div` / `ul` / `li` / `button` inside it — confirmed by
+dumping `getComputedStyle` up the whole ancestor chain, `white-space: nowrap` at every level from
+the `BUTTON` to the `TD`. So the cell sized to the min-content width of one unbreakable line,
+881px, regardless of what the header row did, and the table's existing `max-width: 100%` could
+never bind. The same nowrap forced the diagnostic `<li>` to overrun its own `max-width:min(420px,100%)`
+box — `scrollWidth 825` in a `404px` `li` — which is what pushed the button out sideways.
+
+So the analyst who empties the mechanic group on a phone got: an empty left half of the cell, a
+clipped headline, and the one-click way back laid out two-thirds of a metre off-canvas, inside a
+table with zero rows to scroll through. The worst moment in the walk, and it was **still there**
+after the change that was supposed to fix it.
+
+## Change
+
+One CSS rule, the half v802 was missing:
+
+```css
+#tbl-screener.sc-empty td, #tbl-screener.sc-empty td * { white-space: normal; }
+```
+
+Scoped to the empty state only — real data rows keep `nowrap`, which is what keeps the grid's
+columns aligned. Verified both directions, because a class toggled on every render has to be
+reversible.
+
+## Result
+
+| | v802 (uncommitted) | v803 (shipped) |
+|---|---|---|
+| empty-state table width @390 | 881px in a 362px wrap | **360px — fits** |
+| `.tbl-wrap` inner scrollWidth @390 | 1072 | **360 — nothing to scroll** |
+| recovery button @390 | left 950 / right 1087, off-canvas | **left 200 / right 336, on screen** |
+| button height under `pointer: coarse` | 24px | 24px (clears the floor) |
+| button in view at 390/768/1024/1280 | **no, no, no, no** | **yes at all six widths** |
+| populated grid @1440 | 185 rows, nowrap, 1548px | **unchanged — 185, nowrap, 1548px** |
+
+The analyst who unticks the mechanic group — now a state that genuinely returns nothing, where
+before it silently returned everything — reads a panel that names that cause first, and taps
+"Select all 9 mechanics" to get their 185 rows back **without** losing the take ceiling, NPV
+floors, region and evidence settings they had already set. On a phone, for the first time, that
+button is on the screen. And an export taken from a zero-result screen now refuses instead of
+emitting the previous screen's shortlist under this screen's criteria.
+
+## ⚠ The gate number grades the wrong build — second cycle running this has been flagged
+
+`tools/petroleum/tests/runtime_comprehensive.js:13` is
+`const URL = process.env.TEST_URL || 'https://yoburgqs.github.io/petroleum-fiscal-db/'`, and
+`autonomous_cycle.py` does not set `TEST_URL`. **The cycle's before/after test numbers therefore
+grade the DEPLOYED site, not the tree the cycle just edited.** That is why every cycle email for
+690–708 reads an identical "300 PASS / 0 FAIL": the gate is measuring a build the cycle has not
+touched yet, so a cycle could ship a change that breaks 50 tests and still be handed 300/0 on both
+sides of its own edit. Cycle 708 flagged the same discrepancy from the other direction. Run with
+`TEST_URL` pointed at the local tree, this tree reports **299 PASS / 0 FAIL / 1 WARN**; 708's four
+`SB-PROVENANCE` / `CountryProfile` failures do **not** reproduce here.
+
+This is a loop-harness defect, not a UX defect, so it was recorded rather than fixed — but it is
+the single thing most worth fixing before the next cycle trusts a number.
+
+## Carried forward, still not done
+
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) is still
+  uninvestigated. **Seventh** consecutive cycle log to note it.
+- `Copy for IC Memo` on Side-by-Side is a silent no-op when the comparison holds one country.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- Side-by-Side grid header is still ~117px below the fold at 390 (v801's remaining gap).
+
+## Cleared this cycle
+
+- The ~15 stray `python -m http.server` processes carried since cycle ~690 (ages 6h to 1d22h) were
+  killed. One server on 8966 served this cycle.
+
+**STILL LOCKED respected:** no tooltip, FAQ, banner text, citation or text-only edit; Advanced
+Filters stays collapsed by default on arrival (`_scAllMechanics()` only opens it once the analyst
+has been told a control in there decided their result set); Screener presets stay a dropdown; FC
+columns and the removed Govt NPV column untouched; CP headline untouched; the v612 mobile layer, its
+`min-width: max-content` marker and `#reference-panel` untouched; tab order unchanged. Version
+v802 → v803 at the three display sites only.
+
+**Shipped:** petroleum-fiscal-db `bb90b0c` (v803), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
