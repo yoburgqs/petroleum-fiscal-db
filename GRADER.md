@@ -46191,3 +46191,16 @@ display sites only, silently, after the real change shipped.
 
 **Shipped:** petroleum-fiscal-db `a5bf252` (v807), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 714 Log — 2026-09-12 01:07
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 714 — T6 walk, shipped v807
+
+## Cycle 714 — T6
+
+**Task** — T6, "Where did this number come from and how solid is the evidence?" Stalest by rotation (T6 last ran at cycle 706; 707 T5, 710 T1, 711 T3, 712 T4, 713 T2).
+
+**Friction** — The IOC Portfolio's last column, on both tables (`index.html:34142`/`34162` roll-up, `34283`/`34306` single-entity), printed `formatBreakeven(r.be_75)` — an average of per-contr
