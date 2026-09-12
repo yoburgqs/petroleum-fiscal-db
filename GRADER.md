@@ -47760,3 +47760,18 @@ change shipped.
   shipped sheet shape and wants its own cycle.
 - **Also still open, carried forward:** the FC Reform verdict column has no `data-sort-key`;
   Country Profile's Price Sensitivity Curve renders 300px centred inside a 1,050px card.
+
+---
+## Cycle 728 Log — 2026-09-12 18:51
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed as `9f2ad8f` (v820). Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Cycle 728 summary
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"*
+
+**Friction.** On the IOC Portfolio tab, the `GOVT TAKE` column is `IOC_DATA.take_75` — the take on *that operator's own contracts*, averaged per operator | country | mechanic. Nothing on screen said so, and everything around it implied the opposite:
+
+- It rendered through `fmtTake()`, t
