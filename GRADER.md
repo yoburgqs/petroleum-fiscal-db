@@ -46063,3 +46063,131 @@ three display sites only, silently, after the real change shipped.
 **Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by rotation (last used cycle 705).
 
 **Friction** — The defensibility step in T2 is the Peer Comparison table on Country Profile: *these are the regimes my number sits among — load them and check.* The table shows the country plus five peers. Its own button, **"Load All 
+
+---
+## Cycle 714 Log — 2026-09-12 — T6 — shipped v807
+- Test before (harness, deployed build): 300 PASS / 0 FAIL
+- Test after (suite RUN this cycle against the LOCAL tree): 289 PASS / 4 FAIL / 1 WARN — and the
+  identical 289/4/1 against the stashed unmodified build in the same session. FAIL-neutral.
+- JS errors: 0 page errors across all 9 tabs at 6 widths. 1 console 404 (service worker, known WARN).
+- JS syntax gate: PASS, 11 blocks. PIXEL GATE: PASS.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest by rotation:
+T6 last ran at cycle 706; 707 T5, 710 T1, 711 T3, 712 T4, 713 T2.
+
+Walked cold at 1440x900 and 390 hasTouch — sessionStorage and localStorage cleared, reloaded,
+then the four surfaces that print a provenance signal. Read the real DOM and the real handlers.
+
+The Country Profile / Fiscal Compare half of T6 is in good shape and I found nothing worse than
+minor there: the CP headline take is clickable ("sources ↓" → `_cpTakeToEvidence` → the Evidence
+Chain lands at top=101px), the FC drawer's "N of M model terms cited →" reaches the same chain via
+`_fcOpenTermChain`, Side-by-Side carries the same chip per column, the Indonesia chain names dead
+links, uncited rows and the tier ladder the DCF actually resolves on, and `#cp-tier-schedule`
+exists so "Show the tiers the DCF used →" is not a dead click. Recorded because a T6 cycle that
+re-walks that path and says "already done" is worth more than one that invents work there.
+
+## Friction
+
+**IOC Portfolio, last column of both tables** — the group roll-up (`index.html:34142` header,
+`34162` cell) and the single-entity table (`34283` / `34306`). Both rendered
+`formatBreakeven(r.be_75)` off `IOC_DATA`, which is `AVG(dcf_results.breakeven_price)` per
+operator | country | mechanic. It was the one figure on the row the analyst could not trace, in
+three independent ways, measured against the shipped `IOC_DATA` (1,772 rows, 1,386 with a value):
+
+| | |
+|---|---|
+| Rows printing a breakeven | 1,386 of 1,772 |
+| …whose `COUNTRY_DATA.be_75` is **NULL** | **1,191 (86%)** |
+| Range printed on this tab | **$1 – $187.70** |
+| Range the Breakeven Map states is the whole modelled set | **$27 – $34** |
+| Rows outside that range | 560 |
+
+1. The row is clickable and opens that country's profile — where Breakeven reads "—" and Data
+   Completeness says "not yet computed for this regime". **Shell / United Kingdom read $19 here
+   and nothing at all there.** Norway and USA, the two largest rows in the whole table, are both
+   in the null set. $19 is also the most attractive number on that screen, which is exactly the
+   kind of figure that ends up in an IC memo.
+2. The Breakeven Map's own headline coverage note says all 65 modelled countries "fall between
+   $27 and $34/bbl. That is the whole observed range." This tab contradicted it on 560 rows.
+3. This tab's **own** XLSX *Basis & Assumptions* sheet and its clipboard artifact both say, in so
+   many words, "IRR and breakeven are not reported at this level: the underlying country figures
+   are arithmetic means of per-contract values, not project returns." `_iocExpRows()` has never
+   emitted a Breakeven column. **Only the screen did.**
+
+v787 (T6) removed the IRR column from these same two tables for precisely this reason and left the
+breakeven sitting beside it. This is that removal finished.
+
+## Change
+
+Replaced rather than deleted, because the column was being read for downside resilience and that
+question has a defensible answer the platform already points at — the Breakeven Map's own coverage
+note says "For downside screening use NPV @$50 (modelled 185/185)".
+
+Both IOC tables now end in **`$50 Downside` / `% of $75 NPV kept`**, computed by `_npvRetention()`
+off `COUNTRY_DATA` `npv_50 / npv_75` — the same helper behind the Breakeven Map's Downside
+Resilience cards, the Screener's "% of $75 kept" sub-cell and the Fiscal Compare drawer's "% of NPV
+kept at $50", so the four surfaces cannot drift apart by construction rather than by two numbers
+happening to agree. New `_IOC_DS_TH` header and `_iocDownsideCell(country)` beside `_iocEvCell`.
+
+- Labelled a **jurisdiction** figure, not the operator's position; the header tooltip says so and
+  says to scale by working interest first.
+- Banded on the observed distribution: ≥50% green bold (the Downside Resilience screen line),
+  35–49% muted, <35% orange, negative red bold.
+- The three state-monopoly regimes print **`no position`** with the reason, per the v513
+  null-is-not-passing precedent — not a blank that reads as a pass.
+- A country ORCA holds no record for prints **`no record`**, matching `_iocEvCell`'s fallback.
+
+## Result
+
+Every number on an IOC Portfolio row can now be sourced from somewhere else on the platform. The
+analyst who clicks Shell / United Kingdom no longer lands on a profile that contradicts the row
+they came from, the screen no longer reports a metric its own export disclaims, and the downside
+column they were reading breakeven for is modelled for 182 of 185 countries instead of asserted
+for 1,191 that hold none.
+
+## Verified this cycle (all run, none assumed)
+- Cold walk at 1440x900; both IOC tables rendered; `$50 Downside` present in both headers.
+- **19 operators** rendered (16 Quick brands + Kuwait Oil Company, Saudi Aramco, Petroleum
+  Development Oman): 96 percentage cells, **5 `no position`** (Kuwait x3, Saudi Arabia, Kuwait Oil
+  Company), 0 `no record`, **0 stray output**, **0 page errors**.
+- `scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 9 tabs.
+- 390 `hasTouch`: every new cell and the new header ≥ 24px.
+- **JS syntax gate PASS**, 11 blocks. **PIXEL GATE PASS** — no surface worse than baseline; all 9
+  findings are pre-existing and on `thome` / `t0` / `t7`, none on `t5`.
+- **Runtime suite RUN against the LOCAL tree: 289 PASS / 4 FAIL / 1 WARN.**
+
+### Correction to cycle 713's suite claim
+
+Cycle 713 logged "Runtime suite against the LOCAL tree: 299 PASS / 0 FAIL" and recorded that the
+three `[SB-PROVENANCE]` failures and the `[CountryProfile]` USA evidence-chain failure "no longer
+reproduce". **They reproduce.** Run this cycle against the stashed, unmodified v806 tree on a local
+server, the suite returns **289 PASS / 4 FAIL / 1 WARN** with exactly those four failures. The
+0-FAIL reading was the deployed site answering — which is the very wiring defect cycle 712 escalated
+and 713 restated. Carried forward as open, and this time with the failure list intact rather than
+declared gone.
+
+## Carried forward, still not done
+- `TEST_URL` not set by `autonomous_cycle.py:136` for `run_playwright()`; it *is* set at :307 for
+  the pixel gate. It **is** concealing a live 4-FAIL set after all (see above) — upgraded from
+  "correctness-of-measurement" back to real.
+- `[SB-PROVENANCE]` Brazil strip / Brazil IC line / Sweep defaults, and `[CountryProfile]` USA
+  evidence chain — 4 genuine local failures, unfixed, not caused by this cycle.
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) remains
+  uninvestigated. **Eleventh** consecutive cycle log to note it.
+- `Copy for IC Memo` on Side-by-Side is a silent no-op when the comparison holds one country.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- Side-by-Side grid header sits ~117px below the fold at 390.
+- `fromSlug('united-kingdom')` returns null (the app writes `united_kingdom`).
+- `cp-run-fc-btn` reads `#cp-price-select` and writes `#price` — neither element exists.
+- New, noted not fixed: the Explorer/Screener Evidence column is hover-only; clicking it falls
+  through to the row click. Two clicks to documents, not one. Minor.
+
+**STILL LOCKED respected:** no tooltip-only, FAQ, banner, citation or text-only edit; the v612
+mobile layer, its `min-width: max-content` marker and `#reference-panel` untouched; FC columns and
+the removed Govt NPV column untouched; CP headline two-zone untouched; Screener presets stay a
+dropdown; Advanced Filters still collapsed; tab order unchanged. Version v806 → v807 at the three
+display sites only, silently, after the real change shipped.
+
+**Shipped:** petroleum-fiscal-db `a5bf252` (v807), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
