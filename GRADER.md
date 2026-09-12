@@ -46759,3 +46759,18 @@ analytics, Screener advanced filters and Home "More tools" stay collapsed; Scree
 dropdown. FC columns, the removed Govt NPV column and the CP two-zone headline untouched. Tab order
 unchanged. Version v811 → v812 at the three display sites only, silently, after the real change
 shipped.
+
+---
+## Cycle 720 Log — 2026-09-12 07:09
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 720 complete — shipped as **v812**, pushed to `main` (`bd180f0` + `53336dc`), mirror in sync.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation (last run at cycle 712). Last cycle was T1, not repeated.
+
+## Friction
+Walked cold at 1440×900, storage cleared. Home → Reform Risk → scroll to the tab's findings cards → **ACTIVELY REFORMING (2): United Kingdom · 5 changes since 2010 · score 25**. Pressed "United Kingdom ›".
+
+It threw the analyst out of 
