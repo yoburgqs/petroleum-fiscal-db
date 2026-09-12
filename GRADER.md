@@ -46622,3 +46622,18 @@ live deck, and the chip/count/export triple changed *state*. The v612 mobile lay
 Advanced Filters stay collapsed; Explorer analytics stay collapsed. FC columns, the removed Govt NPV
 column and the CP two-zone headline untouched. Tab order unchanged. Version v810 → v811 at the three
 display sites only, silently, after the real change shipped.
+
+---
+## Cycle 719 Log — 2026-09-12 06:13
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 719 complete — shipped as **v811**.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Last cycle was T3; T1 was stalest by rotation (last run at 710).
+
+## Friction
+Walked cold: Home hero → "open the screen" → **IOC Capital Screen, 15 rows**. The analyst presses **$100** to check the upside — which the deck button's own tooltip invites. The list drops to 12, and the chip stays clean amber still asserting, verbatim:
+
+> ◆ IOC Capital Screen: verified production · Take ≤
