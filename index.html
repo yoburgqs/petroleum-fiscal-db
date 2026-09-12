@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v804</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v805</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v804</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v805</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v804</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v805</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -41961,6 +41961,16 @@ function _rrPopulateLookup() {
   var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
   if (!cd.length) return;
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  // ── v805 (T4): do not build the picker before reform_history.json has landed ───────────────
+  // REFORM_HISTORY is assigned one `await` AFTER COUNTRY_DATA, and parsing its JSON yields to the
+  // event loop -- long enough for DOMContentLoaded -> parseAndNavigate('#/reform/<country>') ->
+  // switchTab -> renderReformRisk() -> here to run inside the gap, with cd at 185 and rh at {}.
+  // Every country then went into the "No sourced reform history" optgroup and dataset.filled was
+  // set to 1, which this function never re-runs past. For the rest of that session the tab
+  // reported "0 of 185 jurisdictions" and handed Nigeria -- 6 sourced events, 2 in window, score
+  // 70/100 -- the unscored verdict. Measured, not inferred: a cold load at #/reform/Nigeria was
+  // still wrong 11.5s later. The coverage split is not knowable until the reform file is here.
+  if (!Object.keys(rh).length) return;
   var names = cd.map(function(d){ return d.country; }).filter(Boolean).sort();
   var covered = names.filter(function(c){ return Array.isArray(rh[c]) && rh[c].length; });
   var uncovered = names.filter(function(c){ return !(Array.isArray(rh[c]) && rh[c].length); });
@@ -42076,6 +42086,10 @@ function _rrSelectWhenReady(country, maxTries) {
   (function attempt() {
     if (window._activeTab !== 'treformrisk') return;   // analyst left before the data landed
     var sel = document.getElementById('rr-country-lookup');
+    // v805 (T4): the picker used to be filled only by renderReformRisk(), which initPlatform()
+    // schedules on requestIdleCallback -- so a deep link raced an idle callback for its options.
+    // Fill it here the moment the reform file is readable; _rrPopulateLookup() is idempotent.
+    if (sel && sel.dataset.filled !== '1') { try { _rrPopulateLookup(); } catch (e) {} }
     if (sel && sel.querySelector('option[value="' + String(country).replace(/"/g, '\\"') + '"]')) {
       sel.value = country;
       try { renderReformCountryVerdict(); } catch (e) {}
@@ -42681,6 +42695,27 @@ function renderReformCountryVerdict() {
     out.style.display = 'none';
     out.innerHTML = '';
     if (clr) clr.style.display = 'none';
+    return;
+  }
+  // v805 (T4): a verdict built while REFORM_HISTORY is still empty reads as a fully formatted,
+  // confident "no sourced reform log" card for a country that has one -- wrong in the direction
+  // that matters, since it tells the analyst to carry an external check instead of the score ORCA
+  // holds. Hold the card back and re-fire once the file arrives, rather than print a false one.
+  var _rhNow = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  if (!Object.keys(_rhNow).length) {
+    out.style.display = 'none';
+    out.innerHTML = '';
+    if (clr) clr.style.display = 'none';
+    if (!window._rrVerdictWaiting) {
+      window._rrVerdictWaiting = setInterval(function () {
+        var r = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+        if (!Object.keys(r).length) return;
+        clearInterval(window._rrVerdictWaiting);
+        window._rrVerdictWaiting = null;
+        try { _rrPopulateLookup(); } catch (e) {}
+        renderReformCountryVerdict();
+      }, 200);
+    }
     return;
   }
   if (clr) clr.style.display = '';
