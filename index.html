@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v813</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v814</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v813</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v814</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v813</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v814</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -39212,24 +39212,30 @@ function loadCountryProfile(country) {
     const maxTake = Math.max(selfTake, ...shown.map(p => p.take_75));
     const takeRange = Math.max(maxTake - minTake, 10); // at least 10pp range for bar scaling
     const barScale = (take) => Math.max(5, Math.round((take - minTake + 5) / (takeRange + 10) * 100));
-    const peersHtml = shown.map(p => {
-      const col = p.take_75 <= 40 ? 'var(--green)' : p.take_75 <= 60 ? 'var(--yellow)' : p.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
-      const w = barScale(p.take_75);
-      const pEsc = p.country.replace(/'/g,"\\'");
-      return '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)22;cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\''+pEsc+'\';loadCountryProfile(\''+pEsc+'\')" onmouseover="this.style.background=\'var(--surface)\'" onmouseout="this.style.background=\'\';">'
-        + '<span style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+p.country+'">' + p.country + '</span>'
-        + '<div style="background:var(--surface);border-radius:3px;height:12px;position:relative;overflow:visible;">'
-        + '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+col+'55;border-radius:3px;"></div>'
-        + '</div>'
-        + '<span style="font-size:12px;font-weight:800;color:'+col+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + p.take_75.toFixed(1) + '%</span>'
-        + '</div>';
-    }).join('');
-    const selfCol = selfTake <= 40 ? 'var(--green)' : selfTake <= 60 ? 'var(--yellow)' : selfTake <= 75 ? 'var(--orange)' : 'var(--red)';
+    // v814 (T2): this whole column rendered as ~836px of blank space in every row. The bar
+    // fills were laid out and sized correctly -- Uzbekistan measured 727px against Indonesia's
+    // 162px -- but their colour was written as 'var(--yellow)' + '55', a CSS custom property
+    // with a hex-alpha suffix glued onto it. That is not a valid <color>, so the parser drops
+    // the declaration and every fill computed to rgba(0,0,0,0). The track had the same problem
+    // by a different route: var(--surface) is #FFFFFF and so is .dd-section, so the unfilled
+    // part of the bar was white on white. A header reading "TAKE (relative)" sat above eight
+    // rows of nothing. Tier colours are literal hex now, which makes the alpha suffix legal --
+    // --green/--yellow/--orange/--red are each defined exactly once and never themed, so these
+    // are the same four colours, not a new palette. Dead `peersHtml` (assigned, never read,
+    // carrying a third copy of the same broken CSS) removed.
+    const _rpHex = (t) => t <= 40 ? '#15803D' : t <= 60 ? '#A16207' : t <= 75 ? '#C2410C' : '#B91C1C';
+    const _rpRule = '#D0CAC0';
     const selfW = barScale(selfTake);
-    const selfRow = '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)22;background:var(--surface);border-radius:4px;padding:5px 8px;margin:-1px -8px;">'
+    // The scale is relative with a padded origin, so a bar length on its own means nothing.
+    // This drops the selected country's own position into every peer track as a rule, so a
+    // peer bar reads as "stops short of us" / "runs past us" -- which is the comparison the
+    // analyst came to this section to make.
+    const _rpMark = '<div style="position:absolute;left:'+selfW+'%;top:-3px;bottom:-3px;width:2px;background:#96570A;opacity:.7;border-radius:1px;"></div>';
+    const selfCol = _rpHex(selfTake);
+    const selfRow = '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;border-bottom:1px solid '+_rpRule+'55;background:var(--surface2);border-radius:4px;padding:5px 8px;margin:-1px -8px;">'
       + '<span style="font-size:12px;font-weight:700;color:var(--accent);">' + country + ' ★</span>'
-      + '<div style="background:var(--border)44;border-radius:3px;height:12px;position:relative;overflow:visible;">'
-      + '<div style="position:absolute;left:0;top:0;height:100%;width:'+selfW+'%;background:'+selfCol+'88;border-radius:3px;border:1px solid '+selfCol+'66;"></div>'
+      + '<div style="background:'+_rpRule+'66;border-radius:3px;height:12px;position:relative;overflow:visible;">'
+      + '<div style="position:absolute;left:0;top:0;height:100%;width:'+selfW+'%;background:'+selfCol+'CC;border-radius:3px;border:1px solid '+selfCol+';"></div>'
       + '</div>'
       + '<span style="font-size:12px;font-weight:800;color:'+selfCol+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + selfTake.toFixed(1) + '%</span>'
       + '</div>';
@@ -39237,13 +39243,14 @@ function loadCountryProfile(country) {
     const allWithSelf = [...shown, {country, take_75: selfTake, _self: true}].sort((a,b) => a.take_75 - b.take_75);
     const combinedHtml = allWithSelf.map(p => {
       if (p._self) return selfRow;
-      const col = p.take_75 <= 40 ? 'var(--green)' : p.take_75 <= 60 ? 'var(--yellow)' : p.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
+      const col = _rpHex(p.take_75);
       const w = barScale(p.take_75);
       const pEsc = p.country.replace(/'/g,"\\'");
-      return '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--border)22;cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\''+pEsc+'\';loadCountryProfile(\''+pEsc+'\')" onmouseover="this.style.background=\'var(--surface)44\'" onmouseout="this.style.background=\'\';">'
+      return '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid '+_rpRule+'55;cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\''+pEsc+'\';loadCountryProfile(\''+pEsc+'\')" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\';">'
         + '<span style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+p.country+(p.has_r_factor_tiers?' (R-factor PSC)':'')+'">' + p.country + (p.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;">◆</span>' : '') + '</span>'
-        + '<div style="background:var(--surface);border-radius:3px;height:12px;position:relative;">'
-        + '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+col+'55;border-radius:3px;"></div>'
+        + '<div style="background:'+_rpRule+'44;border-radius:3px;height:12px;position:relative;">'
+        + '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+col+'99;border-radius:3px;"></div>'
+        + _rpMark
         + '</div>'
         + '<span style="font-size:12px;font-weight:800;color:'+col+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + p.take_75.toFixed(1) + '%</span>'
         + '</div>';
@@ -39254,7 +39261,7 @@ function loadCountryProfile(country) {
       + '<div style="margin:0 -4px;">'
       + '<div style="display:grid;grid-template-columns:130px 1fr 60px;gap:8px;padding:3px 8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">COUNTRY</span>'
-      + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">TAKE (relative)</span>'
+      + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">TAKE (relative) <span style="font-weight:400;letter-spacing:0;">&mdash; <span style="display:inline-block;width:2px;height:8px;background:#96570A;opacity:.7;vertical-align:-1px;"></span> '+country.replace(/'/g,"\\'")+'</span></span>'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;text-align:right;">TAKE%</span>'
       + '</div>'
       + combinedHtml
