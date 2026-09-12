@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v801</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v803</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -213,6 +213,28 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-screener tr.sc-row-sel > td { background: rgba(176,104,0,0.09); }
+/* v802 (T1): while the Screener holds no rows, drop the 12-cell header and let the table
+   collapse to its wrapper. The <th> row is what held the grid open at 881px on a 390px phone,
+   which pushed the whole "No countries match your current filters" panel -- and its recovery
+   button -- off-canvas inside a table with nothing to scroll to. Scoped to the empty state, so
+   the header is untouched on every screen that returns a row. Not part of the v612 mobile
+   layer and not inside a pointer/width query: the same collapse is correct at 1920, where the
+   panel was centred on 881px of table rather than on the card the analyst is reading. */
+#tbl-screener.sc-empty { width: 100%; min-width: 0; }
+#tbl-screener.sc-empty thead { display: none; }
+/* v803 (T1): the other half of the collapse, and the half that actually decided the width.
+   Hiding the 12-cell <thead> above is necessary but NOT sufficient: line 348's global
+   `tbody td { white-space: nowrap }` is inherited straight down into this colspan=12 cell and
+   every div/ul/li/button inside it, so the cell sized to the min-content width of one
+   unbreakable line — 881px — regardless of what the header row did. Measured at 390x844:
+   table 881 inside a 362px .tbl-wrap, and the "Select all 9 mechanics" recovery button laid out
+   at left 950 / right 1087, i.e. ~690px beyond the right edge of the phone, reachable only by
+   swiping sideways through a table holding zero rows. The nowrap also forced the diagnostic
+   <li> text to overrun its own 420px max-width box, which is what pushed the button out.
+   Restoring normal wrapping on the empty cell only — data rows keep nowrap, which is what keeps
+   the real grid's columns aligned — lets min-content fall below the wrapper and the existing
+   `max-width: 100%` on the table finally bind. */
+#tbl-screener.sc-empty td, #tbl-screener.sc-empty td * { white-space: normal; }
 /* v781 (T1): IC shortlist dock -- see the markup comment above </div><!-- end screen mode -->.
    z-index 999 sits just under #compare-basket (1000); _scDockPlace() lifts it above the basket. */
 #sc-sel-dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 999; display: flex; align-items: center; gap: 10px;
@@ -2387,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v801</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v803</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2457,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v801</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v803</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -31242,6 +31264,28 @@ function resetScreenerAll() {
 }
 window.resetScreenerAll = resetScreenerAll;
 
+// v802 (T1) — re-tick every fiscal mechanic, and touch nothing else.
+// Reached from the zero-result panel, which is now the only place an empty mechanic set can
+// land you. Deliberately NOT resetScreenerAll(): the analyst who emptied this group still wants
+// their take ceiling, NPV floors, region and evidence settings, and a hard reset would throw all
+// of them away to undo one mis-click. Writes the checkboxes themselves rather than holding a
+// flag, for the v668 reason -- runScreener() reads the boxes, the active-filter badge counts
+// them, resetScreenerAll() restores them and the export criteria report them, so a parallel
+// piece of state would have to be kept in step with four readers.
+function _scAllMechanics() {
+  var boxes = document.querySelectorAll('#sc-mech-checks input[type=checkbox]');
+  if (!boxes.length) return;
+  for (var i = 0; i < boxes.length; i++) boxes[i].checked = true;
+  // Open the panel the group lives in. The v371/v373 declutter keeps Advanced Filters collapsed
+  // by default and that stays true on arrival -- but an analyst who has just been told a control
+  // in there decided their whole result set should be able to see it in the state it is now in.
+  var det = document.getElementById('screener-advanced-details');
+  if (det) det.open = true;
+  if (typeof runScreener === 'function') runScreener();
+  if (typeof showCopyToast === 'function') showCopyToast('All ' + boxes.length + ' fiscal mechanics selected');
+}
+window._scAllMechanics = _scAllMechanics;
+
 // v668 (T1) — drive the data-basis filter from the count bar.
 // Deliberately writes #sc-proxy-keep rather than holding its own flag: runScreener() reads that
 // checkbox (`includeProxy`), the active-filter badge counts it, resetScreenerAll() restores it and
@@ -31668,9 +31712,24 @@ function runScreener() {
     // v743 (T1): floor-take basis filter. See _scTakeIsFloor().
     if (!includeFloor && _scTakeIsFloor(d)) return false;
 
-    // mechanic: country passes if ANY of its mechanics is in the checked set
+    // mechanic: country passes if ANY of its mechanics is in the checked set.
+    // v802 (T1): the `checkedMechs.length > 0` guard is REMOVED. With every box unticked the
+    // filter was skipped entirely, so the control's two extremes -- all 9 ticked and 0 ticked --
+    // both returned the full 185, and the only live behaviour was in between. A set of "include
+    // this mechanic" boxes that returns everything when you include nothing is not monotone, and
+    // an analyst who clears the group to tick PSC on its own reads the unchanged 185-row table as
+    // "this filter does nothing".
+    // Worse, the page did not agree with itself about which of the two states it was in. The badge
+    // counted it (`checkedMechs.length < totalMechBoxes` -> "1 filter active") and the exported
+    // criteria block claimed `Fiscal mechanics:  only` -- a criterion naming no mechanic -- above
+    // the complete unfiltered universe. That string is not cosmetic: it is the first line under
+    // "SCREEN APPLIED - these criteria produced this row set" in Copy for IC Memo and in the XLSX
+    // criteria sheet, so a screen that had never been applied left the platform asserting it had.
+    // An empty include-set now includes nothing, which is what the boxes say. Every box unticked
+    // can now only remove countries, and the zero-result state below names this cause first and
+    // offers the one-click way back.
     const dMechs = d.mechanics.split(',').map(m => m.trim());
-    if (checkedMechs.length > 0 && !dMechs.some(m => checkedMechs.includes(m))) return false;
+    if (!dMechs.some(m => checkedMechs.includes(m))) return false;
 
     // v537 (T1) — breakeven coverage. This replaces the four-way cost-band radio, whose every
     // real option was inert or actively wrong:
@@ -32121,7 +32180,7 @@ function runScreener() {
     const _outOfScope = d => (_screenerRfactorOnly && !d.has_r_factor_tiers)
       || (_screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1)
       || (reformSet && !reformSet.has(d.country))
-      || (checkedMechs.length > 0 && !d.mechanics.split(',').map(m => m.trim()).some(m => checkedMechs.includes(m)))
+      || (!d.mechanics.split(',').map(m => m.trim()).some(m => checkedMechs.includes(m)))
       || (iocCountries !== null && !iocCountries.has(d.country))
       || (_regionV && !_regionMatch(d.region, _regionV));
     const _why = d => {
@@ -32210,7 +32269,10 @@ function runScreener() {
     if (_screenerMinFacts > 0) crit.push('Min facts on file: ≥' + _screenerMinFacts);
     if (_screenerMinRetention !== null) crit.push('Downside retention: keeps ≥' + Math.round(_screenerMinRetention*100) + '% of its $75/bbl contractor NPV at $50/bbl — measured for the 182 countries with a positive $75 NPV; the 3 state monopolies have no contractor position and are excluded rather than carried');
     if (checkedIOCs.length > 0) crit.push('IOC presence: ' + checkedIOCs.join(', '));
-    if (checkedMechs.length < totalMechBoxes) crit.push('Fiscal mechanics: ' + checkedMechs.join(', ') + ' only');
+    // v802 (T1): the empty selection gets its own sentence. It used to fall through the same
+    // branch and export as "Fiscal mechanics:  only" -- a claimed criterion with nothing in it.
+    if (checkedMechs.length === 0) crit.push('Fiscal mechanics: NONE of the ' + totalMechBoxes + ' selected \u2014 an empty include-set passes no country, so this leg alone returned nothing');
+    else if (checkedMechs.length < totalMechBoxes) crit.push('Fiscal mechanics: ' + checkedMechs.join(', ') + ' only');
     if (!crit.length) crit.push('None — this is the full ORCA universe, not a screen result');
     // v587: an exported shortlist now states its own ordering. The rows were always written in
     // screen order; the file never said what that order was.
@@ -32254,6 +32316,10 @@ function runScreener() {
   })();
 
   const tbody = document.getElementById('tbody-screener');
+  // v802 (T1): see the comment on the empty panel below. Toggled on every render, in both
+  // directions, so a screen that goes empty and then comes back does not keep a dropped header.
+  var _scTblEl = document.getElementById('tbl-screener');
+  if (_scTblEl) _scTblEl.classList.toggle('sc-empty', data.length === 0);
   if (data.length === 0) {
     // v474: Diagnose which filter is most likely causing zero results — helps analyst know what to relax
     var _diagHints = [];
@@ -32277,14 +32343,71 @@ function runScreener() {
     if (reformSet) _diagHints.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
       + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
       + _scReformScoredCount() + ' jurisdictions');
-    var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
-    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
+    // v802 (T1): the empty mechanic set leads the list, because it is decisive on its own --
+    // no country can pass it, so nothing else on the panel matters until it is resolved. It was
+    // previously excluded from these hints outright (`_checkedMechsCount > 0`), which was correct
+    // while an empty set meant "no filter" and is the wrong silence now that it means "no country".
+    // The restore is inline rather than a pointer back to the collapsed Advanced Filters panel:
+    // the group that caused this is inside a <details> the analyst may never have opened, and
+    // Reset All below would also discard the take, NPV and evidence settings they do want.
+    if (_checkedMechsCount === 0) _diagHints.unshift('No fiscal mechanic is selected \u2014 all ' + _totalMechs
+      + ' boxes under Advanced Filters are unticked, and a country has to match at least one to pass. '
+      + '<button onclick="_scAllMechanics()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);color:var(--accent);border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;min-height:24px;" '
+      + 'title="Re-tick all ' + _totalMechs + ' fiscal mechanics and re-run. Every other filter on this panel is left exactly as it is.">Select all ' + _totalMechs + ' mechanics</button>');
+    var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:min(420px,100%);margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
+    // v802 (T1): the panel has to fit the phone, and it did not.
+    // This <td> is colspan=12 inside the horizontally-scrolling .tbl-wrap. The 12 <th> cells hold
+    // the table open at 881px whether or not it has any rows, so `text-align:center` centred the
+    // message on 881px inside a 362px window. At 390 the analyst got an empty left half, a
+    // clipped "No countri...", and a recovery button 350px off-canvas -- reachable only by
+    // swiping sideways through a table with nothing in it. The `.sc-empty` class set just above
+    // drops the header row while the result set is empty, which lets the table collapse to the
+    // width of its wrapper; the cell is then the visible width and the centring means what it
+    // says. Column headers over zero columns of data were not carrying anything anyway, and the
+    // class is removed the moment a row comes back.
+    tbody.innerHTML = '<tr><td colspan="12" style="padding:40px 20px;color:var(--muted);font-size:13px;">'
+      + '<div style="max-width:100%;box-sizing:border-box;text-align:center;">'
       + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">&#8960;</div>'
       + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match your current filters</strong>'
-      + 'Try relaxing your criteria — reduce the IRR minimum, raise the government take ceiling, or uncheck some mechanic filters.'
+      // v802: was "reduce the IRR minimum, raise the government take ceiling, or uncheck some
+      // mechanic filters". The IRR slider was deleted at v517 so the first clause pointed at a
+      // control that does not exist, and the third is the exact wrong instruction in the state
+      // this panel most often reaches -- unticking MORE mechanics can only make it worse.
+      + (_checkedMechsCount === 0
+          ? 'Nothing can pass while the mechanic list is empty \u2014 start with the button below.'
+          : 'Try relaxing your criteria \u2014 raise the government take ceiling, lower the NPV floors, or re-tick a fiscal mechanic.')
       + _diagStr
       + '<br><button onclick="resetScreenerAll()" style="margin-top:12px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset All Filters</button>'
-      + '</td></tr>';
+      + '</div></td></tr>';
+    // v802 (T1): clear the Side-by-Side handoff on the way out. This branch returns BEFORE the
+    // block near the end of runScreener() that writes #screener-top4-btn, so on a zero-result
+    // screen the button kept whatever the PREVIOUS render put there -- a live
+    // "Load top 2 in Side-by-Side -> Vanuatu . Bahamas" sitting directly above a panel reading
+    // "No countries match your current filters", offering to ship two countries that are not in
+    // the result set into the comparison tab. Pre-existing, and reachable from any screen that
+    // narrows to nothing; fixed here because the empty mechanic set is now one of those screens.
+    var _top4Stale = document.getElementById('screener-top4-btn');
+    if (_top4Stale) _top4Stale.innerHTML = '';
+    // v802 (T1) — THE ONE THAT MATTERS. `window._screenerData = data` is written near the end of
+    // runScreener(), which this branch returns before reaching, so on a zero-result screen it
+    // still held the rows of the LAST screen that returned any. All three export paths read it:
+    //
+    //   Screener -> IOC Capital Screen  ->  15 countries.
+    //   Narrow it until the table reads "No countries match your current filters".
+    //   Press Copy for IC Memo         ->  a 15-row pasteable table captioned
+    //                                      "ORCA petroleum fiscal screening shortlist — 15 of 185
+    //                                      countries, screened at $75/bbl", under the CURRENT
+    //                                      screen's criteria block.
+    //
+    // Rows from one screen under the criteria of another, in the artefact that leaves the
+    // platform and goes into an investment-committee document, with nothing on screen saying so.
+    // CSV and XLSX had the same fault from the same line.
+    // Each of the three already opens with `if (!rows.length) { showCopyToast(_scEmptyMsg(..)); return; }`
+    // -- the guard was written for exactly this and had never once been reachable, because the
+    // array it tests was never emptied. Emptying it here arms all three at once, and re-syncs the
+    // button labels and the ticked-shortlist badge to the row set actually on screen.
+    window._screenerData = data;
+    if (typeof _scSyncSelUI === 'function') _scSyncSelUI();
     return;
   }
   // v543 — when no divider can be drawn, the warning goes at the top of the table instead, in the
