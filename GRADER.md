@@ -47130,3 +47130,16 @@ the real change shipped.
   centred inside a 1,050px card (`viewBox="0 0 300 64"`, default `preserveAspectRatio`), axis
   labels at a literal 7px. Carried forward from the v814 log — still true, still not the worst
   moment.
+
+---
+## Cycle 723 Log — 2026-09-12 10:57
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 723 complete — shipped as **v815**, pushed to `main` (`081b692` + `96b3691`), mirror in sync.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation (v814 was T2, v813 T6, v812 T4, v811 T1, v810 T3; T5 last ran at v808). Did not repeat last cycle's T2.
+
+## Friction
+Two places in the product tell the analyst, in these words: *"Before finalizing any IC memo: open **Reform Risk** and look up your country. It returns one IC action."* They follow it, pic
