@@ -46983,3 +46983,150 @@ unchanged. v813 → v814 at the three display sites only, silently, after the re
 
 ## Friction
 Walked cold at 1440×900 and 390×844 with touch, storage cleared. Every interactive affordance on the Country Profile walk worked — "See the 12 producers that take less", "Why t
+
+---
+## Cycle 723 Log — 2026-09-12 (v815)
+- Test before: 300 PASS / 0 FAIL (deployed URL, as supplied to the cycle)
+- Test after: **299 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against this tree
+  (`TEST_URL=http://localhost:8934/index.html`). The 1 WARN is the `sw.js` 404 from serving
+  over `python3 -m http.server`; it was observed on the **unmodified** tree in this cycle's
+  first cold walk, before any edit, so it is the local-serving delta and not this change.
+- JS errors: 0 page errors across every branch exercised.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation
+(v814 was T2, v813 T6, v812 T4, v811 T1, v810 T3; T5 last ran at v808). Last cycle was T2,
+not repeated.
+
+## Friction
+
+Walked cold at 1440×900 and 390×844 `hasTouch`, `sessionStorage` and `localStorage` cleared.
+
+Two places in the product give the analyst the same instruction, in these words:
+
+| where | what it says |
+|---|---|
+| Fiscal Compare → IC Analyst Guide | *"Before finalizing any IC memo: open **Reform Risk** and look up your country. It returns one IC action."* |
+| Reform Risk → tab header | *"Use Stability Scores here alongside Country Profile take figures when building IC memos."* |
+
+The analyst follows it, picks their country, and `#rr-country-verdict` returns the densest
+piece of IC prose in the product: the **IC action** naming the premium to carry, the **Reform
+Frequency Score** with its rank *and an explicit statement of what the score does not read*,
+**reforms since 2010** against the full record, the **direction split**, the **Fiscal
+Predictability** score *with its asynchronous ceiling correction*, **take @ $75**, and the
+**sourced event log** split at the 2010 boundary with a citation and an A/B confidence on
+every row. Measured live: 1,424px tall for Nigeria, 2,301px at 390.
+
+**There was no way to get any of it out.** Every sibling surface can hand its IC content over:
+
+| surface | control |
+|---|---|
+| Fiscal Compare | `#fc-copy-ic-btn` |
+| Screener | `#screener-copy-ic-btn` |
+| Side-by-Side | `#cmp-copy-table-btn` |
+| IOC Portfolio | `#ioc-copy-ic-btn` |
+| Country Profile | `#dd-ic-summary-btn`, `.cp-ic-tbl-btn` |
+| **Reform Risk** | **— none —** |
+
+The tab's only export is `exportReformRiskCSV()`, an 83-row *global* event dump across all 21
+scoreable jurisdictions. It carries no IC action, no score, no rank, no direction split, no
+predictability ceiling and no take — and it is a download, not a paste. So at the gate the
+product had just sent them to, the analyst's only options were retype it or screenshot it.
+
+Retyping is where this costs something real, because what drops is load-bearing and it drops
+in **one direction** — toward a cleaner, more confident sentence than the data supports.
+Nigeria's card says, after an async repaint:
+
+> Carry **≤46 · LOW**, not 73 · MODERATE
+> …a zero premium here is an **absence of measurement, not evidence of stability**
+
+Hand-copied, that becomes *"Nigeria, frequency 70, predictability 73 MODERATE, no premium
+indicated"* — every word of which is on the card, and which **inverts the finding**. The card
+is built to stop precisely that; it just had no way to travel.
+
+## Change
+
+A **`⎘ Copy for IC Memo`** button in the lookup control row, sharing `#rr-lookup-clear`'s
+lifecycle exactly — hidden with no country selected, shown with one. It writes both
+`text/html` and `text/plain`:
+
+1. the headline,
+2. the **IC action in full**,
+3. a **Metric / Value / Basis-and-caveats** table,
+4. an **event table** whose `Counts in Reform Frequency Score` column preserves the 2010
+   split the score is defined on — so the count cannot be rebuilt wrong offline, which is the
+   defect v583 fixed in the CSV,
+5. the ORCA stamp and the count-never-magnitude rule, as every other export carries.
+
+**Reads the rendered card rather than recomputing, deliberately.** Three things on it — the
+IQR ceiling, the observed-spread refutation, and the per-event source and confidence — are
+painted *asynchronously* after the verdict HTML lands. A payload built at render time would
+omit the corrections and ship the pre-correction figure, which is the exact failure the
+corrections exist to prevent. What is on screen is what is copied. Anchors on `#rr-ic-action`
+/ `#rr-verdict-lead` / `#rr-ext-check` and on the stat strip's **computed** `display:flex`
+rather than a child index, so all four verdict branches work — including the 164 jurisdictions
+with no sourced log, where "there is no score" is itself the finding and must paste as
+prominently as a score would.
+
+## Result
+
+The analyst standing at the gate the product sent them to can now put the verdict into the
+memo **with its caveats still attached**, instead of retyping it into a cleaner sentence than
+the data supports. Exercised live on all four branches:
+
+| country | branch | copied |
+|---|---|---|
+| Nigeria | log, async ceiling correction | 5 metrics + 6 events — 4,966 plain / 14,610 html |
+| United Kingdom | log, actively reforming | 5 metrics + 9 events — 5,134 plain / 17,475 html |
+| Russia | log, in-window rise unscored | 5 metrics + 2 events — 2,820 plain / 8,857 html |
+| Chad | **no sourced log** (164 of 185) | 3 metrics + the no-log finding — 1,884 plain |
+
+Nigeria's paste carries `Carry ≤46 · LOW, not 73 · MODERATE` verbatim. Button hidden on cold
+load, shown on select, hidden again after Clear. Refusal path routes through `_icRefuse()`
+(v808), so a copy that cannot happen says so on the button.
+
+## Verification — every gate RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax — all inline `<script>` extracted, `node --check` | **PASS** (11 blocks; re-run after the version bump) |
+| Runtime suite, local tree | **299 PASS / 0 FAIL / 1 WARN** |
+| Pixel gate, `pixel_audit.js`, 10 tabs × 5 viewports | **PASS** — no surface worse than baseline, **no finding on `treformrisk`** |
+| Page errors, all four branches | **0** |
+
+**Step 5b — checked on a phone.** Copy exercised at every viewport, not only measured.
+
+| viewport | scrollWidth / clientWidth (8 tabs) | new button | in view | copy succeeded | errors |
+|---|---|---|---|---|---|
+| 1920 | 1920 / 1920 | 129 × 25px | yes | yes | 0 |
+| 1440 | 1440 / 1440 | 129 × 25px | yes | yes | 0 |
+| 1280 | 1280 / 1280 | 129 × 25px | yes | yes | 0 |
+| 1024 | 1024 / 1024 | 129 × 25px | yes | yes | 0 |
+| 768 | 768 / 768 | 129 × 36px | yes | yes | 0 |
+| **390 `hasTouch`** | **390 / 390** | **129 × 44px** | **yes** | **yes** | **0** |
+
+Zero horizontal scroll at all six across all eight tabs. Under a thumb the button measures
+44px — it inherits `.btn.btn-sm` and needed no new `pointer: coarse` rule, so nothing was
+added to the v612 mobile layer.
+
+**STILL LOCKED respected:** no new tooltip, no new FAQ, no banner, no page-sub paragraph, no
+citation micro-edit, no text-only change — a surface that could not hand over its content now
+can. The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are
+untouched. Explorer analytics, Screener advanced filters and Home "More tools" stay collapsed;
+Screener presets stay a dropdown. CP two-zone headline and the removed FC Govt NPV column
+untouched. Tab order unchanged. v814 → v815 at the three display sites only, silently, after
+the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **FC / Screener / Side-by-Side / IOC / Country Profile "Copy for IC Memo"** — all five fire,
+  all five write `text/html` + `text/plain`, all five flip the button label and raise a toast.
+  SbS cold (example set Norway/UK/Netherlands) copies 6,064 chars; IOC cold (Shell) 11,040.
+- **XLSX exports** — Fiscal Compare (184,645 bytes) and Screener (183,287 bytes) both download
+  cleanly from a cold load.
+- **FC cold copy is still all 185 rows / 50,731 chars with nothing ticked.** This is the v632
+  decision, not a regression — the tick shortlist is the escape hatch and the tooltip states
+  the default. Left alone rather than relitigated.
+- **Still the next one on this tab:** Country Profile's Price Sensitivity Curve renders 300px
+  centred inside a 1,050px card (`viewBox="0 0 300 64"`, default `preserveAspectRatio`), axis
+  labels at a literal 7px. Carried forward from the v814 log — still true, still not the worst
+  moment.
