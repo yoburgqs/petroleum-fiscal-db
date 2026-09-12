@@ -45390,3 +45390,113 @@ they were reading, to a toolbar that gave no indication it was there.
 **Friction.** Walked cold at 390×844 with `hasTouch`, and again at 768/1024/1280/1440/1920. Home → Fiscal Compare → 185 rows auto-load → scroll into the table and tick three countries around rank 20–35, which is what building an IC shortlist actually is.
 
 The toolbar rela
+
+---
+## Cycle 708 Log — 2026-09-11 — T3 (v801)
+
+**Task:** T3, "How do these three countries compare side by side?" Longest without a turn —
+last run cycle 692. (707 was T5, 706 T6, 705 T2, 703 T4, 702 T1.)
+
+**Friction.** Walked cold at 390x844 with `hasTouch`, then 768 / 1024 / 1280 / 1440 / 1920, with
+`sessionStorage` and `localStorage` cleared and a reload before every walk. Home → Side-by-Side.
+The tab auto-seeds its own North Sea Trio (Norway / United Kingdom / Netherlands), so the
+three-country comparison is what a first-time analyst lands on — T3 is the tab's cold state.
+
+The comparison logic underneath is in good shape and was NOT the friction. Checked and found
+sound, unchanged: the verdict strip's comparable-take ordering; the fee-basis handling on
+Norway/Iraq/Guyana (Iraq re-based 84.8% headline → 34.1% PSC/Conc, 415 of 610 contracts TSC);
+the `NOTHING RANKS HERE` state on Iraq/Iran/Kuwait; the proxy-column set-aside; the v791 floating
+column-name bar (fires correctly at both widths when the real header scrolls off); the share-link
+round trip; the Screener → Side-by-Side handoff; the build-your-own flow and its example-clearing
+toast.
+
+The friction was that **the setup block above the grid is a desktop flex row that breaks at phone
+width**, in two places that render as faults rather than as density:
+
+1. **The remove-✕ on every country chip.** The `Fix 6` touch rule at `max-width: 768px` sets
+   `[role="button"] { min-height:44px !important; min-width:44px !important }`. The chip's ✕ is a
+   `span[role=button]`, so it became a **44x44 block** beside a 12px country name. Every chip
+   inflated to **54px**, and because the 44px block is centred while the name is a bare text node,
+   the glyph rendered at the **TOP** of the chip and the country it removes at the **BOTTOM** —
+   they did not read as one control. Three chips took two rows and **114px**.
+2. **The "Example loaded" banner.** `display:flex` over a `<span>`, two bare text nodes and a
+   `<strong>`. In a flex container every bare text node becomes its own anonymous flex item, so at
+   390 the single sentence rendered as **four narrow columns of independently-wrapped text side by
+   side, 99px tall**. This is the only warning the analyst gets that typing a country **clears the
+   three columns already on screen**. The IOC Portfolio banner carried the identical defect.
+
+**Change.**
+- `#cmp-chips span[role="button"]` is exempted from the 44x44 block — the same exemption shape
+  v730 used for the Screener terms chip, for the same reason — and given a 28x24 centred flex box.
+  The thumb target stays 44px tall via the **v713 pattern**: an `::after` that grows **vertically
+  only**, because horizontal reach on an inline element raises its parent's `scrollWidth` and
+  reports to `pixel_audit` as clipped text. Scoped `@media screen and (max-width: 768px)` so it can
+  never reach the `@media print` rule that hides these glyphs as screen controls.
+- Both example banners are `display:block`, so the sentence wraps as a sentence.
+
+**Result — 390x844, cold:**
+
+| | before (v800) | after (v801) |
+|---|---|---|
+| chip height | 54px | **34px** |
+| ✕ glyph vs country-name centre | misaligned (top vs bottom) | **aligned, 0px apart** |
+| chips block | 114px | **74px** |
+| example banner | 99px, four ragged columns | **50px, one readable sentence** |
+| verdict strip visible on first screen | 71px | **142px** |
+| grid header top | 1031px | 961px (**still below the 844 fold**) |
+
+The analyst now reads the whole take ordering — "United Kingdom 49.2% › Norway 68.0%, 18.8pp apart,
+order holds $50–$125" — plus the Netherlands set-aside **without scrolling**, where before the first
+screen ended inside the control block with only the strip's heading showing.
+
+**Not claimed as fixed:** the grid header is still 117px below the fold at 390. The remaining
+consumers are the Profile-basis strip (101px), `Clear` alone on its own 44px row, and `Order
+columns` on another. Closing that last gap would mean hiding the three top export buttons
+(`Export PDF` / `Share Link` / `Copy for IC Memo`) which are exact duplicates of the row under the
+grid — deliberately NOT done, because on a 1,920px-tall phone grid that would put the only share
+control two screens below the reading position, which is the failure v800 had just fixed on Fiscal
+Compare.
+
+**Verification (run this cycle, foreground, final bumped tree, `http://127.0.0.1:8954/`):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Run after the edit and again
+  after the version bump.
+- ✕ removal works at all six viewports. The extended hit area registers a click 8px above the box
+  on coarse pointers (390, 768) and correctly does **not** extend on desktop.
+- Step 5b: `scrollWidth == clientWidth` at 390 / 768 / 1024 / 1280 / 1440 / 1920. **0 page errors**
+  at all six. The ✕ box is 28x24 — clears the 24px coarse-pointer floor in both axes on its own
+  box, not only via the hit area.
+- Desktop unchanged: chip 28px, grid header 367px at 1440, identical to v800.
+- Pixel gate `pixel_audit.js`, baseline **not** updated: **PIXEL GATE PASS — no surface got worse
+  than baseline.** (`tablet-768::5-t2` shows 29.28% screenshot drift — that is this change, and
+  drift is report-only.)
+- IC-memo copy: 6,064 chars, carries the v801 source line. Share link round-trips
+  `#/compare/norway+united_kingdom+netherlands`.
+
+**⚠ The runtime suite is NOT at 0 FAIL, and has not been.** Read from the suite's own report:
+**289 PASS / 4 FAIL / 1 WARN**. The 4 failures are **pre-existing and unrelated to this cycle** —
+the same 4 reproduce on the unmodified pre-change file (285 PASS / 4 FAIL / 5 WARN), verified by
+serving `index.before.html` separately and re-running:
+- `[SB-PROVENANCE] Brazil strip: no default-basis warning`
+- `[SB-PROVENANCE] Brazil IC line: IC line unqualified`
+- `[SB-PROVENANCE] Sweep defaults: default branch fired only 1 times — expected >=100`
+- `[CountryProfile] fully sourced country unchanged: USA evidence chain gained an absence marker`
+
+The "300 PASS / 0 FAIL" carried in the cycle emails is **not** what the suite reports on this tree.
+That is a "stable but wrong" signal of exactly the kind `CLAUDE.md` warns about and it should be
+run down before the next cycle trusts the number. Flagged, not fixed — out of scope for a UX cycle.
+
+**STILL LOCKED respected:** no tooltip, FAQ, banner text, citation or text-only edit; FC columns and
+the removed Govt NPV column untouched; CP headline untouched; the v612 mobile layer, its
+`min-width: max-content` marker and `#reference-panel` untouched; tab order unchanged. Version
+v800 → v801 at the three display sites.
+
+**Also carried forward, still not done:**
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) is still
+  uninvestigated. Sixth consecutive cycle log to note it.
+- `Copy for IC Memo` in the toolbar is a silent no-op when the comparison holds one country (no
+  clipboard write, no toast). Transient state on the way to a real set; logged, not fixed.
+- Screener → Side-by-Side leaves the URL hash at `#/explorer` while the grid holds 5 countries.
+- ~15 `python -m http.server` processes from earlier cycles are still running.
+
+**Shipped:** petroleum-fiscal-db `5fe0b6a` (v801), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
