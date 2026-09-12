@@ -47436,3 +47436,143 @@ three display sites only (`:42`, `:2420`, `:2490`), silently, after the real cha
 Explorer → **Bubble Chart**, cold. The caption tells the analyst exactly where to look: *"the **left frontier** (low take) with **high NPV** represents the most IOC-favorable regimes."*
 
 `renderBubbleChart()` (`index.html:53745`) grouped and
+
+---
+## Cycle 727 Log — 2026-09-12 — T4 — shipped v819
+- Test before (harness, deployed build): 300 PASS / 0 FAIL
+- Test after (suite RUN this cycle, local tree): **299 PASS / 0 FAIL / 1 WARN** — and
+  pristine `HEAD` served from the **same real repo directory** scores **299 / 0 / 1, identical**.
+  FAIL-neutral and WARN-neutral. The 1 WARN is the known `sw.js` 404, a local-static artefact
+  (`index.html:49` registers `/petroleum-fiscal-db/sw.js` by absolute path).
+- JS errors: 0 page errors at all six viewports.
+- Pixel gate: **PASS** — no surface worse than baseline.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation: T4 last ran
+at v812 (cycle 720); since then v814 T2, v815 T5, v817 T3, v818 T1. Last cycle was T1, not
+repeated. Walked cold at 1440x900 and 390x844 `hasTouch`, sessionStorage and localStorage cleared
+and reloaded, against the LOCAL tree.
+
+## Friction
+**Fiscal Compare → Reform verdict column** — `stabCell()` at `index.html:49371`.
+
+v753 diagnosed half of this and fixed that half. Its own comment, still in the file, reads: *"the
+colour channel partitioned nothing."* It then named the two units (`WACC` vs `TAKE`) and gave the
+action rows a filled pill, which correctly separated the only two rows that change a model input.
+**It left the other 19 exactly as it found them.**
+
+`_rrClassify` hands back ONE orange (`#C2410C`) for all six non-action verdicts, and its other two
+branches are unreachable on this data — the green branch needs a measured in-window take *cut* and
+no take rise ever on record; the red branch needs 6+ in-window law changes and the database maxes
+out at the UK's 5. Measured on the cold default table, leaf-element computed styles:
+
+| treatment | rows |
+|---|---|
+| `#C2410C` orange, 10px, weight 800 | **19 of 21** |
+| orange filled pill | 2 (UK, Brazil) |
+| `var(--muted)` + dotted (`n/c`) | 164 |
+
+So **Ghana and Guyana** — the only two rows in 185 where ORCA opened a sourced log and found *no
+fiscal law change at all*, which is the best result this column can return — rendered in exactly
+the same alarm orange as **Russia's 2022 +15pp windfall tax** and Nigeria's unquantified PIA
+rewrite. The one state an analyst should screen **toward** was painted like the states they screen
+**away** from, and colour — the fastest-reading channel in a 185-row grid — carried zero
+information. The analyst either reads 21 strings of 10px text one at a time, or reads the colour
+and gets a uniform wall of alarm across every jurisdiction ORCA actually knows something about.
+
+## Change
+`stabCell()` now tiers the token treatment off **the classifier's own token**. No new
+classification, no new threshold, no new tooltip, no new FAQ — the distinctions already existed in
+`_rrClassify`'s output and simply had no treatment. Four hues and one marker, ordered by what the
+analyst has to *do*:
+
+| token | treatment | meaning |
+|---|---|---|
+| `WACC +5–8pp` | **red** filled pill | changes a model input (discount rate) |
+| `WACC +3–5pp` | **orange** filled pill | changes a model input (discount rate) |
+| `TAKE ±Npp` | **orange** | in-window take move, MEASURED — size against it |
+| `SIZE UNKNOWN` | **orange + dotted rule** | in-window terms rewritten, size NOT measured |
+| `↑ PRE-2010` | **amber** `#A16207` | rupture predates the window — a window artefact |
+| `NO LAW CHANGE` / `NO PREMIUM` | **green** `#15803D` | sourced log, nothing changed in-window |
+
+`SIZE UNKNOWN` deliberately keeps TAKE's hue — both are in-window events — but carries the dotted
+rule that `n/c` already uses for *"ORCA has not measured this."* The two unmeasured states then
+read as the same **kind** of gap without collapsing into each other: `n/c` has no log at all, this
+one has a log with an unquantified event in it.
+
+Measured after, at 1440: **164** muted+dotted (`n/c`, unchanged) · **7** amber · **5** orange ·
+**5** orange+dotted · **2** orange pill · **2** green. Rendered treatments across the 21 scoreable
+rows go from **2 to 5**.
+
+The FC legend (`:3021`) and the column-header key were updated to describe what now renders — the
+legend had been promising a red and a green that never once reached the screen, and calling
+`NO LAW CHANGE` orange.
+
+## Result
+Scanning the Reform verdict column, the analyst reads reform exposure off colour instead of
+parsing 21 strings of 10px text. Ghana and Guyana read green and are visibly screenable-toward.
+The 7 `↑ PRE-2010` rows read amber and no longer look like live in-window exposure. The 5 rows
+whose in-window change was never measured carry the same dotted *unmeasured* marker as `n/c`,
+so a zero premium on them no longer looks like a finding. The 2 rows that actually change a
+discount rate keep the only filled pill.
+
+## Verification — the suite RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax (all inline `<script>` extracted, `node --check`) | **PASS** (11 blocks) |
+| `runtime_comprehensive`, `TEST_URL=localhost:8934` (this tree) | **299 PASS / 0 FAIL / 1 WARN** |
+| Same suite vs pristine `HEAD` written into the **real** repo dir | **299 / 0 / 1 — identical** |
+| `pixel_audit.js` 10 tabs x 5 viewports | **PASS** — no surface worse than baseline |
+
+**Step 5b — checked on a phone.**
+
+| viewport | scrollWidth / clientWidth | n/c rows | dotted verdicts | page errors |
+|---|---|---|---|---|
+| 1920 | 1920 / 1920 | 164 | 5 | 0 |
+| 1440 | 1440 / 1440 | 164 | 5 | 0 |
+| 1280 | 1280 / 1280 | 164 | 5 | 0 |
+| 1024 | 1024 / 1024 | 164 | 5 | 0 |
+| 768 `hasTouch` | 768 / 768 | 164 | 5 | 0 |
+| **390 `hasTouch`** | **390 / 390** | 164 | 5 | **0** |
+
+Zero horizontal scroll at all six. The change is colour and a 1px bottom rule on an existing
+inline span — it adds no control and no width. The `SIZE UNKNOWN` span moves `display:block` to
+`display:inline-block` so the dotted rule hugs the token instead of spanning the cell; the wrapper
+is `text-align:right`, so right-alignment is unchanged and the count line below stays on its own
+line.
+
+**STILL LOCKED respected:** no new tooltip (an existing header key and an existing legend were
+corrected because the change made them false), no new FAQ, no banner, no page-sub paragraph, no
+citation micro-edit, no text-only change — 21 cells changed rendered treatment. The v612 mobile
+layer, `#reference-panel` and the `min-width: max-content` markers are untouched. Explorer
+analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. CP two-zone headline and the removed FC Govt NPV column untouched. Tab order unchanged.
+v818 → v819 at the three display sites only (`:42`, `:2420`, `:2490`), silently, after the real
+change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **Reform Risk tab cold at 1440 and 390.** Lookup is 186 options in two labelled optgroups
+  (*Sourced reform history — scoreable (21)* / *No sourced reform history — predictability only
+  (164)*). Selecting from a scrolled position renders the verdict card and lands its head at
+  viewport top **12**; a second selection re-renders in place at the same offset. Verdict card for
+  Nigeria is 1,424px and carries IC action, score + rank, reforms-since-2010, direction split,
+  the predictability *ceiling* with its own contradiction called out (`≤46 LOW` vs `printed 73`),
+  and a 6-event sourced log split at the 2010 boundary. This is good and was left alone.
+- **The no-coverage path is the best-handled state in the product.** Egypt / Suriname / Namibia
+  each render *"— no Reform Frequency Score … This is not a score of 100"*, then
+  **START THE EXTERNAL CHECK HERE** naming the actual statute ORCA read the terms from, with an
+  explicit *"This is a source citation, not a reform log."*
+- **CP headline chips fire on both branches** — Egypt *"Reform not scored · no sourced log — not a
+  clean record ›"*; Nigeria *"SIZE UNKNOWN · 2 fiscal law changes since 2010 …"*. Both route to
+  the Reform Risk panel, which lands correctly for unscored countries too.
+- **Reform CSV export passes finalization criterion 5.** 92 rows, 12 columns, and 6 trailing
+  assumption lines that state the full-log-not-filtered-view trap, the 72-of-83 scoring filter,
+  that a blank Take Change is *not* zero and must not be averaged, the A/B confidence split, and
+  that reform history carries no take/NPV/breakeven.
+- **Still open on this tab, not worth a cycle alone:** the FC Reform verdict column has no
+  `data-sort-key` and no case in the `sortField` chain, so 185 rows cannot be ordered by reform
+  exposure — the only tool is the binary *Reform-scored only (21 of 185)* checkbox. Adding a sort
+  touches `_fcGenericLast`, the tier dividers and the rank column, so it wants its own cycle.
+- Carried forward and still true, still not the worst moment: Country Profile's Price Sensitivity
+  Curve renders 300px centred inside a 1,050px card (`viewBox="0 0 300 64"`), axis labels at 7px.
