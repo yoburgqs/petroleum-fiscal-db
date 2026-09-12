@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v810</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v811</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v810</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v811</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v810</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v811</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3265,7 +3265,7 @@ window.copyPlatformCitation = function(btn) {
       <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:nowrap;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="_scClearPreset()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
       <select id="screener-preset-select" onchange="if(this.value){applyScreenerPreset(this.value);this.value='';_scRevealResults();}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;" title="Load a preset screen — sets all sliders and filters to a predefined IC workflow. You can then adjust any slider to fine-tune. Use Ctrl+Enter to re-run.">
         <option value="">Load a screen…</option>
-        <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
+        <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at ${DECK} AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
         <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v660 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
@@ -3275,7 +3275,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="rfactor">R-factor PSC — price-sensitive profit oil tiers</option>
         <option value="atlanticfrontier" title="Atlantic margin deepwater benchmark set — the six countries named, screened as an explicit list with no take ceiling. Nigeria (81.1% take) is in the set by name; a 75% ceiling used to remove it silently.">Atlantic Frontier — Guyana · Angola · Brazil · Nigeria · Suriname · Gabon</option>
         <option value="frontiermarkets" title="Scoped to the Sub-Saharan Africa and South-East Asia jurisdictions ORCA holds, using the UN M49 boundary: M49 Africa minus Northern Africa (Algeria, Egypt, Libya, Morocco, Sudan, Tunisia, Western Sahara), plus M49 South-eastern Asia. Five Sub-Saharan countries filed under region &quot;Other&quot; in the data (Cote d&#39;Ivoire, Republic of the Congo, Gambia, Central African Republic, Sao Tome and Principe) are included; Papua New Guinea, filed under &quot;Asia&quot; but M49 Oceania, is not. Before v560 this preset applied no region filter at all and returned 169 of 185 countries led by Canada and the USA.">Frontier Markets — Sub-Saharan Africa + SE Asia (UN M49) · PSC · Take ≤70% · NPV positive</option>
-        <option value="downsideresilience">Downside Resilience — keeps ≥50% of its $75 contractor NPV at $50/bbl</option>
+        <option value="downsideresilience">Downside Resilience — keeps ≥50% of its ${DECK} contractor NPV at $50/bbl</option>
       </select>
       <!-- Hidden preset buttons kept for test selector compatibility -->
       <div style="display:none" aria-hidden="true">
@@ -30707,7 +30707,13 @@ function _scCriteriaState() {
     rfactor:  !!_screenerRfactorOnly,
     minFacts: (_screenerMinFacts === null || _screenerMinFacts === undefined) ? null : _screenerMinFacts,
     minRet:   (_screenerMinRetention === null || _screenerMinRetention === undefined) ? null : _screenerMinRetention,
-    cset:     _screenerCountrySet ? _screenerCountrySet.slice().sort().join('|') : null
+    cset:     _screenerCountrySet ? _screenerCountrySet.slice().sort().join('|') : null,
+    // v811 (T1): the price deck. It is the one criteria-changing control the v718 drift check
+    // could not see, and the loop above cannot reach it: #sc-deck-btns holds BUTTONs, not inputs,
+    // and the radios they drive (input[name="price"], #p50/#p75/#p100/#p125) live outside
+    // #explorer-screen-mode in the shared deck at line 3117. So it is captured here, beside the
+    // other globals, from the same getPriceKey() runScreener() screens on.
+    deck:     (typeof getPriceKey === 'function') ? String(getPriceKey()) : '75'
   };
   return st;
 }
@@ -30717,6 +30723,36 @@ function _scCriteriaState() {
 function _scPresetDrift() {
   if (!_activePresetName || !_activePresetBase) return [];
   var now = _scCriteriaState(), base = _activePresetBase, out = [];
+  // ── v811 (T1) — the price deck leads the drift list, because it re-bases every other leg ──
+  //
+  // Walked T1 cold: Home hero -> "open the screen" -> IOC Capital Screen (15 rows) -> the analyst
+  // presses $100 to see the upside, which is what the deck button's own tooltip invites ("Re-run
+  // this screen at $100/bbl ... a take ceiling screens harder than it does at $75"). The list
+  // drops to 12. The chip stayed clean amber and kept asserting, verbatim:
+  //
+  //   "IOC Capital Screen: verified production · Take ≤65% · NPV ≥0 @$75 AND @$50"
+  //
+  // while the screen that actually ran was Take ≤65% AT $100 · NPV ≥0 @$100 AND @$50. The chip
+  // named a price the screen did not use, and criteria[0] of the export -- the line that heads
+  // the IC memo attachment -- read a clean "Preset: IOC Capital Screen" with no MODIFIED mark.
+  //
+  // The signal was inverted, measured at runtime on the pre-change build: nudging the take slider
+  // 65 -> 63 moves ONE country (15 -> 14) and correctly turns the chip red; pressing $100 moves
+  // THREE (15 -> 12) and re-bases the take basis as well, and was certified clean. The control
+  // that changed the shortlist most was the only one that raised no flag.
+  //
+  // The $50 deck is the sharper case. There the preset's two legs collapse onto one price -- the
+  // screen becomes NPV ≥0 @$50 AND @$50 -- and 18 rows come back under a chip still promising a
+  // two-price test. v724 already found this hazard and fixed the Two-Price preset's label text by
+  // renaming its deck leg "at the deck price"; it never made the deck itself a tracked criterion,
+  // so every other preset kept the stale price in its caption.
+  //
+  // One phrase here reaches all three v718 consumers -- chip, count-line prefix, export header --
+  // because they all read _activePresetModified off this function. Pressing the deck back restores
+  // the clean caption, same as any other control.
+  // Terse, in the same shape as the threshold phrases below ("take ceiling ≤65% → ≤63%"), so the
+  // chip stays a chip. What the deck change DOES is said once, in the chip's tooltip.
+  if (String(base.g.deck) !== String(now.g.deck)) out.push('price deck $' + base.g.deck + ' → $' + now.g.deck);
   Object.keys(base.ctrl).forEach(function (id) {
     if (!(id in now.ctrl)) return;
     if (String(now.ctrl[id]) === String(base.ctrl[id])) return;
@@ -30754,8 +30790,17 @@ function _scPaintPresetChip() {
   lbl.style.color       = '#a3231b';
   lbl.style.background  = 'rgba(163,35,27,.07)';
   lbl.style.borderColor = 'rgba(163,35,27,.35)';
-  lbl.title = 'You changed a threshold after loading this preset, so this shortlist is no longer '
-            + _activePresetName + '. The thresholds that actually ran are in the line under the table, '
+  // v811 (T1): a price-deck change is not a threshold change and the tooltip no longer calls it
+  // one. It is the wider case — the thresholds keep their numbers and the BASIS under them moves,
+  // which is why it reads as the preset still running when it is not.
+  var _deckDrift = drift.length && drift[0].indexOf('price deck') === 0;
+  lbl.title = (_deckDrift
+              ? 'You re-ran this preset at a different oil price. Its thresholds still read the same, '
+                + 'but take%, NPV and tier are all recomputed at the new deck, so the countries that '
+                + 'pass are not the ones ' + _activePresetName + ' selects at its own price. '
+              : 'You changed a threshold after loading this preset, so this shortlist is no longer '
+                + _activePresetName + '. ')
+            + 'The thresholds that actually ran are in the line under the table, '
             + 'and the export is labelled MODIFIED. Move the control back, or press × to reset.';
 }
 window._scPaintPresetChip = _scPaintPresetChip;
@@ -31025,7 +31070,7 @@ function applyScreenerPreset(preset) {
       // after you apply it, so the badge on screen still announced 'IRR >=15%' -- a criterion whose
       // slider, quick-set button and runScreener() branch were all deleted in that same cycle. The
       // analyst got 14 correct rows under a caption describing a filter that no longer runs.
-      iochurdle: 'IOC Capital Screen: verified production \u00b7 Take \u226465% \u00b7 NPV \u22650 @$75 AND @$50',
+      iochurdle: 'IOC Capital Screen: verified production \u00b7 Take \u226465% \u00b7 NPV \u22650 @${DECK} AND @$50',
       sweetspot: 'Low Take · Positive NPV: Take \u226455% \u00b7 Concession/PSC/PRRT/RSC \u00b7 NPV \u22650',
       pscafrica: 'PSC Africa: PSC \u00b7 Africa \u00b7 Take \u226475%',
       deepwater: 'Offshore \u0026 Deepwater: 24 offshore jurisdictions \u00b7 PSC+Concession \u00b7 Take \u226470%',
@@ -31042,8 +31087,29 @@ function applyScreenerPreset(preset) {
       rfactor: 'R-factor PSC: price-sensitive profit oil tiers',
       atlanticfrontier: 'Atlantic Frontier: Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria \u00b7 Suriname \u00b7 Gabon \u2014 explicit set, no take ceiling',
       frontiermarkets: 'Frontier Markets: Sub-Saharan Africa + SE Asia (UN M49) \u00b7 PSC \u00b7 Take \u226470% \u00b7 NPV \u22650',
-      downsideresilience: 'Downside Resilience: retains \u226550% of $75 contractor NPV at $50/bbl \u2014 no take ceiling'
+      downsideresilience: 'Downside Resilience: retains \u226550% of ${DECK} contractor NPV at $50/bbl \u2014 no take ceiling'
     };
+    // ── v811 (T1) — the caption states the price the screen was actually run at ─────────────
+    //
+    // The drift check above catches a deck change made AFTER the preset is loaded. It cannot
+    // catch the other door to the same moment: set $100 first, THEN load the IOC Capital Screen.
+    // There is no drift — the baseline IS $100 — so the chip renders clean and read, verbatim on
+    // the pre-change build, "NPV \u22650 @$75 AND @$50" over a 12-row screen decided at $100. The
+    // preset menu shows the same contradiction inside one line: "NPV positive at $75 AND at $50
+    //   \u2192 12 of 185 @$100".
+    //
+    // Two of the eleven captions hardcode a price that is in fact the deck: iochurdle's first NPV
+    // leg (runScreener screens it on npv_<getPriceKey()>) and downsideresilience's retention
+    // denominator (the NPV @$50 column's "% of $75 kept" sub-heading already follows the deck
+    // buttons). Both now carry a {DECK} token resolved here. The @$50 legs are NOT tokenised —
+    // those read npv_50 at every deck and are genuinely fixed. This is v724's precedent, which
+    // made the Two-Price preset's deck leg say "at the deck price" for exactly this reason, applied
+    // to the two captions it left behind. At the $75 deck every string renders byte-identical to
+    // before, so the default path is unchanged.
+    var _deckNow = (typeof getPriceKey === 'function') ? String(getPriceKey()) : '75';
+    Object.keys(presetCriteria).forEach(function (k) {
+      presetCriteria[k] = presetCriteria[k].split('${DECK}').join('$' + _deckNow);
+    });
     var lblText = document.getElementById('screener-preset-label-text');
     if (preset && presetCriteria[preset]) {
       if (lblText) lblText.textContent = '\u25c6 ' + presetCriteria[preset];
@@ -31363,7 +31429,13 @@ function _labelScreenerPresets() {
       var share = n / total;
       // The count is stated plainly. A preset returning most of the database is not marked wrong --
       // it is a legitimate wide sweep -- but the analyst is told the size before spending the click.
-      o.textContent = o.dataset.baseText + '   \u2192 ' + n + ' of ' + total + ' @$' + deck + (share >= 0.75 ? ' (barely narrows)' : '');
+      // v811 (T1): resolve the caption's own deck token before the suffix is appended, so one
+      // option line cannot name two prices. Pre-change, at the $100 deck, this row read
+      // "NPV positive at $75 AND at $50   \u2192 12 of 185 @$100" \u2014 the criteria and the hit count
+      // disagreeing inside a single line, which is the line the analyst reads BEFORE clicking.
+      // Only the deck-relative legs carry the token; the @$50 legs read npv_50 at every deck.
+      o.textContent = o.dataset.baseText.split('${DECK}').join('$' + deck)
+                    + '   \u2192 ' + n + ' of ' + total + ' @$' + deck + (share >= 0.75 ? ' (barely narrows)' : '');
     });
   } catch (e) { /* non-critical: leave the menu unlabelled rather than half-labelled */ }
   _scRestoreState(snap);
