@@ -46327,3 +46327,21 @@ count: until the gate names the tree it measured, none of these numbers can be c
 The 1 WARN and the 1 "JS error" are the same item on both runs: `index.html:49` registers
 `/petroleum-fiscal-db/sw.js` by absolute path, which resolves only under the GitHub Pages base.
 It is an artifact of local static serving and is not present on the deployed site.
+
+---
+## Cycle 715 Log — 2026-09-12 02:11
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. The pending check resolved, and it changes one thing I said earlier.
+
+**Baseline comparison result** — I ran the suite twice, same machine, same suite, two ports, differing only in `index.html`:
+
+| tree | result |
+|---|---|
+| unmodified v807 (pre-change) | 299 PASS / 0 FAIL / 1 WARN |
+| shipped v808 (this cycle) | 299 PASS / 0 FAIL / 1 WARN |
+
+Two conclusions, and only two:
+
+1. **My change moves the suite by exactly zero** — identical totals on trees differing only by `_icRefuse`
