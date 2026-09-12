@@ -45944,3 +45944,16 @@ v804 → v805 at the three display sites only, silently, after the real change s
 
 **Shipped:** petroleum-fiscal-db `143a978` (v805), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 712 Log — 2026-09-11 23:12
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 712 — T4 walk, shipped v805
+
+## Cycle 712 — T4
+
+**Task** — T4, "What is my fiscal-stability and reform exposure here?" Stalest by rotation (703 T4, 705 T2, 706 T6, 707 T5, 708 T3, 710 T1, 711 T3).
+
+**Friction** — A cold load at `#/reform/<country>` rendered the **wrong verdict**, silently. That URL is the reload, bookmark, browser-Forward and send-this-to-a-colleague path — the entire reason v796 gave the 
