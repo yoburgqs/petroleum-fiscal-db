@@ -47421,3 +47421,18 @@ three display sites only (`:42`, `:2420`, `:2490`), silently, after the real cha
 - Carried forward from v815 and still true, still not the worst moment: Country Profile's
   Price Sensitivity Curve renders 300px centred inside a 1,050px card
   (`viewBox="0 0 300 64"`), axis labels at a literal 7px.
+
+---
+## Cycle 726 Log — 2026-09-12 15:33
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 726 complete — shipped **v818**, pushed to `main` (`a22f662` + `aab50fa`), mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest by rotation (T1 last ran at v811; last cycle was T3, not repeated).
+
+## Friction
+Explorer → **Bubble Chart**, cold. The caption tells the analyst exactly where to look: *"the **left frontier** (low take) with **high NPV** represents the most IOC-favorable regimes."*
+
+`renderBubbleChart()` (`index.html:53745`) grouped and
