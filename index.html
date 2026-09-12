@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v811</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v812</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v811</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v812</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v811</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v812</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -42396,6 +42396,68 @@ function _rrScrollVerdictToTop() {
 }
 window._rrScrollVerdictToTop = _rrScrollVerdictToTop;
 
+// ── v812 (T4): the Reform Risk tab's own country affordances answered a different question ──
+// Every clickable country in this tab's global view -- the 15 rows of "Most Frequently Reformed
+// Regimes" (and the country link inside each), the 20 heatmap row labels, and the 21 "name ›"
+// buttons in the QUIET / REFORMED TWICE / ACTIVELY REFORMING cards -- ran the same three
+// statements: set #dd-country-select, loadCountryProfile(c), switchTab('t7'). 57 targets, one
+// destination, and the destination was a different tab.
+//
+// Walked cold at 1440x900: Home -> Reform Risk -> scroll to ACTIVELY REFORMING (2) at y~4470 ->
+// click "United Kingdom ›". Measured landing: tab t7, scrollY 0, hash #/profile/united_kingdom.
+// What is on screen is the Country Profile country picker and its XLSX / PDF / Compare / IC
+// Citation buttons. The reform answer -- "IC action -- Actively Reforming: 5 law changes since
+// 2010 ... add a 3-5pp WACC premium" -- is at y=1042 on that page, below the fold, with nothing
+// in the viewport naming it. The global rankings the analyst was reading are gone with the tab.
+//
+// That is the wrong answer to the click. The chevron sits inside a reform card, on the reform
+// tab, under a heading about reform exposure, and the analyst pressing it is asking for MORE
+// reform detail on that country. This tab already builds exactly that: renderReformCountryVerdict()
+// renders a 1,100-1,600px verdict card carrying the IC action, the Reform Frequency Score and its
+// rank, the reforms-since-2010 count, the direction split, the fiscal-predictability ceiling and
+// the country's own sourced event log split at the 2010 boundary. Seven surfaces on OTHER tabs
+// route into it through openReformRiskFor(). Not one control on the tab that owns it did.
+// The tab's closing line even tells the analyst to "use the lookup at the top of the tab" --
+// directly beneath 21 buttons that do something else.
+//
+// Now they select the country in this tab's own lookup and land on the verdict card, scrolled to
+// its top by the same _rrScrollVerdictToTop() every other route uses. Nothing is lost: the card
+// carries "Open <Country> Country Profile ›" as its own control, so the profile is one further
+// click, and the global rankings are still below -- which is why this records where the analyst
+// clicked from and renders a "← Back to the rankings" control, so checking a second and third
+// country does not mean hunting for the row again 4,000px down (the v790 lesson, in-tab).
+function _rrOpenProfile(country) {
+  var s = document.getElementById('dd-country-select');
+  if (s) s.value = country;
+  try { loadCountryProfile(country); } catch (e) {}
+  try { switchTab('t7', document.getElementById('tab-btn-t7')); } catch (e) {}
+}
+window._rrOpenProfile = _rrOpenProfile;
+
+function _rrOpenLocal(country, el) {
+  var sel = document.getElementById('rr-country-lookup');
+  if (sel && sel.dataset.filled !== '1') { try { _rrPopulateLookup(); } catch (e) {} }
+  // A country in the reform log that COUNTRY_DATA does not carry has no option here. Rather than
+  // swallow the click, fall back to the route this control used to take.
+  if (!sel || !sel.querySelector('option[value="' + String(country).replace(/"/g, '\\"') + '"]')) {
+    _rrOpenProfile(country);
+    return;
+  }
+  // Anchor the return on the ELEMENT, not on a scroll offset: selecting a country inserts the
+  // verdict card ABOVE the rankings, so every y below it moves by the card's height (1,100-1,600px
+  // at 1440x900). Re-scrolling to a remembered pageYOffset would land the analyst that far wrong.
+  if (el && document.body.contains(el)) {
+    window._rrReturn = { inTab: true, country: String(country), el: el,
+                         top: el.getBoundingClientRect().top };
+  } else {
+    window._rrReturn = null;
+  }
+  sel.value = country;
+  try { renderReformCountryVerdict(); } catch (e) {}
+  _rrScrollVerdictToTop();
+}
+window._rrOpenLocal = _rrOpenLocal;
+
 // v514: jump from a Country Profile with no sourced reform log straight to the Reform
 // Risk tab with that country already selected. The lookup <select> is filled by
 // _rrPopulateLookup(), which only runs once REFORM_HISTORY has landed, so poll briefly
@@ -42447,6 +42509,25 @@ function _rrSelectWhenReady(country, maxTries) {
 function _rrBackToOrigin() {
   var r = window._rrReturn;
   if (!r) return;
+  // v812 (T4): drilled from this tab's own rankings, so there is no pane to restore -- put the
+  // row the analyst clicked back at the viewport offset it had at click time. Measured against
+  // the element rather than a saved pageYOffset because the verdict card is inserted above it.
+  if (r.inTab) {
+    window._rrReturn = null;
+    // Retire the spent control BEFORE measuring: the card is not re-rendered here, and removing
+    // this row afterwards shortens it and shifts the rankings up by its own height (~32px).
+    var b = document.getElementById('rr-back-origin');
+    if (b) { var w = b.parentNode; if (w && w.parentNode && w.children.length === 1) w.parentNode.removeChild(w); else if (w) w.removeChild(b); }
+    var el = r.el;
+    if (el && document.body.contains(el)) {
+      var y = el.getBoundingClientRect().top + (window.pageYOffset || 0) - (r.top || 0);
+      window.scrollTo(0, Math.max(0, Math.round(y)));
+    } else {
+      var g = document.getElementById('reform-risk-content');
+      if (g) window.scrollTo(0, Math.max(0, Math.round(g.getBoundingClientRect().top + (window.pageYOffset || 0) - 12)));
+    }
+    return;
+  }
   // v796: while this visit's own history entry is still current, the button IS browser Back,
   // so the two can never disagree and Back afterwards does not bounce into Reform Risk again.
   var e = window._rrEntry;
@@ -42542,6 +42623,15 @@ function _rrVerdictHead(title, mb) {
   var head = '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:' + mb + 'px;">' + title + '</div>';
   var r = window._rrReturn;
   if (!r) return head;
+  // v812 (T4): drilled from the rankings further down THIS tab -- the control returns to that row,
+  // not to another pane, so it must not read as a tab name.
+  if (r.inTab) {
+    return '<div class="no-print" style="margin-bottom:8px;">'
+      + '<button type="button" id="rr-back-origin" onclick="_rrBackToOrigin()"'
+      + ' title="Return to the ranking row you opened ' + _rrEsc(r.country) + ' from, further down this tab"'
+      + ' style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;min-height:24px;">&larr; Back to the rankings</button>'
+      + '</div>' + head;
+  }
   // Same look as Country Profile's "← Screener" (.cp-back-list), the platform's other drill-back.
   return '<div class="no-print" style="margin-bottom:8px;">'
     + '<button type="button" id="rr-back-origin" onclick="_rrBackToOrigin()" title="Return to ' + _rrEsc(r.label) + ' where you opened ' + _rrEsc(r.country) + '"'
@@ -43496,8 +43586,9 @@ function renderReformRisk() {
           ? _rrDirCells(r.split, 'sm')
             + '<div style="font-size:9px;font-weight:700;color:' + _t.color + ';line-height:1.35;margin-top:2px;white-space:normal;">' + _t.word + '</div>'
           : '—';
-        return '<tr style="cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" title="Click to open ' + r.country + ' Country Profile" onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
-          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">↗</span></td>'
+        // v812 (T4): stays on this tab and opens this country's reform verdict. See _rrOpenLocal().
+        return '<tr style="cursor:pointer;" onclick="_rrOpenLocal(\'' + escapedC + '\', this)" title="Open ' + r.country + '\u2019s reform verdict — IC action, score and rank, and its own sourced event log — at the top of this tab. The full Country Profile is one further click from there." onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
+          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">›</span></td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;color:var(--accent);font-weight:600;">' + r.split.fiscal
               + (r.split.context
                   ? '<div style="font-size:10px;color:var(--muted);font-weight:400;line-height:1.4;margin-top:2px;white-space:nowrap;">+ ' + r.split.context + ' context</div>'
@@ -43528,7 +43619,7 @@ function renderReformRisk() {
     + '<tbody>'
     + heatCountries.map(function(r) {
         return '<tr>'
-          + '<td style="padding:5px 8px;font-size:11px;color:var(--text);white-space:nowrap;"><a href="#" style="color:var(--text);text-decoration:underline dotted;text-underline-offset:2px;" title="Open Country Profile for ' + r.country + '" onclick="event.preventDefault();document.getElementById(\'dd-country-select\').value=\'' + r.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + r.country.replace(/'/g,"\\'") + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));">' + r.country + '</a></td>'
+          + '<td style="padding:5px 8px;font-size:11px;color:var(--text);white-space:nowrap;"><a href="#" style="color:var(--text);text-decoration:underline dotted;text-underline-offset:2px;" title="Open ' + r.country + '\u2019s reform verdict at the top of this tab — the events behind this row, dated and sourced" onclick="event.preventDefault();_rrOpenLocal(\'' + r.country.replace(/'/g,"\\'") + '\', this)">' + r.country + '</a></td>'
           + decades.map(function(d) {
               // v694: n = fiscal law changes (lights the cell); cx = sourced events that
               // changed no fiscal terms (never lights it, but must stay visible).
@@ -43613,7 +43704,8 @@ function renderReformRisk() {
   var midRaisedInWindow = midList.filter(function(r){ return r.lastHostile && r.lastHostile.year >= 2010; }).length;
 
   function _rrRowBtn(ec, name) {
-    return '<button onclick="document.getElementById(\'dd-country-select\').value=\'' + ec + '\';loadCountryProfile(\'' + ec + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:0;text-align:left;font-weight:600;" title="Open Country Profile">' + name + ' ›</button>';
+    // v812 (T4): a chevron inside a reform card now opens the reform verdict, on this tab.
+    return '<button onclick="_rrOpenLocal(\'' + ec + '\', this)" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:2px 0;min-height:24px;text-align:left;font-weight:600;" title="Open this country\u2019s reform verdict at the top of this tab — IC action, score and rank, and its own sourced event log. The full Country Profile is one further click from there.">' + name + ' ›</button>';
   }
 
   function _quietRow(r, mode) {
