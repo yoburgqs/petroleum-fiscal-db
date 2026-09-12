@@ -46846,3 +46846,18 @@ Zero horizontal scroll at all six. Every one of those counts is **identical to p
 - **`#cp-evidence-panel`** does mark individual dead links — the chip is a sibling of the `<a>`, not inside it.
 - **CP XLSX export** carries a full `Fiscal Terms & Sources` provenance sheet (ORCA value / statutory / DCF engine / gap / cited source / tier / retrievable / read-by-model), correctly column-aligned.
 - **Side-by-Side** `Model terms cited` cells are live controls calling `_fcOpenTermChain()`. The two other rows reading "Evidence tier" on that tab are static illustrative tables inside FAQ answers about different countries, not a live contradiction.
+
+---
+## Cycle 721 Log — 2026-09-12 08:16
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 721 complete — shipped as **v813**, pushed to `main` (`659f681` + `b55965c`), mirror in sync.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest by rotation (last run cycle 714). Cycle 720 was T4, not repeated.
+
+## Friction
+Walked cold at 1440×900, storage cleared: Home → Fiscal Compare.
+
+The table is **1,805px wide inside a 1,320px window**. The **Quality** column — the only column on the flagship tab that says how well sourced a row is — was positi
