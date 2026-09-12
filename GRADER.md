@@ -46485,3 +46485,140 @@ The Side-by-Side tab stacks two charts 360px apart, drawn from one country set �
 ```
 take chart (index.html:29300):  dashed = country has NO R-factor tiers
 NPV  chart (index.html:29427):  dashed = statutory basis, no verifi
+
+---
+## Cycle 719 Log — 2026-09-12 — T1 — shipped v811
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Last cycle was T3 (v810); T1 was
+stalest by rotation, last run at cycle 710.
+
+## Friction
+
+Walked cold — `sessionStorage` and `localStorage` cleared, then reloaded. Home hero →
+`_homeOpenICScreen()` → **IOC Capital Screen, 15 rows**. That is the platform's flagship one-click
+IC screen and the Home headline routes straight to it, so it is the T1 path.
+
+The analyst then presses **$100** to see the upside. The deck button's own tooltip invites exactly
+this: *"Re-run this screen at $100/bbl. Progressive regimes … take a larger share here, so a take
+ceiling screens harder than it does at $75."* The list drops to 12.
+
+The chip stayed clean amber and kept asserting, verbatim:
+
+```
+◆ IOC Capital Screen: verified production · Take ≤65% · NPV ≥0 @$75 AND @$50
+```
+
+The screen that actually ran was **Take ≤65% at $100 · NPV ≥0 @$100 AND @$50**. The caption named
+a price the screen did not use. And `criteria[0]` of `window._screenerExportBasis` — the line that
+heads the IC memo attachment — read a clean `Preset: IOC Capital Screen`, with no MODIFIED mark.
+
+**Root cause, verified at runtime.** `_scCriteriaState()` (`index.html:30696`, the v718 drift
+snapshot) walks `#explorer-screen-mode` for `input, select` carrying an `id`. The Screener's price
+deck is `#sc-deck-btns`, which holds **`<button>`** elements; the radios they drive
+(`input[name="price"]`, `#p50`/`#p75`/`#p100`/`#p125`) live **outside** that scope at
+`index.html:3117`, in the deck shared with Fiscal Compare. So the deck was invisible to drift
+detection by construction — the one criteria-changing control v718 could not see.
+
+**The signal was inverted.** Measured on the pre-change build with a real browser:
+
+| analyst action | rows | chip |
+|---|---|---|
+| take slider 65% → 63% | 15 → **14** | red, `MODIFIED: take ceiling ≤65% → ≤63%` |
+| press `$100` | 15 → **12** (+ take basis re-based) | **clean amber, certified unmodified** |
+| press `$50` | 15 → **18** | **clean amber, certified unmodified** |
+
+The control that changed the shortlist *most* was the only one that raised no flag. The `$50` case
+is the sharpest: the preset's two legs collapse onto one price — the screen becomes NPV ≥0 @$50
+AND @$50, not a two-price test at all — and 18 rows come back under a chip still promising
+`@$75 AND @$50`. v724 had already found this hazard and fixed the Two-Price preset's *label text*
+("at the deck price"); it never made the deck a tracked criterion, so every other preset kept a
+stale price in its caption.
+
+**A second door to the same moment,** which drift cannot catch by definition: set `$100` **first**,
+*then* load the preset. There is no drift — the baseline *is* $100 — so the chip rendered clean and
+still said `@$75` over a 12-row screen. The preset menu showed the contradiction inside a single
+line, and it is the line read *before* clicking:
+
+```
+IOC Capital Screen — … NPV positive at $75 AND at $50   → 12 of 185 @$100
+```
+
+## Change
+
+1. **The price deck is now a tracked preset criterion.** `_scCriteriaState()` captures
+   `g.deck` from the same `getPriceKey()` `runScreener()` screens on; `_scPresetDrift()` compares
+   it and pushes `price deck $75 → $100` **first** in the list, because it re-bases every other
+   leg. One phrase reaches all three v718 consumers — chip, count-line prefix, export header.
+   Pressing the deck back restores the clean caption.
+2. **The chip's modified tooltip distinguishes the two cases.** A deck change is not a threshold
+   change: the thresholds keep their numbers and the *basis* under them moves, which is precisely
+   why it read as the preset still running when it was not.
+3. **Door 2 closed.** The two captions that hardcode a deck-relative price — `iochurdle`'s first
+   NPV leg and `downsideresilience`'s retention denominator — now carry a `{DECK}` token resolved
+   from `getPriceKey()` in `applyScreenerPreset()`. The `@$50` legs are **not** tokenised; those
+   read `npv_50` at every deck and are genuinely fixed. v724's precedent, applied to the two
+   captions it left behind.
+4. **The preset menu no longer names two prices in one line.** `_labelScreenerPresets()` resolves
+   the token before appending its hit-count suffix, so both halves agree at every deck.
+
+At the `$75` deck every string renders byte-identical to before — the default path is unchanged.
+
+## Result
+
+An analyst can re-price the IOC Capital Screen at $50 / $100 / $125 and the tool now tells them —
+on screen, in the count line, and in the exported memo header — that the shortlist is no longer the
+screen whose name it carries. A 12-country list produced at $100 can no longer reach an investment
+committee headed `Preset: IOC Capital Screen` as though it were the 15-country screen run at the
+price the caption names. And loading a preset while already on another deck no longer produces a
+caption quoting a price that was never used.
+
+## Verification — the suite RAN this cycle, against this tree
+
+| gate | result |
+|---|---|
+| JS syntax (all inline `<script>` extracted, `node --check`) | **PASS** (11 blocks) |
+| Runtime suite, `TEST_URL=http://localhost:8931/index.html` | **299 PASS / 0 FAIL / 1 WARN** |
+| Same suite vs pristine `HEAD` served from the same directory | **299 PASS / 0 FAIL / 1 WARN** — identical |
+| Pixel gate, `pixel_audit.js` 10 tabs × 5 viewports | **PASS** — no surface worse than baseline |
+
+The single WARN is the `sw.js` 404: `index.html:49` registers `/petroleum-fiscal-db/sw.js` by
+absolute path, which resolves only under the Pages base. Local-static-serving artifact, same item
+cycles 715 and 716 recorded; not present on the deployed site.
+
+**Baseline method note.** The first attempt at a pristine baseline served `git show HEAD:index.html`
+from an otherwise empty temp directory. `COUNTRY_DATA` never loaded there — no sibling data files —
+so the comparison was void and a `renderExplorer` null-`filter` error appeared that had nothing to
+do with this change. Re-run correctly, with HEAD written into the **real** repo directory, both
+builds report 0 page errors over the full interaction sequence. Recording this because the wrong
+baseline briefly looked like a regression this cycle had caused.
+
+**Step 5b — checked on a phone.** Walked at 390 × 844 with `hasTouch: true`, plus the full sweep,
+all in the changed state (IC preset loaded, deck moved to $100 so the MODIFIED chip is rendering):
+
+| viewport | scrollWidth / clientWidth | sub-24px among controls this cycle touched | page errors |
+|---|---|---|---|
+| 1920 | 1920 / 1920 | preset-clear `×` 13px (`pointer: fine` only, pre-existing) | 0 |
+| 1440 | 1440 / 1440 | same | 0 |
+| 1280 | 1280 / 1280 | same | 0 |
+| 1024 | 1024 / 1024 | same | 0 |
+| 768 | 768 / 768 | **0** | 0 |
+| 390 | 390 / 390 | **0** | 0 |
+
+Zero horizontal scroll at all six. The preset-clear `×` clears 24px under `pointer: coarse` at 768
+and 390 via the v612 mobile layer, which is that layer's declared scope. The longer MODIFIED chip
+does not overflow at 390 — `#screener-preset-label-text` already carries `min-width: 0` and
+`overflow-wrap: anywhere` from v718.
+
+Six behaviours verified with a real browser: door 1 (deck changed after loading), door 2 (deck set
+first), return-to-clean, v718 slider drift still firing, both drifts combined and ordered deck-first,
+and the no-preset case leaving the chip hidden rather than inventing one. Token-leak check clean —
+no `${DECK}` reaches rendered text at any deck.
+
+**STILL LOCKED respected:** no new tooltip, no new FAQ, no banner, no citation micro-edit, no
+text-only change — the two caption strings changed only because they are now *computed* from the
+live deck, and the chip/count/export triple changed *state*. The v612 mobile layer, its
+`min-width: max-content` marker and `#reference-panel` untouched. Screener presets stay a dropdown;
+Advanced Filters stay collapsed; Explorer analytics stay collapsed. FC columns, the removed Govt NPV
+column and the CP two-zone headline untouched. Tab order unchanged. Version v810 → v811 at the three
+display sites only, silently, after the real change shipped.
