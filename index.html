@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v818</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v819</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2417,7 +2417,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v818</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v819</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2487,7 +2487,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v818</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v819</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3018,7 +3018,7 @@ window.copyPlatformCitation = function(btn) {
       <strong style="color:var(--muted);">G</strong> = <strong>generic</strong>: ORCA holds no country-specific terms for that country in the compare engine, so the take is the standard default for its mechanic. Every G row on the same mechanic lands on the identical take, NPV and breakeven, so their order relative to each other is not a ranking. A G row is directional only &mdash; do not cite it. The country may still hold well-sourced facts in the database; this figure did not use them.
       <strong style="color:var(--text);">A / B / C / D</strong> = the row <em>was</em> modelled from that country&rsquo;s own terms, graded on the <strong>worse</strong> of two legs: <strong>primary-law share</strong> of its fiscal facts (A &ge;60% &middot; B &ge;40% &middot; C &ge;20% &middot; D below) and <strong>fact depth</strong> (A &ge;150 facts &middot; B &ge;50 &middot; C &ge;15 &middot; D below). A country needs both. Tier B does <em>not</em> count toward the letter: the EY / KPMG / IHS country-level guides are 45.2% of the database and are assigned to a whole country, never read off an individual contract, so grading on A+B graded how thoroughly the bulk tables had run &mdash; it scored 171 of 185 countries A and ranked Russia (3.8% primary law) above Senegal (67.2%). The badge tooltip names which of the two legs is holding that row down.
       Hover any badge for that row&rsquo;s basis. <em>Country Profile &rarr; Evidence Quality</em> names the actual documents.<span id="fc-quality-mix"></span>
-      <strong style="color:var(--text);">Reform verdict</strong> = what this jurisdiction’s sourced reform record tells you to carry, and it exists for a minority of this table. <strong style="color:var(--muted);">n/c</strong> means ORCA holds <em>no sourced fiscal-reform event log</em> for that country — it is not a clean record and not a pass. Carry no reform premium of zero on an n/c row; it needs an external check first. Where a log does exist the cell names one of six verdicts, each stating its own unit: <strong style="color:var(--red);">WACC +5–8pp</strong> / <strong style="color:var(--orange);">WACC +3–5pp</strong> (Actively Reforming — percentage points to <em>add to the discount rate</em>; these are the only verdicts that change a model input and the only ones drawn as a filled pill), <strong style="color:var(--orange);">TAKE +Npp</strong> / <strong style="color:var(--orange);">TAKE NET ±Npp</strong> (percentage points of <em>government take</em> raised inside the window, printed NET where the window also holds a take cut — size against it, not against the count, and never add it to a WACC: until v753 both of these printed as a bare ‘pp’ in the same colour at the same weight, so Russia’s take rise of +15pp outranked the UK’s 3–5pp WACC premium on sight), <strong style="color:var(--orange);">↑ PRE-2010</strong> (the rupture predates the window), <strong style="color:var(--orange);">SIZE UNKNOWN</strong> (terms rewritten in-window, take effect never quantified), <strong style="color:var(--orange);">NO LAW CHANGE</strong> (every post-2010 event is a discovery, first oil or a review that changed nothing) and <strong style="color:var(--green);">NO PREMIUM</strong>. Until v744 this column printed the raw diamond count instead — which put Libya and Algeria at a full ◆◆◆◆◆ and Norway below them, and left the verdict reachable only by hovering one cell at a time. The small grey second line is that count, kept because it is a fact about the jurisdiction; it is not the finding, and it never reads how large a change was, which is why Russia’s 2022 windfall tax (+15pp) sat on a 4-diamond row. Click any cell for the full event log. To drop the unscored rows entirely, use <strong>◆ Reform-scored only</strong> in the filter row above.
+      <strong style="color:var(--text);">Reform verdict</strong> = what this jurisdiction’s sourced reform record tells you to carry, and it exists for a minority of this table. <strong style="color:var(--muted);">n/c</strong> means ORCA holds <em>no sourced fiscal-reform event log</em> for that country — it is not a clean record and not a pass. Carry no reform premium of zero on an n/c row; it needs an external check first. Where a log does exist the cell names one of six verdicts, each stating its own unit: <strong style="color:var(--red);">WACC +5–8pp</strong> / <strong style="color:var(--orange);">WACC +3–5pp</strong> (Actively Reforming — percentage points to <em>add to the discount rate</em>; these are the only verdicts that change a model input and the only ones drawn as a filled pill), <strong style="color:var(--orange);">TAKE +Npp</strong> / <strong style="color:var(--orange);">TAKE NET ±Npp</strong> (percentage points of <em>government take</em> raised inside the window, printed NET where the window also holds a take cut — size against it, not against the count, and never add it to a WACC: until v753 both of these printed as a bare ‘pp’ in the same colour at the same weight, so Russia’s take rise of +15pp outranked the UK’s 3–5pp WACC premium on sight), <strong style="color:#A16207;">↑ PRE-2010</strong> (the rupture predates the window), <strong style="color:var(--orange);border-bottom:1px dotted currentColor;">SIZE UNKNOWN</strong> (terms rewritten in-window, take effect never quantified), <strong style="color:var(--green);">NO LAW CHANGE</strong> (every post-2010 event is a discovery, first oil or a review that changed nothing) and <strong style="color:var(--green);">NO PREMIUM</strong>. Until v744 this column printed the raw diamond count instead — which put Libya and Algeria at a full ◆◆◆◆◆ and Norway below them, and left the verdict reachable only by hovering one cell at a time. The small grey second line is that count, kept because it is a fact about the jurisdiction; it is not the finding, and it never reads how large a change was, which is why Russia’s 2022 windfall tax (+15pp) sat on a 4-diamond row. Click any cell for the full event log. To drop the unscored rows entirely, use <strong>◆ Reform-scored only</strong> in the filter row above.
       <strong style="color:var(--text);">PROXY</strong> badge on a country name = take is modeled from statutory fiscal parameters only (no verified block-level production data for weighting). Results are directional — PROXY regimes may diverge ±5–15pp from block-level economics. IC rule: never cite a PROXY country's take as definitive; always state "statutory model basis (ORCA PROXY)" in the IC memo and cross-check with primary concession/PSA terms before submission.
       Click any row to open the 4-price matrix (Take &middot; Contractor NPV at $50–$125/bbl) and fiscal waterfall. In the drilldown: click <strong>⎘ IC Citation</strong> to copy a ready-to-paste cite string (take, contractor NPV at the selected price and at the $50 downside, breakeven), or click <strong>Full Profile →</strong> to open the Country Profile with sourced fiscal parameters.
     </div>
@@ -49463,12 +49463,52 @@ function renderFCResults(results, price) {
     // A hurried reader carries +15 into a 10% WACC and kills the project. The token now names
     // its unit, and the instruction rows -- the only ones that change a model input -- carry a
     // filled pill so the two classes separate before either number is read.
+    // ── v819 (T4): the colour channel still partitioned nothing ─────────────────────
+    // v753 above named the two units and gave the WACC rows a filled pill, which correctly
+    // separated the only two rows that change a model input. It left the other 19 exactly
+    // as it found them. _rrClassify hands back ONE orange (#C2410C) for all six non-action
+    // verdicts, and its other two branches are unreachable on this data — green needs a
+    // measured in-window take CUT and no take rise ever on record; red needs 6+ in-window
+    // law changes and the database maxes out at the UK's 5. Measured on the cold default
+    // table: 19 of the 21 scoreable rows identical in colour, weight and size.
+    //
+    // So Ghana and Guyana — the only two rows in 185 where ORCA opened a sourced log and
+    // found no fiscal law change at all, which is the best result this column can return —
+    // rendered in exactly the same alarm orange as Russia's 2022 +15pp windfall tax. The
+    // one state an analyst should screen TOWARD was painted like the states they screen
+    // AWAY from, and colour, the fastest-reading channel in a 185-row grid, carried nothing.
+    //
+    // The tier below adds no classification and no threshold: it reads the classifier's OWN
+    // token, which already draws these distinctions, and gives each one a treatment. Four
+    // hues and one marker, ordered by what the analyst has to DO about it:
+    //   WACC +5–8pp   red pill        change a model input (discount rate)
+    //   WACC +3–5pp   orange pill     change a model input (discount rate)
+    //   TAKE ±Npp     orange          in-window take move, MEASURED — size against it
+    //   SIZE UNKNOWN  orange + dotted in-window terms rewritten, NOT measured — go find out.
+    //                                 Same hue as TAKE because both are in-window events;
+    //                                 the dotted rule is the marker n/c already carries for
+    //                                 "ORCA has not measured this", so the two unmeasured
+    //                                 states read as the same kind of gap without collapsing
+    //                                 into each other — n/c has no log, this one has a log
+    //                                 with an unquantified event in it.
+    //   ↑ PRE-2010    amber           last rupture predates the window — a window artefact,
+    //                                 and explicitly not a clean record
+    //   NO LAW CHANGE amber→green     looked, sourced, nothing changed inside the window
+    //   NO PREMIUM    green           (unreachable today; kept correct for when it isn't)
     var isAction = /^WACC /.test(tokTxt);
+    var tokDotted = false, tokCol2;
+    if (isAction)                                        tokCol2 = /^WACC \+5/.test(tokTxt) ? '#B91C1C' : '#C2410C';
+    else if (/^NO LAW CHANGE|^NO PREMIUM/.test(tokTxt))  tokCol2 = '#15803D';
+    else if (/PRE-2010/.test(tokTxt))                    tokCol2 = '#A16207';
+    else if (/^SIZE UNKNOWN/.test(tokTxt))             { tokCol2 = '#C2410C'; tokDotted = true; }
+    else if (/^TAKE /.test(tokTxt))                      tokCol2 = '#C2410C';
+    else                                                 tokCol2 = tokCol;
     var tokStyle = isAction
-      ? 'display:inline-block;background:' + tokCol + ';color:#fff;font-size:10px;font-weight:800;'
+      ? 'display:inline-block;background:' + tokCol2 + ';color:#fff;font-size:10px;font-weight:800;'
         + 'letter-spacing:.02em;white-space:nowrap;padding:2px 6px;border-radius:3px;'
-      : 'display:block;color:' + tokCol + ';font-size:10px;font-weight:800;'
-        + 'letter-spacing:.02em;white-space:nowrap;';
+      : 'display:' + (tokDotted ? 'inline-block' : 'block') + ';color:' + tokCol2 + ';'
+        + 'font-size:10px;font-weight:800;letter-spacing:.02em;white-space:nowrap;'
+        + (tokDotted ? 'border-bottom:1px dotted currentColor;padding-bottom:1px;' : '');
     return btnOpen + 'title="' + t.replace(/"/g, '&quot;') + '">'
       + '<span style="display:block;text-align:right;line-height:1.25;">'
       +   '<span style="' + tokStyle + '">' + tokTxt + '</span>'
@@ -49701,7 +49741,7 @@ function renderFCResults(results, price) {
   // rows the cold default ranks #2 and #3 — Iraq and Somalia — are graded D, which this
   // platform's own Methodology tab says does not belong in a recommendation document.
   if (showStability) {
-    html += '<th class="num" title="The reform verdict for this jurisdiction \u2014 what to carry into the memo, not a score to rank on. Scored ONLY where a sourced fiscal-reform event log exists; ORCA carries one for ' + stabCoveredN + ' of the 185 jurisdictions in this table. Seven states, and they are not interchangeable. EVERY TOKEN CARRYING A NUMBER NAMES ITS OWN UNIT, because two different units live in this column. WACC +3\u20135pp / WACC +5\u20138pp = Actively Reforming, 3+ fiscal law changes since 2010 \u2014 percentage points to ADD TO THE DISCOUNT RATE. These are the only verdicts that change a model input, and the only ones drawn as a filled pill. TAKE +Npp = percentage points of GOVERNMENT TAKE that were already raised inside the scoring window; TAKE NET +/-Npp = the same, net of take cuts inside the window (Norway: 2022 +12pp undid 2020 -12pp, NET 0pp); the count never reads size, so this is the number to size against \u2014 it is a fact about the fiscal terms and must never be added to a WACC. \u2191 PRE-2010 = the last take rise predates the 2010 window, so a high count is where the window starts, not a clean record. SIZE UNKNOWN = terms were rewritten inside the window and ORCA has not quantified the take effect \u2014 a zero premium here is an absence of measurement. NO LAW CHANGE = every post-2010 event on file is a discovery, first oil or a review that changed no terms. NO PREMIUM = no reform-frequency premium indicated. n/c = NOT SCORED: no reform log on file, which is not a clean record and is not a pass. The small second line is the raw count of fiscal law changes since 2010 \u2014 it is a fact, not the finding. Click any cell for the full event log. Distinct from the Fiscal Predictability Score (Explorer/Country Profile), which is computed from contract terms and exists for all 185.">Reform verdict \u24d8</th>';
+    html += '<th class="num" title="The reform verdict for this jurisdiction \u2014 what to carry into the memo, not a score to rank on. Scored ONLY where a sourced fiscal-reform event log exists; ORCA carries one for ' + stabCoveredN + ' of the 185 jurisdictions in this table. Seven states, and they are not interchangeable. EVERY TOKEN CARRYING A NUMBER NAMES ITS OWN UNIT, because two different units live in this column. WACC +3\u20135pp / WACC +5\u20138pp = Actively Reforming, 3+ fiscal law changes since 2010 \u2014 percentage points to ADD TO THE DISCOUNT RATE. These are the only verdicts that change a model input, and the only ones drawn as a filled pill. TAKE +Npp = percentage points of GOVERNMENT TAKE that were already raised inside the scoring window; TAKE NET +/-Npp = the same, net of take cuts inside the window (Norway: 2022 +12pp undid 2020 -12pp, NET 0pp); the count never reads size, so this is the number to size against \u2014 it is a fact about the fiscal terms and must never be added to a WACC. \u2191 PRE-2010 = the last take rise predates the 2010 window, so a high count is where the window starts, not a clean record. SIZE UNKNOWN = terms were rewritten inside the window and ORCA has not quantified the take effect \u2014 a zero premium here is an absence of measurement. NO LAW CHANGE = every post-2010 event on file is a discovery, first oil or a review that changed no terms. NO PREMIUM = no reform-frequency premium indicated. n/c = NOT SCORED: no reform log on file, which is not a clean record and is not a pass. COLOUR IS THE KEY, read it before the words: a filled pill = changes a model input; solid orange = an in-window take move ORCA MEASURED; orange under a dotted rule = terms rewritten in-window and the size NOT measured (the same dotted marker n/c carries); amber = the last rupture predates the window; green = a sourced log with no fiscal law change in it. The small second line is the raw count of fiscal law changes since 2010 \u2014 it is a fact, not the finding. Click any cell for the full event log. Distinct from the Fiscal Predictability Score (Explorer/Country Profile), which is computed from contract terms and exists for all 185.">Reform verdict \u24d8</th>';
   }
   html += '<th class="num" style="width:60px;"></th>';
   html += '</tr></thead><tbody>';
