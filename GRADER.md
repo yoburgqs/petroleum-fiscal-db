@@ -46296,3 +46296,34 @@ changed behaviour at 60 call sites; the v612 mobile layer, its `min-width: max-c
 two-zone untouched; Screener presets stay a dropdown; Advanced Filters still collapsed; tab order
 unchanged. Version v807 → v808 at the three display sites only, silently, after the real change
 shipped.
+
+### Cycle 715 addendum — the four "local FAILs" from cycle 714 did not reproduce, and the change moves the number by zero
+
+Run twice this cycle, same machine, same suite, same `python3 -m http.server`, two ports, differing
+only in `index.html`:
+
+| tree | port | result |
+|---|---|---|
+| unmodified v807 (`git stash`-equivalent copy of the pre-change file) | 8898 | **299 PASS / 0 FAIL / 1 WARN** |
+| shipped v808 (this cycle's change) | 8899 | **299 PASS / 0 FAIL / 1 WARN** |
+
+Two things follow, and only two — the rest is not established and is not claimed:
+
+1. **This cycle's change moves the suite by exactly zero.** Same totals, same single WARN, on trees
+   that differ only by `_icRefuse` and its 60 call sites.
+2. **Cycle 714's `289 PASS / 4 FAIL / 1 WARN` does not reproduce here.** The three
+   `[SB-PROVENANCE]` checks and the `[CountryProfile]` USA evidence-chain check all PASS on the
+   *unmodified* tree. Cycle 713 said they were gone, cycle 714 corrected 713 and said they
+   reproduce, and this run agrees with 713.
+
+**What is NOT established:** why. I did not isolate whether 714's reading came from a different tree
+state (it ran v806, this ran v807), a different server or base path, or genuine timing flakiness in
+those four checks. Three cycles have now given two different answers about the same four checks, so
+the useful conclusion is not "fixed" and not "reproduces" — it is that **this suite's result is not
+currently reproducible across cycles, and no cycle has yet controlled the variable that moves it.**
+That is a stronger reason to fix `TEST_URL` at `autonomous_cycle.py:136` than any single failure
+count: until the gate names the tree it measured, none of these numbers can be compared to each other.
+
+The 1 WARN and the 1 "JS error" are the same item on both runs: `index.html:49` registers
+`/petroleum-fiscal-db/sw.js` by absolute path, which resolves only under the GitHub Pages base.
+It is an artifact of local static serving and is not present on the deployed site.
