@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v805</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v806</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2409,7 +2409,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v805</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v806</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2479,7 +2479,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v805</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v806</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27290,6 +27290,39 @@ function _updateCompareHash() {
   }
 }
 
+// ── v806 (T2) ────────────────────────────────────────────────────────────────
+// The Country Profile's "Load All Peers in Compare" button fired SIX raw addCompare()
+// calls into a five-slot comparison and switched tab in the same click. Side-by-Side
+// holds CMP_MAX = 5; the peer table renders the country plus five peers. So the sixth
+// add always refused, and its refusal toast was raised on the tab the click was in the
+// act of leaving. The analyst landed on "5/5 countries (full)" — which reads like a
+// completed load — one peer short of the table they clicked from, with nothing on
+// screen naming the peer that had been dropped.
+//
+// It was worse when the comparison was not empty. With three countries already loaded
+// the button delivered the country plus ONE peer and discarded four, so "all peers"
+// produced a set that was neither the analyst's nor the peer table's.
+//
+// Same shape as the bug fcOpenSbs() was rewritten to fix, same remedy: build the set
+// that actually fits, replace rather than append, hold the hash for one history entry,
+// and say what was removed once the destination tab is up.
+function cpLoadPeersSbs(country, peerNames) {
+  var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var want = [country].concat(peerNames || []).slice(0, cap);
+  var hadExample = _sbsExampleUntouched;
+  var removed = (compareList || []).filter(function(c) { return want.indexOf(c) < 0; });
+  _cmpHashHold = true;
+  try { clearCompare(); want.forEach(function(c) { addCompare(c); }); }
+  finally { _cmpHashHold = false; }
+  switchTab('t2', document.getElementById('tab-btn-t2'));
+  _updateCompareHash();
+  // An untouched seeded example is not the analyst's work, so its removal is not news.
+  if (!hadExample && removed.length && typeof showCopyToast === 'function') {
+    showCopyToast('Loaded ' + country + ' and its ' + (want.length - 1)
+      + ' closest peers. Removed from the comparison: ' + removed.join(', ') + '.');
+  }
+}
+
 // v509: single source for the Side-by-Side quickstart presets, so they survive a re-render.
 function _sbsQuickstartHTML() {
   return '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">\n      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC: Guyana ~52%, Angola ~55%, Brazil ~65%, Nigeria ~58% — four PSC regimes spanning a 30pp take range. Standard IOC Atlantic capital allocation benchmark.">Atlantic Frontier Quartet</button>\n      <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>\n      <button class="cmp-quickstart-btn" data-countries="USA|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>\n      <button class="cmp-quickstart-btn" data-countries="Angola|Nigeria|Ghana" style="background:transparent;border:1px solid rgba(29,78,216,.35);border-radius:6px;color:#1d4ed8;font-size:11px;padding:5px 12px;cursor:pointer;" title="West Africa Trio PSC: Angola (EPSA IV ~68%), Nigeria (PSC/PIA2021 ~58%), Ghana (Jubilee Concession ~55%) — three core West Africa PSC/Concession regimes spanning a 13pp take range. Standard IOC West Africa capital allocation benchmark.">&#9632; West Africa Trio</button>\n    </div>';
@@ -39753,8 +39786,10 @@ function loadCountryProfile(country) {
       }
       return out + '</td>';
     }
-    function _bpr(r, isSelf) {
-      var bg = isSelf ? "background:rgba(176,104,0,.12);" : "";
+    function _bpr(r, isSelf, outside) {
+      // v806 (T2): a peer the button cannot fit is dimmed, so the table cannot look like
+      // it describes a set the button does not load.
+      var bg = isSelf ? "background:rgba(176,104,0,.12);" : (outside ? "opacity:.55;" : "");
       var fw = isSelf ? "font-weight:800;" : "font-weight:600;";
       var rb = cpPeerBasis(r, '75');
       if (rb.diverges) _anyFee = true;
@@ -39800,12 +39835,20 @@ function loadCountryProfile(country) {
       tr += '</tr>';
       return tr;
     }
-    var selfRow = _bpr(d, true);
-    var peerRows = peers.map(function(p) { return _bpr(p, false); }).join("");
-    var laParts = ["addCompare(decodeURIComponent('" + encodeURIComponent(d.country) + "'))"];
-    peers.forEach(function(p) { laParts.push("addCompare(decodeURIComponent('" + encodeURIComponent(p.country) + "'))"); });
-    laParts.push("var cmpBtn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Side-by-Side');});if(cmpBtn)switchTab('t2',cmpBtn);");
-    var laClick = '(function(){' + laParts.join(';') + '})()';
+    // v806 (T2): Side-by-Side holds CMP_MAX countries and this table renders the country
+    // plus five peers, so "load all peers" never fit. Cap the set here, once, and let the
+    // button label and the excluded rows both be computed from that same cap.
+    var _laCap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+    var _laPeers = peers.slice(0, Math.max(0, _laCap - 1));   // the country itself takes a slot
+    var _laIn = {};
+    _laPeers.forEach(function(p) { _laIn[p.country] = 1; });
+    var _laOut = peers.filter(function(p) { return !_laIn[p.country]; })
+                      .map(function(p) { return p.country; });
+    var selfRow = _bpr(d, true, false);
+    var peerRows = peers.map(function(p) { return _bpr(p, false, !_laIn[p.country]); }).join("");
+    var laClick = "cpLoadPeersSbs(decodeURIComponent('" + encodeURIComponent(d.country) + "'),["
+      + _laPeers.map(function(p) { return "decodeURIComponent('" + encodeURIComponent(p.country) + "')"; }).join(",")
+      + "])";
 
     _peerSection = '<div class="dd-section" id="dd-peers-' + ddSlugPeer + '">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">Peer Comparison \u2014 Similar Fiscal Terms</div>'
@@ -39843,8 +39886,16 @@ function loadCountryProfile(country) {
       + '</tr></thead>'
       + '<tbody>' + selfRow + peerRows + '</tbody>'
       + '</table></div>'
-      + '<div style="margin-top:10px;text-align:right;">'
-      + '<button class="btn btn-sm btn-outline" onclick="' + laClick.replace(/"/g, '&quot;') + '">Load All Peers in Compare \u2192</button>'
+      + '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;">'
+      + (_laOut.length
+          ? '<span style="font-size:10.5px;color:var(--muted);line-height:1.45;text-align:right;flex:1 1 220px;">'
+            + 'Side-by-Side holds ' + _laCap + '. ' + _laOut.join(' and ')
+            + (_laOut.length > 1 ? ' are' : ' is') + ' outside that \u2014 load '
+            + (_laOut.length > 1 ? 'them' : 'it') + ' with the + on '
+            + (_laOut.length > 1 ? 'those rows' : 'that row') + '.</span>'
+          : '')
+      + '<button class="btn btn-sm btn-outline" onclick="' + laClick.replace(/"/g, '&quot;') + '">'
+      + '\u21cc Compare these ' + (_laPeers.length + 1) + ' in Side-by-Side \u2192</button>'
       + '</div></div>';
   })();
 
