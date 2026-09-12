@@ -46345,3 +46345,126 @@ It is an artifact of local static serving and is not present on the deployed sit
 Two conclusions, and only two:
 
 1. **My change moves the suite by exactly zero** — identical totals on trees differing only by `_icRefuse`
+
+---
+## Cycle 716 Log — 2026-09-12 05:06 — v810
+
+**Task: T3** — "How do these three countries compare side by side?" (previous cycle was T5; not repeated.)
+
+Walked cold at 1440 and again at 390 x 844 with `hasTouch: true`: no sessionStorage, no
+localStorage, Side-by-Side tab, Clear the shipped North Sea example, type Norway / Brazil /
+Guyana into `#cmp-search`, read the answer.
+
+**What the walk found was NOT the friction (checked, all working).** Recording these because
+three of them are on the previous cycle's noted-not-fixed list and are now closed:
+
+| checked | result |
+|---|---|
+| `#cmp-search` aliases — UK, holland, ksa, png, usa, ivory coast, nigera | all resolve |
+| Screener dock → Side-by-Side | button exists (`sc-dock-sbs` / `scOpenSbs()`), works |
+| Screener → SbS hash | writes `#/compare/canada+usa+azerbaijan`, not `#/explorer` |
+| Share-link round trip | `#/compare/united_kingdom+papua_new_guinea+trinidad_and_tobago` restores cold, 3/3 |
+| 5-country cap refusal | toast fires, names the country not added |
+| 390 x 844 | grid at 87px/col, zero h-scroll, zero controls under 24px |
+
+**Friction.** `index.html:29300` (take chart) against `:29427` (NPV chart). Two charts, one
+country set, 360px apart on one screen, both keying the SAME visual channel to OPPOSITE
+meanings:
+
+```
+take chart:  borderDash = d.has_r_factor_tiers ? [] : [5,3]     -> dashed = NO R-factor
+NPV  chart:  borderDash = _npvStatSet[country] ? [4,3] : []     -> dashed = statutory basis
+```
+
+Only the NPV chart declares its meaning, in its own subtitle: *"faded dashed bar = statutory
+basis, no verified production — a taller bar there reports the basis, not a better project."*
+The take chart's subtitle keys the hollow marker and says **nothing about dashing at all**. So
+the analyst learns "dashed = proxy column" from the chart that explains itself, scrolls up, and
+applies it to the chart that does not.
+
+On Norway + Brazil + Guyana that produced an **exact inversion**:
+
+| | take chart, before | NPV chart | truth |
+|---|---|---|---|
+| Norway | **dashed** | solid | PROD-WTD, 7,643 contracts, 18.2% production coverage — the grid's own notice calls it *"the strongest column here"* |
+| Brazil | solid | solid | PART-PROD |
+| Guyana | **solid** | faded **dashed** | PROXY, 0% production, `not ranked · statutory terms` on all four Govt Take rows |
+
+The most production-verified column on the screen was the one drawn dashed; the proxy column
+was drawn solid. Both charts export to PNG with their legend, so the contradiction travels into
+the memo.
+
+**Why no cycle caught it.** v684 built the take chart's basis encoding and v691 built the NPV
+chart's; each reads correctly *in isolation*. v691's own comment records that borderDash
+*"means R-factor on the take chart but is unused here"* — the author saw the other chart's use
+of the channel, noted it, and did not check what the reader would do with two charts on one
+screen. Nothing in the cycle was walking the **pair**.
+
+**Change.** The take chart's `borderDash` now keys off `_cmpStatSet` — the same predicate
+`_npvStatSet` is built from — so the two charts cannot disagree by construction. On screen:
+Norway and Brazil are now **solid in both charts**, Guyana is **dashed in both**.
+
+Nothing is lost. R-factor is still carried three times over on the take chart — `rectRot`
+marker, `borderWidth: 3`, and the `◆` label suffix — and is **declared in the title**
+(`◆ = R-factor PSC`), which dashing never was. The dash was a fourth, undeclared, redundant
+copy of a signal already stated three ways.
+
+Same mixed-basis gate as the hollow marker, so a homogeneous set is unchanged. Verified both
+directions: Norway+UK+Brazil (all verified) and Guyana+Suriname+Namibia (all proxy) each draw
+every line solid with no basis key, exactly as before.
+
+Three keys updated so the picture and its legend agree, because the dash now carries meaning
+where it previously carried none:
+- take-chart title key: `hollow markers = statutory basis` → `dashed line + hollow markers =
+  statutory basis, no verified production — not rankable against the solid filled lines`
+- `#cmp-chart` `aria-label`: names both channels and points at the NPV chart's matching dash
+- the "Mixed basis — the lowest line is not the winner" notice: *drawn with hollow markers* →
+  *drawn as a dashed line with hollow markers … the same dash the Contractor NPV bar carries
+  below*, and *"A hollow line sitting below a filled one"* → *"A dashed hollow line sitting
+  below a solid filled one"*
+
+**Result.** An analyst reading the two Side-by-Side charts together no longer reads the most
+production-verified country in the set as the proxy one. One dash rule now holds across both
+pictures, and the key that travels with the `⬇ Chart PNG` export states it — so the
+contradiction cannot reach an IC memo as a pair of exported images either.
+
+### Verification — the suite RAN this cycle, against this tree
+
+`TEST_URL=http://localhost:8921/index.html` (the modified tree, served locally), suite
+`office/tools/petroleum/tests/runtime_comprehensive.js`, report read back from
+`/tmp/orca_cycle716.txt`:
+
+    TOTAL: 299 PASS, 0 FAIL, 1 WARN
+
+Unchanged from the two baseline runs cycle 715 recorded (299/0/1 on both the unmodified v807
+tree and the shipped v808 tree). The single WARN and the single "JS error" are the same item as
+in 715 — `index.html:49` registers `/petroleum-fiscal-db/sw.js` by absolute path, which resolves
+only under the GitHub Pages base. Artifact of local static serving; not present on the deployed
+site. Cycle 715's open point still stands: `TEST_URL` at `autonomous_cycle.py:136` does not name
+the tree it measured, so these counts remain non-comparable across cycles by construction.
+
+JS syntax gate: **PASS** (all inline `<script>` blocks extracted, `node --check`).
+
+**Step 5b — checked on a phone.** Side-by-Side walked at 390 x 844 with `hasTouch: true`, and
+the full viewport sweep re-run after the change:
+
+| viewport | scrollWidth / clientWidth | controls under 24px | page errors |
+|---|---|---|---|
+| 1920 | 1920 / 1920 | `cmp-clear-btn` 23px (`pointer: fine` only, pre-existing) | 0 |
+| 1440 | 1440 / 1440 | same | 0 |
+| 1280 | 1280 / 1280 | same | 0 |
+| 1024 | 1024 / 1024 | same | 0 |
+| 768 | 768 / 768 | **0** | 0 |
+| 390 | 390 / 390 | **0** | 0 |
+
+Zero horizontal scroll at all six. The one sub-24px control is desktop-mouse only — it clears
+under `pointer: coarse` at 768 and 390, which is the v612 mobile layer's declared scope — and it
+is not a control this cycle added or touched.
+
+**STILL LOCKED respected:** no tooltip-only, FAQ, banner, citation or text-only edit — this
+cycle changed what is *drawn*, and the three text keys were updated only because the drawing
+changed under them. The v612 mobile layer, its `min-width: max-content` marker and
+`#reference-panel` untouched. FC columns and the removed Govt NPV column untouched. CP headline
+two-zone untouched. Screener presets stay a dropdown. Advanced Filters still collapsed. Tab
+order unchanged. Version v809 → v810 at the three display sites only, silently, after the real
+change shipped.
