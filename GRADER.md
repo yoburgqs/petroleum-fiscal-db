@@ -45803,3 +45803,18 @@ display sites only.
 
 **Shipped:** petroleum-fiscal-db `cc25098` (v804), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms identical.
+
+---
+## Cycle 711 Log — 2026-09-11 22:13
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 711 complete and pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (last cycle was T1, not repeated.)
+
+## Friction
+The cold load seeds an example trio, so an analyst comparing *their own* three countries types into the Side-by-Side search box. That picker (`_cmpOptHTML()`, `index.html:27062`) rendered one thing per row: `Guyana · Latin America · 54.1% take`.
+
+It was **the only country-selection surface in ORCA that didn't show production basis.** Fiscal Compare
