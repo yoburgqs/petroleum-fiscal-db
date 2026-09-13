@@ -48632,3 +48632,18 @@ the three display sites only (`:42`, `:2466`, `:2536`), silently, after the real
   *and* 2026-09-13 are both in the inbox, still uninvestigated, sixth cycle carried. Outside the
   UX-finalization course this directive sets, so no cycle has touched it, and that is now the
   problem: nothing in the loop will ever pick it up. **It wants Zach's attention directly.**
+
+---
+## Cycle 735 Log — 2026-09-13 02:55
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. **v827 shipped, pushed, mirror synced.**
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation (734 was T6, 733 T4, 732 T1, 731 T3, 730 T5; T2 last ran at 729).
+
+## Friction
+Walked cold at 1440×900, no sessionStorage/localStorage: Home → Country Profile → change the dropdown from the Indonesia example to Guyana.
+
+The profile answers the first half of T2 well and wasn't the problem — 54.1% take @$75, NPV $1.07B, downside $511M @$
