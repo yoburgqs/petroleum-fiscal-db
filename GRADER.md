@@ -49863,3 +49863,16 @@ not an FAQ, not rubric chasing. v836 written at the three display sites (`:42`,
   2026-09-12 *and* 2026-09-13. **Fifteenth cycle carried, still uninvestigated.**
   Outside the UX-finalization course this directive sets, so no cycle will ever pick
   it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 744 Log — 2026-09-13 15:20
+- Test before: 290 PASS / 1 FAIL
+- Test after: 299 PASS / 0 FAIL
+- JS errors: 1
+- Summary: Cycle 744 complete — v836 shipped and pushed (`94c55c6`), log `ae7775d`, mirror in sync. Only the loop's own `CYCLE_STATE.json` / `cycle_log.txt` remain modified.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (743 was T3.) Picked up the item 743 flagged as wanting a T1 walk.
+
+## Friction
+The Screener preset menu line (`index.html:3346`) and the active-preset badge (`:31525`). Walked cold at 1440×900 and 390×844, storages cleared, over http. The menu line is what an ana
