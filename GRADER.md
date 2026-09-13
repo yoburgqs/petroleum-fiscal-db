@@ -48827,3 +48827,123 @@ Every one of these produced a correct artifact with an honest toast, cold, first
 Walked cold at 1440×900 and 390×844, no sessionStorage/localStorage, through all seventeen clipboard and export artifacts. Fifteen were sound. The two that weren't are the two tabs whose button is named for the job:
 
 - **Fiscal Compare**, nothing ticked — one click on
+
+---
+## Cycle 737 Log — 2026-09-13 10:30
+- Test before: suite's own report 289 PASS / 4 FAIL / 1 WARN (the harness said 300/0 — it is wrong)
+- Test after: 289 PASS / 4 FAIL / 1 WARN — unchanged, and identical to unmodified HEAD
+- JS errors: 1 (a 404 on a service-worker script fetch; present at baseline)
+- Summary: **v829 shipped, pushed, mirror synced.**
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation
+(736 was T5, 735 T2, 734 T6, 733 T4, 732 T1; T3 last ran at 731).
+
+## Friction
+Walked cold at 1440×900 and 390×844, sessionStorage and localStorage cleared, through the whole
+tab: the seeded default set, Clear → the four quickstart buttons, type-and-Enter country add, the
+Order columns dropdown at all four values, both charts, all six top controls and all six
+under-grid controls, the share link round-tripped through a fresh cold page.
+
+**Almost all of it is sound** — recorded below so a later cycle does not re-walk it.
+
+The one thing that is not: the verdict strip answers this tab's question on **take** (v756) and on
+**predictability** (v772), and has never carried a **contractor-value** order. Contractor NPV is
+the number an IC recommendation is written on, and the omission inverts the answer on exactly the
+sets the tab spends ~700 words correcting. Guyana / Angola / Iraq, measured on the shipped build:
+
+    Contractor NPV @$75    Guyana $1.07B    Angola $1.14B    Iraq $642M
+                           (not comparable)                  PSC/Conc $3.04B
+
+Angola beats Iraq by ~1.8× in 16px text. On the PSC/Concession basis every row above insists on,
+Iraq is **first** at $3.04B — ~2.7× ahead of Angola. v666 put that figure on screen and it is the
+right figure, but it renders at 10px underneath the number it corrects, with no ordering marker of
+any kind, while the four Govt Take rows two inches above each carry an explicit
+`lowest of 2 · on PSC/Conc`. The take was rescued in rank; the value was rescued only in words.
+(`renderCompare` — `_cmpNpvCell` :27734, strip assembly :28783.)
+
+## Change
+A third line in the strip, above the grid, beside the other two orders:
+**`CONTRACTOR VALUE @$75, LARGEST FIRST`**, computed from the same gates as the take line so the
+two cannot disagree. It invents no number — `g1.v75`, `npv_75` and every exclusion were already
+derived; they had never been assembled into an ordering.
+
+- Fee-blended columns are placed on their PSC/Concession contractor NPV and carry an orange
+  `PSC/Conc basis · ORCA publishes $642M` chip — the same pairing v823 established for take.
+- State monopolies, and statutory-terms columns in a mixed set, are set aside with their own
+  stated reason, mirroring `_cmpRankNpv`'s null branches one for one.
+- **A PRRT cash-flow column is set aside from the TAKE order but IS ranked here**, deliberately:
+  an NPV on the shared standardized profile is a cash result and is comparable. Because that makes
+  the two lines legitimately hold different columns, it is stated in the label tooltip.
+- A pill reports whether value agrees with take, over the columns carrying both. On
+  Guyana / Angola / Brazil / Nigeria — 3 of the 4 in this tab's own Atlantic Frontier quickstart —
+  it reads **⚠ disagrees with take order**: take ranks Angola › Brazil › Nigeria, value ranks
+  Brazil › Angola › Nigeria. The tab has never said so anywhere.
+- $75 only, and it says so where a column is re-based. ORCA holds the Group-1 contractor-side
+  split at the base case alone; ranking $50/$100/$125 would fall back on the blended figure, which
+  is the inversion this exists to stop.
+
+Exercised against the live build on 13 sets: the fee-blend case, the seeded default, USA vs Iraq,
+the Atlantic Frontier quartet, a state-monopoly set, an all-monopoly set, a PRRT set, a
+both-statutory set, a five-country set and three singletons. Every branch renders; none throws.
+
+## Result
+An analyst reading the strip now gets the contractor-value ordering on the same comparable basis
+as the take ordering, with the published blended figure named beside it, and is told when the two
+orders disagree. Previously the only value figures on the tab were the grid's blended ones, which
+on a fee-blended set state the reverse of the platform's own answer. The line rides the
+`.cmp-notice` scrape into **Copy for IC Memo**, so the pasted artifact carries it too — 6,073 →
+8,200 characters on Guyana / Angola / Iraq.
+
+## Verification
+- JS syntax gate: **PASS** (11 inline blocks).
+- Playwright suite **actually ran this cycle** against the local build: **289 PASS / 4 FAIL / 1 WARN**.
+  The same suite run against **unmodified HEAD**, served from a shadow directory, returns
+  **289 / 4 / 1 with the identical four failures** — 3× `SB-PROVENANCE` (Brazil default-basis
+  warning, Brazil IC line, sweep defaults) and 1× `CountryProfile` (USA evidence chain absence
+  marker). All pre-existing, none in Side-by-Side. **This change is suite-neutral.**
+- Mobile: `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390 across four sets.
+  The one hover target added is `min-height:24px` under `pointer: coarse`.
+
+## STILL LOCKED — respected
+No new tooltip on an existing control, no new FAQ, no banner / page-sub / "How to read" block /
+routing hint, no citation micro-edit, no rubric chasing. **Not a text-only change** — a new
+computed ordering that did not exist, rendering 1–3 new rows in the strip and adding ~2,100
+characters to the IC-memo artifact. The v612 mobile layer, `#reference-panel` and the
+`min-width: max-content` markers are untouched. v371/v373 declutter intact; the line is inside the
+existing `#cmp-verdict` block, not a new banner. v430, v449/v451/v452, v489 untouched. Tab order
+unchanged. v756's take line and v772's predictability line are unmodified — this sits between
+them. v829 at the three display sites only (`:42`, `:2484`, `:2554`), silently, after the real
+change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **Cold load seeds Norway / United Kingdom / Netherlands.** Deliberate; the empty state and its
+  four quickstart buttons are reachable via **Clear**, and each quickstart's sub-line already
+  states its own comparability cost ("1 of 3 set aside").
+- **Add flow** — type-and-Enter adds correctly; the dropdown shows region, basis and take before
+  you commit. Badge counts up and states the remaining room.
+- **Order columns** — all four values reorder grid, charts and share link correctly, and `take_asc`
+  correctly places Iraq FIRST on its comparable 34.1%, not its published 84.8%.
+- **Share link** — encodes the *current column order*, not just the set, and restores tab, chips,
+  order and grid on a cold page with no storage. Round-tripped clean.
+- **The four under-grid buttons** carry no inline `onclick` but are delegated and all four fire:
+  Copy Table (6,073 chars), Save as PDF (calls `print()`), Chart PNGs (two downloads, correctly
+  named apart), Share Link (75-char URL).
+
+## Carried forward
+- **The runtime gate reports 300 PASS / 0 FAIL when the suite returns 289 PASS / 4 FAIL.**
+  **Confirmed independently this cycle**, and now confirmed at baseline too — the four failures
+  are real and are being hidden from every cycle summary and every nightly email. Check
+  `autonomous_cycle.py`'s report read. **This is the most important item on this list**: the loop
+  cannot see its own regressions. (Carried from 736.)
+- **The 4 real suite failures.** 3× `SB-PROVENANCE` are the Scenario Builder provenance tests —
+  the same area as the `_sbOrigin.basis` vs `getDCFParams()._basis` disagreement carried from 736.
+  They are not a UX walk finding; they are a failing test with a named cause. Good next T6.
+- **FC Reform verdict column** still has no `data-sort-key` and no `onclick` — reform exposure
+  still cannot be ranked, only swing. (Carried from 733.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. Eighth cycle carried, still uninvestigated. Outside the UX-finalization course
+  this directive sets, so no cycle will ever pick it up. **It wants Zach's attention directly.**
