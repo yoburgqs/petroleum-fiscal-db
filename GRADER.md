@@ -49236,3 +49236,18 @@ v430, v449/v451/v452, v489 untouched. Tab order unchanged. v831 at the three dis
   *and* 2026-09-13, and the 2026-09-13 one arrived after cycle 738 carried it. **Tenth cycle
   carried, still uninvestigated.** It is outside the UX-finalization course this directive sets,
   so no cycle will ever pick it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 739 Log — 2026-09-13 07:53
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 739 complete — v831 shipped and pushed, mirror synced.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation; 738 was T1, T4 last ran at 733)
+
+## Friction
+Walked cold at 1440×900 and 390×844 with both storages cleared — the Reform Risk tab's lookup, ranked table, heatmap and regional tilt panel, then Fiscal Compare's verdict column, filters and all five sort buttons.
+
+The Reform Risk lookup answers a *single* country well. The worst moment is the cr
