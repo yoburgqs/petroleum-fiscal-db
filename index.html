@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v837</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v838</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v837</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v838</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v837</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v838</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -4357,40 +4357,40 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">What data is available for each country — and what is not. Understanding coverage is essential before using ORCA data in IC submissions.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:12px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div id="meth-cov-take-n" style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Government Take</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">All 185 countries have computed take at $30–$125/bbl across 13 price points (100% coverage). 47.6% of the 330,329 facts were read out of the primary legal instrument (tier A); a further 45.2% is tier B, largely the country-level bulk harvest. Sourcing coverage is not the same as the per-country grade — see the evidence tile above.</div>
-        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+        <div id="meth-cov-take-bar" style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div id="meth-cov-npv-n" style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">NPV</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Contractor NPV computed for all 185 countries at all price points using the standardized DCF model ($1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC).</div>
-        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+        <div id="meth-cov-npv-bar" style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">165/185</div>
+        <div id="meth-cov-irr-n" style="font-size:24px;font-weight:800;color:var(--accent);">165/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">IRR (In DB)</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">165 countries have bounded IRR in the database (≤500%). 20 non-computable (very low-take or high-royalty regimes produce unbounded IRR at $75/bbl). Shown in UI: 124 (41 excluded as ≥500% in display).</div>
-        <div style="margin-top:6px;height:4px;background:var(--yellow);border-radius:2px;"></div>
+        <div id="meth-cov-irr-bar" style="margin-top:6px;height:4px;background:var(--yellow);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">65/185</div>
+        <div id="meth-cov-be-n" style="font-size:24px;font-weight:800;color:var(--accent);">65/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Breakeven Price</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">68 countries have A/B-tier royalty AND cost data required to compute breakeven. Remaining 117 are excluded to prevent spurious precision from C-tier cost assumptions.</div>
-        <div style="margin-top:6px;height:4px;background:var(--orange);border-radius:2px;"></div>
+        <div id="meth-cov-be-bar" style="margin-top:6px;height:4px;background:var(--orange);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div id="meth-cov-swing-n" style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Price Swing</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Take spread between $50 and $125/bbl computed for all 185 countries. Key metric for distinguishing royalty-dominant (low swing) from profit-based (high swing) regimes.</div>
-        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+        <div id="meth-cov-swing-bar" style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div id="meth-cov-stab-n" style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Stability Score</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Fiscal stability index (0–5) based on Reform Risk tab legislative change history. 0 = 5+ changes since 2010; 5 = zero changes. Available for all 185 countries.</div>
-        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+        <div id="meth-cov-stab-note" style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Fiscal stability index (0–5) from the sourced legislative-change log. <strong style="color:var(--orange);">Coverage is partial.</strong> Loading…</div>
+        <div id="meth-cov-stab-bar" style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
     </div>
     <div style="padding:8px 12px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">
@@ -43490,6 +43490,94 @@ window._rrOpenLocal = _rrOpenLocal;
 // Risk tab with that country already selected. The lookup <select> is filled by
 // _rrPopulateLookup(), which only runs once REFORM_HISTORY has landed, so poll briefly
 // rather than assuming the option exists at click time.
+// ── v838 (T6) — Methodology > "Data Coverage At a Glance" is painted, not typed ──────────────
+// This panel states its own job as "What data is available for each country — and what is not",
+// and it is where a T6 walk lands from the Coverage Summary jump link. Its six tiles were
+// hardcoded HTML, and two of the six had drifted away from the data they describe:
+//
+//   * STABILITY SCORE read "185/185 ... Available for all 185 countries" over a FULL GREEN bar.
+//     reform_history.json holds a sourced fiscal-law change log for 21 jurisdictions. For the
+//     other 164 there is no reading at all. Every other surface in the platform already says so
+//     -- Fiscal Compare prints "n/c" in its Stability column (v520), the Country Profile headline
+//     prints "n/c -- no sourced reform log, 21 of 185 jurisdictions covered" (v566), and v837
+//     took the same false all-clear out of the FC interpretation guide. This tile was the last
+//     place still granting full coverage, and it is the one panel an analyst opens specifically
+//     to find out what is missing. Absence read as a clean record is the expensive direction of
+//     that error: it carries a reform premium of zero into an IC memo on 164 countries nobody
+//     has researched.
+//   * BREAKEVEN PRICE read "65/185" while its own body text said 68 and "Remaining 117"
+//     (117 + 68 = 185). The data says 68.
+//
+// The other four tiles were correct. They are painted anyway, from the same predicate their own
+// label states, so the panel can no longer drift from the file it describes.
+function _methPaintCoverage() {
+  var rows = (typeof COUNTRY_DATA !== 'undefined' && Array.isArray(COUNTRY_DATA)) ? COUNTRY_DATA : null;
+  if (!rows || !rows.length) return;
+  var total = rows.length;
+  var num = function(v) { return typeof v === 'number' && isFinite(v); };
+  var count = function(fn) { var n = 0; rows.forEach(function(r) { if (fn(r)) n++; }); return n; };
+
+  var cov = {
+    take:  count(function(r) { return num(r.take_75); }),
+    npv:   count(function(r) { return num(r.npv_75); }),
+    irr:   count(function(r) { return num(r.irr_75); }),          // tile label is "IRR (In DB)"
+    be:    count(function(r) { return num(r.be_75) && r.be_75 > 0 && r.be_75 < 900; }),
+    swing: count(function(r) { return num(r.swing); }),
+    stab:  (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY)
+             ? Object.keys(REFORM_HISTORY).filter(function(k) {
+                 return Array.isArray(REFORM_HISTORY[k]) && REFORM_HISTORY[k].length;
+               }).length
+             : 0
+  };
+
+  Object.keys(cov).forEach(function(key) {
+    var n = cov[key];
+    var el = document.getElementById('meth-cov-' + key + '-n');
+    if (el) el.textContent = n + '/' + total;
+    var bar = document.getElementById('meth-cov-' + key + '-bar');
+    if (bar) {
+      var pct = total ? (n / total) : 0;
+      // The bar is the tile's at-a-glance verdict, so it has to track the count it sits under.
+      var col = pct >= 0.99 ? 'var(--green)' : pct >= 0.85 ? 'var(--yellow)'
+              : pct >= 0.30 ? 'var(--orange)' : 'var(--red)';
+      bar.style.background = col;
+      // Fill proportionally rather than running the full width at any coverage level: a 21/185
+      // tile that still paints a full-width bar reads as complete from across the room.
+      bar.style.backgroundImage = 'linear-gradient(to right, ' + col + ' ' + (pct * 100).toFixed(1)
+        + '%, var(--border) ' + (pct * 100).toFixed(1) + '%)';
+    }
+  });
+
+  var note = document.getElementById('meth-cov-stab-note');
+  if (note) {
+    var missing = total - cov.stab;
+    note.innerHTML =
+      'Fiscal stability index (0–5) from the sourced legislative-change log. 0 = 5+ fiscal law '
+      + 'changes since 2010; 5 = zero. <strong style="color:var(--orange);">Scored for ' + cov.stab
+      + ' of ' + total + ' jurisdictions only.</strong> The other ' + missing
+      + ' have no sourced reform log, so they carry <strong>no reading</strong> — not five '
+      + 'diamonds, not a zero-reform premium. Fiscal Compare and the Country Profile both print '
+      + '<em>n/c</em> for them. Use an external check (national petroleum law, IMF Article IV, '
+      + 'operator annual reports) before taking reform exposure to an IC. '
+      + '<span class="meth-cov-rr-link" role="button" tabindex="0" '
+      + 'style="color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap;'
+      + 'display:inline-block;min-height:24px;line-height:24px;">Open Reform Risk →</span>';
+    var link = note.querySelector('.meth-cov-rr-link');
+    if (link) {
+      var go = function(e) {
+        if (e) e.preventDefault();
+        var btn = document.getElementById('tab-btn-treformrisk');
+        try { switchTab('treformrisk', btn); } catch (err) {}
+      };
+      link.addEventListener('click', go);
+      link.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') go(e);
+      });
+    }
+  }
+}
+window._methPaintCoverage = _methPaintCoverage;
+
 function openReformRiskFor(country) {
   var btn = document.getElementById('tab-btn-treformrisk');
   // v790 (T4): remember the tab and row the analyst drilled from. See _rrBackToOrigin().
@@ -56575,6 +56663,8 @@ async function loadPlatformData() {
     // v817: same treatment for the Side-by-Side benchmark presets — the copy in the page's
     // initial markup is the one a cold load shows after Clear before any re-render.
     try { _sbsPaintQuickstart(); } catch(e) { /* non-critical */ }
+    // v838 (T6): the Methodology coverage tiles are painted from the data that just landed.
+    try { _methPaintCoverage(); } catch(e) { /* non-critical */ }
     // v465: Populate live hurdle stat on Home tab after data loads
     // v524 (cycle 423, T1): this line used to read "N of 185 countries clear the IOC hurdle
     // rate (IRR >=15%)" off `irr_75`, which is AVG(per-contract IRR) -- the metric v515, v516,
