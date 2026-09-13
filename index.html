@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v826</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v827</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1060,6 +1060,39 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 #scenario-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.6); align-items: flex-start; justify-content: center; padding-top: 60px; }
 #scenario-modal.open { display: flex; }
 #scenario-modal-inner { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 95%; max-width: 900px; max-height: 85vh; overflow-y: auto; overscroll-behavior: contain; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+
+/* v827 (T2) — the Scenario Builder's only exit scrolled out of its own dialog.
+   ddOpenScenarioBuilder() auto-runs the DCF and scrollIntoView()s the results, which puts
+   #scenario-modal-inner at scrollTop 230 on desktop and 1435 on a 390px phone. The header row
+   carrying the title and the close button lives inside that scroll container, so on the Country
+   Profile route -- the profile's ONLY route to a project IRR -- the analyst lands in a dialog with
+   no visible name and no visible way out. Esc and a backdrop tap both work and neither is on screen;
+   on a phone there is no Esc key and the backdrop is a 10px strip. Pin the header instead of
+   removing the auto-scroll: the auto-scroll is what puts the answer in front of them. */
+#scenario-modal-header {
+  /* offset by the inner's own padding: a sticky top: 0 resolves against the scroll
+     container's CONTENT box, which leaves a 24px gutter for content to scroll through */
+  position: sticky; top: -24px; z-index: 30;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin: -24px -24px 14px; padding: 20px 24px 10px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+/* the inputs panel's own sticky Run DCF bar has to clear it, or it docks underneath */
+#sb-run-dcf-sticky { position: sticky; top: calc(var(--sb-hdr-h, 0px) - 24px); z-index: 10; }
+@media (max-width: 768px) { #sb-run-dcf-sticky { top: calc(var(--sb-hdr-h, 0px) - 16px); } }
+#scenario-modal-close-btn {
+  flex: 0 0 auto; min-width: 32px; min-height: 32px; line-height: 1;
+  border: 1px solid var(--border) !important; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+#scenario-modal-close-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+@media (pointer: coarse) {
+  #scenario-modal-close-btn { min-width: 44px; min-height: 44px; }
+}
+@media (max-width: 768px) {
+  #scenario-modal-header { top: -16px; margin: -16px -16px 12px; padding: 14px 16px 10px; }
+  #scenario-modal-header h2 { font-size: 15px; }
+}
 
 /* v38 responsive additions */
 @media (max-width: 768px) {
@@ -2430,7 +2463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v826</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v827</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2500,7 +2533,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v826</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v827</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -22825,9 +22858,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 <!-- ===== SCENARIO BUILDER MODAL ===== -->
 <div id="scenario-modal" role="dialog" aria-modal="true" aria-labelledby="scenario-modal-title">
   <div id="scenario-modal-inner">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div id="scenario-modal-header">
       <h2 id="scenario-modal-title" style="font-size:18px;font-weight:800;margin:0">Custom Scenario Builder</h2>
-      <button id="scenario-modal-close-btn" aria-label="Close Scenario Builder" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button>
+      <button id="scenario-modal-close-btn" aria-label="Close Scenario Builder" title="Close Scenario Builder (Esc)" style="background:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button>
     </div>
     <div class="page-sub">Build a project-specific fiscal regime and run a live DCF. Set fiscal parameters (royalty, CIT, profit oil split, cost recovery cap, R-factor tiers) and production parameters (capex, opex, peak rate, project life) — then hit <strong>Run DCF</strong> to compute contractor government take, NPV, IRR, and Price Swing at 4 price points. Output includes a <strong>vs. 185-Country Benchmark</strong> showing where your custom scenario ranks against the global database. Use this for bid calibration, IC memo sensitivity analysis, and checking how project-specific terms diverge from ORCA's statutory take for a given country. Pre-built presets load common IOC country archetypes (Norway, Angola, Iraq, Australia, UK, Saudi Arabia, Iran, Guyana, Indonesia, Malaysia, Kazakhstan) in one click.</div>
     <!-- v363: Pre-fill context banner — shown when Scenario Builder is opened from Country Profile via ddOpenScenarioBuilder() -->
@@ -22839,7 +22872,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div class="scenario-builder-grid">
       <div class="scenario-inputs-panel">
-        <div style="margin-bottom:14px;position:sticky;top:0;background:var(--surface2);padding:4px 0 8px;">
+        <div id="sb-run-dcf-sticky" style="margin-bottom:14px;background:var(--surface2);padding:4px 0 8px;">
           <button class="btn" id="sb-run-dcf-top-btn" data-action="runCustomScenario" onclick="runCustomScenario()" aria-label="Run DCF calculation" style="width:100%;font-size:14px;padding:10px;letter-spacing:.03em;">&#9654; Run DCF</button>
         </div>
 
@@ -54588,9 +54621,25 @@ function toggleReferencePanel() {
   document.getElementById('reference-overlay').classList.toggle('open');
 }
 
+// v827 (T2): the sticky header's height, published so the inputs panel's own sticky Run DCF bar
+// docks below it instead of behind it. Measured after .open, because it has no box until then.
+function _sbPinHeader() {
+  var h = document.getElementById('scenario-modal-header');
+  var inner = document.getElementById('scenario-modal-inner');
+  if (!h || !inner) return;
+  var px = Math.round(h.getBoundingClientRect().height);
+  if (px > 0) inner.style.setProperty('--sb-hdr-h', px + 'px');
+}
+window.addEventListener('resize', function () {
+  var m = document.getElementById('scenario-modal');
+  if (m && m.classList.contains('open')) _sbPinHeader();
+});
+
 function openScenarioBuilder() {
   var modal = document.getElementById('scenario-modal');
   modal.classList.add('open');
+  modal.querySelector('#scenario-modal-inner').scrollTop = 0;  // v827 (T2): never inherit the last visit's scroll
+  _sbPinHeader();
   if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): the running basis is stated before the analyst reads any result
   // v363: hide pre-fill banner when opening fresh from header (not from Country Profile)
   var banner = document.getElementById('sb-prefill-banner');
