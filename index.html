@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v821</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v822</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -284,6 +284,13 @@ table { width: 100%; border-collapse: collapse; }
 /* v758 (T5): the Country Profile "→ carry ≤N" ceiling beside the predictability badge carries its
    explanation in a title, so under a thumb it takes the 24px floor, as v745 ruled for .ioc-mech-more. */
 @media (pointer: coarse) { .cp-fp-carry { min-height: 24px; line-height: 24px !important; } }
+/* v822 (T5): the "country-wide N%" line under an IOC take cell carries its reconciliation in a
+   title, so under a thumb — where there is no hover — it is a control and takes the directive's
+   24px floor, as v730/v745/v758 ruled for .sc-terms-chip, .ioc-mech-more and .cp-fp-carry. Both
+   IOC tables use the class: the operator table at the top (added v820) and the exposure annex the
+   two IC-export buttons sit above (added v822). On a mouse it stays on the 13px line so neither
+   table grows. */
+@media (pointer: coarse) { .ioc-ctry-wide { min-height: 24px; line-height: 24px !important; } }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -2417,7 +2424,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v821</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v822</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2487,7 +2494,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v821</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v822</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34262,8 +34269,8 @@ function _iocTakeCell(r) {
     + 'the block terms this operator actually holds, against a national average that includes '
     + 'every other operator\u2019s. Cite whichever answers your question, and say which one it is.';
   return '<td class="num">' + lead
-    + '<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;'
-    + 'white-space:nowrap;cursor:help;" title="' + _iocEvEsc(tip) + '">country-wide '
+    + '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;'
+    + 'margin-top:2px;white-space:nowrap;cursor:help;" title="' + _iocEvEsc(tip) + '">country-wide '
     + ct.toFixed(1) + '%</div></td>';
 }
 
@@ -41481,7 +41488,7 @@ function renderIOCExposure(operatorName) {
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mechanic</th>
-        <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>
+        <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Government take at $75/bbl on THIS OPERATOR&#39;S OWN CONTRACTS in that country, not the country-wide figure. The Evidence column beside it IS country-level and says so in its own header; this one is not. Where the two differ at one decimal place the country-wide figure is printed underneath, because that is what the Country Profile this row opens, Fiscal Compare, the Explorer, the Screener and the JSON API all print &mdash; and it is what the two export buttons above this table now carry in their own column beside this one.">Take @$75<span style="display:block;font-size:9px;font-weight:400;text-transform:none;letter-spacing:.02em;">this operator&rsquo;s contracts</span></th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Evidence grade for the COUNTRY whose fiscal terms produced the take and NPV on this row — not a grade of this operator&#39;s own contracts. The letter is the worse of two legs: primary-law share (A &ge; 60% / B &ge; 40% / C &ge; 20%) and fact depth (A &ge; 150 / B &ge; 50 / C &ge; 15 facts), so 100% primary law on 4 facts grades D. Same grade as the Evidence column in the operator table above, the Explorer and Screener Evidence columns, the Fiscal Compare Quality column and the Country Profile badge. It is carried into the XLSX and the IC clipboard by the two buttons above this table.">Evidence</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">NPV @$75</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Contracts</th>
@@ -41499,7 +41506,7 @@ function renderIOCExposure(operatorName) {
           <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${_iocMechModelledSafe(d.mechanic) ? '' : `<div style="font-size:10px;line-height:1.4;color:#C2410C;font-weight:600;" title="${(('"'+d.mechanic+'" is the instrument type on the contract record, not one of the eight fiscal mechanics ORCA models, so no model of that name produced the take or NPV on this row. ') + (_iocResolvedModelSafe(d.country) ? ('They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country) + ' model.') : ('ORCA cannot resolve which model ' + d.country + ' was run on.'))).replace(/"/g,'&quot;')}">not a fiscal mechanic${_iocResolvedModelSafe(d.country) ? ` \u00b7 <span style="color:var(--muted);font-weight:400;">on ${_iocResolvedModelSafe(d.country)}</span>` : ''}</div>`}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%${_iocExpCtryWide(d, isCtry, operatorName)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);">${d.n||'\u2014'}</td>
@@ -41551,12 +41558,58 @@ function _iocNpvFmt(v) {
   return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US') + 'M';
 }
 
+// ── v822 (T5) — the country-wide take under the annex take cell ──────────────────
+// v820 added this sub-line to the operator table at the TOP of the IOC tab. This annex, 2,000px
+// lower, is the table the two IC-export buttons sit directly above and the one they build from —
+// and it still printed the operator figure alone. Now that the clipboard and the XLSX carry both
+// figures in adjacent columns, the screen they were copied from has to show the same thing, or
+// the analyst pastes a table with a column they never saw. Same rule as the v820 cell: the
+// sub-line appears ONLY where the two disagree at one decimal place, so its presence is itself
+// the signal that this row will not reconcile with the page the country name opens.
+function _iocExpCtryWide(d, isCtry, operatorName) {
+  if (isCtry || d.take75 == null) return '';   // a fallback row IS the country figure already
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(c){ return c.country === d.country; }) : null;
+  if (!cd || cd.take_75 == null) return '';
+  var op = Number(d.take75), ct = Number(cd.take_75), gap = op - ct;
+  if (Math.abs(gap) < 0.05) return '';
+  var tip = d.country + ': this row is the take across ' + operatorName + "'s own contracts, "
+    + op.toFixed(1) + '% at $75/bbl. Across ALL operators in ' + d.country + ' it is '
+    + ct.toFixed(1) + '% — ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 'pp. Clicking the country '
+    + 'name opens the Country Profile, which prints ' + ct.toFixed(1) + '%; so do Fiscal Compare, '
+    + 'the Explorer, the Screener and the JSON API. Neither figure is wrong — a gap of this kind '
+    + 'is normally the licence vintage and the block terms this operator actually holds, against a '
+    + 'national average that includes every other operator’s. Both numbers are in the clipboard '
+    + 'and the XLSX from the buttons above, with the difference in a "Take gap (pp)" column.';
+  return '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;'
+       + 'margin-top:2px;white-space:nowrap;cursor:help;" title="' + tip.replace(/"/g, '&quot;') + '">country-wide '
+       + ct.toFixed(1) + '%</div>';
+}
+
 function _iocExpRows() {
   var st = window._iocExp;
   if (!st || !st.rows || !st.rows.length) return [];
   return st.rows.map(function(d) {
     var cd = (COUNTRY_DATA || []).find(function(c){ return c.country === d.country; });
     var fb = (typeof cpFeeBasis === 'function' && cd) ? cpFeeBasis(cd) : null;
+    // ── v822 (T5) — THE COUNTRY-WIDE TAKE, CARRIED INTO THE ARTIFACT ───────────────
+    // v820 established the finding and fixed the SCREEN: IOC_DATA.take_75 is the take on this
+    // operator's own contracts, 1,512 of the 1,772 IOC rows differ from the country figure the
+    // same row links to, and 346 differ by more than 10pp. The rendered cell now prints
+    // "country-wide 32.2%" under the operator's 25.2%.
+    //
+    // It stopped at the cell. _iocExpRows() is the choke point for BOTH things that leave the
+    // browser — "Copy for IC Memo" and the XLSX — and it still emitted one column, headed
+    // "Govt Take @$75 (%)" with no qualifier on the header face. So the artifact an analyst
+    // pastes into an IC memo said Shell / Mexico 25.2%, while the Country Profile that row
+    // links to, Fiscal Compare, the Explorer, the Screener and the JSON API all say 32.2%.
+    // 7.0pp apart, same label, nothing in the pasted table reconciling them — and the screen
+    // that DID reconcile them is gone by the time anyone reads the memo. On Shell 24 of 33
+    // exported rows diverge. The fix is not a caveat: it is the second number, in its own
+    // column, beside the first.
+    var _ctTake = (cd && cd.take_75 != null) ? Number(cd.take_75) : null;
+    var _opTake = (d.take75 != null) ? Number(d.take75) : null;
+    var _gap    = (_ctTake != null && _opTake != null) ? (_opTake - _ctTake) : null;
     return {
       Country: d.country,
       Region: d.region,
@@ -41576,7 +41629,13 @@ function _iocExpRows() {
                 + 'label described its terms.'
               : 'ORCA cannot resolve which model ' + d.country + ' was run on — treat the '
                 + 'figures on this row as unattributed.'),
-      'Govt Take @$75 (%)': d.take75 != null ? +d.take75.toFixed(1) : null,
+      'Govt Take @$75 (%)': _opTake != null ? +_opTake.toFixed(1) : null,
+      // v822 (T5): the figure every OTHER ORCA surface prints for this country, so the memo and
+      // the platform can be reconciled without reopening the tab that produced the memo.
+      'Country-wide take @$75 (%)': _ctTake != null ? +_ctTake.toFixed(1) : null,
+      // The subtraction done here rather than left to the reader: an IC reader scanning 33 rows
+      // for the ones that will not reconcile should not have to difference two columns by eye.
+      'Take gap (pp)': _gap == null ? null : +_gap.toFixed(1),
       'Contractor NPV @$75 ($M)': d.npv75 != null ? Math.round(d.npv75) : null,
       Contracts: d.n != null ? d.n : null,
       // v653 (T6): the grade the Evidence column now shows on screen, carried into the sheet and
@@ -41590,9 +41649,23 @@ function _iocExpRows() {
                 ? '. DIRECTIONAL: verify against ' + d.country + "'s own petroleum act before citing this row."
                 : '.'); })(_evidenceGrade(cd))
         : 'ORCA holds no country fiscal record for ' + d.country + ', so this row carries no evidence grade.',
+      // v822 (T5): this column already said WHOSE contracts the take is. It now also says how far
+      // that puts the row from the published country figure, in the same cell, so a row read on
+      // its own in a pasted table carries its own reconciliation.
       'Take basis': d.source === 'IOC_DATA'
-        ? "this operator's own contracts in ORCA"
-        : 'COUNTRY AVERAGE — ORCA holds no ' + st.operator + ' contract terms for ' + d.country,
+        ? ("this operator's own contracts in ORCA"
+           + (_gap == null
+               ? ' — ORCA holds no country-wide take for ' + d.country + ' to check it against'
+               : Math.abs(_gap) < 0.05
+                 ? ' — and it matches the country-wide figure to one decimal place'
+                 : ' — ' + (_gap > 0 ? '+' : '') + _gap.toFixed(1) + 'pp vs the country-wide '
+                   + _ctTake.toFixed(1) + '%, which is the figure the Country Profile this row opens, '
+                   + 'Fiscal Compare, the Explorer, the Screener and the JSON API all print for '
+                   + d.country + '. Neither is wrong. Cite this row only where the memo names '
+                   + st.operator + '; cite the country-wide column where it screens the jurisdiction.'))
+        : 'COUNTRY AVERAGE — ORCA holds no ' + st.operator + ' contract terms for ' + d.country
+          + ', so the take column on this row already IS the country-wide figure and the two columns '
+          + 'agree by construction. This row describes the jurisdiction, not this operator\u2019s position in it.',
       'Take comparability': (fb && fb.diverges)
         ? 'NOT rankable as published — ' + Number(fb.n2).toLocaleString() + ' of '
           + Number(fb.tot).toLocaleString() + ' contracts (' + fb.feePct.toFixed(0) + '%) are fee-basis ('
@@ -41658,6 +41731,51 @@ function _iocExpBasisLines() {
   } else {
     L.push('No row falls back to a country average.');
   }
+  // v822 (T5): the Portfolio sheet now carries the country-wide take beside the operator take.
+  // The Basis sheet has to say why there are two columns, and how far apart they actually are on
+  // this particular operator — otherwise a reader treats the second column as a duplicate.
+  (function() {
+    var dv = rows.filter(function(r) {
+      return r['Govt Take @$75 (%)'] != null && r['Country-wide take @$75 (%)'] != null
+          && Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)']) >= 0.05;
+    });
+    L.push('TWO TAKE COLUMNS, AND THEY ARE NOT THE SAME NUMBER. "Govt Take @$75 (%)" is the '
+      + 'contract-weighted take across ' + st.operator + "'s OWN contracts in that country and "
+      + 'mechanic. "Country-wide take @$75 (%)" is the all-operator figure for the same country '
+      + '\u2014 the one the ORCA Country Profile, Fiscal Compare, the Explorer, the Screener and '
+      + 'the JSON API print. "Take gap (pp)" is the first less the second.');
+    if (dv.length) {
+      var worst = dv.reduce(function(a, r) {
+        return Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)'])
+             > Math.abs(a['Govt Take @$75 (%)'] - a['Country-wide take @$75 (%)']) ? r : a;
+      });
+      L.push(dv.length + ' of ' + rows.length + ' rows disagree, the largest by '
+        + Math.abs(worst['Govt Take @$75 (%)'] - worst['Country-wide take @$75 (%)']).toFixed(1)
+        + 'pp: ' + worst.Country + ' ' + worst['Govt Take @$75 (%)'].toFixed(1) + '% on '
+        + st.operator + "'s contracts against " + worst['Country-wide take @$75 (%)'].toFixed(1)
+        + '% across all operators. Neither figure is wrong. A gap of this kind is normally the '
+        + 'licence vintage and the specific block terms this operator holds, set against a '
+        + 'national average that includes every other operator\u2019s. Cite the operator column '
+        + 'where the memo names ' + st.operator + ', the country-wide column where it screens the '
+        + 'jurisdiction, and state which one the number came from \u2014 a figure quoted from '
+        + 'this sheet without that qualifier will not match the platform when it is checked.');
+      L.push('Rows disagreeing by more than 5pp: '
+        + (function() {
+            var big = dv.filter(function(r) {
+              return Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)']) > 5;
+            });
+            return big.length
+              ? big.map(function(r) {
+                  return r.Country + ' ' + r['Govt Take @$75 (%)'].toFixed(1) + '/'
+                       + r['Country-wide take @$75 (%)'].toFixed(1) + '%';
+                }).join('; ')
+              : 'none \u2014 every disagreement on this sheet is 5pp or less.';
+          })());
+    } else {
+      L.push('On this operator the two columns agree on every row to one decimal place, so any '
+        + 'figure here will reconcile with the rest of the platform as published.');
+    }
+  })();
   L.push('');
   // v748 (T6): the Mechanic column is the sheet's only statement of what model produced each
   // figure. 95 of the 1,772 IOC rows name a document type instead, so an IC reader holding only
@@ -41754,6 +41872,35 @@ function copyIOCPortfolio() {
         : '. ')
     + 'Contractor NPV is on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI) — scale by your working interest. '
     + 'IRR and breakeven are not reported at this level: the underlying country figures are arithmetic means of per-contract values, not project returns.';
+  // v822 (T5): the header paragraph has to say, before the table, that the take column is not
+  // the jurisdiction's — and has to size the disagreement rather than merely warn about it.
+  (function() {
+    var dv = rows.filter(function(r) {
+      return r['Govt Take @$75 (%)'] != null && r['Country-wide take @$75 (%)'] != null
+          && Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)']) >= 0.05;
+    });
+    if (!dv.length) {
+      assump += ' Every row\u2019s operator take matches the country-wide take ORCA publishes '
+             + 'elsewhere to one decimal place, so this table and the Country Profile, Fiscal '
+             + 'Compare, the Explorer, the Screener and the JSON API will agree on every figure.';
+      return;
+    }
+    var worst = dv.reduce(function(a, r) {
+      return Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)'])
+           > Math.abs(a['Govt Take @$75 (%)'] - a['Country-wide take @$75 (%)']) ? r : a;
+    });
+    var wg = worst['Govt Take @$75 (%)'] - worst['Country-wide take @$75 (%)'];
+    assump += ' THE TAKE COLUMN IS THIS OPERATOR\u2019S OWN CONTRACTS, NOT THE JURISDICTION\u2019S: '
+      + dv.length + ' of ' + rows.length + ' rows differ from the country-wide figure ORCA prints '
+      + 'on the Country Profile, in Fiscal Compare, the Explorer, the Screener and the JSON API, '
+      + 'the largest by ' + Math.abs(wg).toFixed(1) + 'pp (' + worst.Country + ' '
+      + worst['Govt Take @$75 (%)'].toFixed(1) + '% here vs '
+      + worst['Country-wide take @$75 (%)'].toFixed(1) + '% there). Both figures are in the table, '
+      + 'in adjacent columns, with the difference in "Take gap (pp)" \u2014 so a reader checking '
+      + 'this memo against the platform finds the reconciliation here rather than a contradiction. '
+      + 'Quote the operator column where the memo names ' + st.operator
+      + '; quote the country-wide column where it screens the jurisdiction; say which one you used.';
+  })();
   // v748 (T6): the instrument-type rows named in the artifact, not only on screen.
   var _instRows = rows.filter(function(r){ return /^NOT A FISCAL MECHANIC/.test(r['Mechanic basis']); });
   if (_instRows.length) {
@@ -41773,12 +41920,21 @@ function copyIOCPortfolio() {
               + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
               + ' — yoburgqs.github.io/petroleum-fiscal-db/';
 
-  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
+  // v822 (T5): 'Country-wide take @$75 (%)' sits immediately beside the operator take, not at
+  // the far right, because the whole point is that the two are read against each other. The
+  // header is spelled out on the column face — an IC reader holding only this pasted table has
+  // no tooltip, no hover and no tab to go back to.
+  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Country-wide take @$75 (%)','Take gap (pp)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
   var matrix = [cols].concat(rows.map(function(r){
     return cols.map(function(c){
+      if (c === 'Take gap (pp)') {
+        var g = r['Take gap (pp)'];
+        if (g == null) return '\u2014';
+        return Math.abs(g) < 0.05 ? 'same' : (g > 0 ? '+' : '') + g.toFixed(1);
+      }
       var v = r[c];
       if (v == null) return '\u2014';
-      if (c === 'Govt Take @$75 (%)') return v.toFixed(1) + '%';
+      if (c === 'Govt Take @$75 (%)' || c === 'Country-wide take @$75 (%)') return v.toFixed(1) + '%';
       if (c === 'Contractor NPV @$75 ($M)') return _iocNpvFmt(v);
       return String(v);
     });
