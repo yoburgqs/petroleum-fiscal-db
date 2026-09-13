@@ -49987,3 +49987,16 @@ Not a tooltip sweep, not an FAQ, not rubric chasing. v837 written at the three d
   *and* 2026-09-13. **Sixteenth cycle carried, still uninvestigated.** Outside the UX-finalization
   course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
   directly.**
+
+---
+## Cycle 745 Log — 2026-09-13 17:37
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 745 complete — **v837** shipped (`c29e284`), GRADER log (`893090d`), both pushed, mirror in sync.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation; 744 was T1, T4 last ran at 739.)
+
+## Friction
+`index.html:2768` — the **"Stability Score (diamonds)"** card inside the Fiscal Compare **IC Analyst Interpretation Guide**. It is the only legend the page offers for the `REFORM VERDICT` column sitting a few inches below it, and that column is on by def
