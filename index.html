@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v822</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v823</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -291,6 +291,12 @@ table { width: 100%; border-collapse: collapse; }
    two IC-export buttons sit above (added v822). On a mouse it stays on the 13px line so neither
    table grows. */
 @media (pointer: coarse) { .ioc-ctry-wide { min-height: 24px; line-height: 24px !important; } }
+/* v823 (T3): the "ORCA publishes N%" marker on a re-based column in the Side-by-Side verdict strip
+   carries its reconciliation in a title, so under a thumb — where there is no hover — it is a
+   control and takes the directive's 24px floor, as v730/v745/v758/v822 ruled for .sc-terms-chip,
+   .ioc-mech-more, .cp-fp-carry and .ioc-ctry-wide. On a mouse it stays inline on the strip's own
+   line, so the strip does not grow at desktop width. */
+@media (pointer: coarse) { .cmp-vd-reb { min-height: 24px; line-height: 24px !important; } }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -2424,7 +2430,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v822</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v823</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2494,7 +2500,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v822</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v823</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28657,8 +28663,41 @@ function renderCompare() {
   // It adds no new analysis: the ordering, the exclusions and the price-deck reversal were all
   // already derived, they were just never assembled into an answer.
   const _vdTake = (d) => (d ? _cmpRankTake(d, 75) : null);
+  // v823 (T3): the ordering above the grid is computed on _cmpRankTake, which SUBSTITUTES the
+  // Group-1-only take on a fee-blended column (v549). It printed that substituted figure bare.
+  // On Iraq — which ships on this tab's own "USA vs Iraq" quickstart — the strip read
+  // "Iraq 34.1%" where the Country Profile, Fiscal Compare, the Screener, the Explorer and the
+  // JSON API all print 84.8%. A 50.7pp gap, on the first line of the tab, with nothing marking it.
+  // The grid reconciles it three rows down ("ranked on 34.1% comparable, not 84.8%") but the strip
+  // is the line that gets read and copied. Carry the published figure beside the ranked one, here,
+  // the same pairing v549 established for the Govt Take cells.
   const _vdRanked = selected.filter(d => _vdTake(d) != null)
-    .map(d => ({ c: d.country, v: _vdTake(d) })).sort((a, b) => a.v - b.v);
+    .map(d => {
+      const _pub = d['take_75'];
+      const _v = _vdTake(d);
+      return { c: d.country, v: _v, d: d, pub: _pub,
+               reb: (_pub != null && _v != null && Math.abs(_pub - _v) >= 0.05) };
+    }).sort((a, b) => a.v - b.v);
+  const _vdReb = _vdRanked.filter(x => x.reb);
+  // Why this column is not on its published figure, stated from its own mech_mix — no threshold
+  // is invented here, it is the same >= 0.05pp test the Rank among producers cell already uses.
+  const _vdRebTitle = (x) => {
+    const st = _cmpMixStat(x.d);
+    const _g1n = (st.g1 && st.g1.n != null) ? Number(st.g1.n).toLocaleString() : null;
+    return x.c + ': ORCA publishes a government take of ' + x.pub.toFixed(1) + '% at $75/bbl — that is the '
+      + 'figure on the Country Profile, in Fiscal Compare, in the Screener, in the Regime Explorer and in '
+      + 'the JSON API. It is NOT the figure this ordering uses. '
+      + (st.n2 ? Math.round(st.feePct) + '% of its ' + Number(st.tot).toLocaleString() + ' contracts are '
+                 + 'fee-basis ' + (_cmpMechBare(st, 2) || 'TSC/RSC/Buy-back') + ', where the contractor is paid a fixed $/bbl '
+                 + 'remuneration, so take% climbs toward 99% as a structural artefact of the mechanic rather than as a '
+                 + 'fiscal measure, and cannot be ranked against a PSC or Concession column. ' : '')
+      + 'The ordering therefore places ' + x.c + ' on its '
+      + (_g1n ? _g1n + ' production-sharing and concession contracts alone' : 'production-sharing and concession contracts alone')
+      + ' — ' + x.v.toFixed(1) + '% — which is the only basis on which it is comparable with the rest of this set. '
+      + 'Into an IC memo carry BOTH: ' + x.v.toFixed(1) + '% as the comparable basis, said to be that, and '
+      + x.pub.toFixed(1) + '% as ' + x.c + "'s published take. Quoting " + x.v.toFixed(1)
+      + '% alone will not reconcile with ORCA\u2019s own ' + x.c + ' page.';
+  };
   // Reasons mirror _cmpRankTake's null branches in the same order, so every set-aside column can
   // say WHY in its own clause rather than being silently absent from the ordering.
   const _vdWhy = (d) => {
@@ -28697,7 +28736,14 @@ function renderCompare() {
     if (_vdRanked.length >= 2) {
       const _span = _vdRanked[_vdRanked.length - 1].v - _vdRanked[0].v;
       const _chain = _vdRanked.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> '
-        + x.v.toFixed(1) + '%').join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
+        + x.v.toFixed(1) + '%'
+        + (x.reb
+            ? ' <span class="cmp-vd-reb" title="' + _cmpEsc(_vdRebTitle(x))
+              + '" style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--orange);'
+              + 'background:rgba(194,65,12,.10);border-radius:3px;padding:1px 6px;line-height:1.5;white-space:nowrap;cursor:help;">'
+              + 'PSC/Conc basis · ORCA publishes ' + x.pub.toFixed(1) + '%</span>'
+            : '')
+      ).join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Govt take @$75, lowest first:</span>'
         + '<span style="font-size:12px;">' + _chain + '</span>'
         + _pill(_span.toFixed(1) + 'pp apart',
@@ -28729,13 +28775,33 @@ function renderCompare() {
         + '. ' + (_vdOut.length === 1 ? 'Its take rows print, and are' : 'Their take rows print, and are')
         + ' correct on their own basis — ' + (_vdOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
         + ' in this set.</div>'
-      : (_vdRanked.length >= 2
+      : (_vdRanked.length >= 2 && !_vdReb.length
           ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">All '
             + _vdRanked.length + ' columns are on one basis — nothing is set aside, the ordering above is the whole set.</div>'
           : '');
+    // v823 (T3): the line above used to end the strip. On a set holding a fee-blended column it
+    // ended it with a reassurance that was not true of the figures printed: Iraq / Norway / Angola
+    // has nothing set aside, so the analyst was told "all 3 columns are on one basis — nothing is
+    // set aside", directly under an ordering whose first entry was 50.7pp away from the take ORCA
+    // publishes for that country. The re-basing is what the analyst has to know before carrying
+    // the ordering anywhere, so it is stated in the strip rather than left to the grid below.
+    const _rebLine = _vdReb.length
+      ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:var(--text);">Re-based to rank — ' + _vdReb.length + ' of '
+        + _vdRanked.length + ' ranked column' + (_vdRanked.length === 1 ? '' : 's') + ' '
+        + (_vdReb.length === 1 ? 'is' : 'are')
+        + ' not placed on the take ORCA publishes for ' + (_vdReb.length === 1 ? 'it' : 'them') + ':</strong> '
+        + _vdReb.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> is ranked at '
+            + x.v.toFixed(1) + '% — its production-sharing and concession contracts alone — not at the '
+            + x.pub.toFixed(1) + '% on its Country Profile').join('; ')
+        + '. The published figure blends fee-basis contracts, whose take% is an artefact of the mechanic '
+        + 'and is not rankable against a PSC or Concession column. Carry both numbers into the memo — the '
+        + 'ordering above will not reconcile with ORCA\u2019s own country page on the published figure alone.</div>'
+      : '';
     _vdHtml = '<div id="cmp-verdict" class="cmp-notice" style="margin-bottom:10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.22);border-left:3px solid var(--accent);border-radius:5px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">'
       + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">' + _lead + '</div>'
       + _aside
+      + _rebLine
       // v772 (T3): filled by _sbsPaintVerdictFp() once the per-country spread fetches land.
       + '<div id="cmp-verdict-fp" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
       + '</div>';
