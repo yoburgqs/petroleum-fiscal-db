@@ -48332,3 +48332,20 @@ after the real change shipped.
   overnight chain FAILED — 2026-09-12"* is still in the inbox and still uninvestigated. Outside the
   UX-finalization course this directive sets, but it is now three cycles old and wants Zach's
   attention.
+
+---
+## Cycle 732 Log — 2026-09-12 23:20
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 732 complete. **v824** shipped, pushed, live, mirror synced.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest by rotation; 731 was T3)
+
+## Friction
+Walked the Screener cold at 1440×900 and at 390×844 with touch. Every row had **two "add to list" controls four pixels apart, feeding two different lists with two different bottom bars**:
+
+| control | goes to | cap | export |
+|---|---|---|---|
+| checkbox (col 0, unlabelled column) | IC shortlist dock | none | Co
