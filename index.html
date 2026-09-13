@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v829</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v830</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v829</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v830</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v829</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v830</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32211,6 +32211,22 @@ function _scProdCovTip(d) {
     + 'by contract count. Not a measure of source quality --- that is the Evidence column.';
 }
 
+// ── v830 (T1) — near-miss strip, modelled-terms group ────────────────────────────────────────
+// How many of the modelled-terms rejects render before the "+N more" control. 10 fills roughly two
+// lines at 1440 and four at 390, which is a glance; a harsh ceiling can reject 60+ of the 118 and
+// opening with 60 chips buries the production-backed group above it. The rest are IN the DOM, not
+// re-derived on click, so the count on the button is the count that appears.
+const SC_OUT_B_SHOWN = 10;
+function _scToggleOutMore(btn) {
+  const host = document.getElementById('sc-prod-out');
+  if (!host || !btn) return;
+  const extra = [...host.querySelectorAll('[data-sc-extra="1"]')];
+  const opening = btn.getAttribute('data-sc-open') !== '1';
+  extra.forEach(el => { el.style.display = opening ? 'inline-flex' : 'none'; });
+  btn.setAttribute('data-sc-open', opening ? '1' : '0');
+  btn.textContent = opening ? 'Show fewer' : ('+' + (btn.getAttribute('data-sc-more') || extra.length) + ' more');
+}
+
 function runScreener() {
   // v743 (T1): the floor-take population is read off the live data, not written into the label.
   (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
@@ -32830,19 +32846,68 @@ function runScreener() {
       // At the $50 deck the deck NPV leg and the $50 leg are the same test; say it once.
       return r.filter((x, i) => r.indexOf(x) === i);
     };
-    const _prodInScope = COUNTRY_DATA.filter(d => _dqTier(d).hasProduction && !_outOfScope(d));
-    const _out = _prodInScope.filter(d => !_curSet.has(d.country))
-      .map(d => ({ d: d, why: _why(d) })).filter(x => x.why.length)
-      .sort((a, b) => (b.d[npvKey] || 0) - (a.d[npvKey] || 0));
-    if (!_out.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
-    host.innerHTML = '<span style="font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;font-size:10px;">Not on this list</span>'
-      + '<span>' + _out.length + ' of ' + _prodInScope.length + ' verified-production countries removed:</span>'
-      + _out.map(x => {
-          const nm = x.d.country.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-          return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="Open ' + x.d.country + '’s Country Profile"'
-            + ' style="display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;">'
-            + x.d.country + ' <span style="font-weight:400;color:var(--negative);font-family:\'IBM Plex Mono\',monospace;font-size:10px;">' + x.why.join(' · ') + '</span></button>';
-        }).join('');
+    // ── v830 (T1) — the same answer for the countries nobody has drilled yet ──────────────────
+    // v775 above built the "why isn't it on here?" answer but scoped it to _dqTier().hasProduction,
+    // i.e. 22 of 185 rows. Walked cold at 1440 and 390: Screener -> Downside Resilience returns 24
+    // countries and Guyana, Namibia, Senegal and Suriname are all gone with nothing on screen naming
+    // one of them; a manual Max Govt Take of 45% drops Guyana, Mozambique, Senegal and Suriname the
+    // same silent way. Every one of those four was removed by a THRESHOLD this strip already knows
+    // how to explain -- _why() reads the same numbers _scPass() tested -- and every one of them was
+    // withheld purely because ORCA holds no verified field production for it.
+    //
+    // That is the wrong boundary for this control. The page itself draws a sharper one two
+    // checkboxes away: sc-floor-keep separates the 45 rows whose take is royalty+tax on a thin
+    // record (Vanuatu, Bahamas -- a floor, not a measurement) from the 118 modelled on real
+    // PSC/Concession terms, and its own label names Guyana, Namibia, Mozambique, Senegal and
+    // Suriname as the countries that distinction exists to protect. So the near-miss universe is
+    // now production-backed PLUS modelled-terms, and only the floor-take rows stay out -- naming
+    // Vanuatu as a near miss would be noise, since its take is not a measurement to begin with.
+    //
+    // Ordering, and it is not the same signal as group A. Group A ranks by deck NPV. Ranking the
+    // modelled group that way returns Greenland, Faroe Islands, Romania, Bulgaria and Kyrgyzstan --
+    // NPV rises as take falls, so an NPV sort surfaces the least-known regimes and buries Guyana at
+    // #16. These rows are ranked by FACT DEPTH instead, which is how much of the regime ORCA has
+    // actually read: Russia, Iran, Peru, Venezuela, Algeria, Congo, Ghana, Egypt, Mozambique,
+    // Guyana. That is a statement about the record, not about the terms, and the label says so.
+    // First 10 render; the rest are in the DOM behind their own control, because a screen that
+    // removes 60 countries should not open with 60 chips.
+    const _floorOut = d => (typeof _scTakeIsFloor === 'function') && _scTakeIsFloor(d);
+    const _inScopeA = COUNTRY_DATA.filter(d => _dqTier(d).hasProduction && !_outOfScope(d));
+    const _inScopeB = COUNTRY_DATA.filter(d => !_dqTier(d).hasProduction && !_floorOut(d) && !_outOfScope(d));
+    const _mkOut = (pool, sorter) => pool.filter(d => !_curSet.has(d.country))
+      .map(d => ({ d: d, why: _why(d) })).filter(x => x.why.length).sort(sorter);
+    const _out  = _mkOut(_inScopeA, (a, b) => (b.d[npvKey] || 0) - (a.d[npvKey] || 0));
+    const _outB = _mkOut(_inScopeB, (a, b) => (b.d.n_facts || 0) - (a.d.n_facts || 0));
+    if (!_out.length && !_outB.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    const _chip = (x, hidden) => {
+      const nm = x.d.country.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="Open ' + x.d.country + '’s Country Profile"'
+        + (hidden ? ' data-sc-extra="1" style="display:none;' : ' style="display:inline-flex;')
+        + 'align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;">'
+        + x.d.country + ' <span style="font-weight:400;color:var(--negative);font-family:\'IBM Plex Mono\',monospace;font-size:10px;">' + x.why.join(' · ') + '</span></button>';
+    };
+    const _lbl = t => '<span style="font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;font-size:10px;">' + t + '</span>';
+    let _html = '';
+    if (_out.length) {
+      _html += _lbl('Not on this list')
+        + '<span>' + _out.length + ' of ' + _inScopeA.length + ' verified-production countries removed:</span>'
+        + _out.map(x => _chip(x, false)).join('');
+    }
+    if (_outB.length) {
+      const _shown = _outB.slice(0, SC_OUT_B_SHOWN), _rest = _outB.slice(SC_OUT_B_SHOWN);
+      _html += '<span style="flex-basis:100%;height:0;"></span>'
+        + _lbl(_out.length ? 'Also not on it' : 'Not on this list')
+        + '<span title="Countries ORCA models on real PSC or Concession terms but holds no verified field production for, so their NPV and breakeven are indicative. Ordered by how many fiscal facts ORCA has on file for the country — deepest record first — because contractor NPV rises as take falls and an NPV sort puts the least-documented regimes on top. Floor-take countries (royalty and income tax only, on a record under 50 facts) are not counted here; their take is a lower bound, not a measurement, so it cannot near-miss a ceiling.">'
+        + _outB.length + ' of ' + _inScopeB.length + ' modelled-terms countries removed <span style="opacity:.8;">(no verified production · deepest record first)</span>:</span>'
+        + _shown.map(x => _chip(x, false)).join('')
+        + _rest.map(x => _chip(x, true)).join('')
+        + (_rest.length
+            ? '<button type="button" onclick="_scToggleOutMore(this)" data-sc-more="' + _rest.length + '"'
+              + ' title="Show the remaining ' + _rest.length + ' modelled-terms countries this screen removed, each with the threshold that removed it"'
+              + ' style="display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px dashed var(--border);border-radius:12px;background:transparent;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+' + _rest.length + ' more</button>'
+            : '');
+    }
+    host.innerHTML = _html;
     host.style.display = 'flex';
   })();
   document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;

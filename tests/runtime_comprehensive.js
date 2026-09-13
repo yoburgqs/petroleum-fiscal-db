@@ -329,14 +329,18 @@ async function testCountryProfile(page) {
         found: i >= 0,
         marksUnsourced: /NO SOURCE|NOT RECORDED/.test(seg),
         namesConflict: /DCF USES 33\.4%/.test(seg),
-        // v743: was pinned to the literal "3 of the 5 rows above are independently sourced;
-        // 2 are not sourced at all". v742 partitioned the Evidence Chain by what the country's
-        // mechanic actually reads, and Norway's Concession model does not read Cost Recovery
-        // Cap — so that row moved below the divider and the denominator became 4, correctly.
-        // The literal made a correct change look like a regression. This asserts the PROPERTY
-        // v601 existed to guarantee — the verdict carries a numerator AND a denominator — so
-        // it survives a legitimate repartition but still fails a bare count.
-        hasDenominator: /\b\d+\s+of\s+the\s+\d+\s+rows\b[^.]*\bindependently sourced\b/.test(seg),
+        // v742 (T6): was pinned to the literal "3 of the 5 rows above are independently sourced;
+        // 2 are not sourced at all". Norway's Concession model does not read Cost Recovery Cap,
+        // so that row now sits below the not-read-by-the-model divider and the denominator is
+        // correctly 4, not 5. The assertion is the PROPERTY the v601 fix existed to guarantee --
+        // the verdict states a numerator AND a denominator -- so it survives a rescoping that is
+        // the point of the change rather than a regression in it.
+        hasDenominator: /\d+ of the \d+ rows (above|the [A-Za-z\- ]*model reads) (is|are) independently sourced; \d+ (is|are) not sourced at all/.test(seg),
+        // v742 (T6): the partition itself. Norway holds Cost Recovery Cap, which no Concession
+        // DCF term reads, so the divider must be present and the verdict must be scoped to it.
+        hasPartition: /NOT READ BY THE CONCESSION MODEL/i.test(seg),
+        partitionScoped: /rows the Concession model reads/.test(seg),
+        offRowNamed: /below the divider \(Cost Recovery Cap\)/.test(seg),
         bareDbBadge: /Contract DB average/.test(seg),
         hasControl: !!document.querySelector('#dd-content button[onclick*="_cpScrollToLiveDcf"]')
       };
@@ -353,8 +357,18 @@ async function testCountryProfile(page) {
       if (ec.namesConflict) p(S, 'DCF conflict surfaced', 'Norway State Participation names the 33.4% the DCF engine uses');
       else f(S, 'DCF conflict surfaced', 'Table shows State Participation 0% without naming the DCF value');
 
-      if (ec.hasDenominator) p(S, 'verdict carries denominator', '"3 of the 5 rows above ... 2 are not sourced at all"');
+      if (ec.hasDenominator) p(S, 'verdict carries denominator', 'Sourced-parameter verdict states numerator and denominator');
       else f(S, 'verdict carries denominator', 'Sourced-parameter verdict still reports a count with no denominator');
+
+      // ── v742 (T6): rows the resolved mechanic does not read are partitioned out ──────
+      if (ec.hasPartition) p(S, 'off-model rows partitioned', 'Cost Recovery Cap sits below the "not read by the Concession model" divider');
+      else f(S, 'off-model rows partitioned', 'Evidence Chain does not separate rows the DCF never reads from the terms that produce the take');
+
+      if (ec.partitionScoped) p(S, 'verdict scoped to model terms', 'Denominator names the terms the Concession model reads, not the whole table');
+      else f(S, 'verdict scoped to model terms', 'Verdict counts rows the model does not read');
+
+      if (ec.offRowNamed) p(S, 'off-model rows named', 'The note under the table names Cost Recovery Cap as not an input');
+      else f(S, 'off-model rows named', 'Divider present but the rows below it are not named in any note');
 
       if (ec.hasControl) p(S, 'conflict note is a control', 'Conflict note ends in a button, not an instruction');
       else f(S, 'conflict note is a control', 'No _cpScrollToLiveDcf control in the conflict note');
@@ -366,16 +380,30 @@ async function testCountryProfile(page) {
       if (sel) { sel.value = 'USA'; loadCountryProfile('USA'); }
     });
     await page.waitForTimeout(2200);
+    // v767 (T6): this control used to count ANY "DCF USES" in USA's chain as noise, on the premise
+    // that a country whose held rows are all cited cannot have an engine conflict. v767 measured
+    // that premise false: USA's cited Royalty row prints 17.62% / 18.75% while the DCF runs a
+    // hard-coded 12.5%. The property this control exists for — the NO-SOURCE machinery does not
+    // fire on a fully cited country — is kept exactly; a DCF USES marker is still noise unless it
+    // is the cited-row marker (.ec-eng767), and that marker is now asserted positively below.
     const clean = await page.evaluate(() => {
       const el = document.getElementById('dd-content');
       const t = el ? el.innerText : '';
       const i = t.indexOf('KEY FISCAL PARAMETERS');
       const seg = i < 0 ? '' : t.slice(i, i + 1600);
-      return { found: i >= 0, noNoise: !/NO SOURCE|NOT RECORDED|DCF USES|carr(y|ies) no source at all/.test(seg) };
+      const chain = document.querySelector('#dd-content .ec-chain');
+      const allUses = chain ? (chain.innerText.match(/DCF USES/g) || []).length : 0;
+      const citedUses = chain ? chain.querySelectorAll('.ec-eng767').length : 0;
+      const eng = chain ? [...chain.querySelectorAll('.ec-eng767')].map(c => c.closest('tr').querySelector('td').innerText.trim() + ' ' + c.innerText.trim()) : [];
+      return { found: i >= 0,
+               noNoise: !/NO SOURCE|NOT RECORDED|carr(y|ies) no source at all/.test(seg) && allUses === citedUses,
+               namesEngine: eng.some(s => /^Royalty Rate/.test(s) && /DCF USES 12\.5%/.test(s)) };
     });
     if (clean.found && clean.noNoise) p(S, 'fully sourced country unchanged', 'USA evidence chain shows no absence markers');
     else if (clean.found) f(S, 'fully sourced country unchanged', 'USA evidence chain gained an absence marker it should not have');
     else w(S, 'fully sourced country unchanged', 'USA evidence chain did not render');
+    if (clean.found && clean.namesEngine) p(S, 'cited row names the rate the DCF runs', 'USA Royalty Rate (cited 18.75%) names the 12.5% the engine runs');
+    else if (clean.found) f(S, 'cited row names the rate the DCF runs', 'USA Royalty Rate shows 17.62% / 18.75% and never names the 12.5% the DCF engine runs');
 
     // Hash routing — Bug 15 regression test
     await page.evaluate(() => { window.location.hash = '#/profile/norway'; });
@@ -734,6 +762,28 @@ async function testComparison(page) {
       p(S, 'take marker names its basis', 'every marker on a fee-blended column is tagged "on PSC/Conc"');
     else
       f(S, 'take marker names its basis', `${mkOrder.untagged} marker(s) on a fee-blended column do not name the basis — Iraq cell: ${mkOrder.iraq}`);
+
+    // ── v768 (T3) regression: the take/NPV inversion notice ranks on the figures the grid ranks on ──
+    // Iraq / Kazakhstan / Oman: the $75 rows rank Iraq lowest on take (PSC/Conc 34.1%) with PSC/Conc
+    // $3.0B NPV against Oman's 75.6% / $866M, so there is no inversion. Before v768 the notice under
+    // the grid read the blended headline and printed "Iraq takes more of the barrel than Oman (84.8%
+    // vs 77.6%)". Control: on Afghanistan / Argentina / Iraq the comparable figures DO invert, and the
+    // pair must be printed on them, named as PSC/Conc.
+    const invText = async (arr) => {
+      await page.evaluate(a => { clearCompare(); a.forEach(c => addCompare(c)); }, arr);
+      await page.waitForTimeout(900);
+      return page.evaluate(() => [].slice.call(document.querySelectorAll('#cmp-output .cmp-notice')).map(n => n.innerText).join('\n'));
+    };
+    const inv768a = await invText(['Iraq', 'Kazakhstan', 'Oman']);
+    if (!/takes more of the barrel than/.test(inv768a))
+      p(S, 'inversion notice uses comparable take', 'Iraq/Kazakhstan/Oman prints no take/NPV paradox (Iraq is lowest on PSC/Conc take)');
+    else
+      f(S, 'inversion notice uses comparable take', 'paradox printed on the blended headline: ' + (inv768a.match(/[^.]*takes more of the barrel[^.]*\./) || [''])[0]);
+    const inv768b = await invText(['Afghanistan', 'Argentina', 'Iraq']);
+    if (/Iraq takes more of the barrel than Argentina \(34\.1% on PSC\/Conc vs/.test(inv768b))
+      p(S, 'inversion notice names PSC/Conc basis', 'Afghanistan/Argentina/Iraq prints the real inversion on Iraq\'s PSC/Conc figures');
+    else
+      f(S, 'inversion notice names PSC/Conc basis', 'expected the Iraq > Argentina pair on PSC/Conc figures: ' + (inv768b.match(/[^.]*takes more of the barrel[^.]*\./) || ['(none)'])[0]);
 
     await page.evaluate(() => clearCompare());
     await page.waitForTimeout(200);
@@ -2197,8 +2247,11 @@ async function testSBProvenance(page) {
       return { txt: t, ic: window._sbICLine, shownSb: m ? +m[1] : null, shownCp: m ? +m[2] : null,
                shownGap: m ? +m[4] : null, realSb: window._lastScenario.result.take, realCp: d.take_75 };
     });
-    if (/generic Concession default loaded/.test(brazil.txt)) p(S, 'Brazil strip', 'flags the absence of Brazil-specific terms');
-    else f(S, 'Brazil strip', 'no default-basis warning: ' + brazil.txt.slice(0, 120));
+    // v776: Brazil now loads its own royalty and CIT from COUNTRY_DATA (record basis). The strip
+    // must name both rates and the terms still running at 0%.
+    if (/Loaded from Brazil’s record: royalty [\d.]+% and CIT [\d.]+%/.test(brazil.txt) && /state equity run at 0%/.test(brazil.txt))
+      p(S, 'Brazil strip', 'names the royalty and CIT read from Brazil’s record and the terms left at 0%');
+    else f(S, 'Brazil strip', 'record-basis strip missing: ' + brazil.txt.slice(0, 160));
 
     if (brazil.shownSb !== null && Math.abs(brazil.shownSb - brazil.realSb) < 0.06 && Math.abs(brazil.shownCp - brazil.realCp) < 0.06)
       p(S, 'Brazil numbers', 'strip prints the engine take ' + brazil.shownSb + '% against the published ' + brazil.shownCp + '%');
@@ -2208,7 +2261,7 @@ async function testSBProvenance(page) {
       p(S, 'Brazil gap', 'gap ' + brazil.shownGap + 'pp matches the two figures shown');
     else f(S, 'Brazil gap', 'gap arithmetic wrong: ' + JSON.stringify(brazil));
 
-    if (/terms are the generic .* default, not Brazil-specific/.test(brazil.ic)) p(S, 'Brazil IC line', 'IC line names the generic basis');
+    if (/from ORCA’s Brazil record, .*run at 0%/.test(brazil.ic)) p(S, 'Brazil IC line', 'IC line names the record basis and the zero-rated terms');
     else f(S, 'Brazil IC line', 'IC line unqualified: ' + String(brazil.ic).slice(0, 140));
 
     // ---- 3. own-terms country: Norway ----------------------------------------
@@ -2300,7 +2353,7 @@ async function testSBProvenance(page) {
     // ---- 6. whole-set sweep: every country gets a strip, and it agrees -------
     const sweep = await page.evaluate(async () => {
       const names = COUNTRY_DATA.filter(d => d.take_75 != null).map(d => d.country);
-      const t = { n: 0, missing: 0, mono: 0, dflt: 0, own: 0, mismatch: 0, bad: [] };
+      const t = { n: 0, missing: 0, mono: 0, dflt: 0, rec: 0, own: 0, mismatch: 0, bad: [] };
       for (const cn of names) {
         // Wait for THIS country's auto-run to land. ddOpenScenarioBuilder defers
         // runCustomScenario() by 100ms; a fixed sleep shorter than that reads the
@@ -2313,7 +2366,7 @@ async function testSBProvenance(page) {
         if (!el) { t.missing++; t.bad.push(cn + ':no-strip'); continue; }
         const o = window._sbOrigin, ls = window._lastScenario;
         const d = COUNTRY_DATA.find(x => x.country === cn);
-        if (o.monopoly) t.mono++; else if (o.basis === 'default') t.dflt++; else t.own++;
+        if (o.monopoly) t.mono++; else if (o.basis === 'default') t.dflt++; else if (o.basis === 'record') t.rec++; else t.own++;
         const m = el.innerText.match(/This scenario ([\d.]+)%[\s\S]*?published @\$75 ([\d.]+)%/);
         if (m && (Math.abs(+m[1] - ls.result.take) > 0.06 || Math.abs(+m[2] - d.take_75) > 0.06)) {
           t.mismatch++; t.bad.push(cn + ':numbers');
@@ -2332,8 +2385,9 @@ async function testSBProvenance(page) {
     if (sweep.mono === 3) p(S, 'Sweep monopolies', 'the 3 state monopolies (Bahrain, Kuwait, Saudi Arabia) take the monopoly branch');
     else f(S, 'Sweep monopolies', 'monopoly branch fired ' + sweep.mono + ' times, expected 3');
 
-    if (sweep.dflt >= 100) p(S, 'Sweep defaults', sweep.dflt + ' countries correctly declare generic-default terms');
-    else f(S, 'Sweep defaults', 'default branch fired only ' + sweep.dflt + ' times — expected >=100');
+    // v776: Concession countries without an engine override now read royalty/CIT from their record.
+    if (sweep.rec >= 100 && sweep.dflt <= 5) p(S, 'Sweep record basis', sweep.rec + ' countries load their own record rates and name the terms at 0%; ' + sweep.dflt + ' remain on the generic default');
+    else f(S, 'Sweep record basis', 'record branch fired ' + sweep.rec + ' times, default ' + sweep.dflt + ' — expected >=100 record, <=5 default');
 
     if (sweep.own >= 50) p(S, 'Sweep own terms', sweep.own + ' countries load their own ORCA terms and say so');
     else f(S, 'Sweep own terms', 'own-terms branch fired only ' + sweep.own + ' times');
