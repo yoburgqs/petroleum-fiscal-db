@@ -49876,3 +49876,114 @@ not an FAQ, not rubric chasing. v836 written at the three display sites (`:42`,
 
 ## Friction
 The Screener preset menu line (`index.html:3346`) and the active-preset badge (`:31525`). Walked cold at 1440×900 and 390×844, storages cleared, over http. The menu line is what an ana
+
+## Cycle 745 Log — 2026-09-13 — T4 — shipped v837
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation: 744 was
+T1, 743 T3, 742 T5, 741 T2, 740 T6; T4 last ran at 739.)
+
+## Friction
+`index.html:2768` — the **"Stability Score (diamonds)"** card inside the Fiscal Compare
+**IC Analyst Interpretation Guide** (`#fc-ic-ref`), the only legend the platform offers for the
+`REFORM VERDICT` column that sits six inches below it and is **on by default**.
+
+Walked cold at 1440×900 and 390×844, storages cleared, over http. Two independent defects in one
+card:
+
+1. **It was a legend for a glyph nothing renders.** The card taught a 0–5 diamond scale. Enumerated
+   the live column across all 185 rows: the tokens actually printed are `WACC +3–5pp` (2),
+   `TAKE +15pp` / `TAKE +5pp` ×2 / `TAKE NET +6pp` (4), `SIZE UNKNOWN` (5), `TAKE NET 0pp` (1),
+   `↑ PRE-2010` (7), `NO LAW CHANGE` (2), `n/c` (164). **Not one of them appeared in the card.**
+   The diamond scale was removed from Fiscal Compare at v744, from the Country Profile at v566 and
+   from the Reform Risk tab before that; the guide was never updated.
+
+2. **Its top line licensed a zero premium on 89% of the screening list.**
+   `◆◆◆◆◆ (5) — Zero reforms since 2010; no fiscal risk discount warranted.`
+   On the live build 164 of 185 rows have zero reforms since 2010 **because ORCA holds no reform
+   log for them at all**. The Reform Risk tab (v502/v514), this table's own cell (v520/v556) and
+   the Country Profile panel (v566) each independently refuse to treat that as a clean record —
+   the RR card says so in those words: *"No events on file means no coverage, not a clean record —
+   do not read it as stability and do not carry a reform-frequency premium of zero into an IC memo
+   on this basis."* The interpretation guide was the last surface on the platform still granting
+   exactly that.
+
+Found while walking, not from a rubric: a third defect fell out of the same element. The guide
+carried **no `open` attribute** and its init script only ever *removes* `open`, so it has started
+**collapsed** on every cold load since v365 — while the directive has carried *"v430: FC IC
+Analyst Guide starts OPEN with sessionStorage collapse memory"* as a locked item for 300+ cycles.
+The sessionStorage half was present and working; the half that makes it visible was never there.
+
+## Change
+- The card is now **Reform Verdict**, built at render time by `_fcRenderReformLegend()` from
+  `REFORM_HISTORY` via `_fcReformRank()` → `_rrClassify().icToken` — the *same* function the cell
+  and the Reform sort read, so the legend, the cell and the ordering cannot disagree. It prints
+  one row per band that actually has members, with the real tokens as coloured pills, the real
+  count, and the **unit each token is in**: `WACC` = points to add to a discount rate, `TAKE` =
+  points of government take already taken (*"never add it to a WACC"*).
+- The header reads **"— 21 of 185 carry a sourced log"**, counted off the data, never written into
+  the markup — the reason `_fcSyncReformFilterCount()` exists rather than the Breakeven button's
+  hardcoded `(65/185)`.
+- The `n/c · 164` row is separated by a rule and states plainly: *no reading at all. Not a clean
+  record, not a score of 100. Carry no premium of zero on these rows.* It is deliberately **not**
+  a control — the reform sort hides those rows, and an absent log is not somewhere to send anyone.
+- **Each covered band is a control.** Click or Enter runs `fcSetSort('reform')` (which also ticks
+  ◆ Reform-scored only) and scrolls to the first row in that band, flashing it.
+- IC Memo Quick Rules: the dead `Stability ◇◇◇◇◇ →` line is replaced by two live rules — one for
+  `n/c`, one separating `WACC +Npp` from `TAKE +Npp`.
+- `open` restored on `#fc-ic-ref`, and the init script now sets the arrow/hint to the open state
+  when no collapse is stored. Collapse memory verified untouched: collapse → reload → still closed.
+
+## Result
+An analyst screening for reform exposure can now read the column. Before, the one legend on the
+page named none of the eight strings in it, and its first rule said a country with no reforms
+needs no fiscal risk discount — which on this build is 164 countries whose reform record ORCA has
+never researched. Now the legend names every token that is on screen, states which of them changes
+a WACC and which is take already taken, prints `21 of 185` beside the heading, and says of the
+other 164 that there is no reading — and clicking **WACC +3–5pp** ranks the table and lands on
+United Kingdom and Brazil, the only two jurisdictions on this platform whose verdict changes a
+model input.
+
+### Verification
+- JS syntax gate: **11 scripts, 0 bad.**
+- **Playwright RAN this cycle** against the edited local tree.
+- Pixel gate: **PASS — no surface got worse than baseline.** The three `small-touch-target` and one
+  `clipped-text` findings it reports are all pre-existing and in other elements; the new legend
+  rows measure 64px and 45px at 390 with `hasTouch`.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** (390 with `hasTouch`),
+  with the guide open at every one of them. Zero page errors at all six.
+- Legend counts reconciled against the live column: 2+4+5+1+7+2 = **21 scored**, **164 n/c**,
+  **185 total**.
+- Band-0 click verified: table re-sorted, `#fc-filter-reform` ticked, top rows United Kingdom,
+  Brazil.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — nothing added outside the existing collapsible guide; no banner, no
+page-sub, no routing hint. v430 **restored rather than reverted** (the guide starts open; the
+sessionStorage collapse logic is unchanged). v449/v451/v452, v489 untouched. Tab order unchanged.
+Not a tooltip sweep, not an FAQ, not rubric chasing. v837 written at the three display sites
+(`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **NEW, not fixed this cycle:** the Methodology tab's *Data Coverage At a Glance* tile
+  (`#meth-coverage-summary`) still prints **"Stability Score — 185/185"** with a **green** bar and
+  *"Fiscal stability index (0–5) … 5 = zero changes. Available for all 185 countries."* That is the
+  same false all-clear this cycle removed from the FC guide, on the one panel whose stated job is
+  *"what data is available for each country — and what is not."* Same class of defect, different
+  surface — it wants its own T4 cycle.
+- **~20 on-screen tooltips / column headers still carry the $1.2B literal** (`:50860`, `:52945`,
+  `:33335`). Hover text, not artifacts that leave the tool. (Carried from 744.)
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of 87.2% /
+  85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Sixteenth cycle carried, still uninvestigated.** Outside the UX-finalization
+  course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
+  directly.**
