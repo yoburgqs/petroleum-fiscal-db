@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v835</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v836</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v835</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v836</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v835</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v836</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3335,7 +3335,7 @@ window.copyPlatformCitation = function(btn) {
       <!-- v459: Active preset label — shows the current preset name and criteria inline after loading.
            An analyst who loaded a preset and walked away needs to know what filters are active at a glance.
            applyScreenerPreset() sets window._screenerActivePreset; renderScreener() clears it if sliders move away from preset values. -->
-      <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:nowrap;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="_scClearPreset()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
+      <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:normal;max-width:100%;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="_scClearPreset()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
       <select id="screener-preset-select" onchange="if(this.value){applyScreenerPreset(this.value);this.value='';_scRevealResults();}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;" title="Load a preset screen — sets all sliders and filters to a predefined IC workflow. You can then adjust any slider to fine-tune. Use Ctrl+Enter to re-run.">
         <option value="">Load a screen…</option>
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at ${DECK} AND at $50</option>
@@ -3343,7 +3343,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
         <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v660 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk" title="Scoped to the jurisdictions ORCA holds a sourced fiscal-reform event log for, keeping those with at most one fiscal law change since 2010, then a 70% take ceiling. Before v662 this preset was named Low-Risk Stable and screened on take and fiscal mechanic only — no reform or stability input of any kind — returning 141 of 185 countries led by the United Kingdom, which has 5 fiscal law changes since 2010 and the lowest Reform Frequency Score in the database.">Stable Fiscal Record — ≤1 sourced law change since 2010 · Take ≤70%</option>
-        <option value="downsidereturns" title="Rebuilt at v724. The shipped thresholds were NPV &ge;$100M at the deck AND &ge;$500M at $50 &mdash; but contractor NPV at $50 is &le; contractor NPV at the deck for all 185 countries, so a $500M downside floor removes everything a $100M deck floor could, and the deck leg could never reject a single row. It returned 153 of 185 under the platform's own &quot;(barely narrows)&quot; annotation, and the deck leg was inert by construction, not by calibration. The hurdles are now stated as multiples of the standardized project's $1.2B capex, with the DECK hurdle above the downside hurdle &mdash; the only ordering under which both legs can bind &mdash; and the proxy-economics jurisdictions are out, because a return hurdle read off regional proxy terms is not a return.">Two-Price Return Screen — verified production · NPV ≥$2.4B at deck (2× capex) AND ≥$1.2B at $50 (1× capex)</option>
+        <option value="downsidereturns" title="Rebuilt at v724. The shipped thresholds were NPV &ge;$100M at the deck AND &ge;$500M at $50 &mdash; but contractor NPV at $50 is &le; contractor NPV at the deck for all 185 countries, so a $500M downside floor removes everything a $100M deck floor could, and the deck leg could never reject a single row. It returned 153 of 185 under the platform's own &quot;(barely narrows)&quot; annotation, and the deck leg was inert by construction, not by calibration. The hurdles are stated as multiples of the all-in capex of the project the stored NPVs were computed on (ENGINE_BASIS &mdash; dcf_profiles.py PROFILES.deepwater, $1.0B), with the DECK hurdle above the downside hurdle &mdash; the only ordering under which both legs can bind &mdash; and the proxy-economics jurisdictions are out, because a return hurdle read off regional proxy terms is not a return.">Two-Price Return Screen — verified production · NPV ≥${DECKFLOOR} at deck (${DECKMULT} the ${CAPEXANCHOR} all-in capex) AND ≥${DNFLOOR} at $50 (${DNMULT})</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
         <option value="rfactor">R-factor PSC — price-sensitive profit oil tiers</option>
         <option value="atlanticfrontier" title="Atlantic margin deepwater benchmark set — the six countries named, screened as an explicit list with no take ceiling. Nigeria (81.1% take) is in the set by name; a 75% ceiling used to remove it silently.">Atlantic Frontier — Guyana · Angola · Brazil · Nigeria · Suriname · Gabon</option>
@@ -31258,6 +31258,63 @@ function _scClearPreset() {
 }
 window._scClearPreset = _scClearPreset;
 
+/* ── v836 (T1) — the Two-Price Return Screen stated its hurdles as multiples of a project
+   that produced none of the numbers it filters, and overstated its own deck floor at the
+   $50 deck. ─────────────────────────────────────────────────────
+
+   Walked T1 cold at 1440x900 and 390x844, both storages cleared, over http. The preset
+   menu is where a 20-minute analyst answers "which countries should even be on my list",
+   and the menu line is read BEFORE the click. It rendered:
+
+       Two-Price Return Screen — verified production · NPV ≥$2.4B at deck (2× capex)
+       AND ≥$1.2B at $50 (1× capex)   → 5 of 185 @$75
+
+   Two separate defects, both in what the analyst reads to decide whether to trust the list.
+
+   (1) THE ANCHOR. "2× capex" and "1× capex" were multiples of
+       DCF_PROFILES.deepwater.capexMM = $1,200M — the in-page Live DCF / Scenario Builder
+       profile. runScreener() filters d.npv_75 / d.npv_50, which are COUNTRY_DATA, which
+       petroleum_dcf.py produced on dcf_profiles.py PROFILES.deepwater = ENGINE_BASIS,
+       $1,000M all-in. Same wrong-project error v833/v834/v835 corrected on the Country
+       Profile, the seven exports and the Side-by-Side strip. Measured against the capex
+       the filtered figures actually carry, $2.4B is 2.4× and $1.2B is 1.2×.
+
+       The floors themselves are NOT the defect and are deliberately left alone. Measured
+       on the shipped data at the $75 deck, 2.4×/1.2× is what makes this a two-price test:
+       the deck leg rejects China, the downside leg rejects Colombia, 5 of 185 survive. Re-
+       anchoring to a literal 2×/1× ($2.0B/$1.0B) makes both legs select the SAME nine
+       countries — neither rejects a single row the other does not — which is precisely the
+       inert-leg failure v724 rebuilt this preset to remove. The calibration is right; only
+       its description was wrong. So the dollar floors are the primitive here and the
+       multiples are DERIVED from them, which is also why they can no longer disagree.
+
+   (2) THE $50 DECK. v724 correctly collapses the deck leg to the downside leg at the $50
+       deck (both legs would otherwise test one number, and a 2.4× floor returns zero rows
+       there — max npv_50 is $2.37B). The slider was set to 1200 accordingly, but the menu
+       line and the active-preset badge both kept announcing "$2.4B at the deck price". One
+       click onto the $50 deck and the screen stated a floor twice the one it applied.
+
+   Both surfaces now render from _scReturnHurdles(deck): the floors it applies, the anchor
+   they are measured against, and the multiples computed from the two. */
+function _scReturnHurdles(deckKey) {
+  var capex = 1000;
+  try { if (typeof ENGINE_BASIS !== 'undefined' && ENGINE_BASIS.capexAllInMM) capex = ENGINE_BASIS.capexAllInMM; } catch (e) {}
+  var DN_MM = 1200;          // downside floor at $50 — calibrated, not a round multiple
+  var DECK_MM = 2400;        // deck floor — collapses to the downside floor at the $50 deck
+  var dk = (deckKey === undefined || deckKey === null)
+    ? ((typeof getPriceKey === 'function') ? String(getPriceKey()) : '75')
+    : String(deckKey);
+  var deckMM = (dk === '50') ? DN_MM : DECK_MM;
+  var money = function (v) { return '$' + (v / 1000).toFixed(1) + 'B'; };
+  var mult  = function (v) { return (v / capex).toFixed(1).replace(/\.0$/, '') + '\u00d7'; };
+  return {
+    capexMM: capex, capexTxt: money(capex),
+    deckMM: deckMM, deckTxt: money(deckMM), deckMultTxt: mult(deckMM),
+    dnMM:   DN_MM,  dnTxt:   money(DN_MM),  dnMultTxt:   mult(DN_MM)
+  };
+}
+window._scReturnHurdles = _scReturnHurdles;
+
 function applyScreenerPreset(preset) {
   // v587 (T1): a preset defines the whole screen, ranking included — R-factor PSC ranks by price
   // sensitivity, the rest by the v507 evidence-first order. So loading one clears any column sort
@@ -31405,8 +31462,10 @@ function applyScreenerPreset(preset) {
     // Resilience preset re-references its denominator at the $50 deck (v699). Both floors then
     // test the same number, and the v706 detector says so on screen rather than leaving the
     // analyst to infer that a "two-price" screen is running on one price.
-    var _dr50 = (typeof getPriceKey === 'function' && getPriceKey() === '50');
-    setSlider('sl-npv', _dr50 ? 1200 : 2400); setSlider('sl-npv50', 1200);
+    // v836: the floors come from _scReturnHurdles(), which also paints the menu line and the
+    // badge, so the stated hurdle and the applied hurdle cannot drift apart at any deck.
+    var _H = _scReturnHurdles();
+    setSlider('sl-npv', _H.deckMM); setSlider('sl-npv50', _H.dnMM);
     if (keepProxy) keepProxy.checked = false;
     _activePresetName = 'Two-Price Return Screen';
   } else if (preset === 'rfactor') {
@@ -31522,7 +31581,7 @@ function applyScreenerPreset(preset) {
       // Two-Price Return Screen showed no active-preset badge at all.
       // v724: the badge follows the rebuilt legs, and names the deck leg as "at the deck price"
       // rather than "@$75", because this preset is re-run at whichever deck button is pressed.
-      downsidereturns: 'Two-Price Return Screen: verified production \u00b7 NPV \u2265$2.4B at the deck price (2\u00d7 capex) \u00b7 NPV \u2265$1.2B at $50 (1\u00d7 capex)',
+      downsidereturns: 'Two-Price Return Screen: verified production \u00b7 NPV \u2265${DECKFLOOR} at the deck price (${DECKMULT} the ${CAPEXANCHOR} all-in capex) \u00b7 NPV \u2265${DNFLOOR} at $50 (${DNMULT})',
       highevidence: 'Primary-Source Evidence: tier-A \u2265\u00a055% \u00b7 \u2265\u00a0150 facts on file',
       rfactor: 'R-factor PSC: price-sensitive profit oil tiers',
       atlanticfrontier: 'Atlantic Frontier: Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria \u00b7 Suriname \u00b7 Gabon \u2014 explicit set, no take ceiling',
@@ -31547,8 +31606,17 @@ function applyScreenerPreset(preset) {
     // to the two captions it left behind. At the $75 deck every string renders byte-identical to
     // before, so the default path is unchanged.
     var _deckNow = (typeof getPriceKey === 'function') ? String(getPriceKey()) : '75';
+    // v836: the return-hurdle tokens resolve from _scReturnHurdles(deck) the same way ${DECK}
+    // resolves from the price deck, so the badge cannot state a floor the filter does not apply.
+    var _HB = (typeof _scReturnHurdles === 'function') ? _scReturnHurdles(_deckNow) : null;
     Object.keys(presetCriteria).forEach(function (k) {
-      presetCriteria[k] = presetCriteria[k].split('${DECK}').join('$' + _deckNow);
+      var t = presetCriteria[k].split('${DECK}').join('$' + _deckNow);
+      if (_HB) t = t.split('${DECKFLOOR}').join(_HB.deckTxt)
+                   .split('${DNFLOOR}').join(_HB.dnTxt)
+                   .split('${DECKMULT}').join(_HB.deckMultTxt)
+                   .split('${DNMULT}').join(_HB.dnMultTxt)
+                   .split('${CAPEXANCHOR}').join(_HB.capexTxt);
+      presetCriteria[k] = t;
     });
     var lblText = document.getElementById('screener-preset-label-text');
     if (preset && presetCriteria[preset]) {
@@ -31874,7 +31942,17 @@ function _labelScreenerPresets() {
       // "NPV positive at $75 AND at $50   \u2192 12 of 185 @$100" \u2014 the criteria and the hit count
       // disagreeing inside a single line, which is the line the analyst reads BEFORE clicking.
       // Only the deck-relative legs carry the token; the @$50 legs read npv_50 at every deck.
-      o.textContent = o.dataset.baseText.split('${DECK}').join('$' + deck)
+      // v836: resolve the return-hurdle tokens alongside the deck token, for the same reason the
+      // deck token is resolved here — this line is read BEFORE the click, so it must name the
+      // floors actually applied at THIS deck, not the ones applied at $75.
+      var _cap = (typeof _scReturnHurdles === 'function') ? _scReturnHurdles(deck) : null;
+      var _base = o.dataset.baseText.split('${DECK}').join('$' + deck);
+      if (_cap) _base = _base.split('${DECKFLOOR}').join(_cap.deckTxt)
+                             .split('${DNFLOOR}').join(_cap.dnTxt)
+                             .split('${DECKMULT}').join(_cap.deckMultTxt)
+                             .split('${DNMULT}').join(_cap.dnMultTxt)
+                             .split('${CAPEXANCHOR}').join(_cap.capexTxt);
+      o.textContent = _base
                     + '   \u2192 ' + n + ' of ' + total + ' @$' + deck + (share >= 0.75 ? ' (barely narrows)' : '');
     });
   } catch (e) { /* non-critical: leave the menu unlabelled rather than half-labelled */ }
