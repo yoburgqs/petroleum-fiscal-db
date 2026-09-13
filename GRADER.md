@@ -48495,3 +48495,140 @@ all untouched. Tab order unchanged. v824 → v825 at the three display sites onl
 
 ## Friction
 Fiscal Compare's sort row offers five identically-styled buttons. Four work. The fifth — **Swing**, the only control on the platform that ranks 185 countries by price stability, whose own tooltip reads *"low→high, most stable first"* — had no click handler at
+
+---
+## Cycle 735 Log — 2026-09-13 — T2 — shipped v827 (`ab1132a`)
+
+- Test before: 299 PASS / 0 FAIL / 1 WARN (pre-change build, re-run this cycle, served locally)
+- Test after: 299 PASS / 0 FAIL / 1 WARN
+- JS errors: 0
+- Pixel gate: PASS
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation:
+734 was T6, 733 T4, 732 T1, 731 T3, 730 T5 — T2 last ran at 729.
+
+## Friction
+Walked cold at 1440x900 with no sessionStorage or localStorage: Home → Country Profile → change the
+dropdown from the Indonesia example to **Guyana**.
+
+The profile answers the first half of T2 well and was not the problem. It prints 54.1% take @$75,
+NPV $1.07B, downside $511M @$50, BE < $50/bbl bounded, swing 26.0pp, and it volunteers what would
+otherwise be the trap — *"Take is a range here, not a point. By regime, Concession prices at 18.1%
+(9 contracts) and PSC at 56.5% (134), so the regime you sign moves the take by 38.4pp"*, and
+`#cp-spread-badge` says plainly **"none listed at headline 54.1%"**. That is defensible work.
+
+**IRR is the one metric it refuses**, deliberately and correctly: the country-level figure is an
+arithmetic mean of per-contract IRRs, not a project return. In its place the headline offers one
+route — `IRR: → Model in Scenario Builder` (`index.html:38450` → `ddOpenScenarioBuilder()`,
+`:48679`). **That route opens a dialog with no visible name and no visible way out.**
+
+`ddOpenScenarioBuilder()` auto-runs the DCF, and `runCustomScenario()` ends with
+`output.scrollIntoView()` (`:48225`). `#scenario-modal-inner` is the scroll container, and the header
+row holding the title and the **only** close control sits inside it — so the auto-scroll pushes both
+outside the dialog's own clip. Measured:
+
+    open path                         inner.scrollTop   #scenario-modal-close-btn
+    header "+ Scenario"                       0         visible, top +87
+    Country Profile, 1440 x 900             230         top  -143   (out of view)
+    Country Profile, 390 x 844 touch       1435         top -1398   (out of view)
+
+Esc closes it, and a backdrop tap closes it. Neither is on screen. On a phone there is no Esc key and
+the backdrop is a **10px strip** either side of a 371px dialog (`width:95%`). The screenshot at 390
+shows what the analyst gets: results, mid-sentence, under a hard edge — no title, no ×, nothing
+naming the thing they are inside.
+
+So the analyst who followed the profile's own instruction, to get the one number an IC memo needs,
+lands 1,435px inside an unnamed dialog and has to guess their way back to the country they were
+reading. That is the worst moment in the walk, and it is on the platform's only IRR path.
+
+## Change
+**The header row is pinned.** `#scenario-modal-header` is `position:sticky` at the inner's padding
+edge, carrying the surface background and a bottom rule, so *Custom Scenario Builder* and the close
+button stay on screen at every scroll depth, on every entry path, at every viewport.
+
+The auto-scroll is **kept**. It is what puts the "Loaded from Guyana's terms" reconciliation and the
+three result cards in front of the analyst instead of a form they did not ask for. Removing it would
+have traded one 1,435px scroll for another in the opposite direction.
+
+Three supporting bits, all load-bearing:
+
+- The sticky offset is **`top: -24px`** (`-16px` under 768px), not `0`. A sticky offset resolves
+  against the scroll container's **content** box, so `top:0` parked the header 25px below the dialog
+  edge and content scrolled visibly through the gutter. Measured `gap` 25 → 1.
+- `.scenario-inputs-panel`'s own sticky **▶ Run DCF** bar sticks in the same coordinate space and
+  would have docked *behind* the header. It is now `#sb-run-dcf-sticky`, sticking at
+  `calc(var(--sb-hdr-h) - 24px)`; `_sbPinHeader()` publishes the measured header height on open and
+  on resize rather than hard-coding 63px.
+- `openScenarioBuilder()` resets `inner.scrollTop = 0`, so a header-opened scenario never inherits
+  the previous visit's scroll.
+
+The close button was **11.7 x 23px** — under the directive's 24px floor. It is now a bordered
+**32 x 32** target, **44 x 44** under `pointer: coarse`.
+
+## Result
+From the Country Profile the analyst reads Guyana's project IRR — **243.4%** on the loaded Deepwater
+profile, with *"$129M at risk · payback yr 2"* and the *"these two NPVs are not the same
+measurement"* reconciliation beside it — and then **closes the dialog with a visible control** and is
+back on Guyana's profile. On a 1920 desktop and on a 390px phone alike. Before this cycle, on the
+phone, no control that could close that dialog was rendered anywhere inside it.
+
+## Verification — every number measured this cycle
+- **JS syntax gate: PASS** — 11 inline script blocks, 0 syntax errors.
+- **Runtime suite: RAN**, both builds, over `python3 -m http.server`:
+  - pre-change build (`/tmp/orcawalk/index.before.html`, port 8778) — **299 PASS / 0 FAIL / 1 WARN**
+  - v827 (port 8777) — **299 PASS / 0 FAIL / 1 WARN**
+  - The WARN is a service-worker 404 that only exists when serving locally, and it is present in
+    both runs. The deployed build reports it as the 300th PASS. No regression either way.
+- **Pixel gate: PIXEL GATE PASS** — no surface worse than baseline. The nine findings it lists
+  (`open the screen →`, `Reading this table`, `Why the two differ`, the `conf-a` source badge, the
+  `#cp-terms-chip` clip) all pre-date this cycle and are untouched by it.
+- **Close control visible at the modal's post-auto-scroll position** at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390** — scrollTop 240 / 240 / 240 / 240 / 1138 / 1440,
+  `closeVisible: true` at all six. Size 32x32 with a mouse, 44x44 with a thumb.
+- **Zero horizontal scroll:** `scrollWidth === clientWidth` on all **10 tabs** at all **six**
+  viewports, and again with the modal open.
+- **0 page errors** at every viewport, desktop and phone.
+- Click-close, Esc-close and backdrop-close all still work; `headerPathScrollTop` is 0 after the
+  reset, and `headerPathCloseVisible` is true.
+
+## STILL LOCKED — respected
+No new tooltip, no new FAQ, no banner / page-sub / "How to read" block / routing hint, no citation
+micro-edit, no rubric chasing. **Not a text-only change** — a control that rendered 1,398px outside
+its container now renders inside it, and the dialog gains a pinned header band it did not have. The
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched; the new
+rules are scoped to `#scenario-modal-header`, `#sb-run-dcf-sticky` and `#scenario-modal-close-btn`.
+v371/v373 declutter intact. v430 FC IC Analyst Guide sessionStorage, v449/v451/v452 CP headline and
+the removed FC Govt NPV column, v489 Reform Risk — all untouched. Tab order unchanged. v826 → v827 at
+the three display sites only (`:42`, `:2466`, `:2536`), silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **The Country Profile's regime-blend disclosure is finished work.** On Guyana the headline,
+  `#cp-regime-breakdown`, `#cp-spread-badge` and the `cp-defend-disp` line all tell the same story
+  and the badge volunteers that **no contract sits at the headline number**. On Indonesia the
+  mechanics section prints an unprompted warning that the page shows *three* different government
+  profit-oil shares (71.2% summary / 64.4% evidence table / the 60–88% R-factor ladder the DCF
+  actually resolves on) and says to reconcile all three before quoting any. That is the T2
+  "can I defend that" question answered against the platform's own weakest spot.
+- **The Scenario Builder's country reconciliation is finished work.** The banner resolves the basis
+  before it asserts anything (v607/v776), and the origin strip prints this-scenario vs published for
+  both take and NPV with a plain-English account of why a higher take and a higher NPV can be true at
+  once (Guyana: 54.9% / $3.39B vs 54.1% / $1.07B, 3.2x).
+- **Control audit of the whole Country Profile tab** — every `onclick` resolved to a defined function
+  and every `getElementById` in an inline handler resolved to a present element, except the one
+  already carried below. No second dead button of the v825 kind on this tab.
+
+## Carried forward
+- **FC Reform verdict column** still has no `data-sort-key` and no `onclick` — with the column on,
+  reform exposure still cannot be ranked, only swing. (Carried from 733.)
+- **`#cp-run-fc-btn` (`index.html:4016`)** reads `cp-price-select` and `price`, neither of which
+  exists. **Re-examined this cycle and downgraded:** the `||` falls through to `fc-price`, which does
+  exist, and the write is guarded by `if(_fcP)`. The Country Profile has no price control of its own,
+  so the button does what its label says — switches to FC and runs at FC's price. Dead code, not a
+  dead control. Lower priority than 733 implied.
+- **Screener tick column** header is a bare select-all checkbox with no visible label. (Carried from
+  732.)
+- **The `petroleum overnight chain FAILED` emails are now a series, not an incident** — 2026-09-12
+  *and* 2026-09-13 are both in the inbox, still uninvestigated, sixth cycle carried. Outside the
+  UX-finalization course this directive sets, so no cycle has touched it, and that is now the
+  problem: nothing in the loop will ever pick it up. **It wants Zach's attention directly.**
