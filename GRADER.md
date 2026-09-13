@@ -49388,3 +49388,78 @@ three display sites only (`:42`, `:2484`, `:2554`), silently, after the real cha
 
 ## Friction
 Walked cold at 1440×900 and 390×844, both storages cleared. Country Profile's evidence chain turned out to be mature — the headline take click lands you on the parameter table, dead citations are labelled `LINK DEAD`, and Fiscal Compare's Iraq drilldown disambiguates its three differe
+
+---
+## Cycle 741 Log — 2026-09-13 09:57
+- Test before: 299 PASS / 0 FAIL / 1 WARN (local server; the WARN is the local-only `sw.js` 404 — the deployed build serves it, which is why the harness reads 300 PASS / 0 WARN)
+- Test after: 299 PASS / 0 FAIL / 1 WARN — **the "before" run was made by restoring the pre-change file from backup and serving it on a second port, not assumed**
+- JS errors: 0 page errors, 0 console errors beyond the known `sw.js` 404
+- Shipped: **v833**, commit `b2b2421`, pushed, mirror synced
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest by rotation: 740 was T6, 739 T4, 738 T1, 737 T3, 736 T5; T2 last ran at 735.)
+
+## Friction
+Walked cold at 1440×900 and 390×844, `sessionStorage` and `localStorage` cleared both times. Country Profile autoloads Indonesia. The headline prints **`NPV: $745M @$75`**, and directly under the take chart a footnote (`index.html:39627`) told the analyst the basis to quote beside it:
+
+> *"Take computed on a standardized deepwater project ($1.2B capex · 50k bbl/d peak · $15/bbl opex · 25-year life)."*
+
+The same figures were restated, in more detail, in the collapsible **Cost Profile Assumptions** panel (`:40438`) — the block whose own closing line read *"All take and NPV figures in this profile use this standardized project"*, and which is precisely where an analyst goes to copy an assumption footnote into an IC memo.
+
+**Neither describes the project those numbers came from.** Both read `DCF_PROFILES.deepwater`, the object the *in-page* Live DCF and Scenario Builder run on. Measured:
+
+- `COUNTRY_DATA.npv_75` for Indonesia is **744.6**, which is exactly `avg(dcf_results.contractor_npv_usd_mm) WHERE country='Indonesia' AND price_usd_bbl=75` over 667 rows. The page prints `$745M`. So the headline is the stored engine's output, not the page's.
+- `dcf_results` was produced by `tools/petroleum/petroleum_dcf.py` on `tools/petroleum/dcf_profiles.py → PROFILES.deepwater`. That is a **different project**:
+
+| | stored engine (`dcf_profiles.py`) | in-page panel (`DCF_PROFILES`) |
+|---|---|---|
+| peak rate | 50k bbl/d | 50k bbl/d |
+| plateau | **5 years** | **8 years** |
+| decline | **15%/yr** | **12%/yr** |
+| total production | **241.9 MMbbl** | **294.0 MMbbl** |
+| capex | **$1,000M all-in** ($800M dev + $150M sustaining + $50M abandonment) | **$1,668M all-in** ($1,200M headline + 2%/yr sustaining from yr 4) |
+| opex | **$18/bbl, +2%/yr real** (→ ~$29 by yr 25) | **$15/bbl flat** |
+
+The v504 comment sitting on that panel asserted the opposite in as many words — *"the engine actually uses $1.2B / $15 / ramp 3yr + plateau 8yr for every precomputed take, NPV, IRR and breakeven in COUNTRY_DATA."* It was wrong, and it had been the stated justification for pointing the panel at the wrong object.
+
+**What that does to the analyst.** Scroll down from the headline and the Live DCF panel — defaulted to Deepwater, defaulted to $75, nothing touched — reads **$2.62B**. Two contractor NPVs, same country, same price, same profile *name*, 3.5× apart. The block directly beneath, titled **"Which number goes in the IC memo?"**, reconciled **government take only** and said nothing about NPV at all.
+
+Measured across `COUNTRY_DATA` at $75 on that profile: **179 of the 182 non-monopoly countries** differ by more than $250M between the two NPVs, and 40 by more than 2×. Sierra Leone is the sharpest case — take matches to **0.4pp**, so the block rendered a **green** verdict reading *"Consistent — this scenario lands within 3pp of the country average. **Either figure is defensible**"* — while printing **$1.10B** in the headline and **$3.62B** in the panel. That sentence is the one that walks a 3.3× wrong NPV into an IC memo.
+
+## Change
+- **`ENGINE_BASIS`** (new const beside `DCF_PROFILES`) and **`_basisDelta833()`** hold the stored-result project and compute the panel project's totals from `DCF_PROFILES` rather than restating them. Every surface below reads these; no number is typed twice.
+- **Headline footnote** now states the engine basis in full and says the Live DCF panel below runs a *different* Deepwater, naming the difference.
+- **Cost Profile Assumptions panel** rebuilt off `ENGINE_BASIS` — capex split into dev/sustaining/abandonment, plateau 4–8 with 15% decline, 241.9 MMbbl recovered, $18/bbl escalating 2%/yr — plus a closing paragraph naming the panel profile it is *not*.
+- **The reconciliation block gained its NPV half.** Second card pair: **"✔ Cite this NPV"** ($745M, carrying the engine basis line) against **"Scenario NPV — label it"** ($2.62B, carrying the panel basis line), then an **NPV gap bar** with its own verdict.
+- **Verdict severity is now the worse of the two gaps.** A material NPV divergence — ≥1.5×, a sign flip, or ≥$500M — cannot render green. On Sierra Leone the bar now reads *"Take is consistent — within 3pp of the country average — but that is only half the answer,"* and **"Either figure is defensible" no longer appears beside a 3.3× NPV split.** A sign flip gets its own sentence: the two NPVs do not agree on whether the project clears a 10% WACC.
+- **"Why the two differ"** gained a **Project basis** driver, pushed to *first* position when the panel is on its default profile (where the analyst has changed nothing and has no reason to suspect the basis differs): both projects named, both production volumes, *"+22% more oil on a cheaper barrel … an assumptions difference, not a fiscal finding."*
+- **Methodology assumptions table:** capex row corrected to $1.0B all-in with its split, opex row to $18/bbl escalating, and a **new Production profile row** — 50k bbl/d · 3yr ramp · 5yr plateau · 15% decline · 241.9 MMbbl — which was absent from the limitations table entirely despite being the dominant driver of the NPV level.
+- Reconciliation `<summary>` padded from 17px to a 24px touch target.
+
+## Result
+The analyst can quote the headline NPV with the assumptions it was **actually** computed on — the Cost Profile panel and the memo footnote now agree with the engine instead of with the what-if tool. And they can no longer carry the panel's NPV into a memo built on the headline take without the gap bar telling them, at the moment of the decision, that the two figures are two different projects and how far apart.
+
+## Verification — measured, not assumed
+- Suite **RAN**: 299 PASS / 0 FAIL / 1 WARN **before and after**, the "before" produced by restoring `index.html` from backup onto a second local server, not carried forward from a prior cycle.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390**, Country Profile cold, with the Cost Profile panel expanded and the drivers `<details>` open.
+- Controls under 24px under `pointer: coarse` at 390×844 in the touched blocks: **0** (was 1).
+- Elements overflowing right inside the touched blocks at every width: **0**.
+- Page errors 0; console errors 0 beyond the local `sw.js` 404.
+- Walked on Indonesia (regime mix + R-factor, take gap 4.6pp), Sierra Leone (take match 0.4pp, NPV 3.3×, the green-verdict case) and at $100/bbl on the slider. JS syntax gate: 11 scripts, 0 bad.
+
+## STILL LOCKED — respected
+Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How to read" block / routing hint, not a citation micro-edit, not rubric chasing. **Not text-only** — two new cards render, a verdict colour changes state, a driver is reordered, and a table row is added. v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched. v371/v373 declutter intact — the corrected copy replaces existing blocks in place; no new block was introduced above the fold. v430, v449/v451/v452, v489 untouched. Tab order unchanged. v833 written at the three display sites only (`:42`, `:2484`, `:2554`), silently, after the real change shipped and re-tested.
+
+## Carried forward
+- **RESOLVED this cycle:** the *"Which number goes in the IC memo?"* block answering for take only; and the Cost Profile panel naming the wrong project. Both carried implicitly since v504.
+- **NEW — the same false basis is still published on three other surfaces.** Deliberately not swept this cycle (one moment, one fix), and each needs its own walk because the surrounding structure differs:
+  - `:2859` / `:2969` — the FC **IC citation string** (*"Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex"*). Citation-string edits are banned as a cycle's *purpose*, but this one is factually wrong, not a wording preference. Needs a T5 walk.
+  - `:3792` — the **Side-by-Side profile strip**, which labels pre-computed (stored-basis) values with the panel profile. SbS shows stored numbers only, so this one is unambiguous.
+  - `:3346` — the Screener **Two-Price Return Screen** preset states its hurdles as *"2× capex"* / *"1× capex"* against **$1.2B**. The stored NPVs it filters were computed on **$1.0B**. The thresholds are therefore 2.4× / 1.2× of the real capex, not 2× / 1×. The preset still works; its self-description does not match its own arithmetic.
+  - Fiscal Compare is **not** making the same error in the same way — it already separates *"ORCA database (CITABLE)"* from *"this screen's model"* and runs its own `FC_PROFILES`. Its strip labels a live model profile. Left alone on purpose.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of 87.2% / 85.6%. A data question, wants a Fork-1 walk. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title when a filter leaves one breakeven-populated row. Grammar only. (Carried from 739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance. (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12 *and* 2026-09-13. **Twelfth cycle carried, still uninvestigated.** Outside the UX-finalization course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention directly.**
