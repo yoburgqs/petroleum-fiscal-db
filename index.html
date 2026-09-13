@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v833</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v834</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v833</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v834</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v833</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v834</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33577,8 +33577,8 @@ function _scExportBasisLines() {
   } else {
     L.push('Screen state unavailable — open the Screener tab and re-export to record the criteria.');
   }
-  L.push('ASSUMPTIONS: standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, '
-    + '10% WACC, 100% WI. Take and NPV at the screened price; breakeven always at $75/bbl.');
+  L.push('ASSUMPTIONS: ' + _icEngineBasis()
+    + ' Take and NPV are at the screened price; breakeven is always at $75/bbl.');
   // v743 (T1): only stated when this shortlist actually contains such a row, and it names them,
   // because a caveat about countries that are not in the export is noise in an IC memo.
   (function(){
@@ -42320,8 +42320,8 @@ function _iocExpBasisLines() {
     : 'No row blends fee-basis (TSC / RSC / Buy-back) contracts. All take figures on this sheet are price-linked and mutually rankable.');
   L.push('');
   L.push('NPV BASIS');
-  L.push('Contractor NPV is on the standardized Deepwater profile: $1.2B capex, 50k bbl/d, $15/bbl opex, '
-         + '25yr life, 10% WACC, 100% working interest. It is a jurisdiction comparison, not a valuation of '
+  L.push('Contractor NPV is on the ' + _icEngineBasis()
+         + ' It is a jurisdiction comparison, not a valuation of '
          + st.operator + "'s actual position — scale by your working interest and substitute your own "
          + 'capex/opex before it goes near a valuation.');
   L.push('IRR and breakeven are not reported at this level: the underlying country figures are arithmetic '
@@ -42371,7 +42371,7 @@ function copyIOCPortfolio() {
     + (st.nFromCountry > 0
         ? '; the other ' + st.nFromCountry + ' are the COUNTRY average, substituted because ORCA holds no operator-level terms there — the Take basis column names them, and those rows describe the jurisdiction, not this operator\u2019s position in it. '
         : '. ')
-    + 'Contractor NPV is on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI) — scale by your working interest. '
+    + 'Contractor NPV is on the ' + _icEngineBasis() + ' '
     + 'IRR and breakeven are not reported at this level: the underlying country figures are arithmetic means of per-contract values, not project returns.';
   // v822 (T5): the header paragraph has to say, before the table, that the take column is not
   // the jurisdiction's — and has to size the disagreement rather than merely warn about it.
@@ -46267,10 +46267,9 @@ function copyICSummary() {
   _notes.push(CP_IRR_NOTE);
 
   var _caption = country + ' — ORCA fiscal summary (' + mechStr + ', ' + nStr + ', ' + tierStr + ')';
-  var _assump  = 'Standardized Deepwater profile: $1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, '
-    + '100% working interest. Government take and contractor NPV are modelled at the prices shown. '
-    + 'The ' + _notes.length + ' note' + (_notes.length === 1 ? '' : 's') + ' below this table '
-    + 'qualify the rows they name and travel with it.';
+  var _assump  = _icEngineBasis() + ' Government take and contractor NPV are modelled at the '
+    + 'prices shown. The ' + _notes.length + ' note' + (_notes.length === 1 ? '' : 's')
+    + ' below this table qualify the rows they name and travel with it.';
   var _srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform ' + _orcaVerNow()
     + ' (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
 
@@ -46395,7 +46394,7 @@ function copyComparisonTable(btn) {
   // points over a grid that pastes FOUR -- $100 is a row in the artifact and was missing from
   // its own assumption line -- and its IRR clause carried the stale 239.8% / 124-country
   // literal. Both now match what is actually in the paste.
-  var assump = 'Standardized Deepwater profile, $1.2B capex, 10% WACC, 100% WI. Contractor NPV at $50 / $75 / $100 / $125/bbl; government take at $50–$125/bbl. Breakeven is not reported: every stored value under $50 rendered as the single string "<$50" and all 65 populated values fall between $27 and $34, so the field could not separate two countries; at $75/bbl the DCF engine now returns a usable breakeven for 44 of 71,576 contract rows. Use the $50 contractor NPV as the downside test. '
+  var assump = _icEngineBasis() + ' Contractor NPV at $50 / $75 / $100 / $125/bbl; government take at $50–$125/bbl. Breakeven is not reported: every stored value under $50 rendered as the single string "<$50" and all 65 populated values fall between $27 and $34, so the field could not separate two countries; at $75/bbl the DCF engine now returns a usable breakeven for 44 of 71,576 contract rows. Use the $50 contractor NPV as the downside test. '
     + _icIrrNote('IRR is not reported');
   // v511: last cycle moved three clipboard citations onto _orcaVerNow(); this one was missed,
   // so the pasted comparison table carried a hard-coded version that drifts every cycle.
@@ -46763,6 +46762,56 @@ const ENGINE_BASIS = {
   // One line, used wherever a stored figure has to name its own assumptions.
   short: '50k bbl/d peak · 5yr plateau · $1.0B all-in capex · $18/bbl opex escalating 2%/yr · 25yr life · 10% WACC',
   source: 'tools/petroleum/dcf_profiles.py — PROFILES.deepwater'
+};
+
+/* ── v834 (T5) — the assumptions that travel with a pasted figure are now the assumptions
+   that produced it. ─────────────────────────────────────────────────────────────────────
+
+   v833 corrected the two places on the Country Profile SCREEN that described the stored
+   numbers with the in-page panel's project. It did not touch the artifacts that leave the
+   tool. Seven of them — the three "Copy for IC Memo" clipboard pastes, the Screener CSV/XLSX
+   assumptions block, the IOC Portfolio workbook and its header paragraph, and the Breakeven
+   Map CSV — each carried a hand-typed literal reading
+
+       "standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC"
+
+   above rows of COUNTRY_DATA take, NPV and breakeven. COUNTRY_DATA was produced by
+   petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater — $1.0B all-in, $18/bbl escalating
+   2%/yr real, 5yr plateau, 241.9 MMbbl. The $1.2B/$15 project is DCF_PROFILES.deepwater, the
+   Live DCF and Scenario Builder profile, which recovers 294.0 MMbbl and returns roughly 3x
+   the NPV at the same price on the same country.
+
+   That literal is the line an IC reader uses to rebuild the number. On the exported basis
+   Norway reads $826M at $75/bbl; rebuilt on the basis the export states, it does not. The
+   paste is the worst place for this error to live, because it is read by people who never
+   see the screen it came from and have no way to discover the substitution.
+
+   These strings are now DERIVED from ENGINE_BASIS at call time, the same treatment v574 gave
+   the citation version numbers after they drifted twice under sweep-based maintenance. There
+   is no longer a second copy of these figures to fall out of step. */
+window._icEngineBasis = function(opts) {
+  var o = opts || {};
+  if (typeof ENGINE_BASIS === 'undefined') {
+    return 'ORCA standardized reference project, 10% WACC, 100% working interest.';
+  }
+  var E = ENGINE_BASIS;
+  var core = 'ORCA standardized ' + E.name + ' reference project — the basis the stored figures '
+    + 'were computed on: ' + (E.peakBblDay / 1000).toFixed(0) + 'k bbl/d peak, ' + E.rampYears
+    + 'yr ramp, ' + E.plateauYears + 'yr plateau, ' + (E.declineRate * 100).toFixed(0)
+    + '%/yr decline, ' + E.totalProdMM.toFixed(1) + ' MMbbl recovered, $'
+    + (E.capexAllInMM / 1000).toFixed(1) + 'B all-in capex ($' + E.capexDevMM + 'M development + $'
+    + E.sustainingMM + 'M sustaining + $' + E.abandonmentMM + 'M abandonment), $' + E.opexBbl
+    + '/bbl opex escalating ' + (E.opexEscal * 100).toFixed(0) + '%/yr real, ' + E.years
+    + '-year life, ' + (E.discountRate * 100).toFixed(0) + '% WACC, 100% working interest'
+    + (o.wi === false ? '.' : ' — scale NPV by your WI.');
+  if (o.warn === false) return core;
+  var d = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
+  if (!d) return core;
+  return core + ' Rebuild these figures on those assumptions, not on the in-page Live DCF / '
+    + 'Scenario Builder profile: that panel is also labelled “' + E.name + '” but runs a '
+    + 'different project ($' + (d.capexMM / 1000).toFixed(1) + 'B development capex, '
+    + d.plateauYears + 'yr plateau, ' + (d.declineRate * 100).toFixed(0) + '% decline, $'
+    + d.opexBbl + '/bbl flat opex) and returns a materially different NPV at the same price.';
 };
 // Same two projects, expressed for the reconciliation block.
 function _basisDelta833() {
@@ -54398,7 +54447,7 @@ function copyFCForIC(btn) {
     + (_anyFee
         ? 'Government take in the first numeric column and the ORCA database contractor NPV column are the ORCA contract-database figures — the same values Fiscal Compare ranks on, Country Profile and the row drilldown citation carry, and the ones to cite. '
         : 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. ')
-    + 'That contractor NPV is on a standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex), 10% WACC, 100% working interest — scale by your WI. It is a fixed basis and does not move with the profile selector. '
+    + 'That contractor NPV is on the ' + _icEngineBasis() + ' It is a fixed basis and does not move with the profile selector. '
     + 'The last numeric column is this screen’s model NPV on the ' + profName + ' profile you had selected — the figure that was on screen when you copied. Cite the database column; the model column is for profile sensitivity only.'
     + ' Breakeven is populated for ' + nBe + ' of these ' + N + ' rows (it requires verified per-contract royalty and cost data).';
   var warn = '';
@@ -56056,7 +56105,7 @@ function exportBreakevenCSV() {
       + 'cost structures. TO RANK COUNTRIES ON DOWNSIDE, EXPORT THE FULL SET FROM THE SCREENER: it carries the same retention column for all 185 '
       + 'and is the basis the Downside Resilience preset screens on. This file is a coverage list, not a shortlist.',
     'The ' + nBlank + ' countries absent from this file have no modelled cost structure. That is absence of data, not a low or high breakeven.',
-    'Basis: standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex), 10% WACC, 100% working interest — scale NPV by your WI. '
+    'BASIS — ' + _icEngineBasis() + ' '
       + 'Government take is the ORCA contract-database figure. IRR is blank where the country-level figure exceeds 500% (an arithmetic mean of per-contract IRRs, not a project return).',
     'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/'
   ];
