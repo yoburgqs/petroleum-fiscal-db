@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v827</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v828</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -300,6 +300,24 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
+/* ── v828 (T5) — the tick column, cued at the one moment it matters ──────────
+   "Copy for IC Memo" with nothing ticked copies every row on screen — 185 on the cold
+   view of both Fiscal Compare and the Screener. The mechanism that makes it a shortlist
+   is this column, and on a cold load it is a 30px cell with an EMPTY header (measured:
+   innerText ""), while the "0 selected" pill beside the button is display:none until the
+   first tick. So the affordance is invisible at exactly the moment the analyst needs it.
+   These rules fire only while a bulk copy is armed (see _icArmBulkCopy) and are
+   deliberately background + inset shadow only — nothing here changes a box size, so the
+   column cannot shift the grid at any viewport while the cue is up. */
+#tbl-fc th.fc-selcell.ic-tick-cue, #tbl-fc td.fc-selcell.ic-tick-cue,
+#tbl-screener th.sc-selcell.ic-tick-cue, #tbl-screener td.sc-selcell.ic-tick-cue {
+  background: rgba(176,104,0,.24);
+  box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  #tbl-fc td.fc-selcell.ic-tick-cue, #tbl-screener td.sc-selcell.ic-tick-cue { animation: icTickCue 1s ease-in-out 2; }
+}
+@keyframes icTickCue { 0%,100% { background: rgba(176,104,0,.24); } 50% { background: rgba(176,104,0,.46); } }
 /* ── v800 (T5) — Fiscal Compare IC shortlist dock ──────────────────────────────
    The v781 dock, on the tab it was first needed on. .fc-controls is `position: sticky`
    only down to 768px (the sticky is dropped in the narrow layout), and the Fiscal Compare
@@ -2463,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v827</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v828</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2533,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v827</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v828</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33772,6 +33790,12 @@ function copyScreenerTable() {
   var btn  = document.getElementById('screener-copy-ic-btn');
   var rows = _scExportRows();
   if (!rows.length) { _icRefuse(_scEmptyMsg('copy')); return; }
+  // v828 (T5): same guard as Fiscal Compare, on the tab whose caption already calls its own
+  // cold output "the full ORCA universe, not a screen result". Ticked shortlists never arm.
+  var _scSelN = (typeof _scSelOrdered === 'function' && _scSelOrdered()) ? _scSelOrdered().length : 0;
+  if (!_scSelN && typeof _icArmBulkCopy === 'function'
+      && !_icArmBulkCopy(btn, rows.length, '#tbl-screener .sc-selcell',
+          (typeof _scSyncSelUI === 'function') ? _scSyncSelUI : null)) return;
   var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   var b = window._screenerExportBasis;
 
@@ -46277,6 +46301,108 @@ function _icRefuse(msg) {
 }
 window._icRefuse = _icRefuse;
 
+// ── v828 (T5) — "give me something I can paste straight into an IC memo." ──────────────
+// Walked T5 cold at 1440x900 and again at 390x844 (hasTouch), no sessionStorage, no
+// localStorage. Fiscal Compare auto-loads 185 rows; the Screener opens on 185 of 185 under
+// a caption reading "screening shortlist" whose own criteria block says "None — this is the
+// full ORCA universe, not a screen result". On both tabs the toolbar button is named
+// "Copy for IC Memo", and on both tabs one click on it put the WHOLE TABLE on the clipboard:
+// measured 50,731 characters over 185 rows and 13 columns on Fiscal Compare, 29,452 over 185
+// rows on the Screener. The button then reported "✓ Copied".
+//
+// v632 and v728 built the fix for this — tickable rows — and both left the default click
+// alone on purpose ("no existing path changes"). That was the right call for the ticked path
+// and the wrong one for the cold path, because the shortlist mechanism is INVISIBLE until it
+// has already been used: the tick column's <th> renders with innerText "" (measured), and the
+// "N selected" pill next to the button is display:none while the count is zero. So on the one
+// screen where an analyst has never ticked anything, nothing on the page says a shortlist is
+// even possible. They click the button named for the job, see "✓ Copied", switch to Word, and
+// paste seven pages. The success toast does carry the count, but it lands 12px high in the
+// opposite corner, 2.5s after the clipboard was already overwritten — the same asymmetry v808
+// fixed for refusals, in the direction v808 did not cover.
+//
+// An IC screening shortlist is five to twelve countries; v632's own comment says so. So an
+// unticked bulk copy is armed rather than performed: the first click says what it is about to
+// do ON the button, raises the tick column it did not know about, and copies nothing. A second
+// click inside 6s copies all N exactly as before — the bulk paste stays reachable in two
+// clicks for anyone who genuinely wants the whole table. Ticked copies, and any result set
+// already down to IC size, are never armed and are untouched.
+window.IC_BULK_ROWS = 25;   // above any hand-built IC shortlist, far below the 185-row default
+window._icArmedBtn = null;
+window._icArmTimer = null;
+
+function _icDisarmBulk() {
+  clearTimeout(window._icArmTimer);
+  var b = window._icArmedBtn;
+  window._icArmedBtn = null;
+  var cues = document.querySelectorAll('.ic-tick-cue');
+  for (var i = 0; i < cues.length; i++) cues[i].classList.remove('ic-tick-cue');
+  if (!b || !document.body.contains(b)) return;
+  // Restore the label the way v632's flash() does — from live selection state, not from the
+  // snapshot taken when the arm went up. A snapshot goes stale if the 2s "✓ Copied" flash from
+  // a PREVIOUS copy is still on the button when this one arms, and the button then settles
+  // back onto "✓ Copied" forever. Snapshot is the fallback when no sync function was supplied.
+  if (typeof b._icRestore === 'function') { try { b._icRestore(); } catch (e) {} }
+  else if (b.dataset.icArmedHtml != null) { b.innerHTML = b.dataset.icArmedHtml; }
+  delete b.dataset.icArmedHtml; b._icRestore = null;
+  b.style.minWidth = b.dataset.icArmedMw || '';
+  b.style.whiteSpace = b.dataset.icArmedWs || '';
+  b.style.color = b.dataset.icArmedCol || '';
+  b.style.borderColor = b.dataset.icArmedBd || '';
+  b.style.fontWeight = b.dataset.icArmedFw || '';
+  delete b.dataset.icArmedMw; delete b.dataset.icArmedWs;
+  delete b.dataset.icArmedCol; delete b.dataset.icArmedBd; delete b.dataset.icArmedFw;
+}
+
+// Returns TRUE if the caller should go ahead and copy, FALSE if this click only armed it.
+// Fails open in every degenerate case (no button, no rows, small set) so no existing path
+// can be blocked by this: the only outcome it can add is one extra click.
+function _icArmBulkCopy(btn, n, tickSel, restoreFn) {
+  if (!btn || !document.body.contains(btn)) return true;
+  if (!(n > (window.IC_BULK_ROWS || 25))) return true;
+  if (window._icArmedBtn === btn) { _icDisarmBulk(); return true; }   // confirmed
+  _icDisarmBulk();
+  window._icArmedBtn = btn;
+  btn.dataset.icArmedHtml = btn.innerHTML;
+  btn._icRestore = (typeof restoreFn === 'function') ? restoreFn : null;
+  btn.dataset.icArmedMw = btn.style.minWidth;
+  btn.dataset.icArmedWs = btn.style.whiteSpace;
+  btn.dataset.icArmedCol = btn.style.color;
+  btn.dataset.icArmedBd = btn.style.borderColor;
+  btn.dataset.icArmedFw = btn.style.fontWeight;
+  // Pin the pre-swap width so the longer label cannot shrink-jitter the toolbar, and keep it
+  // on one line — the same guard v808 uses for the refusal label. Verified 1920→390.
+  btn.style.minWidth = btn.offsetWidth + 'px';
+  btn.style.whiteSpace = 'nowrap';
+  btn.innerHTML = '⚠ Copy all ' + n + ' rows — confirm';
+  btn.style.color = 'var(--accent)';
+  btn.style.borderColor = 'var(--accent)';
+  btn.style.fontWeight = '700';
+  btn.setAttribute('aria-live', 'assertive');
+  if (tickSel) {
+    var cells = document.querySelectorAll(tickSel);
+    for (var i = 0; i < cells.length; i++) cells[i].classList.add('ic-tick-cue');
+  }
+  showCopyToast('Nothing ticked, so this would copy all ' + n + ' rows — about '
+    + Math.round(n / 26) + ' pages in Word. Click again to copy all ' + n + ', or tick the rows '
+    + 'you want in the highlighted left-hand column and copy just those.');
+  window._icArmTimer = setTimeout(_icDisarmBulk, 6000);
+  return false;
+}
+window._icArmBulkCopy = _icArmBulkCopy;
+window._icDisarmBulk = _icDisarmBulk;
+
+// Any click that is not the armed button itself cancels the arm — including a tick, which is
+// the outcome this is trying to produce. Capture phase, so the cancel is decided before the
+// row handler runs; the armed button is exempt so its own confirming click reaches the
+// handler with the arm still set.
+document.addEventListener('click', function (e) {
+  if (!window._icArmedBtn) return;
+  var b = e.target && e.target.closest ? e.target.closest('button') : null;
+  if (b === window._icArmedBtn) return;
+  _icDisarmBulk();
+}, true);
+
 function showRoutingHint() {
   if (localStorage.getItem('routing-hint-dismissed')) return;
   var banner = document.createElement('div');
@@ -53528,6 +53654,12 @@ function copyFCForIC(btn) {
     }
   }
   var _isShortlist = !!(_selNames && _selNames.length);
+  // v828 (T5): nothing ticked and the table is still at screening scale — arm, do not paste.
+  // Returns false on the arming click (clipboard untouched); true on the confirming one and
+  // on every ticked / already-small / no-button path, which all behave exactly as before.
+  if (!_isShortlist && typeof _icArmBulkCopy === 'function'
+      && !_icArmBulkCopy(btn, trs.length, '#tbl-fc .fc-selcell',
+            (typeof _fcSyncSelUI === 'function') ? _fcSyncSelUI : null)) return;
   var _selOffscreen = 0;
   if (_isShortlist) for (var _oi = 0; _oi < _selNames.length; _oi++) if (!_rowByC[_selNames[_oi]]) _selOffscreen++;
   var byC = {}; (window._fcResults || []).forEach(function(x){ byC[x.country] = x; });

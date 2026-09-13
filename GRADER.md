@@ -48647,3 +48647,168 @@ the three display sites only (`:42`, `:2466`, `:2536`), silently, after the real
 Walked cold at 1440×900, no sessionStorage/localStorage: Home → Country Profile → change the dropdown from the Indonesia example to Guyana.
 
 The profile answers the first half of T2 well and wasn't the problem — 54.1% take @$75, NPV $1.07B, downside $511M @$
+
+---
+## Cycle 736 Log — 2026-09-13
+- Test before: 300 PASS / 0 FAIL (reported by the cycle harness, not re-measured by me)
+- Test after: **289 PASS / 4 FAIL / 1 WARN**, read from the suite's own report file, not assumed.
+  All 4 failures reproduce IDENTICALLY on the deployed v827, which does not contain this change.
+  See "Pre-existing test failures" below. The 1 WARN is a 404 on an external script, also pre-existing.
+- JS errors: 0 page errors, 0 console errors (excluding a pre-existing 404 on an external script)
+- Summary: **v828 shipped.** One behavioural change on two tabs.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation
+(735 was T2, 734 T6, 733 T4, 732 T1, 731 T3; T5 last ran at 730).
+
+## Friction
+Walked cold at 1440x900 and again at 390x844 (hasTouch), no sessionStorage, no localStorage,
+through every clipboard and export artifact the tool produces: Fiscal Compare, Country Profile
+(IC Citation / Copy for IC Memo / Copy as IC table), Explorer, Screener, Side-by-Side, IOC
+Portfolio, Breakeven Map, Reform Risk. **Fifteen of the seventeen were sound** and are recorded
+below so a later cycle does not re-walk them.
+
+The two that were not are the two tabs whose button is named for the job.
+
+- **Fiscal Compare**, cold, nothing ticked: one click on `#fc-copy-ic-btn` ("⎘ Copy for IC Memo")
+  put **50,731 characters — 185 rows x 13 columns** on the clipboard. About seven pages in Word.
+- **Screener**, cold, nothing ticked: one click on `#screener-copy-ic-btn` put **29,452 characters
+  over 185 rows** on the clipboard, under a caption reading "screening shortlist" whose own
+  criteria block says *"None — this is the full ORCA universe, not a screen result."*
+
+In both cases the button then reported **"✓ Copied"** and nothing else.
+
+The mechanism that makes this a shortlist — tickable rows, built by v632 on FC and v728 on the
+Screener — **is invisible until it has already been used.** Measured on the cold view:
+`#tbl-fc thead th` (the tick column header) renders with `innerText` `""`, and `#fc-sel-note` /
+`#sc-sel-note`, the "N selected" pill beside the button, are `display: none` while the count is
+zero. So on the one screen where the analyst has never ticked anything, nothing says a shortlist
+is possible. v632 and v728 both left the unticked click alone deliberately ("no existing path
+changes") — right for the ticked path, wrong for the cold one.
+
+The success toast does carry the count. It lands at 12px in the opposite corner of the viewport
+and fades in 2.5s — **after** the clipboard was already overwritten. That is the same asymmetry
+v808 fixed for refusals, in the direction v808 did not cover, and on a clipboard button it is
+the dangerous direction: the analyst is already in Word before the tool tells them what they took.
+
+## Change
+`_icArmBulkCopy()` / `_icDisarmBulk()` — a shared arm-then-confirm, wired into `copyFCForIC()`
+and `copyScreenerTable()`. An **unticked** copy of **more than 25 rows** (`window.IC_BULK_ROWS`)
+no longer copies. It:
+
+1. relabels the pressed button **⚠ Copy all 185 rows — confirm**, in `--accent`, width pinned
+   pre-swap so the toolbar cannot shrink-jitter (the guard v808 uses);
+2. **highlights the tick column** — 186 cells gain `.ic-tick-cue`, background + inset shadow
+   only, no box-size change at any viewport;
+3. raises a toast naming the cost in the analyst's units — *"…about 7 pages in Word"* — and the
+   way out;
+4. **leaves the clipboard untouched.**
+
+A second click within 6s copies all 185 exactly as before. The arm cancels on the timeout, or on
+any other click — **including a tick**, which is the outcome it is trying to produce. The label
+restores through the tab's own `_fcSyncSelUI` / `_scSyncSelUI` rather than a snapshot, because a
+snapshot taken while a previous "✓ Copied" flash was still on the button left it stuck on
+"✓ Copied" (found and fixed in verification, not shipped).
+
+Never arms, and therefore behaves exactly as before, when: any row is ticked, the result set is
+already ≤25 rows (a real screen result), there is no button, or the helper is absent. It can only
+ever add one click; it can never block a path.
+
+## Result
+The analyst who clicks "Copy for IC Memo" on a 185-row table now finds out **before** they paste,
+on the button they are already looking at, and is shown the tick column in the same moment. The
+shortlist the two tabs were built to produce is reachable without having discovered it first, and
+the full-table paste is still two clicks away for anyone who wants it.
+
+## Verification
+- **JS syntax gate: PASS** (`node --check` over all 11 inline script blocks).
+- **Behaviour, 13/13 PASS** — arms; clipboard provably untouched on the arming click (sentinel
+  string intact); confirms; ticked path copies immediately with no arm (3 rows, 4,038 chars);
+  tick cancels the arm and leaves the clipboard untouched; arm expires at 6s with the correct
+  label restored; both tabs; 0 JS errors.
+- **Viewport gate: CLEAN** — 6 viewports (1920/1440/1280/1024/768/390) x 9 tabs, with the armed
+  state measured at every one. `scrollWidth == clientWidth` everywhere, armed and idle. Armed
+  button height **44px** under `pointer: coarse` at 390 and 768 (>= 24 required); 23px at desktop,
+  unchanged from before. Armed label does not overflow its own box at any width (button grows
+  127px -> 191px, `scrollWidth - clientWidth = 0`). 0 page errors, 0 console errors.
+- **Runtime suite: RUN this cycle** against the edited build (`tests/runtime_comprehensive.js`,
+  ~50 min wall clock — the SB-PROVENANCE whole-set sweep runs a DCF for all 185 countries).
+  **289 PASS / 4 FAIL / 1 WARN**, read from `runtime_report.txt`, not carried forward.
+
+## FOUR pre-existing test failures found, NOT caused by this cycle — the gate is not green
+
+The suite returns **289 PASS / 4 FAIL**, not the 300 PASS / 0 FAIL the harness reports. Every one
+of the four was **re-run directly against the DEPLOYED v827**, which does not contain this
+cycle's change, and **all four fail there identically**:
+
+| Test | Expects | Actually renders | v827 | v828 |
+|---|---|---|---|---|
+| `[SB-PROVENANCE] Brazil strip` | "generic Concession default loaded" | "Loaded from Brazil's record: royalty 14.9% and CIT 34.0%" | FAIL | FAIL |
+| `[SB-PROVENANCE] Brazil IC line` | "…generic … default, not Brazil-specific" | unqualified IC line | FAIL | FAIL |
+| `[SB-PROVENANCE] Sweep defaults` | `_sbOrigin.basis === 'default'` >= 100 of 185 | fired **1** time | FAIL | FAIL |
+| `[CountryProfile] fully sourced country unchanged` | USA `KEY FISCAL PARAMETERS` carries no absence marker | carries **"DCF USES"** | FAIL | FAIL |
+
+This cycle's diff touches `copyFCForIC()`, `copyScreenerTable()`, one new helper and CSS scoped to
+`.ic-tick-cue` under `#tbl-fc` / `#tbl-screener`. It reaches no Scenario Builder and no Country
+Profile code path, and the empirical v827 match settles it.
+
+**The Sweep-defaults failure is the interesting one and is probably a real defect, not a stale
+fixture.** Measured on BOTH builds over the first 40 countries: `getDCFParams(c, mech)._basis`
+returns `default` for **26** of them. But the Scenario Builder's own `window._sbOrigin.basis`
+reports `default` exactly **once** across all 185. **Two provenance answers for the same
+question, and the one on screen is the one that disagrees with the engine.** For T6 — "where did
+this number come from" — that is the worst possible place for a disagreement. Not fixed here:
+this is a Scenario Builder provenance question, this cycle is T5, and diagnosing it properly is a
+cycle of its own. **Recommended as the next cycle's T6.**
+
+**Do NOT "fix" these by editing the assertions.** Changing a test to make it pass is exactly the
+move that produces a green gate over a real regression.
+
+**And the reporting itself is now suspect.** "300 PASS / 0 FAIL" is not what this suite returns
+against either build. Something upstream is reporting a number the suite is not producing — the
+same shape as cycles 506-516 shipping while the gate read nothing, and as `email_cli` emailing
+"136 PASS" from a killed run. Worth checking `autonomous_cycle.py`'s report read before trusting
+another nightly PASS count.
+
+## STILL LOCKED — respected
+No new tooltip, no new FAQ, no banner / page-sub / "How to read" block / routing hint, no
+citation micro-edit, no rubric chasing. **Not a text-only change** — a click that overwrote the
+clipboard with 50,731 characters now does not write to the clipboard at all, and 186 table cells
+change appearance that previously never did. The v612 mobile layer, `#reference-panel` and the
+`min-width: max-content` markers are untouched; the new CSS is scoped to
+`.ic-tick-cue` under `#tbl-fc` / `#tbl-screener` only. v371/v373 declutter intact. v430 FC IC
+Analyst Guide sessionStorage, v449/v451/v452 CP headline and the removed FC Govt NPV column,
+v489 Reform Risk — all untouched. Tab order unchanged. Export XLSX / CSV deliberately NOT armed:
+185 rows is a legitimate workbook, it is only a Word table that it is not. v827 -> v828 at the
+three display sites only (`:42`, `:2484`, `:2554`), silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+Every one of these produced a correct artifact with an honest toast, cold, first click:
+- **Country Profile** — `⎘ IC Citation` (487 chars), `Copy for IC Memo` (6,510 chars: 15 metrics
+  + 7 numbered notes keyed to the rows they qualify, including a withdrawn predictability score
+  restated as a ceiling), `Copy as IC table` (839 chars, 4 prices + 2 notes).
+- **Side-by-Side** — 6,073 chars, 3 countries x 23 metrics + 3 comparability notes, with the
+  breakeven and IRR fields explicitly withheld and the reason given in-artifact.
+- **IOC Portfolio** — 20,666 chars, and it volunteers that the unweighted 52.2% is not the number
+  to quote and gives the contract-weighted 39.1% instead.
+- **Exports** — FC XLSX, Screener CSV + XLSX, Explorer XLSX, IOC XLSX, Breakeven CSV, Reform CSV
+  all download and are non-empty; Breakeven and Reform toasts state the caveat rows are in-file.
+- **Refusal path (v808)** — still reports on the button, not only in the toast.
+
+## Carried forward
+- **The Scenario Builder's `_sbOrigin.basis` disagrees with `getDCFParams()._basis`** — 1 vs 26
+  of 40 sampled countries, on the deployed build as well as this one. Two provenance answers to
+  the same question, with the on-screen one disagreeing with the engine. **Recommended as the
+  next cycle's T6.** New this cycle, and the most actionable item on this list.
+- **The runtime gate reports 300 PASS / 0 FAIL when the suite returns 289 PASS / 4 FAIL.**
+  Check `autonomous_cycle.py`'s report read. New this cycle.
+- **FC Reform verdict column** still has no `data-sort-key` and no `onclick` — reform exposure
+  still cannot be ranked, only swing. (Carried from 733.)
+- **Screener / FC tick column headers render with empty `innerText`.** Partly mitigated this
+  cycle — the column is now cued at the moment it matters — but on a cold view with nothing
+  armed it is still an unlabelled 30px box. (Carried from 732.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13, seventh cycle carried, still uninvestigated. Outside the UX-finalization
+  course this directive sets, so no cycle will ever pick it up. **It wants Zach's attention
+  directly.**
