@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v831</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v832</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v831</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v832</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v831</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v832</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32828,14 +32828,50 @@ function runScreener() {
       || (!d.mechanics.split(',').map(m => m.trim()).some(m => checkedMechs.includes(m)))
       || (iocCountries !== null && !iocCountries.has(d.country))
       || (_regionV && !_regionMatch(d.region, _regionV));
+    // ── v832 (T6) — this strip is the ONLY surface whose whole job is to answer
+    //    "where did this exclusion come from?", and it was the last ranked surface on the
+    //    platform still missing the state-monopoly guard the rest of the Screener already
+    //    carries. Walked cold: Screener -> Two-Price Return Screen. The table two inches
+    //    below renders Saudi Arabia as take — / "no position" / tier State Monopoly
+    //    (fmtTake + _retentionSub + tierLabel, all keyed off isStateMonopoly). This strip
+    //    bypassed every one of them and printed "Saudi Arabia  NPV @$75 $0M < $2.40B",
+    //    ranking it beneath Nigeria's $302M as though it had been measured and come last.
+    //    It has not been measured. state_eq = 100 on Bahrain, Kuwait and Saudi Arabia zeroes
+    //    the contractor out of the model entirely: take pins to 100.0% at all four decks,
+    //    contractor NPV to $0, IRR to −100% and breakeven to $1/bbl — the three LOWEST
+    //    breakevens in the database, $26 clear of the next country. Those are degenerate
+    //    outputs of an empty position, not fiscal measurements, and an analyst reading
+    //    "$0M < $2.40B" concludes Saudi Arabia was screened out on bad economics when the
+    //    truth is there is no contractor position for this screen to value. Under the IOC
+    //    Capital Screen the same chip read "take 100.0% > 65%" — quoting a take figure
+    //    fmtTake refuses to print anywhere else. Wrong in KIND, not in degree.
+    //    The row still earns its chip: "why isn't Saudi Arabia on here?" deserves an answer.
+    //    It now gets the right one, and it sorts to the back of its group so the near-miss
+    //    slots go to countries that actually came close.
+    const _isMono = d => (typeof isStateMonopoly === 'function')
+      && isStateMonopoly(d[takeKey] != null ? d[takeKey] : d.take_75);
+    // v832 (T6): fmtNpvShared rounds to 2dp at the $B scale, so any shortfall under ~$5M
+    // renders both sides as the same string and the chip printed a self-contradicting
+    // inequality. China read "NPV @$75 $2.40B < $2.40B" on this very preset — npv_75 is
+    // $2,399.9M against a $2,400M floor, a miss of $100k, 0.004%. An analyst reading a
+    // false statement in the tool's own audit trail stops trusting the audit trail. When
+    // the two formatted figures collide the chip now prints the GAP, which is both true
+    // and the number that tells the analyst to nudge the slider rather than drop China.
+    const _npvMiss = (v, lim) => {
+      const a = fmtNpvShared(v), b = fmtNpvShared(lim);
+      if (a !== b) return a + ' < ' + b;
+      const g = lim - v;
+      return a + ' \u2014 short of ' + b + ' by '
+        + (g >= 1 ? '$' + (Math.round(g * 10) / 10) + 'M' : '$' + Math.round(g * 1000) + 'k');
+    };
     const _why = d => {
       const r = [];
       const fc = (takeCeilingActive && feeCmpOn) ? _scFeeCmpAt(d, price) : null;
       const t = (fc && fc.diverges) ? fc.cmp : d[takeKey];
       if (t == null) r.push('no take at ' + priceLabel);
       else if (t > maxTake) r.push((fc && fc.diverges ? 'comparable take ' : 'take ') + t.toFixed(1) + '% > ' + maxTake + '%');
-      if (d[npvKey] != null && d[npvKey] < minNPV) r.push('NPV @$' + price + ' ' + fmtNpvShared(d[npvKey]) + ' < ' + fmtNpvShared(minNPV));
-      if (minNPV50 > -500 && (d.npv_50 == null || d.npv_50 < minNPV50)) r.push('NPV @$50 ' + fmtNpvShared(d.npv_50) + ' < ' + fmtNpvShared(minNPV50));
+      if (d[npvKey] != null && d[npvKey] < minNPV) r.push('NPV @$' + price + ' ' + _npvMiss(d[npvKey], minNPV));
+      if (minNPV50 > -500 && (d.npv_50 == null || d.npv_50 < minNPV50)) r.push('NPV @$50 ' + _npvMiss(d.npv_50, minNPV50));
       if (_screenerMinRetention !== null) {
         const k = _npvRetentionAt(d, _scRetRefDeck());
         if (k === null) r.push('no NPV retention ratio');
@@ -32845,7 +32881,11 @@ function runScreener() {
       const ff = Math.max((minEvid > 0 && evidDepthOn) ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
       if (ff > 0 && (d.n_facts || 0) < ff) r.push((d.n_facts || 0) + ' facts < ' + ff);
       // At the $50 deck the deck NPV leg and the $50 leg are the same test; say it once.
-      return r.filter((x, i) => r.indexOf(x) === i);
+      const _u = r.filter((x, i) => r.indexOf(x) === i);
+      // v832 (T6): only AFTER the row has been shown to fail something. A monopoly that
+      // passes the screen as set is not "removed" and must not be explained away here.
+      if (_u.length && _isMono(d)) return ['state monopoly \u2014 no contractor position to value'];
+      return _u;
     };
     // ── v830 (T1) — the same answer for the countries nobody has drilled yet ──────────────────
     // v775 above built the "why isn't it on here?" answer but scoped it to _dqTier().hasProduction,
@@ -32876,16 +32916,29 @@ function runScreener() {
     const _inScopeA = COUNTRY_DATA.filter(d => _dqTier(d).hasProduction && !_outOfScope(d));
     const _inScopeB = COUNTRY_DATA.filter(d => !_dqTier(d).hasProduction && !_floorOut(d) && !_outOfScope(d));
     const _mkOut = (pool, sorter) => pool.filter(d => !_curSet.has(d.country))
-      .map(d => ({ d: d, why: _why(d) })).filter(x => x.why.length).sort(sorter);
-    const _out  = _mkOut(_inScopeA, (a, b) => (b.d[npvKey] || 0) - (a.d[npvKey] || 0));
-    const _outB = _mkOut(_inScopeB, (a, b) => (b.d.n_facts || 0) - (a.d.n_facts || 0));
+      .map(d => ({ d: d, why: _why(d), mono: _isMono(d) })).filter(x => x.why.length).sort(sorter);
+    // v832 (T6): monopolies last in BOTH groups. Group A ranks by deck NPV and group B by
+    // fact depth, and on either signal a zeroed-out contractor position scores like a real
+    // result: Kuwait's 722 facts put it inside group B's first ten, ahead of Guyana. A row
+    // that was never measured cannot be a near miss, so it sits behind the ones that were.
+    const _out  = _mkOut(_inScopeA, (a, b) => (a.mono ? 1 : 0) - (b.mono ? 1 : 0) || (b.d[npvKey] || 0) - (a.d[npvKey] || 0));
+    const _outB = _mkOut(_inScopeB, (a, b) => (a.mono ? 1 : 0) - (b.mono ? 1 : 0) || (b.d.n_facts || 0) - (a.d.n_facts || 0));
     if (!_out.length && !_outB.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    // v832 (T6): a structural exclusion is not a near miss and must not be dressed as one.
+    // The reason text on every chip was drawn in var(--negative) — the colour this page uses
+    // for a number that fell short — which on a monopoly row coloured a statement that no
+    // measurement exists as though it were a failed measurement. Monopoly chips now carry the
+    // muted treatment the table's own "no position" cell uses, plus the tier word, so the two
+    // read as the same fact about the same country.
     const _chip = (x, hidden) => {
       const nm = x.d.country.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-      return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="Open ' + x.d.country + '’s Country Profile"'
+      const _tip = x.mono
+        ? x.d.country + ' is a state monopoly: ORCA holds 100% state participation for it, so the compare engine carries no contractor position — take pins to 100.0% at every price deck, contractor NPV to $0 and breakeven to $1/bbl. Those are outputs of an empty position, not fiscal measurements, and none of them may be screened, ranked or cited against a country that has one. The question here is access, not economics. Click to open its Country Profile.'
+        : 'Open ' + x.d.country + '’s Country Profile';
+      return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="' + _tip.replace(/"/g, '&quot;') + '"'
         + (hidden ? ' data-sc-extra="1" style="display:none;' : ' style="display:inline-flex;')
-        + 'align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;">'
-        + x.d.country + ' <span style="font-weight:400;color:var(--negative);font-family:\'IBM Plex Mono\',monospace;font-size:10px;">' + x.why.join(' · ') + '</span></button>';
+        + 'align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px ' + (x.mono ? 'dashed' : 'solid') + ' var(--border);border-radius:12px;background:var(--surface);color:' + (x.mono ? 'var(--muted)' : 'var(--text)') + ';font-size:11px;font-weight:600;cursor:pointer;">'
+        + x.d.country + ' <span style="font-weight:400;color:' + (x.mono ? 'var(--muted)' : 'var(--negative)') + ';font-family:\'IBM Plex Mono\',monospace;font-size:10px;">' + x.why.join(' · ') + '</span></button>';
     };
     const _lbl = t => '<span style="font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;font-size:10px;">' + t + '</span>';
     let _html = '';
@@ -50635,6 +50688,13 @@ function renderFCResults(results, price) {
   // the XLSX all carry it and instruct the analyst to cite it. The flagship table did not show it
   // anywhere, so the only way to read a citable take for a 10-country shortlist was ten drilldowns
   // or an XLSX download. It is now a column.
+  // v832 (T6): hoisted. `var _fcProfName` was declared ~120 lines BELOW its first use, in the
+  // NPV (model) column header, so the hoisted binding was still undefined when the header was
+  // built and the tooltip rendered "on the profile selected above (undefined)". That tooltip is
+  // exactly where a T6 analyst goes to ask what basis a number is on, and the tool answered
+  // "undefined". Same value, computed before the header instead of after it.
+  var _fcProfName = (function(){ var e = document.getElementById('fc-profile');
+    var o = e && FC_PROFILES[e.value]; return (o && o.name) ? o.name : 'Deepwater'; })();
   html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>' + _fcQualTh + '<th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 65 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   // v551 (T6): the stated thresholds were never the ones in force. This header said the letter
@@ -50752,8 +50812,6 @@ function renderFCResults(results, price) {
   // This is the same defect v547 fixed for Take%, on the same table, by the same remedy: put the
   // citable database figure on screen NEXT to the model figure, tie the two together in the
   // tooltip, and let the analyst see the number that will land in the memo BEFORE they copy it.
-  var _fcProfName = (function(){ var e = document.getElementById('fc-profile');
-    var o = e && FC_PROFILES[e.value]; return (o && o.name) ? o.name : 'Deepwater'; })();
   var _fcDbNpvMap = (function(){ var m = {}; (window.COUNTRY_DATA || []).forEach(function(x){ m[x.country] = x; }); return m; })();
   var _fcDbNpv = function(r) {
     var meta = _fcDbNpvMap[r.country];
