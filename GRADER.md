@@ -49089,3 +49089,18 @@ now identical). No future cycle should re-raise this.
 - **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
   *and* 2026-09-13. Ninth cycle carried, still uninvestigated. Outside the UX-finalization course
   this directive sets, so no cycle will ever pick it up. **It wants Zach's attention directly.**
+
+---
+## Cycle 738 Log — 2026-09-13 06:41
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 738 complete — v830 shipped, pushed, mirror synced.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest by rotation; 737 was T3, T1 last ran at 732)
+
+## Friction
+Walked the Screener cold at 1440×900 and 390×844 with both storages cleared — the 185-row universe, all eleven presets, the Home CTA, both NPV sliders, the take ceiling, all eight sort columns, the price-deck switch with a preset armed, the tick/dock/export path, and the drill-down round trip.
+
+The wo
