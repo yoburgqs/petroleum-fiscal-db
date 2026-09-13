@@ -47775,3 +47775,137 @@ change shipped.
 **Friction.** On the IOC Portfolio tab, the `GOVT TAKE` column is `IOC_DATA.take_75` — the take on *that operator's own contracts*, averaged per operator | country | mechanic. Nothing on screen said so, and everything around it implied the opposite:
 
 - It rendered through `fmtTake()`, t
+
+---
+## Cycle 729 Log — 2026-09-13 — T2 — shipped v821 (`958491a`)
+- Test before (harness, deployed build): 300 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: suite **RAN this cycle** against this tree (`TEST_URL=http://localhost:8951/index.html`):
+  **289 PASS / 4 FAIL / 1 WARN**. The same suite was then run against **pristine HEAD**
+  (`git show HEAD:index.html`, served identically on :8952) and returned **289 / 4 / 1 with a
+  byte-identical FAIL set** — `diff` of the four `[FAIL]` lines is empty. Zero regression from this
+  change. The four (SB-PROVENANCE Brazil strip / Brazil IC line / Sweep defaults, CountryProfile USA
+  absence marker) and the `sw.js` 404 WARN are the known local-static artefacts; they do not
+  reproduce on the deployed URL the harness reads.
+- JS syntax gate: **PASS** — all 11 inline `<script>` blocks extracted and `node --check`ed, re-run
+  after the version bump.
+- Pixel gate (`pixel_audit.js`, 10 tabs × 5 viewports): **PASS**, no surface worse than baseline.
+  No finding on the surface this cycle touched — the change adds no control, so nothing new can
+  fall under 24px at `pointer: coarse`.
+- Page errors: **0** across every branch walked (Nigeria, Norway, Iraq, Saudi Arabia, Venezuela,
+  Turkmenistan, Tuvalu, Vanuatu, Colombia, Australia, UAE, Suriname, Namibia, Mozambique, Guyana).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation:
+728 was T6, 727 T4, 726 T1, 725/724 T3, 723 T5, 722 T2. Last cycle was T6, not repeated.
+
+## Friction
+Walked cold at 1440×900 with `sessionStorage` and `localStorage` cleared, Home → Country Profile →
+Nigeria, then down the page the way an analyst builds the $75 defence: headline strip → four-price
+grid → **PRICE SENSITIVITY CURVE** → weighting note → regime breakdown.
+
+The curve was one element (`index.html:39150` pre-patch):
+
+```html
+<svg viewBox="0 0 300 64" style="width:100%;height:64px;display:block;">
+```
+
+`preserveAspectRatio` defaults to `xMidYMid meet`, so the drawing scale is
+`min(cardWidth/300, 64/64)` — capped at **1** by the fixed 64px height for any card wider than
+300px. The `<svg>` *box* obeyed `width:100%`; its *contents* did not. Measured on Nigeria at 1440:
+
+| | before |
+|---|---|
+| `<svg>` box width | 1050px |
+| rendered curve width | **244px**, starting at x=440 |
+| dead card either side | ~400px each |
+| take-value labels | `font-size="8"` → **8px** |
+| price-axis labels | `font-size="7"` → **7px** |
+| vertical amplitude for Nigeria's 12.7pp swing | 22px |
+
+So the one picture on this tab that shows the **shape** of the price response — does government
+take keep escalating above $75, or flatten out? — was a thumbnail stranded in the middle of a
+full-width card, at type sizes below anything else on the page. The four take numbers directly
+above it are set at ~34px. The analyst reads those, cannot read the chart, and the chart
+contributes nothing to the defence it exists to support.
+
+This is the item cycle 728 carried forward as *"Country Profile's Price Sensitivity Curve renders
+300px centred inside a 1,050px card"*. It is now measured and fixed rather than carried again.
+
+Worth recording: it rendered **correctly on a phone and wrongly on a desktop**, which is why no
+mobile-focused cycle caught it. At 390 the card is ~336px, close enough to the 300-unit viewBox
+that `meet` scales to ~1 anyway and the chart looks intentional. The defect grew with screen width.
+
+## Change
+Rebuilt in place (`index.html:39132`), same position, same heading, same data:
+
+- **Line and area stretch.** They now live in a `viewBox="0 0 100 100"` layer with
+  `preserveAspectRatio="none"`, so user units are percentages and the geometry fills the card at
+  any width. `vector-effect="non-scaling-stroke"` keeps the 2px stroke and the dashed guide true
+  instead of smearing under the non-uniform scale.
+- **Type left the SVG.** Dots, take labels and the price axis are now HTML spans positioned by
+  percentage over the plot, so they render at real px — **12px** values, **11px** axis — rather
+  than scaling with the drawing. Circles moved out for the same reason: under `none` they would
+  have distorted into ellipses.
+- **Plot height 64 → 104px**, so the curve has amplitude to read.
+- **$75 is drawn as the base case it is:** a dashed guide from the $75 point down to the axis
+  (it stops at the dot, not at the top of the box, so it does not strike through the value label),
+  and a marked `$75 BASE` axis label in the series colour. Every headline figure on this tab is
+  quoted at $75; the chart now says where that sits.
+- **Flat regimes still read flat.** The plotted band keeps an absolute floor — 12pp, up from the
+  old code's 8pp — so a country whose take barely moves is not stretched to fill the box.
+  Verified: Vanuatu plots **0px** of amplitude, Turkmenistan **8px**, Iraq 32px, Nigeria 44px,
+  Norway/Venezuela/Australia 46–48px.
+- State monopolies are unchanged — the block still returns `''` before any of this
+  (Saudi Arabia: curve ABSENT, as before).
+
+Measured after, at every gate viewport, no label crossing its card edge and no document-level
+horizontal scroll (`scrollWidth === clientWidth`) at any of them:
+
+| viewport | curve width | value labels | axis labels | overflow |
+|---|---|---|---|---|
+| 1440 | 244 → **882px** | 8 → **12px** | 7 → **11px** | none |
+| 1280 / 1024 | 516px @1024 | 12px | 11px | none |
+| 768 | 597px | 12px | 11px | none |
+| 390 (`hasTouch`) | 253px | 12px | 11px | none |
+
+## Result
+The analyst can read the curve. On Nigeria they can now see the shape that was previously
+unreadable: take climbs **7.0pp from $50 to $75** and only **5.7pp more across the next $50** —
+the regime front-loads its escalation, so the upside case above $75 is worth less to the
+government than the four evenly-spaced cells above the chart suggest. That is a defence argument
+now visible on screen, rather than one the analyst has to reconstruct by differencing four numbers.
+And the `$75 BASE` guide means they can see, without counting columns, which point on the curve
+the headline 81.1% actually is.
+
+**STILL LOCKED respected:** no new tooltip on a new surface (the plot's one `title` replaces
+nothing and adds no new hover-only fact — every figure in it is printed on the face of the chart);
+no new FAQ; no banner, page-sub or "How to read" block; no citation micro-edit; not a text-only
+change — the rendered geometry changes from 244×22px to 882×44px and the type from 8/7px to 12/11px.
+The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched.
+Explorer analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets
+stay a dropdown. FC Govt NPV column stays removed; CP two-zone headline untouched. Tab order
+unchanged. v820 → v821 at the three display sites only (`:42`, `:2420`, `:2490`), silently, after
+the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **The Live DCF panel's "WHICH NUMBER GOES IN THE IC MEMO?" reconciliation is the strongest T2
+  surface in the product and was left alone.** On Nigeria it prints ✔ CITE THIS 81.1% (834 contracts,
+  averaged) against SCENARIO RESULT 47.3% (one Deepwater project), names the gap as **-33.8pp** and
+  says outright *"do not put these two numbers in the same sentence."*
+- **The headline strip already refuses to let NPV carry the defence** — *"on ORCA's single fixed
+  Deepwater profile contractor NPV tracks govt take at r² 0.89 (≈−$61M per point of take), so these
+  two figures restate the take rather than test it. Defend on the take and its evidence tier."*
+  Checked across Suriname, Namibia, Mozambique, Guyana, Colombia; it adapts per country and the
+  producer-count arithmetic is consistent with the pill above it.
+- **Zero `undefined` / `NaN` / `null` tokens** in the rendered profile text across all 15 countries
+  walked.
+- **Still open, carried forward** (unchanged from 728, neither reached this cycle):
+  the FC Reform verdict column has no `data-sort-key`; the IOC export names the take basis but does
+  not carry the country-wide take beside the operator take.
+- **Newly noted, not worth a cycle alone:** `#cp-run-fc-btn` (`index.html:4003`) reads
+  `cp-price-select`, which does not exist in the DOM, falls back to `fc-price`, then writes it to
+  `document.getElementById('price')`, which also does not exist. Both halves are dead; the button
+  still works only because Fiscal Compare reads `fc-price` itself. Consequence is narrow — the
+  button is inside `#fc-nav-bar` and only visible when the analyst arrived from FC, and its label
+  "Run FC at this price" will run FC at FC's price, not at the $75 the CP page is showing. Wants
+  its own cycle because the honest fix is deciding whether CP should carry a price control at all.
