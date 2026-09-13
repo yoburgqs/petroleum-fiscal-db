@@ -49104,3 +49104,135 @@ now identical). No future cycle should re-raise this.
 Walked the Screener cold at 1440×900 and 390×844 with both storages cleared — the 185-row universe, all eleven presets, the Home CTA, both NPV sliders, the take ceiling, all eight sort columns, the price-deck switch with a preset armed, the tick/dock/export path, and the drill-down round trip.
 
 The wo
+
+---
+## Cycle 739 Log — 2026-09-13
+
+- Test before: 299 PASS / 0 FAIL (graded suite, `office/tools/petroleum/tests/`, run against the local build)
+- Test after: **299 PASS / 0 FAIL** — the suite RAN this cycle; this is its own report, not a carried baseline
+- JS syntax gate: PASS (16 scripts, 0 errors)
+- Page + console errors: 0
+- Shipped: **v831**, pushed (`6ffc806`), mirror synced (sha `d9261fb0f849`, both copies identical)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation
+(738 was T1, 737 T3, 736 T5, 735 T2, 734 T6; T4 last ran at 733). Did not repeat last cycle's T1.
+
+## Friction
+Walked cold at 1440×900 and 390×844 with both storages cleared: the Reform Risk tab (its
+185-jurisdiction header, the n=21 snapshot, the per-country lookup on Norway / Guyana / Oman,
+the ranked table, the decade heatmap and the Regional Reform Tilt panel), then Fiscal Compare
+(cold run, the Reform verdict column, the ◆ Reform-scored only filter, all five sort buttons).
+
+The Reform Risk lookup is in good shape — it answers a *single* country well, and all three
+branches (scored / context-only / no-log) read correctly. The worst moment is the other half of
+T4, the cross-country one, and it is on Fiscal Compare.
+
+**Fiscal Compare has a sort button for every decision axis it carries — Govt Take, NPV,
+Breakeven, Swing, A–Z — except the one T4 is about.** `#fc-sort-row` has no `reform` button, the
+Reform verdict `<th>` has no `data-sort-key` and no `onclick`, and `renderFCResults()` has no
+`sortField === 'reform'` branch. Measured on the live build with ◆ Reform-scored only ticked: the
+21 scored jurisdictions render in **government take order**, which carries no reform signal at
+all. The two jurisdictions holding a WACC premium — the only verdict class this platform says
+changes a model input — sat at **row 5 (United Kingdom)** and **row 19 (Brazil)** of 21, with
+seven `↑ PRE-2010` and two `NO LAW CHANGE` rows above Brazil.
+
+The one reform ranking that existed anywhere on the platform, *Most Frequently Reformed Regimes*
+on the Reform Risk tab, is ranked by **count** — and that same tab spends four paragraphs saying
+the count is blind to magnitude and is not the finding. So **the verdict could not be ranked, and
+the ranking was not the verdict.** (This is the item carried from cycle 733 and re-carried at 734
+through 738 without being picked up.)
+
+## Change
+A **`Reform ▼ (21/185)`** sort button in `#fc-sort-row`, with the result banded and labelled
+on screen by verdict class rather than by a hardcoded numeric threshold:
+
+| band | rows on live data |
+|---|---|
+| ADD A WACC PREMIUM — THE ONLY VERDICTS THAT CHANGE A MODEL INPUT | `=1` United Kingdom `WACC +3–5pp` · `=1` Brazil `WACC +3–5pp` |
+| GOVERNMENT TAKE ALREADY RAISED INSIDE THE 2010 WINDOW | `=3` Russia `+15pp` · Indonesia `NET +6pp` · Australia `+5pp` · Ecuador `+5pp` |
+| TERMS REWRITTEN IN-WINDOW — TAKE EFFECT NEVER QUANTIFIED | `=7` Angola, Mexico, Nigeria, India, Iraq |
+| IN-WINDOW RISE OFFSET BY AN IN-WINDOW CUT — NET ZERO OR NEGATIVE | `12` Norway `TAKE NET 0pp` |
+| TAKE RISE ON RECORD, BUT BEFORE THE WINDOW — SCORE IS AN ARTEFACT | `=13` Canada, Kazakhstan, Venezuela, Algeria, Colombia, Libya, USA |
+| NO FISCAL LAW CHANGE SINCE 2010 | `=20` Ghana, Guyana |
+
+- The band comes from **`_rrClassify()`'s own `icToken`** (`_fcReformRank()` / `_fcReformCmp()`).
+  No second copy of the rules and nothing recomputed, so the order and the cell cannot disagree —
+  the same constraint v550/v556 imposed on the four surfaces that print the verdict.
+- Ordering inside a band: measured magnitude → change count → A–Z for determinism. Norway's
+  `TAKE NET 0pp` sorts on the **net** move, not the gross +12pp, exactly as v773 requires.
+- **Rank ties are the BAND, not the row index.** The seven `↑ PRE-2010` rows print `=13`, not
+  13/14/15…, because `_rrClassify()` never ordered them against each other. Same `=N` treatment
+  v505 gave take ties.
+- Clicking it **auto-ticks ◆ Reform-scored only and forces the verdict column on** — the same
+  v459 rule Breakeven already uses. Ranking 21 readings followed by 164 `n/c` blanks is precisely
+  the "185 rows with most showing —" problem v459 fixed. The manual override is now recorded
+  (`_fcReformManuallySet`) and respected on the way out.
+- Untick the filter and the **164 `n/c` rows sort LAST, never first** — verified live, the tail is
+  Vietnam / Western Sahara / Yemen / Zambia / Zimbabwe. An absent log is no reading, not a clean one.
+- `⇅ Reverse` works and flips the arrow to `▼`, putting the quiet end first.
+
+**Second defect, found while verifying the first:** `'reform'` now joins `'country'` in NOT
+triggering the v563 generic-default partition. That rule is about a ranked NUMBER that came from
+no country's fiscal record — the model take and model NPV mechanic constants. This sort ranks a
+**sourced event log**, which exists independently of whether the compare engine holds that
+country's contract terms. Partitioning anyway put **Brazil (`WACC +3–5pp`) and Russia
+(`TAKE +15pp`) below the unranked divider**, left the UK alone at the top, and printed the band
+headers a **second time** underneath — so the one sort built to show where the premium-bearing
+block ends showed two of them. The per-cell GENERIC marking (`.fc-gen-val` / `.fc-gen-tag`, v748)
+is untouched and still flags those model columns on every row, which is the sort-independent
+signal by design.
+
+Label plumbing followed the new field so nothing downstream lies about the basis: the active-button
+text, `sortDimLabel` / `sortDirLabel` in the rank tooltip, `_tieVal()`, the generic-tie `_gField()`,
+the drilldown's global-rank label and `_rv()`, and the **T5 IC-memo `sortName`** — which now pastes
+"ranked on reform exposure, highest first — the Reform verdict band from ORCA's sourced
+fiscal-reform event log, NOT government take" rather than falling through to the bare field name.
+
+## Result
+The analyst can put reform exposure in order for the first time. They open Fiscal Compare, click
+one button, and read straight off the top which two of the 21 scored jurisdictions carry a premium
+that **changes a model input** — then where the quantified take rises end and the unquantified ones
+begin — instead of scanning a take-ordered column and ranking six verdict classes by hand.
+
+## Verification — measured, not assumed
+- Graded suite against this local build: **299 PASS / 0 FAIL** before and after. No regression.
+- Horizontal scroll with the reform sort ACTIVE at **1920 / 1440 / 1280 / 1024 / 768 / 390**:
+  `scrollWidth === clientWidth` at all six.
+- Reform button under `pointer: coarse` at 390×844: **44px**. Interactive controls under 24px
+  introduced by this change: **0**.
+- Page errors 0, console errors 0 (excluding the two pre-existing file-server 404s for a script
+  that is absent from the local checkout, present before the change).
+- State transitions walked: reform → manual untick → back to Take → reform again → Reverse. The
+  manual override survives, the generic partition is restored on non-reform sorts, and the
+  `n/c` block never rises.
+
+## STILL LOCKED — respected
+Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How to read" block /
+routing hint, not a citation micro-edit, not rubric chasing. **Not a text-only change** — a new
+interactive control, a new sort order over 185 rows, and 6–7 new divider rows that did not exist.
+The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched.
+v371/v373 declutter intact — the button sits in the existing `#fc-sort-row`, no new block.
+v430, v449/v451/v452, v489 untouched. Tab order unchanged. v831 at the three display sites only
+(`:42`, `:2484`, `:2554`), silently, after the real change shipped.
+
+## Carried forward
+- **RESOLVED this cycle:** *FC Reform verdict column has no `data-sort-key` and no `onclick` —
+  reform exposure cannot be ranked, only swing.* Carried from 733 through 738. Solved by a sort
+  button rather than a header click, because `#fc-sort-row` is where this table's sorting lives
+  and a `<th>` click would have been a second, competing control.
+- **`downsidereturns` preset prints "China NPV @$75 $2.40B < $2.40B"** in the Screener near-miss
+  strip — `fmtNpvShared()` rounds to 2 dp at the $B scale, so a real ~$0.5M shortfall renders as a
+  contradiction. Good next T1 or T6. (Carried from 738.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Pre-existing, grammar only, surfaced by the
+  new filtered view. Low priority. **NEW this cycle.**
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  Wants an independent walk. (Carried from 736, re-scoped at 738.)
+- **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13, and the 2026-09-13 one arrived after cycle 738 carried it. **Tenth cycle
+  carried, still uninvestigated.** It is outside the UX-finalization course this directive sets,
+  so no cycle will ever pick it up. **This wants Zach's attention directly.**
