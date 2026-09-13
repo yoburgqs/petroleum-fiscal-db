@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v834</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v835</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v834</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v835</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v834</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v835</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3786,11 +3786,14 @@ window.copyPlatformCitation = function(btn) {
     <span id="cmp-count-badge" style="font-size:11px;color:var(--muted);font-family:system-ui,sans-serif;" title="Countries currently in the comparison (max 5)"></span>
   </div>
 
-  <!-- v469: Profile assumption context strip — SbS always uses pre-computed Deepwater $1.2B 10%WACC values; analyst needs to know the basis before using in IC memo -->
+  <!-- v469: Profile assumption context strip — the analyst needs the basis before using this in an IC memo.
+       v835 (T3): both spans are now PAINTED from ENGINE_BASIS by _sbsPaintBasisStrip(). They used to be
+       hand-typed literals describing the $1.2B / $15-opex project, which is NOT the project that produced
+       a single number on this tab. See the block above _sbsBasisTerms(). Do not re-hard-code them. -->
   <div style="background:rgba(176,104,0,.04);border:1px solid rgba(176,104,0,.14);border-radius:5px;padding:5px 12px;margin-bottom:10px;font-size:11px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
     <span style="color:var(--accent);font-weight:700;">Profile basis:</span>
-    <span id="cmp-profile-terms"><strong style="color:var(--text);">Deepwater</strong> · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI</span>
-    <span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic;">Same basis as Fiscal Compare — values are directly comparable</span>
+    <span id="cmp-profile-terms"></span>
+    <span id="cmp-profile-xref" style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic;"></span>
   </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;position:relative;">
       <input type="text" class="search-input" id="cmp-search" placeholder="Type a country, press Enter…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" spellcheck="false" style="width:260px;">
@@ -27578,6 +27581,9 @@ function toggleSbsEvidence() {
 const PRICES = [50, 75, 100, 125];
 
 function renderCompare() {
+  // v835 (T3): repaint the basis strip from ENGINE_BASIS on every render — it is the only
+  // statement of assumptions on this tab and it travels into the chart PNG and the print PDF.
+  try { _sbsPaintBasisStrip(); } catch (e) { /* non-critical */ }
   const chips = document.getElementById('cmp-chips');
   chips.innerHTML = compareList.map(c =>
     `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:6px;">
@@ -45499,7 +45505,7 @@ function _cmpPngCaptionLines(key) {
   var terms = '';
   var el = document.getElementById('cmp-profile-terms');
   if (el) terms = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
-  if (!terms) terms = 'Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI';
+  if (!terms) terms = _sbsBasisTerms();   // v835: was a hard literal naming the wrong project
   lines.push({ bold: true, text: 'Basis — every column is run on one standardized profile: ' + terms
     + '. These are not country properties; a different capex/opex profile gives different numbers.' });
   if (key === 'npv') {
@@ -46813,6 +46819,86 @@ window._icEngineBasis = function(opts) {
     + d.plateauYears + 'yr plateau, ' + (d.declineRate * 100).toFixed(0) + '% decline, $'
     + d.opexBbl + '/bbl flat opex) and returns a materially different NPV at the same price.';
 };
+/* ── v835 (T3) — the Side-by-Side basis strip described a project that produced none of
+   its numbers, and told the analyst it matched a Fiscal Compare column it does not match.
+   ────────────────────────────────────────────────────────────────────────────────────
+
+   Walked T3 cold at 1440x900 and 390x844, both storages cleared, over http. The tab
+   self-seeds Norway / United Kingdom / Netherlands, so the first thing a first-time
+   analyst sees is a populated three-country grid under an amber strip reading:
+
+       Profile basis: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life
+                      · 10% WACC · 100% WI
+       Same basis as Fiscal Compare — values are directly comparable
+
+   Measured against the grid underneath it, both halves of that strip are wrong.
+
+   The grid prints Norway Contractor NPV @$75 = $826M. That is COUNTRY_DATA.npv_75
+   (825.9) verbatim — petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater, i.e.
+   ENGINE_BASIS: $1.0B all-in, $18/bbl escalating 2%/yr real, 5yr plateau, 15% decline,
+   241.9 MMbbl. The $1.2B / $15-flat / 8yr-plateau project named in the strip is
+   DCF_PROFILES.deepwater — the Live DCF and Scenario Builder profile. It recovers
+   ~294 MMbbl and returns a materially different NPV on the same country at the same
+   price. Not one figure on this tab was computed on the project the strip named.
+
+   The second line is the sharper failure, because it is the one that gets acted on.
+   Fiscal Compare is honest about this: it carries TWO NPV columns side by side —
+   "NPV ($M) MODEL @$75", which is the live $1.2B run and reads $1.21B for Norway, and
+   "NPV ($M) DB · CITABLE @$75", the stored figure, which reads $826M. The FC strip
+   correctly describes the MODEL column. Side-by-Side shows ONLY the citable figure,
+   labels it with the MODEL basis, and then asserts the two tabs are "directly
+   comparable". An analyst who walks FC -> SbS, the documented IC route, meets $1.21B
+   and $826M for the same country at the same price under two strips that read
+   identically, with the tab telling them there is nothing to reconcile. They either
+   conclude the platform contradicts itself, or they paste $826M into a memo footnoted
+   $1.2B capex / $15 opex — a number their reviewer cannot rebuild, and which the
+   stated assumptions would in fact have produced as $1.21B.
+
+   v834 derived the seven EXPORT artifacts from ENGINE_BASIS for exactly this reason.
+   It could not have caught this one: this string is in markup, not in an export
+   function, and the export that consumes it — _cmpPngCaptionLines(), the caption band
+   burned onto the chart PNG — reads it out of the DOM precisely so it "cannot drift
+   from what the page says". It did not drift. What the page said was wrong, and the
+   PNG and the print PDF both carried it out of the tool unchanged.
+
+   Both spans are now painted from ENGINE_BASIS at render time. There is no second copy
+   of these figures left on this tab, and the xref line now names WHICH Fiscal Compare
+   columns this grid agrees with and which it does not. */
+function _sbsBasisTerms() {
+  if (typeof ENGINE_BASIS === 'undefined') return 'ORCA standardized reference project · 10% WACC · 100% WI';
+  return ENGINE_BASIS.name + ' · ' + ENGINE_BASIS.short + ' · 100% WI';
+}
+function _sbsPaintBasisStrip() {
+  var t = document.getElementById('cmp-profile-terms');
+  if (t) {
+    var terms = _sbsBasisTerms();
+    var i = terms.indexOf(' · ');
+    t.innerHTML = (i > 0)
+      ? '<strong style="color:var(--text);">' + terms.slice(0, i) + '</strong>' + terms.slice(i)
+      : terms;
+    t.setAttribute('title', (typeof ENGINE_BASIS !== 'undefined')
+      ? 'Every figure in the grid below is this one project run through each country\'s fiscal terms — '
+        + ENGINE_BASIS.totalProdMM.toFixed(1) + ' MMbbl recovered, $' + ENGINE_BASIS.capexDevMM
+        + 'M development + $' + ENGINE_BASIS.sustainingMM + 'M sustaining + $' + ENGINE_BASIS.abandonmentMM
+        + 'M abandonment. Source: ' + ENGINE_BASIS.source + '. Take is not a property of a country; '
+        + 'cost recovery, R-factor tiers and every profit-oil split move with capex and opex, so a '
+        + 'different profile gives a different answer.'
+      : '');
+  }
+  var x = document.getElementById('cmp-profile-xref');
+  if (x) {
+    var d = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
+    x.textContent = d
+      ? 'Matches Fiscal Compare\u2019s DB \u00b7 CITABLE columns \u2014 not its MODEL columns, which run a different $'
+        + (d.capexMM / 1000).toFixed(1) + 'B / $' + d.opexBbl + '-opex project and read higher'
+      : 'Matches Fiscal Compare\u2019s DB \u00b7 CITABLE columns \u2014 not its MODEL columns';
+    x.setAttribute('title', 'Fiscal Compare shows both. Its MODEL columns are a live run of the Live DCF / '
+      + 'Scenario Builder profile, which is also labelled \u201cDeepwater\u201d but is a different project. '
+      + 'Its DB \u00b7 CITABLE columns are the stored figures \u2014 the same numbers this grid shows, on the '
+      + 'basis named to the left. Norway @$75 reads $1.21B in the MODEL column and $826M in the CITABLE '
+      + 'column; this grid shows $826M.');
+  }
+}
 // Same two projects, expressed for the reconciliation block.
 function _basisDelta833() {
   var p = DCF_PROFILES.deepwater;
