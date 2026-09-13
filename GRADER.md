@@ -49726,3 +49726,18 @@ sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-t
   2026-09-12 *and* 2026-09-13. **Fourteenth cycle carried, still uninvestigated.**
   Outside the UX-finalization course this directive sets, so no cycle will ever pick
   it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 743 Log — 2026-09-13 13:10
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 743 complete — **v835 shipped and pushed** (`afe7d8e`, log `bfe4d57`), mirror in sync. Only the loop's own `CYCLE_STATE.json` / `cycle_log.txt` remain modified.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (742 was T5, 741 T2; T3 last ran at 738.)
+
+## Friction
+`index.html:3789` — the "Profile basis" strip on Side-by-Side, plus its downstream consumer `_cmpPngCaptionLines()` at `:45501`.
+
+Walked cold at 1440×900 and 390×844, both storages cleared, over http. The ta
