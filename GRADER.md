@@ -50000,3 +50000,105 @@ Not a tooltip sweep, not an FAQ, not rubric chasing. v837 written at the three d
 
 ## Friction
 `index.html:2768` — the **"Stability Score (diamonds)"** card inside the Fiscal Compare **IC Analyst Interpretation Guide**. It is the only legend the page offers for the `REFORM VERDICT` column sitting a few inches below it, and that column is on by def
+
+---
+## Cycle 746 Log — 2026-09-13
+
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Shipped: **v838** (`6af154b`), pushed, mirror in sync.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest by rotation:
+745 was T4, 744 T1, 743 T3, 742 T5, 741 T2; T6 last ran at 740.)
+
+## Friction
+Methodology → **Data Coverage At a Glance** (`#meth-coverage-summary`, `index.html:4355`), the
+panel a T6 walk lands on from the *Coverage Summary* jump link at `:4209`. Its own opening
+sentence states its job: *"What data is available for each country — and what is not."*
+
+All six tiles were hardcoded HTML. Two had drifted off the data they describe:
+
+| tile | printed | actual | bar |
+|---|---|---|---|
+| Government Take | 185/185 | 185 | green — correct |
+| NPV | 185/185 | 185 | green — correct |
+| IRR (In DB) | 165/185 | 165 | yellow — correct |
+| **Breakeven Price** | **65/185** | **68** | body text already said 68 and "Remaining 117" |
+| Price Swing | 185/185 | 185 | green — correct |
+| **Stability Score** | **185/185** | **21** | **full GREEN**, *"Available for all 185 countries"* |
+
+`reform_history.json` holds a sourced fiscal-law change log for **21** jurisdictions. For the
+other **164** there is no reading at all, and every other surface in the platform already says
+so — Fiscal Compare prints `n/c` in its Stability column (v520), the Country Profile headline
+prints *"n/c · no sourced reform log · 21 of 185 jurisdictions covered"* (v566), and **v837 last
+cycle removed this exact false all-clear from the FC interpretation guide.** This tile was the
+last place granting full coverage, and it is on the one panel an analyst opens specifically to
+find out what is missing. Absence read as a clean record is the expensive direction of that
+error: it carries a reform premium of **zero** into an IC memo on 164 countries nobody has
+researched.
+
+## Change
+Added **`_methPaintCoverage()`**, called after `country_data.json` and `reform_history.json`
+land. Every tile is now painted from the predicate its own label states, so the panel cannot
+drift from the file again.
+
+On screen:
+- **Stability Score** reads **21/185** on a **red** bar filled to **11.4%** of its width, not a
+  full green one. Its note now reads *"Scored for 21 of 185 jurisdictions only. The other 164
+  have no sourced reform log, so they carry **no reading** — not five diamonds, not a
+  zero-reform premium"*, names the `n/c` that FC and Country Profile print, and states the
+  external check (national petroleum law, IMF Article IV, operator annual reports) required
+  before reform exposure goes to an IC.
+- **Breakeven Price** reads **68/185**, agreeing with its own body text for the first time.
+- The other four painted to the values they were typed with — which is the evidence they were
+  right, now held there by code.
+- New **"Open Reform Risk →"** affordance in the stability note: **24px** desktop, **44px** at
+  390 with `hasTouch`, verified to land on `treformrisk`.
+
+## Result
+An analyst checking whether a Stability Score is defensible before citing it now learns from the
+coverage panel that their country probably has no score at all — instead of being told the
+metric is complete for all 185 and reading a blank as a clean fiscal record.
+
+### Verification
+- JS syntax gate: **11 scripts, 0 bad.**
+- **Playwright RAN this cycle** against the edited local tree: **300 PASS / 0 FAIL / 0 WARN / 0 JS errors.**
+- Pixel gate: **PASS — no surface got worse than baseline.** The 7 findings (3 `small-touch-target`
+  at 768, 3 at 390, 1 `clipped-text`) are all pre-existing and in other elements.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** (390 with `hasTouch`),
+  with the Methodology pane open and scrolled to the coverage panel at every one. **0 page and 0
+  console errors at all six.**
+- Counts reconciled against the live files: `take_75` 185, `npv_75` 185, `irr_75` non-null 165,
+  bounded `be_75` **68**, `swing` 185, `REFORM_HISTORY` non-empty keys **21**.
+- Link click verified: active pane → `treformrisk`, 0 page errors.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — no banner, page-sub or routing hint; the change is entirely inside
+an existing panel. v430, v449/v451/v452, v489 untouched. Tab order unchanged. Not a tooltip, not
+an FAQ, not rubric chasing. v838 written at the three display sites (`:42`, `:2484`, `:2554`)
+silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **CLEARED this cycle:** the Methodology coverage tile's false "Stability Score — 185/185"
+  (carried from 745).
+- **NEW:** the Reform Risk country picker (`#rr-country-lookup`) offers **186 options** — all 185
+  countries plus a placeholder — although only 21 have a log. Selecting one of the other 164
+  should say so at the picker, not after selection. Same defect family as this cycle, one surface
+  further in. Wants a T4 or T6 cycle.
+- **~20 on-screen tooltips / column headers still carry the $1.2B literal** (`:50860`, `:52945`,
+  `:33335`). Hover text, not artifacts that leave the tool. (Carried from 744.)
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of 87.2% /
+  85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Seventeenth cycle carried, still uninvestigated.** Outside the UX-finalization
+  course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
+  directly.**
