@@ -48349,3 +48349,136 @@ Walked the Screener cold at 1440×900 and at 390×844 with touch. Every row had 
 | control | goes to | cap | export |
 |---|---|---|---|
 | checkbox (col 0, unlabelled column) | IC shortlist dock | none | Co
+
+---
+## Cycle 733 Log — 2026-09-13 — T4 — shipped v825 (`9b3cf62`)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation: 732 was T1,
+731 T3, 730 T5, 729 T2, 728 T6; T4 last ran at cycle 727. Not a repeat of last cycle.)
+
+## Friction
+Walked T4 cold at 1440x900 and at 390x844 with `hasTouch`. Fiscal Compare is where the analyst meets
+fiscal stability first — the tab carries both stability readings, Swing (pp) and the Reform verdict
+column — and `#fc-sort-row` presents five sort buttons in one identically-styled group:
+
+| button | `data-sort` | wired? | result on click |
+|---|---|---|---|
+| Govt Take ▲ | `take` | yes | sorts |
+| NPV ▼ | `npv` | yes | sorts |
+| Breakeven ▲ | `breakeven` | yes | sorts |
+| **Swing ▲** | **`swing`** | **NO** | **nothing** |
+| A–Z | `country` | yes | sorts |
+
+The dead one is the only control on the platform that ranks 185 countries by **price stability** —
+its own tooltip reads *"Sort by Price Swing (low→high, most stable first)"*. Measured on the
+unmodified build:
+
+    window._fcSortState   'take'  ->  click Swing  ->  'take'      (unchanged)
+    first 3 rows          USA / Iraq / Somalia     ->  USA / Iraq / Somalia   (unchanged)
+    .active class         not applied.  ▲/▼ arrow  not drawn.  console  clean.
+
+No reorder, no highlight, no arrow, **no error** — so the only reading available to the analyst is
+that the table is broken, and there is no second route: the `SWING (pp)` column header carries no
+`onclick` and computes `cursor:default`, unlike `COUNTRY` which is clickable. On a phone it is worse,
+because the button is 77x44px and sits directly under a thumb: a full-size, well-tooltipped,
+keyboard-focusable control that has never done anything.
+
+**Root cause** — `index.html:56244` wired the row from a hand-kept literal:
+
+    ['take','npv','breakeven','country'].forEach(...)
+
+`data-sort="swing"` was added to the row at **v447** (`dc0f14e`, 2026-08-21) and never added to that
+list. **1,094 commits.** The same literal is where v525 *deleted* `'irr'` when the IRR column went —
+two drifts in opposite directions on one hand-maintained list, which is the structural finding here.
+
+Nothing else was missing. `renderFCResults()` has supported `sortField === 'swing'` the whole time:
+the comparator (`:49564`), the ascending-default map (`:49449`), the active-button arrow map
+(`:49456`), the per-row gap annotation (`:50395`), the `#`-rank tooltip and both sort labels
+(`:49874`, `:50799`) all name it. Calling `fcSetSort('swing')` from the console produced a perfect,
+fully-decorated sort. **Only the listener was absent.** Same shape as the v460 calibration case in
+the directive — a button that had been silently failing.
+
+## Change
+The sort row is wired **from the DOM** instead of from a literal:
+
+    document.querySelectorAll('.fc-sort-btn[data-sort]').forEach(function (sortBtn) {
+      var sort = sortBtn.getAttribute('data-sort');
+      if (!sort) return;
+      sortBtn.addEventListener('click',   function ()  { fcSetSort(sort); });
+      sortBtn.addEventListener('keydown', function (e) { if (e.key === 'Enter') fcSetSort(sort); });
+    });
+
+A button that exists in `#fc-sort-row` is live by construction, so this cannot drift a third time.
+No new control, no new column, no new copy — the control was already on screen, already labelled and
+already sized. It now does the thing it says it does.
+
+## Result
+The analyst can rank Fiscal Compare by price stability. Ascending:
+
+    1 Turkmenistan  +1.6pp     2 Uzbekistan  +1.7pp     3 Bolivia  +3.8pp
+    4 USA           +6.2pp     5 Iraq        +6.6pp     6 China    +9.9pp
+
+— the royalty-dominant regimes whose government take barely moves between $50 and $125/bbl, which is
+the certainty-mandate screen. `⇅ Reverse`:
+
+    1 Guyana  +26.0pp    2 Sierra Leone  +25.7pp    3 Liberia  +25.1pp    4 Suriname
+
+— the regimes that capture most of the price upside, the ones the tooltip says "requires multi-price
+sensitivity table in IC memo". Neither list was reachable on this platform before this cycle, from
+any control on any tab.
+
+## Verification
+- **JS syntax gate: PASS** — 11 inline script blocks, 0 syntax errors.
+- **Runtime suite: RUN this cycle**, both builds, served over `python3 -m http.server`:
+
+      HEAD build (unmodified, served from /tmp/orcabase2)   289 PASS / 4 FAIL / 1 WARN
+      v825 build (this change)                              289 PASS / 4 FAIL / 1 WARN
+
+  Identical, so this change regressed nothing. The 4 failures (3 x SB-PROVENANCE, 1 x CountryProfile
+  evidence chain) and the single console error reproduce on the **unmodified** build and are
+  artefacts of running the suite off localhost: `serviceWorker.register('/petroleum-fiscal-db/sw.js')`
+  (`index.html:49`) is the GitHub Pages path and 404s when the repo root is served at `/`. The
+  **300 PASS / 0 FAIL** figure is the deployed-URL number and is **not** claimed for this run, per the
+  directive's rule against recording a number the suite did not produce.
+- **No regression on the four that already worked** — clicking `npv`, `breakeven`, `country` and
+  `take` each still sets `window._fcSortState` to its own field.
+- **Keyboard:** focus Swing, press Enter -> `_fcSortState === 'swing'`.
+- **Zero horizontal scroll:** `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768**
+  and at **390**.
+- **Phone (390x844, `hasTouch`, `isMobile`):** all five buttons visible, `#fc-sort-row`
+  `display:flex`; Swing measures **77 x 44px**, over the directive's 24px floor; tap sorts
+  (`_fcSortState === 'swing'`, row 1 Turkmenistan); `scrollWidth` 390 = `clientWidth` 390.
+- **0 page errors** in every run, desktop and mobile.
+
+## STILL LOCKED — respected
+No new tooltip, no new FAQ, no banner / page-sub / "How to read" block, no citation micro-edit, no
+rubric chasing. Not a text-only change — 185 rows reorder, a button gains its `.active` state and an
+arrow is drawn where none was. The v612 mobile layer, `#reference-panel` and the
+`min-width: max-content` markers are untouched. v371/v373 declutter intact. v430 FC IC Analyst Guide
+sessionStorage, v449/v451/v452 CP headline and the removed FC Govt NPV column, v489 Reform Risk —
+all untouched. Tab order unchanged. v824 → v825 at the three display sites only (`:42`, `:2433`,
+`:2503`), silently, after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **The Reform Risk country lookup is finished work.** `#rr-country-lookup` carries all 185
+  jurisdictions; the verdict card was read cold for Norway, Nigeria, Malaysia and Iraq and each one
+  is correct and self-qualifying — Norway names the +12pp 2022 rise *and* the offsetting 2020 cut and
+  concludes net 0pp; Nigeria says plainly that a zero premium there is an absence of measurement, not
+  evidence of stability; Malaysia (one of the 164 uncovered) refuses to read as a clean record and
+  names the Petroleum Development Act 1974 as where the external check starts.
+- **The Country Profile → Reform Risk handoff works.** `#/profile/nigeria` cold renders
+  `.cp-reform-cta` as `SIZE UNKNOWN · 2 fiscal law changes since 2010 · terms were rewritten inside
+  the window, size never quantified ›`, the same verdict token and colour the FC Reform cell prints,
+  and `openReformRiskFor()` carries the country across. `#/reform/<country>` deep-links correctly.
+- **Still open, carried forward:** the FC **Reform verdict** column has no `data-sort-key` and no
+  `onclick` — with the column switched on there is still no way to rank by reform exposure, only by
+  swing. That is now the nearer half of the same T4 gap and is the obvious next cycle here.
+  `#cp-run-fc-btn` (`index.html:4010`) still reads two element IDs that do not exist in the DOM
+  (`cp-price-select`, `price`) — both halves dead, narrow consequence, wants its own cycle.
+- **Carried forward from 732, unactioned:** the Screener tick column's header is a bare select-all
+  checkbox with no visible label; with the row `+` gone it is the only list control on that tab.
+- **Unrelated to this cycle, flagged not actioned (fourth cycle carried):** the email *"petroleum
+  overnight chain FAILED — 2026-09-12"* is still in the inbox and still uninvestigated. Outside the
+  UX-finalization course this directive sets, but it is now four cycles old and wants Zach's
+  attention.
