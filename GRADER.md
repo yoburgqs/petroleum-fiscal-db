@@ -49375,3 +49375,16 @@ three display sites only (`:42`, `:2484`, `:2554`), silently, after the real cha
   2026-09-12 *and* 2026-09-13. **Eleventh cycle carried, still uninvestigated.** It is
   outside the UX-finalization course this directive sets, so no cycle will ever pick it up.
   **This wants Zach's attention directly.**
+
+---
+## Cycle 740 Log — 2026-09-13 08:59
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 740 complete — **v832 shipped and pushed**, mirror synced.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest by rotation; 739 was T4, T6 last ran at 734)
+
+## Friction
+Walked cold at 1440×900 and 390×844, both storages cleared. Country Profile's evidence chain turned out to be mature — the headline take click lands you on the parameter table, dead citations are labelled `LINK DEAD`, and Fiscal Compare's Iraq drilldown disambiguates its three differe
