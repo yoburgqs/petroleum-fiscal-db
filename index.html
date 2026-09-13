@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v830</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v831</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v830</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v831</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v830</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v831</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3006,6 +3006,7 @@ window.copyPlatformCitation = function(btn) {
     <button class="fc-sort-btn" data-sort="npv" tabindex="0" aria-label="Sort by Contractor NPV (high to low)" title="Sort by Contractor NPV (high→low, most profitable first) — NPV = net present value of contractor cash flows discounted at 10% WACC for the selected profile and price. Expressed per BOE of production. Positive NPV = project creates value above the cost of capital. Available for all 185 countries.">NPV &#9660;</button>
     <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" aria-label="Sort by Breakeven price (low to high)" title="Sort by Breakeven price (low→high, most resilient first) — breakeven = minimum oil price for contractor NPV ≥ 0 under this profile. &lt;$50/bbl = project viable even in low-price environment. $50–80 = viable at base case. &gt;$80 = requires elevated price. Available for 65 of 185 countries (requires complete royalty + per-contract cost data). Use 'Breakeven only' filter to restrict to the 65 countries with verified data.">Breakeven &#9650;<br><span style="font-size:10px;font-weight:400;opacity:.65;">(65/185)</span></button>
     <button class="fc-sort-btn" data-sort="swing" tabindex="0" aria-label="Sort by Price Swing (low to high)" title="Sort by Price Swing (low→high, most stable first) — Swing = govt take@$125 minus take@$50/bbl in percentage points. Low swing (&lt;10pp, green) = royalty-dominant, stable returns across price cycles; preferred for certainty mandates. High swing (&gt;20pp, red) = progressive/PSC regime; government captures most price upside above $75; requires multi-price sensitivity table in IC memo. Available for all 185 countries.">Swing &#9650;</button>
+    <button class="fc-sort-btn" data-sort="reform" tabindex="0" aria-label="Sort by Reform exposure, highest exposure first" title="Sort by REFORM EXPOSURE (highest first) &mdash; the Reform verdict column, ordered. Bands, worst to quietest: WACC +5&ndash;8pp / +3&ndash;5pp (the only verdicts that change a model input) &rarr; TAKE +Npp already raised inside the 2010 window, largest first &rarr; SIZE UNKNOWN (terms rewritten in-window, take effect never quantified) &rarr; TAKE NET 0pp or negative (the in-window rise was offset by an in-window cut) &rarr; &uarr; PRE-2010 (the rupture predates the window, so the score is an artefact of where it starts) &rarr; NO LAW CHANGE &rarr; NO PREMIUM &rarr; n/c. The band comes from the same _rrClassify() verdict the cell prints, so the order and the cell can never disagree. n/c rows sort LAST, never first &mdash; no sourced log is no reading, not a clean record. Clicking this also ticks &#9670; Reform-scored only and switches the Reform verdict column on, the same way Breakeven does, so you are ranking 21 readings rather than 21 readings followed by 164 blanks. Use &#8645; Reverse for the quiet end first.">Reform &#9660;<br><span style="font-size:10px;font-weight:400;opacity:.65;">(21/185)</span></button>
     <button class="fc-sort-btn" data-sort="country" tabindex="0" aria-label="Sort alphabetically by country name">A&#8211;Z</button>
     <button id="fc-sort-dir-btn" tabindex="0" aria-label="Reverse current sort order" onclick="fcToggleSortDir()" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;font-weight:600;padding:3px 9px;cursor:pointer;transition:.15s;margin-left:4px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" title="Reverse the current sort order (e.g. switch from lowest take to highest take, or from highest IRR to lowest IRR) without changing the sort dimension. Resets when you click a different sort button.">&#x21c5; Reverse</button>
     <div class="fc-stability-toggle">
@@ -3046,7 +3047,7 @@ window.copyPlatformCitation = function(btn) {
          the number the cells actually render. Ticking it also turns the Stability column on if
          it is off, because a table filtered to the reform-scored set with the reform column
          hidden shows the analyst nothing about why those 21 rows are the ones left. -->
-    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the countries ORCA holds a sourced fiscal-reform event log for. The other rows are not low-risk and are not a score of 5 -- they are unscored (n/c), and this toggle hides them rather than letting them sit in a ranking as though a reading existed. Leaves the 21 jurisdictions that carry a reform verdict. Ticking this also switches the Reform verdict column on. Untick to return to all 185."><input type="checkbox" id="fc-filter-reform" style="accent-color:var(--accent);" onchange="(function(cb){if(cb.checked){var st=document.getElementById('fc-stability-check');if(st&&!st.checked)st.checked=true;}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})(this)"> Reform-scored only<span id="fc-filter-reform-n" style="font-weight:400;opacity:.7;"></span></label>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the countries ORCA holds a sourced fiscal-reform event log for. The other rows are not low-risk and are not a score of 5 -- they are unscored (n/c), and this toggle hides them rather than letting them sit in a ranking as though a reading existed. Leaves the 21 jurisdictions that carry a reform verdict. Ticking this also switches the Reform verdict column on. Untick to return to all 185."><input type="checkbox" id="fc-filter-reform" style="accent-color:var(--accent);" onchange="(function(cb){window._fcReformManuallySet=true;if(cb.checked){var st=document.getElementById('fc-stability-check');if(st&&!st.checked)st.checked=true;}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})(this)"> Reform-scored only<span id="fc-filter-reform-n" style="font-weight:400;opacity:.7;"></span></label>
     <!-- ── v729 (T1): the production-data basis had no control on this table ───────────
          Measured off the live cold-default DOM: 163 of the 185 rows hold ZERO verified
          block-level production, and 6 of the TOP 10 by the default Govt Take sort are
@@ -49492,6 +49493,27 @@ function fcSetSort(field) {
   // Auto-unchecks when switching to a different sort, unless analyst manually re-checked.
   var fIRR = document.getElementById('fc-filter-irr');
   var fBE = document.getElementById('fc-filter-be');
+  // v831 (T4): the same v459 rule, for the sparsest column on the table. Ranking by reform
+  // exposure across 185 rows means 21 ranked readings followed by 164 n/c blanks, and the
+  // blanks are 89% of the list -- exactly the "185 rows with most showing —" problem v459
+  // fixed for Breakeven. Ticking the filter also forces the verdict column on, because a
+  // sort by a hidden column is a sort the analyst cannot check.
+  var fRR = document.getElementById('fc-filter-reform');
+  if (field === 'reform') {
+    if (fRR && !window._fcReformManuallySet) { fRR.checked = true; }
+    var _stChk = document.getElementById('fc-stability-check');
+    if (_stChk && !_stChk.checked) _stChk.checked = true;
+    if (fBE && !window._fcBEManuallySet) { fBE.checked = false; }
+    if (fIRR && !window._fcIRRManuallySet) { fIRR.checked = false; }
+    window._fcBEManuallySet = false;
+    window._fcIRRManuallySet = false;
+    if (window._fcLastResults && window._fcLastPrice != null) {
+      renderFCResults(window._fcLastResults, window._fcLastPrice);
+    }
+    return;
+  }
+  if (fRR && !window._fcReformManuallySet) { fRR.checked = false; }
+  window._fcReformManuallySet = false;
   if (field === 'breakeven') {
     // v460 fix: only reset IRR manual flag when switching away from IRR; preserve analyst's BE manual override
     if (fBE && !window._fcBEManuallySet) { fBE.checked = true; }
@@ -49824,6 +49846,72 @@ function _fcHasReformLog(country) {
 }
 window._fcHasReformLog = _fcHasReformLog;
 
+// ── v831 (T4): reform exposure becomes an ORDER, not 21 cells you read one at a time ──
+// Fiscal Compare has a sort button for every decision axis it carries — Govt Take, NPV,
+// Breakeven, Swing, A–Z — except the one T4 is about. The Reform verdict column has no
+// header sort, no button, and no data-sort-key, so the analyst asking "what is my reform
+// exposure across these countries" got 21 verdicts scattered through a list ordered by
+// government take, which is not a reform signal at all. Measured on the live build, cold,
+// with ◆ Reform-scored only ticked: the two jurisdictions carrying a WACC premium — the
+// only verdict class this platform says changes a model input — landed at row 5 (United
+// Kingdom) and row 19 (Brazil) of 21, with ↑ PRE-2010 and NO LAW CHANGE rows above both.
+// The one ranking that did exist, "Most Frequently Reformed Regimes" on the Reform Risk
+// tab, is ranked by COUNT, and that tab spends four paragraphs telling the analyst the
+// count is blind to magnitude and is not the finding. So the verdict could not be ranked
+// and the ranking was not the verdict.
+//
+// This returns a severity band from _rrClassify()'s own icToken — no second copy of the
+// rules, no recomputation, so the order and the cell can never disagree. Ordering inside a
+// band is by measured magnitude, then by the change count, then A–Z for determinism.
+// n/c is band 7 and sorts LAST, never first: an absent log is no reading, not a clean one.
+var _FC_REFORM_BANDS = [
+  { key: 'wacc',    label: 'Add a WACC premium — the only verdicts that change a model input' },
+  { key: 'raised',  label: 'Government take already raised inside the 2010 window' },
+  { key: 'unsized', label: 'Terms rewritten in-window — take effect never quantified' },
+  { key: 'offset',  label: 'In-window rise offset by an in-window cut — net zero or negative' },
+  { key: 'pre2010', label: 'Take rise on record, but before the window — score is an artefact' },
+  { key: 'nochange',label: 'No fiscal law change since 2010' },
+  { key: 'nopremium', label: 'No reform-frequency premium indicated' },
+  { key: 'nolog',   label: 'No sourced reform log — no reading at all, and not a clean record' }
+];
+function _fcReformRank(country) {
+  var v = (typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  if (!v) return { band: 7, mag: 0, score: 999, token: 'n/c', scored: false };
+  var t = String(v.icToken || '');
+  var band, mag = 0;
+  if (t.indexOf('WACC') === 0) {
+    band = 0;
+    // +5–8pp is the score ≤ 20 branch and outranks +3–5pp.
+    mag = (t.indexOf('5–8') >= 0) ? 2 : 1;
+  } else if (t.indexOf('TAKE') === 0) {
+    // 'TAKE +Npp' or 'TAKE NET ±Npp'. Parse the signed magnitude the token itself prints,
+    // so a net-zero Norway cannot be ordered as though it had taken +12pp.
+    var m = t.match(/([+−-])\s*(\d+(?:\.\d+)?)pp/);
+    var n = m ? parseFloat(m[2]) : 0;
+    if (m && (m[1] === '−' || m[1] === '-')) n = -n;
+    if (n > 0) { band = 1; mag = n; } else { band = 3; mag = -n; }
+  } else if (t.indexOf('SIZE UNKNOWN') === 0) {
+    band = 2;
+  } else if (t.indexOf('PRE-2010') >= 0) {
+    band = 4;
+  } else if (t.indexOf('NO LAW CHANGE') === 0) {
+    band = 5;
+  } else {
+    band = 6;
+  }
+  return { band: band, mag: mag, score: (v.score == null ? 999 : v.score), token: t, scored: true };
+}
+window._fcReformRank = _fcReformRank;
+// Worst exposure first. Same convention as NPV (best-value-first is descending there); the
+// ⇅ Reverse button flips it for an analyst who wants the quiet end of the list at the top.
+function _fcReformCmp(a, b) {
+  var ra = _fcReformRank(a.country), rb = _fcReformRank(b.country);
+  if (ra.band !== rb.band) return ra.band - rb.band;
+  if (ra.mag !== rb.mag) return rb.mag - ra.mag;
+  if (ra.score !== rb.score) return ra.score - rb.score;
+  return a.country < b.country ? -1 : a.country > b.country ? 1 : 0;
+}
+
 // The control states its own coverage, counted off the data rather than written into the
 // label, so it cannot drift the way the Breakeven button's hardcoded "(65/185)" can.
 function _fcSyncReformFilterCount() {
@@ -49900,11 +49988,12 @@ function renderFCResults(results, price) {
     var isActive = btn.getAttribute('data-sort') === sortField;
     btn.classList.toggle('active', isActive);
     if (isActive) {
-      var baseTxt = {take:'Govt Take', npv:'NPV', irr:'IRR', breakeven:'Breakeven', swing:'Swing', country:'A\u2013Z'}[sortField] || sortField;
+      var baseTxt = {take:'Govt Take', npv:'NPV', irr:'IRR', breakeven:'Breakeven', swing:'Swing', reform:'Reform', country:'A\u2013Z'}[sortField] || sortField;
       var defaultAsc = !!_sortAscFields[sortField];
       var showingAsc = (_sortDir478 === 'asc');
       var arrow = showingAsc ? '\u25b2' : '\u25bc'; // ▲ or ▼
-      var sub = sortField === 'breakeven' ? '<br><span style="font-size:10px;font-weight:400;opacity:.65;">(65/185)</span>' : '';
+      var sub = sortField === 'breakeven' ? '<br><span style="font-size:10px;font-weight:400;opacity:.65;">(65/185)</span>'
+              : sortField === 'reform' ? '<br><span style="font-size:10px;font-weight:400;opacity:.65;">(21/185)</span>' : '';
       btn.innerHTML = baseTxt + ' ' + arrow + sub;
     }
   });
@@ -50009,6 +50098,9 @@ function renderFCResults(results, price) {
       if (b.be_75 == null) return -1;
       return a.be_75 - b.be_75;
     });
+  } else if (sortField === 'reform') {
+    // v831 (T4): worst reform exposure first, banded off _rrClassify()'s own verdict token.
+    sorted.sort(_fcReformCmp);
   } else if (sortField === 'swing') {
     // v448: Sort by Price Swing (low→high, most stable first)
     sorted.sort(function(a,b) {
@@ -50056,7 +50148,17 @@ function renderFCResults(results, price) {
   // is modelled on its own terms.
   // They are now partitioned to the bottom on every numeric sort, under a divider,
   // with no rank number. The evidence grade now governs position, not just a badge.
-  var _fcGenericLast = (sortField !== 'country');
+  // v831 (T4): 'reform' joins 'country' in NOT partitioning. The v563 rule is about a ranked
+  // NUMBER that came from no country's fiscal record -- the model take and model NPV constants.
+  // The reform sort does not rank on either: it ranks on _rrClassify()'s verdict, read out of
+  // that jurisdiction's own sourced fiscal-reform event log, which exists or does not exist
+  // independently of whether the compare engine holds its contract terms. Partitioning it
+  // anyway put Brazil (WACC +3-5pp) and Russia (TAKE +15pp) BELOW the unranked divider while
+  // the UK sat alone at the top, and printed the band headers a second time underneath -- so
+  // the one sort built to show where the premium-bearing block ends showed two of them.
+  // The per-cell GENERIC marking (.fc-gen-val / .fc-gen-tag, v748) is unaffected and still
+  // flags those model columns on every row, which is the sort-independent signal by design.
+  var _fcGenericLast = (sortField !== 'country' && sortField !== 'reform');
   var _fcRankedN = sorted.length;
   if (_fcGenericLast) {
     var _fcOwnPart = [], _fcGenPart = [];
@@ -50099,6 +50201,8 @@ function renderFCResults(results, price) {
     if (sortField === 'npv' && c.liveNPV == null) hasValue = false;
     if (sortField === 'breakeven' && c.be_75 == null) hasValue = false;
     if (sortField === 'take' && c.liveTake == null) hasValue = false;
+    // v831 (T4): an n/c row carries no reform reading, so it is not a placing on this sort.
+    if (sortField === 'reform' && !_fcHasReformLog(c.country)) hasValue = false;
     if (hasValue) rankTotal++;
     rankMap[c.country] = idx + 1;
   });
@@ -50319,8 +50423,9 @@ function renderFCResults(results, price) {
   };
 
   // Sort dimension labels for rank tooltip
-  var sortDimLabel = sortField === 'npv' ? 'NPV' : sortField === 'breakeven' ? 'breakeven' : sortField === 'swing' ? 'price swing' : 'govt take';
-  var sortDirLabel = (sortField === 'take' || sortField === 'breakeven' || sortField === 'swing') ? '1=lowest' : '1=highest';
+  var sortDimLabel = sortField === 'npv' ? 'NPV' : sortField === 'breakeven' ? 'breakeven' : sortField === 'swing' ? 'price swing' : sortField === 'reform' ? 'reform exposure' : 'govt take';
+  var sortDirLabel = (sortField === 'take' || sortField === 'breakeven' || sortField === 'swing') ? '1=lowest'
+                   : (sortField === 'reform') ? '1=highest exposure' : '1=highest';
 
   // Profile context banner — shows what was run so analyst always has context even if they scroll away from controls
   var profileKey2 = document.getElementById('fc-profile') ? document.getElementById('fc-profile').value : '';
@@ -50571,6 +50676,10 @@ function renderFCResults(results, price) {
   // v468: Price Swing threshold dividers — low (<10pp) / moderate (10–20pp) / progressive (>20pp) when sorted by swing
   var _swing10DividerInserted = false;
   var _swing20DividerInserted = false;
+  // v831 (T4): reform exposure bands. Unlike take/BE/swing these are not thresholds on a
+  // number -- they are the verdict classes _rrClassify() already emits, so the divider is
+  // drawn wherever the band changes rather than at a hardcoded cut.
+  var _rrBandLast = -1;
   // v529 (T5): Bahrain, Kuwait and Saudi Arabia carry a database government take of 100% at every
   // price -- the contractor has no access to project economics at all. That is why fmtTake() has an
   // isStateMonopoly() guard and why the drilldown draws a NOT COMPARABLE block for them. This table
@@ -50688,6 +50797,13 @@ function renderFCResults(results, price) {
     if (sortField === 'npv')     return r.liveNPV == null ? null : r.liveNPV;
     if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
     if (sortField === 'swing')   return r.swing == null ? null : Number(r.swing);
+    // v831 (T4): reform is ordinal. Tie groups are the verdict BAND -- the 7 ↑ PRE-2010 rows
+    // genuinely share one reading, and printing them 12,13,14... would assert an order between
+    // them that _rrClassify() never made. Unscored rows return null and are not tied to anything.
+    if (sortField === 'reform') {
+      if (!_fcHasReformLog(r.country)) return null;
+      return Number(_fcReformRank(r.country).band);
+    }
     // v580 (T5): the take ranking is built on the citable database take, so tie groups must be
     // measured on the same value. Reading liveTake here would report ties that the visible rank
     // order no longer has.
@@ -50725,6 +50841,7 @@ function renderFCResults(results, price) {
       if (sortField === 'npv') return r.liveNPV;
       if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
       if (sortField === 'swing') return r.swing == null ? null : Number(r.swing);
+      if (sortField === 'reform') return _fcHasReformLog(r.country) ? Number(_fcReformRank(r.country).band) : null;
       return r.liveTake;
     };
     sorted.forEach(function(r, i) {
@@ -50850,6 +50967,25 @@ function renderFCResults(results, price) {
         var _s20Colspan = showStability ? 14 : 13;   // v568 (T5): +1 for the citable database NPV column; v632 (T5): +1 for the shortlist select column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _s20Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Price swing &gt;20pp</div></td></tr>';
         _swing20DividerInserted = true;
+      }
+    }
+    // v831 (T4): reform-exposure band dividers. The point of the sort is that the analyst
+    // can see WHERE the premium-bearing block ends -- 2 of the 21 scored jurisdictions carry
+    // a verdict that changes a model input, and without a labelled break that fact is still
+    // something you have to count by hand down a column.
+    if (sortField === 'reform' && typeof _fcReformRank === 'function') {
+      var _rrB = _fcReformRank(r.country).band;
+      if (_rrB !== _rrBandLast) {
+        var _rrLbl = (_FC_REFORM_BANDS[_rrB] || {}).label || '';
+        var _rrCol = _rrB === 0 ? 'rgba(185,28,28,.45)' : _rrB <= 2 ? 'rgba(176,104,0,.40)'
+                   : _rrB === 7 ? 'rgba(120,120,120,.40)' : 'rgba(21,128,61,.35)';
+        var _rrTxt = _rrB === 0 ? 'var(--negative)' : _rrB <= 2 ? 'var(--accent)'
+                   : _rrB === 7 ? 'var(--muted)' : 'var(--green)';
+        var _rrColspan = showStability ? 14 : 13;
+        html += '<tr style="pointer-events:none;"><td colspan="' + _rrColspan + '" style="padding:0;">'
+          + '<div style="border-top:1px solid ' + _rrCol + ';text-align:center;font-size:10px;font-weight:700;color:'
+          + _rrTxt + ';letter-spacing:.04em;padding:3px 6px;text-transform:uppercase;">' + _rrLbl + '</div></td></tr>';
+        _rrBandLast = _rrB;
       }
     }
     var beStr = formatBreakeven(r.be_75);
@@ -51244,7 +51380,7 @@ function openFCDrilldown(country) {
     var ridx = window._fcFilteredResults.findIndex(function(x){return x.country===country;});
     if (ridx < 0) return '';
     var total = window._fcFilteredResults.length;
-    var sortLabel = (window._fcSortState === 'breakeven') ? 'BE' : (window._fcSortState === 'npv') ? 'NPV' : (window._fcSortState === 'swing') ? 'Swing' : 'Take';
+    var sortLabel = (window._fcSortState === 'breakeven') ? 'BE' : (window._fcSortState === 'npv') ? 'NPV' : (window._fcSortState === 'swing') ? 'Swing' : (window._fcSortState === 'reform') ? 'Reform exposure' : 'Take';
     // v505: share the rank with every country carrying the same value, exactly as the
     // table now does. "#1 of 185" on a country tied with 152 others was the single most
     // misleading string in the drawer.
@@ -51252,6 +51388,7 @@ function openFCDrilldown(country) {
       var f = window._fcSortState;
       if (f === 'npv') return x.liveNPV;
       if (f === 'breakeven') return x.be_75; if (f === 'swing') return x.swing;
+      if (f === 'reform') return (typeof _fcHasReformLog === 'function' && _fcHasReformLog(x.country)) ? _fcReformRank(x.country).band : null;
       if (f === 'country') return null; return x.liveTake;
     };
     var _myV = _rv(window._fcFilteredResults[ridx]);
@@ -54018,7 +54155,8 @@ function copyFCForIC(btn) {
   // paste is now built on the citable database take, so the sentence has to say so — an IC
   // reader treats a numbered list as a ranking of the number beside it.
   var sortName = ({ take: 'the ORCA database take column — the CITABLE one — low → high', npv: 'contractor NPV (model), high → low',
-    breakeven: 'breakeven, low → high', swing: 'price swing, low → high', country: 'country name, A–Z'
+    breakeven: 'breakeven, low → high', swing: 'price swing, low → high', country: 'country name, A–Z',
+    reform: 'reform exposure, highest first — the Reform verdict band from ORCA\u2019s sourced fiscal-reform event log, NOT government take'
   })[window._fcSortState || 'take'] || (window._fcSortState || 'take');
   var reg = window._fcRegionFilter || '';
   // v632 (T5): a hand-picked shortlist is captioned as one. Naming the region filter on a
