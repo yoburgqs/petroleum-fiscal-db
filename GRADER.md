@@ -48211,3 +48211,124 @@ shipped.
 
 ## Friction
 I walked Side-by-Side cold over HTTP, reading the real DOM and handlers. Most of the tab is genuinely finished — alias/fuzzy search, the self-clearing example set, `Order columns`, the share link round-trip, both chart dash conventions, every refusal toast, and zero mob
+
+---
+## Cycle 732 Log — 2026-09-12 23:05
+- Test before: 289 PASS / 4 FAIL / 1 WARN (local server, unchanged HEAD build)
+- Test after: 289 PASS / 4 FAIL / 1 WARN (local server, v824 build) — **identical, zero regression**
+- JS syntax gate: PASS
+- JS errors: 1, pre-existing and environmental (see Verification)
+- Summary: Cycle 732 complete. **v824** shipped, pushed, live, mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest by rotation; 731 was T3,
+730 T5, 729 T2, 728 T6, 727 T4, 726 T1)
+
+## Friction
+Walked the Screener cold over HTTP at 1440x900 and at 390x844 with `hasTouch: true` — no
+sessionStorage, no localStorage — reading the real DOM and the real handlers.
+
+Every row of `#tbl-screener` carried **two list-building affordances four pixels apart, feeding two
+separate lists with two separate bottom bars**:
+
+| | control | handler | destination | cap | export |
+|---|---|---|---|---|---|
+| col 0 | `<input type="checkbox" class="sc-sel">` | `scToggleSel()` | IC shortlist dock `#sc-sel-dock` | none | Copy for IC Memo · CSV · Excel · Side-by-Side |
+| col 2 | `<button>+</button>` | `addToBasket()` | Compare basket bar `#compare-basket` | 5 | **none** |
+
+The `+` is the visually dominant one — a bordered button set against the country name — while the
+tick lives in an unlabelled column whose header is a bare select-all checkbox. So the obvious
+affordance led to the weaker list, and the one artefact T1 has to end in (a shortlist you can put in
+front of an IC) was reachable only from the control that looks like furniture.
+
+Measured, using both:
+
+    tick Canada, USA, Azerbaijan   ->  #sc-sel-dock      @ bottom:48px  z-index 999
+    press "+" on Argentina         ->  #compare-basket   @ bottom:0px   z-index 1000
+
+    "IC shortlist  3 ticked  Canada · USA · Azerbaijan   ⎘ Copy  ⬇ CSV  ⬇ Excel  ⇌ Side-by-Side"
+    "Compare basket: Argentina ×                          Clear  Compare →"
+
+Two stacked fixed bars, disagreeing about what the shortlist is, each offering its own route to
+Side-by-Side. On a 390x844 phone that pair covered **212px — a quarter of the screen** (dock 86px at
+y=632, basket 126px at y=718).
+
+Two smaller defects on the same button, found in the same walk:
+- **Dead on the second press.** `addToBasket()` (`index.html:54575`) is add-only. Click `+` on
+  Argentina twice: `window.compareBasket` is `["Argentina"]` after both, the glyph is still `+`, and
+  `title` still reads *"Add Argentina to compare basket"* for a country already in the basket. No
+  toast, no pressed state, nothing in the row says the country is on a list.
+- **22px wide under `pointer: coarse`** (22x36), under the directive's 24px floor. The tick beside
+  it measures 24x24 and passes.
+
+## Change
+The per-row `+` is **removed** from `#tbl-screener` (`index.html:32971`). The tick column is now the
+only way to build a list on this tab, and the IC shortlist dock is the only bottom bar the Screener
+can raise — it drops from `bottom:48px` to `bottom:0`.
+
+Nothing else is touched. `addToBasket()`, `renderBasket()`, `removeFromBasket()`, `clearBasket()`,
+`#compare-basket` and **Explorer's own row `+`** (`index.html:26187`, still 185 buttons) all still
+work, so the basket feature and the six runtime tests that cover it are intact.
+
+Same precedent as v451 (Govt NPV), v517 (IRR), v568 (breakeven ceiling), v623 and v660: when a
+control answers the wrong question on the tab whose whole job is "which countries belong on my
+list", the fix is to delete it, not to label it.
+
+## Result
+One list, one bar, one set of countries. Whatever the analyst marks is what Copy for IC Memo, CSV,
+Excel and Side-by-Side all carry — they can no longer build a shortlist that has no export, and the
+page can no longer show them two shortlists at once.
+
+Verified after the change:
+- `#tbl-screener` row `+` buttons: **0**. `#tbl-explorer` row `+` buttons: **185** (unchanged).
+- Tick 3 → dock reads `IC shortlist 3 ticked Canada · USA · Azerbaijan`, sits alone at `bottom:0`,
+  `#compare-basket` computed `display:none`.
+- Dock `⇌ Side-by-Side` → `#/compare/canada+usa+azerbaijan`, `tab-btn-t2` active. `scOpenSbs()` still
+  handles >5 ticked by opening the first 5 and toasting the names it did not load.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** — zero horizontal scroll.
+- Phone bottom furniture **212px → 86px**; tick target 24x24 under `pointer: coarse`.
+
+## Verification
+The Playwright suite **RAN this cycle**, twice, against a local `python3 -m http.server`:
+
+    HEAD build (unchanged, served from /tmp/orcabase)   289 PASS / 4 FAIL / 1 WARN
+    v824 build (this change)                            289 PASS / 4 FAIL / 1 WARN
+
+Identical, so this change regressed nothing. The 4 failures (3 x SB-PROVENANCE, 1 x CountryProfile
+evidence chain) and the single console error reproduce on the **unmodified** build and are artefacts
+of running the suite off localhost: `serviceWorker.register('/petroleum-fiscal-db/sw.js')`
+(`index.html:49`) is the GitHub Pages path and 404s when the repo root is served at `/`. The
+**300 PASS / 0 FAIL** figure is the deployed-URL number; it is not claimed for this run, per the
+directive's rule against recording a number the suite did not produce.
+
+## STILL LOCKED — respected
+No new tooltip, no new FAQ, no banner / page-sub / "How to read" block, no citation micro-edit, no
+rubric chasing. Not a text-only change — an element is gone from all 185 rows and a fixed bar changes
+position. The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are
+untouched. v371/v373 declutter intact: Explorer analytics, Screener advanced filters and Home "More
+tools" stay collapsed; Screener presets stay a dropdown. v430 FC IC Analyst Guide sessionStorage,
+v449/v451/v452 CP headline and the removed FC Govt NPV column, v489 Reform Risk — all untouched. Tab
+order unchanged. v823 → v824 at the three display sites only (`:42`, `:2433`, `:2503`), silently,
+after the real change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **The tick system is finished work.** Ticks are keyed on `data-country`, survive a re-sort and a
+  price-deck change, re-render `sc-row-sel`, and `_scSelOrdered()` carries only ticks the current
+  screen still returns — so the comparison and the export can never disagree about the list.
+- **The preset menu is honest about what it removed.** `iochurdle` → 15 countries, and the count line
+  names the ten fee-basis blends it re-based, Iraq by name (published 84.8%, comparable 34.1% on 195
+  PSC/Concession contracts), and states that the `$0M` floor at the deck removed 0 rows and cannot.
+- **The price deck is reachable from the Screener** (v651) and drives the same radios as Fiscal
+  Compare — one deck on the platform, no disagreement.
+- **`#screener-preset-label`** correctly shows the active preset and its criteria after loading.
+- **Still open, carried forward:** the FC Reform verdict column has no `data-sort-key`.
+  `#cp-run-fc-btn` (`index.html:4010`) still reads two element IDs that do not exist in the DOM
+  (`cp-price-select`, `price`) — both halves dead, narrow consequence, wants its own cycle.
+- **New, not actioned:** the Screener tick column's header is a bare select-all checkbox with no
+  visible label. With the `+` gone this is now the only list control on the tab, so a later cycle
+  should check cold whether a first-time analyst finds it. Not fixed here because the directive asks
+  for one moment per cycle, and the two-competing-lists defect was the worse one.
+- **Unrelated to this cycle, flagged not actioned (third cycle carried):** the email *"petroleum
+  overnight chain FAILED — 2026-09-12"* is still in the inbox and still uninvestigated. Outside the
+  UX-finalization course this directive sets, but it is now three cycles old and wants Zach's
+  attention.
