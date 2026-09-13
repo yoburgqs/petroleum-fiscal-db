@@ -50102,3 +50102,18 @@ silently, after the real change shipped and re-tested.
   *and* 2026-09-13. **Seventeenth cycle carried, still uninvestigated.** Outside the UX-finalization
   course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
   directly.**
+
+---
+## Cycle 746 Log — 2026-09-13 18:27
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 746 complete — **v838** shipped (`6af154b`), grader log (`81a20fe`), both pushed, mirror in sync.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotation: 745 was T4, 744 T1, 743 T3, 742 T5, 741 T2 — T6 last ran at 740.)
+
+## Friction
+Methodology → **Data Coverage At a Glance** (`index.html:4355`), reached from the *Coverage Summary* jump link. Its opening sentence states its job: *"What data is available for each country — and what is not."*
+
+All six ti
