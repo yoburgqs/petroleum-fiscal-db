@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v832</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v833</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v832</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v833</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v832</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v833</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -4200,7 +4200,7 @@ window.copyPlatformCitation = function(btn) {
   <div class="dd-section" id="meth-calc">
     <div class="dd-section-hdr">How Government Take is Calculated</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      All fiscal metrics are computed on a standardized project basis: <strong>$1.2B deepwater capex</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across <em>all</em> fiscal instruments.
+      All fiscal metrics are computed on a standardized project basis — the ORCA <strong>Deepwater engine profile</strong>: <strong>50k bbl/d peak</strong>, 3-year ramp, <strong>5-year plateau</strong>, 15%/yr decline, <strong>241.9 MMbbl recovered</strong>, <strong>$1.0B all-in capex</strong> ($800M development + $150M sustaining + $50M abandonment), <strong>$18/bbl opex escalating 2%/yr real</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across <em>all</em> fiscal instruments. <span style="color:var(--muted);">This is not the profile the in-page Live DCF and Scenario Builder run &mdash; those use a separate &ldquo;Deepwater&rdquo; project (8-year plateau, 12% decline, 294.0 MMbbl, $15/bbl flat opex) and are what-if tools, not the source of any figure ranked, exported or cited here.</span>
     </p>
     <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
       <span style="font-size:11px;font-weight:700;color:var(--accent);">Does govt take include income tax for concession regimes?</span>
@@ -4251,8 +4251,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </thead>
         <tbody>
           <tr><td>Project life</td><td>25 years (10yr buy-back)</td><td style="font-size:12px;">Understates take for short buy-back contracts</td></tr>
-          <tr><td>Capex</td><td>$1.2B deepwater ($1,200M)</td><td style="font-size:12px;">Scale-neutral for flat-rate mechanics; affects R-factor timing for small fields</td></tr>
-          <tr><td>Opex</td><td>$15–20/bbl</td><td style="font-size:12px;">Too high for US GoM shallow; too low for North Sea brownfield</td></tr>
+          <tr><td>Capex</td><td>$1.0B all-in ($800M dev yrs&nbsp;1&ndash;3 + $150M sustaining + $50M abandonment)</td><td style="font-size:12px;">Scale-neutral for flat-rate mechanics; affects R-factor timing for small fields</td></tr>
+          <tr><td>Production profile</td><td>50k bbl/d peak &middot; 3yr ramp &middot; 5yr plateau &middot; 15%/yr decline &middot; 241.9 MMbbl recovered</td><td style="font-size:12px;">Single recovery volume applied to all 185 countries; the largest single driver of the NPV level, and the reason a country NPV here will not match a scenario run on any other production assumption</td></tr>
+          <tr><td>Opex</td><td>$18/bbl, escalating 2%/yr real (reaches ~$29/bbl by year&nbsp;25)</td><td style="font-size:12px;">Too high for US GoM shallow; too low for North Sea brownfield</td></tr>
           <tr><td>Discount rate</td><td>10% (not risk-adjusted)</td><td style="font-size:12px;">No country risk premium applied — NPV comparisons across countries overstate low-risk jurisdictions</td></tr>
           <tr><td>Tax loss carry-forward</td><td>Unlimited</td><td style="font-size:12px;">USA caps at 80% of taxable income; overstates contractor NPV in capped jurisdictions</td></tr>
           <tr><td>Depreciation</td><td>Straight-line 7yr (or project life if shorter)</td><td style="font-size:12px;">Varies by jurisdiction (UK: 100% yr1; Norway: 6yr linear; Australia: UOP)</td></tr>
@@ -39624,7 +39625,7 @@ function loadCountryProfile(country) {
       <div class="dd-take-cell"><div class="price-lbl">$100/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_100)}">${_fmtTakeCell(d.take_100)}</div></div>
       <div class="dd-take-cell"><div class="price-lbl">$125/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_125)}">${_fmtTakeCell(d.take_125)}</div></div>
     </div>
-    ${_isMonopoly ? '' : '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;">Take computed on a standardized deepwater project ($1.2B capex · 50k bbl/d peak · $15/bbl opex · 25-year life). NPV discounted at <strong>10% WACC</strong> — adjust for your project-specific WACC (see FAQ A137). All values are 100% WI, pre-financing, pre-bonus.</div>'}
+    ${_isMonopoly ? '' : '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.45;">Take, NPV and breakeven above are computed on ORCA&rsquo;s standardized <strong>Deepwater</strong> reference project: <strong>50k bbl/d peak &middot; 3yr ramp &middot; 5yr plateau &middot; 15%/yr decline &middot; 241.9 MMbbl recovered &middot; $1.0B all-in capex ($800M development + $150M sustaining + $50M abandonment) &middot; $18/bbl opex escalating 2%/yr real &middot; 25-year life</strong>, discounted at <strong>10% WACC</strong>, 100% WI, pre-financing, pre-bonus. <span style="display:inline-block;margin-top:3px;">The <em>Live DCF Model</em> panel further down this page also offers a profile named &ldquo;Deepwater&rdquo;, but it is a <strong>different project</strong> (8yr plateau, 12% decline, 294.0 MMbbl, $15/bbl flat opex) and therefore returns a different NPV at the same price. Cite the assumptions above with the figures above; the panel reconciles the two against each other. Adjust for your own WACC &mdash; see FAQ A137.</span></div>'}
     ${(function() {
       // v821 (T2) — PRICE SENSITIVITY CURVE, rebuilt because it did not render at the size it
       // reserved. The old markup was a single <svg viewBox="0 0 300 64" style="width:100%;height:64px">.
@@ -40413,21 +40414,31 @@ function loadCountryProfile(country) {
   </div>
   ${(function(){
     // Cost Profile Assumptions — collapsible disclosure panel
-    // v504: read the REAL standardized profile out of DCF_PROFILES.deepwater instead of hardcoding it.
-    // The hardcoded text said $2.0B capex / $12 opex / plateau years 6–15 and a fabricated Russia
-    // variant; the engine actually uses $1.2B / $15 / ramp 3yr + plateau 8yr for every precomputed
-    // take, NPV, IRR and breakeven in COUNTRY_DATA. An analyst opening this panel to write their IC
-    // assumption footnote was copying numbers the platform never used.
-    const _dwp = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES.deepwater) ? DCF_PROFILES.deepwater : null;
-    const profileName = 'Deepwater standard';
-    const _capexB     = _dwp ? (_dwp.capexMM / 1000) : 1.2;
-    const _rampY      = _dwp ? _dwp.rampYears : 3;
-    const _platY      = _dwp ? _dwp.plateauYears : 8;
-    const capex       = '$' + _capexB.toFixed(1) + 'B (95% spent years 1\u2013' + _rampY + ')';
-    const peakProd    = (_dwp ? (_dwp.peakBblDay / 1000) : 50) + ' MBD (ramp years 1\u2013' + _rampY
+    // v504 pointed this at DCF_PROFILES.deepwater and asserted in a comment that the engine
+    // "actually uses $1.2B / $15 / ramp 3yr + plateau 8yr for every precomputed take, NPV, IRR
+    // and breakeven in COUNTRY_DATA".
+    // v833 (T2): measured, that is false. COUNTRY_DATA.npv_75 is the mean of dcf_results at
+    // $75 — Indonesia 744.6 against the page's $745M — and dcf_results was produced by
+    // tools/petroleum/petroleum_dcf.py on tools/petroleum/dcf_profiles.py PROFILES.deepwater:
+    // 5yr plateau, 15% decline, 241.9 MMbbl, $1.0B all-in capex, $18/bbl opex escalating 2%/yr.
+    // DCF_PROFILES.deepwater is the in-page Live DCF / Scenario Builder project and recovers
+    // 294.0 MMbbl at $15/bbl flat. This panel is where an analyst copies the assumption footnote
+    // for an IC memo, so it must name the basis of the numbers on the page, not the basis of the
+    // what-if tool below them.
+    const _eb833 = (typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS : null;
+    const profileName = 'Deepwater standard (ORCA engine basis)';
+    const _rampY      = _eb833 ? _eb833.rampYears : 3;
+    const _platY      = _eb833 ? _eb833.plateauYears : 5;
+    const capex       = '$' + (_eb833 ? (_eb833.capexAllInMM/1000).toFixed(1) : '1.0') + 'B all-in \u2014 $'
+                        + (_eb833 ? _eb833.capexDevMM : 800) + 'M development (years 1\u2013' + _rampY + '), $'
+                        + (_eb833 ? _eb833.sustainingMM : 150) + 'M sustaining, $'
+                        + (_eb833 ? _eb833.abandonmentMM : 50) + 'M abandonment';
+    const peakProd    = (_eb833 ? (_eb833.peakBblDay / 1000) : 50) + ' MBD (ramp years 1\u2013' + _rampY
                         + ' \u00b7 plateau years ' + (_rampY + 1) + '\u2013' + (_rampY + _platY)
-                        + ' \u00b7 ' + (_dwp ? (_dwp.declineRate * 100).toFixed(0) : '12') + '%/yr decline after)';
-    const opex        = '$' + (_dwp ? _dwp.opexBbl : 15) + '/bbl';
+                        + ' \u00b7 ' + (_eb833 ? (_eb833.declineRate * 100).toFixed(0) : '15') + '%/yr decline after \u00b7 '
+                        + (_eb833 ? _eb833.totalProdMM.toFixed(1) : '241.9') + ' MMbbl recovered)';
+    const opex        = '$' + (_eb833 ? _eb833.opexBbl : 18) + '/bbl, escalating '
+                        + (_eb833 ? (_eb833.opexEscal*100).toFixed(0) : '2') + '%/yr real';
     const collapseId = 'cost-profile-' + safe;
     return `<div class="dd-section">
       <h3 style="cursor:pointer;user-select:none;" onclick="(function(){var el=document.getElementById('${collapseId}');el.style.display=el.style.display==='none'?'block':'none';})()">
@@ -40442,7 +40453,8 @@ function loadCountryProfile(country) {
           <div>├─ Discount rate: 10%</div>
           <div>└─ Project life: 25 years</div>
         </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">All take and NPV figures in this profile use this standardized project. Results are not forecasts of actual field economics — they are a consistent basis for cross-country fiscal comparison.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">Every take, NPV and breakeven figure on this page &mdash; and the ones Fiscal Compare ranks on, Side-by-Side shows and the XLSX export carries &mdash; was computed on this project. It is the assumption set to quote beside them. Results are not forecasts of actual field economics; they are a consistent basis for cross-country fiscal comparison.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px dashed var(--border);padding-top:8px;">Not the same as the <em>Live DCF Model</em> and <em>Scenario Builder</em> profile also named &ldquo;Deepwater&rdquo;, which runs ${(typeof DCF_PROFILES!=='undefined'&&DCF_PROFILES.deepwater)?(DCF_PROFILES.deepwater.plateauYears+'yr plateau, '+(DCF_PROFILES.deepwater.declineRate*100).toFixed(0)+'%/yr decline and $'+DCF_PROFILES.deepwater.opexBbl+'/bbl flat opex'):'a different plateau, decline and opex'} and therefore returns a different NPV at the same price. Those two are reconciled against each other at the foot of the Live DCF panel.</p>
       </div>
     </div>`;
   })()}
@@ -46722,6 +46734,53 @@ const DCF_PROFILES = {
   onshore_us:   { name: 'Onshore US',      peakBblDay: 10000,  rampYears: 1, plateauYears: 5,  declineRate: 0.25, capexMM: 150,  opexBbl: 15, discountRate: 0.10 }
 };
 
+// ── v833 (T2) — the basis the STORED figures were actually computed on ─────────────────
+// Every take_75 / npv_75 / breakeven on this platform is the mean of the per-contract rows
+// in dcf_results, which tools/petroleum/petroleum_dcf.py produced on the "deepwater" profile
+// defined in tools/petroleum/dcf_profiles.py. That profile is NOT DCF_PROFILES.deepwater
+// above — the object the in-page Live DCF and Scenario Builder run on. Measured:
+//
+//                        stored engine (dcf_profiles.py)   in-page panel (DCF_PROFILES)
+//   peak rate            50k bbl/d                         50k bbl/d
+//   plateau              5 years                           8 years
+//   decline              15%/yr                            12%/yr
+//   total production     241.9 MMbbl                       294.0 MMbbl
+//   capex                $800M dev + $150M sustaining      $1,200M headline, +2%/yr
+//                        + $50M abandonment = $1,000M      sustaining from yr4 = $1,668M
+//   opex                 $18/bbl, +2%/yr real              $15/bbl flat
+//
+// The Country Profile footnote, the FC basis strip and the IC citation have all been
+// describing the right-hand column while quoting the left-hand column's numbers. On 179 of
+// the 182 non-monopoly countries the two produce contractor NPVs more than $250M apart at
+// the same price under the same profile name — Sierra Leone 1,098 vs 3,618, Malaysia 627 vs
+// 3,372 — and nothing on the page said the projects were different.
+const ENGINE_BASIS = {
+  name: 'Deepwater',
+  peakBblDay: 50000, rampYears: 3, plateauYears: 5, declineRate: 0.15,
+  totalProdMM: 241.9, capexAllInMM: 1000, capexDevMM: 800,
+  sustainingMM: 150, abandonmentMM: 50,
+  opexBbl: 18, opexEscal: 0.02, discountRate: 0.10, years: 25,
+  // One line, used wherever a stored figure has to name its own assumptions.
+  short: '50k bbl/d peak · 5yr plateau · $1.0B all-in capex · $18/bbl opex escalating 2%/yr · 25yr life · 10% WACC',
+  source: 'tools/petroleum/dcf_profiles.py — PROFILES.deepwater'
+};
+// Same two projects, expressed for the reconciliation block.
+function _basisDelta833() {
+  var p = DCF_PROFILES.deepwater;
+  var jsProd = 0, jsCapex = 0;
+  for (var y = 1; y <= 25; y++) {
+    var bd = (y <= p.rampYears) ? p.peakBblDay * (y / p.rampYears)
+           : (y <= p.rampYears + p.plateauYears) ? p.peakBblDay
+           : p.peakBblDay * Math.pow(1 - p.declineRate, y - p.rampYears - p.plateauYears);
+    jsProd += Math.max(0, bd) * 365 / 1e6;
+    jsCapex += (y === 1) ? p.capexMM * 0.40 : (y === 2) ? p.capexMM * 0.35
+             : (y === 3) ? p.capexMM * 0.20 : p.capexMM * 0.02;
+  }
+  return { jsProdMM: jsProd, jsCapexMM: jsCapex, engProdMM: ENGINE_BASIS.totalProdMM,
+           engCapexMM: ENGINE_BASIS.capexAllInMM,
+           prodGapPct: (jsProd - ENGINE_BASIS.totalProdMM) / ENGINE_BASIS.totalProdMM * 100 };
+}
+
 // ── v698 (T2) — Scenario Builder profile labels are generated, never typed ──────────────
 // The <select id="sb-profile"> used to carry six hardcoded labels. One of them ("Deepwater
 // ($800M capex, ...)") disagreed with DCF_PROFILES.deepwater.capexMM = 1200, which is the
@@ -47414,6 +47473,8 @@ function runLiveDCF(country, profileKey, price) {
   result.mechanic = mechanic;
   result.profileName = profile.name;
   result.dbTake = d.take_75;
+  result.dbNpv  = (d.npv_75 != null ? d.npv_75 : null);   // v833 (T2): the headline NPV this panel sits beneath
+  result.profileKey = profileKey;
   return result;
 }
 
@@ -47834,6 +47895,29 @@ function _execLiveDCF(country, profileKey, price) {
     const adelta = Math.abs(delta);
     const sign = delta >= 0 ? '+' : '';
 
+    // ── v833 (T2) — the NPV half of "which number goes in the IC memo?" ────────────────
+    // This block has reconciled government take since v504 and has never mentioned NPV,
+    // even though the panel prints a 20px contractor NPV two inches above it and the
+    // headline prints another one at the top of the page. Measured across COUNTRY_DATA at
+    // $75/bbl on this same Deepwater profile, 179 of the 182 non-monopoly countries differ
+    // by more than $250M between the two, and 40 of those differ by more than 2x. The
+    // dominant driver is not the terms — it is that the two "Deepwater" projects are not
+    // the same project (see ENGINE_BASIS). Sierra Leone matches on take to 0.4pp and still
+    // printed $1,098M beside $3,618M under a green "either figure is defensible".
+    const _bd833   = _basisDelta833();
+    const _npvDb833 = (result.dbNpv != null && isFinite(result.dbNpv)) ? result.dbNpv : null;
+    const _npvSc833 = (result.npv   != null && isFinite(result.npv))   ? result.npv   : null;
+    const _npvOk833 = (_npvDb833 !== null && _npvSc833 !== null);
+    const _npvDelta833 = _npvOk833 ? (_npvSc833 - _npvDb833) : null;
+    const _npvSignFlip833 = _npvOk833 && ((_npvDb833 >= 0) !== (_npvSc833 >= 0));
+    // Ratio only means something when the reference is a real positive number.
+    const _npvRatio833 = (_npvOk833 && _npvDb833 > 1) ? (_npvSc833 / _npvDb833) : null;
+    function _npvFmt833(v) {
+      if (v == null) return 'n/a';
+      const a = Math.abs(v);
+      return (v < 0 ? '\u2212' : '') + '$' + (a >= 1000 ? (a/1000).toFixed(2) + 'B' : a.toFixed(0) + 'M');
+    }
+
     // Severity — drives the colour and the verdict sentence.
     let sevCol, sevBg, sevBorder, verdict;
     if (adelta < 3) {
@@ -47857,6 +47941,41 @@ function _execLiveDCF(country, profileKey, price) {
               + result.mechanic + ' template because the engine holds no ' + _cpEsc704(country)
               + ' terms, so the difference measures the template, not the regime. Cite the '
               + result.dbTake.toFixed(1) + '% country average; cite the scenario only as a template run, and say so.';
+    }
+
+    // v833 (T2): a take match is not an NPV match. When the two NPVs diverge materially the
+    // verdict can no longer say "either figure is defensible" — that sentence was the reason
+    // an analyst would carry the panel's NPV into a memo built on the headline's take.
+    let _npvVerdict833 = '';
+    if (_npvOk833) {
+      const _matGap833 = _npvSignFlip833
+        || (_npvRatio833 !== null && (_npvRatio833 >= 1.5 || _npvRatio833 <= 0.67))
+        || Math.abs(_npvDelta833) >= 500;
+      if (_npvSignFlip833) {
+        _npvVerdict833 = 'The two NPVs do not even agree on sign: the country average is '
+          + _npvFmt833(_npvDb833) + ' and this scenario is ' + _npvFmt833(_npvSc833)
+          + '. One of them clears a 10% WACC and the other does not — do not carry a viability '
+          + 'conclusion out of this panel without saying which project it came from.';
+      } else if (_matGap833) {
+        _npvVerdict833 = 'NPV is the larger disagreement here: ' + _npvFmt833(_npvDb833)
+          + ' against ' + _npvFmt833(_npvSc833)
+          + (_npvRatio833 !== null ? ' (' + _npvRatio833.toFixed(1) + 'x)' : '')
+          + '. Most of that is project size, not fiscal terms — the two profiles both named '
+          + '"Deepwater" recover ' + ENGINE_BASIS.totalProdMM.toFixed(0) + ' and '
+          + _bd833.jsProdMM.toFixed(0) + ' MMbbl respectively. Quote one NPV with its own '
+          + 'assumptions attached; never the headline take beside the scenario NPV.';
+      } else {
+        _npvVerdict833 = 'NPV agrees within ' + _npvFmt833(Math.abs(_npvDelta833))
+          + ' — unusual on this platform, and the one case where the two figures can sit in '
+          + 'the same paragraph provided you still state which project each is on.';
+      }
+      // Severity floor: a material NPV gap cannot render green.
+      if (_matGap833 && sevCol === 'var(--green)') {
+        sevCol = 'var(--yellow)'; sevBg = 'rgba(161,98,7,.05)'; sevBorder = 'rgba(161,98,7,.25)';
+        verdict = 'Take is consistent \u2014 within 3pp of the country average \u2014 but that is only half the answer. '
+                + verdict.replace('Either figure is defensible; cite the country average for comparability.',
+                                  'Cite the country average take for comparability.');
+      }
     }
 
     // Why they differ — every driver below is read off the data, none is asserted blind.
@@ -47898,6 +48017,25 @@ function _execLiveDCF(country, profileKey, price) {
         + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '') + '.';
     if (_p704.generic) drivers.unshift(_termsDriver704); else drivers.push(_termsDriver704);
 
+    // v833 (T2): the driver that was never listed, and is the largest one for NPV. Both
+    // projects are called "Deepwater"; they are not the same project. Stated first when the
+    // panel is on its default profile, because there the analyst has changed nothing and would
+    // otherwise have no reason to suspect the basis differs at all.
+    if (_npvOk833) {
+      const _basisDriver833 = '<strong>Project basis \u2014 two different &ldquo;Deepwater&rdquo; projects:</strong> the stored '
+        + 'country figures come from ORCA\u2019s engine profile ('
+        + ENGINE_BASIS.plateauYears + 'yr plateau, ' + (ENGINE_BASIS.declineRate*100).toFixed(0) + '% decline, '
+        + ENGINE_BASIS.totalProdMM.toFixed(1) + ' MMbbl, $' + (ENGINE_BASIS.capexAllInMM/1000).toFixed(1) + 'B all-in capex, $'
+        + ENGINE_BASIS.opexBbl + '/bbl opex escalating ' + (ENGINE_BASIS.opexEscal*100).toFixed(0) + '%/yr). '
+        + 'This panel runs its own Deepwater profile (' + DCF_PROFILES.deepwater.plateauYears + 'yr plateau, '
+        + (DCF_PROFILES.deepwater.declineRate*100).toFixed(0) + '% decline, ' + _bd833.jsProdMM.toFixed(1) + ' MMbbl, $'
+        + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex, $' + DCF_PROFILES.deepwater.opexBbl + '/bbl flat). '
+        + 'That is ' + (_bd833.prodGapPct >= 0 ? '+' : '') + _bd833.prodGapPct.toFixed(0)
+        + '% more oil on a cheaper barrel, so the scenario NPV runs high against the country average '
+        + 'even where the two takes agree. It is an assumptions difference, not a fiscal finding.';
+      if (profileKey === 'deepwater') drivers.unshift(_basisDriver833); else drivers.push(_basisDriver833);
+    }
+
     vsEl.innerHTML =
       '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Which number goes in the IC memo?</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'
@@ -47922,11 +48060,35 @@ function _execLiveDCF(country, profileKey, price) {
         + '</div>'
       + '</div>'
       + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
-        + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">Gap ' + sign + delta.toFixed(1) + 'pp</span>'
+        + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">Take gap ' + sign + delta.toFixed(1) + 'pp</span>'
         + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + verdict + '</span>'
       + '</div>'
+      // v833 (T2): the same question, asked of the number an IC actually votes on.
+      + (_npvOk833
+          ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'
+              + '<div style="flex:1 1 220px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.35);border-radius:6px;padding:9px 12px;">'
+                + '<div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;">\u2714 Cite this NPV</div>'
+                + '<div style="font-size:19px;font-weight:900;color:var(--text);margin:3px 0 2px;">' + _npvFmt833(_npvDb833) + '</div>'
+                + '<div style="font-size:11px;color:var(--text);line-height:1.45;">Contractor NPV @ $75/bbl, 10% WACC \u2014 the figure at the top of this page</div>'
+                + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">Engine basis: ' + ENGINE_BASIS.short + '.</div>'
+              + '</div>'
+              + '<div style="flex:1 1 220px;background:var(--surface);border:1px dashed var(--border);border-radius:6px;padding:9px 12px;">'
+                + '<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Scenario NPV \u2014 label it</div>'
+                + '<div style="font-size:19px;font-weight:900;color:var(--muted);margin:3px 0 2px;">' + _npvFmt833(_npvSc833) + '</div>'
+                + '<div style="font-size:11px;color:var(--text);line-height:1.45;">This panel\u2019s ' + result.profileName + ' project @ $' + price + '/bbl</div>'
+                + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">Panel basis: '
+                  + (DCF_PROFILES.deepwater.peakBblDay/1000) + 'k bbl/d peak \u00b7 ' + DCF_PROFILES[profileKey].plateauYears + 'yr plateau \u00b7 $'
+                  + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex \u00b7 $' + DCF_PROFILES[profileKey].opexBbl + '/bbl flat opex.</div>'
+              + '</div>'
+            + '</div>'
+            + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
+              + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">NPV gap '
+                + (_npvDelta833 >= 0 ? '+' : '\u2212') + _npvFmt833(Math.abs(_npvDelta833)).replace('\u2212','') + '</span>'
+              + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + _npvVerdict833 + '</span>'
+            + '</div>'
+          : '')
       + '<details style="font-size:11px;color:var(--muted);">'
-        + '<summary style="cursor:pointer;color:var(--accent);font-weight:600;list-style:revert;">Why the two differ (' + drivers.length + ' reason' + (drivers.length === 1 ? '' : 's') + ')</summary>'
+        + '<summary style="cursor:pointer;color:var(--accent);font-weight:600;list-style:revert;padding:5px 0;min-height:24px;">Why the two differ (' + drivers.length + ' reason' + (drivers.length === 1 ? '' : 's') + ')</summary>'
         + '<ul style="margin:7px 0 0 0;padding-left:18px;line-height:1.65;">'
           + drivers.map(function(x){ return '<li style="margin-bottom:4px;">' + x + '</li>'; }).join('')
         + '</ul>'
