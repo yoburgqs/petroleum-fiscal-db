@@ -49251,3 +49251,127 @@ v430, v449/v451/v452, v489 untouched. Tab order unchanged. v831 at the three dis
 Walked cold at 1440×900 and 390×844 with both storages cleared — the Reform Risk tab's lookup, ranked table, heatmap and regional tilt panel, then Fiscal Compare's verdict column, filters and all five sort buttons.
 
 The Reform Risk lookup answers a *single* country well. The worst moment is the cr
+
+---
+## Cycle 740 Log — 2026-09-13
+
+- Test before: 299 PASS / 0 FAIL / 1 WARN (local build, same server)
+- Test after: 299 PASS / 0 FAIL / 1 WARN — no regression. Suite RAN this cycle, twice,
+  once against the pre-change file restored from backup. The WARN is the pre-existing
+  local-only `sw.js` 404, absent from the local checkout.
+- JS errors: 0. JS syntax gate: PASS (11 inline blocks).
+- Shipped: **v832**, pushed, mirror synced.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+(stalest by rotation; 739 was T4, 738 T1, 737 T3, 736 T5, 735 T2 — T6 last ran at 734)
+
+## Friction
+Walked cold at 1440×900 and 390×844 with `sessionStorage` and `localStorage` cleared:
+Country Profile headline → `#cp-take-source` → Evidence Chain → Evidence Quality panel;
+Fiscal Compare quality badges → row drilldown; Screener presets → the exclusion strip.
+
+The Country Profile evidence chain is mature — `_cpTakeToEvidence()` lands the analyst on
+the parameter table, dead citations are labelled `LINK DEAD`, and the FC drilldown's
+three-take disambiguation for Iraq is genuinely good. The worst moment was not there.
+
+It was the **Screener → "NOT ON THIS LIST" strip**, built at `_why()` in `renderScreener`.
+That strip is the one surface on the platform whose entire job is provenance-of-an-
+exclusion, and it was **the last ranked surface still missing the state-monopoly guard the
+rest of the Screener already carries.** Two defects, both in the first screenful:
+
+1. **Saudi Arabia read `NPV @$75 $0M < $2.40B · NPV @$50 $0M < $1.20B`** — ranked below
+   Nigeria's $302M as though it had been measured and come last. It has not been measured.
+   `state_eq = 100` on **Bahrain, Kuwait and Saudi Arabia** zeroes the contractor out of
+   the model entirely:
+
+   | | take (all 4 decks) | contractor NPV | IRR | breakeven |
+   |---|---|---|---|---|
+   | Saudi Arabia / Kuwait / Bahrain | 100.0% | $0 | −100% | **$1/bbl** |
+   | next-lowest breakeven (Belgium) | 16.6% | $4.12B | — | $27/bbl |
+
+   Those are degenerate outputs of an empty position, not fiscal measurements — and that
+   `$1/bbl` is **the three lowest breakevens in the database, $26 clear of the field.**
+   The table two inches below already knows: `fmtTake()` renders take as `—`,
+   `_retentionSub()` renders `no position`, `tierLabel()` renders `State Monopoly`, all
+   three keyed off `isStateMonopoly()`. Explorer suppresses all four figures. The strip
+   bypassed every one of them. Under **IOC Capital Screen** the same chip read
+   `take 100.0% > 65%` — quoting a figure `fmtTake()` refuses to print anywhere else.
+   **Wrong in KIND, not in degree:** the analyst concludes Saudi Arabia was screened out
+   on bad economics when the truth is there is no contractor position to value.
+
+2. **China read `NPV @$75 $2.40B < $2.40B`** — a self-contradicting inequality.
+   `fmtNpvShared()` rounds to 2 dp at the $B scale, so any shortfall under ~$5M collapses
+   both sides to the same string. China's `npv_75` is **$2,399.9M against a $2,400M
+   floor**: a miss of **$100k, 0.004%**. A false statement inside the tool's own audit
+   trail is where an analyst stops trusting the audit trail. *(Carried from 738/739.)*
+
+## Change
+- Monopoly rows print **`state monopoly — no contractor position to value`** in place of
+  the threshold comparison — and only *after* the row has been shown to fail something, so
+  a monopoly that passes the screen as set is not "explained away" as removed.
+- Those chips are drawn **dashed-border / muted** instead of solid / `--negative`, so a
+  structural exclusion no longer wears the colour this page uses for a number that fell
+  short. Tooltip names the 100% state participation and the four figures it degenerates.
+- **Monopolies sort to the back of BOTH groups.** Group A ranks by deck NPV, group B by
+  fact depth — on either signal a zeroed position scores like a real result, and Kuwait's
+  722 facts put it inside group B's first ten, ahead of Guyana. A row that was never
+  measured cannot be a near miss.
+- When two formatted NPV figures collide, the chip prints the **GAP** instead of an
+  inequality between equals: China now reads `NPV @$75 $2.40B — short of $2.40B by $100k`.
+- **Fiscal Compare, NPV (model) column header:** `var _fcProfName` was declared ~120 lines
+  *below* its first use, so the hoisted binding was still `undefined` when the header was
+  built and the tooltip rendered *"on the profile selected above (**undefined**)"* — at
+  the exact element a T6 analyst hovers to ask what basis a number is on. Declaration
+  hoisted above the header; now reads `(Deepwater)`. Titles in the document containing
+  `undefined`: **0**.
+
+## Result
+The analyst asking *"why isn't Saudi Arabia on my shortlist?"* gets the true answer — no
+contractor position, the question here is access, not economics — instead of a false one,
+and can no longer be led into ranking or citing a $1/bbl breakeven or a 100% take that are
+artefacts of an empty model. The analyst asking *"why isn't China on it?"* reads a true
+statement carrying the size of the miss — $100k on $2.4B — and nudges the slider instead
+of dropping the country. And the FC NPV basis tooltip names its profile.
+
+## Verification — measured, not assumed
+- Suite RAN: 299 PASS / 0 FAIL / 1 WARN **before and after**, both against the same local
+  server, the "before" run made by restoring the pre-change file from backup.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** with the strip
+  rendered — 28 chips at every width, 0 overflowing right.
+- Chips under 24px under `pointer: coarse` at 390×844: **0** (all 24px).
+- Page errors 0, console errors 0 beyond the known local `sw.js` 404.
+- Presets walked: Two-Price Return Screen (NPV path), IOC Capital Screen (take-ceiling
+  path), Stable Fiscal Record (no monopoly in scope — strip correctly unchanged), Downside
+  Resilience. Explorer, the Screener table and Country Profile untouched; they already held
+  the guard.
+
+## STILL LOCKED — respected
+Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How to read"
+block / routing hint, not a citation micro-edit, not rubric chasing. **Not text-only** —
+the reason text, the chip border and colour, and the ordering of two ranked lists all
+change. v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers
+untouched. v371/v373 declutter intact — no new block, the strip is the existing
+`#sc-prod-out`. v430, v449/v451/v452, v489 untouched. Tab order unchanged. v832 at the
+three display sites only (`:42`, `:2484`, `:2554`), silently, after the real change shipped.
+
+## Carried forward
+- **RESOLVED this cycle:** *`downsidereturns` prints "China NPV @$75 $2.40B < $2.40B"* —
+  carried from 738 and 739.
+- **NEW, and it is a data question rather than a UX one.** `isStateMonopoly()` keys off
+  `take >= 99.5`, which catches exactly the three countries whose `state_eq` is 100 **and**
+  whose take reaches 100. **Turkmenistan and Uzbekistan also carry `state_eq = 100`** but
+  read take 87.2% / 85.6% with real NPVs ($1.22B / $1.34B) and `irr_75` of −100% / −63.6%.
+  Either their state-equity figure is wrong or their take is — a 100% state share cannot
+  leave an 87% take. Neither is flagged anywhere. Wants a Fork-1 walk, not a UX cycle.
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover
+  title when a filter leaves one breakeven-populated row. Grammar only. (Carried from 739.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with
+  nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. Wants an independent walk. (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Eleventh cycle carried, still uninvestigated.** It is
+  outside the UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
