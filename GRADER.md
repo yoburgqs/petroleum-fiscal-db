@@ -49463,3 +49463,16 @@ Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How
 - **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
 - **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance. (Carried from 736, re-scoped at 738.)
 - **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12 *and* 2026-09-13. **Twelfth cycle carried, still uninvestigated.** Outside the UX-finalization course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 741 Log — 2026-09-13 10:29
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 741 complete — **v833 shipped and pushed** (`b2b2421`), mirror in sync, working tree clean.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest by rotation; 740 was T6, T2 last ran at 735)
+
+## Friction
+Walked Country Profile cold at 1440×900 and 390×844, both storages cleared. Indonesia autoloads and prints **`NPV: $745M @$75`**, under a footnote telling the analyst the basis to quote beside it: *"standardized deepwater project ($1.2B capex · 50k 
