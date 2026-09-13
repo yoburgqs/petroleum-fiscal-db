@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v823</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v824</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2430,7 +2430,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v823</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v824</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2500,7 +2500,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v823</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v824</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32968,7 +32968,30 @@ function runScreener() {
     return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="_scNoteDrill(this);openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
       <td class="num" style="color:var(--muted)">${i+1}</td>
-      <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
+      <!-- v824 (T1): the per-row compare-basket "+" is REMOVED from the Screener.
+           Walking T1 cold, the row offered TWO ways to put a country on a list, four pixels
+           apart, feeding two different lists with two different bottom bars:
+             col 0  checkbox -> scToggleSel() -> the IC shortlist dock (Copy / CSV / Excel /
+                    Side-by-Side, no cap, ticks survive a re-sort and a price-deck change)
+             col 2  "+"      -> addToBasket()  -> the Compare basket bar (Compare -> only,
+                    hard cap of 5, no export of any kind)
+           The "+" is the visually dominant one -- a labelled button against the country name --
+           so the obvious control led to the weaker list, and the ONE thing T1 has to end in
+           (an exportable shortlist) was reachable only from the unlabelled checkbox column.
+           Worse when both were used: ticking 3 rows and pressing "+" on a 4th left two stacked
+           fixed bars disagreeing about the shortlist -- "IC shortlist: Canada, USA, Azerbaijan"
+           at bottom:48px over "Compare basket: Argentina" at bottom:0. On a 390x844 phone that
+           pair covered 212px, a quarter of the screen. The "+" was also a dead click on the
+           second press (addToBasket() is add-only; the glyph stayed "+" and the title still read
+           "Add Argentina to compare basket" for a country already in the basket) and it rendered
+           22px wide under pointer:coarse, under the 24px floor.
+           Nothing is lost: the dock already carries Side-by-Side and handles >5 by opening the
+           first 5 and naming the rest. The basket itself is untouched -- addToBasket(),
+           renderBasket(), the Explorer's own row "+" (line ~26187) and the #compare-basket bar
+           all still work and are still covered by the runtime suite. Same precedent as v451
+           (Govt NPV), v517 (IRR) and v623: the fix for a control that answers the wrong question
+           is to delete it, not to label it. -->
+      <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
       <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
