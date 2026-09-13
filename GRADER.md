@@ -49741,3 +49741,125 @@ sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-t
 `index.html:3789` — the "Profile basis" strip on Side-by-Side, plus its downstream consumer `_cmpPngCaptionLines()` at `:45501`.
 
 Walked cold at 1440×900 and 390×844, both storages cleared, over http. The ta
+
+---
+## Cycle 744 Log — 2026-09-13 20:20
+- Test before (deployed): 300 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after (local tree): 299 PASS / 0 FAIL / 1 WARN — pre-edit file on the same
+  local server reads 299 / 0 / 1 identically, so the delta is the server, not the edit
+- JS errors: 0 page errors; 1 console 404 (service worker, local-server only)
+- Summary: **v836 shipped and pushed** (`94c55c6`), mirror in sync.
+
+### Task
+**T1 — "Which countries should even be on my screening list?"** (743 was T3, 742 T5,
+741 T2.) Picked up the strongest carried-forward item, flagged at 743 as wanting a
+T1 walk.
+
+### Friction
+`index.html:3346` — the Screener preset menu line — and `:31525`, the active-preset
+badge. Walked cold at 1440x900 and 390x844, both storages cleared, over http.
+
+The preset menu is where a 20-minute analyst answers this question, and the menu line
+is read BEFORE the click. It rendered:
+
+    Two-Price Return Screen — verified production · NPV ≥$2.4B at deck (2× capex)
+    AND ≥$1.2B at $50 (1× capex)   → 5 of 185 @$75
+
+Two defects, both in the text the analyst uses to decide whether to trust the list.
+
+1. **The anchor.** "2× capex" / "1× capex" multiplied `DCF_PROFILES.deepwater.capexMM`
+   = $1,200M — the in-page Live DCF / Scenario Builder profile. `runScreener()` filters
+   `d.npv_75` / `d.npv_50`, which are `COUNTRY_DATA`, produced by `petroleum_dcf.py` on
+   `dcf_profiles.py PROFILES.deepwater` = `ENGINE_BASIS`, **$1,000M all-in**. Measured
+   against the capex the filtered figures actually carry, the floors are **2.4× and
+   1.2×**. Same wrong-project error v833/v834/v835 corrected on the Country Profile,
+   the seven exports and the Side-by-Side strip — but here it described a *filter*,
+   not a caption.
+
+2. **The $50 deck.** v724 correctly collapses the deck leg to the downside leg at the
+   $50 deck (a 2.4× floor returns zero rows there — max `npv_50` is $2.37B). The
+   slider was set to 1200 accordingly, but the menu line and the badge both kept
+   announcing "$2.4B at the deck price". One click onto the $50 deck and the screen
+   stated a floor **twice** the one it applied.
+
+### Change
+**The dollar floors are unchanged, deliberately.** The obvious fix — re-anchor to a
+literal 2×/1×, i.e. $2.0B/$1.0B — was built, measured, and **reverted**. Measured on
+the shipped data at the $75 deck:
+
+| floors | deck leg alone | downside leg alone | both | deck leg rejects | downside leg rejects |
+|---|---|---|---|---|---|
+| $2.4B / $1.2B (shipped) | 6 | 6 | **5** | China | Colombia |
+| $2.0B / $1.0B (literal 2×/1×) | 9 | 9 | **9** | *nothing* | *nothing* |
+
+At a true 2×/1× both legs select the identical nine countries and neither rejects a
+single row the other does not — it stops being a two-price screen at all, which is
+precisely the inert-leg failure v724 rebuilt this preset to remove. The calibration
+was right; only its description was wrong.
+
+So the floors are now the primitive and the **multiples are derived from them** by
+`_scReturnHurdles(deck)`, which paints the sliders, the menu line and the badge from
+one source. Five tokens (`${DECKFLOOR}`, `${DNFLOOR}`, `${DECKMULT}`, `${DNMULT}`,
+`${CAPEXANCHOR}`) resolve through the same two substitution points that already
+resolve `${DECK}`. On screen:
+
+- $75/$100/$125 deck: `NPV ≥$2.4B at deck (2.4× the $1.0B all-in capex) AND ≥$1.2B at $50 (1.2×)`
+- $50 deck: `NPV ≥$1.2B at deck (1.2× the $1.0B all-in capex) AND ≥$1.2B at $50 (1.2×)`
+
+The badge was `white-space:nowrap`; the longer text pushed the Screener filter row to
+**792px inside a 768px viewport**. It now wraps (`white-space:normal;max-width:100%`).
+Caught by this cycle's own scroll gate, against the pre-edit baseline — desktop
+rendering is unchanged at 25px single line.
+
+### Result
+An analyst reading the menu before they click sees the floors **actually applied at
+the deck they are on**, expressed against the capex the numbers were **computed on**.
+"We screened for 2.4× the $1.0B all-in capex at the planning price" is a sentence they
+can defend in the room and a reviewer can rebuild. Before, the multiple was stated and
+the capex it multiplied was not — and at the $50 deck the screen announced a floor
+twice the one it ran.
+
+### Verification
+- JS syntax gate: **11 scripts, 0 bad.**
+- **Playwright RAN this cycle** — local tree 299 PASS / 0 FAIL / 1 WARN. The pre-edit
+  file under the same local server reads **299 / 0 / 1 identically**, so the WARN (a
+  service-worker 404) is the local server, not the edit. Deployed root reads
+  **300 / 0 / 0 / 0**.
+- **The `290 PASS / 1 FAIL` reported into this cycle did not reproduce.** Re-ran the
+  suite against the deployed site: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors. Recorded
+  as a transient read, not a defect — but it is the second time a cycle has been handed
+  a number it could not reproduce.
+- Pixel gate: **PASS** — no surface got worse than baseline.
+- `scrollWidth === clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390 (390 with
+  `hasTouch`). 768 was **failing mid-cycle from my own edit** and is fixed, not waived.
+- Zero page errors at all four decks. Preset re-applied live at $50/$75/$100/$125.
+- Row count at $75 is **5 of 185, unchanged** — the shortlist an analyst gets is
+  identical; only what the tool claims about it changed.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers
+untouched. v371/v373 declutter intact — no block, banner, page-sub or routing hint
+added. v430, v449/v451/v452, v489 untouched. Tab order unchanged. Not a tooltip sweep,
+not an FAQ, not rubric chasing. v836 written at the three display sites (`:42`,
+`:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **RESOLVED this cycle:** `:3346` Screener Two-Price Return Screen preset — carried
+  since 742. Resolved more broadly than logged: the $50-deck floor misstatement was a
+  second, separate defect in the same element that had not been logged at all.
+- **~20 on-screen tooltips / column headers still carry the $1.2B literal** (`:50860`
+  FC citable-NPV header, `:52945` CP breakeven bound, `:33335` Screener downside
+  column). Hover text, not artifacts that leave the tool. Migrate opportunistically.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes
+  of 87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE
+  hover title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view
+  with nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Fifteenth cycle carried, still uninvestigated.**
+  Outside the UX-finalization course this directive sets, so no cycle will ever pick
+  it up. **This wants Zach's attention directly.**
