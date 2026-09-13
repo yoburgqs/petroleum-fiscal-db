@@ -49608,3 +49608,121 @@ tooltip, not an FAQ, not rubric chasing. v834 written at the three display sites
 
 ## Friction
 Walked cold at 1440×900 and 390×844, both storages cleared, over http — on `file://` the Country Profile never resolves past "Loading Norway…", so this path can't be walked
+
+---
+
+## Cycle 743 Log — 2026-09-13 — v835
+
+### Task
+**T3 — "How do these three countries compare side by side?"** Rotation: 742 was T5, 741 T2. T3 last walked at 738.
+
+### Friction
+`index.html:3789` — the `#cmp-profile-terms` basis strip on Side-by-Side, and its
+downstream consumer `_cmpPngCaptionLines()` at `:45501`.
+
+Walked cold at 1440x900 and 390x844, both storages cleared, over http (on `file://`
+the tab cannot be walked — the CP loader never resolves). Side-by-Side self-seeds
+Norway / United Kingdom / Netherlands, so the first thing a first-time analyst sees
+is a populated three-country grid under an amber strip:
+
+    Profile basis: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life
+                   · 10% WACC · 100% WI
+    Same basis as Fiscal Compare — values are directly comparable
+
+Measured against the grid beneath it, **both halves were wrong.**
+
+The grid prints Norway Contractor NPV @$75 = **$826M**. That is
+`COUNTRY_DATA.npv_75` (825.9) verbatim — `petroleum_dcf.py` on
+`dcf_profiles.py PROFILES.deepwater`, i.e. `ENGINE_BASIS`: $1.0B all-in, $18/bbl
+escalating 2%/yr real, 5yr plateau, 15% decline, 241.9 MMbbl. The $1.2B /
+$15-flat / 8yr-plateau project the strip named is `DCF_PROFILES.deepwater` — the
+Live DCF and Scenario Builder profile. **Not one figure on the tab was computed on
+the project the strip named.**
+
+The second line is the sharper failure, because it is the one that gets acted on.
+Fiscal Compare is honest about the split: it carries two NPV columns side by side —
+`NPV ($M) MODEL @$75`, the live $1.2B run, which reads **$1.21B** for Norway and is
+what the FC strip correctly describes, and `NPV ($M) DB · CITABLE @$75`, the stored
+figure, which reads **$826M**. Side-by-Side shows *only* the citable figure, labelled
+it with the *MODEL* basis, and then asserted the two tabs were "directly comparable".
+An analyst walking FC → SbS, the route the platform's own IC workflow documents,
+met $1.21B and $826M for the same country at the same price under two strips that
+read identically, with the tab telling them there was nothing to reconcile.
+
+**v834 could not have caught this.** The string was in markup, not in an export
+function, and the one export that consumes it — the caption band burned onto the
+chart PNG, the tab's only artifact seen by people who never open ORCA — reads it
+out of the DOM *precisely so it "cannot drift from what the page says."* It did not
+drift. What the page said was wrong, and the PNG and the print PDF both carried it
+out of the tool unchanged.
+
+### Change
+`#cmp-profile-terms` and the new `#cmp-profile-xref` are **painted from
+`ENGINE_BASIS`** by `_sbsPaintBasisStrip()`, called at the top of `renderCompare()`.
+
+- Strip now reads `Deepwater · 50k bbl/d peak · 5yr plateau · $1.0B all-in capex ·
+  $18/bbl opex escalating 2%/yr · 25yr life · 10% WACC · 100% WI`.
+- The xref line now reads `Matches Fiscal Compare's DB · CITABLE columns — not its
+  MODEL columns, which run a different $1.2B / $15-opex project and read higher`.
+  That `$1.2B` is derived from `DCF_PROFILES`, not typed.
+- Both carry hover detail naming the $826M / $1.21B split explicitly.
+- `_cmpPngCaptionLines()`'s hard-coded fallback now calls `_sbsBasisTerms()` instead
+  of re-stating the wrong project.
+- No second copy of these figures is left on the tab.
+
+### Result
+An analyst can rebuild the $826M they paste into an IC memo. When the Fiscal Compare
+MODEL column disagrees with the Side-by-Side grid, the tab now tells them which
+column matches and why, instead of telling them the two are the same.
+
+### Verification
+- JS syntax gate: **11 scripts, 0 bad.**
+- **Playwright RAN this cycle** against the local tree — **299 PASS / 0 FAIL / 1 WARN.**
+  The WARN is a service-worker 404 that **reproduces identically on the pre-edit
+  file under the same local server** and does not occur on the deployed root; it
+  accounts for the whole delta from the deployed 300/0/0. My change adds zero
+  console errors.
+- Pixel gate: **PASS** — no surface got worse than baseline.
+- `scrollWidth === clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390 (390 with
+  `hasTouch`). Strip wraps 29 → 56 → 116px rather than overflowing. **No control
+  added, resized or restyled.**
+- PNG caption band re-read live on both the DOM path and the emptied-strip fallback
+  path — both now carry the corrected basis.
+- SbS "Copy for IC Memo" paste re-read live: already correct from v834; its only
+  `$1.2B` is inside the explicit two-project warning. Screen and paste now agree.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers
+untouched. v371/v373 declutter intact — no block added, no page-sub, no banner, no
+routing hint. v430, v449/v451/v452, v489 untouched. Tab order unchanged. Not a
+tooltip sweep, not an FAQ, not rubric chasing. v835 written at the three display
+sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **RESOLVED this cycle:** `:3792` SbS on-screen profile strip — carried since 742.
+  Resolved more broadly than logged: it was also propagating into the chart PNG
+  caption and the print PDF, and the "same basis as Fiscal Compare" half was a
+  second, separate error that had not been logged at all.
+- **`:3346` Screener Two-Price Return Screen preset** — states its hurdles as
+  "2× capex" / "1× capex" against $1.2B; the stored NPVs it filters were computed on
+  $1.0B, so the thresholds are really 2.4× / 1.2×. Preset works; its self-description
+  does not match its own arithmetic. **Wants a T1 walk — now the strongest remaining
+  instance of this defect class.**
+- **~20 on-screen tooltips / column headers still carry the $1.2B literal** (e.g.
+  `:50860` FC citable-NPV header, `:52945` CP breakeven bound, `:33335` Screener
+  downside column). Hover text, not artifacts that leave the tool. Migrate to
+  `_icEngineBasis({warn:false})` opportunistically when a cycle is already in that
+  code — not as a cycle of their own.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes
+  of 87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE
+  hover title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view
+  with nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Fourteenth cycle carried, still uninvestigated.**
+  Outside the UX-finalization course this directive sets, so no cycle will ever pick
+  it up. **This wants Zach's attention directly.**
