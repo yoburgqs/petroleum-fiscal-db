@@ -48960,3 +48960,132 @@ change shipped.
 
 ## Friction
 Walked Side-by-Side cold at 1440×900 and 390×844 with storage cleared — seeded default set, Clear → quickstarts, type-and-Enter add, the Order dropdown at all four values, both charts, all twelve controls, and the share link round-tripped through a fresh page. Nearly all o
+
+---
+## Cycle 738 Log — 2026-09-13 11:40
+- Test before: 299 PASS / 0 FAIL (graded suite, RUN this cycle against the local build)
+- Test after: 299 PASS / 0 FAIL / 1 WARN / 1 JS error (sw.js 404 from the local static server — present at baseline too)
+- JS syntax gate: 11/11 script blocks clean
+- Summary: v830 shipped, pushed, mirror synced.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest by rotation (737 was T3, 736 T5, 735 T2, 734 T6, 733 T4; T1 last ran at 732).
+
+## Friction
+Walked the Screener cold at 1440x900 and 390x844 with both storages cleared: the seeded 185-row
+universe, all eleven presets, the Home hero CTA, both NPV sliders, the take ceiling, all eight sort
+columns, the price-deck switch with a preset armed, the tick/dock/export path and the row-click ->
+Country Profile -> back round trip.
+
+Nearly all of it is sound (recorded below so a later cycle does not re-walk it). The worst moment
+is this: **Screener -> Downside Resilience returns 24 countries and Guyana, Namibia, Senegal and
+Suriname are all gone with nothing on screen naming one of them.** Setting Max Govt Take to 45% by
+hand drops Guyana, Mozambique, Senegal and Suriname the same silent way.
+
+The strip that answers exactly this question already existed — v775, `#sc-prod-out`, built inside
+`runScreener()` at index.html:32849 — and it named Norway, Kazakhstan, Libya, Oman, Nigeria and
+Saudi Arabia with the threshold that removed each. But its universe was
+`COUNTRY_DATA.filter(d => _dqTier(d).hasProduction)`: **22 of 185 rows**. Every one of those four
+frontier countries was removed by a threshold the strip already knew how to explain — `_why()`
+reads the same numbers `_scPass()` tested — and each was withheld purely because ORCA holds no
+verified field production for it.
+
+That is the wrong boundary, and the page draws a sharper one two checkboxes away. `sc-floor-keep`
+separates the 45 rows whose take is royalty+tax on a record under 50 facts (Vanuatu, Bahamas — a
+floor, not a measurement) from the 118 modelled on real PSC/Concession terms, and its own label
+names Guyana, Namibia, Mozambique, Senegal and Suriname as the countries that distinction exists to
+protect. The strip was using "has anyone drilled it" where the page elsewhere uses "does ORCA have
+real terms for it".
+
+## Change
+Near-miss universe widened to production-backed **plus** modelled-terms; only floor-take rows stay
+out, since a lower bound cannot near-miss a ceiling. The new rows render as a second labelled group
+in the same strip — `N of 118 modelled-terms countries removed (no verified production · deepest
+record first)` — each chip carrying the binding threshold and opening that country's profile.
+
+Scope exclusions are unchanged: a country removed by region, mechanic, named set, reform log, IOC
+or R-factor is still not listed, so **Frontier Markets does not claim Guyana was rejected** when it
+is simply not in Sub-Saharan Africa. Verified: group B is empty on that preset.
+
+**Ordering is fact depth, not NPV, and that is the load-bearing decision.** Contractor NPV rises as
+take falls, so an NPV sort on this group returns Greenland, Faroe Islands, Romania, Bulgaria and
+Kyrgyzstan and buries Guyana at #16 of 118 — the same artifact the floor-take divider was invented
+for. Fact depth returns Russia, Iran, Peru, Venezuela, Algeria, Republic of the Congo, Ghana, Egypt,
+Mozambique, Guyana. It is a statement about the record, not about the terms, and the label and
+tooltip both say so. First `SC_OUT_B_SHOWN = 10` render; the rest are in the DOM behind a
+`+N more` / `Show fewer` control (`_scToggleOutMore()`), so a screen that rejects 91 countries does
+not open with 91 chips and the count on the button is the count that appears.
+
+## Result
+The analyst who screens for frontier acreage and does not see Guyana is told why, on screen, in the
+deck and on the basis the screen actually ran — instead of dragging sliders until it reappears, or
+carrying a shortlist to the investment committee that they cannot defend when someone asks where
+Guyana went. Measured: Downside Resilience went from **4 silent frontier disappearances to 101
+named removals**, 10 visible and the rest one tap away.
+
+## Verification — the suite RAN, both before and after
+- Graded suite (`office/tools/petroleum/tests/`), local build, before: **299 PASS / 0 FAIL**.
+- Same suite, after the change: **299 PASS / 0 FAIL**. No regression.
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 with group B **fully expanded**
+  (117 chips): `scrollWidth === clientWidth` at every width.
+- Controls under 24px under `pointer: coarse` in the strip: **0**, in every preset state and
+  expanded. Page errors: 0.
+
+## STILL LOCKED — respected
+Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How to read" block /
+routing hint, not a citation micro-edit, not rubric chasing. **Not a text-only change** — a widened
+computed universe rendering up to 101 new interactive rows plus a new expand control that did not
+exist. The v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers are
+untouched. v371/v373 declutter intact — this is inside the existing `#sc-prod-out` element, not a
+new block. v430, v449/v451/v452, v489 untouched. Tab order unchanged. v775's production-backed
+group is unmodified and still renders first. v830 at the three display sites only (`:42`, `:2484`,
+`:2554`), silently, after the real change shipped.
+
+## CARRIED-FORWARD ITEM RESOLVED — the "4 real suite failures" were never real
+Cycles 736 and 737 each carried forward, as the **most important open item**, that the gate reports
+300 PASS / 0 FAIL while the suite returns 289 PASS / 4 FAIL, concluding "the loop cannot see its own
+regressions." **That is backwards.** Measured this cycle, both copies run against the same local build:
+
+| copy | path | mtime | result |
+|---|---|---|---|
+| **graded — the one that runs** | `office/tools/petroleum/tests/runtime_comprehensive.js` | Sep 10 | **299 PASS / 0 FAIL** |
+| idle — never executed | `petroleum-fiscal-db/tests/runtime_comprehensive.js` | Sep 9 | 289 PASS / 4 FAIL |
+
+`autonomous_cycle.py` runs the **office** copy and its report parse is correct; the 300/0 the cycle
+is handed is the real number. The 4 failures come from running a test file one day out of date —
+3x `SB-PROVENANCE` and 1x `CountryProfile` asserting a build that no longer exists. This is exactly
+the fork `autonomous_cycle.py:112` warns about, in the direction nobody checked.
+
+**Fixed**: `tests/runtime_comprehensive.js` re-synced to the graded copy (sha `dab51c9b1e18`, both
+now identical). No future cycle should re-raise this.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **All eleven presets return exactly the count their dropdown option advertises** — 15/143/34/22/
+  11/5/35/70/6/56/24 promised, 15/143/34/22/11/5/35/70/6/56/24 delivered. No drift.
+- **Price-deck switch with a preset armed** is handled correctly: the chip repaints to
+  `IOC Capital Screen — MODIFIED: price deck $75 → $50`, the count line says "(modified)", the NPV
+  axis re-scales to the new deck, and Iraq's comparable take moves 84.8% -> 81.5% with it.
+- **All eight sort columns** reorder correctly and the two basis dividers survive every sort.
+- **Tick -> dock -> drill -> back** round trip is clean: 3 ticks survive a Country Profile
+  drill-down and return with the preset, the 15 rows and all 3 ticks intact.
+- **Home hero CTA** ("15 countries pass the IOC capital screen — open the screen →") lands on the
+  Screener with the preset already armed and 15 rows rendered.
+- **Reset All** correctly hides the near-miss strip and restores the 185-row universe.
+
+## Carried forward
+- **`downsidereturns` preset prints "China NPV @$75 $2.40B < $2.40B"** in the near-miss strip — a
+  removal reason that reads as a contradiction. `fmtNpvShared()` rounds to 2 decimals at the $B
+  scale, so a genuine ~$0.5M shortfall against the $2,400M threshold renders as `2.40 < 2.40`.
+  Real, narrow, and the kind of thing that makes an analyst distrust every other number on the
+  page. Good next T1 or T6. **NEW this cycle.**
+- **FC Reform verdict column** still has no `data-sort-key` and no `onclick` — reform exposure
+  still cannot be ranked, only swing. (Carried from 733.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (Carried from 734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis` disagreement** in Scenario Builder provenance.
+  Note this is NOT evidenced by the 4 suite failures (see above — those were stale); it wants an
+  independent walk before a cycle spends itself on it. (Carried from 736, re-scoped.)
+- **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. Ninth cycle carried, still uninvestigated. Outside the UX-finalization course
+  this directive sets, so no cycle will ever pick it up. **It wants Zach's attention directly.**
