@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v820</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v821</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2417,7 +2417,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v820</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v821</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2487,7 +2487,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v820</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v821</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -39130,29 +39130,56 @@ function loadCountryProfile(country) {
     </div>
     ${_isMonopoly ? '' : '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;">Take computed on a standardized deepwater project ($1.2B capex · 50k bbl/d peak · $15/bbl opex · 25-year life). NPV discounted at <strong>10% WACC</strong> — adjust for your project-specific WACC (see FAQ A137). All values are 100% WI, pre-financing, pre-bonus.</div>'}
     ${(function() {
+      // v821 (T2) — PRICE SENSITIVITY CURVE, rebuilt because it did not render at the size it
+      // reserved. The old markup was a single <svg viewBox="0 0 300 64" style="width:100%;height:64px">.
+      // preserveAspectRatio defaults to xMidYMid MEET, so the drawing scale is
+      // min(cardWidth/300, 64/64) = 1 for any card wider than 300px. Measured on Nigeria at 1440:
+      // the <svg> box was 1050px wide but the curve inside it was 244px wide starting at x=440 —
+      // a thumbnail floating dead centre with ~400px of empty card on each side, its take labels at
+      // the literal font-size="8" and its price axis at font-size="7". The one picture on this tab
+      // that shows the SHAPE of the price response (does take keep escalating above $75, or flatten?)
+      // was too small to read, so the analyst re-read the four big numbers above it and the chart
+      // carried nothing. Now: the line/area live in a viewBox "0 0 100 100" layer with
+      // preserveAspectRatio="none" so they stretch to the full card, stroke held true by
+      // vector-effect="non-scaling-stroke"; the dots, take labels and price axis are HTML positioned
+      // by percentage, so their type stays at real px (12/11) at every width instead of scaling with
+      // the drawing. $75 is drawn as the base case it is — dashed guide plus a marked axis label —
+      // because that is the price the whole tab is answering for.
       if (_isMonopoly) return '';
       const t50=d.take_50, t75=d.take_75, t100=d.take_100, t125=d.take_125;
       if (t50==null || t75==null || t100==null || t125==null) return '';
-      const xs=[28,108,192,272], ts=[t50,t75,t100,t125];
-      const mn=Math.min(...ts)-4, mx=Math.max(...ts)+4;
-      const rng=Math.max(mx-mn,8);
-      const toY=t=>+(48-(t-mn)/rng*36).toFixed(1);
-      const color=d.has_r_factor_tiers?'var(--purple)':'var(--accent)';
+      const ts=[t50,t75,t100,t125];
+      const prices=['$50','$75','$100','$125'];
+      const xs=[6,35.5,64.5,94];
+      const mn=Math.min(...ts)-2, mx=Math.max(...ts)+2;
+      // 12pp floor on the plotted band so a genuinely flat regime still reads flat rather than
+      // being stretched to fill the box — the old code carried the same idea with an 8pp floor.
+      const rng=Math.max(mx-mn,12);
+      const toY=t=>+(86-(t-mn)/rng*56).toFixed(2);
       const colorHex=d.has_r_factor_tiers?'#7C3AED':'#96570A';
       const pts=xs.map((x,i)=>`${x},${toY(ts[i])}`).join(' ');
-      const area=`M ${xs[0]},${toY(t50)} L ${xs[1]},${toY(t75)} L ${xs[2]},${toY(t100)} L ${xs[3]},${toY(t125)} L ${xs[3]},52 L ${xs[0]},52 Z`;
-      const dots=xs.map((x,i)=>`<circle cx="${x}" cy="${toY(ts[i])}" r="2.5" fill="${colorHex}"/>`).join('');
-      const lbls=xs.map((x,i)=>`<text x="${x}" y="${toY(ts[i])-5}" text-anchor="middle" fill="${colorHex}" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600">${ts[i].toFixed(1)}%</text>`).join('');
-      const priceLbls=['$50','$75','$100','$125'].map((p,i)=>`<text x="${xs[i]}" y="60" text-anchor="middle" fill="#6B6560" font-size="7" font-family="IBM Plex Mono,monospace">${p}</text>`).join('');
+      const area=`M ${xs[0]},${toY(t50)} L ${xs[1]},${toY(t75)} L ${xs[2]},${toY(t100)} L ${xs[3]},${toY(t125)} L ${xs[3]},100 L ${xs[0]},100 Z`;
       const gid='spk_'+(country||'').replace(/\W/g,'');
+      const dots=xs.map((x,i)=>`<span style="position:absolute;left:${x}%;top:${toY(ts[i])}%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:${colorHex};"></span>`).join('');
+      const vlbls=xs.map((x,i)=>`<span style="position:absolute;left:${x}%;top:${toY(ts[i])}%;transform:translate(-50%,-100%);margin-top:-7px;font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:${colorHex};white-space:nowrap;${i===1?'':'opacity:.85;'}">${ts[i].toFixed(1)}%</span>`).join('');
+      const plbls=xs.map((x,i)=>i===1
+        ? `<span style="position:absolute;left:${x}%;transform:translateX(-50%);font-size:11px;font-family:'IBM Plex Mono',monospace;color:${colorHex};font-weight:700;white-space:nowrap;">$75 <span style="font-size:9px;letter-spacing:.06em;">BASE</span></span>`
+        : `<span style="position:absolute;left:${x}%;transform:translateX(-50%);font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);white-space:nowrap;">${prices[i]}</span>`).join('');
+      const _swing=(t125-t50);
       return `<div style="margin-top:10px;padding:8px 0 2px;border-top:1px solid var(--border);">
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Price Sensitivity Curve</div>
-        <svg viewBox="0 0 300 64" style="width:100%;height:64px;display:block;">
-          <defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${colorHex}" stop-opacity=".15"/><stop offset="100%" stop-color="${colorHex}" stop-opacity=".01"/></linearGradient></defs>
-          <path d="${area}" fill="url(#${gid})"/>
-          <polyline points="${pts}" fill="none" stroke="${colorHex}" stroke-width="1.5" opacity=".85"/>
-          ${dots}${lbls}${priceLbls}
-        </svg>
+        <div style="position:relative;padding:0 24px;">
+          <div style="position:relative;height:104px;" title="Government take on the standardized deepwater project at each of the four modelled oil prices. ${_swing>=0?'Take rises':'Take falls'} ${Math.abs(_swing).toFixed(1)}pp from $50 to $125/bbl. The dashed guide marks $75/bbl, the base case every headline figure on this tab is quoted at.">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;display:block;">
+              <defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${colorHex}" stop-opacity=".16"/><stop offset="100%" stop-color="${colorHex}" stop-opacity=".01"/></linearGradient></defs>
+              <path d="${area}" fill="url(#${gid})"/>
+              <line x1="${xs[1]}" x2="${xs[1]}" y1="${toY(t75)}" y2="100" stroke="${colorHex}" stroke-width="1" stroke-dasharray="3 3" opacity=".45" vector-effect="non-scaling-stroke"/>
+              <polyline points="${pts}" fill="none" stroke="${colorHex}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity=".9" vector-effect="non-scaling-stroke"/>
+            </svg>
+            ${dots}${vlbls}
+          </div>
+          <div style="position:relative;height:15px;margin-top:5px;border-top:1px solid var(--border);padding-top:5px;">${plbls}</div>
+        </div>
       </div>`;
     })()}
     <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">
