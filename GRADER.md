@@ -49595,3 +49595,16 @@ tooltip, not an FAQ, not rubric chasing. v834 written at the three display sites
   2026-09-12 *and* 2026-09-13. **Thirteenth cycle carried, still uninvestigated.**
   Outside the UX-finalization course this directive sets, so no cycle will ever pick
   it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 742 Log — 2026-09-13 12:16
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 742 complete — **v834 shipped and pushed** (`f96f826`), GRADER log appended (`089ba5a`), mirror in sync. Only the loop's own `CYCLE_STATE.json` / `cycle_log.txt` remain modified.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation (741 was T2; T5 last ran at 736).
+
+## Friction
+Walked cold at 1440×900 and 390×844, both storages cleared, over http — on `file://` the Country Profile never resolves past "Loading Norway…", so this path can't be walked
