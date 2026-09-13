@@ -48070,3 +48070,131 @@ change shipped.
 
 ## Friction
 I walked every copy/export control on every tab from a cold load at 1440×900 and read the **actual clipboard (both flavours) and the actual downloaded files** — not the changelog. Screener, Fiscal Compare, Side-by-Side, Country Profile and all three CSVs are sound. T
+
+---
+## Cycle 731 Log — 2026-09-12 21:45
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL / 0 WARN — suite RE-RUN this cycle against the DEPLOYED v823, not assumed
+- JS errors: 0
+- Summary: Cycle 731 complete — **v823** shipped and pushed, mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation (730 was T5, 729 T2,
+728 T6, 727 T4, 726 T1, 724/725 T3).
+
+## Friction
+Walked Side-by-Side cold over HTTP (no sessionStorage, no localStorage) at 1440x900 and read the real
+DOM and the real handlers, not the changelog. The tab is mature: the search box resolves aliases and
+fuzzy matches, the seed example clears itself on the analyst's first pick and removes its own banner,
+`Order columns` reorders grid + both charts + PDF + share link, the share link round-trips cold, both
+charts title their own dash convention, the CP `⇌ Compare` and FC/Screener `→ Side-by-Side` doors all
+announce every refusal, and 390x844 had no horizontal scroll. Those are recorded below so a later
+cycle does not re-walk them.
+
+**The worst moment is the first line of the tab.** The verdict strip (`#cmp-verdict`, built at
+`index.html:28664`) ranks columns on `_cmpRankTake`, which for a fee-blended column **substitutes the
+Group-1-only take** (`if (st.blended) return st.g1['t'+p]`, `:28579`). It then printed that substituted
+figure bare:
+
+    GOVT TAKE @$75, LOWEST FIRST:   Iraq 34.1% › Angola 53.0% › Norway 68.0%
+    All 3 columns are on one basis — nothing is set aside, the ordering above is the whole set.
+
+ORCA publishes Iraq at **84.8%**. Verified against `api/v1/country/iraq.json` — `fiscal_summary.take_75
+= 84.8`, and the string `34.1` does not occur anywhere in that file. The Country Profile, Fiscal
+Compare, the Screener and the Regime Explorer all print 84.8% too. So the strip led with a number
+**50.7pp** away from the platform's own figure for that country, with nothing marking it — and then,
+because `_vdOut` was empty, closed with an explicit reassurance that nothing had been set aside.
+
+Iraq ships on this tab's **own quickstart button** (`data-countries="USA|Iraq"`, `:3751`). An analyst
+who clicks it reads `USA 23.4% › Iraq 34.1%` and concludes Iraq is a low-take jurisdiction.
+
+Measured across all 185 countries: 11 carry a `g1` re-basing block. Iraq 50.7pp, Ecuador 7.2pp, South
+Sudan 4.3, Qatar 2.7, Mexico 2.5, Oman 2.0, India −1.3, Iran 1.3, Malaysia 1.1, Azerbaijan 1.0,
+Russia 0.0. The grid reconciles it three rows down (`ranked on 34.1% comparable, not 84.8%`, v571) and
+v549 established the paired presentation for the Govt Take cells — the v756 strip simply never got it.
+
+## Change
+The strip now carries the reconciliation itself, computed from the same `_cmpMixStat` the notices below
+already use, so it cannot disagree with them.
+
+- **Inline on the re-based column**, in the ordering chain: `Iraq 34.1%` is followed by an orange
+  marker `PSC/Conc basis · ORCA publishes 84.8%`. Its title names the fee share and contract counts off
+  the column's own `mech_mix` and says to carry both figures.
+- **The false reassurance is gone.** "All N columns are on one basis — nothing is set aside" is now
+  suppressed whenever a column was re-based, and replaced by a line that states it:
+  *"Re-based to rank — 1 of 3 ranked columns is not placed on the take ORCA publishes for it: Iraq is
+  ranked at 34.1% … not at the 84.8% on its Country Profile."*
+- **Sets with no re-basing are byte-identical.** Verified on the cold North Sea Trio and on
+  Guyana/Angola/Brazil — `.cmp-vd-reb` count 0, strip text unchanged.
+- **It reaches the clipboard for free.** `#cmp-verdict` already carries `.cmp-notice`, which
+  `copyComparisonTable()` sweeps, so the pasted IC table now opens with the reconciled ordering in both
+  `text/plain` and `text/html`. Re-read live: plain 6,869 chars, html 18,500, both carrying
+  `Re-based to rank` and `84.8`.
+
+## Result
+An analyst comparing Iraq — or any of the other 10 blended countries — against PSC/Concession columns
+can no longer carry a take figure out of this tab that contradicts ORCA's own country page. The first
+line of the tab now shows both numbers and says which is which, so the ordering is usable in an IC memo
+without the reader discovering a 50.7pp discrepancy on review. Previously the only place the two
+figures were reconciled was 3 rows into the grid, below the line the strip told them was the whole
+answer.
+
+## Verification
+All numbers below were read from the tool's own output this cycle. None is carried forward.
+
+| check | result |
+|---|---|
+| JS syntax gate (all 11 inline blocks, `node --check`) | PASS |
+| Runtime suite, **re-run this cycle against deployed v823** | **300 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
+| Pixel gate vs `~/logs/pixel_audit/baseline.json` | **PASS — no surface got worse than baseline** |
+| Fix confirmed live on `yoburgqs.github.io` after publish | marker renders, 0 page errors |
+| Horizontal scroll 1920/1440/1280/1024/768/390, 4 tabs each | **0px at every width** |
+| `.cmp-vd-reb` height — mouse / `pointer: coarse` | 17px / **26px** (≥24 floor met) |
+| Console + page errors, all widths, all tabs | **0** |
+| Re-based sets render correctly | Iraq/Norway/Angola, USA vs Iraq, Ecuador/Brazil/Colombia |
+| Non-re-based sets unchanged | North Sea Trio, Guyana/Angola/Brazil — marker count 0 |
+| Clipboard re-read live, both flavours | carries the correction |
+| Iraq 84.8% claim | verified in `api/v1/country/iraq.json`, not assumed |
+
+The marker takes the 24px floor under a thumb via `.cmp-vd-reb`, the same rule v730/v745/v758/v822
+applied to `.sc-terms-chip`, `.ioc-mech-more`, `.cp-fp-carry` and `.ioc-ctry-wide`. On a mouse it stays
+on the strip's own 17px line, so the strip does not grow at desktop width.
+
+**STILL LOCKED respected:** no new tooltip on a new surface (the marker is inside the existing verdict
+strip, which is already a `cursor:help` surface); no new FAQ; no banner, page-sub or "How to read"
+block; no citation micro-edit; no rubric chasing; not a text-only change — a new element renders in the
+ordering chain and a line is conditionally suppressed and replaced. The v612 mobile layer,
+`#reference-panel` and the `min-width: max-content` markers are untouched. v371/v373 declutter intact:
+Explorer analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets
+stay a dropdown. v430 FC IC Analyst Guide sessionStorage untouched. v449/v451/v452 CP headline and the
+removed FC Govt NPV column untouched. v489 Reform Risk untouched. Tab order unchanged.
+v822 → v823 at the three display sites only (`:42`, `:2433`, `:2503`), silently, after the real change
+shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **The SbS search box is finished work.** `ORCA_ALIASES` + Levenshtein fallback + `orcaMatchRank`
+  prefix ranking; "nor" → Norway row 1, Enter adds it, dropdown closes.
+- **The seed example is correct.** Cold load seeds Norway/UK/Netherlands with `_sbsExampleUntouched`;
+  the analyst's first own pick clears all three, removes the banner, and toasts what it cleared.
+  `fcOpenSbs()`/`scOpenSbs()` call `clearCompare()`, which also drops the banner — no stale banner over
+  a real set.
+- **Every refusal announces itself.** CP `⇌ Compare` at 5/5 full switches tab but toasts
+  *"Comparison is full at 5 countries — Norway was not added."*; unknown country name toasts; duplicate
+  toasts.
+- **Share link round-trips cold.** A brand-new context on `#/compare/guyana+angola+brazil` lands on t2
+  with the right 3 columns, no seed spliced in, no example banner, 0 errors.
+- **`Order columns` really reorders** — add → `Guyana, Angola, Brazil`; A–Z → `Angola, Brazil, Guyana`;
+  take_desc → `Brazil, Angola, Guyana`.
+- **Both charts title their own convention** — dashed line / hollow markers and faded dashed bar are
+  each explained in the chart title, not only in the aria-label. Take chart y-axis auto-scales to
+  40–65% on a close pair, and the `2.6pp apart` pill turns orange under 5pp.
+- **All-statutory sets say so** — Guyana/Ghana/Senegal prints *"All 3 columns are on one basis —
+  nothing is set aside"* correctly, because none of them is re-based.
+- **Only 22 of 185 countries carry verified production**, and the producer rank row's "of 21" is that
+  set minus one state monopoly, via `getProducerPeers()` — deliberate, not an off-by-one.
+- **Still open, carried forward:** the FC Reform verdict column has no `data-sort-key`.
+  `#cp-run-fc-btn` (`index.html:4010`) still reads two element IDs that do not exist in the DOM
+  (`cp-price-select`, `price`) — both halves dead, narrow consequence, wants its own cycle.
+- **Unrelated to this cycle, flagged not actioned:** the email *"petroleum overnight chain FAILED —
+  2026-09-12"* is still in the inbox and still uninvestigated. Outside the UX-finalization course this
+  directive sets — but it has now been carried forward two cycles and is worth Zach's attention.
