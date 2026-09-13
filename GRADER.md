@@ -48057,3 +48057,16 @@ change shipped.
 - **Unrelated to this cycle, flagged not actioned:** an email *"petroleum overnight chain FAILED —
   2026-09-12"* is in the inbox. Outside the UX-finalization course this directive sets; not
   investigated here.
+
+---
+## Cycle 730 Log — 2026-09-12 21:04
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 730 complete — **v822** shipped and pushed, mirror in sync.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation (729 was T2, 728 T6, 727 T4, 726 T1, 724/725 T3, 723 T5).
+
+## Friction
+I walked every copy/export control on every tab from a cold load at 1440×900 and read the **actual clipboard (both flavours) and the actual downloaded files** — not the changelog. Screener, Fiscal Compare, Side-by-Side, Country Profile and all three CSVs are sound. T
