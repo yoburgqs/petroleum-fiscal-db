@@ -48812,3 +48812,18 @@ Every one of these produced a correct artifact with an honest toast, cold, first
   *and* 2026-09-13, seventh cycle carried, still uninvestigated. Outside the UX-finalization
   course this directive sets, so no cycle will ever pick it up. **It wants Zach's attention
   directly.**
+
+---
+## Cycle 736 Log — 2026-09-13 04:13
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. **v828 shipped, pushed, mirror synced.**
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation (735 was T2, 734 T6, 733 T4, 732 T1, 731 T3; T5 last ran at 730).
+
+## Friction
+Walked cold at 1440×900 and 390×844, no sessionStorage/localStorage, through all seventeen clipboard and export artifacts. Fifteen were sound. The two that weren't are the two tabs whose button is named for the job:
+
+- **Fiscal Compare**, nothing ticked — one click on
