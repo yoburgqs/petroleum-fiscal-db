@@ -47925,3 +47925,135 @@ Walked cold at 1440×900, storage cleared, Home → Country Profile → Nigeria,
 
 ```html
 <svg viewBox="0 0 300 64" style="widt
+
+---
+## Cycle 730 Log — 2026-09-13
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors — **suite RUN this cycle**, number read from
+  `/tmp/runtime_test_report.txt`, not carried forward.
+- Pixel gate: PASS (no surface worse than baseline). JS syntax gate: PASS.
+- Shipped **v822**, pushed to `main` (`baa7407`), mirror in sync.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation
+(729 T2, 728 T6, 727 T4, 726 T1, 724/725 T3, 723 T5).
+
+## Friction
+Walked cold at 1440x900, storage cleared, across every copy/export control on every tab — reading
+the **actual clipboard, both flavours, and the actual downloaded files**, not the changelog. The
+Screener (tick→copy, 5 of 185 → 2,694 chars with the shortlist named), Fiscal Compare,
+Side-by-Side, Country Profile and the three CSVs all carry their assumptions and reconcile. One
+surface does not.
+
+`IOC_DATA.take_75` is the take on **that operator's own contracts**. v820 established this and
+fixed the **screen**: the operator table at the top of the IOC tab prints `country-wide 32.2%`
+under Shell's `25.2%` for Mexico. It stopped at the rendered cell.
+
+`_iocExpRows()` (`index.html:41560`) is the choke point for both things that leave the browser —
+`⎘ Copy for IC Memo` and `⬇ XLSX` — and it still emitted **one** take column, headed
+`Govt Take @$75 (%)` with no qualifier on the column face. The exposure annex those two buttons
+sit directly above also showed one number.
+
+So the table an analyst pastes into an IC memo read:
+
+| row | pasted table said | every other ORCA surface says | gap |
+|---|---|---|---|
+| Shell / Philippines | 100.0% | 46.5% | **+53.5pp** |
+| Shell / Russia | 22.9% | 46.4% | −23.5pp |
+| Shell / Iraq | 98.5% | 84.8% | +13.7pp |
+| Shell / Egypt | 31.7% | 45.1% | −13.4pp |
+| Shell / Mexico | 25.2% | 32.2% | −7.0pp |
+
+**26 of Shell's 33 exported rows disagreed.** Across all of `IOC_DATA`: **1,512 of 1,772 rows
+diverge, 329 by more than 10pp, largest 73.0pp** (Petroleos del Perù / Peru). The pasted table
+carried nothing reconciling them — and the screen that *did* reconcile them is gone by the time
+anyone reads the memo. A reviewer checking the memo against the platform found a contradiction on
+the same label with no way to tell which figure was wrong. Neither was.
+
+This is the item cycles 728 and 729 both carried forward: *"the IOC export names the take basis
+but does not carry the country-wide take beside the operator take."*
+
+## Change
+Three columns where there was one, emitted from the single choke point so the clipboard
+(`text/plain` **and** `text/html`) and the XLSX `Portfolio` sheet cannot fork:
+
+```
+Country | Region | Mechanic | Mechanic basis | Govt Take @$75 (%) | Country-wide take @$75 (%) | Take gap (pp) | Contractor NPV @$75 ($M) | ...
+```
+
+Adjacent, not at the far right, because the point is that they are read against each other.
+
+- **`Take basis`** now states the gap in its own cell — `this operator's own contracts in ORCA —
+  +53.5pp vs the country-wide 46.5%, which is the figure the Country Profile this row opens,
+  Fiscal Compare, the Explorer, the Screener and the JSON API all print for Philippines` — so a
+  row quoted alone carries its own reconciliation.
+- **Clipboard header paragraph** and **XLSX `Basis & Assumptions` sheet** both size the
+  disagreement for the operator actually loaded: count of divergent rows, worst row named with
+  both figures, and (in the workbook) every row over 5pp listed. Verified it adapts — Shell
+  26/33 max 53.5pp, Chevron 13/19 max 13.5pp, TotalEnergies 37/52 max 28.9pp.
+- **Country-average fallback rows** say the two columns agree by construction, so the second
+  column does not read as a duplicate.
+- **The exposure annex on screen** gained the same `country-wide N%` sub-line the v820 table has,
+  and its header now reads `Take @$75 / this operator's contracts` — the analyst no longer pastes
+  a column they never saw.
+
+## Result
+The analyst can paste the IOC table into an IC memo and have it survive review. The operator
+figure, the jurisdiction figure the platform publishes, and the difference between them now travel
+**inside the artifact**. Quoting Shell's Philippines take no longer silently contradicts ORCA's own
+Philippines page: a reader who checks finds the reconciliation in the table instead of a 53.5pp
+discrepancy, and can tell at a glance from `Take gap (pp)` which rows will not match the platform
+before the memo goes out.
+
+## Verification
+| check | result |
+|---|---|
+| JS syntax gate | PASS |
+| Runtime suite (run this cycle) | 300 PASS / 0 FAIL / 0 WARN / 0 console errors |
+| Pixel gate vs baseline | PASS |
+| Clipboard re-read live, both flavours | plain 20,666 / html 69,810 — columns present, values correct |
+| XLSX parsed with `openpyxl` | 2 sheets, 33 rows, 13 columns, gap column numeric |
+| Horizontal scroll 1920/1440/1280/1024/768/390 | **NONE** at every width |
+| Controls under 24px at `pointer: coarse` | **none** — see below |
+| Page/console errors, all tabs, all widths | 0 |
+
+The new `country-wide N%` line carries its reconciliation in a `title`, so under a thumb it is a
+control and takes the directive's 24px floor via `.ioc-ctry-wide` — the same rule v730/v745/v758
+applied to `.sc-terms-chip`, `.ioc-mech-more` and `.cp-fp-carry`. The class was applied to the
+**v820** sub-line as well, which had the same 13px gap and was a standing violation of
+finalization criterion 3. On a mouse both stay on the 13px line, so neither table grows.
+
+**STILL LOCKED respected:** no new tooltip on a new surface; no new FAQ; no banner, page-sub or
+"How to read" block; no citation micro-edit; no version sweep as the deliverable; not a text-only
+change — the exported table gains two columns and the annex gains a rendered sub-line. The v612
+mobile layer, `#reference-panel` and the `min-width: max-content` markers are untouched. Explorer
+analytics, Screener advanced filters and Home "More tools" stay collapsed; Screener presets stay a
+dropdown. FC Govt NPV column stays removed; CP two-zone headline untouched. Tab order unchanged.
+v821 → v822 at the three display sites only (`:42`, `:2427`, `:2497`), silently, after the real
+change shipped.
+
+## Also walked, found sound — recorded so a later cycle does not re-walk it
+- **Screener tick→copy is finished work.** Cold: 185 rows / 29,452 chars under a header that
+  honestly says *"None — this is the full ORCA universe, not a screen result"*. Tick 5 and the
+  toolbar relabels to `⎘ Copy 5 selected` / `⬇ CSV (5)` / `⬇ Excel (5)`, the dock appears, and the
+  artifact drops to 2,694 chars naming the five countries and keeping each one's rank *"of 185"*.
+- **All three CSVs carry their assumptions** (finalization criterion 5): the Screener CSV ends with
+  an ASSUMPTIONS line, a 45-country TAKE BASIS floor warning and the IRR exclusion; the Breakeven
+  CSV says outright *"ROW ORDER IS NOT A RANKING"* and *"This file is a coverage list, not a
+  shortlist"*; the Reform CSV warns that filters do not narrow it and that only 72 of 83 rows score.
+- **`text/html` and `text/plain` agree on every copy surface** — stripped-tag length matched plain
+  to within 8 characters on Screener, FC, Side-by-Side and IOC. Word gets the caveats, not a bare
+  table.
+- **Country Profile `Copy for IC Memo`** remains the strongest single-country artifact: a
+  Metric/Value table plus 6 numbered notes keyed to the rows they qualify, including the withdrawn
+  Nigeria predictability grade with its 57.5–91.4% observed range.
+- **Still open, carried forward:** the FC Reform verdict column has no `data-sort-key`.
+  `#cp-run-fc-btn` (`index.html:4003`) still reads two element IDs that do not exist in the DOM
+  (`cp-price-select`, `price`) — both halves dead, narrow consequence, wants its own cycle.
+- **Newly noted, not worth a cycle alone:** Side-by-Side's cold example (North Sea Trio — Norway /
+  UK / Netherlands) is copyable straight into a memo. The artifact is accurate and the on-screen
+  banner says it is an example, but the clipboard itself does not — an analyst who lands on the tab
+  and copies without reading gets ORCA's demo set captioned as their comparison.
+- **Unrelated to this cycle, flagged not actioned:** an email *"petroleum overnight chain FAILED —
+  2026-09-12"* is in the inbox. Outside the UX-finalization course this directive sets; not
+  investigated here.
