@@ -48198,3 +48198,16 @@ shipped.
 - **Unrelated to this cycle, flagged not actioned:** the email *"petroleum overnight chain FAILED —
   2026-09-12"* is still in the inbox and still uninvestigated. Outside the UX-finalization course this
   directive sets — but it has now been carried forward two cycles and is worth Zach's attention.
+
+---
+## Cycle 731 Log — 2026-09-12 22:25
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 731 complete. **v823** shipped, pushed, live, mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest by rotation; 730 was T5, 729 T2, 728 T6, 727 T4, 726 T1, 724/725 T3)
+
+## Friction
+I walked Side-by-Side cold over HTTP, reading the real DOM and handlers. Most of the tab is genuinely finished — alias/fuzzy search, the self-clearing example set, `Order columns`, the share link round-trip, both chart dash conventions, every refusal toast, and zero mob
