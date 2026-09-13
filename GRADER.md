@@ -48482,3 +48482,16 @@ all untouched. Tab order unchanged. v824 → v825 at the three display sites onl
   overnight chain FAILED — 2026-09-12"* is still in the inbox and still uninvestigated. Outside the
   UX-finalization course this directive sets, but it is now four cycles old and wants Zach's
   attention.
+
+---
+## Cycle 733 Log — 2026-09-13 00:29
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 733 complete. **v825** shipped, pushed, live, mirror synced.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation: 732 was T1, 731 T3, 730 T5, 729 T2, 728 T6; T4 last ran at 727.)
+
+## Friction
+Fiscal Compare's sort row offers five identically-styled buttons. Four work. The fifth — **Swing**, the only control on the platform that ranks 185 countries by price stability, whose own tooltip reads *"low→high, most stable first"* — had no click handler at
