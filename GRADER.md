@@ -48947,3 +48947,16 @@ change shipped.
 - **The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
   *and* 2026-09-13. Eighth cycle carried, still uninvestigated. Outside the UX-finalization course
   this directive sets, so no cycle will ever pick it up. **It wants Zach's attention directly.**
+
+---
+## Cycle 737 Log — 2026-09-13 05:30
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 737 complete. v829 shipped, pushed, mirror synced.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation (736 was T5, 735 T2, 734 T6, 733 T4, 732 T1; T3 last ran at 731).
+
+## Friction
+Walked Side-by-Side cold at 1440×900 and 390×844 with storage cleared — seeded default set, Clear → quickstarts, type-and-Enter add, the Order dropdown at all four values, both charts, all twelve controls, and the share link round-tripped through a fresh page. Nearly all o
