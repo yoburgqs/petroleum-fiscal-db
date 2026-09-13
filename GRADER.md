@@ -49476,3 +49476,122 @@ Not a tooltip on an existing control, not an FAQ, not a banner / page-sub / "How
 
 ## Friction
 Walked Country Profile cold at 1440×900 and 390×844, both storages cleared. Indonesia autoloads and prints **`NPV: $745M @$75`**, under a footnote telling the analyst the basis to quote beside it: *"standardized deepwater project ($1.2B capex · 50k 
+
+## Cycle 742 Log — 2026-09-13 — T5 — shipped v834 (`f96f826`)
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (stalest by
+rotation; 741 was T2, 740 T6, 739 T4, 738 T1, 737 T3 — T5 last ran at 736.)
+
+## Friction
+Walked cold at 1440×900 and 390×844, both storages cleared, served over http so
+`COUNTRY_DATA` actually loads (on `file://` the profile never resolves past
+"Loading Norway…", which is why this path has to be walked on a server).
+
+Home → Country Profile → Norway → **⎘ Copy for IC Memo**. The paste carries correct
+stored figures — take 59.3 / 68.0 / 72.4 / 75.0, contractor NPV $379M / $826M /
+$1.71B, breakeven $29/bbl; `COUNTRY_DATA.npv_75` for Norway reads 825.9 — under a
+header line reading:
+
+> "Standardized Deepwater profile: $1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC,
+> 100% working interest."
+
+That describes `DCF_PROFILES.deepwater`, the in-page Live DCF / Scenario Builder
+project. The numbers in the table came from `petroleum_dcf.py` on
+`dcf_profiles.py PROFILES.deepwater` — $1.0B all-in, $18/bbl escalating 2%/yr real,
+5yr plateau, 241.9 MMbbl. v833 measured those two projects ~3× apart on NPV across
+179 of 182 non-monopoly countries.
+
+**v833 fixed this on the SCREEN and stopped there.** The artifacts that *leave* the
+tool still carried it, which is where it costs more: a paste is read by people who
+never see the screen it came from and have no way to discover the substitution.
+Seven artifacts each held their own hand-typed copy of the wrong literal:
+
+| Artifact | Site |
+|---|---|
+| `copyICSummary()` — Country Profile "Copy for IC Memo" | `:46270` |
+| `copyComparisonTable()` — Side-by-Side "Copy for IC Memo" | `:46398` |
+| `copyFCForIC()` — Fiscal Compare "Copy for IC Memo" | `:54401` |
+| Screener CSV / XLSX — `ASSUMPTIONS:` block | `:33580` |
+| IOC Portfolio XLSX — `NPV BASIS` | `:42323` |
+| IOC Portfolio paste — header paragraph | `:42374` |
+| Breakeven Map CSV — `Basis:` | `:56059` |
+
+Checked and deliberately **not** changed: Fiscal Compare's `#fc-profile-strip`
+tooltip and its seven per-profile cite strings (`:2859` / `:2969`). FC runs its own
+live `FC_PROFILES`, whose `deepwater.capexMM` **is** 1200 — that strip labels a live
+model profile and is correct. The carried-forward note flagging it was wrong; it is
+struck below.
+
+## Change
+- New `window._icEngineBasis()`, **derived** from the `ENGINE_BASIS` constant v833
+  introduced, plus `DCF_PROFILES.deepwater` for the contrast clause. All seven sites
+  call it instead of restating figures — the treatment v574 gave the citation version
+  strings after sweep-based maintenance let them drift twice. There is no longer a
+  second copy of these numbers that can fall out of step.
+- Every artifact now names the real engine basis (50k bbl/d peak · 3yr ramp · 5yr
+  plateau · 15%/yr decline · 241.9 MMbbl recovered · $1.0B all-in capex, split
+  $800M dev / $150M sustaining / $50M abandonment · $18/bbl opex escalating 2%/yr
+  real · 25yr · 10% WACC · 100% WI) and states, inside the artifact, that the panel
+  profile of the same name is a different project returning a materially different
+  NPV at the same price.
+
+**Nothing on screen moved.** What changed is what seven controls write to the
+clipboard and into exported files — the output of the action, not its label. This is
+not a text-only cycle in the sense the directive bans: no rendered copy was edited.
+
+## Result
+An IC reader who takes the pasted table and rebuilds the DCF from the assumption
+line beside it now reproduces the figures in the table. Before, they landed roughly
+3× high with nothing in the artifact to reveal why.
+
+## Verification
+- Runtime suite **RUN this cycle**: **300 PASS / 0 FAIL / 0 WARN / 0 JS errors**,
+  read from the suite's own report, identical to the pre-change number.
+- JS syntax gate: 11 scripts, 0 bad.
+- **6 of 7 artifacts re-read live** — clipboard intercepted on Country Profile,
+  Side-by-Side, Fiscal Compare and IOC Portfolio; `URL.createObjectURL` intercepted
+  for the Screener and Breakeven Map CSVs. All six confirmed carrying the corrected
+  basis. The 7th (IOC XLSX workbook) is the same string builder as the verified IOC
+  paste but emits binary — **verified by code path, not by reading the file.**
+- `scrollWidth === clientWidth` on all 9 tabs at 1920 / 1440 / 1280 / 1024 / 768 /
+  390 (390 with `hasTouch`). No control added, resized or restyled.
+
+## STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers
+untouched. v371/v373 declutter intact — no block added, no page-sub, no banner, no
+routing hint. v430, v449/v451/v452, v489 untouched. Tab order unchanged. Not a
+tooltip, not an FAQ, not rubric chasing. v834 written at the three display sites
+(`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+## Carried forward
+- **RESOLVED this cycle:** the export/clipboard half of the false-basis defect —
+  all seven artifacts listed above. Carried implicitly since v504, explicitly since 741.
+- **STRUCK, not resolved:** `:2859` / `:2969` — the FC profile-strip cite strings.
+  Verified correct against `FC_PROFILES.deepwater.capexMM = 1200`. No work needed.
+- **NEW — the same literal still sits on ~20 on-screen tooltips and column headers**
+  (e.g. `:50860` FC citable-NPV header, `:52945` CP breakeven bound, `:33335`
+  Screener downside column). These are hover text, not artifacts that leave the tool,
+  and a tooltip sweep is banned as a cycle's purpose. They should be migrated to
+  `_icEngineBasis({warn:false})` opportunistically when a cycle is already in that
+  code for another reason — not as a cycle of their own.
+- **`:3792` SbS on-screen profile strip** — still states `$1.2B capex · $15/bbl opex`
+  over stored values. On-screen, so lower cost than the paste was, but it is a visible
+  strip rather than a tooltip. Wants a T3 walk.
+- **`:3346` Screener Two-Price Return Screen preset** — states its hurdles as
+  "2× capex" / "1× capex" against $1.2B; the stored NPVs it filters were computed on
+  $1.0B, so the thresholds are really 2.4× / 1.2×. Preset works; its self-description
+  does not match its own arithmetic. Wants a T1 walk.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes
+  of 87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE
+  hover title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view
+  with nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Thirteenth cycle carried, still uninvestigated.**
+  Outside the UX-finalization course this directive sets, so no cycle will ever pick
+  it up. **This wants Zach's attention directly.**
