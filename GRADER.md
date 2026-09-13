@@ -47909,3 +47909,19 @@ the real change shipped.
   button is inside `#fc-nav-bar` and only visible when the analyst arrived from FC, and its label
   "Run FC at this price" will run FC at FC's price, not at the $75 the CP page is showing. Wants
   its own cycle because the honest fix is deciding whether CP should carry a price control at all.
+
+---
+## Cycle 729 Log — 2026-09-12 20:05
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 729 complete — shipped **v821**, pushed to `main` (`958491a` + `aabdc49`), mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation (728 was T6, 727 T4, 726 T1, 724/725 T3, 723 T5, 722 T2).
+
+## Friction
+Walked cold at 1440×900, storage cleared, Home → Country Profile → Nigeria, down the page the way an analyst builds a $75 defence. The **Price Sensitivity Curve** was one element:
+
+```html
+<svg viewBox="0 0 300 64" style="widt
