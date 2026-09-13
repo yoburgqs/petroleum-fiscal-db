@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v836</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v837</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v836</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v837</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v836</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v837</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2725,10 +2725,16 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <h2 class="page-title">Fiscal Compare</h2>
 
   <!-- v365: IC Analyst Quick Reference — collapsible interpretation guide for senior analysts seeing the platform for the first time -->
-  <details id="fc-ic-ref" style="margin-bottom:12px;">
-    <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Collapse IC analyst interpretation guide for take tiers, Swing, and Stability">
+  <!-- v837 (T4): the `open` attribute. The directive has carried "v430: FC IC Analyst Guide
+       starts OPEN with sessionStorage collapse memory" as a locked item, and the sessionStorage
+       half was here and working -- but the markup has never carried `open`, and the init script
+       only ever REMOVES it, so the guide has started collapsed on every cold load since v365.
+       Restored, because the legend inside it is the only explanation of the Reform verdict
+       column and that column is on by default. The collapse memory is untouched. -->
+  <details id="fc-ic-ref" open style="margin-bottom:12px;">
+    <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Collapse IC analyst interpretation guide for take tiers, Swing, and the Reform verdict column">
       <span id="fc-ic-ref-arrow" style="color:var(--accent);font-size:12px;">&#9656;</span> IC Analyst Interpretation Guide
-      <span id="fc-ic-ref-hint" style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">expand — take tiers, Swing, Stability, IC memo rules</span>
+      <span id="fc-ic-ref-hint" style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">expand — take tiers, Swing, Reform verdict, IC memo rules</span>
     </summary>
     <div style="padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface);">
     <!-- v455: Quick workflow row — tells a first-time analyst the 3 steps to get an answer, not just what the columns mean -->
@@ -2765,14 +2771,20 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           <strong>&gt;$80</strong> &mdash; High: challenged at current strip; include downside NPV scenario
         </div>
       </div>
+      <!-- v837 (T4): this card used to be "Stability Score (diamonds)" — a legend for a 0–5
+           diamond glyph that no surface on this platform has rendered since v744, whose top
+           line read "◆◆◆◆◆ (5) — Zero reforms since 2010; no fiscal risk discount warranted".
+           164 of the 185 rows in the table below have zero reforms because ORCA holds no
+           reform log for them, so that line licensed a zero WACC premium on 89% of the
+           screening list off an absence of research. Every live surface — v502/v514 (Reform
+           Risk), v520/v556 (this table's own cell), v566 (Country Profile) — already refuses
+           to make that claim; this guide was the last place still teaching it. It is now the
+           legend for the tokens the Reform verdict column actually prints, counted off the
+           live reform log rather than written into the markup, and each band is a control
+           that ranks the table by reform exposure and jumps to that band. -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Stability Score (diamonds)</div>
-        <div style="font-size:11px;line-height:1.8;">
-          <strong>&#9670;&#9670;&#9670;&#9670;&#9670; (5)</strong> &mdash; Zero reforms since 2010; no fiscal risk discount warranted<br>
-          <strong>&#9670;&#9670;&#9670;&#9671;&#9671; (3&ndash;4)</strong> &mdash; 1&ndash;2 reforms since 2010; add 1&ndash;2pp to WACC or show reform sensitivity<br>
-          <strong>&#9670;&#9671;&#9671;&#9671;&#9671; (1&ndash;2)</strong> &mdash; 3&ndash;4 reforms since 2010; high reform frequency; add 3&ndash;5pp discount rate premium<br>
-          <strong>&#9671;&#9671;&#9671;&#9671;&#9671; (0)</strong> &mdash; 5+ reforms since 2010; probability-weighted NPV scenario required in IC memo
-        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Reform Verdict <span id="fc-ic-ref-reform-n" style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.75;"></span></div>
+        <div id="fc-ic-ref-reform" style="font-size:11px;line-height:1.7;color:var(--muted);">Reading the sourced reform log&hellip;</div>
       </div>
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">IC Memo Quick Rules</div>
@@ -2780,7 +2792,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           Take &gt;75% + Swing &gt;20pp &rarr; mandatory price range table ($50/$75/$100/$125)<br>
           Take &le;60% + Swing &lt;10pp &rarr; preferred regime; single-price take cite acceptable<br>
           PSC mechanic + Swing &gt;15pp &rarr; note cost recovery cap in IC — govt take rises steeply once cost bank is depleted<br>
-          Stability &#9671;&#9671;&#9671;&#9671;&#9671; &rarr; always pair with Reform Risk tab data in IC<br>
+          Reform verdict <strong>n/c</strong> &rarr; no sourced reform log; carry no premium of zero &mdash; check the national petroleum law before the memo goes up<br>
+          Reform verdict <strong>WACC +3&ndash;5pp</strong> or <strong>+5&ndash;8pp</strong> &rarr; the only verdicts that change a model input; <strong>TAKE +Npp</strong> is take already taken, never a WACC add<br>
           IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries<br>
           Take &gt;65% + IRR not shown &rarr; do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission<br>
           &ldquo;&mdash;&rdquo; in any cell = data not yet verified to Evidence A/B standard; do not cite in IC memo<br>
@@ -2798,7 +2811,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     if (sessionStorage.getItem('fc-ic-ref-collapsed')) {
       d.removeAttribute('open');
       if (arr) arr.innerHTML = '&#9656;';
-      if (hint) hint.textContent = 'expand — take tiers, Swing, Stability, IC memo rules';
+      if (hint) hint.textContent = 'expand — take tiers, Swing, Reform verdict, IC memo rules';
+    } else if (d.open) {
+      if (arr) arr.innerHTML = '&#9660;';
+      if (hint) hint.textContent = 'collapse \u2014 stays collapsed this session';
     }
     d.addEventListener('toggle', function() {
       if (d.open) {
@@ -2808,7 +2824,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       } else {
         sessionStorage.setItem('fc-ic-ref-collapsed', '1');
         if (arr) arr.innerHTML = '&#9656;';
-        if (hint) hint.textContent = 'expand \u2014 take tiers, Swing, Stability, IC memo rules';
+        if (hint) hint.textContent = 'expand \u2014 take tiers, Swing, Reform verdict, IC memo rules';
       }
     });
   })();
@@ -50339,6 +50355,123 @@ function _fcReformCmp(a, b) {
   if (ra.score !== rb.score) return ra.score - rb.score;
   return a.country < b.country ? -1 : a.country > b.country ? 1 : 0;
 }
+
+// ── v837 (T4): the Reform verdict legend, read off the live log ──────────────
+// The Fiscal Compare IC Analyst Interpretation Guide carried a "Stability Score (diamonds)"
+// card whose first line was "◆◆◆◆◆ (5) — Zero reforms since 2010; no fiscal risk discount
+// warranted". Two things were wrong with it at once. It described a glyph the table stopped
+// printing at v744 — the column has printed named verdict tokens since — so the guide named
+// none of the eight strings an analyst could actually see. And its rule mapped "zero reforms"
+// onto a zero WACC premium, which on the live build is 164 of 185 rows, every one of them
+// zero because ORCA holds NO reform log for that jurisdiction. That is the exact inference
+// v502/v514 removed from the Reform Risk tab, v520/v556 from this table's own cell and v566
+// from the Country Profile. The guide was the last surface still granting it.
+//
+// The bands, their order and their membership all come from _fcReformRank(), which reads
+// _rrClassify()'s icToken — so the legend, the cell and the Reform sort cannot disagree.
+// Counts are computed from REFORM_HISTORY at render time, never written into the markup,
+// for the reason _fcSyncReformFilterCount() gives about the Breakeven button's hardcoded
+// "(65/185)". Each covered band is a control: it ranks the table by reform exposure (the
+// same fcSetSort('reform') the sort button runs, which also ticks ◆ Reform-scored only) and
+// scrolls to the first row in that band. The n/c row is deliberately NOT a control — that
+// sort hides those rows, and an absent log is not somewhere to be sent.
+var _FC_REFORM_LEGEND_MEANING = [
+  'percentage points to <em>add to your discount rate</em> — the only verdicts here that change a model input',
+  'percentage points of <em>government take</em> already taken since 2010 — size against this, never add it to a WACC',
+  'terms were rewritten inside the window and ORCA never measured the take effect — nothing to size against, and not a zero',
+  'the in-window rise was cancelled by an in-window cut — the net measured move is zero or negative',
+  'the take rise predates 2010, so a high score here is an artefact of where the window starts',
+  'every post-2010 event is a discovery, first oil or a review that changed no terms',
+  'no reform-frequency premium indicated — reform history alone does not clear the jurisdiction',
+  '<strong>no sourced reform log — no reading at all.</strong> Not a clean record, not a score of 100. Carry no premium of zero on these rows; they need an external check first'
+];
+function _fcReformLegendMag(t) {
+  var m = String(t).match(/([+−-])\s*(\d+(?:\.\d+)?)pp/);
+  if (!m) return 0;
+  var n = parseFloat(m[2]) || 0;
+  return (m[1] === '−' || m[1] === '-') ? -n : n;
+}
+function _fcRenderReformLegend() {
+  var host = document.getElementById('fc-ic-ref-reform');
+  if (!host) return true;
+  if (typeof REFORM_HISTORY === 'undefined' || !REFORM_HISTORY) return false;
+  if (typeof _fcReformRank !== 'function' || typeof _rrClassify !== 'function') return false;
+  var covered = Object.keys(REFORM_HISTORY).filter(_fcHasReformLog);
+  if (!covered.length) return false;
+  var total = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length)
+    ? COUNTRY_DATA.length : 185;
+  var bands = [];
+  for (var i = 0; i < 8; i++) bands.push({ n: 0, tokens: [], color: 'var(--muted)' });
+  covered.forEach(function(c) {
+    var r = _fcReformRank(c), v = _rrClassify(c);
+    var b = bands[r.band];
+    if (!b) return;
+    b.n++;
+    if (b.tokens.indexOf(r.token) < 0) b.tokens.push(r.token);
+    if (v && v.icColor) b.color = v.icColor;
+  });
+  bands[7].n = Math.max(0, total - covered.length);
+  bands[7].tokens = ['n/c'];
+  var out = [];
+  bands.forEach(function(b, idx) {
+    if (!b.n) return;
+    var live = idx < 7;
+    var pills = b.tokens.slice().sort(function(x, y) {
+      var d = _fcReformLegendMag(y) - _fcReformLegendMag(x);
+      return d !== 0 ? d : (x < y ? -1 : x > y ? 1 : 0);
+    }).map(function(t) {
+      return '<span style="display:inline-block;font-family:IBM Plex Mono,monospace;font-size:9.5px;font-weight:800;'
+        + 'letter-spacing:.02em;padding:1px 5px;border-radius:3px;border:1px solid ' + b.color + ';'
+        + 'color:' + b.color + ';white-space:nowrap;">' + t + '</span>';
+    }).join(' ');
+    var body = pills
+      + ' <span style="color:var(--muted);font-weight:600;">&middot; ' + b.n + '</span> '
+      + '<span style="color:var(--muted);">&mdash; ' + _FC_REFORM_LEGEND_MEANING[idx] + '</span>';
+    if (live) {
+      out.push('<div role="button" tabindex="0" data-rr-band="' + idx + '"'
+        + ' title="Rank the table by reform exposure and jump to this band. Runs the same Reform sort as the button above, which also ticks ◆ Reform-scored only, so you are ranking the ' + covered.length + ' jurisdictions that carry a reading rather than ' + covered.length + ' readings followed by ' + bands[7].n + ' blanks."'
+        + ' style="display:block;min-height:24px;padding:3px 4px;margin:0 -4px;border-radius:4px;cursor:pointer;">'
+        + body + '</div>');
+    } else {
+      out.push('<div style="display:block;padding:3px 4px;margin:0 -4px;border-top:1px solid var(--border);margin-top:4px;padding-top:5px;">'
+        + body + '</div>');
+    }
+  });
+  host.innerHTML = out.join('');
+  var cnt = document.getElementById('fc-ic-ref-reform-n');
+  if (cnt) cnt.textContent = '— ' + covered.length + ' of ' + total + ' carry a sourced log';
+  host.querySelectorAll('[data-rr-band]').forEach(function(el) {
+    var band = parseInt(el.getAttribute('data-rr-band'), 10);
+    el.addEventListener('click', function() { _fcReformLegendJump(band); });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _fcReformLegendJump(band); }
+    });
+  });
+  return true;
+}
+function _fcReformLegendJump(band) {
+  if (typeof fcSetSort === 'function') fcSetSort('reform');
+  setTimeout(function() {
+    var rows = document.querySelectorAll('#fc-results tbody tr[data-country]');
+    for (var i = 0; i < rows.length; i++) {
+      var c = rows[i].getAttribute('data-country');
+      if (_fcReformRank(c).band !== band) continue;
+      rows[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var prev = rows[i].style.outline;
+      rows[i].style.outline = '2px solid var(--accent)';
+      (function(r, p) { setTimeout(function() { r.style.outline = p; }, 1600); })(rows[i], prev);
+      return;
+    }
+  }, 320);
+}
+window._fcRenderReformLegend = _fcRenderReformLegend;
+(function _fcWaitForReformLegend() {
+  if (_fcRenderReformLegend()) return;
+  var tries = 0;
+  var iv = setInterval(function() {
+    if (_fcRenderReformLegend() || ++tries > 40) clearInterval(iv);
+  }, 250);
+})();
 
 // The control states its own coverage, counted off the data rather than written into the
 // label, so it cannot drift the way the Breakeven button's hardcoded "(65/185)" can.
