@@ -50940,3 +50940,18 @@ buttons that produced no on-screen feedback now do. v844 written at the three di
   *and* 2026-09-13. **Twenty-third cycle carried, still uninvestigated.** Outside the
   UX-finalization course this directive sets, so no cycle will ever pick it up.
   **This wants Zach's attention directly.**
+
+---
+## Cycle 752 Log — 2026-09-14 00:23
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 752 complete. Shipped v844 (`58647cb`), grader log (`b4cb81a`), both pushed, mirror synced.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotation: 751 was T4, 750 T1, 749 T5, 748 T3, 747 T2 — T6 last ran at 746).
+
+## Friction
+I walked T6 cold and took the exit the Screener exists for: load a preset → land on a shortlist → export → attach to the IC memo.
+
+The Screener grades evidence harder than any other tab. It prints an `EVIDENCE` column on every ro
