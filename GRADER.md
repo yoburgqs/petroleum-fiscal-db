@@ -52043,3 +52043,143 @@ Iraq. The same gesture now works on all eight columns.
 ## Friction
 
 I walked T6 cold across the whole product first. The Country Profile evidence layer is genuinely strong — swept 15 countries, and it prints a per-parameter ORCA-value / statutory / source table, partitions rows the model doesn't read, names unsourced ones, and Fiscal 
+
+---
+## Cycle 763 Log — 2026-09-14 13:15
+- Test before: 311 PASS / 0 FAIL / 1 WARN (local, v854)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (local, v855)
+- JS errors: 0 (the 1 captured is a 404 for a script that only exists on Pages)
+- Summary: v855 shipped — the Explorer workbook described one row order and shipped another.
+
+## Task: T5 — "Give me something I can paste straight into an IC memo."
+
+(762 was T6, 761 T2, 758 T3, 757 T4, 756 T1 — T5 had not run since 755.)
+
+## Friction
+
+Walked T5 cold across every artifact that leaves this tool: Screener CSV/XLSX/copy,
+Country Profile XLSX + IC Citation + Copy for IC Memo, Side-by-Side copy, IOC XLSX + copy,
+Reform verdict, Explorer XLSX + link. Most of them are in good shape. The Country Profile
+paste is a 6,208-character assumption table with seven keyed notes and holds up; the
+Screener CSV carries its take-basis, evidence-grade and predictability caveats; every XLSX
+opens, parses, and has a Basis sheet. The confirm gate on an unticked Screener copy fires
+correctly.
+
+The worst moment is in the **Explorer workbook**, and it is not a missing caveat — it is a
+**false one**. `exportExplorer()`'s "Filters & Assumptions" sheet is the only thing an
+analyst reading that file inside an IC pack has to go on, and the two cells that describe
+the file were private re-implementations of sentences `renderExplorer()` already prints
+correctly. Measured, by stubbing `XLSX.writeFile` and reading the workbook object:
+
+| state on screen | rows actually shipped | the workbook's own "Ranked by" |
+|---|---|---|
+| Evidence, 1 click (default) | Iraq (D), Colombia (C), Kazakhstan (C) | `Evidence quality (best first)` |
+| Evidence, 2 clicks (reversed) | Canada (A), Angola (A), Norway (A) | `Evidence quality (best first)` |
+| Stability | Iraq, Mexico, India | `stability` |
+| Country, 2 clicks | Zimbabwe, Zambia, Yemen | `Country A–Z` |
+
+Four separate defects in one 8-line map (`SORT_LABEL`, was line 42776):
+
+1. **The default evidence export claimed the opposite of the truth.** The Evidence sort's
+   declared default is weakest-first. So the file a first-time analyst gets from one click
+   on the Evidence header and one on Excel leads with Iraq at grade D / 12% primary law,
+   under a heading telling the committee the best-evidenced countries are on top. This
+   predates v854 and was wrong independently of it. It is the worst of the four because it
+   needs no gesture and it **inverts** the one judgement T5/T6 exists to support.
+2. **`stability` had no entry**, fell through `|| R.sort`, and printed the raw internal key.
+3. **Direction was never captured.** v854 (last cycle) made all eight headers reverse;
+   `_explorerRendered` recorded `sort` and not the direction, so a reversed export and its
+   exact opposite carried byte-identical text.
+4. **`Ranking basis` tested `proxy === 0`** and routed everything else to *"No country in
+   this file has verified field production — all economics are regional proxy estimates."*
+   `proxy > 0` is the **MIXED** case, not the none case. Untick "Verified production first"
+   on the cold view and the workbook told the analyst that none of its 185 rows had verified
+   production, with USA, Canada, Iraq and Norway in the file. The screen has read this
+   correctly since v543 with four branches; the export kept a three-branch copy.
+
+The rows themselves were always in the right order. Only the file's description of itself
+was wrong — which is precisely why no existing assertion caught it.
+
+## Change
+
+**The private copy is deleted, not corrected.** `renderExplorer()` now records `dir` in
+`_explorerRendered` — the export's only permitted input since v584 — and the workbook
+composes "Ranked by" from **`_EXPL_SORT_ORDER`**, the same direction-aware, all-eight-keys
+map the count line under the table already prints. That is the part that matters: the defect
+class here is a second source of truth for one sentence, so correcting the strings would
+have left it free to drift again.
+
+Also: the grouped "Ranking basis" now states the order **within** each data-basis block
+(grouping is only half the order); the A–Z branch follows the real direction; and the mixed
+case gets its own sentence naming both counts and telling the reader the two bases are being
+ranked against each other.
+
+## Result
+
+The workbook states the order it actually shipped, in every state:
+
+| state | "Ranked by" now reads |
+|---|---|
+| Evidence default | `Evidence quality — weakest evidence grade first` |
+| Evidence reversed | `Evidence quality — best-evidenced first (the column's default order reversed on screen before export)` |
+| Stability | `Fiscal Predictability — least predictable first` |
+| Country reversed | `Country name — Z–A` |
+| Take, ungrouped | basis reads `Data basis is MIXED … 22 of these 185 … 163 carry regional proxy economics` |
+
+The analyst can do the thing v854 shipped last cycle — reverse Evidence to put the countries
+they can defend on top, Canada / Angola / Norway, all grade A — export it, and attach a file
+whose own assumptions sheet agrees with its rows. An IC pack no longer carries a heading that
+inverts evidence quality.
+
+## Verification — the suite actually ran this cycle
+
+- **317 PASS / 0 FAIL / 1 WARN** against the local tree at v855. 311 before, **+6** from the
+  new guard; the 1 WARN is a 404 on a script that only exists on Pages, an artefact of the
+  local server. JS syntax gate: **11 blocks, 0 failures**.
+
+- **New guard `Explorer / EXPL-XL-BASIS`, 6 assertions.** It stubs `XLSX.writeFile` and reads
+  the **workbook object**, so it asserts what would be written to disk rather than what the
+  page says. Stated as agreement between the file and the screen — not against any fixed
+  country order — so it does not go stale as the data moves. **Against the pre-fix build it
+  fails 5 of 6**, naming each defect verbatim:
+
+  ```
+  ✗ EXPL-XL-BASIS default order stated: default evidence export claims: "Evidence quality (best first)"
+  ✗ EXPL-XL-BASIS reversed order stated: reversed export claims: "Evidence quality (best first)"
+  ✗ EXPL-XL-BASIS direction changes the cell: both directions wrote the same "Ranked by"
+  ✗ EXPL-XL-BASIS every header named: stability export wrote "stability" — raw key or unnamed
+  ✗ EXPL-XL-BASIS mixed basis not called all-proxy: a file holding verified-production
+                  countries is described as: "No country in this file has verified field production…"
+  ```
+  The 6th (`file matches screen`) passes on **both** builds, correctly — the row order was
+  never wrong, only the sentence about it. Recorded rather than tuned to fail.
+
+- **Edge branches proved intact by live export**, not by reading: an all-proxy file (search
+  `Vanuatu`, 1 row) still reads *"No country in this file has verified field production"*;
+  an all-verified file (Prod Data Only, 22 rows) still reads *"Every country in this file has
+  verified field production."*
+
+- **Six viewports — 1920 / 1440 / 1280 / 1024 / 768 / 390:** `scrollWidth == clientWidth` on
+  arrival, after both taps of the Evidence header, and scrolled to the bottom. **Zero
+  horizontal scroll**, 0 JS errors at every width. The Excel button measures 25px with a
+  mouse and **44px** under `pointer: coarse`. This change touches the contents of a
+  downloaded file, so the on-screen layout is deliberately unchanged — stated plainly rather
+  than dressed up as a visual improvement.
+
+### Carried forward
+
+- **3 controls under 24px on the Reform Risk country card** — sourced-event citation links at
+  21px under `pointer: coarse`. Open since cycle 757; a T4 cycle should take it.
+- **`copyExplorerLink()` still serializes nothing** — measured this cycle, it writes bare
+  `#/explorer` with no sort key, no direction and no filters, so a shared Explorer link
+  reopens the unfiltered 185-country default rather than what the sender was looking at.
+  Same root cause as this cycle's defect (the order does not leave the tool) but a separate
+  surface; the Screener's `copyScreenerLink()` was fixed at v842 and is the model. Widened
+  from the note carried out of 762.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs
+  `33.4%` in the Live DCF panel). A **data** gap; no cycle can close it from `index.html`.
+- **`window.compareBasket` vs `compareList`** — two stores, near-identical names,
+  `clearCompare()`/`clearBasket()` operating on different ones. 761 found one caller that
+  picked wrong; a sweep for the others is still worth a cycle.
+- **Still no process check comparing the deployed version string against the local tree** —
+  carried from 758, 761 and 762, still true.
