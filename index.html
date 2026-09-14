@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v841</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v842</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v841</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v842</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v841</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v842</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2659,7 +2659,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Screener</div><div style="font-size:11px;color:var(--muted);">Ranked shortlist with presets: IOC Capital Screen, Low Take · Positive NPV, Frontier, Downside Resilience</div></div>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered, ranked shortlist of investable regimes — set max take %, min contractor NPV at $75, min NPV at the $50 downside, breakeven, mechanic, or region. One-click presets: IOC Capital Screen (verified production · Take ≤65% · NPV positive at $75 and at $50), Low Take · Positive NPV (Take ≤55% · NPV positive), Downside Resilience (keeps ≥50% of its $75 contractor NPV at $50/bbl), Deepwater, Stable Fiscal Record (≤1 sourced fiscal law change since 2010). Export shortlist to Excel.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered, ranked shortlist of investable regimes — set max take %, min contractor NPV at $75, min NPV at the $50 downside, primary-source evidence, mechanic, region, or reform record. One-click presets: IOC Capital Screen (verified production · Take ≤65% · NPV positive at $75 and at $50), Low Take · Positive NPV (Take ≤55% · NPV positive), Downside Resilience (keeps ≥50% of its $75 contractor NPV at $50/bbl), Deepwater, Stable Fiscal Record (≤1 sourced fiscal law change since 2010). Export shortlist to Excel.</div>
     </div>
     <!-- v491: Reform Risk promoted from More tools to card 4 — primary IOC screening criterion -->
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))">
@@ -3403,7 +3403,7 @@ window.copyPlatformCitation = function(btn) {
            An analyst who loaded a preset and walked away needs to know what filters are active at a glance.
            applyScreenerPreset() sets window._screenerActivePreset; renderScreener() clears it if sliders move away from preset values. -->
       <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:normal;max-width:100%;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="_scClearPreset()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
-      <select id="screener-preset-select" onchange="if(this.value){applyScreenerPreset(this.value);this.value='';_scRevealResults();}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;" title="Load a preset screen — sets all sliders and filters to a predefined IC workflow. You can then adjust any slider to fine-tune. Use Ctrl+Enter to re-run.">
+      <select id="screener-preset-select" onchange="if(this.value){var _p=this.value;applyScreenerPreset(_p);this.value='';if(typeof _scRouteSetPreset==='function')_scRouteSetPreset(_p);_scRevealResults();}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;" title="Load a preset screen — sets all sliders and filters to a predefined IC workflow. You can then adjust any slider to fine-tune. Use Ctrl+Enter to re-run.">
         <option value="">Load a screen…</option>
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at ${DECK} AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
@@ -3709,7 +3709,7 @@ window.copyPlatformCitation = function(btn) {
            panel and the count bar can never disagree, and the details block stays collapsed. -->
       <span id="screener-basis-action" style="display:none;"></span>
       <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
-      <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
+      <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-link-btn" class="btn btn-sm btn-outline" onclick="copyScreenerLink()" title="Copy a link that reopens THIS screen &mdash; the Screener, with the preset you loaded already applied. Until v842 this pane wrote the Explorer&#39;s URL, so a copied link reopened the unfiltered 185-country Browse table instead of your shortlist." aria-label="Copy a link that reopens this screen" style="min-height:24px;">&#128279; Copy Link</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
       <!-- v728 (T5): shows only while a shortlist exists; the escape hatch back to "all rows the screen returned". -->
       <span id="sc-sel-note" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.30);border-radius:12px;padding:2px 4px 2px 10px;white-space:nowrap;margin-left:6px;">
         <span id="sc-sel-count" title="Countries ticked for the IC shortlist. Copy, CSV and Excel carry only these.">0 selected</span>
@@ -26115,6 +26115,13 @@ function _setScreenerRegion(rawRegion) {
 window._setScreenerRegion = _setScreenerRegion;
 
 function renderExplorer() {
+  // v842 (T1): a cold load at a hash that opens this pane runs parseAndNavigate() on
+  // DOMContentLoaded, which is BEFORE country_data.json lands. COUNTRY_DATA is still null, so
+  // the filter below threw "Cannot read properties of null (reading 'filter')" on every cold
+  // #/explorer -- a page error the finalization gate counts, on the platform's own share links.
+  // initPlatform() calls renderExplorer() again the moment the data arrives, so returning here
+  // costs nothing and the table fills as soon as there is anything to put in it.
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return;
   const _fourPriceActive = window._fourPriceActive || false;
   const price  = getPriceKey();
   const mech   = document.getElementById('flt-mech').value;
@@ -31417,6 +31424,7 @@ function _scClearPreset() {
   var sel = document.getElementById('screener-preset-select');
   if (sel) sel.value = '';
   applyScreenerPreset('reset');   // clears every filter, the chip and the new v718 baseline
+  if (typeof _scRouteSetPreset === 'function') _scRouteSetPreset(null);   // v842
 }
 window._scClearPreset = _scClearPreset;
 
@@ -31909,6 +31917,7 @@ function _homeOpenICScreen() {
         var sel = document.getElementById('screener-preset-select');
         if (sel) sel.value = '';
         if (typeof applyScreenerPreset === 'function') applyScreenerPreset('iochurdle');
+        if (typeof _scRouteSetPreset === 'function') _scRouteSetPreset('iochurdle');   // v842
         _scRevealResults();
       }, 80);
     }, 80);
@@ -32136,6 +32145,7 @@ function resetScreenerAll() {
   // the table stayed in whatever order the analyst had clicked it into.
   _scSortKey = null; _scSortDir = null;
   applyScreenerPreset('reset');
+  if (typeof _scRouteSetPreset === 'function') _scRouteSetPreset(null);   // v842: and the URL with them
   showCopyToast('All filters reset');
 }
 window.resetScreenerAll = resetScreenerAll;
@@ -46045,7 +46055,16 @@ function parseAndNavigate(hash) {
   }
 
   var route = hash.replace(/^#\/?/, '');
-  var parts = route.split('/');
+  // v842 (T1): the SECTION is everything before the query string. This split ran over the whole
+  // route, so the Explorer's own Copy Link button -- which serialises its filters as
+  // "#/explorer?mech=PSC&region=Africa" -- produced parts[0] = "explorer?mech=PSC&region=Africa",
+  // matched no branch, and fell off the end of this function. A cold load of a copied Explorer
+  // link therefore opened HOME with no filters, and the qParams block forty lines below (mech,
+  // region, q, price) had never once been reachable from a shared or bookmarked link -- only
+  // from an in-session pushState, which fires no hashchange. Same shape of defect as v460:
+  // a shipped control that had been silently doing nothing.
+  var _qCut = route.indexOf('?');
+  var parts = (_qCut === -1 ? route : route.slice(0, _qCut)).split('/');
   var section = parts[0];
   var param = parts[1] || '';
 
@@ -46089,6 +46108,17 @@ function parseAndNavigate(hash) {
       var cmpBtn = _tabBtnFor('t0');
       if (cmpBtn) switchTab('t0', cmpBtn);
     }
+  } else if (section === 'screener') {
+    // v842 (T1): the Screener's own route. #/screener, or #/screener/<preset>.
+    var scBtn = _tabBtnFor('tscreener') || _tabBtnFor('texplorer');
+    _explRouteHold = true;
+    switchTab('texplorer', scBtn);
+    setTimeout(function () {
+      _explRouteHold = false;
+      window._scRoutePreset = null;
+      if (typeof switchExplorerMode === 'function') switchExplorerMode('screen');
+      _scRouteEnter(param ? decodeURIComponent(param) : '');
+    }, 60);
   } else if (section === 'explorer') {
     // v795 (T1): every forward write of #/explorer is a pushState, which fires no hashchange, so a
     // bare #/explorer arriving here from another pane is Back/Forward. Return to the Explorer as it
@@ -46117,7 +46147,18 @@ function parseAndNavigate(hash) {
           var eq = pair.indexOf('=');
           if (eq !== -1) qParams[decodeURIComponent(pair.slice(0, eq))] = decodeURIComponent(pair.slice(eq + 1));
         });
-        setTimeout(function() {
+        // v842 (T1): the fixed 200ms fires long before country_data.json lands on a cold load,
+        // and _labelRegionControls() rebuilds the region <select> when it does -- so a shared
+        // Explorer link applied its chips into an empty table and then had them rewritten from
+        // under it. Measured on the shipped build with the route parse corrected but this timer
+        // left alone: "#/explorer?mech=PSC&region=Africa" still opened all 185 with both chips
+        // reading All. Waits for the data, then applies once.
+        (function _applyExplorerQ(tries) {
+          if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) {
+            if (tries > 80) return;               // 20s, then give up quietly
+            setTimeout(function(){ _applyExplorerQ(tries + 1); }, 250);
+            return;
+          }
           if (qParams.mech) {
             var mechChip = document.querySelector('.chip[data-filter="mechanic"][data-value="' + qParams.mech + '"]');
             if (mechChip) setExplorerChip('mechanic', qParams.mech, mechChip);
@@ -46134,7 +46175,7 @@ function parseAndNavigate(hash) {
             var priceEl = document.querySelector('input[name="price"][value="' + qParams.price + '"]');
             if (priceEl) { priceEl.checked = true; renderExplorer(); }
           }
-        }, 200);
+        })(0);
       }
     }
   } else if (section === 'ioc') {
@@ -53265,11 +53306,124 @@ function _cpBackToList() {
   }, screen ? 350 : 150);
 }
 // v795: the Screener tab after a drill from the shortlist is the same return trip as the button.
+/* ── v842 (T1): the Screener had no URL, and the nav said it was somewhere else ───────────
+
+   Walked T1 cold at 1440x900, both storages cleared, over http. The analyst clicks Screener,
+   loads IOC Capital Screen, gets 15 countries. Measured on the shipped v841 build:
+
+       location.hash after clicking Screener .................. "#/explorer"
+       location.hash after loading a preset ................... "#/explorer"
+       reload ................................................. Explorer BROWSE, 185 rows,
+                                                                preset gone, nav reads Explorer
+       clicking the in-pane Screener mode button .............. nav highlights EXPLORER
+
+   Three consequences, all on the one tab whose entire job is "which countries should be on my
+   list", and all of them silent:
+
+   * A shortlist cannot be reloaded. Every other destination on this platform has a URL --
+     #/compare, #/profile/<country>, #/compare/<a>+<b>, #/ioc, #/reform/<country> (v796),
+     even #/explorer/rfactor. The Screener, alone, wrote the Explorer's. Refreshing the page,
+     restoring a tab, or opening the link on the phone in the meeting returns the unfiltered
+     185 under a different tab name, with nothing on screen saying the screen was dropped.
+   * A shortlist cannot be sent. Browse mode has a Copy Link button; Screener mode had none,
+     and the address bar held a link to Browse, so copying it sent a colleague somewhere else.
+   * The nav and the mode toggle disagreed about where the analyst was. Two nav buttons drive
+     ONE pane in two modes, and .active was written by whichever button was clicked -- so the
+     in-pane toggle moved the view and not the nav, and the back-navigation restore at v795
+     could land in Screener mode under the Explorer tab.
+
+   The fix is that the pane's MODE, not the button that was pressed, decides both the hash and
+   which of the two nav buttons is lit. A user's preset pick travels in the hash as
+   #/screener/<preset>. Writes are replaceState, so a mode toggle does not add history entries
+   -- switchTab() has already pushed one entry for the navigation and this replaces its value. */
+var _explRouteHold = false;
+
+function _explSyncRoute(mode) {
+  if (_explRouteHold) return;
+  if (window._activeTab !== 'texplorer') return;
+  var screen = (mode === 'screen');
+  ['tab-btn-tscreener', 'tab-btn-texplorer'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    var on = (id === (screen ? 'tab-btn-tscreener' : 'tab-btn-texplorer'));
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  var want = screen
+    ? '#/screener' + (window._scRoutePreset ? '/' + window._scRoutePreset : '')
+    : '#/explorer';
+  var cur = window.location.hash || '';
+  // Never overwrite a Browse filter link (#/explorer?mech=...) or #/explorer/rfactor with the
+  // bare section hash -- those carry state of their own and explorer-copy-link publishes them.
+  if (!screen && cur.indexOf('#/explorer') === 0 && cur !== '#/explorer') return;
+  if (cur !== want) { try { history.replaceState(null, '', want); } catch (e) {} }
+}
+window._explSyncRoute = _explSyncRoute;
+
+// Called from the preset menu's own onchange and from the Home IC-screen card -- the two places
+// an analyst PICKS a screen. Deliberately NOT inside applyScreenerPreset(): _labelScreenerPresets()
+// drives every option through that function to count its hits, and would otherwise rewrite the
+// URL eleven times at load and leave it on whichever preset happened to be counted last.
+function _scRouteSetPreset(id) {
+  window._scRoutePreset = (id && id !== 'reset') ? id : null;
+  _explSyncRoute('screen');
+}
+window._scRouteSetPreset = _scRouteSetPreset;
+
+// Arrival from the hash. On a cold load this runs before country_data.json has landed, so it
+// waits for the data AND for _labelScreenerPresets() to finish its counting pass (which ends by
+// restoring the unfiltered state) before applying the routed preset over the top of it.
+function _scRouteEnter(presetId, tries) {
+  tries = tries || 0;
+  var sel = document.getElementById('screener-preset-select');
+  var ready = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length)
+              && (!sel || sel.dataset.countedDeck || tries > 20);
+  if (!ready) {
+    if (tries > 80) return;                       // 20s, then give up quietly
+    setTimeout(function () { _scRouteEnter(presetId, tries + 1); }, 250);
+    return;
+  }
+  if (!presetId) { if (typeof runScreener === 'function') runScreener(); _explSyncRoute('screen'); return; }
+  var known = sel && [].slice.call(sel.options).some(function (o) { return o.value === presetId; });
+  if (!known) { window._scRoutePreset = null; _explSyncRoute('screen'); return; }
+  if (sel) sel.value = '';
+  window._scRoutePreset = presetId;
+  if (typeof applyScreenerPreset === 'function') applyScreenerPreset(presetId);
+  _explSyncRoute('screen');
+}
+window._scRouteEnter = _scRouteEnter;
+
+// The Screener's own share control. Browse mode has had one since v41; this pane had none,
+// because until this cycle there was no screen-specific URL for it to copy.
+function copyScreenerLink() {
+  _explSyncRoute('screen');
+  var url = window.location.href.split('#')[0] + (window.location.hash || '#/screener');
+  var done = function () {
+    showCopyToast(window._scRoutePreset
+      ? 'Link copied \u2014 opens the Screener with this preset applied'
+      : 'Link copied \u2014 opens the Screener');
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(function () {
+      showCopyToast('Clipboard unavailable \u2014 copy from the address bar.');
+    });
+  } else {
+    showCopyToast('Clipboard unavailable \u2014 copy from the address bar.');
+  }
+}
+window.copyScreenerLink = copyScreenerLink;
+
 function _scTabEnter(btn) {
   var l = (window._paneLeave || {}).texplorer;
   if (window._activeTab !== 'texplorer' && l && l.mode === 'screen' && window._scDrill) { _cpBackToList(); return; }
+  // v842: hold the route across switchTab()'s own switchExplorerMode('browse'), so entering the
+  // Screener does not flash the Explorer nav button and write #/explorer on the way through.
+  _explRouteHold = true;
   switchTab('texplorer', btn);
-  setTimeout(function () { if (typeof switchExplorerMode === 'function') switchExplorerMode('screen'); }, 50);
+  setTimeout(function () {
+    _explRouteHold = false;
+    if (typeof switchExplorerMode === 'function') switchExplorerMode('screen');
+  }, 50);
 }
 
 // v313: FC nav bar — step through ranked FC list from Country Profile
@@ -55987,6 +56141,10 @@ function switchExplorerMode(mode, btn) {
     }
   }
   window._explorerMode = mode;
+  // v842 (T1): the mode decides the hash and which of the two nav buttons is lit. Leaving the
+  // Screener drops the preset from the route so #/explorer cannot carry a stale screen name.
+  if (mode !== 'screen') window._scRoutePreset = null;
+  if (typeof _explSyncRoute === 'function') _explSyncRoute(mode);
 }
 
 function toggleReferencePanel() {
