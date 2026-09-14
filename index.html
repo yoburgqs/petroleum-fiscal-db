@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v843</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v844</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v843</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v844</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v843</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v844</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33855,6 +33855,50 @@ function _scExportBasisLines() {
       + 'moves take up and NPV down, so a low take here is missing record rather than favourable terms. '
       + 'See the Take_Basis column.');
   })();
+  // v844 (T6): the sourcing basis. Counted off the rows actually in this file — the same two
+  // sources the data-basis split above uses — so a hand-ticked shortlist is described by its own
+  // grade mix and not by the pre-shortlist match set. Production coverage and evidence grade are
+  // different questions: a country can have verified field production and still rest on a fact
+  // base that is almost entirely secondary guides, which is what the row above does not say.
+  (function(){
+    if (typeof _evidenceGrade !== 'function') return;
+    var _s3 = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+    var _inF = (window._screenerData || []);
+    if (_s3 && _s3.length) _inF = _inF.filter(function(x){ return _s3.indexOf(x.country) >= 0; });
+    if (!_inF.length) return;
+    var cnt = { A: 0, B: 0, C: 0, D: 0 }, cd = [];
+    _inF.forEach(function(x) {
+      var g = _evidenceGrade(x);
+      if (cnt[g.letter] === undefined) cnt[g.letter] = 0;
+      cnt[g.letter]++;
+      if (g.grade === 'c' || g.grade === 'd') {
+        cd.push(x.country + ' (' + g.letter + ', ' + g.aPct.toFixed(0) + '% primary law, '
+          + Number(x.n_facts || 0).toLocaleString() + ' facts)');
+      }
+    });
+    L.push('EVIDENCE GRADE — how solid the terms behind these numbers are: ' + cnt.A + ' A, '
+      + cnt.B + ' B, ' + cnt.C + ' C, ' + cnt.D + ' D across the ' + _inF.length + ' row'
+      + (_inF.length === 1 ? '' : 's') + ' in this file. The grade is the WORSE of primary-law share '
+      + '(A ≥60% / B ≥40% / C ≥20%) and fact depth (A ≥150 facts / B ≥50 / C ≥15). '
+      + 'It is NOT an A+B share — tier B is 45.2% of the database and is largely the EY / IHS / KPMG '
+      + 'country-level bulk harvest, which puts 171 of 185 countries above 80% A+B and tells you nothing. '
+      + 'The grade is a property of the FACT BASE, not of the model. See the Evidence_Grade, '
+      + 'Evidence_Primary_Law_pct and Evidence_Basis columns. Distinct from the production/proxy split above: '
+      + 'a country can have verified field production and still be graded D.');
+    if (cd.length) {
+      // A real shortlist is 8-15 rows and names every one. A full 185-row coverage export would
+      // otherwise put a 78-country list in a single spreadsheet cell, which nobody reads — so
+      // past 25 the sentence points at the column instead of pretending to enumerate.
+      var _named = cd.length > 25
+        ? cd.slice(0, 25).join('; ') + '; and ' + (cd.length - 25)
+          + ' more — the Evidence_Grade column marks every one'
+        : cd.join('; ');
+      L.push('  ' + cd.length + ' of these ' + _inF.length + ' row' + (cd.length === 1 ? ' grades' : 's grade')
+        + ' C or D. Per ORCA methodology a C is screening-only, and a D does not belong in a recommendation '
+        + 'document without first establishing the terms from that country’s own petroleum act: '
+        + _named + '.');
+    }
+  })();
   // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
   L.push(_icIrrNote('IRR is not reported'));
   L.push('Fiscal_Predictability is the same score the Country Profile and Side-by-Side show '
@@ -34147,6 +34191,61 @@ function _scSyncSbsBtn() {
 }
 window.scOpenSbs = scOpenSbs; window._scSyncSbsBtn = _scSyncSbsBtn;
 
+/* ── v844 (T6) — THE SHORTLIST THAT LEAVES THE SCREENER NOW CARRIES ITS EVIDENCE GRADE ──────
+   Walked "where did this number come from and how solid is the evidence?" cold, and took the
+   exit the Screener is built for: load a preset, land on a shortlist, press ⬇ Excel / ⬇ CSV /
+   Copy for IC Memo, attach the file to the memo.
+
+   The Screener grades evidence harder than any other tab. It prints an EVIDENCE column on
+   every row; it ships a "Primary-Source Evidence" preset; it carries a "Min primary-source
+   evidence (A)" slider with a ≥50-fact depth floor attached. The Methodology tab states the
+   consequence in the platform's own words: "Treat a C as screening-only and do not put a D in
+   a recommendation document without establishing the terms from the country's own petroleum
+   act."
+
+   _scExportRows() is the single choke point for all four export paths — CSV, XLSX, the
+   clipboard TSV and the clipboard HTML table — and it carried 25 columns: Take_Basis,
+   Predictability_Basis, Verified_Production, Breakeven_Tested, FeeBasis_Blend. Not the grade.
+   Nor did _scExportBasisLines(), which names the production/proxy split, the fee-basis blend,
+   the take floor, the IRR rule and the predictability basis, and says nothing about sourcing.
+
+   Measured on the shipped bundle: of the 185 rows a cold screen exports, 28 grade A, 79 B,
+   43 C and 35 D. Seventy-eight of them are the two grades the platform says not to cite — and
+   they are not obscure rows. Nigeria, Mexico, Colombia, Kazakhstan, Oman and Saudi Arabia are
+   C; Iraq, Russia, UAE — Abu Dhabi and Iraq-Kurdistan are D. So an analyst who screened ON the
+   evidence slider handed over a file that omitted the criterion they screened on, and one who
+   did not handed over Russia and Iraq with nothing in the workbook to say the terms behind
+   those numbers are almost entirely not primary law.
+
+   Two columns per row plus a counted basis block, all measured off the rows actually in the
+   file rather than the pre-shortlist match set. Nothing on screen moves. */
+var _SC_EVID_USE = {
+  a: 'Citable — primary-law backed on a deep record.',
+  b: 'Citable with the sourcing mix stated alongside it.',
+  c: 'SCREENING ONLY — per ORCA methodology, do not carry a C into a recommendation without re-reading the terms.',
+  d: 'NOT FOR A RECOMMENDATION DOCUMENT without first establishing the terms from this country’s own petroleum act.'
+};
+function _scEvidExport(d) {
+  if (typeof _evidenceGrade !== 'function') return { grade: 'not graded', basis: 'evidence grader unavailable' };
+  var g = _evidenceGrade(d);
+  var nf = Number(g.nFacts || 0).toLocaleString();
+  var leg = g.limiter === 'sourcing'
+      ? 'the fact base is deep enough, but too little of it is primary law'
+      : g.limiter === 'depth'
+        ? 'the sourcing mix is good, but ' + nf + ' facts is a thin base to generalise a national regime from'
+        : 'both the sourcing mix and the ' + nf + '-fact base sit at this level';
+  return {
+    grade: g.letter,
+    letter: g.letter,
+    aPct: +g.aPct.toFixed(1),
+    basis: g.letter + ' — ' + g.label + '. ' + g.aPct.toFixed(1) + '% of this country’s ' + nf
+      + ' fiscal facts were read out of the primary legal instrument (petroleum act, gazette, finance act, '
+      + 'PSC text); the rest are secondary guides, industry reference or defaults. ' + leg + '. '
+      + _SC_EVID_USE[g.grade] + ' Grades the fact base, not the model.'
+  };
+}
+window._scEvidExport = _scEvidExport;
+
 function _scExportRows() {
   var data = window._screenerData || [];
   // v699 (T1): the deck the shortlist was actually screened at. Every export used to carry
@@ -34168,6 +34267,12 @@ function _scExportRows() {
       Mechanics: d.mechanics,
       R_factor_Tiers: d.has_r_factor_tiers ? 'Yes' : 'No',
       Verified_Production: _dqTier(d).hasProduction ? 'Yes' : 'No',
+      // v844 (T6): the EVIDENCE column the screen prints on every row, and the slider this
+      // tab lets the analyst screen on. Sits with the other data-quality flags, ahead of the
+      // take basis, so the workbook answers "how solid is this?" before it answers "how much?".
+      Evidence_Grade: _scEvidExport(d).grade,
+      Evidence_Primary_Law_pct: _scEvidExport(d).aPct,
+      Evidence_Basis: _scEvidExport(d).basis,
       // v743 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
       // direction of its own error, or the divider on screen stops at the browser window.
       Take_Is_Floor: _scTakeIsFloor(d) ? 'Yes' : 'No',
@@ -34248,6 +34353,21 @@ function exportScreenerCSV() {
   var scrPrice = getPriceKey ? getPriceKey() : '75';
   a.download = 'petroleum_screener_$' + scrPrice + '_' + new Date().toISOString().slice(0, 10) + '.csv';
   a.click();
+  if (typeof showCopyToast === 'function') showCopyToast(_scExportToast(rows, 'CSV'));
+}
+
+/* v844 (T6): the two download buttons were the only export paths on this tab that said nothing
+   on screen when they fired — Copy for IC Memo flashes a toast, ⬇ CSV and ⬇ Excel dropped a file
+   into Downloads silently. The moment the shortlist leaves the tool is the last moment the
+   analyst is looking at the evidence column, so the grade mix of the file is stated there. */
+function _scExportToast(rows, kind) {
+  var n = rows.length;
+  var base = n + ' countr' + (n === 1 ? 'y' : 'ies') + ' exported as ' + kind
+    + ' — the screen that produced it travels with the file.';
+  var cd = rows.filter(function(r){ return r.Evidence_Grade === 'C' || r.Evidence_Grade === 'D'; });
+  if (!cd.length) return base + ' Every row grades A or B on evidence.';
+  return base + ' ' + cd.length + ' of the ' + n + ' row' + (cd.length === 1 ? ' grades' : 's grade')
+    + ' C or D on evidence — see the Evidence_Grade column before any of them goes in the memo.';
 }
 
 /* ── v660 (T5) — "give me something I can paste straight into an IC memo." ─────────────
@@ -34320,6 +34440,19 @@ function _scCopyColumns(rows, price) {
         return /^not scored/.test(basis) ? basis : 'not scored — ' + basis;
       }
       return r.Fiscal_Predictability + '/100 — ' + basis;
+    } });
+  // v844 (T6): the EVIDENCE column the screen prints beside Govt Take, which the clipboard
+  // table dropped. "Data basis" below is production vs proxy — a different question — and was
+  // the only quality signal a pasted shortlist carried. C and D rows say so in the cell, because
+  // a grade letter alone in a memo table is a credential and not a instruction.
+  cols.push({ h: 'Evidence',
+    f: function(r){
+      if (!r.Evidence_Grade || r.Evidence_Grade === 'not graded') return '—';
+      var s = r.Evidence_Grade + ' · ' + (r.Evidence_Primary_Law_pct != null
+        ? Number(r.Evidence_Primary_Law_pct).toFixed(0) + '% primary law' : 'ungraded');
+      if (r.Evidence_Grade === 'C') s += ' — screening only';
+      if (r.Evidence_Grade === 'D') s += ' — not citable without the statute';
+      return s;
     } });
   cols.push({ h: 'Data basis', f: function(r){ return r.Verified_Production === 'Yes' ? 'verified field production' : 'proxy economics'; } });
   return cols;
@@ -45861,6 +45994,7 @@ function exportScreenerExcel() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(basis), 'Screen & Basis');
   var scrPrice = getPriceKey ? getPriceKey() : '75';
   XLSX.writeFile(wb, 'petroleum_screener_$' + scrPrice + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+  if (typeof showCopyToast === 'function') showCopyToast(_scExportToast(rows, 'XLSX'));
 }
 
 function shareComparison() {
