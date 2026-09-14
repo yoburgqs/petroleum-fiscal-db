@@ -51551,3 +51551,18 @@ visible reason.
   2026-09-12, 2026-09-13 and 2026-09-14 (two on the 14th). **Twenty-seventh cycle carried,
   still uninvestigated.** Outside the UX-finalization course this directive sets, so no
   cycle will ever pick it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 756 Log — 2026-09-14 04:56
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 756 complete — v848 shipped and pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (Rotation: 755 was T5, 754 T2, 753 T3, 752 T6, 751 T4. T1 was stalest, last run at 750.)
+
+## Friction
+I walked it cold at 1440×900 with no stored state: Home → Screener card → Advanced Filters → untick the three fee-basis mechanics → tick Shell → collapse the panel. 185 rows became 31, and **nothing on screen named the two filters that removed the other 154.**
+
+- The collapsed `
