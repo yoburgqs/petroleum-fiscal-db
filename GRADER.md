@@ -52028,3 +52028,18 @@ Iraq. The same gesture now works on all eight columns.
   future T5 cycle.
 - **Still no process check comparing the deployed version string against the local tree** —
   carried from 758 and 761, still true.
+
+---
+## Cycle 762 Log — 2026-09-14 12:18
+- Test before: 306 PASS / 0 FAIL
+- Test after: 312 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — v854 shipped and verified on the deployed site.
+
+## Task: T6 — "Where did this number come from and how solid is the evidence?"
+
+(761 was T2, 758 T3, 757 T4, 756 T1, 755 T5 — T6 hadn't run since 751.)
+
+## Friction
+
+I walked T6 cold across the whole product first. The Country Profile evidence layer is genuinely strong — swept 15 countries, and it prints a per-parameter ORCA-value / statutory / source table, partitions rows the model doesn't read, names unsourced ones, and Fiscal 
