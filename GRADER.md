@@ -50390,3 +50390,109 @@ Cold load at 1440×900, no storage. I cleared the seeded set and built the compa
 ```
 Contractor NPV @$50 (downside)   $389M   $334M   -$33M
 Contractor NPV @$75 (base)       $642M   $745M   $62
+
+---
+## Cycle 749 Log — 2026-09-13 — v841 (`87359a3`)
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Rotation: 748 was T3,
+747 T2, 746 T6, 745 T4, 744 T1 — T5 last ran at 742.)
+
+## Friction
+Cold load at 1440x900 over http, `sessionStorage` and `localStorage` cleared. Opened Fiscal
+Compare, ticked Angola / Guyana / Malaysia / Norway, and went looking for the basis footnote
+a memo needs beside the numbers.
+
+Fiscal Compare carries two NPV columns. The second, `NPV ($M) db · citable`, is the one its
+own tooltip calls **"the one that reaches your memo."** That header — built in
+`renderFCResults()` at `index.html:51502` — hand-typed its basis as
+
+    "on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC)"
+
+That column is `COUNTRY_DATA.npv_*`. `petroleum_dcf.py` produced it on
+`dcf_profiles.py PROFILES.deepwater` — **$1.0B all-in capex, $18/bbl opex escalating 2%/yr
+real, 5yr plateau, 241.9 MMbbl**. The `$1.2B / $15-flat` project is `DCF_PROFILES.deepwater`,
+the Live DCF / Scenario Builder profile, which recovers 294.0 MMbbl and returns roughly **3x**
+the NPV on the same country at the same price.
+
+The amber strip above the table (`#fc-profile-strip`) said the same thing, undivided —
+`Deepwater · Capex $1.2B · Opex $15/bbl` — and ended in the only control on the tab labelled
+**"(ⓘ cite basis)"**, which was a hover `<span>`, not a button. Its tooltip handed out:
+*"Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex."*
+
+**v834 derived all seven clipboard artifacts from `ENGINE_BASIS` and left the screen behind.**
+The resulting state was worse than either half alone: press ⌘ Copy for IC Memo and the paste
+reads *$1.0B all-in, $18/bbl escalating*; read the header for the same Norway **$826M** and it
+reads *$1.2B, $15/bbl flat*. The tool disagreed with itself about the assumptions behind one
+number, and the wrong half was the half on screen — which is the half an analyst retypes.
+
+## Change
+- **The strip is two labelled zones.** `MODEL COLS` carries the profile-selector project as
+  before. `DB · CITABLE COLS` is new, **on screen**, filled from `ENGINE_BASIS.short`, tagged
+  *"fixed — does not follow the Profile selector"*. Switch the selector to Giant and the left
+  zone moves to `$2.0B · 150k bbl/d · $10/bbl`; the right zone does not move. The distinction
+  is visible instead of inferable.
+- **"(ⓘ cite basis)" is now a button — `⎘ Copy cite basis`.** It writes a two-part footnote:
+  `1. CITED FIGURES` (ENGINE_BASIS, naming the db · citable columns, Country Profile, the API
+  and every export) and `2. ON-SCREEN SENSITIVITY` (the live profile, naming the model columns
+  only). Built at click time from `_icEngineBasis()`, so it cannot drift from the pastes.
+- **The citable NPV header's basis is derived, not typed** (`_fcEngShort` from `ENGINE_BASIS`),
+  and says outright that it is not the project named in the strip above.
+
+## Result
+An analyst citing ORCA's contractor NPV now reads, on screen *and* in the clipboard, the
+assumptions that actually produced it — and can tell at a glance which of the two same-named
+Deepwater projects on this tab governs which column. Before this cycle, the footnote taken
+from the screen was one under which Norway's cited $826M could not be rebuilt.
+
+## Verification
+- JS syntax gate **PASS** (11 blocks).
+- Runtime suite **RAN** against the modified tree: **299 PASS / 0 FAIL / 1 WARN**. The WARN is
+  the localhost-only service-worker 404; it is present in the pre-change cold walks of this
+  same tree, so it is the server, not the change. Read from the suite's own report file, not
+  assumed.
+- **Zero horizontal scroll and zero console/page errors at 1920 / 1440 / 1280 / 1024 / 768 /
+  390** (390 with `hasTouch: true`), across 8 tabs at each width.
+- `#fc-cite-basis-btn` measures **24px** tall at every width including 390.
+- Exercised on **Deepwater** (default) and **Giant** — the citable zone correctly stays put
+  while the model zone follows the selector; the copied footnote's Part 2 changes and Part 1
+  does not.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — no banner, page-sub or routing hint added. v430, v449/v451/v452,
+v489 untouched. Tab order unchanged. Not rubric chasing, not a version sweep, not a new FAQ,
+not a new tooltip (a hover became a working control), not text-only — the strip's layout and
+the cite control's behaviour both changed. v841 written at the three display sites (`:42`,
+`:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **Reform Risk country picker (`#rr-country-lookup`) offers 186 options** for 21 countries
+  with a log. (Carried from 746.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question, not a UX one.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover
+  title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with
+  nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. (Carried from 736, re-scoped at 738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`, `4211`, `135`)
+  above a Fiscal Mechanics row printing `Concession (7,643)`. Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages** (`:4144`,
+  `:4819`, `:5092`, `:5505`, `:5622`, `:5769` …). Fiscal Compare's live surfaces are now
+  clean; the reference prose is not. It is a bulk text correction, so it wants its own
+  deliberate pass rather than a cycle — flagging it as a known, bounded inconsistency.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Twentieth cycle carried, still uninvestigated.** Outside the
+  UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
+
+## Cycle 749 Log — 2026-09-13 21:0x
+- Test before: 300 PASS / 0 FAIL (live URL baseline)
+- Test after: 299 PASS / 0 FAIL / 1 WARN (local http; WARN = pre-existing sw 404)
+- JS errors: 0 page errors, 0 console errors at all six viewports
+- Summary: Cycle 749 complete — **v841** shipped (`87359a3`), pushed, mirror in sync.
