@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v857</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v858</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -386,6 +386,10 @@ thead th[data-sort-key]:hover, thead th[data-sc-sort]:hover { color: var(--text)
 thead th[data-sc-sort]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; color: var(--text); }
 thead th.sort-asc::after  { content: ' ▲'; color: var(--accent); }
 thead th.sort-desc::after { content: ' ▼'; color: var(--accent); }
+/* v858 (T1): the ranking a table ARRIVES in, as opposed to one the analyst clicked for.
+   Muted rather than accent so the two states stay distinguishable at a glance: accent = you
+   did this, muted = this is the order the screen produced. */
+thead th.sort-default::after { content: ' ▼'; color: var(--muted); opacity: .8; }
 tbody tr { border-top: 1px solid var(--border); transition: background .1s; }
 tbody tr:hover { background: rgba(176,104,0,0.04); }
 tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
@@ -2516,7 +2520,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v857</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v858</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2586,7 +2590,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v857</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v858</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -31766,7 +31770,20 @@ function _scSortCmp(takeKey, npvKey, cmpBasis) {
 // the header indicator clears rather than sticking on a column.
 function setScreenerSort(key) {
   if (!key || !_SC_SORT_DEFAULT_DIR.hasOwnProperty(key)) return;
-  if (_scSortKey !== key) { _scSortKey = key; _scSortDir = _SC_SORT_DEFAULT_DIR[key]; }
+  // v858 (T1) -- `_scSortKey === null` is not "unsorted". It is contractor NPV DESCENDING inside
+  // the data-basis blocks (swing descending under the R-factor preset), and that is the order the
+  // analyst reads for the whole of T1, because nothing in the task makes them click a header.
+  // Asking for that same column re-applied the order already on screen: measured on the IOC
+  // Capital Screen, clicking "Contractor NPV" from a cold walk produced Canada > USA > Azerbaijan
+  // > Mexico > Argentina ... > Iraq, byte-identical to the fifteen rows already rendered. Hand
+  // cursor, header lights up, not one row moves. That is the defect v587 was written to fix for
+  // Govt Take, still live on the one column that DOES the default ranking.
+  // When the table is already in its implicit order, the only thing a click on that column can
+  // mean is "reverse it" -- so it does. The second click comes back. Every other column keeps the
+  // three-state cycle unchanged, and so does this one when the analyst arrives from another sort.
+  var _implicitKey = _screenerRfactorOnly ? 'swing' : 'npv';
+  if (key === _implicitKey && _scSortKey === null) { _scSortKey = key; _scSortDir = 1; }
+  else if (_scSortKey !== key) { _scSortKey = key; _scSortDir = _SC_SORT_DEFAULT_DIR[key]; }
   else if (_scSortDir === _SC_SORT_DEFAULT_DIR[key]) { _scSortDir = -_scSortDir; }
   else { _scSortKey = null; _scSortDir = null; }
   if (typeof runScreener === 'function') runScreener();
@@ -31783,6 +31800,15 @@ function _scSortLabelNow() {
   var s = pair[_scSortDir === 1 ? 0 : 1];
   if (_scSortKey === 'take' && _scTakeSortOnCmp) s += ' (comparable take \u2014 the figure this screen tested)';
   return s;
+}
+// v858 (T1): the default ranking has a name too. `_scSortLabelNow()` returns '' when
+// `_scSortKey` is null -- which is the state the analyst spends the entire task in -- so the one
+// ordering they actually read was the one the page never named. The EXPORT has named it since
+// v587 ("Ranked by: verified field production first, then contractor NPV descending within each
+// group"); the screen never did. This is the same string, for the screen.
+function _scRankLabelNow() {
+  if (_scSortKey) return _scSortLabelNow();
+  return _screenerRfactorOnly ? 'price sensitivity (swing high\u2192low)' : 'Contractor NPV high\u2192low';
 }
 function clearScreenerSort() {
   _scSortKey = null; _scSortDir = null;
@@ -33456,9 +33482,12 @@ function runScreener() {
   const priceLabel = `$${price}/bbl`;
   // v587 (T1): the count line names the active column sort and offers the way back to the default
   // ranking, so an analyst who reordered the table can see that they did and undo it in one click.
+  // v858 (T1): the null branch used to be empty unless the R-factor preset was on, so the count
+  // line above a ranked shortlist said nothing about what ranked it. When the rows are grouped the
+  // basis sentence below carries the ordering, so this stays quiet there rather than saying it twice.
   const sortNote = _scSortKey
     ? ` · sorted by <strong style="color:var(--accent);">${_scSortLabelNow()}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
-    : (_screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '');
+    : (_grouped ? '' : ` · ranked by <strong style="color:var(--muted);">${_scRankLabelNow()}</strong>`);
   // v718: a screen the analyst has edited is no longer the preset that named it. The prefix
   // says so rather than letting the name sit in front of thresholds it does not describe.
   const presetPrefix = _activePresetName
@@ -33480,7 +33509,7 @@ function runScreener() {
     ? ` \u2014 <span style="color:var(--accent);font-weight:600;">${_nFloor} of ${data.length} ${_nFloor === 1 ? 'row carries a take that is a floor' : 'rows carry a take that is a floor'}, not a measurement: royalty and income tax only on under ${SC_EVID_MIN_FACTS} facts, so take is a lower bound and NPV an upper bound${_floorGrouped ? '. They are ranked last, under their own line' : ''}.</span>`
     : '';
   const _basisNote = _grouped
-    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nModelled} modelled on regional proxy terms${_nFloor > 0 ? `, then ${_nFloor} whose take is a floor` : ''}${_scSortKey ? `, ${_scSortLabelNow().toLowerCase()} within each block` : ''}`
+    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nModelled} modelled on regional proxy terms${_nFloor > 0 ? `, then ${_nFloor} whose take is a floor` : ''}, ${_scRankLabelNow().toLowerCase()} within each block`
     : _allProxy
       ? ` <span style="color:var(--accent);font-weight:600;">\u2014 none of these ${data.length} countries has verified field production. Every take, NPV and breakeven below is a regional proxy estimate, indicative only, and not defensible as a screening shortlist on its own.</span>`
       : _mixedUngrouped
@@ -34236,17 +34265,37 @@ function runScreener() {
   // v587 (T1): sort indicator on the Screener headers. The ▲/▼ CSS (thead th.sort-asc/.sort-desc)
   // has existed since the Explorer table was built; #tbl-screener simply never set the class,
   // because it had no sort. aria-sort is set alongside so a screen reader announces the change.
+  // v858 (T1): v587 lit a header only when the analyst had CLICKED one. On the cold walk nobody
+  // clicks, so every header read aria-sort="none" and carried no arrow while the fifteen rows were
+  // ordered by contractor NPV descending -- an unlabelled ranking that the # column numbers 1..15
+  // and that "Load top 5 in Side-by-Side" draws its five from. Three of the fifteen are tagged
+  // High Take and sit ABOVE rows tagged Inv-Friendly (Azerbaijan 60.8% at #3, Argentina 31.0% at
+  // #5), so the obvious read of a screener's rank column -- fiscal attractiveness -- is the wrong
+  // one, and nothing on the table said so. The column that produces the order now carries a muted
+  // ▼ and announces itself as descending, in the state the analyst is actually in.
+  var _implicitSortKey = _scSortKey ? null : (_screenerRfactorOnly ? 'swing' : 'npv');
   document.querySelectorAll('#tbl-screener thead th[data-sc-sort]').forEach(function (th) {
-    th.classList.remove('sort-asc', 'sort-desc');
+    th.classList.remove('sort-asc', 'sort-desc', 'sort-default');
+    if (th.dataset.baseTitle === undefined) th.dataset.baseTitle = th.getAttribute('title') || '';
+    var _k = th.getAttribute('data-sc-sort');
     // Tier and Govt Take share data-sc-sort="take"; both light up, which is correct — the tier
     // IS the take bucket, so sorting either produces the same order. v685: that had stopped being
     // true for the fee-basis countries, whose tier was labelled off the published blend while the
     // order ran on the comparable figure; both cells now read the same basis as the sort.
-    if (_scSortKey && th.getAttribute('data-sc-sort') === _scSortKey) {
+    if (_scSortKey && _k === _scSortKey) {
       th.classList.add(_scSortDir === 1 ? 'sort-asc' : 'sort-desc');
       th.setAttribute('aria-sort', _scSortDir === 1 ? 'ascending' : 'descending');
+      th.title = th.dataset.baseTitle;
+    } else if (_implicitSortKey && _k === _implicitSortKey) {
+      th.classList.add('sort-default');
+      th.setAttribute('aria-sort', 'descending');
+      th.title = 'THIS COLUMN IS ALREADY RANKING THE TABLE, highest first'
+        + (_screenerEvidenceFirst ? ' \u2014 inside the data-basis blocks, verified field production first.' : '.')
+        + ' It is what the # column counts, and what \u201cLoad top 5 in Side-by-Side\u201d takes its five from.'
+        + ' Click to reverse it (lowest first); click again to come back.\n\n' + th.dataset.baseTitle;
     } else {
       th.setAttribute('aria-sort', 'none');
+      th.title = th.dataset.baseTitle;
     }
   });
 
