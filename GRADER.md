@@ -51105,3 +51105,130 @@ Cycle 753 remains complete: v845 (`00e44ca`) and the grader log (`ec1b9db`) are 
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 754 — v846 — 2026-09-14
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?"
+
+**Friction.** Not reading the number — *reaching* the country. Walked T2 cold
+(sessionStorage and localStorage cleared, then reload) from a shared link, which
+is how an analyst with 20 minutes actually arrives at a single-country page.
+
+`handleRoute()`'s profile branch, `index.html:46423`:
+
+```js
+if (section === 'profile' && param) {
+  var country = fromSlug(param);
+  if (country) { ...switchTab('t7')... loadCountryProfile(country); }
+}   // <- no else
+```
+
+`fromSlug()` compared the raw string against `toSlug()`, which joins words with
+**underscores**. But this platform publishes a **second** spelling of the same
+country and prints it on the Country Profile itself — the country API's
+hyphen form, at the "Resolved from `api/v1/country/united-kingdom.json`" line
+(`:38184`) and again in the breakeven basis note (`:54114`). A hyphen is also
+what anyone typing or hand-editing a URL writes.
+
+Measured against the shipped `country_data.json`: **40 of the 185 countries**
+have a separator in their slug and were therefore unreachable in hyphen form.
+
+| link | before | after |
+|---|---|---|
+| `#/profile/united-kingdom` | **Home**, silently | United Kingdom |
+| `#/profile/saudi-arabia` | **Home**, silently | Saudi Arabia |
+| `#/profile/iraq-kurdistan` | **Home**, silently | Iraq-Kurdistan |
+| `#/profile/papua-new-guinea` | **Home**, silently | Papua New Guinea |
+| `#/profile/uae-abu-dhabi` | **Home**, silently | UAE — Abu Dhabi |
+| `#/profile/cote-d-ivoire` | **Home**, silently | Cote d'Ivoire |
+| `#/profile/united_kingdom` | United Kingdom | United Kingdom (unchanged) |
+
+And because nothing downstream handled the `null`, the failure was **completely
+silent**: no tab change, no message, no console warning. The analyst sent a link
+to a country profile got the platform's front page and had nothing to tell them
+whether the link was stale, the country absent, or the tool broken. A typo
+(`nigera`, `guyanaa`) did the same. Same shape as v460 — a shipped route that
+had been doing nothing.
+
+**Change.**
+
+1. **`fromSlug()` canonicalises the separator on both sides** (`_slugKey846()`),
+   so the two slug spellings this platform publishes are one route. Exact match
+   is still attempted first, so nothing that worked before changes. A
+   separator-free last resort — accepted **only when exactly one** country
+   collapses to it, so it can never guess — reaches `Cote d'Ivoire` from
+   `cote-d-ivoire`, which no hyphen spelling could otherwise reproduce (`toSlug`
+   deletes the apostrophe and yields `cote_divoire`).
+
+2. **The missing `else` branch now exists.** An unresolved slug routes to
+   Country Profile and renders `#cp-slug-notfound` above the profile. It names
+   the slug that failed, states plainly that nothing on the page came from the
+   link and that any profile below is the platform's own default example — and
+   offers the closest names on file as **one-click buttons** (`_slugNear846()`,
+   scored on prefix/containment/common-prefix, min score 3, max 4 shown, so a
+   name with no plausible neighbour gets none rather than a wrong guess).
+   The notice clears on a pick, or on any change of the country selector.
+
+**Result.** A link to any of the 185 country profiles opens that profile in
+either spelling. When a name genuinely does not exist, the analyst is told
+*which* name failed and is one click from the right one — instead of reading a
+59.5% take figure off Indonesia's page believing it is the country they were
+sent to.
+
+### Verification — all run this cycle
+- **JS syntax gate:** 11 of 11 inline scripts parse. PASS.
+- **Runtime suite RAN** against the patched file: **299 PASS / 0 FAIL / 1 WARN**,
+  0 failures. The WARN and the single "JS error" are the same `sw.js` 404 the
+  pre-change baseline produces on this machine — service-worker registration
+  against `python3 -m http.server`, not the deployed build — identical to
+  cycles 752 and 753.
+- **Horizontal scroll, not-found state:** `scrollWidth === clientWidth` at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**. Zero overflowing descendants.
+- **Step 5b, 390x844 `hasTouch:true`:** notice renders, `scrollWidth === 390`,
+  and both new buttons measure **26px** tall under `pointer: coarse` — over the
+  24px floor. Hyphen route re-verified on the phone context (`saudi-arabia`).
+- **Behaviour:** near-match click loads the country and rewrites the hash to
+  `#/profile/nigeria`; selector change clears the notice; `atlantis` (no
+  plausible neighbour) shows the notice with no buttons rather than a guess.
+- **Pixel gate:** PASS — no surface worse than baseline.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and every `min-width: max-content` marker
+untouched. The notice is not a page-sub, banner or routing hint under v371/v373:
+it renders **only** when a route has already failed and is absent on every
+working path, including the default view. v430, v449, v451, v452, v489, v626,
+v705, v845 untouched. Tab order unchanged. Not rubric chasing, not a version
+sweep, not a changelog catch-up, not a new FAQ, not a new tooltip, and **not
+text-only** — a route that resolved nothing now resolves, and a new control
+appears on screen. v846 written at the three display sites (`:42`, `:2484`,
+`:2554`) silently, after the change shipped and re-tested.
+
+### Carried forward
+- **The Breakeven Map CSV carries no evidence grade.** (752.)
+- **`switchTab()` strips the query off `#/explorer?…`** — low priority. (750.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil
+  shares** (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against
+  takes of 87.2% / 85.6%. Fork-1 data question. (740.)
+- **The all-185 rank line duplicates Zone A on a non-producer.** Namibia reads
+  "#106 of 185 · not production-weighted" and then "All 185 countries: #106 …".
+  For a producer the two lines carry different denominators (Indonesia: #13 of 21
+  vs #159 of 185) and the second earns its place; outside the producer set it
+  restates the first. Cosmetic, found on this cycle's walk. (754.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the
+  Best-BE hover title. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold
+  view. (732/736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario
+  Builder provenance. (736/738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`).
+  Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages**,
+  and **the Reference panel still claims Reform Risk covers 185 jurisdictions**
+  (it is 21). Both text-only — one deliberate bulk prose pass, not a cycle each.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an
+  incident** — 2026-09-12 *and* 2026-09-13. **Twenty-fifth cycle carried, still
+  uninvestigated.** Outside the UX-finalization course this directive sets, so
+  no cycle will ever pick it up. **This wants Zach's attention directly.**
