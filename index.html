@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v838</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v839</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v838</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v839</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v838</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v839</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -38013,7 +38013,8 @@ function cpBandNpvNote(d, b) {
   if (hasR2 && r2 < 0.25) {
     return win + 'take explains almost none of the contractor NPV spread (r\u00b2 ' + r2.toFixed(2) + ')'
       + range + '. Take% is an undiscounted lifetime share while NPV is discounted at 10% on the same '
-      + '$1.2B / 50k bbl/d profile for every country, so '
+      + '$' + (ENGINE_BASIS.capexAllInMM / 1000).toFixed(1) + 'B / '
+      + (ENGINE_BASIS.peakBblDay / 1000).toFixed(0) + 'k bbl/d profile for every country, so '
       + (b.ratio != null ? 'that ' + b.ratio.toFixed(1) + '\u00d7 gap' : 'that gap')
       + ' is largely WHEN the government takes its share, not how much.';
   }
@@ -38754,7 +38755,7 @@ function loadCountryProfile(country) {
     var _proxyDisclosure = _isProxyCountry
       ? ' <span style="font-size:10px;color:var(--yellow);font-weight:700;background:rgba(161,98,7,.08);border:1px solid rgba(161,98,7,.25);border-radius:3px;padding:1px 5px;white-space:nowrap;cursor:help;" title="PROXY basis: no block-level production data — take modeled from statutory fiscal parameters. IC rule: state \'statutory model basis (ORCA PROXY)\' and cross-check primary PSA/concession terms before IC submission. Take may diverge ±5–15pp from actual block economics.">⚠ PROXY — statutory model</span>'
       : '';
-    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-bottom:10px;" title="One-line IC read. The government take and its tier are the discriminating figures and are what you can cite. The NPV pair below them is a FLOOR CHECK, not a ranking: contractor NPV is computed on one fixed standardized Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex, 10% WACC, 100% WI) that is identical for all 185 countries, so gross revenue is a constant and NPV is close to the residual left after government take — it regresses on take at r² 0.89. Almost every non-monopoly regime clears it; the line states the exact pass count. Do not read a larger NPV as a better project: the top of that ranking is Vanuatu, the Bahamas and Montenegro, jurisdictions with no verified production. Country-level IRR is deliberately absent — the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Run Scenario Builder for a project NPV or IRR on your own field.">'
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-bottom:10px;" title="One-line IC read. The government take and its tier are the discriminating figures and are what you can cite. The NPV pair below them is a FLOOR CHECK, not a ranking: contractor NPV is computed on one fixed standardized Deepwater profile (' + _engineBasisLine() + ') that is identical for all 185 countries, so gross revenue is a constant and NPV is close to the residual left after government take — it regresses on take at r² 0.89. Almost every non-monopoly regime clears it; the line states the exact pass count. Do not read a larger NPV as a better project: the top of that ranking is Vanuatu, the Bahamas and Montenegro, jurisdictions with no verified production. Country-level IRR is deliberately absent — the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Run Scenario Builder for a project NPV or IRR on your own field.">'
       + '<span style="font-size:14px;font-weight:900;color:' + col + ';flex-shrink:0;">' + icon + '</span>'
       + '<span style="font-size:11px;color:var(--text);line-height:1.4;min-width:0;">' + msg + _proxyDisclosure + '</span>'
       + '</div>';
@@ -38862,7 +38863,7 @@ function loadCountryProfile(country) {
         + _bn734.rank + ' of ' + _bn734.n + ' at this take \u00b7 ' + (_up734 ? '+' : '\u2212')
         + cpNpvFmt(Math.abs(_delta734)) + ' vs band median</span>';
     }
-    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>' + _bandPill734;
+    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile (' + _engineBasisLine(false) + '). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>' + _bandPill734;
   })() : '';
   const _dnside516Display = (!_isMonopoly && d.npv_50 != null) ? (function() {
     // v786 (T2): same $50 figure the verdict tests. Where it is the PSC/Concession figure, the blend
@@ -38873,7 +38874,7 @@ function loadCountryProfile(country) {
     var _dnBlend = _dn.cmp
       ? '<span class="cp-dn-basis" style="opacity:.8;font-size:10px;cursor:help;" title="' + (d.country + ': ' + cpNpvFmt(dv) + ' is contractor NPV at $50/bbl' + cpDownside50Basis(_dn) + '. ~/MECHANIC_COMPARABILITY: fee-basis take and NPV are a property of the remuneration mechanic, not of the terms.').replace(/"/g, '&quot;') + '"> · PSC/Conc ' + Number(_dn.n1).toLocaleString() + ' · blend ' + cpNpvFmt(_dn.blend) + '</span>'
       : '';
-    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside case, same standardized Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex), 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break; negative = viability depends on the price environment. This replaced the country-level IRR tile in v516: the bundled IRR is an arithmetic mean of per-contract IRRs (median 333% across the 165 countries that carry one) and is not a project return.">Downside: <strong style="color:' + dCol + ';">' + cpNpvFmt(dv) + '</strong><span style="opacity:.65;font-size:10px;"> @$50 (' + dLabel + ')</span>' + _dnBlend + '</span>';
+    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside case, same standardized Deepwater profile (' + _engineBasisLine(false) + '), 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break; negative = viability depends on the price environment. This replaced the country-level IRR tile in v516: the bundled IRR is an arithmetic mean of per-contract IRRs (median 333% across the 165 countries that carry one) and is not a project return.">Downside: <strong style="color:' + dCol + ';">' + cpNpvFmt(dv) + '</strong><span style="opacity:.65;font-size:10px;"> @$50 (' + dLabel + ')</span>' + _dnBlend + '</span>';
   })() : (!_isMonopoly ? '<span style="font-size:11px;color:var(--muted);opacity:.8;" title="Contractor NPV at the $50/bbl downside case is not computed for this country. Use Scenario Builder to run a low-price case with your own capex and opex.">Downside @$50: n/a</span>' : '');
   // v516: the route to a genuine, project-level IRR stays on the strip -- what was removed is the
   // country-level average that masqueraded as one. Scenario Builder computes an IRR from the
@@ -47098,6 +47099,59 @@ function _basisDelta833() {
            prodGapPct: (jsProd - ENGINE_BASIS.totalProdMM) / ENGINE_BASIS.totalProdMM * 100 };
 }
 
+/* ── v839 (T2) — the assumptions printed ON the headline NPV are now the assumptions that
+   produced it. ──────────────────────────────────────────────────────────────────────────
+
+   Walked T2 cold at 1440x900 over http, both storages cleared. The tab self-seeds Indonesia,
+   so the first thing a first-time analyst sees is a headline reading
+
+       NPV: $745M @$75   ·   Downside: $334M @$50 (survives $50)   ·   BE: < $50/bbl bounded
+
+   and the whole task is "can I defend that". Four places on this screen answer the question
+   "on what project?" — the hover on the $75 NPV, the hover on the $50 downside, the hover on
+   the bounded breakeven, and the body paragraph under the contract table that exists solely to
+   say what the headline NPV is. All four were hand-typed literals reading
+
+       $1.2B capex · 294 MMbbl · $15/bbl opex
+
+   which is DCF_PROFILES.deepwater — the Live DCF / Scenario Builder project. The stored figure
+   is petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater (verified against that file: 300 +
+   300 + 200 development, 30/yr sustaining over years 3-7, 50 abandonment = $1,000M all-in;
+   5yr plateau; 15% decline; $18/bbl escalating 2%/yr real; 241.9 MMbbl).
+
+   The page already knows this and says so twice — the footnote under the price-scenario block
+   and the Live DCF reconciliation panel both print the $1.0B / 241.9 / $18 basis, and the
+   reconciliation panel prints Indonesia's two NPVs side by side, $745M against $2.62B, under a
+   line reading "the two profiles both named Deepwater recover 242 and 294 MMbbl respectively".
+   So the analyst who scrolled to defend the number found the page contradicting itself about
+   its own headline, with the wrong version attached to the number itself.
+
+   Derived from ENGINE_BASIS and DCF_PROFILES at call time, the treatment v574 gave the citation
+   versions and v834 gave the exported artifacts. There is no hand-typed copy left on this screen
+   to fall out of step again. */
+function _engineBasisLine(full) {
+  if (typeof ENGINE_BASIS === 'undefined') return 'ORCA standardized Deepwater reference project';
+  var E = ENGINE_BASIS;
+  var s = (E.peakBblDay / 1000).toFixed(0) + 'k bbl/d peak \u00b7 ' + E.plateauYears + 'yr plateau \u00b7 '
+        + E.totalProdMM.toFixed(1) + ' MMbbl recovered \u00b7 $' + (E.capexAllInMM / 1000).toFixed(1)
+        + 'B all-in capex \u00b7 $' + E.opexBbl + '/bbl opex escalating '
+        + (E.opexEscal * 100).toFixed(0) + '%/yr real';
+  if (full === false) return s;
+  return s + ' \u00b7 ' + E.years + 'yr life \u00b7 ' + (E.discountRate * 100).toFixed(0)
+       + '% WACC, 100% WI';
+}
+function _panelBasisLine() {
+  var p = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
+  if (!p) return '';
+  var prod = null;
+  try { if (typeof _basisDelta833 === 'function') prod = _basisDelta833().jsProdMM; } catch (e) { prod = null; }
+  return '$' + (p.capexMM / 1000).toFixed(1) + 'B development capex \u00b7 ' + p.plateauYears
+       + 'yr plateau \u00b7 ' + (prod != null ? prod.toFixed(1) + ' MMbbl \u00b7 ' : '')
+       + '$' + p.opexBbl + '/bbl flat opex';
+}
+window._engineBasisLine = _engineBasisLine;
+window._panelBasisLine  = _panelBasisLine;
+
 // ── v698 (T2) — Scenario Builder profile labels are generated, never typed ──────────────
 // The <select id="sb-profile"> used to carry six hardcoded labels. One of them ("Deepwater
 // ($800M capex, ...)") disagreed with DCF_PROFILES.deepwater.capexMM = 1200, which is the
@@ -53376,8 +53430,8 @@ function cpBeBound(d) {
     + (d.country || 'this country') + ' — 117 of 185 countries have none on file. This range is '
     + 'arithmetic on the four contractor NPVs printed on this page (' + fmtN(v[0]) + ' @ $50 · '
     + fmtN(v[1]) + ' @ $75 · ' + fmtN(v[2]) + ' @ $100 · ' + fmtN(v[3]) + ' @ $125), on the '
-    + 'standardized Deepwater profile ($1.2B capex · 294 MMbbl · $15/bbl opex · 10% WACC, '
-    + '100% WI). NPV = 0 therefore sits ' + sense + '. It is a bound, not a price: the exact figure '
+    + 'standardized Deepwater profile (' + _engineBasisLine() + '). NPV = 0 therefore sits '
+    + sense + '. It is a bound, not a price: the exact figure '
     + 'is not on file, and the bound is only as good as that one standardized profile. '
     + 'Do not repeat the "no production data" reason given elsewhere on this page — it is not the '
     + 'driver: breakeven is on file for more non-producers than producers. For a breakeven on your '
@@ -53479,6 +53533,17 @@ window._cpObsSpread = window._cpObsSpread || {};
 // ceiling): a column that cannot state its own basis is removed, and where the question IS
 // answered is stated in its place. Take%, operator, mechanic, production and key rate stay --
 // every one of them a fact about the contract, on one basis across all rows.
+// v839 (T2): the one clause that stops the analyst reconciling the headline against the wrong
+// panel. The Live DCF panel sits ~1,800px below this note and is also labelled "Deepwater"; on
+// Indonesia it prints $2.62B against this headline's $745M.
+function _cpPanelIsNotThis() {
+  var pl = (typeof _panelBasisLine === 'function') ? _panelBasisLine() : '';
+  if (!pl) return '';
+  return ' That is the <strong style="color:var(--text);">engine</strong> profile \u2014 not the '
+       + '<em>Live DCF Model</em> panel further down this page, which is also labelled \u201cDeepwater\u201d '
+       + 'but runs a different project (' + pl + ') and returns a different NPV on the same country '
+       + 'at the same price.';
+}
 function cpContractColNote(country, contracts) {
   if (!contracts || !contracts.length) return '';
   var d = COUNTRY_DATA.find(function(x){ return x.country === country; });
@@ -53498,13 +53563,15 @@ function cpContractColNote(country, contracts) {
   if (d && d.npv_75 != null) {
     hdr = 'The <strong>' + fmtNpvShared(d.npv_75) + '</strong> at $75'
         + (d.npv_50 != null ? ' and <strong>' + fmtNpvShared(d.npv_50) + '</strong> at $50' : '')
-        + ' in the headline strip are one standardized Deepwater project ($1.2B capex · 294 MMbbl '
-        + '· $15/bbl opex) run through ' + country + '’s terms — one profile for all 185 '
-        + 'countries, which is what makes them comparable.';
+        + ' in the headline strip are one standardized Deepwater project (' + _engineBasisLine(false)
+        + ') run through ' + country + '’s terms — one profile for all 185 '
+        + 'countries, which is what makes them comparable.'
+        + _cpPanelIsNotThis();
   } else {
-    hdr = 'Every NPV this platform reports is one standardized Deepwater project ($1.2B capex · '
-        + '294 MMbbl · $15/bbl opex) run through a country’s terms — one profile for all '
-        + '185 countries, which is what makes them comparable.';
+    hdr = 'Every NPV this platform reports is one standardized Deepwater project ('
+        + _engineBasisLine(false) + ') run through a country’s terms — one profile for all '
+        + '185 countries, which is what makes them comparable.'
+        + _cpPanelIsNotThis();
   }
 
   var why = ' The per-contract figures were not on that profile and stated no basis of their own: '
