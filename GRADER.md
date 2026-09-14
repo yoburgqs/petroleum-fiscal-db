@@ -50776,3 +50776,16 @@ display sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped 
   *and* 2026-09-13. **Twenty-second cycle carried, still uninvestigated.** Outside the
   UX-finalization course this directive sets, so no cycle will ever pick it up.
   **This wants Zach's attention directly.**
+
+---
+## Cycle 751 Log — 2026-09-13 23:15
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 751 complete — v843 shipped (`ef9da35`), grader log (`a2f0234`), both pushed, mirror synced.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (T4 was least recent, at cycle 745; last cycle ran T1)
+
+## Friction
+The Reform Risk tab itself is fine — I walked it cold and the lookup, the verdict cards and all seven inbound routes work. The friction is on **Country Profile**, in the Stability row that sits directly above the IC MEMO block — the most compact reform readin
