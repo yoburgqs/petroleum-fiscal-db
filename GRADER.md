@@ -52245,3 +52245,18 @@ The clip was the entire difference. Every prior pass measured `getBoundingClient
 - Test after: 317 PASS / 0 FAIL / 1 WARN (run this cycle, local, authoritative suite)
 - JS errors: 0
 - Summary: T4 — reform citation links were 22px tap targets on a phone because `overflow: hidden` clipped the v612 `::after` hit area. Fixed by growing the badge box vertically under `pointer: coarse`. 29 links, all now 30px+.
+
+---
+## Cycle 764 Log — 2026-09-14 14:30
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 764 complete and pushed.
+
+## Cycle 764 — T4
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (763 was T5; T4 last ran at 757.)
+
+**Friction.** I walked T4 cold at 390×844 with touch. Most of the path is genuinely good — seven surfaces drill into `openReformRiskFor()`, `#/reform/<country>` deep-links correctly, and the 164 jurisdictions with no sourced log get a careful "this is not a score of 100" card rather than a blank.
+
+The break is at the last step. On the Refo
