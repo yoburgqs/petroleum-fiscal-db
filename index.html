@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v840</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v841</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v840</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v841</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v840</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v841</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2863,17 +2863,31 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </span>
     <span id="fc-status" role="status" aria-live="polite" aria-atomic="true" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Auto-loading&hellip;</span>
   </div>
-  <!-- v454: Profile assumption strip — shows the active profile's key DCF inputs inline before results, so analysts can see the model basis without looking at dropdown text -->
-  <div id="fc-profile-strip" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:6px 12px;background:rgba(176,104,0,.04);border:1px solid rgba(176,104,0,.14);border-radius:6px;margin-bottom:10px;font-size:11px;color:var(--muted);">
-    <span style="color:var(--accent);font-weight:700;letter-spacing:.02em;" id="fc-strip-name">Deepwater</span>
-    <span><strong style="color:var(--text);">Capex:</strong> <span id="fc-strip-capex">$1.2B</span></span>
-    <span><strong style="color:var(--text);">Peak rate:</strong> <span id="fc-strip-peak">50k bbl/d</span></span>
-    <span><strong style="color:var(--text);">Opex:</strong> <span id="fc-strip-opex">$15/bbl</span></span>
-    <span><strong style="color:var(--text);">Life:</strong> <span id="fc-strip-life">25yr</span></span>
-    <span><strong style="color:var(--text);">Discount:</strong> 10% WACC</span>
-    <span style="color:var(--muted);font-size:10px;border-left:1px solid var(--border);padding-left:10px;" title="All NPV and IRR figures assume 100% working interest. Scale by your actual WI% for equity-stake NPV (e.g. 30% WI → multiply NPV by 0.30).">100% WI basis</span>
-    <span class="orca-cite-title" style="margin-left:auto;color:var(--muted);font-style:italic;" title="IC memo citation: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA v575 (Aug 2026).'">IOC standard benchmarking basis <span style="font-size:10px;opacity:.65;font-style:normal;">(ⓘ cite basis)</span></span>
-    <span id="fc-rerun-hint" style="display:none;font-size:10px;color:var(--accent);font-weight:600;font-style:normal;padding:2px 8px;background:rgba(176,104,0,.1);border-radius:3px;cursor:pointer;" onclick="if(typeof runFiscalCompare==='function')runFiscalCompare();" title="Profile or price changed — click here or press Ctrl+Enter to re-run Compare">&#9654; Re-run Compare</span>
+  <!-- v454: Profile assumption strip — the active profile's key DCF inputs inline before results.
+       v841 (T5): split into TWO labelled zones. It used to be one undivided line reading
+       "Deepwater · Capex $1.2B · Opex $15/bbl", ending in "IOC standard benchmarking basis
+       (ⓘ cite basis)" — above a table that carries a MODEL NPV column and a db · CITABLE NPV
+       column whose figures were computed on two different projects. Only the model half was
+       ever described here. The citable half is now on screen beside it, derived from
+       ENGINE_BASIS, and "cite basis" is a button that copies both with their scope attached. -->
+  <div id="fc-profile-strip" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:6px 12px;background:rgba(176,104,0,.04);border:1px solid rgba(176,104,0,.14);border-radius:6px;margin-bottom:10px;font-size:11px;color:var(--muted);">
+    <span id="fc-basis-model" style="display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;" title="Governs the two columns marked &quot;model&quot; ONLY — Take% model and NPV ($M) model. These are the figures this screen computes live, and the only two in the table that move with the Profile selector above. They are not the citable figures and are not what ⌘ Copy for IC Memo or Export XLSX carry.">
+      <span style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 5px;">MODEL COLS</span>
+      <span style="color:var(--accent);font-weight:700;letter-spacing:.02em;" id="fc-strip-name">Deepwater</span>
+      <span><strong style="color:var(--text);">Capex:</strong> <span id="fc-strip-capex">$1.2B</span></span>
+      <span><strong style="color:var(--text);">Peak rate:</strong> <span id="fc-strip-peak">50k bbl/d</span></span>
+      <span><strong style="color:var(--text);">Opex:</strong> <span id="fc-strip-opex">$15/bbl</span></span>
+      <span><strong style="color:var(--text);">Life:</strong> <span id="fc-strip-life">25yr</span></span>
+      <span><strong style="color:var(--text);">Discount:</strong> 10% WACC</span>
+    </span>
+    <span id="fc-basis-citable" style="display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;border-left:1px solid var(--border);padding-left:10px;" title="Governs the two columns marked &quot;db · citable&quot; — Take% db · citable and NPV ($M) db · citable — and every figure that leaves this tool: Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo. A DIFFERENT project from the model zone on the left, also called Deepwater. It does not move with the Profile selector. Rebuild a cited NPV on these assumptions, not on the ones to the left.">
+      <span style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--green);border:1px solid var(--green);border-radius:3px;padding:1px 5px;">DB · CITABLE COLS</span>
+      <span id="fc-strip-engine" style="color:var(--text);">ORCA engine basis</span>
+      <span style="font-size:10px;opacity:.8;">fixed &mdash; does not follow the Profile selector</span>
+    </span>
+    <span style="color:var(--muted);font-size:10px;border-left:1px solid var(--border);padding-left:10px;" title="All NPV and IRR figures assume 100% working interest. Scale by your actual WI% for equity-stake NPV (e.g. 30% WI &rarr; multiply NPV by 0.30).">100% WI basis</span>
+    <button type="button" id="fc-cite-basis-btn" class="orca-cite-title" style="margin-left:auto;background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:700;padding:3px 10px;min-height:24px;cursor:pointer;font-family:inherit;white-space:nowrap;" aria-label="Copy the basis footnote for an IC memo — both the model and the citable project assumptions, each naming the columns it governs">&#9112; Copy cite basis</button>
+    <span id="fc-rerun-hint" style="display:none;font-size:10px;color:var(--accent);font-weight:600;font-style:normal;padding:2px 8px;background:rgba(176,104,0,.1);border-radius:3px;cursor:pointer;min-height:24px;line-height:20px;" onclick="if(typeof runFiscalCompare==='function')runFiscalCompare();" title="Profile or price changed — click here or press Ctrl+Enter to re-run Compare">&#9654; Re-run Compare</span>
   </div>
 
 <script>
@@ -2977,8 +2991,12 @@ window.copyPlatformCitation = function(btn) {
       if (peakEl) peakEl.textContent = (p.peakBblDay/1000).toFixed(0) + 'k bbl/d';
       if (opexEl) opexEl.textContent = '$' + p.opexBbl + '/bbl';
       if (lifeEl) lifeEl.textContent = (key === 'marginal') ? '15yr' : (key === 'lng') ? '30yr' : '25yr';
-      // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
-      var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
+      // v841 (T5): the citable zone, derived from ENGINE_BASIS so there is no second copy of
+      // these figures to fall out of step with the exports (same treatment v834 gave the pastes).
+      var engEl = document.getElementById('fc-strip-engine');
+      if (engEl && typeof ENGINE_BASIS !== 'undefined') engEl.textContent = ENGINE_BASIS.short;
+      // v841: was a hover-only <span> found by style selector; it is now a real copy button.
+      var noteEl = document.getElementById('fc-cite-basis-btn');
       if (noteEl) {
         var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v690');
         var profileCite = {
@@ -2990,9 +3008,28 @@ window.copyPlatformCitation = function(btn) {
           shallow:   { label: 'Shallow offshore profile', cite: 'Computed using ORCA Shallow Offshore profile: $400M capex / 30k bbl/d / $12/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           north_sea: { label: 'North Sea / high-cost offshore profile', cite: 'Computed using ORCA North Sea profile: $600M capex / 40k bbl/d / $22/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' }
         };
-        var pc = profileCite[key] || { label: 'Custom profile', cite: 'Computed using ORCA ' + (p.name || key) + ' profile. Source: ORCA ' + _cv + ' (Aug 2026).' };
-        noteEl.title = "IC memo citation: " + pc.cite;
-        noteEl.innerHTML = pc.label + ' <span style="font-size:10px;opacity:.65;font-style:normal;">(ⓘ cite basis)</span>';
+        var pc = profileCite[key] || { label: 'Custom profile', cite: 'Computed using ORCA ' + (p.name || key) + ' profile.' };
+        // v841 (T5): every one of those seven strings described the MODEL columns and was
+        // offered, unqualified, as "the" cite basis for a table that also carries the db ·
+        // citable columns. They are the wrong project for those: COUNTRY_DATA take / NPV /
+        // breakeven were computed by petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater
+        // ($1.0B all-in, $18/bbl escalating 2%/yr, 241.9 MMbbl), not on the $1.2B / $15-flat
+        // project named here. Each string now states which columns it governs, and the
+        // citable footnote is built beside it from ENGINE_BASIS.
+        var _modelCite = pc.cite.replace(/\.$/, '') + '. Governs the Take% (model) and NPV (model) columns only \u2014 the two that follow the Profile selector.';
+        var _citeCite = (typeof _icEngineBasis === 'function')
+          ? ('Contractor NPV, government take and breakeven cited from ORCA are computed on the '
+             + _icEngineBasis({ warn: false }) + ' Governs the Take% (db \u00b7 citable) and NPV (db \u00b7 citable) columns, Country Profile, the JSON API and every export.')
+          : '';
+        window._fcCiteBasisText = 'BASIS \u2014 ORCA ' + _cv + ' (yoburgqs.github.io/petroleum-fiscal-db/), retrieved '
+          + new Date().toISOString().slice(0, 10) + '.\n'
+          + '1. CITED FIGURES. ' + _citeCite + '\n'
+          + '2. ON-SCREEN SENSITIVITY. ' + _modelCite;
+        noteEl.title = 'Copy a two-part basis footnote for the IC memo. Part 1 is the project behind the db \u00b7 citable columns and every exported figure \u2014 '
+          + ((typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS.short : 'the ORCA engine basis')
+          + '. Part 2 is ' + pc.label.toLowerCase() + ': ' + pc.cite
+          + ' The two are different projects with the same name, and only Part 1 rebuilds a number you cite.';
+        noteEl.setAttribute('data-cite-label', pc.label);
       }
     }
     document.addEventListener('DOMContentLoaded', function() {
@@ -3006,6 +3043,20 @@ window.copyPlatformCitation = function(btn) {
         }
       }
       if (profSel) { profSel.addEventListener('change', _updateFCStrip); profSel.addEventListener('change', _showRerunHint); }
+      // v841 (T5): "cite basis" was a tooltip. An analyst assembling a memo had to read a
+      // hover and retype it, which is why the figures in it drifted unnoticed for so long.
+      var citeBtn = document.getElementById('fc-cite-basis-btn');
+      if (citeBtn) citeBtn.addEventListener('click', function() {
+        _updateFCStrip();
+        var txt = window._fcCiteBasisText;
+        if (!txt) { if (typeof _icRefuse === 'function') _icRefuse('Basis unavailable \u2014 reload the page.'); return; }
+        var restore = citeBtn.innerHTML;
+        function flash(m) { citeBtn.innerHTML = m; setTimeout(function() { citeBtn.innerHTML = restore; }, 2200); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(function() { flash('\u2713 Basis copied'); })
+            .catch(function() { flash('Copy failed'); });
+        } else { flash('Copy failed'); }
+      });
       if (priceSel) priceSel.addEventListener('change', _showRerunHint);
       // Try to update once FC_PROFILES loads (data-driven)
       var _stripInterval = setInterval(function() {
@@ -51422,6 +51473,14 @@ function renderFCResults(results, price) {
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th title="Fiscal mechanism \u2014 the structure governing how revenue is split between government and contractor, AND the mechanic this row\'s DCF was actually run on. It is the mechanic the PLURALITY of that country\'s contracts in ORCA use (the count under each tag), not the first one listed alphabetically: before v548 any country holding a single Concession contract read Concession, which named 39 of these 185 rows wrongly \u2014 Indonesia, Guyana, Iraq, Iran, India, China. Hover any tag for a full description.">Mechanic</th>';
   var priceTag = price ? ' <span style="font-size:10px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
+  // v841 (T5): the citable NPV column header used to hand-type "$1.2B capex, 50k bbl/d, $15/bbl
+  // opex" as the basis of a column built from COUNTRY_DATA.npv_*, which petroleum_dcf.py produced
+  // on dcf_profiles.py PROFILES.deepwater ($1.0B all-in, $18/bbl escalating 2%/yr, 241.9 MMbbl).
+  // v834 corrected every clipboard artifact from ENGINE_BASIS and left the screen behind, so the
+  // header and the paste of the SAME number named two different projects. Derived, not typed.
+  var _fcEngShort = (typeof ENGINE_BASIS !== 'undefined')
+    ? (ENGINE_BASIS.name + ' engine profile \u2014 ' + ENGINE_BASIS.short + ', 100% WI')
+    : 'the ORCA standardized engine profile';
   // v813 (T6): built here, emitted straight after the citable-take column below.
   var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. Since v580 this is NOT the column the # rank is built from \u2014 the rank follows the citable database take in the next column. Use this one only for profile sensitivity: it is the only take in the tool that moves with the profile selector. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
@@ -51440,7 +51499,7 @@ function renderFCResults(results, price) {
   // "undefined". Same value, computed before the header instead of after it.
   var _fcProfName = (function(){ var e = document.getElementById('fc-profile');
     var o = e && FC_PROFILES[e.value]; return (o && o.name) ? o.name : 'Deepwater'; })();
-  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>' + _fcQualTh + '<th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
+  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>' + _fcQualTh + '<th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database. This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector. Basis: ' + _fcEngShort + '. That is NOT the project named in the amber strip above, which describes the model columns only; the two are different projects both called Deepwater and they differ by roughly 3x on the same country at the same price. Rebuild a cited NPV on the basis in this sentence.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 65 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   // v551 (T6): the stated thresholds were never the ones in force. This header said the letter
   // meant "% of its fiscal facts primary-sourced" while getTierBadge() was fed a_pct + b_pct.
