@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v848</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v852</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -353,7 +353,7 @@ table { width: 100%; border-collapse: collapse; }
      390 x 844, hasTouch, on the shipped build:
 
        #expl-evidence-first  input 13x13   label row 362x17
-       #expl-irr-check       input 13x13   label row 362x17
+       #expl-dn-check        input 13x13   label row 362x17
        #expl-be-check        input 13x13   label row 362x17
        #sc-evidence-first    input 13x13   label row 212x17
 
@@ -368,7 +368,7 @@ table { width: 100%; border-collapse: collapse; }
      declaration clears both measurements. Same rule, same control type as the FC block above —
      this is the third tab it has been applied to, which is the argument for it being a rule
      about checkboxes rather than a rule about Fiscal Compare. */
-  #expl-evidence-first, #expl-irr-check, #expl-be-check, #sc-evidence-first { width: 24px; height: 24px; }
+  #expl-evidence-first, #expl-dn-check, #expl-be-check, #sc-evidence-first { width: 24px; height: 24px; }
 
   /* v726: the footer's two outbound links measured 30x15 (API) and 24x15 (CI) — the last two
      sub-24px targets on the platform, and the only finding present on all ten tabs, because the
@@ -1185,6 +1185,23 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
    what pushed this table 27-117px past its wrapper at 1024. This table's own cells wrap. */
 .facts-table.ec-chain th, .facts-table.ec-chain td { white-space: normal; }
 .facts-table.ec-chain .cite-dead-chip, .facts-table.ec-chain .source-badge > span:not(.ec-src-name) { white-space: nowrap; }
+/* v850 (T6): the two halves of a citation string. The instrument's title is the lead and stays at
+   full weight; ORCA's harvest annotation is kept -- it is real provenance -- but demoted, so the
+   analyst can tell at a glance which half a catalogue will actually match. */
+.ec-src-note { color: var(--muted); opacity: .72; font-weight: 400; cursor: help; }
+/* The affordance that replaced a click on a dead address. It is inside the anchor, so the anchor
+   is the control and this is its label; the coarse-pointer floor is set anyway because the chip is
+   what a thumb aims at. */
+.ec-find-chip {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  border: 1px solid rgba(176,104,0,.5); border-radius: 3px; padding: 1px 5px;
+  margin-left: 2px; font-size: 10px; font-weight: 700; letter-spacing: .03em;
+  color: var(--accent); background: rgba(176,104,0,.09);
+}
+.facts-table.ec-chain .source-badge > .ec-src-note { white-space: normal; }
+@media (pointer: coarse) {
+  .ec-find-chip { min-height: 24px; padding: 3px 8px; font-size: 11px; }
+}
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 10px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
 .tier-badge.tier-a { background: var(--green); color: #fff; }
@@ -2481,7 +2498,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v848</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v852</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v848</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v852</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2635,7 +2652,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Evidence Tier</strong> = where the number was read from, not how good it is. <strong style="color:var(--text);">A</strong> = the primary legal instrument itself (petroleum act, gazette, finance act, PSC text). <strong style="color:var(--text);">B</strong> = the EY / KPMG / IHS country-level tax and fiscal guides &mdash; assigned to the whole country, never read off an individual contract, and <em>not</em> an operator filing. <strong style="color:var(--text);">C</strong> = industry reference. <strong style="color:var(--text);">D</strong> = no source found, mechanic or regional default.<span id="home-evidence-mix"></span></span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Price Swing</strong> = take difference between $50 and $125/bbl. &lt;10pp = royalty-dominant, stable; &gt;20pp = progressive regime, requires multi-price analysis in IC memo.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Profile</strong> = production assumption (capex, peak rate, opex). Start with <strong>Deepwater $75/bbl</strong> for standard IOC benchmarking.</span></div>
-    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">IRR</strong> = contractor internal rate of return at the selected price (10% WACC basis). IRR &ge;15% clears most IOC hurdle rates; &lt;10% = sub-hurdle. Shown for 124/185 countries.</span></div>
+    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">NPV @ $50</strong> = contractor net present value at the $50/bbl downside, same standardized Deepwater profile as the base-case NPV, 10% WACC. Positive = the entry still clears its cost of capital through a price break; 180 of 185 do. This replaced the IRR column at v851 — ORCA&rsquo;s only country-level IRR is an arithmetic mean of per-contract IRRs (median 333%), not a project return. For an IRR, open a country and run <strong style="color:var(--text);">Model in Scenario Builder</strong> at your own capex and profile.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">NPV</strong> = contractor net present value at 10% WACC, 100% WI, standardized production profile. Positive NPV at $75/bbl is the primary investment screen.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Breakeven</strong> = minimum oil price for contractor NPV &ge;0 on the standardized profile. &lt;$40/bbl = resilient; &gt;$70/bbl = high-cost regime. Available for 65/185 countries.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Reform verdict</strong> (Fiscal Compare) names what to carry, and every token states its own unit: <strong>WACC +3&ndash;5pp</strong> / <strong>WACC +5&ndash;8pp</strong> (percentage points to add to the discount rate &mdash; the only verdicts that change a model input, and the only ones drawn as a filled pill), <strong>TAKE +Npp</strong> (percentage points of <em>government take</em> already raised inside the 2010 window &mdash; a fact about the fiscal terms, never a WACC add), <strong>TAKE NET &plusmn;Npp</strong> (the same, net of take cuts inside the window &mdash; Norway&rsquo;s 2022 +12pp undid its 2020 &minus;12pp relief, so it reads NET 0pp),<strong>&uarr; PRE-2010</strong>, <strong>SIZE UNKNOWN</strong>, <strong>NO LAW CHANGE</strong>, <strong>NO PREMIUM</strong>, or <strong>n/c</strong> where no reform log exists at all (164 of 185). The small grey line beneath it is the raw count of fiscal law changes since 2010 &mdash; a <em>count</em>, which never reads how large a change was, so do not convert it to a premium yourself. The Reform Risk lookup and this cell return the same verdict from the same classifier.</span></div>
@@ -3231,7 +3248,7 @@ window.copyPlatformCitation = function(btn) {
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share">Revenue Share</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
     <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" style="color:var(--purple);border-color:rgba(124,58,237,.3);">R-factor PSC</button>
-    <button class="chip" id="chip-has-irr" role="button" aria-pressed="false" data-chip-action="has-irr" style="color:var(--purple);border-color:rgba(124,58,237,.3);" title="Show only the 124 countries with verified IRR data (IRR &lt;500% — values ≥500% excluded as unbounded returns) — useful when screening by hurdle rate in the Screener tab">&#9678; Has IRR Data <span style="font-size:10px;opacity:.7;">(124)</span></button>
+    <button class="chip" id="chip-downside-positive" role="button" aria-pressed="false" data-chip-action="has-irr" style="color:var(--purple);border-color:rgba(124,58,237,.3);" title="Show only the countries whose contractor NPV is still positive at the $50/bbl downside, on the standardized Deepwater profile — the NPV @ $50 column in the table. 180 of 185 survive a price break; the 5 that do not are Malaysia and Yemen (genuinely negative) plus Bahrain, Kuwait and Saudi Arabia (state monopolies with no contractor position to value). This chip replaced &ldquo;Has IRR Data&rdquo; at v851: the IRR it filtered on was an arithmetic mean of per-contract IRRs, and the &lt;500% window it screened with kept the plausible-looking values and hid the broken ones. Mirrors the checkbox on the toolbar row below.">&#9678; Positive at $50 <span style="font-size:10px;opacity:.7;">(180)</span></button>
     <button class="chip" id="chip-has-be" role="button" aria-pressed="false" data-chip-action="has-be" style="color:var(--green);border-color:rgba(21,128,61,.3);" title="Show only the 68 countries with verified breakeven price data — filters to countries where the breakeven oil price is computed from complete royalty and cost data">&#9651; Has Breakeven <span style="font-size:10px;opacity:.7;">(68)</span></button>
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" style="margin-left:auto;">Map View</button>
   </div>
@@ -3283,9 +3300,9 @@ window.copyPlatformCitation = function(btn) {
     </div>
     <div class="ctrl-group">
       <label>Sort</label>
-      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); IRR = rank by project returns (higher = more profitable); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); Evidence = rank by evidence grade, weakest first (grade, then primary-law share, then fact depth); Stability = rank by Fiscal Predictability, the 28 countries with a MEASURED take spread first and least predictable first, then the one-term UNGRADED regimes, then the ones ORCA holds no distribution for — a one-term 100 is not steadier than a measured 74, it is the one ORCA holds less contract evidence against; A-Z = alphabetical">
+      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); NPV @ $50 (downside) = rank by contractor net present value at the $50/bbl price break, largest first \u2014 modelled for all 185 countries (this slot was IRR until v851; that figure was an arithmetic mean of per-contract IRRs, not a project return); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); Evidence = rank by evidence grade, weakest first (grade, then primary-law share, then fact depth); Stability = rank by Fiscal Predictability, the 28 countries with a MEASURED take spread first and least predictable first, then the one-term UNGRADED regimes, then the ones ORCA holds no distribution for — a one-term 100 is not steadier than a measured 74, it is the one ORCA holds less contract evidence against; A-Z = alphabetical">
         <option value="take">Govt Take</option>
-        <option value="irr">IRR</option>
+        <option value="npv50">NPV @ $50 (downside)</option>
         <option value="npv">NPV</option>
         <option value="be">Breakeven</option>
         <option value="swing">Swing (pp)</option>
@@ -3314,11 +3331,11 @@ window.copyPlatformCitation = function(btn) {
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off" inputmode="search" spellcheck="false">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.10);"></div>
     </div>
-    <label id="expl-evidence-first-wrap" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): the 22 countries with verified field production rank above the 163 whose economics are regional proxy estimates, sorted by the chosen metric within each group. Nothing is filtered out \u2014 a labelled divider marks the boundary. OFF: rank all 185 on the metric alone, which puts the lowest-take proxy regimes (Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%) at the top and the first production-backed country at rank 62. Does not apply to the A\u2013Z sort."><input type="checkbox" id="expl-evidence-first" checked style="accent-color:var(--accent);" onchange="_toggleExplorerEvidenceFirst(this);"> Verified production first</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 124 countries with verified IRR data"><input type="checkbox" id="expl-irr-check" style="accent-color:var(--accent);" onchange="_explorerHasIRR=this.checked;renderExplorer();"> IRR only</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven data"><input type="checkbox" id="expl-be-check" style="accent-color:var(--accent);" onchange="_explorerHasBreakeven=this.checked;renderExplorer();"> BE only</label><button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only the 22 countries where at least some contracts are matched to verified field production — the same set the badge on each row calls FACTS or EVIDENCE, and the same set the count line ranks first. The other 163 carry regional proxy economics. Coverage inside this set runs from 37.6% (United Kingdom) to 0.2% (USA); the row badge separates them." aria-label="Toggle production data filter — show only the 22 countries with verified field production" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="toggleExplorerMap()" title="Toggle world map view">Map View</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
+    <label id="expl-evidence-first-wrap" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): the 22 countries with verified field production rank above the 163 whose economics are regional proxy estimates, sorted by the chosen metric within each group. Nothing is filtered out \u2014 a labelled divider marks the boundary. OFF: rank all 185 on the metric alone, which puts the lowest-take proxy regimes (Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%) at the top and the first production-backed country at rank 62. Does not apply to the A\u2013Z sort."><input type="checkbox" id="expl-evidence-first" checked style="accent-color:var(--accent);" onchange="_toggleExplorerEvidenceFirst(this);"> Verified production first</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 180 countries whose contractor NPV is still positive at the $50/bbl downside \u2014 the NPV @ $50 column. Mirrors the &#9678; Positive at $50 chip above; either control moves both."><input type="checkbox" id="expl-dn-check" style="accent-color:var(--accent);" onchange="setExplorerDownsidePositive(document.getElementById('chip-downside-positive'), this.checked);"> NPV+ @ $50</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven data"><input type="checkbox" id="expl-be-check" style="accent-color:var(--accent);" onchange="_explorerHasBreakeven=this.checked;renderExplorer();"> BE only</label><button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only the 22 countries where at least some contracts are matched to verified field production — the same set the badge on each row calls FACTS or EVIDENCE, and the same set the count line ranks first. The other 163 carry regional proxy economics. Coverage inside this set runs from 37.6% (United Kingdom) to 0.2% (USA); the row badge separates them." aria-label="Toggle production data filter — show only the 22 countries with verified field production" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="toggleExplorerMap()" title="Toggle world map view">Map View</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
-    Data coverage: <span style="color:var(--muted);">Govt Take</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">IRR</span> <strong style="color:var(--text);">124/185</strong> <span style="color:var(--muted);cursor:help;" title="IRR shown for 124 of 185 countries — values ≥500% excluded as unbounded returns (e.g. very-low-royalty regimes at high oil price where payback is near-instant); 20 countries lack sufficient cost data for IRR computation">ⓘ</span> &nbsp;·&nbsp; <span style="color:var(--muted);">Breakeven</span> <strong style="color:var(--text);">65/185</strong> <span style="color:var(--muted);cursor:help;" title="Breakeven requires complete royalty and cost data — coverage expands as sourcing progresses">ⓘ</span>
+    Data coverage: <span style="color:var(--muted);">Govt Take</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV @$50</span> <strong style="color:var(--text);">185/185</strong> <span style="color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside is modelled for every country, on the same standardized Deepwater profile as the $75 NPV beside it. This line read &ldquo;IRR 124/185&rdquo; until v851; the 61 missing rows were not the problem with that figure \u2014 the 124 present ones were, at a median of 333%.">ⓘ</span> &nbsp;·&nbsp; <span style="color:var(--muted);">Breakeven</span> <strong style="color:var(--text);">65/185</strong> <span style="color:var(--muted);cursor:help;" title="Breakeven requires complete royalty and cost data — coverage expands as sourcing progresses">ⓘ</span>
   </div>
   <div class="tbl-wrap">
     <table id="tbl-explorer">
@@ -3337,7 +3354,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num expl-sm-off" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 124 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(124/185 countries)</span></th>
+          <th class="num expl-sm-off" data-sort-key="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside, same standardized Deepwater profile as the NPV column beside it (50k bbl/d peak, $1.0B all-in capex, 10% WACC, 100% WI). Modelled for all 185 countries and monotonic in price, so it ranks. Green = the entry still clears its cost of capital through a price break; red = it does not. THIS SLOT USED TO BE IRR @ $75. That figure is AVG(irr_pct) across every contract in the country — an arithmetic mean of a heavy-tailed distribution, median 333% across the 165 countries carrying one, and not monotonic in price because the 999-sentinel drops a different subset at each price point. It is not a project return. v516 withdrew it from the Country Profile, v517 from the Screener hurdle slider, v525 from Fiscal Compare, v787 from both IOC tables and v847 from the Breakeven CSV; this table was the last surface still printing it. For a real return, open a country and use Model in Scenario Builder at your own capex and profile. Sort: largest downside NPV first">NPV @ $50 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(downside · 185/185)</span></th>
           <th class="num expl-sm-off" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 65 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(65/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num" data-sort-key="stability" tabindex="0" role="columnheader" aria-sort="none" style="cursor:pointer;" title="Sort: measured spread first, least predictable first — see the order note under the table. —— Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = the bundled quartiles are identical, so the IQR component contributed nothing and the score reflects price swing and mechanic count only &mdash; but that basis is only as good as the quartiles, and for 41 of the 132 one-term rows ORCA's OWN contract file refutes it. Those rows resolve on scroll and re-print as a ceiling ('&le;52 &middot; LOW &#9650;', stored score struck through) with the observed spread in place of the basis chip ('&ge;29.6pp obs') &mdash; the same ceiling Country Profile, Side-by-Side and Reform Risk give for that country. It is a ceiling, not a recomputed score: the observed spread is a floor on the true spread. A row still reading 'one term' after you have scrolled past it is one the contract file agrees with; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
@@ -4944,7 +4961,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;">Q: Why does IRR show "—" for many countries? How do I use the platform without full IRR coverage?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          IRR requires verified per-contract opex and capex data in addition to fiscal terms — 124 of 185 countries have IRR shown in the UI (165 countries have data in the database; 41 are excluded as unbounded ≥500%); 68 have breakeven data. The 61 countries without displayable IRR still have full government take and NPV data at 4 price points — which covers the primary use case (regime comparison and fiscal screening). For the 124 IRR-covered countries, the Screener tab's "Min IRR threshold" filter is the most efficient workflow: set a hurdle rate and instantly see which regimes clear it. Countries with IRR ≥500% are excluded as unbounded (typically very-low-royalty regimes at high oil price where NPV payback is near-instant — these are universally attractive and the ≥500% threshold is disclosed in the Explorer column header). The footer shows current coverage counts; coverage expands as the sourcing pipeline processes additional cost data. Use the <strong style="color:var(--purple);">◎ Has IRR Data</strong> chip in the Explorer mechanic row to instantly filter to the 124 IRR-covered countries.
+          ORCA no longer displays a country-level IRR anywhere, and the coverage count is not the reason. The figure the database holds is <code>irr_75</code> = AVG(irr_pct) across every contract in the country — an arithmetic mean of a heavy-tailed distribution. 165 of 185 countries carry one, the median is 333%, and only 9 sit below 100%. It is also not monotonic in price: the 999-sentinel drops a different subset of contracts at each price point, so the four price columns were means over four different samples. That is not a rate of return on anything, and it was withdrawn surface by surface — Country Profile (v516), Screener "Min IRR threshold" slider (v517), Fiscal Compare (v525), both IOC Portfolio tables (v787), the Breakeven CSV (v847) and finally the Explorer table and its XLSX (v851). What replaced it is what the hurdle test was standing in for: <strong>contractor NPV at the $50/bbl downside</strong>, modelled for all 185 countries and monotonic in price. Use the <strong style="color:var(--purple);">◎ Positive at $50</strong> chip in the Explorer mechanic row to filter to the 180 regimes that stay positive through a price break. For a real IRR, open a country and use <strong>Model in Scenario Builder</strong> with your own capex, opex, production profile and discount rate — that output is a project return and is the number to put in front of an IC. Breakeven remains available for 65 of 185 countries; coverage expands as the sourcing pipeline processes additional cost data.
         </div>
       </div>
 
@@ -5068,7 +5085,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         Govt Take is a revenue-share metric; it tells you what fraction of gross revenue the government captures, but not the economics of your specific project. Two countries at 55% take can have very different IRRs if their cost structures, royalty bases, or profit-sharing tiers differ. Use this three-step workflow:<br><br>
         <strong style="color:var(--text);">Step 1 — Screen by Take (Explorer/Screener).</strong> Identify the tier of each country: IF (&lt;45%), Moderate (45–60%), High-Take (60–72%), or State-Dominated (&gt;72%). Two countries at 55% are both Moderate — take alone does not differentiate.<br><br>
         <strong style="color:var(--text);">Step 2 — Compare Price Swing.</strong> The Swing column (Govt Take @$125 − Take @$50, in pp) tells you how price-responsive the fiscal regime is. A low-swing country (green, &lt;10pp) offers predictable terms at any oil price. A high-swing country (red, &gt;20pp) captures most of your upside in a high-price scenario — important for a project that depends on high-price economics to clear your hurdle rate.<br><br>
-        <strong style="color:var(--text);">Step 3 — Use IRR and Breakeven for final differentiation.</strong> If both countries have IRR data (filter with the ◎ Has IRR Data chip), compare IRR @$75/bbl directly — this accounts for cost structure. If one country lacks IRR data, use Breakeven as a proxy: a lower breakeven means the project is profitable over a wider price range, which approximates a higher IRR. For your final 2–3 candidates, run a field-specific DCF in Scenario Builder with your project's actual capex/opex to get a calibrated IRR for each.<br><br>
+        <strong style="color:var(--text);">Step 3 — Use the $50 downside and Breakeven for final differentiation.</strong> Compare <strong>NPV @ $50</strong> — contractor net present value at the price break, on the same standardized profile for every country, so the columns are comparable. A candidate that stays comfortably positive at $50 survives a cycle the base case at $75 says nothing about; 5 of 185 do not. Filter with the <strong>◎ Positive at $50</strong> chip. Breakeven is the same question asked as a price rather than a value, and is modelled for 65 of 185. Neither is a return: for a calibrated IRR on your final 2–3 candidates, run a field-specific DCF in Scenario Builder with your project's actual capex and opex. The platform does not publish a country-level IRR, because the only one it holds is an arithmetic mean of per-contract IRRs.<br><br>
         <em>Rule of thumb: Take for headline screening → Swing for price risk → Breakeven for cost efficiency → Scenario Builder IRR for investment decision.</em>
       </div>
     </div>
@@ -5137,7 +5154,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
       <div class="meth-faq-a" id="faq-a19-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
         The platform reports <strong style="color:var(--text);">Contractor NPV</strong> (the net present value accruing to the IOC after all fiscal deductions) and <strong style="color:var(--text);">IRR</strong> (the return rate at which that NPV equals zero). For equity stake decisions, use them as a two-part filter:<br><br>
-        <strong style="color:var(--text);">Step 1 — IRR as the entry gate.</strong> Compare IRR to your firm's hurdle rate (typically 12–15% for E&amp;P, higher for frontier acreage). Countries with IRR below your hurdle should be flagged — either negotiate better terms, use a lower-cost profile, or drop. Use the "Has IRR Data" chip in Explorer to filter to the 124 countries with verified IRR (displayed; 165 countries have IRR in the database, but 41 with ≥500% unbounded returns are excluded from the table).<br><br>
+        <strong style="color:var(--text);">Step 1 — the $50 downside as the entry gate.</strong> ORCA does not publish a country-level IRR to test against your hurdle rate, and the figure it holds is not one: <code>irr_75</code> is an arithmetic mean of per-contract IRRs, median 333% across the 165 countries carrying one. The screening question that hurdle test was standing in for is whether the entry survives a price break, and that ORCA does model for all 185 countries — <strong>NPV @ $50</strong>. Filter with the <strong>◎ Positive at $50</strong> chip in Explorer, then take your shortlist into Scenario Builder at your own capex, opex and discount rate for the IRR your IC will actually compare against the hurdle.<br><br>
         <strong style="color:var(--text);">Step 2 — NPV as the equity-stake calibrator.</strong> Once a country clears the IRR hurdle, Contractor NPV tells you the absolute value creation per standard project profile. A 20% equity stake in a $2,000M NPV project creates $400M of value at your working interest. Compare across the shortlist — a higher-take country with a bigger resource base may outperform a low-take country with a marginal structure.<br><br>
         <strong style="color:var(--text);">Step 3 &mdash; sizing the government&rsquo;s position.</strong> Use the <strong style="color:var(--text);">Govt Take</strong> figure directly, at a stated price. Do <em>not</em> convert it into a government NPV with Contractor NPV &times; take &divide; (100 &minus; take): ORCA models government <em>take</em> and contractor NPV, and no government NPV, so that expression multiplies a production-weighted take by an unweighted-mean NPV and scales an undiscounted revenue share onto a discounted figure. It was removed from Side-by-Side at v555 and from Fiscal Compare at v451. Where the two columns of a comparison differ most on take, they differ most on this quantity too, so it inverted rankings rather than refining them. For a genuine government cash-flow NPV on your own terms and profile, build both sides in <strong style="color:var(--text);">Scenario Builder</strong>, where take and cash flow come from one run.<br><br>
         <strong style="color:var(--text);">Key calibration:</strong> All platform NPV and IRR figures use a standardized production profile (e.g. deepwater: $1.2B capex, 50k bbl/d peak, 8-year plateau). Use the Scenario Builder to re-run with your actual project parameters for equity stake modeling — the standardized figures are directional screeners, not deal inputs.<br><br>
@@ -23891,6 +23908,39 @@ function fmtTake(v) {
   if (isStateMonopoly(v)) return '<span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span>';
   return `<span class="take-val ${takeClass(v)}" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${Number(v).toFixed(1)}%</span>`;
 }
+// ── v851 (T6): the Explorer stops printing the bundled per-country IRR ──────────────────────
+// `irr_75` is AVG(irr_pct) over every contract in the country. v515 diagnosed it, v516 pulled it
+// off the Country Profile, v517 off the Screener hurdle slider, v525 off Fiscal Compare, v787 off
+// both IOC tables and v847 off the Breakeven CSV -- and every clipboard artifact on the platform
+// now carries a sentence explaining its absence. The Explorer table was the last surface still
+// printing it, still offering it as a sort key whose own tooltip called it "project returns", and
+// still exporting it into the XLSX an analyst attaches to an IC memo. Cold at 1440px it read USA
+// 421.4%, Azerbaijan 410.0%, Mexico 333.2% and one row at -100.0%.
+//
+// The slot takes what v516 put in the equivalent slot on the Country Profile peer table:
+// contractor NPV at the $50/bbl downside, on the SAME standardized Deepwater profile as the NPV
+// column beside it. 185 of 185 rows carry one, it is monotonic in price, and it discriminates --
+// 180 countries stay positive through a price break and 5 do not (Malaysia -$33.2M, Yemen
+// -$139.1M, and the three state monopolies at $0.0M, which is an absent contractor position, not
+// a breakeven one, and is printed as such). Removed rather than caveated, on the v451 precedent.
+function fmtDownsideNpv(d) {
+  var v = d ? d.npv_50 : null;
+  if (v === null || v === undefined) {
+    return '<span style="color:var(--muted);font-size:11px" title="Contractor NPV at the $50/bbl downside is not modelled for this country.">\u2014</span>';
+  }
+  // take_75 = 100 with npv_75 = 0 is the state-monopoly sentinel the breakeven guards already
+  // know (v735): there is no contractor position to value, which is not the same as one worth $0.
+  var monopoly = (d.npv_75 === 0 && d.take_75 !== null && d.take_75 !== undefined && d.take_75 >= 99.9);
+  if (monopoly) {
+    return '<span style="color:var(--muted);font-size:11px" title="State monopoly at ~100% government take -- ORCA holds no contractor position to value, at $50/bbl or at any other price. This is an absent number, not a zero one.">\u2014</span>';
+  }
+  var pos = v > 0;
+  var col = pos ? 'var(--green)' : 'var(--negative)';
+  var t = pos
+    ? 'Contractor NPV ' + fmtNpvShared(v) + ' at the $50/bbl downside, standardized Deepwater profile at 10% WACC. Still clears the cost of capital through a price break.'
+    : 'Contractor NPV ' + fmtNpvShared(v) + ' at the $50/bbl downside, standardized Deepwater profile at 10% WACC. Goes NEGATIVE at $50/bbl -- this entry is price-dependent and the base case at $75 does not tell you so.';
+  return '<span style="color:' + col + ';font-weight:' + (pos ? '400' : '700') + ';" title="' + t + '">' + fmtNpvShared(v) + '</span>';
+}
 function fmtIrr(v) {
   if (v === null || v === undefined) return '<span style="color:var(--muted);font-size:11px" title="IRR calculation requires complete revenue/cost data — not available for all fiscal regimes">—</span>';
   if (v >= 500) return '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology. ~60 countries affected at extreme leverage. Threshold ensures meaningful fiscal comparison.">n/a*</span>';
@@ -24161,6 +24211,57 @@ const _CITE_DEAD = (function() {
 // answered, or one that merely bot-blocked the checker, returns false and is left completely alone.
 function _citeLinkDead(url) { return !!(url && _CITE_DEAD.has(String(url))); }
 
+// ── v850 (T6) — SPLIT THE INSTRUMENT'S NAME FROM ORCA'S HARVEST ANNOTATION ─────
+// Both places that print a citation tell the analyst, where the address is dead, to "locate the
+// instrument by name". Measured 2026-09-14 over all 239 api/v1/country/*.json: 272 of the 502
+// sourced rows cite an address in _CITE_DEAD, across 119 countries — and 228 of those 272 (84%)
+// print a "name" that is not the document's name. It is the title with ORCA's own harvest
+// annotation welded onto the end:
+//
+//     Guyana Petroleum Agreement Stabroek Block 2016 ExxonMobil Hess CNOOC PSA CIT 25 pct Royalty 2 pct
+//     Indonesia Government Regulation No. 53 of 2017 Gross Split PSC Cost Recovery 70 pct
+//     Tunisia Code des Hydrocarbures 1999 Royalty 5-15 pct CIT 50 pct Petroleum Companies
+//
+// "CIT 25 pct Royalty 2 pct" is ORCA recording what it read, not part of what the document is
+// called. Handed that whole string, a search engine or a law librarian returns nothing, so the
+// one instruction the page gives at the point where the citation fails could not be carried out.
+//
+// This splits the string rather than trimming it — the annotation is real provenance and stays on
+// screen, demoted and labelled as ORCA's note. Deliberately conservative: it cuts at the FIRST
+// fiscal-term keyword that is followed within three tokens by an "N pct" / "N-N pct" / "N%", and
+// only if the string contains a percentage at all, the title keeps at least three words, and at
+// least 35% of the tokens survive. Anything that fails a guard is returned untouched. Over the 231
+// distinct source strings in the API it splits 153 and leaves 78 alone; no title is left a stub.
+function _srcTitleSplit(s) {
+  var raw = String(s == null ? '' : s).trim();
+  if (!raw || !/\d+(\.\d+)?\s*(pct|%)/i.test(raw)) return { title: raw, note: '' };
+  var toks = raw.split(/\s+/);
+  var KEY = /^(CIT|CR|PO|FTP|VAT|WHT|SPT|PRRT|NOC|Royalty|Royalties|Redevance|Recovery|Profit|Special|Ring|Sliding|State|Govt|Government|Contractor|Share|Uplift|Cost|Tax|Taxe|Impuesto)$/i;
+  var PCT = /^\d+(\.\d+)?([-–]\d+(\.\d+)?)?\s*(pct|%)$|^(pct|%)$/i;
+  var bare = function(t) { return String(t).replace(/[.,;:]+$/, ''); };
+  var start = -1;
+  for (var i = 0; i < toks.length && start < 0; i++) {
+    if (!KEY.test(bare(toks[i]))) continue;
+    for (var j = i + 1; j <= Math.min(i + 3, toks.length - 1); j++) {
+      if (PCT.test(bare(toks[j]))) { start = i; break; }
+    }
+  }
+  if (start < 3) return { title: raw, note: '' };
+  if (start < toks.length * 0.35) return { title: raw, note: '' };
+  // A trailing connective belongs to the annotation, not the title ("... Petroleum Act 2010 No"
+  // + "CIT Royalty 5 pct" -> the "No" is negating the CIT). Only pulled back when the next token
+  // is itself a fiscal keyword, so "Morocco Dahir No 1-91-118" keeps its "No".
+  while (start > 3 && /^(No|and|plus|with|&|of|the|[-–—])$/i.test(bare(toks[start - 1]))) start--;
+  var title = toks.slice(0, start).join(' ').replace(/[\s,;:—-]+$/, '');
+  if (title.split(/\s+/).length < 3) return { title: raw, note: '' };
+  return { title: title, note: toks.slice(start).join(' ') };
+}
+// Where the recorded address returns nothing, the click that used to open a 404 runs the search
+// the page is asking the analyst to run. Quoted so the title is matched as a phrase.
+function _citeFindHref(title) {
+  return 'https://www.google.com/search?q=' + encodeURIComponent('"' + String(title || '').trim() + '"');
+}
+
 const _BULK_SOURCES = ['EY_KPMG_CIT_Guide_2025', 'EY_IHS_BulkHarvest_2025'];
 function _isBulkSource(name) { return _BULK_SOURCES.indexOf(name) !== -1; }
 // v569 (T6): promoted out of buildEvidencePanel() so the per-parameter Evidence Chain table
@@ -24421,7 +24522,11 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
     // this country's law. Labelled here so the tier letter beside it cannot be read as proof the
     // instrument is country-specific.
     const shareList = isBulk ? null : _sharedSource(s.name);
-    const display = _BULK_LABEL[s.name] || s.name;
+    // v850 (T6): same split as the Evidence Chain -- this list gives the identical "locate the
+    // instrument by name" instruction, so it must hand over the identical name.
+    const _spN = _BULK_LABEL[s.name] ? { title: _BULK_LABEL[s.name], note: '' } : _srcTitleSplit(s.name);
+    const display = _spN.title;
+    const displayNote = _spN.note;
     const shareTip = shareList
       ? _cpEsc('This document is the cited source for ' + shareList.length + ' jurisdictions \u2014 '
         + shareList.join(', ') + '. It is a regional instrument applied across all of them, not a text '
@@ -24444,9 +24549,16 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       : (isBulk
       ? 'Country-level bulk harvest \u2014 this link opens the PwC Worldwide Tax Summaries country index, not a citation for any single parameter. Verify the specific rate against the country\u2019s own petroleum act before an IC memo.'
       : (shareList ? shareTip : 'Open the cited source document'));
-    const nameEl = s.url
-      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isDead || isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display}${isDead ? '' : ' \u2197'}</a>`
-      : `<span style="font-size:11px;color:var(--text);">${display}</span>`;
+    const _noteEl = displayNote
+      ? `<span class="ec-src-note" title="${_cpEsc('ORCA\u2019s own harvest annotation, not part of the document\u2019s name: it records the rates read off this instrument at harvest time. Search for the title alone.')}"> \u00b7 ORCA note: ${_cpEsc(displayNote)}</span>`
+      : '';
+    // v850 (T6): a dead row's link went to the address the chip beside it had just declared dead.
+    // It now runs the search the tooltip asks for, on the instrument's title.
+    const nameEl = (isDead && !isBulk)
+      ? `<a href="${_citeFindHref(display)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;" title="${deadTip}">${display}${_noteEl} <span class="ec-find-chip">\u2315 find document \u2197</span></a>`
+      : (s.url
+      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display}${_noteEl} \u2197</a>`
+      : `<span style="font-size:11px;color:var(--text);">${display}${_noteEl}</span>`);
     return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isDead || isBulk || shareList) ? 'opacity:.82;' : ''}">
       <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
       ${isDead ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${deadTip}">LINK DEAD</span>` : ''}
@@ -26138,7 +26250,12 @@ function renderExplorer() {
     if (region && !_regionMatch(d.region, region)) return false;
     if (_explorerRFactorOnly) { if (!d.has_r_factor_tiers) return false; }
     else if (mech && !_mechMatch(d, mech)) return false;
-    if (_explorerHasIRR) { if (!d.irr_75 || d.irr_75 <= 0 || d.irr_75 >= 500) return false; }
+    // v851 (T6): was "IRR only" -- keep only rows whose irr_75 landed in (0, 500), a window
+    // chosen to hide the self-evidently broken values and keep the plausible-looking ones. It is
+    // now the downside screen the new column supports: keep the countries whose contractor NPV is
+    // still positive at $50/bbl. The state monopolies sit at exactly 0.0 and are excluded, because
+    // an absent contractor position is not a surviving one.
+    if (_explorerDownsidePositive) { if (!(d.npv_50 > 0)) return false; }
     if (_explorerHasBreakeven) { if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return false; }
     if (search && !d.country.toLowerCase().includes(search)) return false;
     // v581 (T6): this was `prod_coverage_pct <= 5`. _dqTier() -- declared in v507 as the single
@@ -26164,7 +26281,11 @@ function renderExplorer() {
     let va, vb;
     switch(sort) {
       case 'take':    va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999; break;
-      case 'irr':     va = -((a[irrKey] >= 500 ? null : a[irrKey]) ?? -999); vb = -((b[irrKey] >= 500 ? null : b[irrKey]) ?? -999); break;
+      // v851 (T6): was `irr`, ranking on AVG(per-contract IRR). 'irr' is kept as an alias so a
+      // share link saved before v851 still sorts on something, rather than silently falling
+      // through `default` to take and showing the analyst a different table than their URL says.
+      case 'npv50':
+      case 'irr':     va = -(a.npv_50 ?? -1e12); vb = -(b.npv_50 ?? -1e12); break;
       case 'npv':     va = -(a[npvKey]  ?? -999); vb = -(b[npvKey]  ?? -999); break;
       // v735 (T1): `a.be_75 ?? 999` took the state-monopoly sentinel at face value. Bahrain,
       // Kuwait and Saudi Arabia carry be_75 = 1.0 next to take_75 = 100, npv_75 = 0 and
@@ -26238,7 +26359,7 @@ function renderExplorer() {
       regionFromChip: !!chipRegion,
       search: search || null,
       prodOnly: !!prodOnly,
-      irrOnly: !!_explorerHasIRR,
+      irrOnly: !!_explorerDownsidePositive,
       beOnly: !!_explorerHasBreakeven,
       evidenceFirst: !!_explorerEvidenceFirst
     }
@@ -26333,7 +26454,7 @@ function renderExplorer() {
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
       <td class="num">${fmtNpvShared(npv)}</td>
-      <td class="num expl-sm-off">${fmtIrr(irr)}</td>
+      <td class="num expl-sm-off">${fmtDownsideNpv(d)}</td>
       <td class="num expl-sm-off" style="${(function(){
         if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return ''; // <=1 is state-monopoly sentinel
         if (d.be_75 < 50) return 'border-left:3px solid #15803D;padding-left:5px;';
@@ -26470,9 +26591,10 @@ function renderExplorer() {
   document.querySelectorAll('#tbl-explorer thead th[data-sort-key]').forEach(function(th) {
     th.classList.remove('sort-asc', 'sort-desc');
     if (th.dataset.sortKey === _curSort) {
-      th.classList.add(_curSort === 'npv' || _curSort === 'irr' ? 'sort-desc' : 'sort-asc');
+      th.classList.add(_curSort === 'npv' || _curSort === 'npv50' || _curSort === 'irr' ? 'sort-desc' : 'sort-asc');
     }
   });
+  _syncExplorerDownsideControls();   // v851 (T6): chip label carries the live count, not a literal
   setTimeout(renderIRRScatter, 50);
   if (typeof _expApplyObsSpread === 'function') _expApplyObsSpread();
 }
@@ -26815,7 +26937,7 @@ window.addEventListener('resize', function() { setTimeout(renderIRRScatter, 100)
 const explorerChipFilters = { mechanic: 'all', region: 'all' };
 window.explorerChipFilters = explorerChipFilters; // v99: expose for test suite + page.evaluate access
 let _explorerRFactorOnly = false;
-let _explorerHasIRR = false;
+let _explorerDownsidePositive = false;
 let _explorerHasBreakeven = false;
 
 function setExplorerRFactor(btn) {
@@ -26836,19 +26958,28 @@ function setExplorerRFactor(btn) {
   if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
 }
 
-function setExplorerHasIRR(btn) {
-  _explorerHasIRR = !_explorerHasIRR;
-  btn.classList.toggle('active', _explorerHasIRR);
-  btn.setAttribute('aria-pressed', _explorerHasIRR ? 'true' : 'false');
-  if (_explorerHasIRR) {
-    // Show count in button text
-    const count = (window.COUNTRY_DATA || []).filter(d => d.irr_75 && d.irr_75 > 0 && d.irr_75 < 500).length;
-    btn.textContent = '◎ Has IRR (' + count + ')';
-  } else {
-    btn.textContent = '◎ Has IRR Data';
-  }
+// v851 (T6): was setExplorerHasIRR. Two controls drove the SAME `_explorerHasIRR` flag -- this
+// chip and the checkbox on the toolbar row below it -- and neither reflected the other, so
+// clicking the chip filtered the table while the checkbox beside it stayed unticked. They are
+// now kept in sync explicitly, in both directions.
+function setExplorerDownsidePositive(btn, forced) {
+  _explorerDownsidePositive = (forced === undefined) ? !_explorerDownsidePositive : !!forced;
+  _syncExplorerDownsideControls();
   renderExplorer();
   if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
+}
+function _syncExplorerDownsideControls() {
+  const btn = document.getElementById('chip-downside-positive');
+  const box = document.getElementById('expl-dn-check');
+  if (box) box.checked = _explorerDownsidePositive;
+  if (btn) {
+    btn.classList.toggle('active', _explorerDownsidePositive);
+    btn.setAttribute('aria-pressed', _explorerDownsidePositive ? 'true' : 'false');
+    const count = (window.COUNTRY_DATA || []).filter(d => d.npv_50 > 0).length;
+    btn.innerHTML = _explorerDownsidePositive
+      ? '\u25ce Positive at $50 (' + count + ')'
+      : '\u25ce Positive at $50 <span style="font-size:10px;opacity:.7;">(' + count + ')</span>';
+  }
 }
 
 function setExplorerHasBreakeven(btn) {
@@ -27645,7 +27776,36 @@ function addCompare(country) {
     return false;
   }
   if (compareList.includes(country)) {
-    if (_sbsExampleUntouched && !_sbsSeeding) _sbsDropExample();   // keeping an example country = choosing it
+    // v852 (T3): this branch used to call _sbsDropExample() and stop. That only clears the
+    // UNTOUCHED flag and removes the banner -- it leaves the other example countries standing.
+    // So v509's fix covered only the analyst whose first pick is NOT in the seed. An analyst
+    // whose first pick IS in it (the seed is Norway / United Kingdom / Netherlands, and Norway
+    // is one of the most-compared regimes on the platform) kept all three and then stacked on
+    // top: Norway, Indonesia, Nigeria, Angola, Brazil produced
+    //   ["Norway","United Kingdom","Netherlands","Indonesia","Nigeria"]
+    // -- two columns they never chose holding slots, two they did choose refused at CMP_MAX,
+    // and the only feedback was "Norway is already in the comparison." (reads as benign) plus
+    // two "comparison is full" toasts that blame the cap instead of the example. The headline
+    // verdict then named the United Kingdom the lowest-take country in "their" set.
+    //
+    // Keeping an example country IS choosing it -- that country, not the set it arrived in.
+    // The example collapses to the one country the analyst named, and the toast says which
+    // columns went and why, so the change is visible rather than inferred from the chip row.
+    if (_sbsExampleUntouched && !_sbsSeeding) {
+      var _dropped = compareList.filter(function (c) { return c !== country; });
+      compareList = [country];
+      cmpAddSeq = [country];
+      _sbsDropExample();
+      renderCompare();
+      _updateCompareHash();
+      if (typeof showCopyToast === 'function') {
+        showCopyToast(_dropped.length
+          ? 'Kept ' + country + ' from the example and cleared the other ' + _dropped.length
+            + ' (' + _dropped.join(', ') + ') \u2014 building your comparison from ' + country + '.'
+          : country + ' is already in the comparison.');
+      }
+      return true;
+    }
     if (typeof showCopyToast === 'function') showCopyToast(country + ' is already in the comparison.');
     return false;
   }
@@ -36802,8 +36962,20 @@ function renderReformTimeline(country) {
     // to "locate the instrument by name" and the name is the only lead left. The full string was
     // only in a title="" -- which on a dead link is the dead-link explanation, and on a phone does
     // not exist. The name now renders whole and wraps inside the cell (.ec-chain CSS).
+    // v850 (T6): the name and ORCA's harvest annotation are no longer one undifferentiated
+    // blob. The instrument's title leads; the annotation follows, muted and labelled, so the
+    // analyst can see which half of the string is the document's name -- which is the half the
+    // dead-link note tells them to go and look for.
     const _shortSrc = function(s) {
-      return '<span class="ec-src-name">' + _esc(s) + '</span>';
+      const _sp = _srcTitleSplit(s);
+      let h = '<span class="ec-src-name">' + _esc(_sp.title) + '</span>';
+      if (_sp.note) {
+        h += '<span class="ec-src-note" title="' + _esc('ORCA\u2019s own harvest annotation, not part of '
+          + 'the document\u2019s name: it records the rates that were read off this instrument when the '
+          + 'fact was harvested. Search for the title alone \u2014 no catalogue or search engine will '
+          + 'match the string with this appended.') + '"> \u00b7 ORCA note: ' + _esc(_sp.note) + '</span>';
+      }
+      return h;
     };
     const _fmtPct = function(v) { return (Math.round(v * 100) / 100) + '%'; };
     // v743 (T6): row labels are HTML (v625 wraps NOT HELD labels in an opacity span). Any label
@@ -37148,17 +37320,34 @@ function renderReformTimeline(country) {
             if (_citeLinkDead(srcMeta.url)) {
               deadLinkCount++;
               deadLinkLabels.push(label);
+              // v850 (T6): the click. Until now this anchor still pointed at the address the
+              // page had just finished saying returns nothing, so the analyst's one affordance
+              // opened a 404 in a new tab. It now runs the search the note asks for, against the
+              // instrument's title with ORCA's harvest annotation removed. The recorded address
+              // is not lost -- it is named in the tooltip below, which is where an audit trail
+              // belongs once it has stopped being a destination.
+              const _dTitle = _srcTitleSplit(srcLabel).title;
               const _dTip = _esc(label + ': ORCA cannot retrieve this document. The address on record — '
                 + srcMeta.url + ' — returned no document when checked on ' + _CITE_DEAD_CHECKED
                 + ' (either a 404, or a hostname that does not resolve). This says nothing about whether '
                 + srcLabel + ' is authoritative, and the tier letter beside it is unchanged; it means the '
                 + 'citation cannot be opened and checked from here. The rate in the Statutory column was '
                 + 'taken from this source when it was harvested and has not been re-read since. '
-                + 'Find the instrument yourself before this figure goes in an IC memo.');
+                + 'Clicking this row no longer opens that dead address — it searches for the '
+                + 'instrument by title, “' + _dTitle + '”, which is the step this platform '
+                + 'cannot complete for you. Confirm you have the right instrument and the right '
+                + 'vintage before this figure goes in an IC memo.');
               const _deadChip = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
                 + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
                 + 'letter-spacing:.04em;cursor:help;" title="' + _dTip + '">LINK DEAD</span> ';
-              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`;
+              // v850 (T6): a BULK row is excluded. "EY / KPMG corporate income tax guides
+              // (2025)" is ORCA's label for its own country-level harvest, not an instrument
+              // sitting in a catalogue under that name, and its address is the PwC all-countries
+              // index (v518). Offering to "find" it would send the analyst after a document that
+              // does not exist. Those rows keep the recorded address and the plain dead chip.
+              badgeHtml = isBulk
+                ? `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`
+                : `<a href="${_esc(_citeFindHref(_dTitle))}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.85;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ find document ↗</span></a>`;
             } else {
               badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
             }
@@ -37733,7 +37922,13 @@ function renderReformTimeline(country) {
               + 'presently produce.'
             : '.')
         + ' <strong style="color:var(--text);">Locate the instrument by name before '
-        + (deadLinkCount === 1 ? 'this figure goes' : 'these figures go') + ' in an IC memo.</strong>'
+        + (deadLinkCount === 1 ? 'this figure goes' : 'these figures go') + ' in an IC memo</strong>'
+        // v850 (T6): this sentence used to be the end of the road -- the instruction was given and
+        // the only click on the page went to the dead address. The Source cell now carries it out.
+        + ' — the <span class="ec-find-chip" style="cursor:default;">⌕ find document</span> '
+        + 'control on each dead row above searches for that title, with ORCA’s harvest annotation '
+        + '(the trailing rate list, shown separately as <em>ORCA note</em>) stripped off, because no '
+        + 'catalogue matches the annotated string.'
         + '</div>'
       : '';
     // Scopes the tick sentence itself, in the same place and the same voice as v625's _scope625.
@@ -42438,7 +42633,13 @@ function exportExplorer() {
     // v584: NPV and IRR were hardcoded to $75 while the table showed the active price. At the
     // $100 radio the file disagreed with the screen and labelled the disagreement "$75".
     [`Contractor NPV @$${price} ($M)`]: d[npvKey] !== null && d[npvKey] !== undefined ? +d[npvKey].toFixed(1) : null,
-    [`IRR @$${price} (%)`]: (d[irrKey] !== null && d[irrKey] !== undefined && d[irrKey] < 500) ? +d[irrKey].toFixed(1) : null,
+    // v851 (T6): was `IRR @$${price} (%)`, and its `< 500` guard was backwards in exactly the way
+    // v847 found in the Breakeven CSV -- it blanked the self-evidently broken values and exported
+    // the plausible-looking ones, so the file that went into an IC memo carried USA 421.4% and
+    // Azerbaijan 410.0% as if they were returns. Replaced by the downside NPV the table now shows,
+    // which is modelled for all 185 rows. The 'Where IRR went' row on Filters & Assumptions says so
+    // inside the workbook, because the analyst reading the file is not looking at the page.
+    'Contractor NPV @$50 ($M)': (d.npv_50 !== null && d.npv_50 !== undefined) ? +d.npv_50.toFixed(1) : null,
     'Breakeven @$75 ($/bbl)': (d.be_75 && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null,
     'Swing $50→$125 (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
     // ── v738 (T4): the workbook's one "stability" number was invented here ───────────
@@ -42474,7 +42675,9 @@ function exportExplorer() {
   }));
 
   // Sheet 2 — what the ranking on sheet 1 is, so it survives being pasted out of context.
-  const SORT_LABEL = { take:'Government take (lowest first)', irr:'IRR (highest first)',
+  const SORT_LABEL = { take:'Government take (lowest first)',
+                       npv50:'Contractor NPV at the $50/bbl downside (largest first)',
+                       irr:'Contractor NPV at the $50/bbl downside (largest first)',   // v851: legacy key
                        npv:'Contractor NPV (highest first)', be:'Breakeven (lowest first)',
                        swing:'Price swing (smallest first)', evidence:'Evidence quality (best first)',
                        country:'Country A–Z' };
@@ -42483,7 +42686,7 @@ function exportExplorer() {
   if (f.region)   applied.push('Region = ' + f.region + (f.regionFromChip ? ' (map/chip)' : ''));
   if (f.search)   applied.push('Search = "' + f.search + '"');
   if (f.prodOnly) applied.push('Prod Data Only — verified field production');
-  if (f.irrOnly)  applied.push('IRR only — verified IRR held');
+  if (f.irrOnly)  applied.push('NPV+ @ $50 — contractor NPV still positive at the $50/bbl downside');
   if (f.beOnly)   applied.push('BE only — verified breakeven held');
 
   const ctx = [
@@ -42505,6 +42708,11 @@ function exportExplorer() {
     { Field: 'Data Basis key', Value: 'FACTS = take production-weighted, >5% contract coverage. EVIDENCE = partial production match. PROXY = no verified production; regional estimate.' },
     { Field: 'Govt take', Value: 'Production-weighted where production data exists, equal-weighted otherwise.' },
     { Field: 'Breakeven', Value: 'Reported at $75/bbl for all rows — it is a price, not a function of the price radio.' },
+    // v851 (T6): the answer travels inside the file, because the analyst reading this workbook in
+    // an IC pack is not looking at the page that would have explained it. Same treatment the
+    // Country Profile, Side-by-Side and Screener artifacts have carried since v687.
+    { Field: 'Contractor NPV @$50', Value: 'The $50/bbl downside on the same standardized Deepwater profile as the base-case NPV column (50k bbl/d peak, $1.0B all-in capex, 10% WACC, 100% WI, 25-year life). Modelled for all 185 countries. It is a fiscal comparison basis, not a valuation of any country’s own fields.' },
+    { Field: 'NO IRR COLUMN — withdrawn, not missing', Value: 'This file carried an “IRR @$75 (%)” column until ' + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : 'v851') + '. The underlying figure is AVG(irr_pct) across every contract in the country — an arithmetic mean of a heavy-tailed distribution, median 333% across the 165 countries carrying one, with only 9 below 100%, and not monotonic in price because the 999-sentinel drops a different subset of contracts at each price point. It is not a project return. The same figure was withdrawn from the Country Profile (v516), the Screener hurdle slider (v517), Fiscal Compare (v525), both IOC tables (v787) and the Breakeven CSV (v847). The exported column’s own “<500%” guard made it worse, not safer: it blanked the self-evidently broken values and exported the plausible-looking ones. For a return you can put in front of an IC, open the country on the platform and run Model in Scenario Builder at your own capex, opex and production profile.' },
     // v738 (T4): the workbook previously carried one column called 'Stability Score' and no note
     // saying what it was. It was 100 - swing*3, matched nothing on screen, and inverted Iraq and
     // Guyana against the platform's own reading. Two named readings now, each with its basis.
@@ -58777,7 +58985,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var btn = e.target.closest('button');
       if (!btn) return;
       var action = btn.getAttribute('data-chip-action');
-      if (action === 'has-irr') { setExplorerHasIRR(btn); return; }
+      if (action === 'has-irr') { setExplorerDownsidePositive(btn); return; }
       if (action === 'has-be') { setExplorerHasBreakeven(btn); return; }
       if (btn.id === 'explorer-map-toggle') { toggleExplorerMap(); return; }
       var val = btn.getAttribute('data-value');

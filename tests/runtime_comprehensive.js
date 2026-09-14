@@ -467,7 +467,12 @@ async function testExplorer(page) {
     await page.selectOption('#flt-region', '');
 
     // Sort columns
-    for (const sortKey of ['take', 'irr', 'npv', 'be', 'swing', 'evidence', 'country']) {
+    // v851 (T6): 'irr' -> 'npv50'. The Explorer's IRR column, sort option and "Has IRR Data"
+    // chip were withdrawn at v851 (AVG of per-contract IRRs, median 333%, not a project return),
+    // the last surface still printing the figure v516/v517/v525/v787/v847 had already pulled.
+    // This loop swallows selectOption failures with .catch(), so it would have gone on reporting
+    // "All sort options applied without error" while exercising a key the <select> no longer has.
+    for (const sortKey of ['take', 'npv50', 'npv', 'be', 'swing', 'evidence', 'country']) {
       const th = await page.$(`#tbody-explorer`)
         .catch(() => null);
       // try sort via select
@@ -475,6 +480,41 @@ async function testExplorer(page) {
       await page.waitForTimeout(150);
     }
     p(S, 'sort options', 'All sort options applied without error');
+
+    // ── v851 (T6): the Explorer may not regrow a country-level IRR ──────────────────────────
+    // irr_75 = AVG(irr_pct) across every contract in a country. It has been withdrawn six
+    // separate times -- Country Profile (v516), Screener hurdle slider (v517), Fiscal Compare
+    // (v525), both IOC tables (v787), the Breakeven CSV (v847) and finally this table and its
+    // XLSX (v851) -- and it grew back on a new surface each time because nothing asserted its
+    // absence. This does.
+    await page.selectOption('#flt-sort', 'npv50').catch(() => {});
+    await page.waitForTimeout(250);
+    const _irrSurfaces = await page.evaluate(() => {
+      const tb = document.getElementById('tbl-explorer');
+      const hdrs = tb ? [...tb.querySelectorAll('thead th')].map(h => h.innerText.replace(/\s+/g, ' ').trim()) : [];
+      const sel = document.getElementById('flt-sort');
+      return {
+        irrHeader: hdrs.filter(h => /\bIRR\b/i.test(h)),
+        dnHeader:  hdrs.filter(h => /NPV @ \$50/.test(h)),
+        irrSortOpt: sel ? [...sel.options].map(o => o.value).filter(v => v === 'irr') : ['no-select'],
+        irrChip: !!document.getElementById('chip-has-irr'),
+        dnChip: !!document.getElementById('chip-downside-positive'),
+        dnBox: !!document.getElementById('expl-dn-check'),
+        rows: tb ? tb.querySelectorAll('tbody tr[data-country]').length : 0,
+      };
+    });
+    if (_irrSurfaces.irrHeader.length === 0 && _irrSurfaces.irrSortOpt.length === 0 && !_irrSurfaces.irrChip)
+      p(S, 'EXPL-NO-IRR no country IRR surface', 'no IRR column header, sort key or chip on the Explorer');
+    else
+      f(S, 'EXPL-NO-IRR no country IRR surface',
+        `IRR regrew: header=${JSON.stringify(_irrSurfaces.irrHeader)} sortKey=${JSON.stringify(_irrSurfaces.irrSortOpt)} chip=${_irrSurfaces.irrChip}`);
+    if (_irrSurfaces.dnHeader.length === 1 && _irrSurfaces.dnChip && _irrSurfaces.dnBox && _irrSurfaces.rows === 185)
+      p(S, 'EXPL-NO-IRR downside replaced it', `"${_irrSurfaces.dnHeader[0].replace(/\n/g, ' ')}" over ${_irrSurfaces.rows} rows, chip + checkbox both present`);
+    else
+      f(S, 'EXPL-NO-IRR downside replaced it',
+        `expected one NPV @ $50 header over 185 rows with both controls, got ${JSON.stringify(_irrSurfaces)}`);
+    await page.selectOption('#flt-sort', 'take').catch(() => {});
+    await page.waitForTimeout(200);
 
     // Bubble chart mode
     await page.click('.mode-toggle button:has-text("Bubble Chart")').catch(() => {});
@@ -645,6 +685,44 @@ async function testComparison(page) {
   try {
     await switchTab(page, 't2');
     await page.waitForTimeout(300);
+
+    // ── v852 (T3): the untouched example must collapse to the ONE country the analyst named ──
+    // v509 made the first analyst-initiated add replace the seeded North Sea example instead of
+    // stacking on it -- but only on the branch where that country is NOT already in the seed.
+    // The `compareList.includes(country)` branch called _sbsDropExample(), which clears the flag
+    // and the banner and nothing else, so the other example columns survived. Cold, an analyst
+    // adding Norway (in the seed) then Indonesia / Nigeria / Angola / Brazil got
+    // ["Norway","United Kingdom","Netherlands","Indonesia","Nigeria"] -- two columns never chosen
+    // holding slots and two chosen ones refused at CMP_MAX. Asserted here because nothing
+    // asserted it for 343 versions and the half-fix read as a whole one.
+    const _sbsEx = await page.evaluate(() => {
+      const seed = ['Norway', 'United Kingdom', 'Netherlands'];
+      if (typeof addCompare !== 'function') return { skip: 'no addCompare' };
+      compareList = seed.slice();
+      if (typeof cmpAddSeq !== 'undefined') cmpAddSeq = seed.slice();
+      _sbsExampleUntouched = true;
+      const ret = addCompare('Norway');            // first pick IS in the example
+      const afterKeep = compareList.slice();
+      ['Indonesia', 'Nigeria', 'Angola', 'Brazil'].forEach(c => addCompare(c));
+      return { ret, afterKeep, afterAll: compareList.slice(), untouched: _sbsExampleUntouched };
+    });
+    if (_sbsEx.skip) {
+      w(S, 'SBS-EXAMPLE collapses to the named country', _sbsEx.skip);
+    } else {
+      const keepOk = _sbsEx.afterKeep.length === 1 && _sbsEx.afterKeep[0] === 'Norway';
+      const allOk = JSON.stringify(_sbsEx.afterAll) ===
+        JSON.stringify(['Norway', 'Indonesia', 'Nigeria', 'Angola', 'Brazil']);
+      if (keepOk) p(S, 'SBS-EXAMPLE collapses to the named country',
+        'keeping an example country left exactly ["Norway"], not the 3-country seed');
+      else f(S, 'SBS-EXAMPLE collapses to the named country',
+        'example survived the analyst\'s first pick: ' + JSON.stringify(_sbsEx.afterKeep));
+      if (allOk) p(S, 'SBS-EXAMPLE no unchosen column holds a slot',
+        'all 5 analyst picks present, no example residue, nothing refused at CMP_MAX');
+      else f(S, 'SBS-EXAMPLE no unchosen column holds a slot',
+        'expected the 5 chosen countries, got ' + JSON.stringify(_sbsEx.afterAll));
+    }
+    await page.evaluate(() => { if (typeof clearCompare === 'function') clearCompare(); });
+    await page.waitForTimeout(150);
 
     // Empty state
     await page.evaluate(() => { compareList = []; renderCompare(); });
