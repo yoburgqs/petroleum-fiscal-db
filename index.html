@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v855</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v856</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1520,6 +1520,24 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     position: absolute;
     inset: -10px 0;
   }
+  /* v856 (T4): the ::after above does nothing on a .source-badge, and has not since it was
+     written. v500 gave .source-badge `overflow: hidden` to drive the one-line ellipsis, and a
+     parent's overflow clip applies to its own absolutely-positioned ::after — so the -10px box
+     is painted and immediately clipped back to the padding box. Measured at 390 with
+     hasTouch on the Reform Risk country card: tappable band 22px; set overflow:visible on the
+     same element and it becomes 40px. The clip was the whole difference.
+       This is the control an analyst taps to open the statute behind a reform event — the last
+     step before carrying a 3-5pp WACC premium into an IC memo — and on a phone it was a 22px
+     target, under the directive's 24px floor, on 29 links across the 13 sourced countries that
+     print a citation (UK alone has 9).
+       Fixed by growing the badge's own box instead of its ::after, so the ellipsis clamp that
+     v500/v576 rely on is untouched. Vertical padding only: per v713, any horizontal reach on an
+     inline element raises its parent's scrollWidth and reports to pixel_audit as clipped text.
+     Scoped to a.source-badge — the non-anchor .source-badge spans are labels, not controls. */
+  a.source-badge {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
   /* v710 (T2): the Peer Comparison / Similar Fiscal Profile fee-basis marks. They are
      title-only glyphs, 7x12px with a mouse, and the directive's floor is 24px under a
      thumb. Given the box height and the same invisible hit area the chips use, so the
@@ -2498,7 +2516,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v855</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v856</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2568,7 +2586,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v855</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v856</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
