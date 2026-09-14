@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v856</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v857</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2516,7 +2516,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v856</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v857</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2586,7 +2586,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v856</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v857</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27904,6 +27904,7 @@ function addCompare(country) {
       _sbsDropExample();
       renderCompare();
       _updateCompareHash();
+  if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
       if (typeof showCopyToast === 'function') {
         showCopyToast(_dropped.length
           ? 'Kept ' + country + ' from the example and cleared the other ' + _dropped.length
@@ -27932,6 +27933,7 @@ function addCompare(country) {
   _sbsApplyOrder();   // v647: a chosen order survives the next add — it is not addition order again
   renderCompare();
   _updateCompareHash();
+  if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
   return true;
 }
 function removeCompare(country) {
@@ -27940,8 +27942,11 @@ function removeCompare(country) {
   cmpAddSeq = cmpAddSeq.filter(c => c !== country);   // v647
   renderCompare();
   _updateCompareHash();
+  if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
 }
-function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash(); }
+function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash();
+  if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
+}
 
 // ── v845 (T3): rescue a comparison the data-basis gate has refused. ──────────────────────────
 // v626's gate is right — a production-weighted column and a statutory-terms column do not rank
@@ -27957,6 +27962,7 @@ function sbsKeepBasis(names) {
   try { compareList = names.slice(); cmpAddSeq = names.slice(); _sbsApplyOrder(); renderCompare(); }
   finally { _cmpHashHold = false; }
   _updateCompareHash();
+  if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
   if (dropped.length && typeof showCopyToast === 'function') {
     showCopyToast('Now comparing the ' + names.length + ' columns ORCA can rank against each other: '
       + names.join(', ') + '. Removed: ' + dropped.join(', ')
@@ -57370,23 +57376,110 @@ function removeFromBasket(country) {
   window.compareBasket.delete(country);
   localStorage.setItem('compareBasket', JSON.stringify([...window.compareBasket]));
   renderBasket();
+  // v857 (T3): while a comparison is live the bar IS the comparison, so the pill's ✕ has to
+  // drop the column too. Without this the next comparison edit would sync the country straight
+  // back in and the ✕ would read as broken.
+  if (_basketLive && typeof compareList !== 'undefined' && compareList
+      && compareList.indexOf(country) !== -1 && typeof removeCompare === 'function') {
+    removeCompare(country);
+  }
 }
 
 function clearBasket() {
   window.compareBasket.clear();
   localStorage.setItem('compareBasket', '[]');
+  _basketLive = false;
+  renderBasket();
+}
+
+/* ── v857 (T3) — ONE comparison, not two. ────────────────────────────────────────────────────
+   Walked "how do these three countries compare side by side?" cold, via the route the tool's
+   own help text prescribes (Explorer "+" → compare basket → "Compare →"). Measured:
+
+     1. collected USA, Argentina, Mexico in Explorer and pressed "Compare →"  → Side-by-Side
+        renders those three. Correct.
+     2. dropped USA with the chip ✕ and added Norway in the search box       → compareList
+        ["Argentina","Mexico","Norway"]. The chip row and the whole grid agree.
+     3. the floating basket bar still read  USA × Argentina × Mexico ×.
+
+   So the screen now carried TWO lists of "the countries I am comparing", disagreeing, and the
+   basket bar was the louder of the two: full-bleed, fixed to the bottom, 2px accent top border,
+   and the only solid-amber primary button anywhere on the tab. Pressing it — the obvious thing
+   to press, labelled "Compare →" — ran launchCompare() off `window.compareBasket`, which had
+   never heard about either edit. Result:
+
+        curated  ["Argentina","Mexico","Norway"]   →  one press  →  ["USA","Argentina","Mexico"]
+
+   Norway, deliberately added seconds earlier, was gone; USA, deliberately removed, was back.
+   No toast, no confirm, no diff — the grid simply repainted with different countries. An analyst
+   with 20 minutes before a screening meeting reads that as the tool losing their work, and there
+   is no undo on this tab.
+
+   The cause is that the basket (a localStorage Set, written by addToBasket) and compareList (the
+   in-memory array the grid actually renders) are two stores for one concept, and nothing ever
+   moved information from the second back into the first. v853 found the same split from the other
+   direction — a button that pushed into the basket while the grid read compareList.
+
+   Fix: once "Compare →" has handed a set over, the basket tracks the comparison. Edits to the
+   comparison (add / remove / clear / keep-basis) write back, so the bar can no longer disagree
+   with the chips and the amber button becomes idempotent instead of destructive.
+
+   Deliberately NOT a render-time sync. This fires only on an explicit edit to a live comparison,
+   which leaves two behaviours intact: the cold-load Norway/UK/Netherlands example never
+   manufactures a basket bar (_basketLive is false until "Compare →" is pressed), and an analyst
+   who goes back to Explorer to collect a 4th country still accumulates — addToBasket is untouched
+   and nothing clobbers the bar between the "+" and the next "Compare →". */
+let _basketLive = false;
+
+function _basketSameAs(list) {
+  if (!window.compareBasket || window.compareBasket.size !== list.length) return false;
+  for (var i = 0; i < list.length; i++) if (!window.compareBasket.has(list[i])) return false;
+  return true;
+}
+
+function _basketSyncFromCompare() {
+  if (!_basketLive || !window.compareBasket) return;
+  var list = (typeof compareList !== 'undefined' && compareList) ? compareList.slice() : [];
+  if (_basketSameAs(list)) return;
+  if (!list.length) {
+    // Clear on the comparison clears the hand-off too — otherwise the bar survives as the last
+    // thing on screen still naming countries the analyst just dismissed.
+    window.compareBasket.clear();
+    localStorage.setItem('compareBasket', '[]');
+    _basketLive = false;
+  } else {
+    window.compareBasket = new Set(list);
+    localStorage.setItem('compareBasket', JSON.stringify(list));
+  }
   renderBasket();
 }
 
 function launchCompare() {
   const items = [...window.compareBasket];
   if (items.length === 0) return;
+  _basketLive = true;   // v857: from here on the bar mirrors the comparison it handed over
   const slugs = items.map(toSlug).join('+');
   window.location.hash = '#/compare/' + slugs;
   parseAndNavigate(window.location.hash);
 }
 
-renderBasket(); // initialize on load
+/* v857: this call used to sit here bare, 1,829 lines ABOVE the #compare-basket markup it renders
+   into, so on every load getElementById returned null and renderBasket() early-returned. A basket
+   persisted from a previous session was therefore live in memory and read by "Compare →" while
+   being invisible and unclearable — and the moment the analyst pressed "+" on one country in
+   Explorer the bar appeared holding four, three of them from a session they no longer remember.
+   Run it once the markup exists instead. */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    renderBasket();
+    // A restored #/compare/<a>+<b>+<c> whose membership matches the basket IS a handed-over
+    // comparison — reloading the page should not silently re-split the two stores.
+    if (typeof compareList !== 'undefined' && compareList && compareList.length
+        && _basketSameAs(compareList)) _basketLive = true;
+  });
+} else {
+  renderBasket();
+}
 
 // ─── Typeahead Search ────────────────────────────────────────────────────────
 (function() {
