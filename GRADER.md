@@ -51232,3 +51232,23 @@ appears on screen. v846 written at the three display sites (`:42`, `:2484`,
   incident** — 2026-09-12 *and* 2026-09-13. **Twenty-fifth cycle carried, still
   uninvestigated.** Outside the UX-finalization course this directive sets, so
   no cycle will ever pick it up. **This wants Zach's attention directly.**
+
+---
+## Cycle 754 Log — 2026-09-14 02:45
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 754 complete — v846 shipped and pushed.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (rotated off T3, which ran last cycle.)
+
+## Friction
+Not reading the number — *reaching the country*. Walking T2 cold from a shared link, `handleRoute()`'s profile branch (`index.html:46423`) was:
+
+```js
+var country = fromSlug(param);
+if (country) { ...load it... }    // no else
+```
+
+`fromSlug()` matched only the **underscore** slug that `toSlug()` produces. But the
