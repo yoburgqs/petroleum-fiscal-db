@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v853</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v854</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2498,7 +2498,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v853</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v854</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2568,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v853</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v854</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3348,7 +3348,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="num">Contracts</th>
           <th>Mechanics</th>
           <th class="num" data-sort-key="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take as % of gross revenue at $75/bbl (royalties + taxes + profit oil — all instruments). Lower = better for investor. Sort: low→high.">Govt Take</th>
-          <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts the country&#39;s regime was built from. The grade is the worse of two legs: primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15) &mdash; so 100% primary law on 4 facts grades D, not A. Same grade as Fiscal Compare&#39;s Quality column. Sort: weakest grade first.">Evidence</th>
+          <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts the country&#39;s regime was built from. The grade is the worse of two legs: primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15) &mdash; so 100% primary law on 4 facts grades D, not A. Same grade as Fiscal Compare&#39;s Quality column. Sort: weakest grade first — click again to reverse it and put the best-evidenced countries on top. The order in force is printed under the row count.">Evidence</th>
           <th class="num expl-sm-off" title="Price sensitivity sparkline — mini line chart showing government take at $50, $75, $100, and $125/bbl (left to right). A steep upward slope = progressive regime (take rises sharply with price — common in profit-based PSCs and PRRT). A flat line = royalty-dominant (take barely changes with price). The highlighted dot marks the currently selected price scenario. Use 'Swing (pp)' column for the precise numeric value of this sensitivity.">Curve</th>
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
@@ -26321,10 +26321,12 @@ function renderExplorer() {
   // and evidence are populated for all 185, so they have no unrankable block to separate.
   const _explBeSplit  = sort === 'be';
   const _explBeRank   = d => (_beTested(d) ? 0 : 1);
+  // v854 (T6): the two grouping terms stay in their natural direction; only the metric flips.
+  const _explDir = (typeof _explSortDir === 'number' && _explSortDir === -1) ? -1 : 1;
   data.sort((a, b) =>
        (_explBeSplit  ? (_explBeRank(a)      - _explBeRank(b))      : 0)
     || (_explGroupable ? (_explorerDqRank(a) - _explorerDqRank(b)) : 0)
-    || _explMetricCmp(a, b));
+    || (_explDir * _explMetricCmp(a, b)));
   // v735: on the breakeven sort the data-basis boundary is drawn inside the ranked block, so
   // its counts describe that block. Below the breakeven line nothing is ranked, and a caveat
   // about the ordering of an unordered set would be noise.
@@ -26573,7 +26575,7 @@ function renderExplorer() {
   // stopped reading by the time they see the rows. State it under the result set instead.
   const _fpK = (typeof _fpCnt === 'function') ? _fpCnt() : null;
   const _explStabNote = (sort === 'stability' && _fpK)
-    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on <strong style="color:var(--text);">Fiscal Predictability</strong>, basis before number${_explGrouped ? ', inside each data-basis block above' : ''}: <strong style="color:var(--text);">countries with a measured take spread come first, least predictable first</strong> — ${_fpK.nMeas} of 185, and the only ones the score’s largest penalty (IQR, up to −40) was ever charged against or that this column grades. The ${_fpK.nSingle} one-term <strong style="color:var(--text);">UNGRADED</strong> regimes follow, then the ${_fpK.nNone} ORCA holds no contract distribution for. A one-term 100 is not a steadier regime than a measured ${_fpK.ceil} — it is the one ORCA holds less contract evidence against. This column is the Fiscal Predictability Score; reform-event counts are the separate Reform Frequency Score on the Reform Risk tab.</div>`
+    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on <strong style="color:var(--text);">Fiscal Predictability</strong>, basis before number${_explGrouped ? ', inside each data-basis block above' : ''}: <strong style="color:var(--text);">countries with a measured take spread come first, ${_explDir === -1 ? 'most predictable first' : 'least predictable first'}</strong> — ${_fpK.nMeas} of 185, and the only ones the score’s largest penalty (IQR, up to −40) was ever charged against or that this column grades. The ${_fpK.nSingle} one-term <strong style="color:var(--text);">UNGRADED</strong> regimes follow, then the ${_fpK.nNone} ORCA holds no contract distribution for. A one-term 100 is not a steadier regime than a measured ${_fpK.ceil} — it is the one ORCA holds less contract evidence against. This column is the Fiscal Predictability Score; reform-event counts are the separate Reform Frequency Score on the Reform Risk tab.</div>`
     : '';
   // v735 (T1): the breakeven sort states its own coverage before the row numbers are read. The
   // header already carried "BREAKEVEN (65/185 COUNTRIES)", but that is a column caption; it does
@@ -26582,16 +26584,39 @@ function renderExplorer() {
   const _explBeNote = _explBeGrouped
     ? ` — <strong style="color:var(--text);">ranked on breakeven for the ${_explBeScope.length} countries ORCA models one for</strong>; the other ${_explBeUnrank} print — and are listed below the line, not ranked`
     : '';
+  // ── v854 (T6): the order, in words, beside the count it describes ───────────────────────
+  // The <option> labels carry a direction ("Evidence (weakest first)") and the arrow on the
+  // header carries one glyph. Neither survives a reversal being read from across a desk, and
+  // the select's own label goes stale the moment a header flips it. The order is now printed
+  // where the analyst reads the row count, and it names the reverse gesture the first time --
+  // this is the affordance that was missing, not the arrow.
+  const _explOrderPair = _EXPL_SORT_ORDER[sort] || null;
+  const _explOrderNote = _explOrderPair
+    ? `<div style="margin-top:4px;line-height:1.55;">Ordered <strong style="color:var(--text);">${_explOrderPair[_explDir === -1 ? 1 : 0]}</strong>`
+      + (_explGrouped ? ', inside each data-basis block' : '')
+      + ` \u00b7 <span style="color:var(--muted);">click the <strong style="color:var(--text);">${_explSortLabel(sort)}</strong> header again to reverse it${_explDir === -1 ? ' back' : ''}</span></div>`
+    : '';
   document.getElementById('explorer-count').innerHTML = `Showing ${data.length} of ${COUNTRY_DATA.length} countries · Take, NPV, IRR at ${_explPL[price]||('$'+price)}/bbl`
     + _explBeNote
     + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`)
+    + _explOrderNote
     + _explStabNote;
   // Update sort indicator on column headers
   const _curSort = document.getElementById('flt-sort').value;
+  // v854 (T6): the arrow and aria-sort now follow _explSortDir. Before this the class was a
+  // constant per key and aria-sort was never written at all -- it stayed on the literal
+  // aria-sort="none" in the markup for seven of the eight headers, and the Evidence header
+  // announced "ascending" whether or not it was the active sort. A screen-reader user had no
+  // way to hear which column the table was ordered on.
+  const _curDefDesc = (_curSort === 'npv' || _curSort === 'npv50' || _curSort === 'irr');
   document.querySelectorAll('#tbl-explorer thead th[data-sort-key]').forEach(function(th) {
     th.classList.remove('sort-asc', 'sort-desc');
     if (th.dataset.sortKey === _curSort) {
-      th.classList.add(_curSort === 'npv' || _curSort === 'npv50' || _curSort === 'irr' ? 'sort-desc' : 'sort-asc');
+      const _asc = _curDefDesc ? (_explDir === -1) : (_explDir === 1);
+      th.classList.add(_asc ? 'sort-asc' : 'sort-desc');
+      th.setAttribute('aria-sort', _asc ? 'ascending' : 'descending');
+    } else {
+      th.setAttribute('aria-sort', 'none');
     }
   });
   _syncExplorerDownsideControls();   // v851 (T6): chip label carries the live count, not a literal
@@ -26792,13 +26817,72 @@ document.querySelectorAll('input[name="price"]').forEach(r => r.addEventListener
 }));
 document.getElementById('flt-mech').addEventListener('change', renderExplorer);
 document.getElementById('flt-region').addEventListener('change', renderExplorer);
-document.getElementById('flt-sort').addEventListener('change', renderExplorer);
+// v854 (T6): choosing a key from the dropdown returns that column to its declared default
+// direction. The <option> labels name that direction ('Evidence (weakest first)'), so the
+// select must not inherit a reversal the analyst set on a different column's header.
+document.getElementById('flt-sort').addEventListener('change', function() {
+  _explSortDir = 1; window._explSortDir = 1; renderExplorer();
+});
 var _searchDebounce;
 function debouncedRenderExplorer() { clearTimeout(_searchDebounce); _searchDebounce = setTimeout(renderExplorer, 200); }
 document.getElementById('flt-search').addEventListener('input', debouncedRenderExplorer);
 
+// ── v854 (T6): the Explorer column headers were a one-way switch ────────────────────────
+// Walked T6 cold: Home -> Explorer -> click "Evidence". The header is the one control this
+// table offers for "how solid is the evidence?" (v557 fixed it when it was sorting by the
+// wrong key entirely). It returns weakest-grade first -- Iraq D, Colombia C, Kazakhstan C --
+// which is the right DEFAULT and what its own tooltip promises. Clicking it a second time,
+// which is what every sortable table on earth has trained this analyst to do, did nothing:
+// setExplorerSort() only ever wrote the key into #flt-sort and re-rendered, so the order, the
+// row set and aria-sort="ascending" were byte-identical after click 2, click 3 and click 10.
+// Measured cold on all eight headers -- country, take, evidence, npv, npv50, be, swing,
+// stability -- every one of them STUCK. So there was no way to put the best-evidenced
+// countries at the top of this table at all: under the default "Verified production first"
+// grouping the 28 A-graded countries land at rows 19-22 and then again at the very bottom of
+// the proxy block, 1,144px down the page behind 17 rows of D and C.
+//
+// The direction state is RELATIVE to each column's declared default, so every comparator in
+// _explMetricCmp() is untouched -- the ones that already bake their direction into the value
+// (npv and npv50 negate; stability and evidence rank through _fpSortVal/_evidenceSortVal)
+// keep doing exactly that, and -1 simply reads them backwards. The GROUPING terms are
+// deliberately outside the flip: reversing the breakeven split would put the 120 countries
+// with no breakeven above the 65 that have one, and reversing the data-basis grouping would
+// put regional-proxy economics above verified production. Neither is a thing an analyst can
+// have meant by clicking a header twice. The Screener has had this since v587 (_scSortDir);
+// this is the same two-state toggle, minus its third "off" state, because #flt-sort is the
+// single source of truth for the Explorer's key and must always hold one.
+var _explSortDir = 1;   // 1 = the column's declared default order, -1 = reversed
+window._explSortDir = _explSortDir;
+
+// What the current order actually is, in words, for the count line under the table. Keyed off
+// the header tooltips so the sentence and the column caption cannot drift apart.
+var _EXPL_SORT_ORDER = {
+  country:   ['A\u2013Z', 'Z\u2013A'],
+  take:      ['lowest government take first', 'highest government take first'],
+  evidence:  ['weakest evidence grade first', 'best-evidenced first'],
+  npv:       ['largest contractor NPV first', 'smallest contractor NPV first'],
+  npv50:     ['largest downside NPV first', 'smallest downside NPV first'],
+  irr:       ['largest downside NPV first', 'smallest downside NPV first'],
+  be:        ['lowest breakeven first', 'highest breakeven first'],
+  swing:     ['lowest price swing first', 'highest price swing first'],
+  stability: ['least predictable first', 'most predictable first']
+};
+
+// The visible caption of the header that carries a key, so the count line points at the
+// thing the analyst can actually see rather than at an internal key name.
+function _explSortLabel(key) {
+  var th = document.querySelector('#tbl-explorer thead th[data-sort-key="' + key + '"]');
+  if (!th) return key;
+  return (th.childNodes[0] && th.childNodes[0].nodeType === 3 ? th.childNodes[0].nodeValue : th.textContent)
+    .replace(/[\u24d8\u24be\u2139\u25b2\u25bc]/g, '').trim() || key;
+}
+window._explSortLabel = _explSortLabel;
+
 function setExplorerSort(key) {
-  document.getElementById('flt-sort').value = key;
+  var sel = document.getElementById('flt-sort');
+  if (sel.value === key) { _explSortDir = -_explSortDir; }
+  else { sel.value = key; _explSortDir = 1; }
+  window._explSortDir = _explSortDir;
   renderExplorer();
 }
 
