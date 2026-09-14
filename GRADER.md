@@ -50255,3 +50255,121 @@ FAQ, not a citation micro-edit, not rubric chasing. v839 written at the three di
 Country Profile, cold load at 1440×900 over http, both storages cleared. The tab self-seeds Indonesia, so the analyst lands on a headline reading `NPV: $745M @$75 · Downside: $334M @$50 · BE: < $50/bbl bounded`. The whole task is *defend that*.
 
 Six places on tha
+
+---
+
+## Cycle 748 Log — 2026-09-13 — v840 (`ae31692`)
+
+- Test before: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: **300 PASS / 0 FAIL / 0 WARN / 0 JS errors** — suite ACTUALLY RAN this cycle
+  (`node tests/runtime_comprehensive.js`, number read from its own output, not assumed)
+
+### Task
+**T3 — "How do these three countries compare side by side?"** (747 was T2, 746 was T6.
+The carried-forward note from 747 asked for a T3 or T5 cycle on Fiscal Compare's
+MODEL/CITABLE literal; that is still open — this cycle found something worse on the
+Side-by-Side walk itself and took that instead.)
+
+### Friction
+Cold load at 1440×900, no sessionStorage/localStorage. The tab self-seeds Norway /
+United Kingdom / Netherlands; cleared it and built the set **this platform's own FAQ A592
+prescribes** — *"Load Malaysia, Indonesia, Vietnam in ORCA Side-by-Side"* — as
+Iraq / Indonesia / Malaysia. The Economics block rendered:
+
+```
+Contractor NPV @$50 (downside)   $389M   $334M   -$33M
+Contractor NPV @$75 (base)       $642M   $745M   $627M
+```
+
+Malaysia changes **sign** between the downside row and the base row, and a hyphen was the
+only thing on screen that said so. `_cmpNpvCell` (`index.html:27758`) returned
+`fmtNpvShared(v)` unstyled for any `v`, so −$33M rendered at the same 13px, colour and
+weight as $745M, in the rightmost cell. The verdict strip above carries three orderings —
+take, contractor value, predictability — **all read at $75**, so none of them can see the
+downside, and the strip reported Malaysia as an unremarkable third place at $720M directly
+over a cell reading −$33M.
+
+The platform treats that crossing as a **binary elimination everywhere else**: the Screener
+ships a dedicated `Set $0 ⟵ survives $50/bbl` control whose stated rule is that a regime
+NPV-positive at $75 and negative at $50 does not survive a downturn, and this row's own
+tooltip calls $50 *"the low-price stress case — the row an IC asks for first."*
+Side-by-Side is the tab whose output goes into the memo, and it was the one surface
+printing the elimination without marking it.
+
+It is also the **rarest event in the block**, which is why it is marked rather than
+caveated. Measured over the shipped `country_data.json`: of 185 countries `npv_75`,
+`npv_100` and `npv_125` are negative for **none**, and `npv_50` for exactly **two** —
+Yemen −$139M (from +$1.02B at $75) and Malaysia −$33M (from +$627M).
+
+### Change
+1. **The cell.** A negative contractor NPV renders in `var(--negative)` at weight 700 with
+   a sub-line `▼ value-negative at $50`, reusing the 10px sub-line vocabulary the Govt Take
+   rows already use for `PSC/Conc 34.1%` — no new visual grammar. Tooltip states the sign
+   change, the $75 figure it crosses from, the 2-of-185 rarity and the Screener rule.
+   Deliberately **not** behind the statutory-basis gate: a legal regime that destroys value
+   at $50 on the shared profile is a finding about the regime, so Yemen shows it with its
+   existing `not comparable · statutory terms` line beside it.
+2. **The strip.** A fourth line, `▼ Value-negative at the $50 downside — N of M`, firing
+   **only** where a column actually crosses zero. State monopolies excluded (their NPV rows
+   are already an em dash — $0 there is the arithmetic of a 100% take, not a contractor
+   result). Silent on 183 of 185 columns, so it is an exception report by construction and
+   cannot become wallpaper.
+3. **The export.** Both ride plumbing that already existed: the cell goes through the shared
+   `rows` array into `#cmp-data-table`, and `#cmp-verdict` already carries
+   `class="cmp-notice"`, which `copyComparisonTable()` harvests. Verified in the actual
+   clipboard artifact — the pasted `$50` row reads `-$33M ▼ value-negative at $50` and the
+   strip line lands in the numbered comparability notes.
+
+Also fixed in passing: the v666 g1 tooltip interpolated `_npvBase` — an HTML span on a
+gated column — into a `title` attribute. Now uses the plain formatted string.
+
+### Result
+An analyst comparing three countries sees, **before reading any row**, that one of them
+turns value-negative if oil falls to $50 — the fact that eliminates it under this
+platform's own screening rule — instead of inferring it from a hyphen in the rightmost
+cell, or missing it entirely and pasting a $75 ordering into the IC memo that the downside
+row contradicts.
+
+### Verification
+- JS syntax gate **PASS** (11 blocks).
+- Runtime suite **RAN**: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors.
+- **Zero horizontal scroll and zero console/page errors at 1920 / 1440 / 1280 / 1024 / 768 /
+  390** (390 with `hasTouch: true`), with the set rebuilt at each. Marker measures **45px at
+  390** under `pointer: coarse`.
+- Exercised on three sets: **Iraq/Indonesia/Malaysia** (fires, producer basis),
+  **Yemen/Norway/Angola** (fires, statutory basis labelled), **Guyana/Angola/Brazil**
+  (correctly silent — the normal case).
+- Counts re-derived from the primary source (`country_data.json`), not from the changelog.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — no banner, page-sub or routing hint. v430, v449/v451/v452,
+v489 untouched. Tab order unchanged. Not a tooltip-only change, not an FAQ, not a citation
+micro-edit, not rubric chasing. v840 written at the three display sites (`:42`, `:2484`,
+`:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **Fiscal Compare still prints the `$1.2B / $15-opex` literal** at `:51423` (CITABLE NPV
+  column hover) and `:28528` / `:28542` / `:28991` / `:29004`, where FC prints a MODEL and a
+  CITABLE column side by side so the literal is right for one and wrong for the other.
+  **Still wants a T3 or T5 cycle.** (Carried from 744/747.)
+- **Reform Risk country picker (`#rr-country-lookup`) offers 186 options** for 21 countries
+  with a log. (Carried from 746.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question, not a UX one.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover
+  title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with
+  nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder
+  provenance. (Carried from 736, re-scoped at 738.)
+- **NEW: `# Contracts` row in Side-by-Side prints unformatted integers** (`7643`, `4211`,
+  `135`) directly above a Fiscal Mechanics row printing `Concession (7,643)`. Cosmetic only
+  — logged, not worth a cycle on its own.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Nineteenth cycle carried, still uninvestigated.** Outside
+  the UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
