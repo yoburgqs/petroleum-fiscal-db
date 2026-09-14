@@ -51566,3 +51566,102 @@ visible reason.
 I walked it cold at 1440×900 with no stored state: Home → Screener card → Advanced Filters → untick the three fee-basis mechanics → tick Shell → collapse the panel. 185 rows became 31, and **nothing on screen named the two filters that removed the other 154.**
 
 - The collapsed `
+
+---
+## Cycle 757 Log — 2026-09-14
+- Test before: 300 PASS / 0 FAIL
+- Test after: **300 PASS / 0 FAIL / 0 WARN / 0 JS errors** — suite ACTUALLY RAN this cycle
+  (`runtime_comprehensive.js` against the local tree at `http://localhost:8778/petroleum-fiscal-db/`,
+  report read back from its own `ORCA_REPORT_FILE`, not assumed from a prior baseline).
+- JS syntax gate: PASS (11 script blocks, `node --check` each).
+- Shipped: **v849**, pushed as `9d1ebac`.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+Rotation: 756 was T1, 755 T5, 754 T2, 753 T3, 752 T6, 751 T4. T4 was stalest.
+
+## Friction
+Walked T4 cold at 1440×900 and 390×844 (`hasTouch`), storage cleared.
+
+**The reform half is finished.** All 21 scoreable countries return a specific IC action; the
+lookup is split into `scoreable (21)` / `no sourced log (164)` optgroups; the 164 name the statute
+the external check starts from; every window artefact in the ranked tables carries a ⚠ and its
+take-rise annotation; `openReformRiskFor()` round-trips with scroll restore. Nothing worth a cycle.
+
+**The stability half was not, on the one surface that ranks it.** The Fiscal Predictability Score
+renders on four screens. Three withdraw it where ORCA's own contract file refutes the one-term
+basis it was built on, and print the ceiling instead:
+
+| surface | applier | prints |
+|---|---|---|
+| Country Profile | `_cpApplyObsSpread()` | "ORCA's own contract file refutes the one-term basis" |
+| Side-by-Side | `_sbsApplyObsSpread()` | `76 UNGRADED / ≥29.6pp obs / best case / carry ≤52 LOW` |
+| Reform Risk | `_rrApplyObsSpread()` | "Carry ≤52 · LOW, not 76." |
+| **Explorer / Screener** | **— none —** | **`76 · UNGRADED · one term`** |
+
+The fourth is the 185-row table with the sortable **Stability** header — where the ranking actually
+happens. It printed the stored number, and its hover asserted the refuted claim outright, in the
+platform's own voice:
+
+> "every one of Norway's 7,643 contracts prices to the same take at $75/bbl, so the measured
+> spread is zero"
+
+Counted against the shipped `api/v1/country/*.json` this cycle, not assumed: **132 one-term rows,
+all resolvable, 41 refuted by their own contract file** — Uzbekistan 55.8pp, Angola 45.2, Albania
+40.3, Colombia 39.4, Indonesia 37.2, Thailand 36.6, Netherlands 30.8, Norway 29.6, Malaysia 13.8.
+True for 91 rows, false for 41, with nothing on screen to separate them. An analyst screening on
+this column carried Norway **76** into the memo; the tab the product itself nominates as the last
+gate before filing told them to carry **≤52 · LOW**.
+
+## Change
+`_expApplyObsSpread()` / `_expPaintObsSpread()`, modelled on the three existing appliers.
+
+- One-term rows resolve as they scroll into view. Where the contract file disagrees the cell
+  re-prints as a ceiling: **`≤52`** + **`LOW ▲`** + the stored **~~76~~** struck through + basis
+  chip `one term` → **`≥29.6pp obs`**.
+- The hover no longer claims every contract prices alike. It names the observed range, the points
+  the spread term costs, and that a ceiling is not a recomputed score.
+- Live result: Angola 62 → **≤26 VERY LOW**, Uzbekistan 89 → **≤49**, Colombia 72 → **≤40**,
+  Indonesia 62 → **≤32**, Norway 76 → **≤52 LOW**, Malaysia 54 → **≤43 VERY LOW**.
+- Vanuatu, Bahamas and Russia keep `one term` — their contract file agrees. The correction is
+  selective, not blanket.
+- Column legend and Stability header tooltip updated to describe the new chip rather than
+  contradict it.
+
+**Nothing recomputed, no new threshold.** The number is `_fpObsCeiling()`, the same object the
+other three surfaces paint from, so the four now read one value. It is a CEILING because the
+observed spread is a FLOOR on the true spread — same rule as v559/v713/v758.
+
+**The SORT is deliberately untouched.** It already ranks measured spreads first and one-term rows
+after them, which is correct and is what its header promises. Re-ranking on ceilings known only
+for the rows fetched so far would make the order depend on how far the analyst had scrolled.
+
+**Lazy by design.** IntersectionObserver + the v559 `cpObsSpread` cache: ~20 visible rows are
+fetched, not 185, and each country at most once per session. A row whose file is missing or
+unreadable is left exactly as it rendered rather than guessed at.
+
+### Two defects found by EXECUTING, not by reading
+Both would have shipped silently as a no-op — the cells would simply never have corrected:
+1. The observer must be rooted on **`.tbl-wrap`** (`max-height:750px; overflow-y:auto`). The table
+   scrolls *inside* it while the page itself moves ~450px total. Rooted on the viewport, every row
+   below the wrap's own fold reported `ratio 0` forever.
+2. It must observe the **`<tr>`, not the cell**. Stability is column 17 of 19 and the wrap scrolls
+   horizontally, so on a 1440px screen the cell is off the right edge of the root — it intersects
+   on neither axis, and all 132 reported `ratio 0` with their row in plain view.
+
+## Result
+An analyst screening on the Explorer Stability column now reads the same fiscal-stability number
+the Reform Risk tab will give them when they check that country before filing. Norway reads
+**≤52 · LOW** on the screening table, not 76. Four surfaces, one number.
+
+## Mobile (390×844, `hasTouch`)
+`scrollWidth 390 = clientWidth` at Home, Explorer cold, and Explorer fully scrolled. 132/132 rows
+resolved, 41 corrected. **0 controls under 24px** in the touched cells. 0 JS errors.
+
+## Carried forward (new this cycle)
+- **3 controls under 24px on the Reform Risk country card** — the sourced-event citation links
+  render at **21px** under `pointer: coarse` (`<a>` inside `.reform-event`, e.g. Norway's three
+  source links). Finalization criterion 3, on the surface T4 lands on. Small but real; a scoped
+  `min-height` inside the v612 mobile layer would close it. **Next T4 should take this.**
+- Explorer Stability sort does not reverse on a second click of the header (first click sorts,
+  second is a no-op). Low priority — the single order it produces is the correct one.
