@@ -50117,3 +50117,126 @@ silently, after the real change shipped and re-tested.
 Methodology → **Data Coverage At a Glance** (`index.html:4355`), reached from the *Coverage Summary* jump link. Its opening sentence states its job: *"What data is available for each country — and what is not."*
 
 All six ti
+
+---
+## Cycle 747 Log — 2026-09-13 19:05
+- Test before: 300 PASS / 0 FAIL (deployed baseline)
+- Test after: 299 PASS / 0 FAIL / 1 WARN — **suite RAN this cycle** against the edited local tree
+- JS errors: 0 from page code (1 console 404 for the service worker, an artifact of serving over
+  `python3 -m http.server`; present on the UNEDITED tree in the same walk, before any change)
+- Summary: Cycle 747 complete — **v839** shipped (`87e732d`), pushed, mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(rotation: 746 was T6, 745 T4, 744 T1, 743 T3, 742 T5 — T2 last ran at 741.)
+
+## Friction
+Country Profile, cold load at 1440x900 over http, both storages cleared. The tab self-seeds
+Indonesia, so the first thing a first-time analyst sees is a headline strip reading
+
+    NPV: $745M @$75  ·  Downside: $334M @$50 (survives $50)  ·  BE: < $50/bbl bounded
+
+The whole of T2 is *can I defend that*. Six places on this screen answer the question "on what
+project was this computed?" — and every one of them was a hand-typed literal reading
+
+    $1.2B capex · 294 MMbbl · $15/bbl opex
+
+That is `DCF_PROFILES.deepwater` — the **Live DCF / Scenario Builder** project. The stored figure
+is `petroleum_dcf.py` run on `tools/petroleum/dcf_profiles.py` `PROFILES.deepwater`, verified
+against that file this cycle: 300 + 300 + 200 development, 30/yr sustaining over years 3–7, 50
+abandonment = **$1,000M all-in**; **5yr plateau**; 15% decline; **$18/bbl escalating 2%/yr real**;
+**241.9 MMbbl**.
+
+The page already knows this and says so twice — the footnote under the price-scenario block
+(`index.html:39728`) and the Live DCF reconciliation panel, which prints Indonesia's two NPVs side
+by side, **$745M against $2.62B**, under a line reading *"the two profiles both named Deepwater
+recover 242 and 294 MMbbl respectively."* So an analyst who scrolled down to defend the headline
+found the page contradicting itself about its own number — with the **wrong** version attached to
+the number itself, and the correct one 8,000px away.
+
+The six sites, all in the CP render path:
+
+| site | what it is | where |
+|---|---|---|
+| `cpContractColNote()` | **body paragraph** under the contract table — exists solely to say what the headline NPV is | `:53501` |
+| NPV @$75 hover | the tooltip on `$745M` itself | `:38865` |
+| Downside @$50 hover | the tooltip on `$334M` | `:38876` |
+| `cpBeBound()` tip | the tooltip on the `bounded` breakeven marker | `:53379` |
+| IC verdict pill hover | "FLOOR CHECK, not a ranking…" | `:38757` |
+| `cpBandNpvNote()` | the band-rank timing reading | `:38016` |
+
+Only the first is body text; the other five are what an analyst hovers precisely *because* they
+are about to cite. v833 fixed the two CP body notes and v834 the seven exported artifacts — these
+six were the copies left on the screen.
+
+## Change
+- New `_engineBasisLine(full)` and `_panelBasisLine()` (`:47102`), **derived from `ENGINE_BASIS`
+  and `DCF_PROFILES` at call time** — the treatment v574 gave the citation versions and v834 gave
+  the exports. All six sites now call them. There is no hand-typed copy of either project left on
+  this screen to fall out of step again.
+- Every one of the six now reads
+  `50k bbl/d peak · 5yr plateau · 241.9 MMbbl recovered · $1.0B all-in capex · $18/bbl opex escalating 2%/yr real`.
+- The body paragraph additionally gained the clause the two honest sites already carry — new
+  `_cpPanelIsNotThis()` (`:53536`): *"That is the **engine** profile — not the Live DCF Model panel
+  further down this page, which is also labelled "Deepwater" but runs a different project ($1.2B
+  development capex · 8yr plateau · 294.0 MMbbl · $15/bbl flat opex) and returns a different NPV on
+  the same country at the same price."* The panel sits ~1,800px below that paragraph; it is the
+  thing the analyst would otherwise reconcile the headline against.
+
+## Result
+An analyst defending the $745M reads **one** basis on this page instead of two contradictory ones,
+and the basis printed on the number is the basis that produced it. The assumptions line they paste
+into an IC memo now rebuilds the figure it sits under — it previously named a project that returns
+$2.62B for the same country at the same price.
+
+### Verification
+- JS syntax gate: **11 scripts, 0 bad.**
+- **Playwright RAN this cycle** against the edited local tree: **299 PASS / 0 FAIL / 1 WARN.** The
+  WARN is `[ConsoleErrors] non-critical errors: A bad HTTP response code (404) … fetching the
+  script` — the service worker under `python3 -m http.server`. The same 404 was captured on the
+  **unedited** tree in this cycle's first cold walk, before any edit. Not caused by this change.
+- Pixel gate: **PASS — no surface got worse than baseline.** 7 findings (3 `small-touch-target` +
+  1 `clipped-text` at 768, 3 `small-touch-target` at 390), all pre-existing and in other elements.
+- `scrollWidth === clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** (390 with
+  `hasTouch: true`), with the edited paragraph scrolled into view at every one. **0 page and 0
+  console errors at all six.** No control added or touched renders under 24px under
+  `pointer: coarse` (the paragraph's existing `run Scenario Builder →` link measures ≥24px at 390).
+- Exercised on **Indonesia, Norway, Malaysia, USA, Iraq, Turkmenistan, Angola**: 0 tooltips and 0
+  body text carrying the old literal on any of them; both branches of `cpContractColNote()` covered.
+- `ENGINE_BASIS` re-verified against the primary source, `tools/petroleum/dcf_profiles.py`
+  `PROFILES.deepwater`, not against the changelog.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched. v371/v373
+declutter intact — no banner, page-sub or routing hint; the change is entirely inside text already
+on the page. v430, v449/v451/v452, v489 untouched. Tab order unchanged. Not a tooltip added, not an
+FAQ, not a citation micro-edit, not rubric chasing. v839 written at the three display sites
+(`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **CLEARED this cycle:** "~20 on-screen tooltips / column headers still carry the $1.2B literal"
+  (carried from 744) is now **partially** cleared — the six in the Country Profile render path are
+  derived. Remaining sites live in **Fiscal Compare** (`:51423` CITABLE NPV column hover, `:28528`
+  / `:28542` Side-by-Side metric hovers, `:28991` / `:29004`) and in Methodology/FAQ prose. The FC
+  ones matter more than the prose: FC prints a MODEL column and a CITABLE column side by side, so
+  the literal is correct for one and wrong for the other. **Wants a T3 or T5 cycle.**
+- **The Reform Risk country picker (`#rr-country-lookup`) offers 186 options** — all 185 countries
+  plus a placeholder — although only 21 have a log. (Carried from 746.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares** —
+  71.2% (profile summary + XLSX), 64.4% (parameter table), and the R-factor ladder at 60–88%, which
+  is the only one the DCF reads. The page discloses this in full and tells the analyst to reconcile
+  against Indonesia's petroleum act; the underlying disagreement is a **Fork-1 data question**, not
+  a UX one, and no UX cycle can close it.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of 87.2% /
+  85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (Carried from 736, re-scoped at 738.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Eighteenth cycle carried, still uninvestigated.** Outside the UX-finalization
+  course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
+  directly.**
