@@ -51771,3 +51771,116 @@ country IRR regrew on a new surface six times before anyone asserted its absence
 
 ### First: the 2 FAIL was not a regression
 The suite targets the **deployed** site, which was still v849. Two earlier cycles had built v850 and v851, written the guard assertions, and **never committed or pushed**. The `EXPL-NO-IRR` guard was correctly reporti
+
+---
+
+## Cycle 761 — v853 — 2026-09-14
+
+**Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"*
+(rotation: 758 was T3, 757 T4, 756 T1, 755 T5, and T2 has not run since 754 — stalest.)
+
+### Friction
+
+Walked cold at 1440px, no sessionStorage, no localStorage: Home → **Country Profile** →
+select **Norway**.
+
+Attractiveness itself reads well on this page. The headline already refuses to oversell —
+*"Clears the 10% WACC at $75 ($826M) … but so do 181 of 182 non-monopoly regimes here"* —
+and it already splits the take finding from the NPV finding. The weak half of T2 is
+**"can I defend that?"**, and the page's own answer to that is the **Similar Fiscal Profile**
+section: regimes within ±6pp of this country's take drawn from **different regions**, which is
+exactly the exhibit that shows an IC the number is not a regional artefact. Its one action is
+the button at the foot of that section.
+
+That button never put anything in the Side-by-Side grid.
+
+`index.html:41195` (inside `loadCountryProfile` → `similars` block) built its own onclick inline:
+
+```js
+clearCompare();
+['Norway','Algeria','Kazakhstan','Equatorial Guinea']
+  .forEach(function(c){ if(c && window.compareBasket) window.compareBasket.add(c); });
+switchTab('t2', …);
+```
+
+Two comparison stores exist with near-identical names, and the button used the wrong one:
+
+| store | what it is | what reads it |
+|---|---|---|
+| `compareList` (27281) | the Side-by-Side array | `renderCompare()` — the grid |
+| `window.compareBasket` (57175) | a `Set` in localStorage | `renderBasket()` — the floating pill bar |
+
+`clearCompare()` empties `compareList`; the four countries then went into the **basket**.
+Arriving at `t2` with an empty `compareList` re-armed the seeded example. Measured:
+
+| | |
+|---|---|
+| asked for | Norway, Algeria, Kazakhstan, Equatorial Guinea |
+| got | `["Norway","United Kingdom","Netherlands"]` |
+| banner | **"Example loaded: North Sea Trio"** |
+| share hash | `#/compare/norway+united_kingdom+netherlands` |
+
+Zero of the three analogues requested. Two columns never chosen. Worse than a no-op in two
+ways: the share hash carried the demo set, so a link sent to the IC propagated it; and the
+banner reads **identically to a cold tab**, so the most available reading is that the click
+did nothing — not that it quietly substituted a different set of countries. The one exhibit
+whose entire purpose is cross-region defensibility handed back three North Sea neighbours.
+
+Same failure *class* as the `SBS-EXAMPLE` defect cycle 758 fixed on the other side, and the
+directive's own v460 entry (a button calling the wrong function and silently failing).
+
+### Change
+
+The button now calls **`cpLoadPeersSbs(country, peers)`** — the identical call the *Peer
+Comparison* section further up this same page has been using correctly all along. That
+function drops the example, holds the hash while it rebuilds, replaces rather than appends,
+and names anything it evicted.
+
+The face of the button also states the real count and the country —
+**"Compare Norway + top 3 peers in Side-by-Side →"**. `similars` can be shorter than 3, and
+the old label said "top 3" regardless.
+
+Also deleted `sbs3Onclick` (41196): computed, never referenced, and carrying a defect of its
+own — `['a','b','c'.split(',')]` nested an array inside the country list.
+
+### Result
+
+The three analogues the section prints on screen are the three columns the analyst gets,
+beside the country itself, with a share hash that matches what is rendered. The cross-region
+peer set is defensible in Side-by-Side instead of being replaced by the North Sea demo.
+
+### Verification — the suite actually ran this cycle
+
+- **305 PASS / 0 FAIL / 1 WARN** against the local tree at v853. JS syntax gate: 11 blocks,
+  0 failures. Cycle 758 measured **303** locally; the **+2** are the assertions added here.
+  The 1 WARN is a 404 on a script that only exists on Pages, an artefact of the local server.
+- **Negative control**, both builds served side by side, assertion is label-agnostic so it
+  tests behavior rather than copy:
+
+  | build | `compareList` after the click | example banner | verdict |
+  |---|---|---|---|
+  | pre-fix (v852) | `["Norway","United Kingdom","Netherlands"]` | true | **FAIL** |
+  | v853 | `["Norway","Algeria","Kazakhstan","Equatorial Guinea"]` | false | **PASS** |
+
+- **New guard `Comparison / CP-PEER-SBS`**, 2 assertions, driven through a **real click on the
+  real button** because the defect lived in the onclick string, not in a function. It reads the
+  expected peer names off the rendered rows rather than hard-coding them, so it will not go
+  stale when the underlying data moves.
+- **Mobile 390×844 `hasTouch`:** `scrollWidth 390 = clientWidth` at Home, Country Profile cold,
+  Norway loaded, Side-by-Side after the launch, and scrolled to bottom. Touched control measures
+  **27px**. 0 JS errors. Peer set loads correctly on the phone.
+
+### Carried forward
+
+- **3 controls under 24px on the Reform Risk country card** — sourced-event citation links render
+  at 21px under `pointer: coarse`. Open since cycle 757; a T4 cycle should take it.
+- **Norway's State Participation contradiction is on screen and loud** (`0%` unsourced in the
+  evidence chain vs `33.4%` hard-coded in the Live DCF panel, a 33.4pp gap). The page already
+  says "do not quote either" — this is a **data** gap, not a UX one, and no cycle can close it
+  from `index.html`. Logging it so it is not repeatedly re-found as a UX defect.
+- **`window.compareBasket` vs `compareList` is a standing trap.** Two stores, near-identical
+  names, and `clearCompare()`/`clearBasket()` operate on different ones. This cycle found one
+  caller that picked wrong; a sweep for others is worth a future cycle.
+- Explorer Stability sort still does not reverse on a second header click. Low priority.
+- **Still no process check comparing the deployed version string against the local tree** —
+  carried from 758, still true.
