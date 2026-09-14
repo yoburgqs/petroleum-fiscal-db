@@ -51899,3 +51899,132 @@ peer set is defensible in Side-by-Side instead of being replaced by the North Se
 **Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* (758 was T3, 757 T4, 756 T1, 755 T5 — T2 hadn't run since 754.)
 
 **Friction.** Walked cold at 1440px into Country Profile → Norway. The *attractiveness* half of T2 reads well — the headline already refuses to oversell ("clears the 10% WACC at $75… but so do 181 of 182 non-monopoly regimes here"). The weak half is 
+
+---
+
+## Cycle 762 — v854 — T6
+
+**Task: T6** — *"Where did this number come from and how solid is the evidence?"* (761 was T2, 758 T3, 757 T4, 756 T1, 755 T5 — T6 had not run since 751.)
+
+### Friction
+
+Walked T6 cold at 1440x900, storage cleared. The Country Profile evidence layer is in good
+shape and was not the weak point: swept across 15 countries (Norway, Indonesia, Nigeria, Guyana,
+Iraq, Namibia, Suriname, Angola, Brazil, Senegal, Mozambique, Kazakhstan, Libya, Vanuatu,
+Montenegro) the evidence chain prints a per-parameter ORCA-value / statutory / source table,
+partitions the rows the model does not read, names the unsourced ones, and the Fiscal Compare
+drilldown reaches it in one click via `_fcOpenTermChain()`. Fiscal Compare's Quality cell, the
+IOC Portfolio Evidence column and the Home sourcing strip are all correctly scoped.
+
+The break is on **Explorer**. Its Evidence header is the one control that 185-row table offers
+for "how solid is the evidence?" — v557 already had to fix it once, when it was sorting on the
+wrong key entirely. It returns weakest-grade first (Iraq D, Colombia C, Kazakhstan C, Nigeria C),
+which is the correct default and what its tooltip promises. **Clicking it a second time did
+nothing at all.** `setExplorerSort()` only ever wrote the key into `#flt-sort` and re-rendered:
+
+```
+v853, measured cold, three consecutive clicks on the Evidence header
+  click 1  Iraq(D), Colombia(C), Kazakhstan(C), Nigeria(C), Ecuador(C), Oman(C) …
+  click 2  byte-identical
+  click 3  byte-identical
+  aria-sort  "ascending" throughout
+```
+
+Swept all eight sortable headers — `country, take, evidence, npv, npv50, be, swing, stability` —
+**every one of them one-way.** So there was no way to put the best-evidenced countries at the top
+of this table at all. Under the default *Verified production first* grouping the 28 A-graded
+countries land at rows 19–22 and then again at the bottom of the proxy block; the first A row sits
+1,144px down the page behind 17 rows of D and C. An analyst asking which of their shortlist they
+can actually defend had to read the table backwards. This also closes the "Explorer Stability sort
+does not reverse" item carried forward from 758 — it was never a Stability bug, it was all eight.
+
+### Change
+
+`setExplorerSort()` now carries a direction. Clicking the active header flips it; clicking a
+different header adopts that column's declared default; choosing a key from the Sort dropdown
+resets to default, because the `<option>` labels name a direction ("Evidence (weakest first)")
+and must not inherit a reversal set on another column.
+
+The arrow and `aria-sort` follow the real direction. Before this the class was a constant per key
+and `aria-sort` was never written at all — seven of the eight headers kept the literal
+`aria-sort="none"` from the markup, and the Evidence header announced "ascending" whether or not
+it was the active sort.
+
+**The order in force is now printed in words under the row count** — *"Ordered best-evidenced
+first, inside each data-basis block · click the Evidence header again to reverse it back"*. That
+is the affordance that was missing; an arrow glyph does not teach a gesture nobody knows exists.
+The Stability note's "least predictable first" inverts with it rather than going stale.
+
+Direction is **relative to each column's declared default**, so no comparator in
+`_explMetricCmp()` changed — `npv`/`npv50` still negate, `stability` and `evidence` still rank
+through `_fpSortVal()`/`_evidenceSortVal()`. The two **grouping** terms are deliberately outside
+the flip: reversing the breakeven split would lift the 120 countries with no breakeven above the
+65 that have one, and reversing the data-basis grouping would lift regional-proxy economics above
+verified production. Neither is a thing an analyst can have meant by clicking a header twice.
+Both verified to still hold under reversal. The Screener has had this since v587 (`_scSortDir`);
+this is the same two-state toggle minus its third "off" state, because `#flt-sort` is the
+Explorer's single source of truth for the key and must always hold one.
+
+### Result
+
+The analyst can put the best-evidenced countries at the top of the Explorer — **Canada, Angola,
+Norway, Brazil, all grade A, all production-backed** — instead of reading 185 rows upward from
+Iraq. The same gesture now works on all eight columns.
+
+### Verification — the suite actually ran this cycle
+
+- **311 PASS / 0 FAIL / 1 WARN** against the local tree at v854. 305 before the new guard, **+6**
+  from it; cycle 761 measured 305 locally, so the baseline is unmoved. The 1 WARN is a 404 on a
+  script that only exists on Pages, an artefact of the local server. JS syntax gate: 11 blocks,
+  0 failures.
+
+- **Negative control**, both builds served side by side from the repo so every asset resolved,
+  fully loaded, **0 JS errors on each**:
+
+  | build | click 1 | click 2 | aria-sort after click 2 | verdict |
+  |---|---|---|---|---|
+  | pre-fix (v853) | Iraq (D), Colombia (C), Kazakhstan (C) | **identical** | ascending | **FAIL** |
+  | v854 | Iraq (D), Colombia (C), Kazakhstan (C) | Canada (A), Angola (A), Norway (A) | descending | **PASS** |
+
+- **New guard `Explorer / EXPL-SORT-DIR`**, 6 assertions. Stated as a **difference** between
+  click 1 and click 2 and a **return** on click 3 rather than against any hard-coded country
+  order — the old defect was invisible to every existing assertion precisely because "clicking
+  Evidence sorts by evidence" passed while the second click did nothing. It will not go stale when
+  the underlying evidence grades move. It also sweeps all eight headers and asserts the grouping
+  terms survive the reversal. **Run against the pre-fix build it fails 4 of 6**, naming the
+  one-way headers outright:
+
+  ```
+  ✗ EXPL-SORT-DIR evidence reverses: second click left the order unchanged
+  ✗ EXPL-SORT-DIR aria-sort tracks direction: got ascending -> ascending
+  ✗ EXPL-SORT-DIR all headers reverse: one-way headers: country, take, evidence,
+                                       npv, npv50, be, swing, stability
+  ✗ EXPL-SORT-DIR count line names the order
+  ```
+
+  The 2 that still pass there are the ones vacuously true when nothing moves.
+
+- **Six viewports — 1920 / 1440 / 1280 / 1024 / 768 / 390:** `scrollWidth == clientWidth` at every
+  one, measured on arrival, after both taps, and scrolled to the bottom. **Zero horizontal scroll.**
+  The Evidence header measures **45px** with a mouse and **30px** under `pointer: coarse`; reversal
+  verified by real taps at 390x844 with `hasTouch`. 0 JS errors at every width. The `npv50` and
+  `be` headers report 0px on a phone — they carry `expl-sm-off` (`display: none` below the
+  breakpoint), so they are not rendered controls there, and both remain reachable via the Sort
+  dropdown.
+
+### Carried forward
+
+- **3 controls under 24px on the Reform Risk country card** — sourced-event citation links render
+  at 21px under `pointer: coarse`. Open since cycle 757; a T4 cycle should take it.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs `33.4%`
+  hard-coded in the Live DCF panel). The page already says "do not quote either". This is a
+  **data** gap, not a UX one, and no cycle can close it from `index.html`.
+- **`window.compareBasket` vs `compareList`** remains a standing trap — two stores, near-identical
+  names, `clearCompare()`/`clearBasket()` operating on different ones. 761 found one caller that
+  picked wrong; a sweep for others is still worth a cycle.
+- **`copyExplorerLink()` does not serialize the sort key or its direction**, so a shared Explorer
+  link does not reproduce the order the sender was looking at. Pre-existing — the key was never
+  serialized either — but the reversal makes the gap one step wider. Small, and a candidate for a
+  future T5 cycle.
+- **Still no process check comparing the deployed version string against the local tree** —
+  carried from 758 and 761, still true.
