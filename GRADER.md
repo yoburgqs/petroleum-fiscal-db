@@ -50496,3 +50496,16 @@ the cite control's behaviour both changed. v841 written at the three display sit
 - Test after: 299 PASS / 0 FAIL / 1 WARN (local http; WARN = pre-existing sw 404)
 - JS errors: 0 page errors, 0 console errors at all six viewports
 - Summary: Cycle 749 complete — **v841** shipped (`87359a3`), pushed, mirror in sync.
+
+---
+## Cycle 749 Log — 2026-09-13 21:01
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 749 complete — **v841** shipped (`87359a3`), grader log (`00a4269`), both pushed, mirror synced.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (748 was T3; T5 last ran at 742.)
+
+## Friction
+Cold load at 1440×900 over http, both storages cleared. Fiscal Compare carries two NPV columns. The second — `NPV ($M) db · citable` — is the one the platform's own tooltip calls *"the one that reaches your memo."* That header (`renderFCResults`, `index.html:51502`) hand-ty
