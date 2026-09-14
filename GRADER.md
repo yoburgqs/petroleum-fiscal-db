@@ -52506,3 +52506,18 @@ instead of appearing to be ignored.
 - Test after: 318 PASS / 0 FAIL (317 + the off-Pages `sw.js` WARN, measured locally)
 - JS errors: 0
 - Summary: v858 shipped and pushed. Screener default ranking is now named on the column that produces it, and clicking that column reorders instead of no-opping.
+
+---
+## Cycle 766 Log — 2026-09-14 17:26
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 766 complete — v858 shipped and pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (765 was T3; T1 last ran at cycle 756.)
+
+## Friction
+Walked it cold — no localStorage, no sessionStorage — by the platform's own headline route: Home → *"15 countries pass the IOC capital screen … open the screen →"* → the Screener, fifteen rows numbered **1…15**.
+
+For T1 that `#` column *is* the deliverable. Nothing on screen said what produced it. `_scSortKey` is `null` on tha
