@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v852</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v853</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2498,7 +2498,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v852</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v853</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2568,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v852</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v853</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27776,7 +27776,7 @@ function addCompare(country) {
     return false;
   }
   if (compareList.includes(country)) {
-    // v852 (T3): this branch used to call _sbsDropExample() and stop. That only clears the
+    // v853 (T3): this branch used to call _sbsDropExample() and stop. That only clears the
     // UNTOUCHED flag and removes the banner -- it leaves the other example countries standing.
     // So v509's fix covered only the analyst whose first pick is NOT in the seed. An analyst
     // whose first pick IS in it (the seed is Norway / United Kingdom / Netherlands, and Norway
@@ -41191,13 +41191,27 @@ function loadCountryProfile(country) {
       + '<span style="font-size:10px;font-weight:700;color:' + (d.npv_50 != null && d.npv_50 > 0 ? 'var(--green)' : d.npv_50 != null ? 'var(--negative)' : 'var(--muted)') + ';font-family:\'IBM Plex Mono\',monospace;' + _sfpColW + '">' + (d.npv_50 != null ? cpNpvFmt(d.npv_50) : '\u2014') + '</span>'
       + '<span style="width:13px;"></span>'
       + '</div>';
-    // v456: "Compare top 3 in Side-by-Side" button — loads current country + top 3 similar peers into SbS
-    const top3 = similars.slice(0, 3).map(p => p.country.replace(/'/g, "\\'"));
-    const sbs3Onclick = top3.length >= 1
-      ? `clearCompare();['${country.replace(/'/g, "\\'")}','${top3.join("','")}'.split(',')].forEach(function(c){if(c&&window.compareBasket)window.compareBasket.add(c);});switchTab('t2',document.getElementById('tab-btn-t2'));`
-      : '';
+    /* v456: "Compare top 3 in Side-by-Side" button — loads current country + top 3 similar peers into SbS.
+       v853 (T2): it did not. The button pushed its four countries into `window.compareBasket` — the
+       floating basket bar's Set, which the Side-by-Side grid never reads — while `clearCompare()`
+       emptied `compareList`, which is the only thing that grid renders. Landing on t2 with an empty
+       compareList re-seeded the canned example, so an analyst on Norway who asked for its three
+       closest fiscal analogues (Algeria, Kazakhstan, Equatorial Guinea) got the North Sea Trio
+       (Norway, United Kingdom, Netherlands) — zero of the three peers requested, two columns never
+       chosen, and an "Example loaded:" banner implying the click never happened.
+       Route through cpLoadPeersSbs(), which is what the Peer Comparison button on this same page
+       already uses: it drops the example, holds the hash, replaces rather than appends, and names
+       anything it evicted. Also state the real peer count — `similars` can be shorter than 3, and
+       the face of the button said "top 3" regardless. */
+    const top3 = similars.slice(0, 3).map(p => p.country);
+    const sbs3Click = "cpLoadPeersSbs(decodeURIComponent('" + encodeURIComponent(country) + "'),["
+      + top3.map(function(c) { return "decodeURIComponent('" + encodeURIComponent(c) + "')"; }).join(",")
+      + "])";
     const sbs3Btn = top3.length >= 1
-      ? '<div style="margin-top:8px;text-align:right;"><button class="btn btn-sm btn-outline" style="font-size:11px;" onclick="clearCompare();[' + [country,...similars.slice(0,3).map(p=>p.country)].map(c=>"'"+c.replace(/'/g,"\\'")+"'").join(',') + '].forEach(function(c){if(c&&window.compareBasket)window.compareBasket.add(c);});switchTab(\'t2\',document.getElementById(\'tab-btn-t2\'));" title="Load this country + top 3 fiscal peers into Side-by-Side comparison (clears existing SbS)">Compare top 3 peers in SbS →</button></div>'
+      ? '<div style="margin-top:8px;text-align:right;"><button class="btn btn-sm btn-outline" style="font-size:11px;min-height:24px;" onclick="' + sbs3Click + '"'
+        + ' title="' + _esc594('Loads ' + country + ' and ' + (top3.length === 1 ? 'its closest fiscal peer' : 'its ' + top3.length + ' closest fiscal peers') + ' (' + top3.join(', ') + ') into Side-by-Side as the full comparison. Replaces whatever is in the comparison now.') + '">'
+        + _esc594('Compare ' + country + ' + top ' + top3.length + ' peer' + (top3.length === 1 ? '' : 's'))
+        + ' in Side-by-Side →</button></div>'
       : '';
     return '<div class="dd-section">'
       + '<h3>Similar Fiscal Profile <span style="font-weight:400;font-size:11px;color:var(--muted);">countries with take within ±6pp of ' + selfTake.toFixed(1) + '% · different regions · click row to open profile</span></h3><div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;"><strong style="color:var(--text);">IC use:</strong> Fiscal analogues — regimes with comparable government take across different geographies. Read <strong style="color:var(--text);">NPV @$75</strong> against this country\'s own row to rank contractor value on the base case, and <strong style="color:var(--text);">NPV @$50</strong> to see which analogues survive a price break. The two columns can rank the set differently. Load top 3 into Side-by-Side for a direct column comparison.</div>'
