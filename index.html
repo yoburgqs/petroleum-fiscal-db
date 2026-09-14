@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v844</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v845</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v844</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v845</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v844</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v845</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27498,6 +27498,27 @@ function removeCompare(country) {
   _updateCompareHash();
 }
 function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash(); }
+
+// ── v845 (T3): rescue a comparison the data-basis gate has refused. ──────────────────────────
+// v626's gate is right — a production-weighted column and a statutory-terms column do not rank
+// against each other — but when it fires it leaves the analyst with "NOTHING RANKS HERE" and no
+// way forward. Replaces the set with the columns that DO rank against each other, keeping the
+// analyst on the tab. Same shape as cpLoadPeersSbs(): replace rather than edit, hold the hash so
+// the whole change is one history entry, and name what was removed once the grid is up.
+function sbsKeepBasis(names) {
+  if (!Array.isArray(names) || names.length < 2) return;
+  var dropped = (compareList || []).filter(function (c) { return names.indexOf(c) < 0; });
+  _sbsDropExample();
+  _cmpHashHold = true;
+  try { compareList = names.slice(); cmpAddSeq = names.slice(); _sbsApplyOrder(); renderCompare(); }
+  finally { _cmpHashHold = false; }
+  _updateCompareHash();
+  if (dropped.length && typeof showCopyToast === 'function') {
+    showCopyToast('Now comparing the ' + names.length + ' columns ORCA can rank against each other: '
+      + names.join(', ') + '. Removed: ' + dropped.join(', ')
+      + ' — read those rows on their own basis, or re-add them from the search box above.');
+  }
+}
 var _cmpHashHold = false;   // v797: fcOpenSbs() loads a whole set, then writes ONE history entry, not one per country
 function _updateCompareHash() {
   if (_cmpHashHold) return;
@@ -29188,9 +29209,81 @@ function renderCompare() {
         + (_vdDown.length === 1 ? 'Do not carry this column' : 'Do not carry these columns')
         + ' into the memo on the $75 ordering alone; state the sign change beside it.</div>'
       : '';
+    // ── v845 (T3): the way out of "NOTHING RANKS HERE". ──────────────────────────────────────
+    //
+    // Walked T3 cold at 1440x900, no storage, and built the comparison an analyst actually builds:
+    // Guyana, Brazil, Suriname — the Atlantic margin. Guyana + Suriname alone order correctly
+    // ("GOVT TAKE @$75, LOWEST FIRST: Guyana 54.1% > Suriname 54.2%", contractor value ordered
+    // too). Adding Brazil — one more country, the obvious next click — DESTROYS both orderings:
+    // Brazil is the only production-weighted column, v626's basis gate fires, and the strip turns
+    // into "NOTHING RANKS HERE: Only Brazil carries a comparable take. A single column is not a
+    // comparison", with every take and NPV cell on the other two stamped "not comparable".
+    //
+    // The gate is correct and stays. What was missing is the exit. Three notices told the analyst
+    // what could not be done and not one named the set that works — which here is two of the three
+    // columns already on screen. The analyst's move is to REMOVE a column, and removing a column
+    // to get MORE comparison is not a step anyone guesses in a 20-minute screening window.
+    //
+    // Fires only where the basis gate is what broke the ordering (_cmpBasisGate && fewer than two
+    // ranked columns), so a set that still orders — the tab's own Norway/UK/Netherlands default —
+    // is untouched. The subset is not assumed to work: on a single-basis subset the gate is off by
+    // construction, so _cmpRankTake's OTHER null branches (state monopoly, PRRT, fee-blended with
+    // no Group-1 take) are re-run against it, and the offer is made only where two columns survive.
+    // Where neither basis reaches two, there is no button — it says which side needs one more.
+    const _basisFix = (function () {
+      if (!_cmpBasisGate || _vdRanked.length >= 2) return '';
+      const _rankNoGate = (d) => {
+        const v = d ? d.take_75 : null;
+        if (v == null || isStateMonopoly(v)) return null;
+        const st = _cmpMixStat(d);
+        if (st.prrt) return null;
+        if (st.blended) return (st.g1 && st.g1.t75 != null) ? st.g1.t75 : null;
+        return v;
+      };
+      const _grp = (names, label, why) => {
+        const set = selected.filter(d => d && names.indexOf(d.country) >= 0);
+        return { label: label, why: why, names: names,
+                 ranks: set.filter(d => _rankNoGate(d) != null).length };
+      };
+      const _cands = [
+        _grp(_cmpProdNames, 'production-weighted',
+             'ORCA holds verified field production behind ' + (_cmpProdNames.length === 1 ? 'it' : 'each of them')),
+        _grp(_cmpStatNames, 'statutory-terms',
+             'each is the legal regime run on the same standard profile')
+      ].filter(g => g.names.length >= 2).sort((a, b) => b.ranks - a.ranks);
+      const _ok = _cands.filter(g => g.ranks >= 2);
+      const _wrap = (inner) => '<div style="font-size:11px;color:var(--muted);line-height:1.55;display:flex;'
+        + 'flex-wrap:wrap;align-items:center;gap:8px;">' + inner + '</div>';
+      if (!_ok.length) {
+        const _short = _cmpProdNames.length >= _cmpStatNames.length
+          ? { label: 'production-weighted', have: _cmpProdNames } : { label: 'statutory-terms', have: _cmpStatNames };
+        return _wrap('<span><strong style="color:var(--text);">To get an ordering back:</strong> this set holds '
+          + _cmpProdNames.length + ' production-weighted column' + (_cmpProdNames.length === 1 ? '' : 's') + ' ('
+          + _cmpEsc(_cmpProdNames.join(', ')) + ') and ' + _cmpStatNames.length + ' statutory-terms column'
+          + (_cmpStatNames.length === 1 ? '' : 's') + ' (' + _cmpEsc(_cmpStatNames.join(', '))
+          + '), and neither side reaches two rankable columns. Add a second '
+          + _short.label + ' country, or drop the odd column out — ORCA orders columns within one basis, never across the two.</span>');
+      }
+      const _btn = (g) => '<button type="button" data-cmp-uionly="1" data-keep="' + _cmpEsc(JSON.stringify(g.names))
+        + '" onclick="sbsKeepBasis(JSON.parse(this.dataset.keep))"'
+        + ' title="' + _cmpEsc('Replaces this comparison with ' + g.names.join(', ')
+            + ' — the ' + g.names.length + ' ' + g.label + ' columns in the set, ' + g.why
+            + '. They rank against each other, so the take, contractor-value and predictability '
+            + 'orderings come back. Nothing is deleted: re-add the other columns from the search box above.')
+        + '" style="display:inline-flex;align-items:center;min-height:26px;font-size:11px;font-weight:700;'
+        + 'color:var(--accent);background:var(--surface2);border:1px solid var(--accent);border-radius:4px;'
+        + 'padding:2px 10px;cursor:pointer;white-space:nowrap;">Compare the ' + g.names.length + ' '
+        + g.label + ' columns \u2192</button>';
+      return _wrap('<span><strong style="color:var(--text);">A comparison is available in this set:</strong> '
+        + _ok.map(g => _cmpEsc(g.names.join(' + ')) + ' rank against each other').join(', and ')
+        + '. Restrict the comparison to one basis and the orderings come back \u2014 nothing is deleted, '
+        + 'and the columns you drop can be re-added from the search box above.</span>'
+        + _ok.map(_btn).join(''));
+    })();
     _vdHtml = '<div id="cmp-verdict" class="cmp-notice" style="margin-bottom:10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.22);border-left:3px solid var(--accent);border-radius:5px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">'
       + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">' + _lead + '</div>'
       + _aside
+      + _basisFix
       + _rebLine
       + _valLine
       + _dsLine
@@ -47057,7 +47150,16 @@ function copyComparisonTable(btn) {
   try {
     var _nodes = document.querySelectorAll('#cmp-output .cmp-notice');
     for (var _n = 0; _n < _nodes.length; _n++) {
-      var _t = (_nodes[_n].innerText || _nodes[_n].textContent || '')
+      // v845 (T3): a notice may now carry an on-screen CONTROL (the basis-fix button). Its label
+      // is an instruction to the tool, not a note about the set, so it does not belong in a pasted
+      // memo. Read a clone with anything marked data-cmp-uionly removed; the prose stays.
+      var _src = _nodes[_n];
+      if (_src.querySelector('[data-cmp-uionly]')) {
+        _src = _src.cloneNode(true);
+        var _ui = _src.querySelectorAll('[data-cmp-uionly]');
+        for (var _u = 0; _u < _ui.length; _u++) _ui[_u].parentNode.removeChild(_ui[_u]);
+      }
+      var _t = (_src.innerText || _src.textContent || '')
         .replace(/[\u24D8\u2139\u24BE\u200A]/g, '')
         .replace(/\s+/g, ' ')
         // On screen these notices sit under the grid, so they say "the Price Swing row below".
