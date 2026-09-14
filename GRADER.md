@@ -50240,3 +50240,18 @@ FAQ, not a citation micro-edit, not rubric chasing. v839 written at the three di
   *and* 2026-09-13. **Eighteenth cycle carried, still uninvestigated.** Outside the UX-finalization
   course this directive sets, so no cycle will ever pick it up. **This wants Zach's attention
   directly.**
+
+---
+## Cycle 747 Log — 2026-09-13 19:19
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 747 complete — **v839** shipped (`87e732d`), grader log (`5bb0a04`), both pushed, mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (746 was T6; T2 last ran at 741.)
+
+## Friction
+Country Profile, cold load at 1440×900 over http, both storages cleared. The tab self-seeds Indonesia, so the analyst lands on a headline reading `NPV: $745M @$75 · Downside: $334M @$50 · BE: < $50/bbl bounded`. The whole task is *defend that*.
+
+Six places on tha
