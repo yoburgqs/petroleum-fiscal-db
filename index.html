@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v842</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v843</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v842</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v843</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v842</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v843</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -36134,6 +36134,27 @@ function _rrClassify(c) {
 }
 window._rrClassify = _rrClassify;
 
+// ── v843 (T4): the verdict-token tier, in ONE place ──────────────────────────────────────────
+// v819 built this six-way treatment for Fiscal Compare's Reform verdict cell, because
+// _rrClassify hands back a single orange for six non-action verdicts and the colour channel
+// therefore partitioned nothing. The Country Profile sidebar now renders the same token, so the
+// classification lives here rather than being typed a second time — a second copy is exactly how
+// two surfaces start giving one country two different readings, which is the failure v843 is
+// fixing in the first place. Adds no threshold: it reads _rrClassify()'s own token.
+function _rrTokenTier(tokTxt, fallbackCol) {
+  var t = String(tokTxt || '');
+  var isAction = /^WACC /.test(t);
+  var col, dotted = false;
+  if (isAction)                                   col = /^WACC \+5/.test(t) ? '#B91C1C' : '#C2410C';
+  else if (/^NO LAW CHANGE|^NO PREMIUM/.test(t))  col = '#15803D';
+  else if (/PRE-2010/.test(t))                    col = '#A16207';
+  else if (/^SIZE UNKNOWN/.test(t))             { col = '#C2410C'; dotted = true; }
+  else if (/^TAKE /.test(t))                      col = '#C2410C';
+  else                                            col = fallbackCol;
+  return { col: col, dotted: dotted, isAction: isAction };
+}
+window._rrTokenTier = _rrTokenTier;
+
 // v601 (T2): the Evidence Chain conflict note ends in a control. Scrolls the Live DCF panel into
 // view and flashes its Fiscal Breakdown, so "the DCF panel uses a different number" is something
 // the analyst can see rather than something they have to take on trust.
@@ -38922,7 +38943,9 @@ function loadCountryProfile(country) {
   const _stab344 = Math.max(0, 5 - _reforms344);
   var _stabDots344 = '';
   for(var _i344=0;_i344<5;_i344++){_stabDots344 += (_i344 < _stab344 ? '\u25C6' : '\u25C7');}
-  const _stabColor344 = _stab344 >= 4 ? '#15803D' : _stab344 >= 3 ? '#A16207' : _stab344 >= 2 ? '#C2410C' : '#B91C1C';
+  // v843 (T4): _stabColor344 -- the green/amber/orange/red ramp over the diamond COUNT -- is deleted,
+  // not left dangling. It is the thing that painted Russia's +15pp windfall tax green at 4 of 5.
+  // Severity now comes from _rrClassify()'s verdict token; the diamonds are a count in neutral grey.
   // v566 (T4): the diamond scale cannot tell "no reforms" from "no reform log". REFORM_HISTORY
   // carries a sourced event log for 21 of 185 jurisdictions; for the other 164 this strip rendered
   // five green diamonds and "0 reforms since 2010" — the exact reading the Fiscal Reform History
@@ -38946,9 +38969,82 @@ function loadCountryProfile(country) {
     ? Object.keys(REFORM_HISTORY).filter(function(k){ return Array.isArray(REFORM_HISTORY[k]) && REFORM_HISTORY[k].length; }).length
     : 0;
   const _rrTotN344 = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) ? COUNTRY_DATA.length : 185;
+  // ── v843 (T4): the Stability row prescribed a premium from a COUNT, next to a verdict that
+  //    had already measured the size ─────────────────────────────────────────────────────────
+  // This row sits in the Zone-B metric strip immediately above the IC MEMO block. It is the most
+  // compact reform reading on the page and the one an analyst lifts into a memo. It rendered the
+  // diamonds (5 minus in-window fiscal law changes), the raw count, and a tooltip that converts
+  // the diamonds straight into a premium: "3-4 diamonds -> note 1-2 reforms, 1-2pp premium".
+  //
+  // A count cannot carry that instruction, and every other surface on this platform already says
+  // so. Measured against the live reform_history.json, four jurisdictions render at 3-4 diamonds
+  // while holding a QUANTIFIED in-window take rise:
+  //     Russia     4 diamonds   +15pp  2022 windfall tax on oil export revenues
+  //     Ecuador    4 diamonds    +5pp  2010 PSC replaced by RSC -- a whole-regime conversion
+  //     Indonesia  3 diamonds    +9pp  2017 Gross Split, -3pp 2020 -> net +6pp
+  //     Norway     3 diamonds   +12pp  2022, against -12pp 2020 -> net 0pp, correctly benign
+  // The row handed all four the same "1-2pp premium" -- including Russia, whose +15pp is the
+  // largest in-window rise on file outside the United Kingdom, and it did so while colouring the
+  // diamonds GREEN at 4. The Reform Risk tab names this exact failure in its own snapshot prose
+  // ("Russia's +15pp windfall tax in 2022 moves it exactly as far as a 1pp administrative change
+  // would"), and Fiscal Compare's Reform verdict column has printed TAKE +15pp since v744. The FC
+  // column header goes further and asserts that its cell, the Reform Risk tab "and the Country
+  // Profile sidebar" all read the same classifier, "so the three surfaces cannot give you three
+  // different premiums for one country". Two of the three did. This one never called it.
+  //
+  // It does now. Nothing is recomputed and no threshold is introduced here: the row renders
+  // _rrClassify()'s own icToken in _rrClassify()'s own icColor. And the mute-plus-red-! treatment
+  // v583 built for context events generalises to every non-green verdict -- a strict superset, as
+  // NO LAW CHANGE (the Guyana case that produced the rule) is itself one of them.
+  const _rrV843 = (_rrCovered344 && typeof _rrClassify === 'function') ? _rrClassify(d.country) : null;
+  // THE DIAMOND COLOUR RAMP IS REMOVED, not re-thresholded. The first attempt at this fix muted the
+  // ramp wherever the verdict contradicted it, and that fired on 19 of the 21 covered jurisdictions
+  // -- a marker on 90% of the population is not a marker. The count-vs-verdict disagreement is not
+  // an exception to flag; it is the normal case, because a count can never express a magnitude.
+  // So the ramp goes. The diamonds stay as the COUNT they always were, rendered in one neutral grey,
+  // and the verdict token beside them carries the colour and the finding.
+  //
+  // This is the move Fiscal Compare already made at v744, for this same reason and in this same
+  // data: it replaced its raw diamond-count column with the verdict token because the count "put
+  // Libya and Algeria at a full ◆◆◆◆◆ and Norway below them". FC keeps the count too, as a small
+  // grey second line, explicitly "a fact, not the finding". This row now reads the same way, which
+  // is what finally makes the FC header's standing claim true -- that the cell, the Reform Risk tab
+  // and the Country Profile sidebar "cannot give you three different premiums for one country".
+  //
+  // The red ! keeps exactly its v583 scope -- the 5 jurisdictions with in-window events that changed
+  // no fiscal terms (Australia, Libya, Iraq, Ghana, Guyana). That is a real 5-of-21 signal about what
+  // the count omitted, and it is not what this cycle is changing.
+  const _rrQual843 = !!(_rrV843 && _rrV843.icColor !== 'var(--green)');
+  const _rrMute843 = _rrCtxIn344.length > 0;
+  // The tooltip is interpolated into a title="" attribute, so strip markup and the quote. The
+  // classifier's own strings already carry HTML entities (scoreNote uses &middot;), which would
+  // otherwise render literally once & is escaped -- decode the few it actually emits first.
+  const _rrTxt843 = function(s) {
+    return String(s == null ? '' : s).replace(/<[^>]*>/g, '')
+      .replace(/&middot;/g, '·').replace(/&mdash;/g, '—').replace(/&ndash;/g, '–')
+      .replace(/&nbsp;/g, ' ').replace(/&rarr;/g, '→').replace(/&amp;/g, '&')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
   const _stabGlyph344 = _rrCovered344
-    ? '<span style="color:' + (_rrCtxIn344.length ? 'var(--muted)' : _stabColor344) + ';font-size:13px;letter-spacing:1px;">' + _stabDots344 + '</span>'
-      + (_rrCtxIn344.length ? '<span style="color:var(--negative);font-weight:800;font-size:12px;margin-left:3px;">!</span>' : '')
+    ? '<span style="color:var(--muted);font-size:13px;letter-spacing:1px;">' + _stabDots344 + '</span>'
+      + (_rrMute843 ? '<span style="color:var(--negative);font-weight:800;font-size:12px;margin:0 2px 0 3px;">!</span>' : '')
+      + (_rrV843
+          ? (function() {
+              // Same tier Fiscal Compare's cell uses, from the same helper: WACC verdicts are the
+              // only ones that change a model input, so they alone get the filled pill; SIZE UNKNOWN
+              // keeps the dotted rule that means "ORCA has not measured this".
+              var _t = (typeof _rrTokenTier === 'function')
+                ? _rrTokenTier(_rrV843.icToken, _rrV843.icColor)
+                : { col: _rrV843.icColor, dotted: false, isAction: false };
+              var _base = 'display:inline-block;font-size:10px;font-weight:800;letter-spacing:.02em;'
+                + 'line-height:1.5;padding:0 5px;margin-left:6px;white-space:nowrap;border-radius:3px;';
+              var _sty = _t.isAction
+                ? _base + 'background:' + _t.col + ';color:#fff;border:1px solid ' + _t.col + ';'
+                : _base + 'color:' + _t.col + ';border:1px solid ' + _t.col + ';'
+                  + (_t.dotted ? 'border-bottom-style:dotted;' : '');
+              return '<span style="' + _sty + '">' + _rrTxt843(_rrV843.icToken) + '</span>';
+            })()
+          : '')
     : '<span style="color:var(--muted);font-size:11px;font-weight:700;border:1px dashed var(--border);border-radius:4px;padding:1px 6px;">n/c</span>';
   const _stabSub344 = _rrCovered344
     ? '(' + _reforms344 + ' fiscal law change' + (_reforms344 !== 1 ? 's' : '') + ' since 2010'
@@ -38959,7 +39055,35 @@ function loadCountryProfile(country) {
       + ' \u00b7 <span class="rr-link" style="color:var(--accent);">Reform Risk \u2192</span>)'
     : '(no sourced reform log \u00b7 ' + _rrCovN344 + ' of ' + _rrTotN344 + ' jurisdictions covered \u00b7 <span class="rr-link" style="color:var(--accent);">Reform Risk \u2192</span>)';
   const _stabTip344 = _rrCovered344
-    ? 'Diamonds = 5 minus the number of sourced FISCAL LAW CHANGES since 2010. IC rule: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 diamonds \u2192 add 3\u20135pp WACC premium; 3\u20134 diamonds \u2192 note 1\u20132 reforms, 1\u20132pp premium; 5 diamonds \u2192 no discount warranted.'
+    ? (_rrV843
+        ? _rrTxt843(_rrV843.icToken) + ' \u2014 ' + _rrTxt843(_rrV843.icLabel) + '. Reform Frequency Score '
+          + _rrV843.score + '/100, ' + _rrTxt843(_rrV843.scoreNote) + '. '
+          + 'READ THE TOKEN, NOT THE DIAMONDS. The diamonds are 5 minus the count of sourced fiscal law '
+          + 'changes since 2010 \u2014 a fact about the jurisdiction, which is why they carry no colour. A count '
+          + 'never reads how large a change was: Russia\u2019s 2022 windfall tax (+15pp) moves it exactly as far '
+          + 'as a 1pp administrative tweak would, and left on the old green ramp it sat at 4 of 5. '
+          + (_rrQual843
+              ? 'The finding for ' + _rrTxt843(d.country || 'this country') + ' is ' + _rrTxt843(_rrV843.icToken)
+                + ' \u2014 size against what that token names. '
+              : '')
+          + 'EVERY TOKEN CARRYING A NUMBER NAMES ITS OWN UNIT: TAKE +Npp / TAKE NET \u00b1Npp are percentage points of '
+          + 'GOVERNMENT TAKE already moved inside the window and must never be added to a WACC, while WACC +3\u20135pp / '
+          + '+5\u20138pp are points to add to the discount rate. SIZE UNKNOWN means terms were rewritten in-window and the '
+          + 'take effect was never quantified \u2014 a zero premium there is an absence of measurement, not stability. '
+          + '\u2191 PRE-2010 means the rupture predates the window, so a high score records where the window starts. '
+          + 'For the count in isolation only: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 \u2192 3\u20135pp WACC premium; '
+          + '3\u20134 \u2192 note 1\u20132 reforms, 1\u20132pp; 5 \u2192 no frequency premium. That ladder reads frequency and nothing else.'
+          + (_rrCtxIn344.length
+              ? ' The count also leaves out ' + _rrCtxIn344.length + ' in-window event'
+                + (_rrCtxIn344.length === 1 ? '' : 's') + ' that changed no fiscal terms ('
+                + _rrCtxIn344.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+                    .map(function(e){ return e.year + ' ' + String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim(); }).join(', ')
+                + ').'
+              : '')
+          + ' This token is _rrClassify()\u2019s own verdict \u2014 the same one Fiscal Compare\u2019s Reform verdict column '
+          + 'and the Reform Risk tab print, so the three surfaces cannot hand you three different premiums for this country. '
+          + 'Click to open the full reform verdict and event log.'
+        : 'Diamonds = 5 minus the number of sourced FISCAL LAW CHANGES since 2010. IC rule: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 diamonds \u2192 add 3\u20135pp WACC premium; 3\u20134 diamonds \u2192 note 1\u20132 reforms, 1\u20132pp premium; 5 diamonds \u2192 no discount warranted.'
       + (_rrCtxIn344.length
           ? ' MUTED WITH A RED ! \u2014 the count is not the whole record here. '
             + _rrCtxIn344.length + ' sourced event' + (_rrCtxIn344.length === 1 ? ' dated 2010 or later is' : 's dated 2010 or later are')
@@ -38968,7 +39092,7 @@ function loadCountryProfile(country) {
                 .map(function(e){ return e.year + ' ' + String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim(); }).join(', ')
             + '), so they do not move the diamonds. Read the IC action in the Fiscal Reform History section below before applying the premium ladder.'
           : '')
-      + ' Click to open Reform Risk tab for the full event log and stability ranking.'
+      + ' Click to open Reform Risk tab for the full event log and stability ranking.')
     : 'NOT SCORED for ' + (d.country || 'this country') + '. ORCA holds a sourced fiscal-law change log for ' + _rrCovN344 + ' of ' + _rrTotN344 + ' jurisdictions and this is not one of them, so there is no reform count to place on the diamond scale. This is missing coverage, not a clean record \u2014 it is not five diamonds, it is not a Reform Frequency Score of 100, and it carries no reform premium of zero into an IC memo. It carries no reading at all. Fiscal Compare prints n/c in its Stability column for the same reason. The Fiscal Reform History section below states what you can defend instead; for reform exposure specifically this jurisdiction needs an external check \u2014 national petroleum law, IMF Article IV, or operator annual reports \u2014 before it goes to an IC. Click to open the Reform Risk tab.';
   // v468: Recent reform inline tag — if country had a reform event in 2024–2026, show ⚠ tag in Zone B so
   // analysts see it immediately without needing to click through to Reform Risk tab
@@ -51290,14 +51414,10 @@ function renderFCResults(results, price) {
     //                                 and explicitly not a clean record
     //   NO LAW CHANGE amber→green     looked, sourced, nothing changed inside the window
     //   NO PREMIUM    green           (unreachable today; kept correct for when it isn't)
-    var isAction = /^WACC /.test(tokTxt);
-    var tokDotted = false, tokCol2;
-    if (isAction)                                        tokCol2 = /^WACC \+5/.test(tokTxt) ? '#B91C1C' : '#C2410C';
-    else if (/^NO LAW CHANGE|^NO PREMIUM/.test(tokTxt))  tokCol2 = '#15803D';
-    else if (/PRE-2010/.test(tokTxt))                    tokCol2 = '#A16207';
-    else if (/^SIZE UNKNOWN/.test(tokTxt))             { tokCol2 = '#C2410C'; tokDotted = true; }
-    else if (/^TAKE /.test(tokTxt))                      tokCol2 = '#C2410C';
-    else                                                 tokCol2 = tokCol;
+    // v843 (T4): hoisted to _rrTokenTier() so the Country Profile sidebar renders this token in
+    // this tier rather than in a second copy of it. Same six branches, same hues, unchanged.
+    var _tier843 = _rrTokenTier(tokTxt, tokCol);
+    var isAction = _tier843.isAction, tokDotted = _tier843.dotted, tokCol2 = _tier843.col;
     var tokStyle = isAction
       ? 'display:inline-block;background:' + tokCol2 + ';color:#fff;font-size:10px;font-weight:800;'
         + 'letter-spacing:.02em;white-space:nowrap;padding:2px 6px;border-radius:3px;'
