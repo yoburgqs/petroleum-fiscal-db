@@ -50509,3 +50509,125 @@ the cite control's behaviour both changed. v841 written at the three display sit
 
 ## Friction
 Cold load at 1440×900 over http, both storages cleared. Fiscal Compare carries two NPV columns. The second — `NPV ($M) db · citable` — is the one the platform's own tooltip calls *"the one that reaches your memo."* That header (`renderFCResults`, `index.html:51502`) hand-ty
+
+---
+## Cycle 750 Log — 2026-09-13 — v842 (`c898c85`)
+
+## Task
+**T1 — "Which countries should even be on my screening list?"**
+(Rotation: 749 was T5, 748 T3, 747 T2, 746 T6, 745 T4 — T1 last ran at 744.)
+
+## Friction
+Cold load at 1440×900 over http, `sessionStorage` and `localStorage` cleared. The analyst
+clicks **Screener**, loads **IOC Capital Screen**, gets 15 countries. Measured on the shipped
+v841 build:
+
+| step | `location.hash` | what the nav said |
+|---|---|---|
+| click Screener | `#/explorer` | Screener |
+| load a preset | `#/explorer` | Screener |
+| **reload** | `#/explorer` | **Explorer** — Browse mode, 185 rows, preset gone |
+| click the in-pane Screener mode button | `#/explorer` | **Explorer** |
+
+The Screener was the only destination on the platform without a URL. `#/compare`,
+`#/profile/<country>`, `#/compare/<a>+<b>`, `#/ioc`, `#/reform/<country>` (v796) and even
+`#/explorer/rfactor` all have one; the Screener wrote the **Explorer's**. So refreshing the
+page, restoring a tab, or opening the link on the phone in the meeting returned the unfiltered
+185 under a different tab name, with nothing on screen saying the screen had been dropped.
+Browse mode has a Copy Link button; Screener mode had none, and the address bar held a link
+to Browse — copying it sent a colleague somewhere else.
+
+Two nav buttons drive ONE pane in two modes, and `.active` was written by whichever button was
+clicked, so the in-pane mode toggle moved the view and not the nav.
+
+**Walking the same defect outward found its sibling, dead since the feature shipped.**
+`parseAndNavigate()` split the WHOLE route on `/`:
+
+    var parts = route.split('/');   // "explorer?mech=PSC&region=Africa"
+
+`copyExplorerLink()` serialises Browse's filters as `#/explorer?mech=PSC&region=Africa`, so
+`parts[0]` matched no branch and the function fell off its end. A cold load of a copied
+Explorer link opened **Home**, unfiltered — and the `qParams` block forty lines below
+(`mech` / `region` / `q` / `price`) had never once been reachable from a shared or bookmarked
+link, only from an in-session `pushState`, which fires no `hashchange`. Same shape as v460:
+a shipped control silently doing nothing. Verified against the pre-change tree:
+
+| cold route | v841 | v842 |
+|---|---|---|
+| `#/explorer?mech=PSC&region=Africa` | Home, 185 rows, chips All | Explorer, **36 rows**, chips PSC / Africa |
+| `#/explorer?q=norw&price=100` | Home, 185 rows, $75 | Explorer, **1 row**, search `norw`, **$100** |
+| `#/screener/iochurdle` | Home, 185 rows | Screener, **15 rows**, preset badge shown |
+
+## Change
+- **`#/screener` and `#/screener/<preset>` are real routes.** A user's preset pick travels in
+  the hash. Deliberately hooked at the two places an analyst *picks* a screen (the menu's
+  `onchange`, the Home IC-screen card) and **not** inside `applyScreenerPreset()` —
+  `_labelScreenerPresets()` drives every option through that function to count hits, and would
+  otherwise rewrite the URL eleven times at load.
+- **The pane's MODE decides the hash and the lit nav button**, not the button that was pressed
+  (`_explSyncRoute()`, called from the tail of `switchExplorerMode()`). `replaceState`, so a
+  mode toggle adds no history entry — `switchTab()` already pushed one for the navigation and
+  this replaces its value.
+- **New `#screener-copy-link-btn`** in the Screener action row, beside Reset All. 28px tall at
+  every width including 390.
+- **`parseAndNavigate()` takes the section from the part before `?`**, and the Explorer query
+  block now waits for `country_data.json` instead of firing on a fixed 200ms (the old timer ran
+  before the data landed *and* before `_labelRegionControls()` rebuilt the region select).
+- **`renderExplorer()` returns early when `COUNTRY_DATA` is still null.** Every cold
+  `#/explorer` threw `Cannot read properties of null (reading 'filter')` — **2 page errors on
+  the baseline, 0 now.**
+- Home's Screener card stopped offering a **breakeven** filter. That ceiling slider was deleted
+  at v568; the card had gone on listing it for 274 versions.
+
+## Result
+The analyst can reload, bookmark, or send the shortlist they just built and get *that
+shortlist* back — and a copied Explorer link reopens the filtered table instead of the front
+page. The nav and the mode toggle can no longer disagree about where they are.
+
+### Verification — the suite RAN this cycle
+- **299 PASS / 0 FAIL / 1 WARN**, read from the suite's own report, local http. The WARN is the
+  service worker registering at the GitHub Pages absolute path `/petroleum-fiscal-db/sw.js`,
+  which 404s when the tree is served from its own root; present on the pre-change tree too, so
+  it is the server, not the change.
+- **Zero horizontal scroll and zero page/console errors at 1920 / 1440 / 1280 / 1024 / 768 /
+  390** (390 with `hasTouch: true`), across 9 tabs at each width.
+- **14 hash routes re-checked cold in fresh browser contexts** against the pre-change build.
+  Every Explorer/profile/compare/reform/ioc route byte-identical; the two previously-broken
+  ones now work; an unknown preset (`#/screener/bogus`) degrades to `#/screener` rather than
+  erroring.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — no banner, page-sub or routing hint added, Advanced Filters still
+collapsed, Screener presets still a dropdown. v430, v449, v451, v452, v489 untouched. Tab
+**order** unchanged — only which of the two Explorer-pane buttons is lit. Not rubric chasing,
+not a version sweep, not a changelog catch-up, not a new FAQ, not a new tooltip, not
+text-only. v842 written at the three display sites (`:42`, `:2484`, `:2554`) silently, after
+the real change shipped and re-tested.
+
+### Carried forward
+- **`switchTab()` strips the query off `#/explorer?…`** the moment any tab is clicked, so the
+  address bar loses a filter link's payload after arrival. The link still *works* on load
+  (fixed above); it just cannot be re-copied from the bar. Low priority.
+- **Reform Risk country picker (`#rr-country-lookup`) offers 186 options** for 21 countries
+  with a log. (Carried from 746.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover
+  title when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with
+  nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (Carried from 736, re-scoped at 738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`, `4211`, `135`)
+  above a Fiscal Mechanics row printing `Concession (7,643)`. Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages.** Fiscal
+  Compare's live surfaces are clean; the reference prose is not. Wants its own deliberate
+  bulk pass, not a cycle.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12 *and* 2026-09-13. **Twenty-first cycle carried, still uninvestigated.** Outside
+  the UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
