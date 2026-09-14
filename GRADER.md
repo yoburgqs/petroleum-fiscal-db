@@ -51678,3 +51678,82 @@ resolved, 41 corrected. **0 controls under 24px** in the touched cells. 0 JS err
 **Task: T4** — *"What is my fiscal-stability and reform exposure here?"* (rotation: 756 was T1, 751 was the last T4, so T4 was stalest).
 
 **Friction.** The reform half of T4 is genuinely finished — I walked all 21 scoreable countries cold and every one returns a specific IC action, the 164 uncovered ones name the statute the external check starts from, and the round-trip navigation restores 
+
+---
+## Cycle 758 — v852 — 2026-09-14
+
+**Task: T3** — *"How do these three countries compare side by side?"*
+(rotation: 757 was T4, 756 T1, 755 T5, 754 T2, and v850/v851 were both T6 — T3 was stalest.)
+
+### First, the thing that was not a regression
+The cycle opened on **300 PASS / 2 FAIL**, after fourteen straight 0-FAIL cycles. The two
+failures were `EXPL-NO-IRR`, and they were correct. `runtime_comprehensive.js` targets
+`https://yoburgqs.github.io/petroleum-fiscal-db/` — the **deployed** site — and the deployed
+site was still **v849**. Two earlier cycles had built **v850** (citation title / harvest-annotation
+split) and **v851** (Explorer country-IRR withdrawal), written the guard assertions, and never
+committed or pushed. The guard was reporting that its own fix was undeployed.
+
+Verified before shipping, not assumed: local tree ran **301 PASS / 0 FAIL**. Both are now pushed.
+The lone WARN is localhost-only — `sw.js` is registered at the absolute Pages path
+`/petroleum-fiscal-db/sw.js`, which 404s at a server root and resolves on Pages.
+
+**Process note worth more than the fix:** two cycles' work sat complete and invisible. The suite
+caught it only because v851's author wrote an assertion. Nothing else in the loop compares the
+deployed version against the local tree.
+
+### Friction (T3)
+Side-by-Side seeds a North Sea example — **Norway / United Kingdom / Netherlands** — on a cold
+load. **v509** made the first analyst-initiated add *replace* that example rather than stack on it,
+but only on the branch where the chosen country is **not** already in the seed. The
+`compareList.includes(country)` branch of `addCompare()` called `_sbsDropExample()`, which clears
+the untouched flag and removes the banner **and nothing else**. The other example columns survived.
+
+Walked cold at 1440px. An analyst whose first pick is Norway — one of the most-compared regimes
+here — asking for Norway, Indonesia, Nigeria, Angola, Brazil got:
+
+| | |
+|---|---|
+| asked for | Norway, Indonesia, Nigeria, Angola, Brazil |
+| got | `["Norway","United Kingdom","Netherlands","Indonesia","Nigeria"]` |
+| toasts | "Norway is already in the comparison." · "Comparison is full at 5 — Angola was not added." · same for Brazil |
+
+Two columns never chosen holding slots; two chosen ones refused at `CMP_MAX`. The only feedback
+reads as benign, and the two refusals blame the cap rather than the example that caused it. The
+headline verdict then printed **"GOVT TAKE @$75, LOWEST FIRST: United Kingdom 49.2% › Indonesia
+59.5% › Norway 68.0% › Nigeria 81.1%"** — naming as most attractive a country absent from the
+analyst's screening set, on the tab whose output exists to be pasted into an IC memo.
+
+### Change
+Keeping an example country now means choosing **that country**, not the set it arrived in. The
+example collapses to the one country named, and the toast names what went:
+
+> *Kept Norway from the example and cleared the other 2 (United Kingdom, Netherlands) — building
+> your comparison from Norway.*
+
+### Result
+The five countries the analyst asked for are the five columns they get, and nothing is refused at
+the cap to make room for a demo. The headline now ranks **Angola 53.0% › Brazil 55.6% › Indonesia
+59.5% › Norway 68.0% › Nigeria 81.1%** — their own set. The same path also repairs the
+**"Norway vs United Kingdom"** quickstart, which promised two countries and loaded three.
+
+### Verification — the suite actually ran this cycle
+- **303 PASS / 0 FAIL / 1 WARN** (local tree, v852). JS syntax gate: 16 blocks, 0 failures.
+- **Negative control:** both new assertions **FAIL** on the pre-fix build served side by side and
+  **PASS** on v852. The guard is real, not decorative.
+- **v509 path unchanged** — first pick not in the seed still yields `["Guyana","Angola","Brazil"]`.
+- **Genuine duplicate** after the analyst owns the set still refuses and returns `false`.
+- **Mobile 390×844 `hasTouch`:** `scrollWidth 390 = clientWidth` at Home, SbS cold, post-collapse,
+  3-country grid, and scrolled to bottom. **0 controls under 24px** on the touched surfaces.
+  0 JS errors.
+
+### New guard
+`Comparison / SBS-EXAMPLE`, two assertions. The v509 half-fix stood for **343 versions** because
+nothing asserted the branch it did not cover — the same failure mode as `EXPL-NO-IRR`, where the
+country IRR regrew on a new surface six times before anyone asserted its absence.
+
+### Carried forward
+- **3 controls under 24px on the Reform Risk country card** — sourced-event citation links render
+  at 21px under `pointer: coarse`. Still open; inherited from cycle 757. Next T4 should take it.
+- Explorer Stability sort does not reverse on a second header click. Low priority.
+- **No process check compares the deployed version string against the local tree.** This cycle
+  found two shipped-but-undeployed cycles only by accident of one assertion. Worth a cheap check.
