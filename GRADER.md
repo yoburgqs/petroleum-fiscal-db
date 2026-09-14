@@ -52385,3 +52385,124 @@ Nine-step behavioural walk, all pass:
 **Friction.** I walked T3 cold — no localStorage, no sessionStorage — by the route the tool's own help text prescribes: Explorer `+` buttons → compare basket → **"Compare →"**. The handoff itself works. The step *after* it does not.
 
 I collected USA, Argentina and Mexico, pressed "Compare →", then did the ordinary thing: dropped USA wit
+
+---
+
+## Cycle 766 — T1
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (765 was T3, 764 T4, 763 T5, 762 T6, 761 T2; T1 last ran at cycle 756.)
+
+**Friction.** Walked T1 cold — no `localStorage`, no `sessionStorage` — by the route the platform's own
+headline offers: Home → *"✓ 15 countries pass the IOC capital screen … **open the screen →**"* →
+`_homeOpenICScreen()` → `#/screener/iochurdle`, fifteen rows numbered **1 … 15**.
+
+For T1 the `#` column *is* the deliverable. It is the shortlist order. Nothing on screen said what
+produced it.
+
+`_scSortKey` is `null` for that entire walk, because nothing in the task makes the analyst click a
+column header — and every surface that names the ordering is gated on `_scSortKey` being non-null:
+
+| surface | line | default state |
+|---|---|---|
+| header sort indicator (v587) | `index.html:34239` | every header `aria-sort="none"`, no arrow |
+| `sortNote` in the count line | `index.html:33459` | `''` (except under the R-factor preset) |
+| within-block clause of the basis sentence | `index.html:33483` | omitted |
+
+The rows were ordered by **contractor NPV descending** the whole time. Three of the fifteen carry a
+**High Take** tier tag and sit *above* rows tagged **Inv-Friendly** — Azerbaijan 60.8% at **#3**,
+Argentina 31.0% at **#5** — so the obvious read of a rank column on a tab called *Screener*,
+"this is ranked by how good the fiscal terms are", is the wrong one. The page never said so. And
+`⇌ Load top 5 in Side-by-Side` draws its five countries from that same unnamed order.
+
+The **export** has named it since v587 — `Ranked by: verified field production first, then contractor
+NPV descending within each group` (`index.html:33828`). The **screen** never had.
+
+**Second half of the same defect, measured.** From that default state, clicking **Contractor NPV**
+re-applied the order already on the page. `setScreenerSort('npv')` set `_scSortDir` to
+`_SC_SORT_DEFAULT_DIR.npv = -1`, which is exactly what the `null` branch sorts by, so all fifteen rows
+came back byte-identical:
+
+```
+before click:  Canada > USA > Azerbaijan > Mexico > Argentina > Colombia > China > Australia >
+               Ecuador > Brazil > United Kingdom > Angola > India > Indonesia > Iraq
+after  click:  Canada > USA > Azerbaijan > Mexico > Argentina > Colombia > China > Australia >
+               Ecuador > Brazil > United Kingdom > Angola > India > Indonesia > Iraq
+```
+
+Hand cursor, header lights up, caption appears, **not one row moves.** That is the defect v587 was
+written to fix for Govt Take ("clicked 'Govt Take', saw the hand cursor, and nothing moved"), still
+live 171 cycles later on the one column that *does* the default ranking.
+
+**Change.**
+
+1. **`thead th.sort-default::after`** — a **muted ▼**, deliberately distinct from the accent ▼/▲ of a
+   sort the analyst clicked for. Accent = you did this; muted = this is the order the screen produced.
+   The header loop now marks the column actually ordering the table when no explicit sort is set
+   (`npv`, or `swing` under the R-factor preset), sets `aria-sort="descending"` on it, and gives it a
+   title that says the rows are already ranked by it, that the `#` column counts it, and that
+   *Load top 5 in Side-by-Side* takes its five from it. Base titles are cached in
+   `dataset.baseTitle` so the column's own explanation is never lost.
+2. **`setScreenerSort()`** — a click on the column the table is *already* implicitly ordered by now
+   **reverses** it rather than re-applying it; the second click returns to the default. Arriving at
+   that column from another sort keeps the normal three-state cycle, so "highest NPV first" is still
+   one click away from a take sort. Every other column is untouched.
+3. **`_scRankLabelNow()`** — one name for the ordering in force, default included. The count line now
+   reads `· ranked by Contractor NPV high→low` on an ungrouped screen, and the grouped basis sentence
+   closes `, contractor npv high→low within each block`. It stays quiet in the count line when the
+   rows are grouped, so the ordering is not stated twice in one sentence.
+
+**Result.** The analyst can see what ranked the shortlist **without clicking anything**, can tell a
+screen-produced order from one they imposed, and clicking the ranking column now reorders the table
+instead of appearing to be ignored.
+
+### Verification — measured this cycle, not carried forward
+
+| # | check | result |
+|---|---|---|
+| 1 | cold Screener, grouped, 185 rows | Contractor NPV header `sort-default` / `aria-sort="descending"` ✅ |
+| 2 | …its count line | closes `, contractor npv high→low within each block` ✅ |
+| 3 | Home hero → IOC Capital Screen (15, ungrouped) | header marked; count line `· ranked by Contractor NPV high→low` ✅ |
+| 4 | click Contractor NPV once | **exact reverse** of the 15 rows (Iraq → Canada); header goes accent **ascending** ✅ |
+| 5 | click it again | back to the default order; header back to muted ▼ ✅ |
+| 6 | Govt Take sort → then click NPV | still NPV **descending** (high first), not ascending ✅ |
+| 7 | R-factor preset | `Swing (pp)` carries the muted marker; three distinct states, third returns to default; no dead click ✅ |
+
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs + the Screener:** **0** horizontal-scroll failures,
+  **0** page errors, **0** console errors (the `sw.js` 404 excluded — it exists only off Pages).
+- **390 × 844 `hasTouch`:** **0** Screener header controls under 24px.
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN** against the modified build: **317 PASS / 0 FAIL / 1 WARN** — the WARN being the
+  `sw.js` 404; 317 + that WARN reconciles to the harness's 318 on Pages. **Unchanged from before the edit.**
+
+### Carried forward
+
+- **New this cycle, not fixed:** the mechanic filter is a *country-level* include-set, not a
+  contract-level one. Ticking **TSC only** returns Mexico at **32.2%** take — Mexico's whole-country
+  blended figure, dominated by its Concession contracts — not anything resembling Mexican TSC terms.
+  Four rows come back (Mexico, Ecuador, Iraq, Russia) and each take% shown is the country blend. Per
+  `MECHANIC_COMPARABILITY.md` this is exactly the Group-2 trap. Recorded rather than scope-crept: the
+  fix is a data-model question, not an `index.html` one.
+- **New this cycle, minor:** `#screener-preset-select` resets to *"Load a screen…"* immediately after
+  applying a preset (`index.html:3441`, `this.value=''`). That is deliberate — it is what makes
+  re-selecting the same preset possible — but it means the control that names the loaded screen never
+  names it. The count line's `presetPrefix` does carry it, so this is cosmetic, not misleading.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against `~/office/tools/petroleum/tests/runtime_comprehensive.js`
+  — repo copy 303 PASS, office copy 317, same build. `autonomous_cycle.py` copies office → repo
+  (line 120), so running the suite straight out of the repo silently tests 14 fewer assertions.
+  Carried from 764, 765.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`, no sort key, direction or
+  filters. `copyScreenerLink()` (v842) is the model. Carried from 763, 765.
+- **Basket pill ✕ glyphs measure 44px tall but only 8px wide** under `pointer: coarse`. Carried from 765.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs `33.4%` in the
+  Live DCF panel). A data gap; not closable from `index.html`.
+- **`.reform-mechanic` / `.reform-take` have `position: relative` and no `::after`** (band 18px). Not
+  controls today; if either ever gets a handler it is already below the floor.
+- **Still no process check comparing the deployed version string against the local tree** — carried from
+  758, 761, 762, 763, 764, 765.
+
+---
+## Cycle 766 Log — 2026-09-14
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL (317 + the off-Pages `sw.js` WARN, measured locally)
+- JS errors: 0
+- Summary: v858 shipped and pushed. Screener default ranking is now named on the column that produces it, and clicking that column reorders instead of no-opping.
