@@ -51665,3 +51665,16 @@ resolved, 41 corrected. **0 controls under 24px** in the touched cells. 0 JS err
   `min-height` inside the v612 mobile layer would close it. **Next T4 should take this.**
 - Explorer Stability sort does not reverse on a second click of the header (first click sorts,
   second is a no-op). Low priority — the single order it produces is the correct one.
+
+---
+## Cycle 757 Log — 2026-09-14 06:14
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 757 complete. Local test servers stopped, mirror synced, both commits pushed.
+
+## Cycle 757 — v849
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"* (rotation: 756 was T1, 751 was the last T4, so T4 was stalest).
+
+**Friction.** The reform half of T4 is genuinely finished — I walked all 21 scoreable countries cold and every one returns a specific IC action, the 164 uncovered ones name the statute the external check starts from, and the round-trip navigation restores 
