@@ -52198,3 +52198,50 @@ inverts evidence quality.
 **Task:** T5 — *"Give me something I can paste straight into an IC memo."* (762 was T6, 761 T2, 758 T3, 757 T4, 756 T1 — T5 hadn't run since 755.)
 
 **Friction.** I walked every artifact that leaves the tool: Screener CSV/XLSX/copy, Country Profile XLSX + IC Citation + Copy for IC Memo, Side-by-Side copy, IOC XLSX + copy, Reform verdict, Explorer XLSX + link. Most are in genuinely good shape — the Country Profile past
+
+---
+
+## Cycle 764 — T4
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (763 was T5, 762 T6, 761 T2, 758 T3; T4 last ran at 757, which is where this defect was first noted.)
+
+**Friction.** Walked T4 cold at 390x844 with `hasTouch: true` — no sessionStorage, no localStorage. The routing into reform exposure is in good shape: seven surfaces call `openReformRiskFor()`, `#/reform/<country>` deep-links and re-selects, and the 164 unsourced jurisdictions get a genuinely careful "this is not a score of 100" card with the sourcing statute to start the external check from. The verdict cards for the 21 sourced countries are strong.
+
+The break is at the last step. On the country card, the **sourced-event citation links measured a 22px tappable band** — under the directive's 24px coarse-pointer floor. That is the control an analyst taps to open the statute behind a reform event, immediately before deciding whether to carry a 3–5pp WACC premium. **29 links across the 13 sourced countries that print a citation**; the United Kingdom card alone has 9.
+
+**Why it survived since 757.** The v612 mobile layer already lists `.source-badge` in its `::after { inset: -10px 0 }` hit-area rule, so the class *looked* covered. It was not. v500 gave `.source-badge` `overflow: hidden` to drive its one-line ellipsis, and **a parent's overflow clip applies to its own absolutely-positioned `::after`** — the −10px box is painted and clipped straight back to the padding box. Measured both ways on the same live element:
+
+```
+overflow: hidden  (as shipped)   tappable band 22px
+overflow: visible (probe only)   tappable band 40px
+```
+
+The clip was the entire difference. Every prior pass measured `getBoundingClientRect().height`, which reads 21px either way — so the mechanism read as present while doing nothing. A second, related gap was found and deliberately **not** acted on: `.reform-mechanic` and `.reform-take` are given `position: relative` at line 1496 but never appear in the `::after` rule at line 1518, so they get no hit area at all (measured band 18px = their own height). They carry no `href` or handler, so they are labels, not controls, and are out of the directive's scope. Recorded rather than scope-crept.
+
+**Change.** Grow the badge's **own box** instead of its `::after`, leaving v500/v576's ellipsis clamp untouched. Vertical padding only, 2px → 6px, per the v713 lesson that horizontal reach on an inline element inflates its parent's `scrollWidth` and reports to `pixel_audit` as clipped text. Scoped to `a.source-badge` inside the existing `@media (pointer: coarse)` block, so the non-anchor label spans and the whole desktop render are unaffected.
+
+**Result.** All 29 citation links are now 30px+ tap targets. An analyst checking reform exposure on a phone opens the source act on the first tap instead of missing it or hitting the notes block above it.
+
+### Verification — measured this cycle, not carried forward
+
+- **185 countries walked at 390 with `hasTouch`**, each citation link hit-tested pixel-by-pixel with `elementFromPoint` rather than by box height: **29 links, 0 under 24px** (was 29 of 29), minimum band **30px**, **0 horizontal scroll**, **0 page errors**.
+- **Desktop at 1440 with a mouse:** badge still 21px, padding still 2px, `text-overflow: ellipsis` intact — the rule is inside `pointer: coarse`, so nothing changed.
+- **Six viewports × six tabs** (1920/1440/1280/1024/768/390): **0 horizontal-scroll failures, 0 page errors**.
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN this cycle** against the modified build: **317 PASS / 0 FAIL / 1 WARN**. The 1 WARN is the `sw.js` 404 that only exists off GitHub Pages; 317 PASS + that WARN reconciles to the harness's 318 on Pages.
+
+### Carried forward
+
+- **The repo's `tests/runtime_comprehensive.js` is stale against the authoritative copy** at `~/office/tools/petroleum/tests/runtime_comprehensive.js` — the repo copy scores **303 PASS**, the office copy **317**, on the same build. `autonomous_cycle.py` copies office → repo (line 120), so anyone running the suite straight out of the repo silently tests 14 fewer assertions. New this cycle.
+- **`.reform-mechanic` / `.reform-take` have `position: relative` and no `::after`** (band 18px). Not controls today; if either ever gets a handler it is already below the floor.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`, no sort key, direction or filters. `copyScreenerLink()` (v842) is the model. Carried from 763.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs `33.4%` in the Live DCF panel). A data gap; not closable from `index.html`.
+- **`window.compareBasket` vs `compareList`** — two stores, near-identical names; 761 found one caller picking wrong, a sweep for the others is still owed.
+- **Still no process check comparing the deployed version string against the local tree** — carried from 758, 761, 762, 763.
+
+---
+## Cycle 764 Log — 2026-09-14
+- Test before: 318 PASS / 0 FAIL (harness, against Pages)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (run this cycle, local, authoritative suite)
+- JS errors: 0
+- Summary: T4 — reform citation links were 22px tap targets on a phone because `overflow: hidden` clipped the v612 `::after` hit area. Fixed by growing the badge box vertically under `pointer: coarse`. 29 links, all now 30px+.
