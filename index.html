@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v845</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v846</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v845</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v846</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v845</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v846</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -46363,11 +46363,127 @@ function toSlug(name) {
     .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 }
 
+// v846 (T2): ORCA publishes TWO slug spellings of the same country and only one of them routed.
+//   toSlug() joins words with UNDERSCORES  -> "#/profile/united_kingdom"
+//   the country API joins them with HYPHENS -> "api/v1/country/united-kingdom.json"
+// Both strings are printed by this page (the API form on the Country Profile itself, at the
+// "Resolved from api/v1/country/..." line and in the breakeven basis note), and a hyphen is what
+// anyone typing or hand-editing a URL writes. fromSlug() compared the raw string, so every
+// multi-word country was unreachable in its hyphen form: united-kingdom, saudi-arabia,
+// papua-new-guinea, iraq-kurdistan, uae-abu-dhabi, trinidad-and-tobago and ~90 more all resolved
+// to null. Nothing downstream handled null (see the profile branch of handleRoute), so the
+// analyst was silently dropped on HOME.
+// Canonicalise the separator on BOTH sides and the two spellings become one route. Exact match is
+// still tried first so nothing that worked before changes.
+function _slugKey846(s) {
+  try { s = decodeURIComponent(String(s)); } catch (e) { s = String(s); }
+  return s.toLowerCase()
+    .replace(/[\u2018\u2019']/g, '')
+    .replace(/[\u00e0-\u00e5]/g, 'a').replace(/[\u00e8-\u00eb]/g, 'e')
+    .replace(/[\u00ec-\u00ef]/g, 'i').replace(/[\u00f2-\u00f6]/g, 'o')
+    .replace(/[\u00f9-\u00fc]/g, 'u').replace(/[\u00f1]/g, 'n').replace(/[\u00e7]/g, 'c')
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+}
+
 function fromSlug(slug) {
   if (!COUNTRY_DATA) return null; // guard: called before async data load completes
-  var s = slug.toLowerCase();
+  var s = String(slug).toLowerCase();
   var match = COUNTRY_DATA.find(function(d){ return toSlug(d.country) === s; });
-  return match ? match.country : null;
+  if (match) return match.country;
+  var k = _slugKey846(slug);
+  if (!k) return null;
+  match = COUNTRY_DATA.find(function(d){ return _slugKey846(d.country) === k; });
+  if (match) return match.country;
+  // Last resort: ignore separators entirely, so "cote-d-ivoire" reaches "Cote d'Ivoire" (toSlug
+  // deletes the apostrophe and yields cote_divoire, which no hyphen spelling can reproduce).
+  // Only accepted when exactly ONE country collapses to it, so this can never guess.
+  var bare = k.replace(/_/g, '');
+  var hits = COUNTRY_DATA.filter(function(d){ return _slugKey846(d.country).replace(/_/g, '') === bare; });
+  return hits.length === 1 ? hits[0].country : null;
+}
+
+// v846 (T2): nearest names for a slug that matched nothing, so the not-found notice can offer
+// one-click routes instead of sending the analyst back to a 185-row dropdown.
+function _slugNear846(slug, n) {
+  var k = _slugKey846(slug);
+  if (!k || !COUNTRY_DATA) return [];
+  return COUNTRY_DATA.map(function(d){
+    var c = _slugKey846(d.country), sc = 0;
+    if (c === k) sc = 100;
+    else if (c.indexOf(k) === 0 || k.indexOf(c) === 0) sc = 60;
+    else if (c.indexOf(k) !== -1 || k.indexOf(c) !== -1) sc = 40;
+    var i = 0; while (i < c.length && i < k.length && c[i] === k[i]) i++;
+    return { country: d.country, score: sc + i };
+  }).filter(function(x){ return x.score >= 3; })
+    .sort(function(a,b){ return b.score - a.score || a.country.localeCompare(b.country); })
+    .slice(0, n || 4).map(function(x){ return x.country; });
+}
+
+// v846 (T2): the not-found notice itself. Lives above the profile, is absent unless a route
+// failed, and carries the two things the silent Home-drop withheld: WHICH name failed, and a
+// live route to the names that would have worked.
+function _cpClearNotFound846() {
+  var n = document.getElementById('cp-slug-notfound');
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+}
+
+function _cpPick846(c) {
+  _cpClearNotFound846();
+  var sel = document.getElementById('dd-country-select');
+  if (sel) sel.value = c;
+  if (typeof updateHash === 'function' && typeof toSlug === 'function') updateHash('profile', toSlug(c));
+  if (typeof loadCountryProfile === 'function') loadCountryProfile(c);
+}
+
+function _cpShowNotFound846(slug) {
+  _cpClearNotFound846();
+  var host = document.getElementById('t7');
+  if (!host) return;
+  var raw = String(slug);
+  try { raw = decodeURIComponent(raw); } catch (e) {}
+  var shown = raw.replace(/[<>&"]/g, '').slice(0, 60);
+  var near = _slugNear846(slug, 4);
+
+  var btn = 'display:inline-block;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.45);'
+    + 'border-radius:4px;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;'
+    + 'padding:5px 10px;min-height:26px;line-height:1.2;';
+
+  var html = '<div id="cp-slug-notfound" role="status" style="background:var(--surface2);'
+    + 'border:1px solid rgba(185,28,28,.35);border-left:4px solid var(--red);border-radius:8px;'
+    + 'padding:12px 14px;margin:10px 8px 14px;">'
+    + '<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;">'
+    + '\u26A0 No country in ORCA is named \u201C' + shown + '\u201D</div>'
+    + '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:' + (near.length ? '9px' : '0') + ';">'
+    + 'The link you opened asked for a country profile by that name. None of the 185 countries on '
+    + 'file resolves to it, so nothing on this page came from your link \u2014 any profile below is '
+    + 'the platform\u2019s own default example, not the country you were sent to. Check the name with '
+    + 'whoever sent the link before reading a take figure off this page.'
+    + '</div>';
+
+  if (near.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">'
+      + '<span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Closest names on file</span>';
+    near.forEach(function(c){
+      html += '<button type="button" onclick="_cpPick846(' + JSON.stringify(c).replace(/"/g, '&quot;') + ')" '
+        + 'title="Open the ' + c.replace(/"/g, '') + ' country profile" style="' + btn + '">' + c + '</button>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  var node = wrap.firstChild;
+  var before = document.getElementById('cp-empty-state') || document.getElementById('dd-content');
+  if (before && before.parentNode) before.parentNode.insertBefore(node, before);
+  else host.appendChild(node);
+
+  // Any deliberate pick from the full list means the analyst has recovered \u2014 drop the notice.
+  var sel = document.getElementById('dd-country-select');
+  if (sel && !sel._nf846) {
+    sel._nf846 = true;
+    sel.addEventListener('change', _cpClearNotFound846);
+  }
 }
 
 function _tabBtnFor(tabId) {
@@ -46426,8 +46542,18 @@ function parseAndNavigate(hash) {
       if (cpBtn) switchTab('t7', cpBtn);
       var ddSel = document.getElementById('dd-country-select');
       if (ddSel) { ddSel.value = country; }
+      _cpClearNotFound846();
       // Small delay so tab renders before profile loads
       setTimeout(function(){ loadCountryProfile(country); }, 50);
+    } else if (COUNTRY_DATA) {
+      // v846 (T2): the branch that did not exist. An unresolved profile slug fell off the end of
+      // handleRoute() and left the page on HOME — no tab change, no message, no console warning.
+      // The analyst who opened a shared link to a country profile saw the platform's front page
+      // and had nothing to tell them whether the link was stale, the country absent, or the tool
+      // broken. Route to Country Profile and say which name failed, with the near matches live.
+      var cpBtnNF = _tabBtnFor('t7');
+      if (cpBtnNF) switchTab('t7', cpBtnNF);
+      _cpShowNotFound846(param);
     }
   } else if (section === 'compare') {
     // v597 (T1) — "#/compare" is TWO routes wearing one name, and only one of them worked.
