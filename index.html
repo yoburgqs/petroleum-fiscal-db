@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v847</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v848</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v847</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v848</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v847</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v848</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3546,7 +3546,7 @@ window.copyPlatformCitation = function(btn) {
       </div>
     </div>
     <details id="screener-advanced-details" style="margin-top:10px;">
-      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Region · Reform Record · Data Basis</span></summary>
+      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span id="sc-adv-summary-note" style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Region · Reform Record · Data Basis</span></summary>
     <div class="screener-extra">
       <div class="screener-filter-block">
         <span id="sc-mech-label" class="filter-lbl">Fiscal Mechanic</span>
@@ -33398,6 +33398,97 @@ function runScreener() {
         : []
     };
   })();
+
+  // ── v848 (T1) — A COLLAPSED PANEL THAT WILL NOT SAY WHAT IS ON INSIDE IT ────────────
+  // Walked T1 cold at 1440x900: Home -> "Screener" card -> Advanced Filters -> untick the
+  // three fee-basis mechanics, tick Shell -> collapse the panel again. 185 rows became 31,
+  // and at that point NOTHING on screen named the two filters that removed the other 154:
+  //
+  //   summary   "ADVANCED FILTERS > Mechanic · IOC Operator · Region · Reform Record ·
+  //              Data Basis"   <- byte-identical to the untouched state. A static list of
+  //                               category NAMES, printed whether or not any of them is on.
+  //   badge     "2 filters active"  <- a count, and it carried no title at all.
+  //   preset    display:none        <- nothing to name; this screen was built by hand.
+  //   count bar "31 countries match at $75/bbl - ranked by data basis: ..."  <- explains the
+  //                               ORDERING, never the CRITERIA.
+  //
+  // So the one route back to "why is this list 31 countries?" was to re-open the panel and
+  // eyeball 17 checkboxes against their defaults -- and the mechanic group defaults to
+  // ALL NINE CHECKED, so "which ones did I turn off" is a counting exercise, not a glance.
+  // This is the T1 question itself: the analyst is about to paste a 31-country shortlist into
+  // an IC memo and cannot state the basis it was built on. The preset path was already covered
+  // (#screener-preset-label names the criteria); the HAND-BUILT path, which is every screen an
+  // analyst tunes after loading a preset, was not.
+  //
+  // The fix reuses the criteria strings assembled immediately above -- the same array that goes
+  // into the CSV's "SCREEN APPLIED" block and the XLSX basis sheet. The platform already knew
+  // how to say "Fiscal mechanics: Concession, PSC, PRRT, Gross Split, EPSA, Revenue Share only"
+  // and "IOC presence: Shell"; those sentences just never reached the screen. Driving the
+  // summary off that one array rather than re-deriving it is deliberate: a second
+  // implementation would drift from the export, and an on-screen basis that disagrees with the
+  // exported basis is worse than none.
+  //
+  // v371/v373 is respected -- the panel still starts COLLAPSED and this does not open it. The
+  // untouched state is byte-identical to before: the static category list is restored verbatim
+  // whenever no in-panel filter is on, so a cold Screener looks exactly as it did.
+  (function () {
+    var note = document.getElementById('sc-adv-summary-note');
+    if (!note) return;
+    // Only the filters that actually LIVE inside this <details>. The take / NPV / evidence
+    // sliders are in the card above it and are already visible without opening anything.
+    var on = [];
+    if (checkedMechs.length === 0) on.push('Mechanics: none of ' + totalMechBoxes);
+    else if (checkedMechs.length < totalMechBoxes) on.push('Mechanics: ' + checkedMechs.length + ' of ' + totalMechBoxes);
+    if (checkedIOCs.length) on.push('IOC: ' + (checkedIOCs.length === 1 ? checkedIOCs[0] : checkedIOCs.length + ' selected'));
+    if (scRegionActive) on.push('Region: ' + scRegionActive);
+    if (reformSet) on.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label);
+    if (!includeProxy) on.push('Verified production only');
+    if (!includeFloor) on.push('Measured take only');
+
+    if (!on.length) {
+      // Restore the resting label exactly. Not a no-op: the analyst may have just cleared a
+      // filter, and a stale "Region: Africa" left in the summary would be a lie.
+      note.textContent = 'Mechanic · IOC Operator · Region · Reform Record · Data Basis';
+      note.style.opacity = '.7';
+      note.style.color = '';
+      note.style.fontWeight = '400';
+      note.removeAttribute('title');
+      return;
+    }
+    note.textContent = on.join(' · ');
+    note.style.opacity = '1';
+    note.style.color = 'var(--accent)';
+    note.style.fontWeight = '700';
+    // The long form, verbatim from the export, so the hover and the pasted file agree.
+    var _crit = (window._screenerExportBasis && window._screenerExportBasis.criteria) || [];
+    var _inPanel = _crit.filter(function (c) {
+      return /^(Fiscal mechanics|IOC presence|Region|Reform record|Verified field production only)/.test(c);
+    });
+    note.title = (_inPanel.length ? _inPanel.join('\n') + '\n\n' : '')
+      + 'These filters are set inside this panel and are narrowing the list while it is collapsed. '
+      + 'Open the panel to change them, or press Reset All to clear every filter.';
+  })();
+
+  // v848 (T1): the badge counted the active filters and named none of them, with no title of
+  // any kind. Same criteria array, same reason -- the count bar is too narrow to carry the
+  // sentences, but there is no excuse for the element to be unhoverable.
+  (function () {
+    var badgeEl2 = document.getElementById('screener-active-filters');
+    if (!badgeEl2) return;
+    // Cleared rather than left behind when the badge hides: _labelScreenerPresets() drives every
+    // preset through applyScreenerPreset() to count its hits, so a cold Screener that has never
+    // been filtered was otherwise carrying "Preset: Downside Resilience" in an attribute from the
+    // last probe. Unreachable while hidden, but a stale attribute that only becomes wrong later is
+    // the exact failure mode this platform keeps having to fix.
+    if (badgeEl2.style.display === 'none') { badgeEl2.removeAttribute('title'); return; }
+    var _crit2 = (window._screenerExportBasis && window._screenerExportBasis.criteria) || [];
+    var _narrowing = _crit2.filter(function (c) { return c.indexOf('Ranked by: ') !== 0; });
+    badgeEl2.title = _narrowing.length
+      ? 'The criteria that produced this row set — the same list the CSV and XLSX exports carry '
+        + 'under "SCREEN APPLIED":\n\n' + _narrowing.map(function (c, i) { return (i + 1) + '. ' + c; }).join('\n')
+      : '';
+  })();
+
   // v477: screener-result-count now shows how many were filtered out, not just total, for clearer context
   var _screenerFiltered = COUNTRY_DATA.length - data.length;
   // v513: "all N countries pass current filters" is only true if every row was actually
