@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v839</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v840</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v839</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v840</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v839</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v840</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27801,19 +27801,70 @@ function renderCompare() {
     // note, exactly as the Govt Take rows keep their number and carry "not ranked . statutory
     // terms". Applies to all four price rows, because the gate is a property of the column.
     const _npvGate = _cmpNpvBasisFlag(d, v);
-    const _npvBase = _npvGate
-      ? '<span style="color:var(--muted);">' + fmtNpvShared(v) + '</span>'
-      : fmtNpvShared(v);
-    if (price !== '75' || v == null) return _npvBase + _npvGate;
+    // v840 (T3): the SIGN of a contractor NPV cell.
+    //
+    // Walked "compare these three countries" cold at 1440x900, no sessionStorage/localStorage, and
+    // built the platform's own prescribed Southeast Asia screen -- Iraq / Indonesia / Malaysia (FAQ
+    // A592 says in as many words "Load Malaysia, Indonesia, Vietnam in ORCA Side-by-Side"). The
+    // Economics block rendered:
+    //
+    //     Contractor NPV @$50 (downside)   $389M     $334M     -$33M
+    //     Contractor NPV @$75 (base)       $642M     $745M     $627M
+    //
+    // Malaysia changes SIGN between the downside row and the base row, and the minus sign was the
+    // only thing on screen that said so: same 13px, same colour, same weight as the 183 columns
+    // that never go negative, in the rightmost cell, under a verdict strip that orders the set on
+    // $75 alone and therefore reports Malaysia as a perfectly ordinary third place.
+    //
+    // This platform treats that sign change as a BINARY ELIMINATION everywhere else it appears.
+    // The Screener ships a dedicated control for it -- "Set $0 <- survives $50/bbl" -- whose label
+    // reads "a regime that is NPV-positive at $75 but negative at $50 does not survive a downturn",
+    // and the row's own tooltip here calls $50 "the low-price stress case -- the row an IC asks for
+    // first". Side-by-Side is the tab whose output goes into the memo, and it was the one surface
+    // that printed the elimination without marking it.
+    //
+    // It is also the rarest event in the Economics block, which is exactly why it must be marked
+    // rather than caveated. Measured over the shipped country_data.json: of 185 countries, npv_100
+    // and npv_125 are negative for none, npv_75 for none, and npv_50 for exactly TWO -- Yemen
+    // -$139M (from +$1.02B at $75) and Malaysia -$33M (from +$627M at $75). So this marker is
+    // silent on 183 of 185 columns and cannot become wallpaper; where it does fire it is the one
+    // fact in the block that changes the answer.
+    //
+    // Kept off the basis gate deliberately: a gated (statutory-terms) column such as Yemen still
+    // shows the sign, because a legal regime that destroys value at $50 on the shared profile is
+    // a finding about the regime. The gate's own sub-line still prints beside it and says on what
+    // basis. Rides the shared `rows` array into #cmp-data-table, so Export PDF and both
+    // Copy-for-IC-Memo flavours carry it too.
+    const _npvNeg = (typeof v === 'number' && v < 0);
+    const _npvPlain = fmtNpvShared(v);
+    const _npvBase = _npvNeg
+      ? '<span style="color:var(--negative);font-weight:700;">' + _npvPlain + '</span>'
+      : (_npvGate ? '<span style="color:var(--muted);">' + _npvPlain + '</span>' : _npvPlain);
+    const _npvNegLine = _npvNeg
+      ? '<span style="display:block;font-size:10px;font-weight:700;color:var(--negative);cursor:help;" title="'
+        + _cmpEsc(d.country + ': contractor NPV is NEGATIVE at $' + price + '/bbl \u2014 ' + _npvPlain
+          + ' on the standardized Deepwater profile every column here is run on. '
+          + (d.npv_75 != null && d.npv_75 > 0
+              ? 'The same country returns ' + fmtNpvShared(d.npv_75) + ' at $75/bbl, so this is a SIGN CHANGE inside the published price deck, not a weak result. '
+                + 'ORCA models a negative contractor NPV at $50/bbl for 2 of 185 countries and for none at $75, $100 or $125, so a column that crosses zero here is a '
+                + 'two-in-185 case and not a matter of degree. '
+              : '')
+          + 'This platform screens the crossing as a pass/fail elsewhere: the Screener carries a '
+          + '"Set $0 \u27f5 survives $50/bbl" control whose stated rule is that a regime NPV-positive at $75 and negative at $50 '
+          + 'does not survive a downturn. Ranking this column on its $75 figure alone states the opposite of what the downside row says. '
+          + 'Carry the sign change into the memo beside the base case.')
+        + '">\u25bc value-negative at $' + price + '</span>'
+      : '';
+    if (price !== '75' || v == null) return _npvBase + _npvGate + _npvNegLine;
     const _npvSt = _cmpMixStat(d);
-    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate;
+    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate + _npvNegLine;
     const _npvG1 = fmtNpvShared(_npvSt.g1.v75);
     // Same convention as the take correction: print it only where it changes the number on screen.
-    if (_npvG1 === fmtNpvShared(v)) return _npvBase + _npvGate;
-    return _npvBase + _npvGate + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+    if (_npvG1 === _npvPlain) return _npvBase + _npvGate + _npvNegLine;
+    return _npvBase + _npvGate + _npvNegLine + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
       + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $75/bbl across its '
         + Number(_npvSt.g1.n).toLocaleString() + ' production-sharing and concession contracts only. '
-        + 'The ' + _npvBase + ' above is an unweighted mean over all ' + (d.n != null ? Number(d.n).toLocaleString() : _npvSt.tot ? Number(_npvSt.tot).toLocaleString() : '?')
+        + 'The ' + _npvPlain + ' above is an unweighted mean over all ' + (d.n != null ? Number(d.n).toLocaleString() : _npvSt.tot ? Number(_npvSt.tot).toLocaleString() : '?')
         + ' contracts, ' + Number(_npvSt.n2).toLocaleString() + ' of them fee-basis ('
         + _cmpMechNames(_npvSt, 2) + '), where the contractor is paid a fixed $/bbl remuneration and the '
         + 'DCF returns a far smaller position. Compare THIS figure against the other columns \u2014 it is the '
@@ -29036,11 +29087,55 @@ function renderCompare() {
       // no fee-blended column the four price rows are all on one basis and there is nothing to warn about.
       return _h + _valAside + (_vdValReb.length ? _valOnly75 : '');
     })();
+    // ── v840 (T3): the DOWNSIDE line. ────────────────────────────────────────────────────────
+    //
+    // Every ordering this strip carries -- take, contractor value, predictability -- is read at
+    // $75/bbl. That is the right base case and it is not the whole screen: the question "how do
+    // these three compare" is answered differently by a column that turns value-negative when the
+    // price deck drops, and the strip had no way to say so.
+    //
+    // It matters on exactly the sets an analyst builds. Iraq / Indonesia / Malaysia -- the screen
+    // the platform's own FAQ A592 prescribes -- reads "CONTRACTOR VALUE @$75, LARGEST FIRST: Iraq
+    // $3.04B > Indonesia $745M > Malaysia $720M", an unremarkable third place, over a grid whose
+    // $50 row prints Malaysia at -$33M. The strip and the block below it were saying different
+    // things about the same country and only one of them was in bold.
+    //
+    // Fires ONLY when a column in the set actually crosses zero. Measured on the shipped
+    // country_data.json that is 2 of 185 countries (Yemen, Malaysia) and only at $50 -- nothing is
+    // negative at $75, $100 or $125 -- so on the overwhelming majority of sets this line does not
+    // render at all. A notice that appears on every set is wallpaper; this one is an exception
+    // report by construction.
+    //
+    // State monopolies are excluded: _cmpNpvCell already renders their NPV rows as an em dash
+    // because $0 there is the arithmetic of a 100% take and not a contractor result, so they have
+    // no sign to change. Statutory-basis columns are KEPT and labelled, matching the cell.
+    // #cmp-verdict carries class="cmp-notice", so this line is picked up by copyComparisonTable()
+    // and lands in the pasted IC table with the rest of the set-specific notices.
+    const _vdDown = selected.filter(d => d && typeof d.npv_50 === 'number' && d.npv_50 < 0
+                                      && !isStateMonopoly(d.take_75));
+    const _dsLine = _vdDown.length
+      ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:var(--negative);">\u25bc Value-negative at the $50 downside \u2014 '
+        + _vdDown.length + ' of ' + selected.filter(d => !!d).length + ':</strong> '
+        + _vdDown.map(d => '<strong style="color:var(--text);">' + _cmpEsc(d.country) + '</strong> '
+            + fmtNpvShared(d.npv_50) + ' at $50/bbl'
+            + (d.npv_75 != null && d.npv_75 > 0 ? ', against ' + fmtNpvShared(d.npv_75) + ' at $75' : '')
+            + ((_cmpBasisGate && !_cmpHasProd(d)) ? ' (statutory terms \u2014 the legal regime on the standard profile, not this country\u2019s own fields)' : '')
+          ).join('; ')
+        + '. Every ordering above is read at $75/bbl and none of them shows this. '
+        + 'ORCA models a negative contractor NPV for 2 of 185 countries at $50/bbl and for none at $75, $100 or $125, '
+        + 'so a column that crosses zero here is not a weaker result on the same scale \u2014 it is the price-break '
+        + 'survival test this platform screens as pass/fail in the Screener\u2019s '
+        + '\u201cSet $0 \u27f5 survives $50/bbl\u201d control. '
+        + (_vdDown.length === 1 ? 'Do not carry this column' : 'Do not carry these columns')
+        + ' into the memo on the $75 ordering alone; state the sign change beside it.</div>'
+      : '';
     _vdHtml = '<div id="cmp-verdict" class="cmp-notice" style="margin-bottom:10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.22);border-left:3px solid var(--accent);border-radius:5px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">'
       + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">' + _lead + '</div>'
       + _aside
       + _rebLine
       + _valLine
+      + _dsLine
       // v772 (T3): filled by _sbsPaintVerdictFp() once the per-country spread fetches land.
       + '<div id="cmp-verdict-fp" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
       + '</div>';
