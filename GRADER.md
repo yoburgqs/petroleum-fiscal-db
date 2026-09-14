@@ -50373,3 +50373,20 @@ micro-edit, not rubric chasing. v840 written at the three display sites (`:42`, 
   2026-09-12 *and* 2026-09-13. **Nineteenth cycle carried, still uninvestigated.** Outside
   the UX-finalization course this directive sets, so no cycle will ever pick it up.
   **This wants Zach's attention directly.**
+
+---
+## Cycle 748 Log — 2026-09-13 20:09
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 748 complete — **v840** shipped (`ae31692`), grader log (`b166a70`), both pushed, mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"**
+
+## Friction
+Cold load at 1440×900, no storage. I cleared the seeded set and built the comparison the platform's *own* FAQ A592 tells analysts to build — Iraq / Indonesia / Malaysia. The Economics block rendered:
+
+```
+Contractor NPV @$50 (downside)   $389M   $334M   -$33M
+Contractor NPV @$75 (base)       $642M   $745M   $62
