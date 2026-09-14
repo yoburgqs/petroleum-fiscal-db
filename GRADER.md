@@ -52370,3 +52370,18 @@ Nine-step behavioural walk, all pass:
 - **`.reform-mechanic` / `.reform-take` have `position: relative` and no `::after`** (band 18px). Not controls today; if either ever gets a handler it is already below the floor.
 - **`window.compareBasket` vs `compareList` sweep — now CLOSED** for the Side-by-Side path by this cycle. The remaining unaudited consumers are `_scDockPlace()` / `_fcDockPlace()` (lines ~34722, ~51702), which only read `basket.offsetHeight` to stack their own docks; both were exercised at 390 and 1440 this cycle with the bar up and the bar down.
 - **Still no process check comparing the deployed version string against the local tree** — carried from 758, 761, 762, 763, 764.
+
+---
+## Cycle 765 Log — 2026-09-14 15:38
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed.
+
+## Cycle 765 — T3
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (764 was T4; T3 last ran at cycle 724.)
+
+**Friction.** I walked T3 cold — no localStorage, no sessionStorage — by the route the tool's own help text prescribes: Explorer `+` buttons → compare basket → **"Compare →"**. The handoff itself works. The step *after* it does not.
+
+I collected USA, Argentina and Mexico, pressed "Compare →", then did the ordinary thing: dropped USA wit
