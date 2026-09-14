@@ -50648,3 +50648,131 @@ Walked it cold at 1440×900, both storages cleared. The analyst clicks Screener,
 | step | URL | nav said |
 |---|---|---|
 | click Screener | `#/explorer`
+
+---
+## Cycle 751 Log — 2026-09-13 23:10
+- Test before: 300 PASS / 0 FAIL
+- Test after: **299 PASS / 0 FAIL / 1 WARN** — read from the suite's own report, suite RAN this cycle
+- JS errors: 0 page errors; 1 console 404 (sw.js, see Verification)
+- Summary: Cycle 751 complete — **v843** shipped (`ef9da35`), pushed, mirror synced.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(rotation: 750 T1, 749 T5, 748 T3, 747 T2, 746 T6 — T4 last ran at 745, least recent)
+
+## Friction
+Walked it cold at 1440×900, both storages cleared. The Reform Risk tab itself is in good shape —
+the lookup's two optgroups split 21 scoreable from 164 unscored before you commit, the verdict
+cards for Nigeria and Mozambique are both honest, and all seven routes into `openReformRiskFor()`
+land on the card top. The friction is not there. It is on **Country Profile**, in the Zone-B
+metric strip, on the **Stability row** — the most compact reform reading on the page and the one
+sitting directly above the IC MEMO block, i.e. the one an analyst lifts into a memo.
+
+`_stabGlyph344` / `_stabSub344` / `_stabTip344` rendered the diamonds (5 minus in-window fiscal
+law changes) on a **green→red ramp**, the raw count, and a tooltip converting the diamonds
+straight into a premium: *"3–4 diamonds → note 1–2 reforms, 1–2pp premium"*.
+
+A count cannot carry that instruction. Measured against the live `reform_history.json`, four
+jurisdictions rendered at 3–4 diamonds while holding a **quantified in-window take rise**:
+
+| country | diamonds | ramp colour | on file |
+|---|---|---|---|
+| **Russia** | ◆◆◆◆◇ (4) | **GREEN** | **+15pp** — 2022 windfall tax on oil export revenues |
+| **Ecuador** | ◆◆◆◆◇ (4) | **GREEN** | **+5pp** — 2010, PSC replaced by RSC (whole-regime conversion) |
+| **Indonesia** | ◆◆◆◇◇ (3) | amber | +9pp 2017 / −3pp 2020 → **net +6pp** |
+| **Norway** | ◆◆◆◇◇ (3) | amber | +12pp 2022 / −12pp 2020 → net 0pp (correctly benign) |
+
+So the row told an analyst to carry **1–2pp on Russia** — whose +15pp is the largest in-window
+rise on file outside the United Kingdom — and painted it green.
+
+The platform already knew. The Reform Risk tab's own snapshot names this exact case in prose
+(*"Russia's +15pp windfall tax in 2022 moves it exactly as far as a 1pp administrative change
+would"*), and Fiscal Compare's Reform verdict column has printed `TAKE +15pp` since v744. The FC
+column header goes further and asserts that its cell, the Reform Risk tab **"and the Country
+Profile sidebar"** all read one classifier, *"so the three surfaces cannot give you three
+different premiums for one country."* Two of the three did. **This row never called
+`_rrClassify()`.**
+
+## Change
+The Stability row now renders `_rrClassify()`'s own `icToken` beside the diamonds, in the
+verdict's own tier. Nothing is recomputed; no threshold is introduced here.
+
+**The diamond colour ramp is deleted, not re-thresholded.** The first attempt muted the ramp
+wherever the verdict contradicted it — and that fired on **19 of the 21** covered jurisdictions.
+A marker on 90% of the population partitions nothing. Count-vs-verdict disagreement is not an
+exception to flag; it is the *normal* case, because a count can never express a magnitude. So the
+diamonds became one neutral grey — the fact — and the token carries the colour and the finding.
+`_stabColor344` is removed rather than left dangling.
+
+This is the same move FC made at v744 in this same data, and that block's own comment records the
+identical finding independently: *"The disclaimer was a red ! on 19 of 19 grey rows. A marker that
+fires on the whole population partitions nothing."*
+
+The six-way token tier v819 built for the FC cell is hoisted into **`_rrTokenTier()`** and both
+surfaces call it, so a second copy cannot drift — a second copy being precisely how one country
+starts getting two readings. FC's rendered output is **byte-identical across its first 40 rows**,
+diffed against the pre-change build served side by side.
+
+The red `!` keeps its exact v583 scope — the 5 jurisdictions with in-window events that changed no
+fiscal terms (Australia, Libya, Iraq, Ghana, Guyana). Untouched.
+
+## Result
+An analyst asking what reform exposure they carry in Russia now reads
+`Stability: ◆◆◆◆◇ [TAKE +15pp] (1 fiscal law change since 2010 · Reform Risk →)` —
+percentage points of *government take*, with the token naming its own unit — instead of four green
+diamonds and an instruction to carry 1–2pp. Nigeria reads `SIZE UNKNOWN`, Algeria `↑ PRE-2010`
+(its 100/100 is a window artefact), the UK a filled `WACC +3–5pp` pill. **Ghana and Guyana — the
+only two jurisdictions in 185 where ORCA opened a sourced log and found no fiscal law change at
+all, the best result this reading can return — now render green**, where they previously sat on
+the same ramp as Russia's windfall tax.
+
+### Verification — the suite RAN this cycle
+- **299 PASS / 0 FAIL / 1 WARN**, read from the suite's own report, local http. The WARN is the
+  service worker registering at the GitHub Pages absolute path `/petroleum-fiscal-db/sw.js`.
+  Confirmed by request, not assumed: `/sw.js` → 200, `/petroleum-fiscal-db/sw.js` → 404 when the
+  tree is served from its own root. Unrelated to this change and present at cycle 750.
+- **Zero horizontal scroll and zero page/console errors at 1920 / 1440 / 1280 / 1024 / 768 / 390**
+  (390 with `hasTouch: true`), across 9 tabs at each width.
+- **Stability row 44px tall under `pointer: coarse`** at 390 (wraps to two lines), 20px on desktop
+  as before. Nothing added renders under 24px on a thumb.
+- **FC Reform verdict column diffed row-by-row** against the pre-change build after the
+  `_rrTokenTier()` extraction — identical in text, colour and background across 40 rows.
+- Token colours now partition, verified computed: Russia `#C2410C`, Guyana `#15803D`,
+  UK white-on-filled pill. Before the change all four sampled countries returned one orange.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — no banner, page-sub or routing hint added. v430, v449, v451, v452,
+v489 untouched: this is Zone B's metric strip, not the take headline, and the take% tier colouring
+is not involved. Tab order unchanged. Not rubric chasing, not a version sweep, not a changelog
+catch-up, not a new FAQ, not a new tooltip on a fresh surface, not text-only — the rendered
+colour, the glyph treatment and a new control element all change. v843 written at the three
+display sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **`switchTab()` strips the query off `#/explorer?…`** — a filter link works on load but cannot be
+  re-copied from the address bar. Low priority. (750.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with nothing
+  armed. (Carried from 732, partly mitigated at 736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (736/738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`) above a Fiscal
+  Mechanics row printing `Concession (7,643)`. Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages.** Wants its own
+  deliberate bulk pass, not a cycle.
+- **NEW — the Reference panel claims Reform Risk covers 185 jurisdictions.** "Reform Risk — Fiscal
+  reform heatmap and timeline for **185 jurisdictions**." It is 21. Every live surface on the tab
+  now states the 21/185 split correctly; this one line in the slide-out reference did not get the
+  v566/v837 correction. Text-only, so not a cycle on its own — fold it into the bulk prose pass
+  above.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Twenty-second cycle carried, still uninvestigated.** Outside the
+  UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
