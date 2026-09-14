@@ -52260,3 +52260,113 @@ The clip was the entire difference. Every prior pass measured `getBoundingClient
 **Friction.** I walked T4 cold at 390×844 with touch. Most of the path is genuinely good — seven surfaces drill into `openReformRiskFor()`, `#/reform/<country>` deep-links correctly, and the 164 jurisdictions with no sourced log get a careful "this is not a score of 100" card rather than a blank.
 
 The break is at the last step. On the Refo
+
+---
+## Cycle 765 Log — 2026-09-14 — T3 — shipped v857 (`33d1949`)
+- Test before: 318 PASS / 0 FAIL (harness, against Pages)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (RAN this cycle, local, authoritative office copy)
+- JS errors: 0
+- Summary: T3 — the basket bar and the Side-by-Side chip row were two lists of the same
+  thing, and the louder one won. "Compare →" replaced the analyst's curated set with a
+  stale one. The bar now tracks the comparison.
+
+## Cycle 765 — T3
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (764 was T4; T3 last ran at 724.)
+
+**Friction.** Walked T3 cold — no `localStorage`, no `sessionStorage` — by the route the
+platform's own help text prescribes (line 5022: *"Use the compare basket (+ buttons in
+Explorer) to collect candidates ... before launching Side-by-Side"*; line 5566 repeats it for
+the Screener). Most of this tab is in good shape: the `#cmp-search` box has aliases, fuzzy
+"did you mean", ranked prefix matching and keyboard control (v586/v631); `_sbsExampleUntouched`
+correctly collapses the Norway/UK/Netherlands seed the moment the analyst names their own
+country (v509/v853); the data-basis gate refuses to rank a PROD-WTD column against a statutory
+PROXY column and offers `sbsKeepBasis()` as a way out (v626/v845).
+
+The break is one step past the handoff. Measured:
+
+| step | `compareList` (what the grid renders) | `window.compareBasket` (what the bar shows) |
+|---|---|---|
+| collected USA / Argentina / Mexico in Explorer, pressed "Compare →" | `["USA","Argentina","Mexico"]` | `["USA","Argentina","Mexico"]` |
+| dropped USA with the chip ✕, added Norway in the search box | `["Argentina","Mexico","Norway"]` | `["USA","Argentina","Mexico"]` |
+| **pressed "Compare →"** | **`["USA","Argentina","Mexico"]`** | `["USA","Argentina","Mexico"]` |
+
+So the screen carried **two lists of "the countries I am comparing", disagreeing**, and the
+basket bar was the louder of the two: `position: fixed`, full-bleed, 2px accent top border,
+and the only solid-amber primary button anywhere on the tab. Pressing it — the obvious thing
+to press, labelled "Compare →" — ran `launchCompare()` off `window.compareBasket`, which had
+never heard about either edit. Norway, deliberately added seconds earlier, was gone. USA,
+deliberately removed, was back. No toast, no confirm, no diff; the grid just repainted with
+different countries, and this tab has no undo.
+
+Cause: the basket (a `localStorage` Set written by `addToBasket`, line ~57369) and
+`compareList` (the in-memory array `renderCompare()` renders, line ~27387) are two stores for
+one concept, and nothing ever moved information from the second back into the first. v853 hit
+the same split from the other direction — a button that pushed into the basket while the grid
+read `compareList`.
+
+**Second defect, same root, found on the way.** `renderBasket(); // initialize on load` sat at
+line 57389, **1,829 lines above** the `#compare-basket` markup at 59218. `getElementById`
+returned `null` and the function early-returned on every load. A basket persisted from a
+previous session was therefore live in memory and read by "Compare →" while being invisible
+and unclearable — and one "+" press in Explorer made the bar appear holding four countries,
+three of them from a session the analyst no longer remembers. Reproduced: seed
+`['Chad','Gabon','Yemen']`, load (bar `display:none`), press one "+" → bar reads
+*"Chad × Gabon × Yemen × USA ×"*.
+
+**Change.** Once "Compare →" has handed a set over (`_basketLive`), the bar tracks the
+comparison rather than shadowing it. Comparison edits write back — `addCompare()` (both the
+success tail and the kept-from-example branch), `removeCompare()`, `clearCompare()`,
+`sbsKeepBasis()`. A basket pill's ✕ now drops that column from the comparison too. `Clear` on
+the tab clears the handoff and removes the bar. The init render moved to `DOMContentLoaded`,
+and a restored `#/compare/<a>+<b>+<c>` whose membership matches the basket re-arms `_basketLive`
+so a reload does not silently re-split the stores.
+
+Deliberately **not** a render-time sync. It fires only on an explicit edit to a *live* handoff,
+which preserves two behaviours: the cold-load example never manufactures a basket bar
+(`_basketLive` is false until "Compare →" is pressed), and an analyst who returns to Explorer
+for a 4th country still accumulates — `addToBasket` is untouched and nothing clobbers the bar
+between the "+" and the next "Compare →".
+
+**Result.** The two lists on screen can no longer disagree, and the most prominent button on
+the tab is idempotent instead of destructive. An analyst who collects a shortlist, then swaps
+one country for another on the tab, keeps the comparison they curated instead of watching it
+revert to a set they had already rejected.
+
+### Verification — measured this cycle, not carried forward
+
+Nine-step behavioural walk, all pass:
+
+| # | check | result |
+|---|---|---|
+| T0 | cold load, no storage → no bar | `display:none` ✅ |
+| T1 | example seeded on t2 → still no bar, basket `[]` | ✅ |
+| T2 | Explorer "+"×3 → "Compare →" | both stores `["USA","Argentina","Mexico"]` ✅ |
+| T3 | drop USA, add Norway | both `["Argentina","Mexico","Norway"]`; bar reads the same ✅ |
+| T4 | **press "Compare →"** | `["Argentina","Mexico","Norway"]` — was `["USA","Argentina","Mexico"]` ✅ |
+| T5 | basket pill ✕ Mexico | both `["Argentina","Norway"]` ✅ |
+| T6 | back to Explorer, "+" a 4th | basket appends, nothing clobbered; Compare → carries all 3 ✅ |
+| T7 | `Clear` on the tab | basket `[]`, bar `display:none` ✅ |
+| T8 | persisted basket on load | bar renders *"Chad × Gabon × Yemen ×"* — was invisible ✅ |
+
+- **390×844 `hasTouch` with a persisted basket on screen** (worst case, the bar is up):
+  **0 horizontal scroll across 9 tabs**; all 5 basket-bar controls **44px tall** under
+  `pointer: coarse` (the v612 layer already covers them), **0 under 24px**.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs:** 0 horizontal-scroll failures, 0 page errors.
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN** against the modified build: **317 PASS / 0 FAIL / 1 WARN**. The WARN is
+  the `sw.js` 404 that exists only off GitHub Pages; 317 + that WARN reconciles to the
+  harness's 318 on Pages.
+
+### Carried forward
+
+- **New this cycle:** basket pill ✕ glyphs measure **44px tall but only 8px wide** under
+  `pointer: coarse`. The directive's floor is stated as height, so this passes as written, but
+  an 8px-wide thumb target on the control that removes a country is thin. Recorded rather than
+  scope-crept; it is pre-existing markup, not something this cycle touched.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against `~/office/tools/petroleum/tests/runtime_comprehensive.js` — repo copy 303 PASS, office copy 317, same build. `autonomous_cycle.py` copies office → repo (line 120), so running the suite straight out of the repo silently tests 14 fewer assertions. Carried from 764.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`, no sort key, direction or filters. `copyScreenerLink()` (v842) is the model. Carried from 763.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs `33.4%` in the Live DCF panel). A data gap; not closable from `index.html`.
+- **`.reform-mechanic` / `.reform-take` have `position: relative` and no `::after`** (band 18px). Not controls today; if either ever gets a handler it is already below the floor.
+- **`window.compareBasket` vs `compareList` sweep — now CLOSED** for the Side-by-Side path by this cycle. The remaining unaudited consumers are `_scDockPlace()` / `_fcDockPlace()` (lines ~34722, ~51702), which only read `basket.offsetHeight` to stack their own docks; both were exercised at 390 and 1440 this cycle with the bar up and the bar down.
+- **Still no process check comparing the deployed version string against the local tree** — carried from 758, 761, 762, 763, 764.
