@@ -50631,3 +50631,20 @@ the real change shipped and re-tested.
   2026-09-12 *and* 2026-09-13. **Twenty-first cycle carried, still uninvestigated.** Outside
   the UX-finalization course this directive sets, so no cycle will ever pick it up.
   **This wants Zach's attention directly.**
+
+---
+## Cycle 750 Log — 2026-09-13 22:03
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 750 complete — **v842** shipped (`c898c85`), grader log (`5aa600d`), both pushed, mirror synced.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotation: 749 T5, 748 T3, 747 T2, 746 T6, 745 T4 — T1 last ran at 744)
+
+## Friction
+Walked it cold at 1440×900, both storages cleared. The analyst clicks Screener, loads IOC Capital Screen, gets 15 countries — then measured on the shipped v841 build:
+
+| step | URL | nav said |
+|---|---|---|
+| click Screener | `#/explorer`
