@@ -51252,3 +51252,156 @@ if (country) { ...load it... }    // no else
 ```
 
 `fromSlug()` matched only the **underscore** slug that `toSlug()` produces. But the
+
+---
+## Cycle 755 Log — 2026-09-14 08:30
+
+- Test before: 300 PASS / 0 FAIL
+- JS errors: 0
+- Version: v846 → v847
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Rotation: 754
+was T2, 753 T3, 752 T6, 751 T4, 750 T1 — T5 last ran at 749 and was stalest.
+
+## Friction
+Walked every T5 artifact cold at 1440x900 and compared them against each other:
+Fiscal Compare `⎘ Copy for IC Memo` (`copyFCForIC`, `:55506`), Country Profile
+`Copy for IC Memo` (`copyICSummary`), the Screener CSV, the Reform History CSV
+and the Breakeven Map CSV (`exportBreakevenCSV`, `:57279`).
+
+Four of the five are in good shape. The Breakeven Map CSV was not, and the defect
+was not the one carried forward from 752.
+
+**It shipped a column of country-level IRRs that appear nowhere on the tab that
+produced them, and that every other artifact on this platform explicitly refuses
+to report.**
+
+- The Breakeven Map panel renders **no IRR at all** — the string "IRR" does not
+  occur anywhere in `#tbreakevenmap`'s rendered text. The column existed only in
+  the download, so there was nothing on screen to check it against.
+- Every other IC artifact had already withdrawn the figure *and says why*.
+  `copyFCForIC`'s preamble: *"IRR is not reported at country level: the underlying
+  figure is an arithmetic mean of per-contract IRRs (median 333% across the 165
+  countries that carry one at $75/bbl) and is not a project return. Use Scenario
+  Builder."* The drilldown's `Copy 4-price as IC table` tooltip states *"No IRR
+  column"*. `exportIOCPortfolio` carries the same refusal. `CP_IRR_NOTE` is a
+  getter that returns the refusal string, not a value. The Screener CSV carries
+  28 columns — evidence grade, fee-basis blend, comparable take — and no IRR.
+  This file was the **only** export still emitting the numbers.
+- **The guard was backwards.** The cell was written only when `d.irr_75 < 500`:
+
+      (d.irr_75 != null && d.irr_75 < 500) ? d.irr_75.toFixed(1) : ''
+
+  So it suppressed the self-evidently broken values and exported the
+  plausible-looking ones. Measured on the live export: **26 of 65 rows, 108%–492%,
+  median 333.1%** — the very median Fiscal Compare cites as its reason not to
+  publish the number. 492% is no more a project return than 501%; the threshold
+  removed precisely the values that would have warned the reader and kept the ones
+  that read as data.
+- The caveat block sits *below* the data (correctly — v650 put it there so pandas
+  parses), which means in a spreadsheet the IRR column is 65 rows above any
+  qualification of it.
+
+A second gap surfaced on the same walk and is the item carried forward from 752:
+this file carried **no evidence grade**, alone among the exports.
+
+## Change
+`exportBreakevenCSV` (`index.html:57279`):
+
+1. **`IRR @$75 (%)` column removed.** Removed rather than caveated, on the v451
+   precedent — Govt NPV was deleted from Fiscal Compare because a caveat is not
+   enough at the decision point.
+2. **Two columns added in its place: `Evidence Grade` and `Evidence Basis`**, via
+   the existing `_scEvidExport()` the Screener CSV already uses. The file now
+   grades its own fact base like every other export.
+3. **Two caveat rows added, both measured off the rows in the file rather than
+   asserted**, so they cannot drift from the data:
+   - `NO IRR COLUMN — WITHDRAWN, NOT MISSING` — states that ORCA does not report
+     IRR at country level, names the spread that *would* have shipped
+     (26 of 65 rows, 108%–492%, median 333%), says the old 500% cut kept the
+     wrong half, and routes to Scenario Builder for a project IRR.
+   - `EVIDENCE —` — states that the grade is a property of the fact base, not the
+     model, and counts the C/D rows by name.
+4. Toast updated automatically (`the last 8 rows`, was 6).
+
+**The evidence column immediately paid for itself.** Of the 65 rows in this file —
+the list an analyst reads as "cheapest barrels on earth" — **47 are C or D**
+(A 5 / B 13 / C 18 / D 29). Row 1, Belgium at $27.0/bbl, rests on **6 facts**.
+That was invisible in this artifact before this cycle.
+
+## Result
+The analyst who exports the Breakeven Map can no longer paste a 333%-median IRR
+column into an IC memo, because it is not in the file — and if they go looking for
+it, the file tells them it was withdrawn, why a mean of per-contract IRRs is not a
+project return, and where to get a real one. In exchange they get the column the
+file never had: 47 of the 65 "cheap breakeven" countries are now visibly
+screening-only on evidence, with the sourcing mix behind each grade in the next
+cell.
+
+## Verification — all run this cycle
+- **JS syntax gate:** 11 of 11 inline scripts parse. **PASS.**
+- **Runtime suite RAN** against the patched file: **299 PASS / 0 FAIL / 1 WARN**,
+  0 failures. The WARN and the single "JS error" are the same `sw.js` 404 the
+  pre-change baseline produces on this machine — service-worker registration
+  against `python3 -m http.server`, not the deployed build — identical to cycles
+  752, 753 and 754. Number read from the suite's own report, not assumed.
+- **Export re-downloaded and parsed:** `pandas.read_csv(..., nrows=65)` → shape
+  **(65, 10)**, zero columns matching `IRR`, `Evidence Grade` distribution
+  A 5 / B 13 / C 18 / D 29. Opens straight into Excel; header still on row 1, so
+  the v650 parse fix is intact.
+- **Horizontal scroll:** `scrollWidth === clientWidth` at **1920 / 1440 / 1280 /
+  1024 / 768 / 390**.
+- **Step 5b, 390x844 `hasTouch:true`:** Breakeven Map renders, `scrollWidth === 390`,
+  `#breakeven-csv-btn` measures **44px** tall under `pointer: coarse` — over the
+  24px floor. Export was **triggered and verified on the phone context**: file
+  downloads, header carries no IRR column.
+- **Pixel gate:** **PASS** — no surface worse than baseline.
+- **Cross-check before claiming "the last one":** grepped every export and copy
+  function for `irr_75` / `'IRR`. `exportScreenerCSV`, `exportScreenerExcel`,
+  `exportFCResults`, `copyFCForIC`, `copyScreenerTable`, `exportReformRiskCSV`
+  emit none; `exportCountryProfile`, `exportIOCPortfolio`, `copyICSummary`,
+  `copyComparisonTable`, `copyIOCPortfolio` carry the *refusal string*
+  (`CP_IRR_NOTE` is a getter returning "IRR is not reported at country level"),
+  not a value; `exportExplorer`'s hits are sort/filter labels; `exportVintageCSV`'s
+  are comments documenting a past bug. The claim holds.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and every `min-width: max-content` marker
+untouched — this cycle changed one export function and no CSS. v371/v373, v430,
+v449, v451, v452, v489, v626, v705, v845, v846 untouched. Tab order unchanged.
+Not rubric chasing, not a version sweep, not a changelog catch-up, not a new FAQ,
+not a new tooltip, and **not text-only** — a column of numbers left the artifact,
+two columns entered it, and the on-screen toast changed. v847 written at the three
+display sites (`:42`, `:2484`, `:2554`) silently, after the change shipped and
+re-tested.
+
+### Carried forward
+- **The Breakeven Map CSV evidence-grade gap (752) is CLOSED** by this cycle.
+- **`switchTab()` strips the query off `#/explorer?…`** — low priority. (750.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil
+  shares** (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against
+  takes of 87.2% / 85.6%. Fork-1 data question. (740.)
+- **The all-185 rank line duplicates Zone A on a non-producer.** Cosmetic. (754.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the
+  Best-BE hover title. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold
+  view. (732/736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario
+  Builder provenance. (736/738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`). (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages**,
+  and **the Reference panel still claims Reform Risk covers 185 jurisdictions**
+  (it is 21). Both text-only — one deliberate bulk prose pass, not a cycle each.
+- **NEW, from this cycle's walk — 47 of the 65 countries with a modelled breakeven
+  are C or D on evidence, and 29 are D.** Belgium's $27.0/bbl breakeven rests on
+  6 facts. The export now discloses this, but the underlying question — whether a
+  breakeven should be modelled at all off a 6-fact base — is a **Fork-1 data
+  question**, not a UX one.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an
+  incident** — 2026-09-12, 2026-09-13 *and* 2026-09-14 (two on the 14th).
+  **Twenty-sixth cycle carried, still uninvestigated.** Outside the UX-finalization
+  course this directive sets, so no cycle will ever pick it up. **This wants Zach's
+  attention directly.**

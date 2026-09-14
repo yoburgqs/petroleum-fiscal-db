@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v846</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v847</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2481,7 +2481,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v846</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v847</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2551,7 +2551,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v846</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v847</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -57287,9 +57287,31 @@ function exportBreakevenCSV() {
   // the caveat block, the retention columns the screen names as the axis that DOES separate,
   // and the Mechanic column -- which read d.mechanic against a field named d.mechanics and has
   // therefore been exporting empty on all 65 rows since the column was added.
+  // ── v847 (T5) ─ the last country-level IRR in any ORCA export, removed ─────────────
+  // This file shipped an 'IRR @$75 (%)' column. Nothing on the Breakeven Map tab renders an
+  // IRR — the word does not appear anywhere in the panel — so the column existed only in the
+  // download, with nothing on screen for the analyst to check it against.
+  //
+  // Every other IC artifact on this platform had already withdrawn that figure, and says why:
+  // the Fiscal Compare 'Copy for IC Memo' preamble refuses it outright ("IRR is not reported at
+  // country level: the underlying figure is an arithmetic mean of per-contract IRRs (median 333%
+  // ...) and is not a project return. Use Scenario Builder"); the row drilldown's "Copy 4-price
+  // as IC table" states "No IRR column" in its own tooltip; and the Screener CSV carries 28
+  // columns — evidence grade, fee-basis blend, comparable take — and no IRR at all.
+  //
+  // Worse, the guard was backwards. The cell was written only when d.irr_75 < 500, so the file
+  // suppressed the self-evidently broken values and exported the plausible-looking ones: 26 rows
+  // running 108%–492%, median 333.1% — the very median Fiscal Compare cites as its reason not
+  // to publish the number. 492% is no more a project return than 501% is; the threshold removed
+  // exactly the values that would have warned the reader and kept the ones that read as data.
+  // The mean-of-per-contract-IRRs defect does not attenuate below 500%.
+  //
+  // Removed rather than caveated, on the v451 precedent (Govt NPV deleted from Fiscal Compare
+  // because a caveat is not enough at the decision point). In its place the column this file has
+  // been missing since it was built, and the one every other export carries: the evidence grade.
   var head = ['Country','Region','Mechanic','Breakeven ($/bbl)','Govt Take @$75 (%)',
               'Contractor NPV @$75 ($M)','Contractor NPV @$50 ($M)',
-              'NPV Retention $50 vs $75 (%)','IRR @$75 (%)'];
+              'NPV Retention $50 vs $75 (%)','Evidence Grade','Evidence Basis'];
   var rows = [head];
   // v591: the $1.0 state-monopoly floor artifact is not exported — in a spreadsheet it reads
   // as the cheapest barrel on earth with nothing on screen to contradict it.
@@ -57304,8 +57326,17 @@ function exportBreakevenCSV() {
       return String(a.country).localeCompare(String(b.country));
     });
   var beVals = {}, nRet = 0, retVals = {}, retLo = null, retHi = null;
+  // v847 (T5): C/D evidence tally, and the IRR spread that WAS being exported — both measured
+  // off the rows in this very file, not asserted, so the caveat cannot drift from the data.
+  var nCD = 0, cdNames = [], nGraded = 0, _irrHad = [];
   sorted.forEach(function(d) {
     beVals[d.be_75] = 1;
+    var _ev = (typeof _scEvidExport === 'function') ? _scEvidExport(d) : null;
+    if (_ev && _ev.grade && _ev.grade !== 'not graded') {
+      nGraded++;
+      if (_ev.grade === 'C' || _ev.grade === 'D') { nCD++; if (cdNames.length < 8) cdNames.push(d.country); }
+    }
+    if (d.irr_75 != null && d.irr_75 < 500) _irrHad.push(d.irr_75);
     var ret = (typeof _npvRetention === 'function') ? _npvRetention(d) : null;
     if (ret !== null && ret !== undefined) {
       nRet++;
@@ -57324,7 +57355,8 @@ function exportBreakevenCSV() {
       d.npv_75 != null ? d.npv_75.toFixed(0) : '',
       d.npv_50 != null ? d.npv_50.toFixed(0) : '',
       (ret === null || ret === undefined) ? '' : (ret * 100).toFixed(0),
-      (d.irr_75 != null && d.irr_75 < 500) ? d.irr_75.toFixed(1) : ''
+      _ev ? _ev.grade : '',
+      _ev ? _ev.basis : ''
     ]);
   });
   if (rows.length <= 1) { _icRefuse('No breakeven data to export.'); return; }
@@ -57332,6 +57364,17 @@ function exportBreakevenCSV() {
   var nDistinct = Object.keys(beVals).length;
   var lo = sorted[0].be_75, hi = sorted[sorted.length - 1].be_75;
   var nBlank = (COUNTRY_DATA.length || 185) - N;
+
+  // v847 (T5): spread of the IRR column this file used to ship, measured so the withdrawal
+  // note below states what was actually removed rather than a remembered number.
+  var _irrLo = null, _irrHi = null, _irrMed = null;
+  if (_irrHad.length) {
+    _irrHad.sort(function(a,b){ return a - b; });
+    _irrLo = _irrHad[0];
+    _irrHi = _irrHad[_irrHad.length - 1];
+    var _m = Math.floor(_irrHad.length / 2);
+    _irrMed = (_irrHad.length % 2) ? _irrHad[_m] : (_irrHad[_m - 1] + _irrHad[_m]) / 2;
+  }
 
   // v608 (T5): the same caveat the tab carries on screen, prepended so it travels into the
   // memo with the numbers rather than staying behind on the page.
@@ -57352,7 +57395,29 @@ function exportBreakevenCSV() {
       + 'and is the basis the Downside Resilience preset screens on. This file is a coverage list, not a shortlist.',
     'The ' + nBlank + ' countries absent from this file have no modelled cost structure. That is absence of data, not a low or high breakeven.',
     'BASIS — ' + _icEngineBasis() + ' '
-      + 'Government take is the ORCA contract-database figure. IRR is blank where the country-level figure exceeds 500% (an arithmetic mean of per-contract IRRs, not a project return).',
+      + 'Government take is the ORCA contract-database figure.',
+    // v847 (T5): says what was withdrawn and why, and measures the withdrawn spread off the rows
+    // in this file so the sentence cannot drift from the data it describes.
+    'NO IRR COLUMN — WITHDRAWN, NOT MISSING. Until ' + _orcaVerNow() + ' this file carried an "IRR @$75 (%)" column. '
+      + 'ORCA does not report IRR at country level and no other export or clipboard artifact on the platform does: '
+      + 'the stored figure is an arithmetic mean of per-contract IRRs, which is not a project return and cannot be '
+      + 'compared against a hurdle rate. '
+      + (_irrHad.length
+          ? 'On this export it would have populated ' + _irrHad.length + ' of ' + N + ' rows at '
+            + _irrLo.toFixed(0) + '%–' + _irrHi.toFixed(0) + '%, median ' + _irrMed.toFixed(0) + '% — and the old column blanked '
+            + 'anything above 500%, so it suppressed the values that would have looked wrong and kept the ones that read as data. '
+          : '')
+      + 'For a project IRR, open Scenario Builder and enter your own capex, opex and working interest; '
+      + 'the contractor NPV columns here are on the standardized basis stated above and can be rebuilt against it.',
+    'EVIDENCE — the "Evidence Grade" column grades the FACT BASE behind each country (share of facts read out of the '
+      + 'primary legal instrument, and the depth of that record), not the accuracy of the model. '
+      + (nGraded ? nGraded + ' of ' + N + ' rows carry a grade. ' : '')
+      + (nCD
+          ? nCD + ' of them are C or D — secondary-led or thin. Per ORCA methodology a C or D is SCREENING ONLY: do not '
+            + 'carry one into a recommendation without re-reading the terms. ' + cdNames.slice(0,8).join(', ')
+            + (nCD > cdNames.length ? ' and ' + (nCD - cdNames.length) + ' more' : '') + '. '
+          : 'No row in this file is C or D on evidence. ')
+      + 'The "Evidence Basis" column states the sourcing mix behind each grade.',
     'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/'
   ];
 
