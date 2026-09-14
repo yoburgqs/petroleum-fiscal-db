@@ -50955,3 +50955,141 @@ buttons that produced no on-screen feedback now do. v844 written at the three di
 I walked T6 cold and took the exit the Screener exists for: load a preset → land on a shortlist → export → attach to the IC memo.
 
 The Screener grades evidence harder than any other tab. It prints an `EVIDENCE` column on every ro
+
+---
+## Cycle 753 — 2026-09-14 — v845
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (rotation: 752 was T6, 751 T4,
+750 T1, 749 T5, 748 T3, 747 T2.)
+
+## Friction
+Walked T3 cold at 1440x900 and 390x844, no sessionStorage and no localStorage, and built the
+comparison an analyst actually builds rather than the one the tab seeds: **Guyana, Brazil,
+Suriname** — the Atlantic margin, three countries any IC screening deck in 2026 puts on one page.
+
+Two of them work. Guyana + Suriname alone produce a complete comparison:
+
+    GOVT TAKE @$75, LOWEST FIRST:      Guyana 54.1% › Suriname 54.2%   0.1pp apart
+    CONTRACTOR VALUE @$75, LARGEST:    Guyana $1.07B › Suriname $1.01B  agrees with take order
+    All 2 columns are on one basis — nothing is set aside.
+
+Then the analyst adds the third country. That is the only move the tab offers, the counter above
+the grid invites it (`2/5 countries — room for 3 more`), and it **destroys both orderings**:
+
+    NOTHING RANKS HERE: Only Brazil carries a comparable take (55.6% at $75/bbl).
+                        A single column is not a comparison.
+    Set aside — 2 of 3 columns carry no comparable take: Guyana …; Suriname …
+    Contractor value does not order here: only Brazil …
+    PREDICTABILITY: Brazil 61 › Suriname ≤59; not placed: Guyana …
+
+Brazil is the set's only production-weighted column, so v626's data-basis gate
+(`_cmpBasisGate`, `renderCompare()` ~:28783) fires and sets the other two aside. **The gate is
+correct** — a production-weighted take and a statutory-terms take are not the same measurement —
+and it is not what this cycle changes.
+
+What was missing is the **exit**. Three separate notices told the analyst what could not be done;
+not one named a set that works — and one was sitting in front of them, two of the three columns
+already on screen. The analyst's correct move is to **remove** a column, and *removing* a column
+to get *more* comparison is not a step anyone guesses with twenty minutes before a screening
+meeting. The observable behaviour was: add a country, lose the answer, no route back.
+
+## Change
+**On screen** — a new line inside `#cmp-verdict`, rendered directly under the "Set aside" clause
+that states the refusal, with a working control on it:
+
+> **A comparison is available in this set:** Guyana + Suriname rank against each other. Restrict
+> the comparison to one basis and the orderings come back — nothing is deleted, and the columns
+> you drop can be re-added from the search box above.
+> `[ Compare the 2 statutory-terms columns → ]`
+
+The button (`sbsKeepBasis()`, new, beside `clearCompare()` ~:27500) replaces the set with those
+columns, keeps the analyst on the tab, writes **one** history entry (`_cmpHashHold`, the
+`cpLoadPeersSbs()` pattern), updates `#/compare/…`, and toasts what it removed and how to get it
+back.
+
+Three things it deliberately does **not** do:
+
+1. **It does not fire on a set that still orders.** Condition is
+   `_cmpBasisGate && _vdRanked.length < 2` — the gate fired *and* it is what broke the ordering.
+   The tab's own seeded default (Norway / UK / Netherlands) gates the Netherlands out but still
+   ranks two columns, so nothing is added there. Verified: no line at 1440 or 390.
+2. **It does not assume the subset works.** On a single-basis subset `_cmpBasisGate` is false by
+   construction, so `_cmpRankTake`'s *other* null branches — state monopoly, PRRT cash-flow basis,
+   fee-blended with no Group-1 take — are re-run against the candidate (`_rankNoGate`), and the
+   offer is made only where **two columns actually survive**. A button that produced another
+   "NOTHING RANKS HERE" would be worse than no button.
+3. **Where neither basis reaches two, there is no button** — it says which side needs one more
+   country. Brazil + Guyana (1 producer, 1 statutory) gets prose, not a control that cannot help.
+
+**In the pasted IC memo** — `#cmp-verdict` carries `class="cmp-notice"`, which
+`copyComparisonTable()` sweeps into the clipboard artifact (v669). The prose *should* travel; a
+button label should not. The sweeper (~:47151) now reads a clone with `[data-cmp-uionly]` removed.
+Measured: the pasted note carries "A comparison is available in this set: Guyana + Suriname rank
+against each other…" and does **not** carry "Compare the 2 statutory-terms columns →".
+
+## Result
+The analyst who builds Guyana / Brazil / Suriname and is told nothing ranks can now get a ranked
+comparison **in one click, from the line that refused them**, without knowing that ORCA orders
+within a basis and never across it, and without guessing that the way to more comparison is to
+delete a column. Concretely, after the click: take ordering, contractor-value ordering and the
+`order changes in $75–$100` price-stability flag all return, the set is 2 columns not 3, the URL
+is `#/compare/guyana+suriname` and is shareable, and the toast names Brazil and says how to put it
+back.
+
+## Verification — measured this cycle, none assumed
+- **JS syntax gate: PASS**, 11 inline blocks, `node --check` on each.
+- **Behaviour, 1440x900, cold, no storage:** Guyana/Brazil/Suriname → line renders, one button,
+  `data-keep=["Guyana","Suriname"]`. Click → verdict becomes
+  `GOVT TAKE @$75, LOWEST FIRST: Guyana 54.1% › Suriname 54.2%` + `CONTRACTOR VALUE @$75,
+  LARGEST FIRST: Guyana $1.07B › Suriname $1.01B — agrees with take order`; columns = Guyana,
+  Suriname; hash = `#/compare/guyana+suriname`; toast fired naming Brazil. **0 page errors.**
+- **Six sets exercised, both viewports** — fires on exactly the two it should:
+  | set | line |
+  |---|---|
+  | Norway + UK + Netherlands (tab default) | none — still ranks 2 |
+  | Guyana + Suriname (all statutory) | none — no gate |
+  | Norway + UK (all producers) | none — no gate |
+  | Saudi Arabia + Kuwait + Guyana + Suriname | none |
+  | Brazil + Guyana (1+1) | prose, **no button** — neither side reaches two |
+  | Iraq + Guyana + Suriname (fee-blended producer) | button, 2 statutory columns |
+- **Mobile 5b, 390x844 `hasTouch:true`:** `scrollWidth === clientWidth === 390` on every set above.
+  The one new control measures **26px** tall under `pointer: coarse` — over the 24px floor.
+- **Clipboard:** prose in, button label out (above).
+- Suite **ran this cycle** against the final file: **299 PASS / 0 FAIL / 1 WARN**, 0 failures. The single WARN and the single "JS error" are the same sw.js 404 the *pre-change* baseline run produced on this machine — service-worker registration against `python3 -m http.server`, not the deployed build, and identical to cycle 752.
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and every `min-width: max-content` marker untouched.
+v371/v373 declutter: the addition is one line inside an **existing** notice that only renders when
+the set is already broken — not a banner, not a page-sub, not a routing hint, and it is absent on
+the default view. v430, v449, v451, v452, v489, v626, v705 untouched — the basis gate itself is
+unchanged. Tab order unchanged. Not rubric chasing, not a version sweep, not a changelog catch-up,
+not a new FAQ, not a new tooltip, and **not text-only**: a new control changes the set on screen.
+v845 written at the three display sites (`:42`, `:2484`, `:2554`) silently, after the change
+shipped and re-tested.
+
+### Carried forward
+- **`#tab-btn-tsamples` — RESOLVED, not a bug.** Carried from 752 as "a tab nobody can click".
+  It is `display:none` **by design**: Sample Analyses lives in the Reference dropdown
+  (`ref-item-samples` → `switchTabFromDropdown('tsamples')`, ~:58179), and is reachable there.
+  The primary-strip button is a dead duplicate, not a lost tab. **Dropped from this list.**
+- **The Breakeven Map CSV carries no evidence grade.** (752.)
+- **`switchTab()` strips the query off `#/explorer?…`** — low priority. (750.)
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title.
+  Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view. (732/736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (736/738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`). Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages**, and **the
+  Reference panel still claims Reform Risk covers 185 jurisdictions** (it is 21). Both text-only
+  — one deliberate bulk prose pass, not a cycle each.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Twenty-fourth cycle carried, still uninvestigated.** Outside the
+  UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
