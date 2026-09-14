@@ -51757,3 +51757,17 @@ country IRR regrew on a new surface six times before anyone asserted its absence
 - Explorer Stability sort does not reverse on a second header click. Low priority.
 - **No process check compares the deployed version string against the local tree.** This cycle
   found two shipped-but-undeployed cycles only by accident of one assertion. Worth a cheap check.
+
+---
+## Cycle 760 Log — 2026-09-14 09:45
+- Test before: 300 PASS / 2 FAIL
+- Test after: 304 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed, servers stopped, deployed site verified green.
+
+## Cycle 758 — v852
+
+**Task: T3** — *"How do these three countries compare side by side?"* (757 was T4, 756 T1, 755 T5, 754 T2; v850/v851 were both T6, so T3 was stalest.)
+
+### First: the 2 FAIL was not a regression
+The suite targets the **deployed** site, which was still v849. Two earlier cycles had built v850 and v851, written the guard assertions, and **never committed or pushed**. The `EXPL-NO-IRR` guard was correctly reporti
