@@ -50789,3 +50789,154 @@ display sites (`:42`, `:2484`, `:2554`) silently, after the real change shipped 
 
 ## Friction
 The Reform Risk tab itself is fine — I walked it cold and the lookup, the verdict cards and all seven inbound routes work. The friction is on **Country Profile**, in the Stability row that sits directly above the IC MEMO block — the most compact reform readin
+
+---
+## Cycle 752 Log — 2026-09-14 00:2x
+
+- Test before: 300 PASS / 0 FAIL / 0 WARN / 0 JS errors (harness, deployed URL)
+- Test after: **299 PASS / 0 FAIL / 1 WARN**, run this cycle against the LOCAL tree on
+  `localhost:8899`. The suite genuinely ran — it is not a carried-forward number. The single
+  WARN is `[ConsoleErrors] non-critical errors: A bad HTTP response code (404) was received
+  when fetching the script` — the service-worker registration, which resolves on the deployed
+  origin and not on a bare `python3 -m http.server` root. That one check is the only delta
+  between 299 and 300; every other assertion passed.
+- JS errors: 0 page errors, 0 console errors other than the sw.js 404 above.
+- JS syntax gate: PASS (11 inline blocks).
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Rotation: 751 was T4,
+750 T1, 749 T5, 748 T3, 747 T2 — T6 last ran at 746 and was the stalest.
+
+## Friction
+Walked T6 cold with no sessionStorage or localStorage, and took the exit the Screener is built
+for: load a preset → land on a shortlist → press ⬇ Excel / ⬇ CSV / ⌘ Copy for IC Memo → attach
+the file to the memo.
+
+**The Screener grades evidence harder than any other tab in the platform.** It prints an
+`EVIDENCE` column on every row (verified on screen: `["", "#", "COUNTRY", "REGION", "MECHANICS",
+"GOVT TAKE", "EVIDENCE", "CONTRACTOR NPV", …]`). It ships a **Primary-Source Evidence** preset
+(`applyScreenerPreset('highevidence')`, `:3428`). It carries a **"Min primary-source evidence
+(A)"** slider (`#sl-evid`, `:3515`) with a ≥50-fact depth floor bolted to it (`#sc-evid-depth`).
+And the Methodology tab states the consequence in the platform's own words (`:4366`): *"Treat a
+C as screening-only and do not put a D in a recommendation document without establishing the
+terms from the country's own petroleum act."*
+
+`_scExportRows()` (`:34150`) is the single choke point for **all four** export paths — CSV
+(`:34224`), the clipboard IC memo (`:34330`), the XLSX (`:45853`), and the clipboard HTML table
+via `_scCopyColumns()`. Read its returned object on a cold screen: **25 columns.**
+
+    Rank, Country, Region, Mechanics, R_factor_Tiers, Verified_Production, Take_Is_Floor,
+    Take_Basis, GovtTake_50/75/100/125, GovtTake_75_Comparable, FeeBasis_Blend, NPV_50_M,
+    NPV_75_M, Screened_At_bbl, NPV_Screened_M, Retention_Reference_bbl, NPV_Retention_pct,
+    Breakeven_bbl, Breakeven_Tested, Swing_pp, Fiscal_Predictability, Predictability_Basis
+
+**The evidence grade is not among them.** Neither is it in `_scExportBasisLines()` (`:33774`),
+which names the production/proxy split, the fee-basis blend, the take floor, the IRR rule and
+the predictability basis across nine paragraphs — and says nothing about sourcing. The
+clipboard table's one quality column, `Data basis` (`:34324`), is `Verified_Production` —
+production vs proxy, which is a **different question**: it asks whether ORCA modelled this
+country off real field output, not whether the fiscal terms it modelled were read out of a law.
+
+Measured against the live bundle, not asserted: of the 185 rows a cold screen exports,
+**28 grade A, 79 B, 43 C, 35 D — 78 are the two grades the platform says not to cite.** They
+are not obscure rows. **Nigeria, Mexico, Colombia, Ecuador, Kazakhstan, Oman and Saudi Arabia
+are C. Iraq, Russia, UAE — Abu Dhabi and Iraq-Kurdistan are D** (Russia: 3.8% primary law on
+3,929 facts). So the analyst who *screened on* the evidence slider handed over a workbook that
+omitted the criterion they screened on, and the analyst who did not handed over Russia and Iraq
+into an IC memo with nothing in the file to say the terms behind those numbers are almost
+entirely secondary guides. This is finalization test 5 — *"every export opens, parses, and
+carries the assumptions behind its numbers"* — and it was the biggest single failure of it left
+on the platform.
+
+## Change
+Four edits, no DOM added, nothing on screen moved.
+
+1. **`_scExportRows()`** — three columns added, placed with the other data-quality flags and
+   *ahead* of the take basis, so the workbook answers "how solid is this?" before it answers
+   "how much?": `Evidence_Grade` (A/B/C/D), `Evidence_Primary_Law_pct`, and `Evidence_Basis` —
+   a full sentence naming the share, the fact count, **which leg is binding** (sourcing vs
+   depth, read off `_evidenceGrade().limiter`), and the IC instruction for that grade. All four
+   export paths inherit it from the one choke point.
+2. **`_scCopyColumns()`** — an `Evidence` column in the pasted table, beside `Data basis`.
+   C and D rows carry the instruction in the cell (`D · 4% primary law — not citable without
+   the statute`), because a bare letter in a memo table is a credential, not an instruction.
+3. **`_scExportBasisLines()`** — an `EVIDENCE GRADE` block counted off the rows *actually in
+   the file* (same two sources the data-basis split already uses), so a hand-ticked shortlist
+   is described by its own grade mix and not the pre-shortlist match set. It states the two
+   legs and the thresholds, states that it is **not** an A+B share and why that number is
+   worthless, and names every C/D row with its share and fact count — capped at 25 names, past
+   which it points at the column rather than putting 78 countries in one spreadsheet cell.
+4. **`⬇ CSV` and `⬇ Excel` were silent** — the only export paths on the tab that dropped a file
+   into Downloads with no on-screen acknowledgement (Copy for IC Memo has always flashed a
+   toast). Both now toast the grade mix of the file they just wrote, at the one moment the
+   analyst is still looking at the evidence column:
+   *"185 countries exported as CSV — the screen that produced it travels with the file. 78 of
+   the 185 rows grade C or D on evidence — see the Evidence_Grade column before any of them
+   goes in the memo."*
+
+## Result
+The analyst can now answer "how solid is this?" **from the file, away from the tool** — in the
+IC meeting, three weeks later, on someone else's laptop. Concretely:
+
+- The XLSX and CSV carry the grade, the primary-law share and a per-row diagnosis, so a reader
+  who never opens ORCA can tell a Norway row (A, 66.1% primary law on 63,848 facts) from a
+  Russia row (D, 3.8% on 3,929) without asking the analyst.
+- A shortlist built with the **Primary-Source Evidence** preset now *proves* it: 35 rows,
+  **28 A / 7 B / 0 C / 0 D**, stated in the Screen & Basis sheet. The criterion that produced
+  the shortlist travels with the shortlist.
+- A shortlist built *without* it now carries its own warning, by name, before the file is
+  opened — and the export button says so on screen as it fires.
+
+## Verification — all measured this cycle, none assumed
+- **CSV parses**: header on row 1, **28 columns, 0 malformed data rows of 185**, caveat block
+  after the data (the v579/v650 rule respected). `EVIDENCE GRADE` present in the tail block.
+- **XLSX round-trips** through the page's own `XLSX` library: both sheets, 185 rows,
+  `Evidence_Grade` = `D` / `Evidence_Primary_Law_pct` = `3.8` on Russia, `EVIDENCE GRADE` and
+  the C/D line both present on `Screen & Basis`.
+- **Clipboard table** header now reads `… Fiscal predictability | Evidence | Data basis`;
+  Russia's cell renders `D · 4% primary law — not citable without the statute`.
+- **Shortlist path** exercised via `applyScreenerPreset('highevidence')` — counts recomputed
+  against the 35 surviving rows, not the 185.
+- **Mobile 5b**: `scrollWidth === clientWidth === 390` at 390×844 `hasTouch:true` across all 9
+  tabs; 0 page errors. No element was added to the DOM, so there is no new control to measure
+  against the 24px floor — the only new surface is the existing `#copy-toast`.
+- Suite **ran this cycle**: 299 PASS / 0 FAIL / 1 WARN (sw.js 404 of local serving, above).
+
+### STILL LOCKED — respected
+v612 mobile layer, `#reference-panel` and the `min-width: max-content` markers untouched.
+v371/v373 declutter intact — nothing added to the page. v430, v449, v451, v452, v489 untouched.
+Tab order unchanged. Not rubric chasing, not a version sweep, not a changelog catch-up, not a
+new FAQ, not a new tooltip, and **not text-only**: four export artifacts change content, and two
+buttons that produced no on-screen feedback now do. v844 written at the three display sites
+(`:42`, `:2484`, `:2554`) silently, after the real change shipped and re-tested.
+
+### Carried forward
+- **`switchTab()` strips the query off `#/explorer?…`** — a filter link works on load but cannot
+  be re-copied from the address bar. Low priority. (750.)
+- **`#tab-btn-tsamples` is `aria-hidden="true"` and not clickable at 1440px.** Found while
+  enumerating tabs this cycle. It resolves in the DOM and `switchTab('tsamples')` works, but the
+  Sample Analyses tab cannot be reached by clicking at a common desktop width. **NEW — wants a
+  cycle of its own; a tab nobody can click is worse than anything in this cycle's fix.**
+- **The Breakeven Map CSV carries no evidence grade either** — same class of gap as the one
+  fixed here, one tab over, and the Breakeven tab's own screen text says "the letter is the
+  country's evidence grade … Open the profile before shortlisting". Smaller blast radius (65
+  rows, a coverage list not a shortlist). **NEW.**
+- **Indonesia's Key Fiscal Parameters prints three different government profit-oil shares**
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- **`isStateMonopoly()` / Turkmenistan + Uzbekistan** — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (Carried from 740.)
+- **FC quick-stats prints "rank all 1 countries with verified data"** in the Best-BE hover title
+  when a filter leaves one breakeven-populated row. Grammar only. (739/740.)
+- **Screener / FC tick column headers render with empty `innerText`** on a cold view with
+  nothing armed. (Carried from 732, partly mitigated at 736.)
+- **`#cmp-run-fc-btn`** — dead code, not a dead control. Low priority. (734/735.)
+- **`_sbOrigin.basis` vs `getDCFParams()._basis`** disagreement in Scenario Builder provenance.
+  (736/738.)
+- **`# Contracts` row in Side-by-Side prints unformatted integers** (`7643`). Cosmetic. (748.)
+- **The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages**, and **the
+  Reference panel still claims Reform Risk covers 185 jurisdictions** (it is 21). Both text-only
+  — they want one deliberate bulk prose pass, not a cycle each.
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** — 2026-09-12
+  *and* 2026-09-13. **Twenty-third cycle carried, still uninvestigated.** Outside the
+  UX-finalization course this directive sets, so no cycle will ever pick it up.
+  **This wants Zach's attention directly.**
