@@ -51420,3 +51420,134 @@ re-tested.
 I walked all five paste artifacts cold and compared them against each other. Four were in good shape. The Breakeven Map CSV was not — and the defect wasn't the one carried forward from cycle 752.
 
 **It shipped a column of country-level IRRs that appear nowhere on the tab tha
+
+---
+## Cycle 756 Log — 2026-09-14 04:50
+- Test before: 300 PASS / 0 FAIL (live URL, per cycle harness)
+- Test after: 299 PASS / 0 FAIL / 1 WARN — **suite actually RAN this cycle**, against
+  the LOCAL build (`TEST_URL=http://localhost:8765`). The single WARN is
+  `GET /petroleum-fiscal-db/sw.js 404` — the service worker registering at its GitHub
+  Pages path, which does not exist under a localhost root. Confirmed in the server log,
+  predates this change, and is why live reads 300/0 and local reads 299/1. Not a
+  regression and not assumed: the number is read from the suite's own report.
+- JS errors: 0
+- Pixel gate: **PASS** — no surface got worse than baseline.
+- Summary: Cycle 756 complete — v848 shipped and pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"**
+(Rotation: 755 was T5, 754 T2, 753 T3, 752 T6, 751 T4 — T1 was stalest, last run at 750.)
+
+## Friction
+Walked cold at 1440x900, no sessionStorage, no localStorage: Home → "Screener" card →
+Advanced Filters → untick the three fee-basis mechanics (TSC / RSC / Buy-back) → tick
+Shell → collapse the panel again. 185 rows became 31. At that point **nothing on screen
+named the two filters that removed the other 154**:
+
+| surface | what it said | what it is |
+|---|---|---|
+| `<summary>` (`:3549`) | `ADVANCED FILTERS ▸ Mechanic · IOC Operator · Region · Reform Record · Data Basis` | **byte-identical to the untouched state** — a static list of category NAMES, printed whether or not any is on |
+| `#screener-active-filters` (`:32955`) | `2 filters active` | a count — and it carried **no `title` attribute at all** |
+| `#screener-preset-label` | `display:none` | correct — this screen was built by hand, so there was no preset to name |
+| `#screener-count` | `31 countries match at $75/bbl — ranked by data basis: …` | explains the **ordering**, never the **criteria** |
+
+So the only route back to "why is this list 31 countries?" was to re-open the panel and
+eyeball 17 checkboxes against their defaults — and the mechanic group defaults to **all
+nine checked**, making "which ones did I turn off" a counting exercise rather than a glance.
+
+This is the T1 question itself. The analyst is about to paste a 31-country shortlist into
+an IC memo and cannot state the basis it was built on. The **preset path was already
+covered** — `#screener-preset-label` names the criteria, e.g. "PSC Africa: PSC · Africa ·
+Take ≤75%". The **hand-tuned path was not**, and that is every screen an analyst adjusts
+after loading a preset.
+
+## Change
+The collapsed `<summary>` is now **state-bearing** instead of static:
+
+    before (any state):  ADVANCED FILTERS ▸ Mechanic · IOC Operator · Region · Reform Record · Data Basis
+    after  (filtered):   ADVANCED FILTERS ▸ Mechanics: 6 of 9 · IOC: Shell
+    after  (PSC Africa): ADVANCED FILTERS ▸ Mechanics: 2 of 9 · Region: Africa
+    after  (cold/reset): ADVANCED FILTERS ▸ Mechanic · IOC Operator · Region · Reform Record · Data Basis
+
+Named filters render in accent at full opacity; the full export sentences ("Fiscal
+mechanics: Concession, PSC, PRRT, Gross Split, EPSA, Revenue Share only", "IOC presence:
+Shell") are on hover. The badge gained the numbered `SCREEN APPLIED` criteria list it
+never had.
+
+**Both read `window._screenerExportBasis.criteria`** — the same array that already feeds
+the CSV's `SCREEN APPLIED` block and the XLSX basis sheet. The platform already knew how
+to describe its own screen in plain English; those sentences simply never reached the
+screen. Reusing the array rather than re-deriving it is deliberate: a second
+implementation would drift, and an on-screen basis that disagrees with the exported basis
+is worse than none.
+
+## Result
+The analyst can read the basis of a hand-built shortlist **without opening anything**, and
+can state it in the IC memo instead of reverse-engineering it from 17 checkboxes. A
+shortlist tuned last month is legible on return rather than being 31 countries with no
+visible reason.
+
+### STILL LOCKED — respected
+- **v371/v373**: the Advanced panel still starts **COLLAPSED** and this does **not** open
+  it. Only the label of the closed summary changed.
+- **v612 mobile layer**, `#reference-panel`, every `min-width: max-content` marker:
+  untouched — **this cycle changed no CSS at all.**
+- v430, v449, v451, v452, v489, v626, v705, v845, v846, v847 untouched. Tab order unchanged.
+- Not rubric chasing, not a version sweep, not a changelog catch-up, not a new FAQ, not a
+  new tooltip as the fix (the fix is that invisible state became visible; the hover is
+  supplementary), and **not text-only** — an element's content is now driven by filter
+  state where it was a hardcoded string.
+- v848 written at `:42`, `:2484`, `:2554` silently, after the change shipped and re-tested.
+
+### Verified this cycle, not assumed
+- Cold and post-`Reset All` both restore the resting label **byte-identical** — checked
+  explicitly, because a stale `Region: Africa` left in the summary after a clear would be
+  a lie rather than a cosmetic slip.
+- **Stale-attribute bug found and fixed during verification.** The first implementation
+  returned early when the badge was hidden, leaving its `title` behind. A cold Screener
+  that had never been filtered was carrying `Preset: Downside Resilience` — residue from
+  `_labelScreenerPresets()`, which drives every preset through `applyScreenerPreset()` to
+  count its hits. Unreachable while hidden, but an attribute that only becomes wrong later
+  is precisely the "stable but wrong" failure mode. Now cleared on hide.
+- Mobile 390x844 `hasTouch`: `scrollWidth 390 = clientWidth` at Home, cold Screener and
+  filtered-collapsed. Summary fits one line (336x29). 0 JS errors.
+
+### Carried forward
+- **⚠ NEW — finalization criterion 3 is not met on the Screener.** 17 controls render at
+  **13x13px** under `pointer: coarse`: the 9 **Fiscal Mechanic** and 8 **IOC Operator**
+  checkboxes in `#sc-mech-checks` / `#sc-ioc-checks`. Every *named* checkbox on the tab is
+  already 24px (`sc-fee-cmp` v640, `sc-evid-depth` v681, `sc-proxy-keep`, `sc-floor-keep`,
+  `sc-evidence-first`, `sc-sel-all`, all row ticks). These 17 are generated without ids, so
+  the "name them individually" approach could not reach them — and **v640 and v681 each
+  explicitly declined to widen the selector because it "would grow the collapsed
+  mechanic/IOC grids."** That reasoning does not hold for T1, which is the task that opens
+  that panel. Mitigation in place: the wrapping `<label>` is 28px and tappable, so the text
+  works; the 13px box is a mis-tap risk, and PSC/TSC sit 6px apart with a one-letter
+  difference — mis-tapping them swings the list between 81 and 4 countries. Not fixed this
+  cycle: it needs a scoped selector (`#sc-mech-checks input, #sc-ioc-checks input`) inside
+  the v612 layer, and the directive forbids narrowing that layer casually. **Next T1 should
+  take this.**
+- `switchTab()` strips the query off `#/explorer?…` — low priority. (750.)
+- Indonesia's Key Fiscal Parameters prints three different government profit-oil shares
+  (71.2% / 64.4% / R-factor ladder 60–88%). Fork-1 data question.
+- `isStateMonopoly()` / Turkmenistan + Uzbekistan — `state_eq = 100` against takes of
+  87.2% / 85.6%. Fork-1 data question. (740.)
+- The all-185 rank line duplicates Zone A on a non-producer. Cosmetic. (754.)
+- FC quick-stats prints "rank all 1 countries with verified data" in the Best-BE hover
+  title. Grammar only. (739/740.)
+- Screener / FC tick column headers render with empty `innerText` on a cold view. (732/736.)
+- `#cmp-run-fc-btn` — dead code, not a dead control. Low priority. (734/735.)
+- `_sbOrigin.basis` vs `getDCFParams()._basis` disagreement in Scenario Builder provenance. (736/738.)
+- `# Contracts` row in Side-by-Side prints unformatted integers (`7643`). (748.)
+- The `$1.2B / $15-opex` literal survives in ~25 Methodology / FAQ passages, and the
+  Reference panel still claims Reform Risk covers 185 jurisdictions (it is 21). Both
+  text-only — one deliberate bulk prose pass, not a cycle each. **Note:** the Screener's
+  GOVT TAKE cell tooltip also says "standardized $1.2B deepwater project" while the
+  `downsidereturns` preset states the anchor as `$1.0B` (ENGINE_BASIS, `dcf_profiles.py`
+  PROFILES.deepwater). Same literal, now confirmed to disagree with a live control.
+- 47 of the 65 countries with a modelled breakeven are C or D on evidence, 29 are D
+  (Belgium's $27.0/bbl rests on 6 facts). Fork-1 data question. (755.)
+- **⚠ The `petroleum overnight chain FAILED` emails are a series, not an incident** —
+  2026-09-12, 2026-09-13 and 2026-09-14 (two on the 14th). **Twenty-seventh cycle carried,
+  still uninvestigated.** Outside the UX-finalization course this directive sets, so no
+  cycle will ever pick it up. **This wants Zach's attention directly.**
