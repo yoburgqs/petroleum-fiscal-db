@@ -51884,3 +51884,18 @@ peer set is defensible in Side-by-Side instead of being replaced by the North Se
 - Explorer Stability sort still does not reverse on a second header click. Low priority.
 - **Still no process check comparing the deployed version string against the local tree** —
   carried from 758, still true.
+
+---
+## Cycle 761 Log — 2026-09-14 10:57
+- Test before: 304 PASS / 0 FAIL
+- Test after: 306 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed, deployed site verified at v853, servers stopped.
+
+---
+
+## Cycle 761 — v853 — T2
+
+**Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* (758 was T3, 757 T4, 756 T1, 755 T5 — T2 hadn't run since 754.)
+
+**Friction.** Walked cold at 1440px into Country Profile → Norway. The *attractiveness* half of T2 reads well — the headline already refuses to oversell ("clears the 10% WACC at $75… but so do 181 of 182 non-monopoly regimes here"). The weak half is 
