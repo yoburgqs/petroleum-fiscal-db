@@ -51405,3 +51405,18 @@ re-tested.
   **Twenty-sixth cycle carried, still uninvestigated.** Outside the UX-finalization
   course this directive sets, so no cycle will ever pick it up. **This wants Zach's
   attention directly.**
+
+---
+## Cycle 755 Log — 2026-09-14 03:57
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 755 complete — v847 shipped and pushed.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Rotation: 754 was T2, 753 T3, 752 T6, 751 T4, 750 T1 — T5 was stalest, last run at 749.)
+
+## Friction
+I walked all five paste artifacts cold and compared them against each other. Four were in good shape. The Breakeven Map CSV was not — and the defect wasn't the one carried forward from cycle 752.
+
+**It shipped a column of country-level IRRs that appear nowhere on the tab tha
