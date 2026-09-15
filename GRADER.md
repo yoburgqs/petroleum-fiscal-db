@@ -52934,3 +52934,112 @@ The contradiction is unchanged; the artifact is no longer silent about which fig
 
 ## Friction
 I walked every clipboard artifact the product has, cold. Six of the seven are genuinely good — Fiscal Compare, Screener, Side-by-Side, IOC Portfolio, Country Profile and Reform Risk all write rich HTML plus plain text with proper fallbacks, and all carry a full basis paragraph spe
+
+---
+## Cycle 770 Log — 2026-09-15 04:00
+- Test before: 318 PASS / 0 FAIL
+- Test after (suite RAN against the modified local build): 317 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 (the 1 WARN is the `sw.js` 404 — local-only, no service worker served by `python -m http.server`)
+- Summary: Cycle 770 complete — **v862 shipped and pushed**.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (769 was T5, 768 T6, 767 T2, 766 T1, 765 T3 — T4 was stalest, last run at 764.)
+
+## Friction
+Reform Risk tab → **QUIET SINCE 2010** card → `_quietRow()` (`index.html` ~46315).
+
+The card is filtered on `since2010 <= 1`, so a jurisdiction with **one** sourced in-window fiscal
+law change legitimately belongs in it. Every row string, however, was written as though the count
+were always zero. The `!lh` branch asserted, in bold orange:
+
+> **no fiscal law change since 2010** · its one in-window event is context — 2014 export and revenue
+> dispute · terms never reopened here, not terms held steady
+
+…off a test that only asked whether in-window **context** events existed. That test says nothing at
+all about whether a fiscal law change also occurred.
+
+**Iraq has one.** The 2023 KRG–Baghdad FSC ruling, take move never quantified. At **84.8% government
+take — the highest figure on the card** — Iraq was printed as a jurisdiction whose terms had never
+been reopened. The country lookup **at the top of the same tab** returns `SIZE UNKNOWN` for Iraq:
+
+> IC action — terms were rewritten inside the window, size never quantified … source its take effect
+> externally before carrying a zero reform premium.
+
+Two panels, one screen, one country, opposite readings — and the false one sat in the card an analyst
+scans as the *safe* bucket. This is the exact failure mode the tab's own comments are written to
+prevent ("a second copy is exactly how two surfaces start giving one country two different readings").
+
+Four of the 13 rows carried an in-window change that no row named, three of them above 69% take:
+
+| Country | Take @$75 | In-window change | Row said |
+|---|---|---|---|
+| **Iraq** | 84.8% | 2023 KRG-Baghdad FSC ruling | "no fiscal law change since 2010" — false |
+| **Venezuela** | 74.9% | 2022 Chevron licence restored | only "last take rise 2007" |
+| **Kazakhstan** | 69.9% | 2014 PSC term disputes resolved | only "last take rise 2007" |
+| **India** | 61.9% | 2016 HELP licensing policy | "no take-raising change on record" |
+
+All four are changes whose take effect ORCA has never quantified — which is why they left no trace in
+a row built around take *rises*. Absence, not error: the same trap the rest of this tab is built to catch.
+
+## Change
+- The **"terms never reopened here, not terms held steady"** sentence is now gated on
+  `since2010 === 0`, so it renders only where the count is actually zero. Ghana and Guyana keep it
+  verbatim; it now occurs exactly twice on the tab instead of three times.
+- Where a scored in-window change exists but carries **no quantified take move**, the row now leads
+  with it, above the take-rise note:
+  > **1 fiscal law change since 2010** · 2023 KRG-Baghdad FSC ruling — revenue sharing dispute ·
+  > take move never quantified — in the count, but there is no size to carry into a premium.
+  > **Not evidence the terms held.**
+- Context events sitting beside a scored change are still named, but as context ("one further
+  in-window event changed no terms — 2014 export and revenue dispute") rather than as proof of quiet.
+- `_midRow` already leads the `==2` band with its count; this gives the `<=1` band the same treatment.
+  **No new threshold and no recomputation** — the count is `_rrCountScored`'s, the predicate is
+  `_rrScores`, both the tab's own.
+
+## Result
+An analyst screening Iraq now reads the **same** finding from the Quiet card and from the country
+lookup instead of opposite ones, and can no longer carry a zero reform premium on Iraq, Venezuela,
+Kazakhstan or India off a row that never mentioned the in-window law change. The four highest-take
+rows in the card stopped reading as evidence of stability.
+
+## Verification
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN** against the modified local build: **317 PASS / 0 FAIL / 1 WARN**. Unchanged
+  from the pre-change local baseline.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs:** **0** horizontal-scroll failures, **0** page
+  errors, **0** console errors.
+- **390 × 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on the Reform Risk tab; **0**
+  controls under 24px in `#reform-risk-content`.
+- **Card partition intact:** 13 + 6 + 2 = 21, and the "partition all 21 jurisdictions" assertion
+  still renders.
+- **All 185 lookup countries swept:** 0 degenerate cards, 0 `NaN`/`undefined`/`null`.
+- **Cross-surface:** `_rrCountScored` and `icToken` re-read for all 21 scored jurisdictions and
+  compared against the rendered row text — Iraq/India `SIZE UNKNOWN` (n=1), Kazakhstan/Venezuela
+  `↑ PRE-2010` (n=1), Ghana/Guyana `NO LAW CHANGE` (n=0). No row now contradicts its own token.
+
+## Carried forward
+- **Ghana and Guyana are still the only two rows** allowed the "terms never reopened" sentence, and
+  both are correct — but the sentence is a strong claim resting on ORCA holding *no* fiscal event for
+  them since 2010, which is coverage, not evidence. Worth a look in a future T6.
+- **The intro strip's IC rule names a `5–8pp` WACC band at "Score ≤ 20"**, which needs 6+ in-window
+  changes. The maximum on file is the UK at 5 (score 25), so that band can never fire on current
+  data. New this cycle. Candidate for the next T4.
+- **`#/reform/<slug>` deep links work in both directions** (verified cold this cycle) — but
+  `copyExplorerLink()` still serializes nothing, bare `#/explorer`. Carried from 763, 765-769.
+- **The Cost Recovery / IRR card**'s *"clears a 15% IOC hurdle (+$490M)"* still has no basis line.
+  Carried from 767-769.
+- **Mechanic filter is a country-level include-set, not a contract-level one** — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. Data-model fix. Carried from 766-769.
+- **`#screener-preset-select` resets to "Load a screen…"** after applying a preset. Carried from 766-769.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against the office copy. Carried from 764-769.
+- **Basket pill ✕ glyphs measure 44px tall but only 8px wide** under `pointer: coarse`. Carried from 765-769.
+- **The evidence grade ignores the D (default-estimate) share entirely.** Carried from 768, 769.
+- **Norway's State Participation contradiction** (`0%` unsourced vs `33.4%` in the Live DCF panel).
+  Data gap. Carried.
+- **The Scenario Builder modal's description over-promises** production-parameter inputs that do not
+  exist. Carried from 769.
+- **4 of the 164 unscored jurisdictions have no statute anchor either** — Iraq-Kurdistan, Paraguay,
+  Somalia, UAE — Abu Dhabi. Confirmed this cycle by sweeping all 185. Known since v707; Iraq-Kurdistan
+  is the one that matters, given the KRG expansion in `NEXT.md`.
+- **Still no process check comparing the deployed version string against the local tree** — carried
+  from 758, 761-769.
