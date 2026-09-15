@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v875</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v876</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1647,6 +1647,9 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 /* v789 (T1): the Screener's phone-only rank-basis line. Off at every width; the <=720px block
    below turns it on, where the column it repeats is out of view. */
 .sc-rank-basis { display: none; }
+/* v876 (T1): the data-basis block letter that prefixes the Screener # column. Sized and
+   coloured to read as a qualifier on the ordinal, not as part of the number itself. */
+.sc-rank-blk { color: var(--accent); font-weight: 700; font-size: 9px; letter-spacing: .02em; margin-right: 1px; vertical-align: 1px; }
 
 /* ── 2. Narrow layout. 720px so small tablets in portrait get it too. ── */
 @media (max-width: 720px) {
@@ -2546,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v875</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v876</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2616,7 +2619,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v875</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v876</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3803,7 +3806,7 @@ window.copyPlatformCitation = function(btn) {
                order, and it does not carry the hand cursor.
                v623 (T1): the Breakeven column this comment used to also exempt is GONE from this
                table -- see the note under it. -->
-          <th class="sc-selcell" title="Tick rows to build an IC shortlist. &#x2398; Copy for IC Memo, &#8595; CSV and &#8595; Excel then carry ONLY the ticked countries &mdash; with nothing ticked they carry every row the screen returned, which on the cold view is all 185. The ticks survive re-sorting and a price-deck change; use Clear beside the buttons to drop them. This header box ticks or clears every row currently shown."><input type="checkbox" class="sc-sel-all" id="sc-sel-all" onclick="scToggleSelAll(this)" aria-label="Select or clear all Screener rows currently shown"></th><th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
+          <th class="sc-selcell" title="Tick rows to build an IC shortlist. &#x2398; Copy for IC Memo, &#8595; CSV and &#8595; Excel then carry ONLY the ticked countries &mdash; with nothing ticked they carry every row the screen returned, which on the cold view is all 185. The ticks survive re-sorting and a price-deck change; use Clear beside the buttons to drop them. This header box ticks or clears every row currently shown."><input type="checkbox" class="sc-sel-all" id="sc-sel-all" onclick="scToggleSelAll(this)" aria-label="Select or clear all Screener rows currently shown"></th><th title="Placing in the ranking the column headers set. It restarts inside each data-basis block rather than counting straight through the whole result set: bare 1, 2, 3 for the countries with verified field production, then &#80;1, &#80;2 below the proxy divider, then &#70;1, &#70;2 below the floor divider. A &#80; or &#70; row is the top of ITS block, never the top of the screen &mdash; proxy terms are regional estimates that carry none of the country-specific surcharges real producers pay, so their takes read systematically lower. Turn the data-basis grouping off and the rows become one list, numbered 1..N.">#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
           <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take<span id="sc-take-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV<span id="sc-npv-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th>
           <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
@@ -34636,6 +34639,52 @@ function runScreener() {
     }
     return `<span class="sc-rank-basis" aria-hidden="true">${lbl} <span class="sc-rank-basis-v">${val}</span></span>`;
   };
+  // v876 (T1) — the # column is a ranking that ran straight through its own dividers.
+  // Walked T1 cold at 1440x900: Screener -> Max Govt Take 40% -> sort GOVT TAKE ascending.
+  // 110 rows survive. Rows 1-8 are the production-backed regimes (USA 23.4% ... Ecuador 39.3%).
+  // Then the v507 divider: "BELOW THIS LINE — 102 COUNTRIES WITH NO VERIFIED FIELD PRODUCTION
+  // ... Ranked among themselves by take." The next row was numbered 9.
+  //
+  // So the divider claimed a separate ranking and the # column denied it, four pixels apart, and
+  // the # column wins: it is the only continuous ordinal on the table and prose between two rows
+  // is what the eye skips. What the analyst read was Greenland #9, Faroe Islands #10, Romania #11,
+  // Kyrgyzstan #13, Barbados #18, Paraguay #21 — a top-20 global screening shortlist, every row
+  // tagged Inv-Friendly, sitting one place behind Ecuador.
+  //
+  // And the ordering is actively inverted, which is what makes it expensive rather than untidy:
+  // proxy terms are modelled off regional templates with none of the country-specific surcharges
+  // real producers carry, so the proxy block's takes (11.6%-28.4%) are SYSTEMATICALLY LOWER than
+  // the verified block's (23.4%-39.3%). The thinner the record, the more attractive the row, the
+  // better its global-looking placing. Same failure v743 found on the NPV sort, one column over.
+  //
+  // The ordinal now restarts inside each data-basis block and carries the block on its face, so
+  // it cannot be read as a placing among all 185: verified rows stay bare 1, 2, 3; proxy rows read
+  // P1, P2; floor rows F1, F2. Counting is per block rather than reset-on-change so it stays
+  // truthful even if a sort ever interleaves the blocks. With the data-basis toggle off the rows
+  // genuinely are one list and the single 1..N sequence is the honest one, so it is left alone.
+  const _rankBlockOf = (d) => _dqTier(d).hasProduction ? 'V' : (_scTakeIsFloor(d) ? 'F' : 'P');
+  const _rankPartitioned = _grouped || _floorGrouped;
+  const _rankMarks = (function () {
+    const out = [], seen = {};
+    for (let k = 0; k < data.length; k++) {
+      if (!_rankPartitioned) { out.push({ n: k + 1, blk: null }); continue; }
+      const blk = _rankBlockOf(data[k]);
+      seen[blk] = (seen[blk] || 0) + 1;
+      out.push({ n: seen[blk], blk: blk });
+    }
+    return out;
+  })();
+  const _RANK_BLK_TIP = {
+    V: 'Placing among the countries in this screen that have verified field production. This block is the only one defensible as a screening shortlist on its own.',
+    P: 'P = the proxy block. Placing among the countries in this screen with NO verified field production, whose fiscal terms are regional proxy estimates. P1 is the top of that block, not the top of the screen — and because proxy terms carry none of the country-specific surcharges real producers pay, a low take here is usually the absence of a record rather than a better deal.',
+    F: 'F = the floor block. Placing among the countries in this screen whose take is a floor (royalty and income tax only), not a measurement. A low take here is missing record, not favourable terms. F1 is the top of that block, not the top of the screen.'
+  };
+  const _rankCell = (i) => {
+    const m = _rankMarks[i];
+    if (!m.blk) return `<td class="num" style="color:var(--muted)">${m.n}</td>`;
+    if (m.blk === 'V') return `<td class="num" style="color:var(--muted);cursor:help;" title="${_RANK_BLK_TIP.V}">${m.n}</td>`;
+    return `<td class="num" style="color:var(--muted);cursor:help;" title="${_RANK_BLK_TIP[m.blk]}"><span class="sc-rank-blk">${m.blk}</span>${m.n}</td>`;
+  };
   tbody.innerHTML = _topBanner + data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
     // v685: the TIER cell is the take bucket, so it follows the take cell onto the comparable
@@ -34660,7 +34709,7 @@ function runScreener() {
       ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;"><div class="sc-div-body">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
-        + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
+        + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'} &mdash; the # column restarts at <strong style="color:var(--accent);">P1</strong> below, and every row in this block carries its <strong style="color:var(--accent);">P</strong>. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</div></td></tr>`
       : '';
     // v743 (T1): second boundary, drawn where the ranking stops being a measurement at all.
@@ -34672,7 +34721,7 @@ function runScreener() {
       ? `<tr class="screener-basis-divider screener-floor-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;"><div class="sc-div-body">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nFloor} ${_nFloor === 1 ? 'COUNTRY WHOSE TAKE IS A FLOOR' : 'COUNTRIES WHOSE TAKE IS A FLOOR'}, NOT A MEASUREMENT</strong><br>`
         + _scFloorWhy()
-        + ` Their take cells read <strong style="color:var(--accent);">&ge;</strong> and their NPV cells <strong style="color:var(--accent);">&le;</strong> for that reason. A low take here is missing record, not favourable terms &mdash; do not carry this block into a shortlist.`
+        + ` Their take cells read <strong style="color:var(--accent);">&ge;</strong> and their NPV cells <strong style="color:var(--accent);">&le;</strong> for that reason, and the # column restarts at <strong style="color:var(--accent);">F1</strong> below. A low take here is missing record, not favourable terms &mdash; do not carry this block into a shortlist.`
         + `</div></td></tr>`
       : '';
     // Bug 3 fix: click row to navigate to country profile
@@ -34683,7 +34732,7 @@ function runScreener() {
     const attrName = d.country.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="_scNoteDrill(this);openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
-      <td class="num" style="color:var(--muted)">${i+1}</td>
+      ${_rankCell(i)}
       <!-- v824 (T1): the per-row compare-basket "+" is REMOVED from the Screener.
            Walking T1 cold, the row offered TWO ways to put a country on a list, four pixels
            apart, feeding two different lists with two different bottom bars:
@@ -34720,6 +34769,16 @@ function runScreener() {
     </tr>`;
   }).join('');
   window._screenerData = data;
+  // v876 (T1): the label the # column actually printed, per country, so the three export paths
+  // carry the same ordinal the analyst saw rather than a placing among all 185.
+  window._scRankMarks = (function () {
+    const m = {};
+    for (let k = 0; k < data.length; k++) {
+      const mk = _rankMarks[k];
+      m[data[k].country] = (mk.blk && mk.blk !== 'V' ? mk.blk : '') + mk.n;
+    }
+    return m;
+  })();
   // v728 (T5): re-label Copy/CSV/Excel and re-draw the shortlist badge for the row set
   // that is now on screen — including a warning when a ticked country no longer passes.
   if (typeof _scSyncSelUI === 'function') _scSyncSelUI();
@@ -34753,7 +34812,7 @@ function runScreener() {
       th.setAttribute('aria-sort', 'descending');
       th.title = 'THIS COLUMN IS ALREADY RANKING THE TABLE, highest first'
         + (_screenerEvidenceFirst ? ' \u2014 inside the data-basis blocks, verified field production first.' : '.')
-        + ' It is what the # column counts, and what \u201cLoad top 5 in Side-by-Side\u201d takes its five from.'
+        + ' It is what the # column counts inside each data-basis block, and what \u201cLoad top 5 in Side-by-Side\u201d takes its five from.'
         + ' Click to reverse it (lowest first); click again to come back.\n\n' + th.dataset.baseTitle;
     } else {
       th.setAttribute('aria-sort', 'none');
@@ -35430,7 +35489,11 @@ function _scExportRows() {
     var _beArtifact = (disp.state === 'monopoly') || (d.be_75 != null && d.be_75 > 0 && d.be_75 <= 1);
     var _beReal = (!_beArtifact && d.be_75 != null && d.be_75 > 1 && d.be_75 < 999);
     return {
-      Rank: i + 1,
+      // v876 (T1): the label the # column printed on screen, which restarts inside each
+      // data-basis block -- bare 1,2,3 for verified production, P1,P2 for the proxy block,
+      // F1,F2 for the floor block. It used to be a bare i+1 that counted straight through both
+      // dividers, so a pasted shortlist put Greenland at rank 9 next to Ecuador at 8.
+      Rank: (window._scRankMarks && window._scRankMarks[d.country] != null) ? window._scRankMarks[d.country] : (i + 1),
       Country: d.country,
       Region: d.region,
       Mechanics: d.mechanics,
