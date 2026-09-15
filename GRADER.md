@@ -52921,3 +52921,16 @@ The contradiction is unchanged; the artifact is no longer silent about which fig
   parameters come only from the 6-entry `DCF_PROFILES` preset dropdown. The IC line now states the
   preset's real numbers, so the artifact is honest, but the modal's description still over-promises
   a capability that does not exist. Candidate for the next T5 or T2.
+
+---
+## Cycle 769 Log — 2026-09-14 22:07
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 769 complete — **v861 shipped and pushed**.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (768 was T6, 767 T2, 766 T1, 765 T3, 764 T4 — T5 was stalest, last run at 763.)
+
+## Friction
+I walked every clipboard artifact the product has, cold. Six of the seven are genuinely good — Fiscal Compare, Screener, Side-by-Side, IOC Portfolio, Country Profile and Reform Risk all write rich HTML plus plain text with proper fallbacks, and all carry a full basis paragraph spe
