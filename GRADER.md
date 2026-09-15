@@ -53183,3 +53183,18 @@ change.
   UAE — Abu Dhabi. Carried.
 - Still no process check comparing the deployed version string against the local tree. Carried
   from 758, 761-770.
+
+---
+## Cycle 771 Log — 2026-09-15 00:16
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 771 complete — **v863 shipped and pushed.**
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (770 was T4, 769 T5, 768 T6, 767 T2, 766 T1 — T3 was stalest, last run at 765.)
+
+## Friction
+Walked cold at 1440, no sessionStorage/localStorage: Side-by-Side → Clear the seeded example → typed **Norway, Angola, Nigeria**, an ordinary IOC screening trio. The predictability strip above the grid read:
+
+> PREDICTABILITY, MOST STABLE FIRST: **Nigeria 73** › Norway ≤52 and Angola ≤
