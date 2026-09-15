@@ -54576,3 +54576,127 @@ no contractor position and never will, or the breakeven is not modelled there ye
 Walked it cold: Screener → tick a shortlist → **Copy for IC Memo**, then the same rows through **CSV** and **Excel**.
 
 The export wrote the breakeven straight out of the bundle. For **Saudi Arabia, Bahrain and Kuwait** the stored value is **1.0** — a DCF floor artifact for a 100%-government-take regim
+
+---
+## Cycle 782 Log — 2026-09-15 17:52
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL / 0 WARN — **the suite RAN this cycle**, against the local
+  tree at `http://localhost:8778/petroleum-fiscal-db/index.html`, number read from
+  `/tmp/runtime_test_report.txt`, not carried forward.
+- JS errors: 0
+- Summary: Cycle 782 complete — shipped as **v874**, committed, mirrored, pushed (`d30c1e5`).
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (Rotation: 781 was T5, 780 T6,
+779 T2, 778 T1, 777 T3 — T4 was stalest, last run at 776.)
+
+## Friction
+Walked it cold at 1440x900. The Reform Risk tab itself is in good shape — the 21 covered
+jurisdictions return a full verdict card with the IC action, score, rank and event log, and the
+164 uncovered ones correctly refuse to score and hand the analyst the statute to start the
+external check from. The break is on the *other* T4 surface: **Country Profile → Predictability**.
+
+`_cpApplyObsSpread()` (index.html:56727) rewrites the badge for the measured cohort — Nigeria's
+`73 · MODERATE / 0.4pp` becomes `≤46 · LOW / ≥33.9pp obs` — and it overwrites the badge's
+leading text node, so the printed 73 · MODERATE is **gone from the tile entirely**.
+
+It never touched the paragraph `_fpCohortLine()` prints directly beneath it
+(index.html:41703 → :26002). That paragraph carries the ranking claim:
+
+> **3rd of 28 countries ORCA can measure** — not 3rd of 185. The spread penalty is charged in
+> this cohort and nowhere else, so it is the only one that carries a graded band at all — ceiling
+> 74, Turkmenistan. **MODERATE here outranks any UNGRADED score, however high its number.**
+
+Two defects in one block:
+1. **The rank is computed from the withdrawn score.** `_fpCohortStats()` sorts the measured
+   cohort on the stored figure, so Nigeria is 3rd *because of* the 73 the same function has just
+   withdrawn. At the ceiling it is not 3rd.
+2. **"MODERATE here outranks" names a band that is no longer on screen.** Unlike the one-term
+   path — which keeps `printed 62 · UNGRADED` visible beside the ceiling — this path leaves the
+   sentence with no referent at all.
+
+Measured live against `api/v1/country/*.json` for all 28, not asserted: **7** of the
+measured-spread countries have a ceiling that moves the band, and they carry these ranks —
+
+| country | printed | ceiling | cohort rank shown |
+|---|---|---|---|
+| Kazakhstan | 73 · MODERATE | ≤53 · LOW | **2 of 28** |
+| Nigeria | 73 · MODERATE | ≤46 · LOW | **3 of 28** |
+| Republic of the Congo | 62 · MODERATE | ≤47 · LOW | 8 of 28 |
+| Brazil | 61 · MODERATE | ≤59 · LOW | 9 of 28 |
+| Mauritania | 60 · MODERATE | ≤58 · LOW | 10 of 28 |
+| Mexico | 51 · LOW | ≤27 · VERY LOW | 22 of 28 |
+| Morocco | 45 · LOW | ≤39 · VERY LOW | 25 of 28 |
+
+So the **two most predictable regimes ORCA claims it can MEASURE — ranks 2 and 3 of 28, the top
+of the only cohort this platform grades — are both countries whose grade it has already
+withdrawn**, and Country Profile was the surface still advertising the rank.
+
+## Change
+The rule already existed and had simply never reached this tab. **v720** put it in the Copy for
+IC Memo clipboard ("the cohort rank and the rule that a graded band outranks an UNGRADED score do
+not hold here"); **v784** put it on the Reform Risk card, which *replaces* the cohort paragraph
+with the withdrawal rather than appending a retraction under it. Same treatment here, off the
+same `_fpObsCeiling()` object, so the three surfaces cannot drift. Added `id="cp-fp-cohort"` at
+:41703 so the async paint can find the block.
+
+On screen, Nigeria's Predictability tile now reads:
+
+> **No cohort rank for Nigeria.** Its rank among the countries ORCA can measure is computed from
+> the printed 73 · MODERATE, which this country's own contract table bounds at 46 · LOW. At the
+> ceiling Nigeria is no longer a MODERATE, so do not rank it above an ungraded score on the
+> strength of the band. Same withdrawal the Reform Risk card and the IC-memo clipboard print.
+
+Scoped to `bandMoves` exactly as v784 is. Verified untouched: **Ghana** (measured, band holds at
+the ceiling — keeps "20th of 28"), **Angola** and **Indonesia** (one-term, printed score stays
+visible beside the ceiling so the cohort sentence still parses).
+
+## Result
+An analyst walking T4 into a Country Profile can no longer read a top-3-of-28 fiscal-predictability
+ranking off a page whose own badge, two lines above, withdraws the band that ranking was computed
+from. For Kazakhstan and Nigeria specifically — the two highest-ranked rows in the measured cohort
+— the page now refuses the rank instead of advertising it. Country Profile, Reform Risk and the
+IC-memo clipboard print one rank position for these 7 countries where they previously printed two
+contradictory ones.
+
+## Mobile (Step 5b) — 390×844, `hasTouch: true`
+- `scrollWidth` 390 = `clientWidth` 390 on **all 10 tabs**. 0 horizontal overflow.
+- Nigeria's Country Profile with the new block rendered: 390 = 390, no overflow. Block measures
+  310px wide, right edge 350 of 390, height 120px.
+- **No control was added or resized** — the edit replaces a text block. Nothing new under 24px.
+- v612 MOBILE LAYER untouched; `#reference-panel` untouched.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load. From 771-781.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-781.
+- Mechanic filter is a country-level include-set, not contract-level. From 766-781.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-781.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes
+  vs 173,759. **The office copy is the one that was run**, again this cycle. From 764-781.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-781.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-781.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-781.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`. From 776-781.
+- Sorting Govt Take high→low puts Saudi Arabia (`—`, no take value) at rank 1. From 778-781.
+- `mode-btn-screen` loses its result count when you leave Screener mode. From 778-781.
+- Saudi Arabia's Country Profile emits no `Fiscal character` line and no verdict box. From 779.
+- Nigeria's `Profit Oil (Govt) 40%` has **no source of any kind**. From 780.
+- Side-by-Side clipboard Evidence tier row renders a stray `· of ·` from the join. From 781.
+- **New this cycle, not fixed:** the Vintage Analysis pane (`#t4`, reachable from the reference
+  panel) holds a second reform table whose country buttons still run the pre-v812 three-statement
+  route into Country Profile. Lower value than the rank defect — that pane is about vintage, not
+  reform exposure — so the v812 reasoning does not straightforwardly transfer. Logged, not fixed.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-781.
+
+## Resolved this cycle
+- ✅ **Kazakhstan and Nigeria no longer rank 2nd and 3rd of 28 on fiscal predictability** on a
+  Country Profile that withdraws the band those ranks were computed from. 7 countries corrected.
