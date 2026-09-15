@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v861</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v862</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v861</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v862</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v861</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v862</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -46312,24 +46312,83 @@ function renderReformRisk() {
     return '<button onclick="_rrOpenLocal(\'' + ec + '\', this)" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:2px 0;min-height:24px;text-align:left;font-weight:600;" title="Open this country\u2019s reform verdict at the top of this tab — IC action, score and rank, and its own sourced event log. The full Country Profile is one further click from there.">' + name + ' ›</button>';
   }
 
+  // ── v862 (T4): the card prints 0-OR-1 in-window changes, the rows were written for 0 ──────
+  // QUIET SINCE 2010 is filtered on `since2010 <= 1`, so a jurisdiction with ONE sourced fiscal
+  // law change inside the window belongs here. Every row text, though, was written as if the
+  // count were always zero. The `!lh` branch asserted, in bold orange, "no fiscal law change
+  // since 2010 ... terms never reopened here, not terms held steady" off nothing but the
+  // presence of in-window CONTEXT events -- a test that says nothing at all about whether a
+  // fiscal law change also occurred.
+  //
+  // Iraq has one. Government take 84.8%, the highest figure on this card, and its single
+  // in-window event that scores is the 2023 KRG-Baghdad FSC ruling, whose take move ORCA has
+  // never quantified. The row printed it as a country with no in-window fiscal law change whose
+  // terms were never reopened. The country lookup at the top of this same tab returns
+  // SIZE UNKNOWN for Iraq -- "terms were rewritten inside the window, size never quantified ...
+  // source its take effect externally before carrying a zero reform premium". Two panels, one
+  // screen, one country, opposite readings, and the false one sits in the card an analyst scans
+  // as the safe bucket.
+  //
+  // Four of the 13 rows carry an in-window fiscal law change that no row named, three of them
+  // above 69% take:
+  //   Iraq       84.8%  2023 KRG-Baghdad FSC ruling            printed "no fiscal law change"
+  //   Venezuela  74.9%  2022 Chevron licence restored          printed only "last take rise 2007"
+  //   Kazakhstan 69.9%  2014 PSC term disputes resolved        printed only "last take rise 2007"
+  //   India      61.9%  2016 HELP licensing policy             printed "no take-raising change"
+  // All four are changes whose take effect is unquantified, which is why they left no trace in a
+  // row built around take rises -- the same absence-not-error trap the rest of this tab is built
+  // to catch.
+  //
+  // _midRow already leads the ==2 band with its count. This does the same for the <=1 band. No
+  // new threshold and no recomputation: the count is _rrCountScored's, the predicate is
+  // _rrScores, and the "never reopened" sentence is now gated on that count actually being zero.
   function _quietRow(r, mode) {
     var ec = r.country.replace(/'/g,"\\'");
     var lh = r.lastHostile;
     var demoted = (mode === 'artefact');
     var note;
+    var inScored  = (r.events || []).filter(_rrScores);
+    var inUnquant = inScored.filter(function(e){ return !e.take_change; })
+                            .sort(function(a,b){ return (a.year||0)-(b.year||0); });
+    // Rendered above the take-rise note, for the rows where a scored in-window change exists but
+    // carries no quantified take move -- so it is visible on the row itself, not only in the score.
+    var windowLine = inUnquant.length
+      ? '<div style="font-size:10px;line-height:1.5;margin-top:2px;">'
+        + '<span style="color:var(--orange);font-weight:700;">' + inScored.length + ' fiscal law change'
+        + (inScored.length === 1 ? '' : 's') + ' since 2010</span>'
+        + '<span style="color:var(--muted);"> \u00b7 '
+        + inUnquant.map(function(e){ return e.year + ' ' + _rrEsc(e.event); }).join('; ')
+        + ' \u00b7 take move never quantified \u2014 in the count, but there is no size to carry '
+        + 'into a premium. Not evidence the terms held.</span>'
+        + '</div>'
+      : '';
     if (!lh) {
       // v583 (T4): Ghana and Guyana reach this card with a clean count only because every one of
       // their post-2010 events is context -- a discovery, first oil, a review that changed nothing.
       // "no take-raising change on record" is true and, on its own, the wrong thing to read.
-      note = (r.contextIn && r.contextIn.length)
-        ? '<span style="color:var(--orange);font-weight:700;">no fiscal law change since 2010</span>'
+      // v862 (T4): gated on since2010 === 0. Iraq reached this line with a 2023 fiscal law change
+      // on file and was told its terms had never been reopened.
+      var ctxNames = (r.contextIn && r.contextIn.length)
+        ? r.contextIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+              .map(function(e){ return e.year + ' ' + _rrEsc(String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim()); }).join(', ')
+        : '';
+      if (r.since2010 === 0 && ctxNames) {
+        note = '<span style="color:var(--orange);font-weight:700;">no fiscal law change since 2010</span>'
           + '<span style="color:var(--muted);"> \u00b7 '
           + (r.contextIn.length === 1 ? 'its one in-window event is context \u2014 '
              : 'all ' + r.contextIn.length + ' in-window events are context \u2014 ')
-          + r.contextIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
-              .map(function(e){ return e.year + ' ' + _rrEsc(String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim()); }).join(', ')
-          + ' \u00b7 terms never reopened here, not terms held steady</span>'
-        : '<span style="color:var(--muted);">no take-raising change on record</span>';
+          + ctxNames
+          + ' \u00b7 terms never reopened here, not terms held steady</span>';
+      } else if (ctxNames) {
+        // A scored in-window change exists (named in windowLine above) AND context events sit
+        // beside it. Name them as context without claiming the terms were never reopened.
+        note = '<span style="color:var(--muted);">no take-raising change on record \u00b7 '
+          + (r.contextIn.length === 1 ? 'one further in-window event changed no terms \u2014 '
+             : r.contextIn.length + ' further in-window events changed no terms \u2014 ')
+          + ctxNames + '</span>';
+      } else {
+        note = '<span style="color:var(--muted);">no take-raising change on record</span>';
+      }
     } else if (mode === 'inwindow') {
       // v540: the rise is inside the scoring window. Lead with it, in the same weight the
       // Below-the-line rows use, and say the size is not in the score.
@@ -46353,6 +46412,7 @@ function renderReformRisk() {
       + _rrRowBtn(ec, r.country)
       + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;white-space:nowrap;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</span>'
       + '</div>'
+      + windowLine
       + '<div style="font-size:10px;line-height:1.5;margin-top:2px;">' + note + '</div>'
       + '</div>';
   }
