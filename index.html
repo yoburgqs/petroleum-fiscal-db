@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v859</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v860</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1203,8 +1203,18 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   color: var(--accent); background: rgba(176,104,0,.09);
 }
 .facts-table.ec-chain .source-badge > .ec-src-note { white-space: normal; }
+/* v860 -- the terminal state of the same affordance: there is no document to send the analyst
+   to. Deliberately NOT accent-coloured and NOT inside an anchor, because nothing here is
+   clickable; the point of the chip is to stop the search, not to start one. */
+.ec-nopage-chip {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px;
+  margin-left: 2px; font-size: 10px; font-weight: 700; letter-spacing: .03em;
+  color: var(--muted); background: rgba(148,163,184,.10); cursor: help;
+}
 @media (pointer: coarse) {
   .ec-find-chip { min-height: 24px; padding: 3px 8px; font-size: 11px; }
+  .ec-nopage-chip { min-height: 24px; padding: 3px 8px; font-size: 11px; }
 }
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 10px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
@@ -2520,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v859</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v860</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2590,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v859</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v860</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -24284,6 +24294,54 @@ function _citeFindHref(title) {
   return 'https://www.google.com/search?q=' + encodeURIComponent('"' + String(title || '').trim() + '"');
 }
 
+
+// ── v860 (T6) — THE BULK CITATION'S DEAD ADDRESS NOW OPENS THE COUNTRY'S OWN PAGE ────────────
+// v850 stopped a dead citation from opening a 404 — but only for non-bulk rows. Its stated
+// reason was sound: "EY / KPMG corporate income tax guides (2025)" is ORCA's label for its own
+// country-level harvest, not an instrument sitting in a catalogue under that name, so offering
+// to "find document" would send the analyst after something that does not exist. What it left
+// in place is the worse half. A bulk row measured dead kept `href = s.url`, so the Key sources
+// list still rendered the universal "open the cited source" arrow on an address the chip beside
+// it had just declared dead, and the click opened a 404 in a new tab.
+//
+// Measured against the shipped country_data.json: 142 of the 185 country profiles show a Key
+// sources row wearing LINK DEAD and a live arrow, carrying 65,490 facts between them. The
+// address is the same one on every single one of them — https://taxsummaries.pwc.com/allcountries,
+// the PwC Worldwide Tax Summaries index, which v518 already identified as "not a citation for
+// any particular parameter" and which v641 measured as a 404 on 4 Sep 2026.
+//
+// The index is gone. The per-country pages are not. Re-measured 2026-09-14 from this host, full
+// GET, browser UA, one retry on any connection error, over all 185 countries in the shipped
+// bundle and every plausible slug for each:
+//
+//     https://taxsummaries.pwc.com/allcountries   404   (confirms v641 independently, today)
+//     https://taxsummaries.pwc.com/               200
+//     127 of the 185 countries return 200 on their own page (norway, iraq, united-arab-emirates,
+//         peoples-republic-of-china, republic-of-congo, the-bahamas, ...)
+//      58 return 404 — PwC publishes no summary for them (Somalia, Russia, Timor-Leste, Eritrea,
+//         Western Sahara, ...). That is a coverage gap in the publication, not a broken link.
+//
+// So of the 142 profiles showing the dead bulk row, 108 have a live page of their own and 34 do
+// not. The 108 now link to THAT page — the actual document the bulk harvest was read out of for
+// that country, not an index of every country on earth. The 34 stop being links at all and say
+// on screen that the publication does not cover them, which is the one thing that lets an
+// analyst stop looking. Nothing here changes a value, a tier letter, a percentage or a grade.
+const _PWC_COUNTRY = (function() {
+  const m = {};
+  'Albania|albania\nAngola|angola\nArgentina|argentina\nArmenia|armenia\nAustralia|australia\nAustria|austria\nAzerbaijan|azerbaijan\nBahamas|the-bahamas\nBahrain|bahrain\nBangladesh|bangladesh\nBarbados|barbados\nBelgium|belgium\nBolivia|bolivia\nBosnia and Herzegovina|bosnia-and-herzegovina\nBotswana|botswana\nBrazil|brazil\nBrunei|brunei-darussalam\nBulgaria|bulgaria\nCambodia|cambodia\nCameroon|republic-of-cameroon\nCanada|canada\nCape Verde|cabo-verde\nChad|chad\nChile|chile\nChina|peoples-republic-of-china\nColombia|colombia\nCosta Rica|costa-rica\nCote d\'Ivoire|ivory-coast\nCroatia|croatia\nCyprus|cyprus\nCzech Republic|czech-republic\nDemocratic Republic of the Congo|democratic-republic-of-the-congo\nDenmark|denmark\nDominican Republic|dominican-republic\nEcuador|ecuador\nEgypt|egypt\nEl Salvador|el-salvador\nEquatorial Guinea|equatorial-guinea\nEthiopia|ethiopia\nFrance|france\nGabon|gabon\nGeorgia|georgia\nGermany|germany\nGhana|ghana\nGreece|greece\nGreenland|greenland\nGuatemala|guatemala\nGuyana|guyana\nHonduras|honduras\nHungary|hungary\nIndia|india\nIndonesia|indonesia\nIraq|iraq\nIraq-Kurdistan|iraq\nIreland|ireland\nIsrael|israel\nItaly|italy\nJamaica|jamaica\nJapan|japan\nJordan|jordan\nKazakhstan|kazakhstan\nKenya|kenya\nKuwait|kuwait\nLaos|lao-pdr\nLebanon|lebanon\nLiberia|republic-of-liberia\nLibya|libya\nLithuania|lithuania\nMadagascar|madagascar\nMalaysia|malaysia\nMalta|malta\nMauritania|mauritania\nMexico|mexico\nMoldova|moldova\nMongolia|mongolia\nMontenegro|montenegro\nMorocco|morocco\nMozambique|mozambique\nMyanmar|myanmar\nNamibia|republic-of-namibia\nNetherlands|netherlands\nNew Caledonia|new-caledonia\nNew Zealand|new-zealand\nNicaragua|nicaragua\nNigeria|nigeria\nNorway|norway\nOman|oman\nPakistan|pakistan\nPanama|panama\nPapua New Guinea|papua-new-guinea\nParaguay|paraguay\nPeru|peru\nPhilippines|philippines\nPoland|poland\nPortugal|portugal\nPuerto Rico|puerto-rico\nQatar|qatar\nRepublic of the Congo|republic-of-congo\nRomania|romania\nRwanda|rwanda\nSaudi Arabia|saudi-arabia\nSenegal|senegal\nSerbia|serbia\nSlovakia|slovak-republic\nSlovenia|slovenia\nSouth Africa|south-africa\nSouth Korea|republic-of-korea\nSpain|spain\nSweden|sweden\nTaiwan|taiwan\nTanzania|tanzania\nThailand|thailand\nTrinidad and Tobago|trinidad-and-tobago\nTunisia|tunisia\nTurkey|turkey\nUAE|united-arab-emirates\nUAE — Abu Dhabi|united-arab-emirates\nUAE — Dubai|united-arab-emirates\nUSA|united-states\nUganda|uganda\nUkraine|ukraine\nUnited Kingdom|united-kingdom\nUruguay|uruguay\nUzbekistan|republic-of-uzbekistan\nVenezuela|venezuela\nVietnam|vietnam\nZambia|zambia'.split('\n').forEach(function(p) {
+    const i = p.indexOf('|');
+    if (i > 0) m[p.slice(0, i)] = p.slice(i + 1);
+  });
+  return m;
+})();
+// The verified page for this country, or '' when PwC publishes none. Never falls back to the
+// index: the index is the address that was measured dead.
+function _pwcHref(country) {
+  const slug = _PWC_COUNTRY[String(country || '')];
+  return slug ? 'https://taxsummaries.pwc.com/' + slug : '';
+}
+const _PWC_CHECKED = '14 Sep 2026';
+
 const _BULK_SOURCES = ['EY_KPMG_CIT_Guide_2025', 'EY_IHS_BulkHarvest_2025'];
 function _isBulkSource(name) { return _BULK_SOURCES.indexOf(name) !== -1; }
 // v569 (T6): promoted out of buildEvidencePanel() so the per-parameter Evidence Chain table
@@ -24576,14 +24634,38 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       : '';
     // v850 (T6): a dead row's link went to the address the chip beside it had just declared dead.
     // It now runs the search the tooltip asks for, on the instrument's title.
-    const nameEl = (isDead && !isBulk)
+    // v860 (T6): the bulk arm of that fix. A dead BULK row still carried `href = s.url`, so on
+    // 142 of the 185 profiles this list rendered LINK DEAD and a working arrow on the same row,
+    // and the arrow opened the 404. It now opens this country's own page in the same publication
+    // where one exists, and is not a link at all where one does not.
+    const _pwcUrl = (isDead && isBulk) ? _pwcHref(entry.country) : '';
+    const _pwcTip = (isDead && isBulk) ? _cpEsc(display + ': the address ORCA has on record for this '
+      + 'harvest \u2014 ' + s.url + ' \u2014 returned no document when checked on ' + _CITE_DEAD_CHECKED
+      + '. It was an index of every country on earth, not a citation for any parameter on this page. '
+      + (_pwcUrl
+        ? 'PwC Worldwide Tax Summaries does publish a page for ' + entry.country + ', re-checked live on '
+          + _PWC_CHECKED + ', and this opens it. That page is the secondary guide these ' + (s.n || 0)
+          + ' facts were harvested from \u2014 it is not this country\u2019s petroleum act, and it is '
+          + 'not contract-specific. Read the rate off it if you like, then establish the term from the '
+          + 'statute before an IC memo.'
+        : 'PwC Worldwide Tax Summaries publishes no page for ' + entry.country + ' \u2014 re-checked on '
+          + _PWC_CHECKED + ' \u2014 so there is nothing to open and no point searching for one. The '
+          + (s.n || 0) + ' facts attributed to this harvest cannot be checked against their source from '
+          + 'here at all. Establish these terms from ' + entry.country + '\u2019s own petroleum act '
+          + 'before anything on this profile goes in an IC memo.'))
+      : '';
+    const nameEl = (isDead && isBulk)
+      ? (_pwcUrl
+        ? `<a href="${_pwcUrl}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;" title="${_pwcTip}">${display}${_noteEl} <span class="ec-find-chip">\u2315 ${_cpEsc(entry.country)} page \u2197</span></a>`
+        : `<span style="font-size:11px;color:var(--muted);" title="${_pwcTip}">${display}${_noteEl} <span class="ec-nopage-chip">no page for ${_cpEsc(entry.country)}</span></span>`)
+      : (isDead && !isBulk)
       ? `<a href="${_citeFindHref(display)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;" title="${deadTip}">${display}${_noteEl} <span class="ec-find-chip">\u2315 find document \u2197</span></a>`
       : (s.url
       ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display}${_noteEl} \u2197</a>`
       : `<span style="font-size:11px;color:var(--text);">${display}${_noteEl}</span>`);
     return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isDead || isBulk || shareList) ? 'opacity:.82;' : ''}">
       <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
-      ${isDead ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${deadTip}">LINK DEAD</span>` : ''}
+      ${isDead ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${isBulk ? _pwcTip : deadTip}">LINK DEAD</span>` : ''}
       ${isBulk ? '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;" title="Assigned at country level, not verified against this country\u2019s individual contracts.">BULK</span>' : ''}
       ${shareList ? `<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;" title="${shareTip}">${shareList.length} JURISDICTIONS</span>` : ''}
       ${nameEl}
@@ -37501,13 +37583,38 @@ function renderReformTimeline(country) {
               const _deadChip = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
                 + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
                 + 'letter-spacing:.04em;cursor:help;" title="' + _dTip + '">LINK DEAD</span> ';
-              // v850 (T6): a BULK row is excluded. "EY / KPMG corporate income tax guides
-              // (2025)" is ORCA's label for its own country-level harvest, not an instrument
-              // sitting in a catalogue under that name, and its address is the PwC all-countries
-              // index (v518). Offering to "find" it would send the analyst after a document that
-              // does not exist. Those rows keep the recorded address and the plain dead chip.
+              // v850 (T6): a BULK row is excluded from "find document". "EY / KPMG corporate
+              // income tax guides (2025)" is ORCA's label for its own country-level harvest, not
+              // an instrument sitting in a catalogue under that name, and its address is the PwC
+              // all-countries index (v518). Offering to "find" it would send the analyst after a
+              // document that does not exist.
+              // v860 (T6): but it kept `href = srcMeta.url` -- so the bulk row still opened the
+              // 404, while _dTip told the analyst in as many words that "clicking this row no
+              // longer opens that dead address". The tooltip was describing the other branch.
+              // Both are fixed together: the tip is now written per branch, and the click goes to
+              // this country's own page in that publication, or nowhere at all if it has none.
+              const _pwcU = isBulk ? _pwcHref(country) : '';
+              const _bTip = !isBulk ? _dTip : _esc(label + ': the address ORCA has on record for this '
+                + 'harvest \u2014 ' + srcMeta.url + ' \u2014 returned no document when checked on '
+                + _CITE_DEAD_CHECKED + '. It was an index of every country on earth, not a citation for '
+                + 'this parameter. The tier letter is unchanged and the rate in the Statutory column was '
+                + 'read off this harvest when it was taken. '
+                + (_pwcU
+                  ? 'PwC Worldwide Tax Summaries does publish a page for ' + country + ', re-checked live '
+                    + 'on ' + _PWC_CHECKED + ', and this row opens it. It is a secondary guide, not '
+                    + country + '\u2019s petroleum act and not contract-specific \u2014 confirm the rate '
+                    + 'against the statute before this figure goes in an IC memo.'
+                  : 'PwC Worldwide Tax Summaries publishes no page for ' + country + ' \u2014 re-checked '
+                    + 'on ' + _PWC_CHECKED + ' \u2014 so this row is not a link and there is nothing to '
+                    + 'search for. This parameter cannot be checked against its source from here at all. '
+                    + 'Establish it from ' + country + '\u2019s own petroleum act before an IC memo.'));
+              const _deadChipB = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
+                + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
+                + 'letter-spacing:.04em;cursor:help;" title="' + _bTip + '">LINK DEAD</span> ';
               badgeHtml = isBulk
-                ? `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`
+                ? (_pwcU
+                  ? `<a href="${_esc(_pwcU)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.8;" title="${_bTip}">${_deadChipB}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ ${_esc(country)} page ↗</span></a>`
+                  : `<span class="source-badge ${confClass}" style="opacity:.7;" title="${_bTip}">${_deadChipB}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-nopage-chip">no page for ${_esc(country)}</span></span>`)
                 : `<a href="${_esc(_citeFindHref(_dTitle))}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.85;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ find document ↗</span></a>`;
             } else {
               badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
