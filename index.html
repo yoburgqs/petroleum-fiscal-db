@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v872</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v873</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2546,7 +2546,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v872</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v873</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2616,7 +2616,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v872</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v873</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34993,6 +34993,26 @@ function _scExportBasisLines() {
         + _named + '.');
     }
   })();
+  // v873 (T5): an empty cell in a spreadsheet is read as "not available yet". For these three
+  // it means the opposite — the question does not apply and never will. Carried only when such a
+  // row is actually in the file, counted off the same two sources as the blocks above.
+  (function(){
+    var _s4 = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+    var _inB = (window._screenerData || []);
+    if (_s4 && _s4.length) _inB = _inB.filter(function(x){ return _s4.indexOf(x.country) >= 0; });
+    var _sup = _inB.filter(function(x){ return x.be_75 != null && x.be_75 > 0 && x.be_75 <= 1; })
+                   .map(function(x){ return x.country; });
+    if (!_sup.length) return;
+    var _one = _sup.length === 1;
+    L.push('BREAKEVEN — ' + _sup.join(', ') + (_one ? ' carries' : ' carry') + ' no breakeven in this '
+      + 'file. ' + (_one ? 'Its' : 'Their') + ' Breakeven_bbl cell is deliberately EMPTY and '
+      + 'Breakeven_Tested reads "n/a — no contractor position": government take is 100% and '
+      + 'contractor NPV is $0 at every modelled price, so there is no contractor position to break '
+      + 'even. ORCA stores 1.0 for ' + (_one ? 'it' : 'these') + ' as a DCF floor artifact, which is '
+      + 'what the on-screen Breakeven column renders as an em dash. It is not a $1/bbl breakeven and '
+      + 'must not be sorted, ranked or cited as one. A blank on any OTHER row means the opposite — '
+      + 'Breakeven_Tested "No", the breakeven is simply not modelled there yet.');
+  })();
   // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
   L.push(_icIrrNote('IRR is not reported'));
   L.push('Fiscal_Predictability is the same score the Country Profile and Side-by-Side show '
@@ -35354,6 +35374,10 @@ function _scExportRows() {
     var fc = _scFeeCmpAt(d, '75');
     var fp = getFiscalPredictabilityScore(d);
     var disp = _fpDispersion(d);
+    // v873 (T5): see the Breakeven_bbl note below. True for the three regimes whose stored
+    // be_75 is the DCF floor artifact rather than a breakeven.
+    var _beArtifact = (disp.state === 'monopoly') || (d.be_75 != null && d.be_75 > 0 && d.be_75 <= 1);
+    var _beReal = (!_beArtifact && d.be_75 != null && d.be_75 > 1 && d.be_75 < 999);
     return {
       Rank: i + 1,
       Country: d.country,
@@ -35392,8 +35416,26 @@ function _scExportRows() {
       NPV_Screened_M: d['npv_' + _xDeck],
       Retention_Reference_bbl: _xRef,
       NPV_Retention_pct: (function(){ var r = _npvRetentionAt(d, _xRef); return r === null ? null : +(r*100).toFixed(1); })(),
-      Breakeven_bbl: d.be_75,
-      Breakeven_Tested: _beIsTested(d.be_75) ? 'Yes' : 'No',
+      // ── v873 (T5): the $1/bbl floor artifact stops here ────────────────────────────
+      // Every rendered surface on this platform already refuses this value. formatBreakeven()
+      // prints `val <= 1` as an em dash, _beIsTested() exists to reject it by name — "the DCF
+      // floor artifact for state-monopoly regimes (Bahrain / Kuwait / Saudi Arabia)" — cpBeFor()
+      // filters on `> 1`, and v564 rewrote getBreakevenBand() specifically because Country
+      // Profile had printed "Breakeven Price $1/bbl — Resilient at $1" for these three.
+      // Fiscal Compare's workbook was brought into line at v529: "a 100%-take regime has no
+      // breakeven. Bahrain, Kuwait and Saudi Arabia were exporting '1' into the breakeven
+      // column of an IC attachment." The Screener's three export paths — clipboard, CSV and
+      // XLSX — were not. They wrote a bare 1, so on the cold 185-row export Saudi Arabia,
+      // Bahrain and Kuwait held the three lowest breakevens in the file by $26/bbl: sort
+      // Breakeven_bbl ascending in Excel and the three regimes with NO contractor position
+      // rank 1, 2 and 3 of 68, above every country that has one. The clipboard table pasted
+      // "$1 (untested)" straight into the memo, where the parenthetical reads as an unverified
+      // estimate worth keeping rather than as a number that is not a breakeven at all — beside
+      // "100.0%" take and "$0M" NPV in the same row, with nothing reconciling the three.
+      // Same defect, same three countries, same fix as v529 — on the tab whose whole job is
+      // producing the IC shortlist.
+      Breakeven_bbl: _beReal ? d.be_75 : null,
+      Breakeven_Tested: _beArtifact ? 'n/a — no contractor position' : _beReal ? 'Yes' : 'No',
       Swing_pp: d.swing,
       Fiscal_Predictability: fp == null ? 'not scored' : fp,
       Predictability_Basis: disp.state === 'monopoly' ? 'not scored — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% take at every price, contractor NPV $0'
@@ -35484,7 +35526,9 @@ function _scExportToast(rows, kind) {
    whether 12 countries survived a take ceiling or are simply the first 12 alphabetically. */
 function _scCopyColumns(rows, price) {
   var anyFee = rows.some(function(r){ return r.FeeBasis_Blend === 'Yes'; });
-  var anyBe  = rows.some(function(r){ return r.Breakeven_bbl != null; });
+  // v873 (T5): the column is also carried when a row's breakeven was SUPPRESSED as the floor
+  // artifact, so the paste says why it is blank instead of dropping the question silently.
+  var anyBe  = rows.some(function(r){ return r.Breakeven_bbl != null || r.Breakeven_Tested === 'n/a — no contractor position'; });
   var cols = [];
   // v728 (T5): a hand-picked row has to say where it placed, or the reader cannot tell a
   // shortlist from a favourites list. The criteria block above the table asserts this
@@ -35518,9 +35562,17 @@ function _scCopyColumns(rows, price) {
   }
   // v568/v623 removed the breakeven criterion but not the column; it is populated for 65 of
   // 185, so it is carried only when this particular shortlist has one.
+  // v873 (T5): the "(untested)" suffix is gone with the only rows that could produce it. Every
+  // value that now reaches this cell has been through the same `> 1 && < 999` guard the screen
+  // uses, so a number here is a modelled breakeven and nothing else. The two reasons a cell can
+  // be empty are no longer the same string: "no contractor position" is a property of the regime
+  // and is final; "not modelled" is missing cost data and may fill in later.
   if (anyBe) cols.push({ h: 'Breakeven ($/bbl)',
     f: function(r){ return r.Breakeven_bbl != null
-        ? '$' + Number(r.Breakeven_bbl).toFixed(0) + (r.Breakeven_Tested === 'Yes' ? '' : ' (untested)') : '—'; } });
+        ? '$' + Number(r.Breakeven_bbl).toFixed(0)
+        : r.Breakeven_Tested === 'n/a — no contractor position'
+          ? 'n/a — 100% govt take, no contractor position to break even'
+          : '— not modelled'; } });
   cols.push({ h: 'Price swing (pp)', f: function(r){ return r.Swing_pp != null ? '+' + Number(r.Swing_pp).toFixed(1) + 'pp' : '—'; } });
   // Carries its own basis in the cell, so the score cannot be pasted as a stability finding
   // where v536 ruled no predictability reading may leave the tool.
