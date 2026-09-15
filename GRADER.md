@@ -54862,3 +54862,111 @@ The 318th assertion is `[ConsoleErrors] no JS errors`. **Any local suite run mus
 Walked it cold at 1440×900 — cleared sessionStorage and localStorage, reloaded, clicked Side-by-Side. No typing, no preset, just the tab's own seeded Norway / UK / Netherlands.
 
 The Predictability Score row painted three badges at equal weight: **76**, **58**, **84**. Underneath two of t
+
+---
+## Cycle 784 Log — 2026-09-15 20:1x
+- Test before: 318 PASS / 0 FAIL (reported by the cycle harness against the deployed URL)
+- Test after: **317 PASS / 0 FAIL / 1 WARN — the suite RAN this cycle**, against the local tree on
+  `http://localhost:8777`. Not assumed from a prior baseline. A **control run of the pre-change
+  file on the same server scored 317 PASS / 0 FAIL / 1 WARN with a byte-identical PASS set**, so
+  the 318→317 delta and the WARN are artifacts of testing localhost rather than
+  `yoburgqs.github.io` (a 404 on a script fetch that only exists off the deployed host), not a
+  regression from this change. This cycle is test-neutral by control, not by assertion.
+- JS errors: 0 (syntax gate: 11 script blocks, 0 failures)
+- Shipped as **v876** (`7ca8325`), pushed, mirror in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+(Rotation: 783 was T3, 782 T4, 781 T5, 780 T6, 779 T2 — T1 was stalest, last run at 778.)
+
+## Friction
+Walked cold at 1440×900 with `sessionStorage` and `localStorage` cleared. Home → Screener →
+Max Govt Take **40%** → click **GOVT TAKE** to sort ascending. This is the shortest path that
+answers T1 with one slider and one click, and it is the one a first-time analyst takes.
+
+110 rows survive. Rows **1–8** are the production-backed regimes — USA 23.4%, Mexico 29.7%,
+Argentina 31.0%, Canada 32.7%, Colombia 33.5%, Iraq 34.1%, Australia 38.5%, Ecuador 39.3%.
+Then the v507 divider fires:
+
+> BELOW THIS LINE — 102 COUNTRIES WITH NO VERIFIED FIELD PRODUCTION … **Ranked among themselves
+> by take.** Usable for fiscal comparison; not defensible as a screening shortlist on their own.
+
+**The next row was numbered 9.**
+
+The divider claimed a separate ranking and the `#` column denied it, four pixels apart — and the
+`#` column wins. It is the only continuous ordinal on the table, and a row of prose between two
+data rows is exactly what the eye skips. What the analyst actually read was **Greenland #9,
+Faroe Islands #10, Romania #11, Bulgaria #12, Kyrgyzstan #13, Barbados #18, Paraguay #21** — a
+top-20 global screening shortlist, every one tagged `Inv-Friendly`, sitting one place behind
+Ecuador. Source: `<td class="num" style="color:var(--muted)">${i+1}</td>`, a flat global index
+over the whole sorted array.
+
+Two things made it worse than untidy:
+
+1. **The ordering is actively inverted.** Proxy terms are modelled off regional templates that
+   carry none of the country-specific surcharges real producers pay, so the proxy block's takes
+   (11.6%–28.4%) run **systematically lower** than the verified block's (23.4%–39.3%). The
+   thinner the fiscal record, the more attractive the row, the better its global-looking placing.
+   This is the same failure v743 documented on the NPV sort, one column over — the divider was
+   added there, but the ranking behind it never was.
+2. **It travelled into the paste.** `_scExportRows()` carried `Rank: i + 1` straight through both
+   dividers into the clipboard, CSV and XLSX — the artifact that ends up in the IC memo.
+
+Three surfaces already asserted the correct model and were contradicted by the column: the v507
+divider ("ranked among themselves"), the v743 floor divider ("do not carry this block into a
+shortlist"), and the implicit-sort header tooltip ("it is what the # column counts").
+
+## Change
+- **The Screener ordinal restarts inside each data-basis block and carries the block on its face.**
+  Verified-production rows stay bare `1, 2, 3`; proxy rows read `P1, P2`; floor rows read `F1, F2`
+  (new `.sc-rank-blk` marker, accent, 9px). Counted **per block** rather than reset-on-change, so
+  it stays truthful even if a sort ever interleaves the blocks. Each cell carries a tooltip stating
+  that `P1`/`F1` is the top of ITS block, never the top of the screen, and why a low proxy take is
+  usually an absent record rather than a better deal.
+- **Both grouped dividers now name the restart** — "the # column restarts at **P1** below, and
+  every row in this block carries its **P**" / "…restarts at **F1** below". The two surfaces now
+  agree instead of contradicting each other.
+- **The `#` header explains the scheme**, and the implicit-sort header tooltip no longer claims the
+  `#` column counts the whole result set.
+- **`_scExportRows()` `Rank` emits the label the analyst saw** (`window._scRankMarks`), so a pasted
+  shortlist cannot put Greenland at rank 9 next to Ecuador at 8.
+- **Deliberately left alone:** with the data-basis toggle OFF the rows genuinely are one
+  interleaved list, so `_rankPartitioned` is false, the single `1..N` sequence stands and no prefix
+  renders. Verified: that state draws the v543 `MIXED DATA BASIS … INTERLEAVED BY THIS SORT`
+  banner, which makes no `P1` claim — so the new prose and the new prefixes appear together or not
+  at all, with no state where one asserts something the other denies.
+
+Observed after the change, same cold walk: `1…8` verified, divider, `P1 Greenland … P15 Belarus`;
+in the default cold view `1…22` verified (Saudi Arabia last at `—`), divider, `P1…P118`, floor
+divider, `F1 Vanuatu ≥5.0% … F45`. Export rows read `1 USA verified=Yes … P1 Greenland verified=No`.
+
+## Result
+An analyst building a screening list can read the `#` column as what it actually is — a placing
+within a comparable evidence basis. The top of the proxy block is legible as **P1** at a glance,
+rather than as the 9th-best fiscal regime on earth, without having to read the divider prose that
+sits above it; and the same ordinal survives into the clipboard, CSV and XLSX, so the shortlist
+pasted into an IC memo no longer ranks a proxy jurisdiction against a real producer as if the two
+placings meant the same thing.
+
+## Mobile (390 × 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all 9 tabs reachable at that
+  width. (`tab-btn-tsamples` is `display:none` at 390 by design — it lives in the Reference
+  dropdown — pre-existing, confirmed against the unmodified file, unrelated to this cycle.)
+- Screener rank cells measure **52–73px** tall under `pointer: coarse`, well over the 24px floor.
+  The `P`/`F` marker is an 11×6px text qualifier inside that cell, not a control: no handler, no
+  focus, not independently tappable.
+
+## Carried forward (unchanged this cycle)
+Everything in the 783 carry-forward list still stands, minus the item this cycle closed. Two of
+those items were re-confirmed in passing while walking T1 and are worth re-stating with what was
+learned:
+- The take ceiling **does** filter floor-only rows (43 survive at 30%, 19 at 20%, 2 at 10%), so
+  the identical "45 floor rows" count at ceilings 40/55/70 is coincidence — every floor value on
+  file is ≤28.4% — **not** an unfiltered path. Recorded because it looks like a bug and is not.
+  One real edge remains: **Bahamas `≥10.0%` survives a ≤5% ceiling.** Off-by-one in the floor
+  comparison, 2 rows, at a ceiling nobody screens at. Minor; not taken.
+- A take of `—` still sorts as if it were the **maximum**: sorting GOVT TAKE high→low puts
+  **Saudi Arabia (`—`) at rank 1**, above Iraq at 84.8%. 3 countries affected (Saudi Arabia,
+  Bahrain, Kuwait); ascending order is unaffected because the nulls sink. Carried from 778.
+  This cycle's change makes the null's *block* legible but not its position — the fix is in the
+  comparator, not the ordinal, and belongs to a T1 or T6 cycle of its own.
