@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v862</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v863</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v862</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v863</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v862</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v863</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -30957,35 +30957,88 @@ function _sbsObsCell(row, c) {
   var esc = String(c).replace(/"/g, '\\"');
   return document.querySelectorAll('#cmp-output [data-sbs-row="' + row + '"][data-sbs-c="' + esc + '"]');
 }
+// ── v863 (T3): this grid's spread audit skipped the cohort that could win its ranking ──
+// v719 established, on the Reform Risk card, that a MEASURED dispersion can be refuted by the
+// country's own contract table, and that it is the cohort where the consequence is worse —
+// because since v624 'measured' is the only cohort that carries a graded band and a colour at
+// all. This function was never given that rule, so the two tabs printed opposite stability
+// verdicts for the same country.
+//
+// Walked cold this cycle: Side-by-Side → Norway, Angola, Nigeria, an ordinary IOC screening
+// trio. The strip above the grid read
+//     PREDICTABILITY, MOST STABLE FIRST:  Nigeria 73 › Norway ≤52 and Angola ≤26
+// — Nigeria first, and the only graded band on the row. Its bundled p25/p75 are 83.1–83.5%
+// (0.4pp), so the IQR term, the score's largest at up to −40 points, was charged 0.3 of them.
+// ORCA's own api/v1/country/nigeria.json lists its 50 largest producing contracts running
+// 57.5–91.4% take at $75/bbl: 33.9pp, 84x the bundled figure, and the SECOND-WIDEST observed
+// dispersion in that very set. The set notice underneath then pointed at Nigeria as "the column
+// in this set ORCA does hold a measured spread for" — the sentence written to protect the
+// analyst aimed them at the worst column. Reform Risk, for the same country, already printed
+// "≤46 LOW ceiling".
+//
+// Nothing new is computed. The refutation test is _rrIqrUnderstated() and the ceiling is
+// _fpObsCeilingFrom(), both v719/v720, both already read by Country Profile's Copy for IC Memo
+// and the XLSX. The one-term arithmetic is unchanged: _fpObsCeilingFrom() with a zero bundled
+// IQR is the same expression this function used to compute inline (charged 0, cost
+// min(40, spread x 0.8)).
 function _sbsPaintObsSpread(c, d, obs, token) {
   if (token !== window._sbsRenderToken) return;                 // set changed mid-fetch
-  if (typeof cpSpreadConflict !== 'function' || !cpSpreadConflict(d, obs)) return;
+  var u   = (typeof _rrIqrUnderstated === 'function') ? _rrIqrUnderstated(d, obs) : null;
+  var one = !u && typeof cpSpreadConflict === 'function' && cpSpreadConflict(d, obs);
+  if (!u && !one) return;
+  var cl = (typeof _fpObsCeilingFrom === 'function')
+             ? _fpObsCeilingFrom(d, obs, u || { iqr: 0, excess: obs.spread }) : null;
+  if (!cl) return;
+  // Materiality, on v719's rule and only on the measured path: a 1-point correction dressed
+  // like Nigeria's 27-point one is what trains an analyst to skip the line. The one-term path
+  // keeps withdrawing on a single counterexample, because there it is the CLAIM — "every
+  // contract prices the same" — that is refuted, not the size of the score.
+  if (!one && !cl.material) return;
   var nAll  = (d.n != null) ? Number(d.n).toLocaleString() : 'its';
   var range = obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '%';
-  var cost  = Math.min(40, obs.spread * 0.8);
-  var fp    = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
-  var bound = (fp == null) ? null : Math.max(0, Math.round(fp - cost));
-  var bLbl  = bound == null ? '' : (bound >= 75 ? 'HIGH' : bound >= 60 ? 'MODERATE' : bound >= 45 ? 'LOW' : 'VERY LOW');
+  var cost  = cl.cost;
+  var fp    = cl.printed;
+  var bound = cl.bound;
+  var bLbl  = cl.band;
+  var bundled = one ? null : (d.p25_take.toFixed(1) + '\u2013' + d.p75_take.toFixed(1)
+                              + '% (' + cl.iqr.toFixed(1) + 'pp)');
 
-  var why = c + ': the bundled quartiles are identical, which is what put "single term" in this '
-    + 'cell. ORCA\u2019s own contract file for ' + c + ' lists the ' + obs.n + ' largest producing '
-    + 'contracts running ' + range + ' government take at $75/bbl, across ' + obs.distinct
-    + ' distinct values \u2014 so they do not all price the same, and block selection does change the '
-    + 'fiscal outcome here. This is a FLOOR on the spread, not an IQR: a top-' + obs.n
-    + '-by-production sample cannot establish a population spread across all ' + nAll
-    + ' contracts, so nothing here is recomputed. Do not rank this column as the uniform-terms one.';
+  var why = one
+    ? c + ': the bundled quartiles are identical, which is what put "single term" in this '
+      + 'cell. ORCA\u2019s own contract file for ' + c + ' lists the ' + obs.n + ' largest producing '
+      + 'contracts running ' + range + ' government take at $75/bbl, across ' + obs.distinct
+      + ' distinct values \u2014 so they do not all price the same, and block selection does change the '
+      + 'fiscal outcome here. This is a FLOOR on the spread, not an IQR: a top-' + obs.n
+      + '-by-production sample cannot establish a population spread across all ' + nAll
+      + ' contracts, so nothing here is recomputed. Do not rank this column as the uniform-terms one.'
+    : c + ': the bundled quartiles put the middle half of its contracts at ' + bundled
+      + ', and that is the figure the Predictability Score\u2019s spread penalty was charged on \u2014 '
+      + cost.toFixed(0) + ' points were available and ' + cl.charged.toFixed(1) + ' were taken. '
+      + 'ORCA\u2019s own contract file for ' + c + ' lists the ' + obs.n + ' largest producing contracts '
+      + 'running ' + range + ' government take at $75/bbl, across ' + obs.distinct + ' distinct values '
+      + '\u2014 ' + obs.spread.toFixed(1) + 'pp, wider than the bundled spread by ' + cl.excess.toFixed(1)
+      + 'pp. This is a FLOOR on the dispersion, not a population IQR: a top-' + obs.n
+      + '-by-production sample across all ' + nAll + ' contracts cannot establish one, so nothing '
+      + 'here is recomputed. Do not rank this column as the uniform-terms one on the bundled figure.';
 
   // Row: Take spread across contracts
   var spreadCells = _sbsObsCell('spread', c);
   for (var i = 0; i < spreadCells.length; i++) {
     var cell = spreadCells[i];
     if (cell.dataset.obsPainted) continue;
-    if (cell.textContent.trim().indexOf('single term') === -1) continue;   // only the claim this refutes
+    // v863: the one-term path still patches only the cell that makes the claim it refutes.
+    // The measured path patches the cell printing the bundled band, and keeps that band on
+    // screen, struck through, because it is what the score was charged on and the analyst has
+    // to be able to see what was withdrawn rather than watch a number change.
+    var _txt863 = cell.textContent.trim();
+    if (one ? _txt863.indexOf('single term') === -1 : _txt863.indexOf('pp)') === -1) continue;
     cell.dataset.obsPainted = '1';
     cell.innerHTML = '<span style="color:var(--orange);font-weight:700;" title="' + _sbsAttr(why) + '">'
       + '\u2265' + obs.spread.toFixed(1) + 'pp observed</span>'
       + '<span style="display:block;font-size:10px;font-weight:600;color:var(--orange);">'
-      + range + ' across top ' + obs.n + '</span>';
+      + range + ' across top ' + obs.n + '</span>'
+      + (one ? '' : '<span style="display:block;font-size:10px;color:var(--muted);">bundled '
+          + '<span style="text-decoration:line-through;">' + bundled + '</span></span>');
   }
 
   // Row: Predictability Score — the basis chip inside the badge, plus a best-case marker
@@ -30994,7 +31047,11 @@ function _sbsPaintObsSpread(c, d, obs, token) {
     var host = fpCells[k];
     if (host.dataset.obsPainted) continue;
     var chip = host.querySelector('.orca-fp-basis');
-    if (!chip || chip.textContent.trim() !== 'one term') continue;
+    // v863: 'one term' on the refuted one-term path, the bundled spread ('0.4pp') on the
+    // refuted measured path. Matching the exact string keeps this from repainting a cell that
+    // some other pass has already rewritten.
+    if (!chip) continue;
+    if (chip.textContent.trim() !== (one ? 'one term' : cl.iqr.toFixed(1) + 'pp')) continue;
     host.dataset.obsPainted = '1';
     chip.style.color = 'var(--orange)';
     chip.style.fontWeight = '700';
@@ -31004,7 +31061,10 @@ function _sbsPaintObsSpread(c, d, obs, token) {
     if (badge) {
       badge.title = (badge.title || '')
         + '  \u2014\u2014 UPPER BOUND: the take-spread component of this score \u2014 its largest, worth up to '
-        + '\u221240 points \u2014 was charged ZERO because the bundled quartiles for ' + c + ' are identical. '
+        + '\u221240 points \u2014 was charged '
+        + (one ? 'ZERO because the bundled quartiles for ' + c + ' are identical. '
+               : 'only ' + cl.charged.toFixed(1) + ' points, because the bundled quartiles for ' + c
+                 + ' are ' + bundled + '. ')
         + 'The contract file refutes that: ' + range + ' across the ' + obs.n + ' largest producing '
         + 'contracts (' + obs.spread.toFixed(1) + 'pp). At that dispersion the spread term alone would '
         + 'cost ' + cost.toFixed(0) + ' points'
@@ -31037,7 +31097,10 @@ function _sbsPaintObsSpread(c, d, obs, token) {
         + 'color:var(--orange);line-height:1.35;" title="' + _sbsAttr(
             'Carry ' + bound + ' \u00b7 ' + bLbl + ' for ' + c + ', not the printed ' + fp + '. '
           + 'The take-spread component of this score \u2014 its largest, worth up to \u221240 points \u2014 '
-          + 'was charged ZERO because the bundled p25 and p75 take for ' + c + ' are identical. '
+          + 'was charged '
+          + (one ? 'ZERO because the bundled p25 and p75 take for ' + c + ' are identical. '
+                 : cl.charged.toFixed(1) + ' points because the bundled p25/p75 take for ' + c
+                   + ' are ' + bundled + '. ')
           + 'ORCA\u2019s own contract file lists the ' + obs.n + ' largest producing contracts running '
           + range + ' government take at $75/bbl across ' + obs.distinct + ' distinct values, so that '
           + 'basis does not hold. At ' + obs.spread.toFixed(1) + 'pp the spread term alone costs '
@@ -31052,7 +31115,7 @@ function _sbsPaintObsSpread(c, d, obs, token) {
     }
   }
 
-  _sbsObsNotice(c, obs, bound, bLbl, fp, token);
+  _sbsObsNotice(c, obs, bound, bLbl, fp, token, one ? 'single' : 'measured', cl);
 }
 function _sbsAttr(x) {
   return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -31283,12 +31346,13 @@ function _sbsPaintVerdictFp(s) {
       + 'white-space:nowrap;cursor:help;">≤ = ceiling, not a score</span>';
   row.style.display = 'flex';
 }
-function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
+function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
   if (token !== window._sbsRenderToken) return;
   var out = document.getElementById('cmp-output');
   if (!out) return;
   window._sbsObsHits = window._sbsObsHits || {};
-  window._sbsObsHits[c] = { obs: obs, bound: bound, bLbl: bLbl, fp: fp };
+  window._sbsObsHits[c] = { obs: obs, bound: bound, bLbl: bLbl, fp: fp,
+                            mode: mode || 'single', cl: cl || null };   // v863
   var hits = Object.keys(window._sbsObsHits).filter(function(k) {
     return compareList.indexOf(k) !== -1;
   });
@@ -31304,11 +31368,29 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
     if (grid && grid.nextSibling) out.insertBefore(el, grid.nextSibling);
     else out.appendChild(el);
   }
+  // v863: each refuted column states the basis that was withdrawn beside what the contracts
+  // hold, because the two cohorts are refuted for different reasons and the notice used to
+  // assert the one-term reason over both.
   var parts = hits.map(function(k) {
     var h = window._sbsObsHits[k];
-    return k + ' ' + h.obs.min.toFixed(1) + '\u2013' + h.obs.max.toFixed(1) + '% ('
-      + h.obs.spread.toFixed(1) + 'pp across its top ' + h.obs.n + ')';
+    var was = (h.mode === 'measured' && h.cl)
+      ? 'bundled ' + h.cl.iqr.toFixed(1) + 'pp'
+      : 'identical quartiles';
+    return k + ' ' + was + ' \u2192 its contracts run ' + h.obs.min.toFixed(1) + '\u2013'
+      + h.obs.max.toFixed(1) + '% (' + h.obs.spread.toFixed(1) + 'pp across its top ' + h.obs.n + ')';
   });
+  var nMeas863 = hits.filter(function(k) { return window._sbsObsHits[k].mode === 'measured'; }).length;
+  var nOne863  = hits.length - nMeas863;
+  var head863  = (nMeas863 && nOne863)
+    ? 'The take-spread basis behind the Predictability Score is withdrawn for ' + hits.length
+      + ' columns in this set \u2014 ' + nOne863 + ' on a \u201csingle term\u201d basis and ' + nMeas863
+      + ' on a measured spread this platform\u2019s own contract file exceeds.'
+    : nMeas863
+    ? 'The measured take spread the Predictability Score was charged on is withdrawn for '
+      + nMeas863 + ' column' + (nMeas863 > 1 ? 's' : '') + ' in this set \u2014 and a measured spread is '
+      + 'the only basis on this grid that carries a graded band.'
+    : 'The \u201csingle term\u201d claim is withdrawn for ' + nOne863 + ' column'
+      + (nOne863 > 1 ? 's' : '') + ' in this set.';
   var measured = compareList.filter(function(k) {
     if (hits.indexOf(k) !== -1) return false;
     var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
@@ -31338,12 +31420,11 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
           : 'are shown on a measured basis and are directly readable.');
   }
   var fpSink = {};
-  el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
-    + hits.length + ' column' + (hits.length > 1 ? 's' : '') + ' in this set.</strong> ORCA ships identical p25/p75 '
-    + 'take for ' + parts.length + ' of these countries, which is what the Take spread and Predictability rows were '
-    + 'built on. Its own contract file contradicts that: ' + parts.join('; ') + ' \u2014 measured government take at '
-    + '$75/bbl, not simulated.' + cmp + ' The scores are NOT recomputed here, because a top-N-by-production sample '
-    + 'cannot establish a population spread; they are marked \u25b2 best case.' + _sbsBoundOrder(hits, measured, fpSink);
+  el.innerHTML = '<strong style="color:var(--orange);">\u26a0 ' + head863 + '</strong> What the Take spread and '
+    + 'Predictability rows were built on, against what ORCA\u2019s own contract file holds: ' + parts.join('; ')
+    + ' \u2014 measured government take at $75/bbl, not simulated.' + cmp + ' The scores are NOT recomputed here, '
+    + 'because a top-N-by-production sample cannot establish a population spread; they are marked \u25b2 best case.'
+    + _sbsBoundOrder(hits, measured, fpSink);
   _sbsPaintVerdictFp(fpSink);
 }
 function _sbsApplyObsSpread() {
@@ -31357,9 +31438,15 @@ function _sbsApplyObsSpread() {
   compareList.forEach(function(c) {
     var d = COUNTRY_DATA.filter(function(x) { return x.country === c; })[0];
     if (!d) return;
-    // Only the one-term basis can be refuted — a measured or absent distribution has nothing
-    // to withdraw, and a state monopoly has no contractor position to rank.
-    if (_fpDispersion(d).state !== 'single') return;
+    // v863 (T3): BOTH scored dispersion cohorts are checked against the contract table, the
+    // rule v719 already applies on the Reform Risk card. The line that used to stand here —
+    // "only the one-term basis can be refuted; a measured distribution has nothing to withdraw"
+    // — is wrong, and it exempted the cohort where the consequence is worse: 'measured' is the
+    // ONLY cohort that still carries a graded band and a colour, so it is the only one that can
+    // win this grid's predictability order outright. 'none' and 'monopoly' hold no distribution
+    // and still have nothing to withdraw.
+    var _st863 = _fpDispersion(d).state;
+    if (_st863 !== 'single' && _st863 !== 'measured') return;
     var cached = (typeof cpObsSpread === 'function') ? cpObsSpread(c) : null;
     if (cached) { _sbsPaintObsSpread(c, d, cached, token); return; }
     var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
