@@ -53443,3 +53443,16 @@ of defensibility.
   — carried from 767-772, closed by this change. The figure now carries "at 15%" in its own
   label when it is the headline, and "at 15% … same cash flow, higher discount rate" in the
   note when it is not.
+
+---
+## Cycle 773 Log — 2026-09-15 02:32
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. **v865 shipped and pushed** (`909d091`).
+
+## Cycle 773 — T2
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (772 was T1, 771 T3, 770 T4, 769 T5, 768 T6 — T2 was stalest.)
+
+**Friction.** Walked Country Profile cold at 1440 with storage cleared, served over HTTP so the JSON payloads actually load. The headline strip, evidence chain and 4-price table are genuinely candid — the page volunteers its own contradictions. The break is the one pane
