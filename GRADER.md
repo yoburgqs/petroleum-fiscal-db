@@ -53198,3 +53198,118 @@ change.
 Walked cold at 1440, no sessionStorage/localStorage: Side-by-Side → Clear the seeded example → typed **Norway, Angola, Nigeria**, an ordinary IOC screening trio. The predictability strip above the grid read:
 
 > PREDICTABILITY, MOST STABLE FIRST: **Nigeria 73** › Norway ≤52 and Angola ≤
+
+---
+## Cycle 772 Log — 2026-09-15 06:20
+- Test before: 318 PASS / 0 FAIL (deployed baseline reported by the loop)
+- Test after: **317 PASS / 0 FAIL / 1 WARN**, suite RAN this cycle against the modified
+  local build; `/tmp/runtime_test_report.txt` written 2026-09-15T06:17:29Z. The WARN is
+  the local `sw.js` 404 and the figure equals the cycle-771 local baseline. Not assumed.
+- JS errors: 0
+- Summary: Cycle 772 complete — **v864 shipped and pushed** (`c954803`).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (771 was T3, 770 T4,
+769 T5, 768 T6, 767 T2 — T1 was stalest, last run at 766.)
+
+## Friction
+Walked cold at 1440, no sessionStorage/localStorage: Home → Screener → loaded **IOC
+Capital Screen** (15 countries) → clicked the **$125** price-deck button, which is the
+obvious second move for an IC screen and the whole reason v651 put the deck on this tab.
+
+The deck works. Take, NPV, Tier and the pass/fail set all follow `getPriceKey()`; the row
+set went 15 → 11 and Canada's take moved 32.7% → 36.3%, NPV $3.91B → $8.44B. What did not
+follow were the two column headers the analyst reads the decision off (`#tbl-screener`
+thead, index.html:3786–3795):
+
+| on screen at the $125 deck | cell printed | header said | tooltip said |
+|---|---|---|---|
+| Govt Take | **36.3%** | `GOVT TAKE` | *"Government take at **$75/bbl**"* |
+| Contractor NPV | **$8.44B** | `CONTRACTOR NPV` | *"Contractor NPV at **$75/bbl** in $M"* |
+| Tier | Inv-Friendly | `TIER` | *"...take level at **$75/bbl**"* |
+
+Canada's actual $75 figures are 32.7% and $3.91B. The table printed a $125 number under a
+label that told the analyst, in words, that it was a $75 number — and the tooltip is
+precisely where someone goes when they are about to cite a figure into an IC memo.
+
+Two things made it worse rather than merely stale. First, the third numeric column has
+tracked the deck since **v699** (`% of $125 kept`, and `same as base column` at the $50
+deck), so one column was visibly deck-aware and the two beside it read as authoritative
+constants rather than as unmaintained labels. Second, the deck *is* disclosed — at the tail
+of the ~500-character count paragraph above the table, and in every export header — but a
+criteria sentence that long is not where a number gets copied from. The column header is.
+
+## Change
+- **Govt Take** and **Contractor NPV** each gained a deck sub-line, in the same slot, the
+  same 10px muted style and the same block position as the v699 `#sc-npv50-den` sub-heading
+  — so the header row gains no height and no width. It reads `@ $75/bbl` muted on the
+  default deck and **accented amber and bold** on $50 / $100 / $125, because $75 is the
+  state an analyst assumes and the other three are the ones that mislead.
+- `_scSyncNpvAxis()` rewrites the **Govt Take, Contractor NPV and Tier** tooltips against
+  the live deck each pass, and writes `dataset.baseTitle` alongside `title`. That second
+  write is load-bearing: `renderScreener()`'s header-sort loop re-applies `baseTitle` over
+  `title` on every render, so updating `title` alone would have survived exactly one pass.
+- The Tier tooltip now also names a regime that actually changes tier between decks —
+  Azerbaijan is MOD at $50 and $75 and HI at $125 — so the bucket reads as deck-dependent
+  rather than as a fixed classification.
+- **Swing (pp)** is deck-independent by construction ($125 take − $50 take) and is left
+  alone; labelling it with the deck would have been the lie in the other direction.
+
+No take, NPV, tier, ordering, filter result, preset, count line or export value changes.
+Verified across default order, the NPV sort, and all four decks.
+
+## Result
+An analyst stressing their shortlist at $50 or $100 can now read the take and the NPV off
+the column header and know which price those two numbers belong to — instead of carrying a
+$125 figure into an IC memo under a header that says $75.
+
+## Verification
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN:** 317 PASS / 0 FAIL / 1 WARN against the modified local build.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 12 tabs:** 0 horizontal-scroll failures,
+  0 page errors, 0 console errors.
+- **390 × 844 `hasTouch`:** Screener `scrollWidth` 390 = `clientWidth` 390. The two new
+  sub-lines are non-interactive text and add no control of any height.
+- **All 11 presets re-walked** after the change (iochurdle 15, sweetspot 143, pscafrica 34,
+  deepwater 22, lowrisk 11, downsidereturns 5, highevidence 35, rfactor 70,
+  atlanticfrontier 6, frontiermarkets 56, downsideresilience 24) — counts unchanged, every
+  preset chip renders, 0 errors.
+- **Deck round-trip:** $75 → $50 → $125 → $75 with a preset loaded and with the NPV sort
+  explicit; sub-line, colour and all three tooltips correct in every state.
+
+## Also observed on this walk, not fixed
+- **17 row-selection checkboxes render 13px tall under `pointer: coarse`** on the Screener
+  (`input.sc-sel`, and `#sc-sel-all` in the header cell). They predate this cycle and were
+  not touched by it, but they are the control that builds the IC shortlist, so they are a
+  direct candidate for the next T1 or T5.
+- The empty/near-empty screen states are genuinely good: at Take ≤15% + NPV ≥$4500M the
+  table leads with `EVERY ROW BELOW — 5 COUNTRIES WITH NO VERIFIED FIELD PRODUCTION` and
+  names the recovery ("widen the screen, or load the IOC Capital Screen preset"). No change.
+- The count line honestly self-reports inert criteria ("the $3000M floor at $75/bbl removed
+  0 rows", "this screen is decided at $50/bbl alone"). Nothing to fix there.
+
+## Carried forward
+- `copyExplorerLink()` still serializes a bare `#/explorer`. Carried from 763, 765–771.
+- The Cost Recovery / IRR card's *"clears a 15% IOC hurdle (+$490M)"* still has no basis
+  line. Carried from 767–771.
+- Mechanic filter is a country-level include-set, not a contract-level one — Group-2 trap
+  per `MECHANIC_COMPARABILITY.md`. Carried from 766–771.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset (the chip
+  beside it carries the state, so this is cosmetic). Carried from 766–771.
+- The repo's `tests/runtime_comprehensive.js` is stale against the office copy — the office
+  copy is 173,759 bytes to the repo's 157,358 and is the one that was run. Carried from
+  764–771.
+- Basket pill ✕ glyphs measure 44px tall but 8px wide under `pointer: coarse`. From 765–771.
+- The evidence grade ignores the D (default-estimate) share entirely. Carried from 768–771.
+- Norway's State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF
+  panel). Carried.
+- The Scenario Builder modal over-promises production-parameter inputs that do not exist.
+  Carried from 769–771.
+- The intro strip's IC rule names a `5–8pp` WACC band at "Score ≤ 20", which needs 6+
+  in-window changes; the maximum on file is the UK at 5. Carried from 770, 771.
+- Side-by-Side Contractor NPV rows carry no highest/lowest markers. Carried from 771.
+- Side-by-Side quickstart presets are unreachable without clicking Clear. Carried from 771.
+- 4 of the 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay,
+  Somalia, UAE — Abu Dhabi. Carried.
+- Still no process check comparing the deployed version string against the local tree.
+  Carried from 758, 761–771.
