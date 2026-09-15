@@ -54985,3 +54985,126 @@ learned:
 Walked it cold at 1440×900 — sessionStorage and localStorage cleared, then Home → Screener → Max Govt Take **40%** → click **GOVT TAKE** to sort ascending. One slider, one click: the shortest path that actually answers T1.
 
 110 rows survive. Rows 1–8 are the real producers — USA 23.4%
+
+---
+## Cycle 785 Log — 2026-09-15 21:4x
+
+- Test before: 304 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after:  304 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- **Suite RAN this cycle**, not assumed. Both numbers are read from the suite's own report
+  (`ORCA_REPORT_FILE`), run against the LOCAL tree under the `/petroleum-fiscal-db/` prefix (the
+  sw.js path trap). "Before" is a genuine second run: HEAD's `index.html` was checked out into a
+  scratch tree symlinked to the same data files and served on its own port, so the two numbers are
+  the same suite over two builds, not one number carried forward.
+- **304, not 318.** 318 is the count this suite returns against the deployed GitHub Pages URL,
+  which carries assertions that only run there. The local prefix run returns 304 on the unmodified
+  HEAD as well, so the gap is the harness target, not this cycle. Stated rather than reconciled.
+- Shipped as **v877** (`e4ca6f0`), committed, mirrored to
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html`, pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest by rotation;
+784 was T1, 783 T3, 782 T4, 781 T5, 780 T6 — last T2 at 779.)
+
+## Friction
+Walked cold at 1440x900, sessionStorage and localStorage cleared: Home → **Country Profile** →
+dropdown → **Iran**. The profile answers the first half of T2 well — 75.7% headline, the fee-basis
+correction to 74.4%, the evidence tier, the contract spread. The second half — *can I defend it* —
+has exactly one route on that tab, because v516 removed the bundled country IRR and left
+**"IRR: → Model in Scenario Builder"** as the only return affordance. So the T2 walk goes through
+the builder.
+
+`ddOpenScenarioBuilder('Iran')` loads Iran's Buy-back override, auto-runs, and the **last panel on
+the screen** — the `vs 185-Country Database` block inside `runCustomScenario()`, `index.html:51598`
+— closed the walk with:
+
+> **Ranked #3 of 185 by govt take (1=highest) · Median 28.4% · This regime +62.9pp vs median ·
+> 98% of countries have lower take at $75/bbl**
+
+Iraq's TSC reads **#4 of 185 / 98%** on the same panel.
+
+That is the precise error `~/MECHANIC_COMPARABILITY.md` **Group 2** was written to prevent. Under a
+TSC / RSC / Buy-back the contractor is paid a fixed $/bbl fee, so government take is the whole
+residual and climbs toward 97–99% **on any terms** — it measures the remuneration structure, not
+the fiscal burden. Iraq's 415 TSCs average 98.5% take **and** +$319M contractor NPV at the same
+time. The panel is titled "vs 185-Country Database", so it does not read as arithmetic nobody
+checked; it reads as the platform's considered comparison, and "third-harshest regime on earth" is
+what goes in the memo.
+
+Two things made it the worst moment rather than a merely wrong one:
+
+1. **On Iraq the page contradicts itself inside one screen.** The price-deck note ~100px above
+   already says *"this take% is not rankable against a PSC or Concession"* (`index.html:51507`).
+   The analyst is told not to rank it, then handed the rank.
+2. **On Iran there is no contradiction because there is no warning at all.** That note is gated on
+   `flat` — contractor NPV identical across the deck. Iran's Buy-back NPV runs −$1.76B → −$1.57B,
+   so `flat` is false, the note never fires, and the rank was the *only* comparability statement
+   anywhere on the screen.
+
+Every other surface already handles this: `cpCmpTakeOf()`, `getGlobalTakeRank()` (v683),
+Side-by-Side's comparable take (v549/v552), the Vintage decade bars (`VINTAGE_FEE_BASIS`, v696) and
+the Fiscal Compare census all re-base or withhold. The Scenario Builder was the last surface still
+printing a raw percentile on a fee-basis run.
+
+## Change
+`runCustomScenario()`'s database-context panel now branches on the mechanic group before it ranks
+anything. For **TSC / RSC / Buy-back** it emits no rank, no percentile and no vs-median. In their
+place, an orange-bordered panel headed **"vs 185-Country Database — no placing for a Buy-back"**
+that:
+
+- states the mechanism in one sentence — a fixed fee per barrel means government take is the
+  residual and runs toward 97–99% on any terms, so the figure measures the remuneration structure
+  and has no placing among 185 production-sharing regimes;
+- says plainly that **the rank and percentile that used to print here were an artefact**, and cites
+  MECHANIC_COMPARABILITY Group 2 rather than asserting it;
+- names what *does* compare on this run — contractor NPV, IRR, capital at risk and payback, already
+  in the three cards above, which are outputs of the analyst's project rather than properties of
+  the fee formula;
+- where the run carries a `_sbOrigin.country`, prints that country's Group-1 placing read from
+  **`getGlobalTakeRank()`** — one source, so the builder and the Country Profile cannot hand the
+  analyst two different placings for the same country.
+
+**Withheld, not re-based**, because there is no honest re-basing of a fee-basis take. The v451
+precedent: removing the untrustworthy thing was the improvement.
+
+Observed after the change:
+
+| run | before | after |
+|---|---|---|
+| CP → Iraq → Scenario Builder (TSC) | `#4 of 185 · +57.4pp vs median · 98% lower` | `no placing for a TSC` + `Iraq 34.1% — #102 of 185` |
+| CP → Iran → Scenario Builder (Buy-back) | `#3 of 185 · +62.9pp vs median · 98% lower` | `no placing for a Buy-back` + `Iran 74.4% — #174 of 185` |
+| preset `Iraq TSC` / `India RSC` / `Iran Buy-back` (no origin country) | ranked | withheld, no origin line |
+| Norway / Brazil / Indonesia / preset `Norway` (Group 1) | `#64` / `#91` / `#18` | **unchanged** |
+
+Note the Iran result is not a whitewash: on its production-sharing contracts Iran still ranks
+#174 of 185 — a genuinely high-take regime. The change removes a false placing, it does not
+manufacture a flattering one.
+
+## Result
+An analyst defending a country at $75/bbl now leaves the Scenario Builder with a number that
+survives IC review. Iraq reads **34.1% — #102 of 185** instead of "harsher than 98% of the world";
+Iran reads **74.4% — #174** instead of **#3**. Both are the same figures those countries' own
+Country Profiles print, so the two screens can no longer be quoted against each other. Iraq and
+Iran are 2 of the 9 benchmark quick-loads on the Country Profile empty state and 3 of the 13
+Scenario Builder presets are Group 2, so this is on the default path, not an edge case.
+
+## Mobile (390 × 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all 9 tabs reachable at that
+  width, and on Country Profile → Iran, and with the Scenario Builder modal open.
+- The new panel measures **313 scrollWidth / 313 clientWidth** — no internal overflow.
+- It adds **no controls**: prose only, so the 24px `pointer: coarse` floor is not engaged.
+
+## Carried forward (unchanged this cycle, re-confirmed while walking T2)
+- **The CP NPV chip is still on the blend while the verdict sentence beside it is on the
+  PSC/Concession basis.** Iraq prints `NPV: $642M @$75` in the chip and `$3.04B` in the sentence
+  one line up; the Downside chip beside it carries `· PSC/Conc 195 · blend $389M` and the NPV chip
+  carries nothing. v871 made this call deliberately ("the headline NPV chip, the band pill and the
+  band sentence still read `d.npv_75`") to avoid one paragraph quoting two $75 figures. Recorded so
+  the decision stays visible, not reopened.
+- `▶ Run FC at this price` on the Country Profile reads `cp-price-select`, **which does not exist**
+  on that tab, then falls back to `fc-price` and assigns to `#price`, which also does not exist.
+  Net effect: it switches to Fiscal Compare and runs at whatever price FC already held. Harmless
+  today because CP has no price control, so "this price" is always $75 — but the label promises a
+  control that is not there. Minor; not taken.
+- A take of `—` still sorts as the maximum in the Screener (carried from 778/784), and Bahamas
+  `≥10.0%` still survives a ≤5% ceiling (carried from 784). Neither is on the T2 path.
