@@ -54167,3 +54167,130 @@ is pasteable into an IC pack as a standalone figure (T5 benefit, not claimed as 
 
 ## Friction
 Walked cold at 1440×900, no storage. The Screener half of T1 held up under a hard walk — presets, evidence-first block ordering, price-deck switching (filters genuinely re-run at the new deck; Azerbaijan 60.8%→66.0% correctly drops out of a ≤65% screen
+
+---
+## Cycle 779 Log — 2026-09-15 09:23
+- Test before: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Suite ACTUALLY RUN this cycle (not assumed): `tools/petroleum/tests/runtime_comprehensive.js`
+  (the office copy, 173,759 bytes — the graded one) against the local tree via
+  `TEST_URL=http://localhost:8778/petroleum-fiscal-db/index.html`. Run twice: once after the
+  code change, once after the version bump. Both 318/0/0.
+- JS syntax gate: PASS (11 inline blocks)
+- Summary: Cycle 779 complete — shipped as **v871** (`12bbf4c`), pushed, mirrored.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(rotation: 778 was T1, 777 T3, 776 T4, 775 T5, 774 T6 — T2 was stalest, last run at 773.)
+
+## Friction
+Walked cold at 1440×900, no storage, over HTTP (the page cannot be walked on `file://` —
+`#loading-overlay` never clears, so every control is pointer-blocked; noted for future cycles).
+
+The Country Profile verdict sentence reads *"Clears the 10% WACC at $75 (X) and at the $50/bbl
+downside (Y)"*. **v786 switched only the Y leg** to the PSC/Concession (Group-1) basis wherever a
+fee-basis blend changed the figure on screen, and left X reading `d.npv_75`, the all-contract
+blend. The two legs of a single sentence were therefore computed on different contract sets.
+
+On **Iraq** this printed **`$642M @$75` against `$1.44B @$50`** — a downside **2.2× the base
+case**. NPV cannot rise as price falls on a monotonic curve, so this is not a judgement call: the
+pair is impossible on its face, and it is the first sentence of the verdict box, directly under
+the headline take. An analyst carrying it into an IC pack loses the room.
+
+The v786 comment shows the trade was made knowingly — *"The $75 NPV is NOT switched … one
+paragraph quoting two $75 figures would be worse than the defect."* That reasoning holds for the
+band-rank clause, which must stay on the blend because every country is ranked on it. It does not
+hold for the two legs of the **same comparison**, where the mismatch is the defect.
+
+Blast radius measured across all 185 countries: **10** print a mismatched pair — Azerbaijan,
+Ecuador, India, Iran, **Iraq**, Malaysia, Mexico, Oman, Qatar, South Sudan. Iraq is the only one
+where it inverts; the other 9 understate or overstate the fall.
+
+Three call sites shared the defect: the main verdict (`~40110`), the `Price-dependent entry`
+branch (`~40147`, currently unreached by any of the 10), and the IC strip's `_downFails670`
+branch (`~40563`).
+
+## Change
+- `cpDownside50()` now also carries **`out.v75`** — the Group-1 $75 NPV from **`d.g1.v75`, which
+  was already in `COUNTRY_DATA` and never read** — plus `out.blend75`. Set only where it formats
+  differently from the blend, so no sentence gains a figure it does not need.
+- New **`cpPair75(dn, blend75)`** feeds the matched figure to all three call sites.
+- `cpDownside50Basis()` no longer annotates one leg. Where the pair switched it prints
+  *"; both figures read on its 195 PSC/Concession contracts"* and puts the **blend pair** behind a
+  **`Blend basis ›`** disclosure — the existing `.cp-why-btn` / `.cp-why-body` pattern, already
+  `min-height:24px` under `pointer: coarse`. The disclosure names the blend pair as a *pair*
+  (`$642M @$75 and $389M @$50`), says it is what the NPV chip, the other tabs, the XLSX and the API
+  return, and ends *"Quote the PSC/Concession pair or quote the blend pair — never one figure from
+  each."* The single-leg clause is retained as the fallback where no comparable $75 exists.
+- The band-rank clause still quotes the blend and is now tagged **"on the blend"**, so the two $75
+  figures in one paragraph reconcile instead of contradicting. This is the v786 objection answered
+  rather than ignored.
+- Iraq now reads: **`Clears the 10% WACC at $75 ($3.04B) and at the $50/bbl downside ($1.44B; both
+  figures read on its 195 PSC/Concession contracts Blend basis ›)`** … `($642M on the blend against
+  a $2.75B band median)`.
+- Countries with no fee-basis blend are **byte-identical** — Norway still reads `$826M` / `$379M`
+  with no added clause.
+
+## Result
+On the 10 fee-basis countries the analyst now gets a base case and a downside **computed on the
+same contracts**, so the downside sits below the base case and the pair survives a reviewer who
+checks it. Iraq's verdict went from an impossible pair to `$3.04B → $1.44B`. Where the analyst
+needs the blend — it is what every other surface returns — it is one tap away **as a matched
+pair**, with an explicit instruction against mixing bases. Exports were checked and were never
+wrong: the IC citation and `Copy for IC Memo` already quoted a consistent blend/blend pair
+(`$642M` / `$389M`), so screen and export now agree on which basis is which.
+
+## Verification
+- All-185 sweep: **0 inverted pairs remaining** (was 1); all 10 switched pairs monotonic.
+- Mobile 390×844 `hasTouch`: `scrollWidth 390 = clientWidth` on Iraq / Malaysia / Oman; new
+  control measures **24px**; tapping it opens the disclosure with no sideways scroll.
+- Exports re-read after the change: IC citation and IC memo parse, carry v871, carry assumptions.
+
+## New this cycle (found, not fixed)
+- **The page cannot be walked on `file://`.** `#loading-overlay` never clears because the data
+  fetches fail under the file protocol, leaving every control pointer-blocked. Any cycle that
+  "walked it cold" from a `file://` URL did not walk it. Serve it over HTTP.
+- **The service worker registers a hard-coded deploy path** (`/petroleum-fiscal-db/sw.js`). Served
+  from a local root this 404s and the suite reports `317 PASS / 1 WARN` — a harness artefact, not a
+  regression. Serve under the `/petroleum-fiscal-db/` prefix to get a number comparable to the
+  graded 318/0/0. This is a live trap for the version-vs-deployed check listed below.
+- **Saudi Arabia's Country Profile emits no `Fiscal character` line and no verdict box at all** —
+  it jumps straight from the country name to the take strip. Defensible for a state monopoly (the
+  strip carries `state monopoly — not a contractor regime` and the `⚠ State Monopoly` banner is
+  further down), so logged rather than treated as this cycle's fix.
+- One evidence-chain source link (`EY / IHS Markit bulk fiscal harvest (2025) ↗`) renders **17px**
+  under `pointer: coarse` on Malaysia and Oman. Pre-existing, not introduced here.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load. From 771-778.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+  From 774-778.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-778. (Note: the Country
+  Profile's own `Copy link` is correct — it serializes `#/profile/norway`. Walked this cycle.)
+- Mechanic filter is a country-level include-set, not contract-level. From 766-778.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-778.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes vs
+  173,759. **The office copy is the one that was run.** From 764-778.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-778.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-778.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+  Walked again this cycle: the Evidence Chain now flags it inline (`⚠ DCF USES 33.4%`), carries a
+  red reconciliation paragraph and a working `Show what the DCF panel used →` scroll-and-highlight.
+  The contradiction in the data is unresolved; the page's handling of it is not the weak point.
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-778.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`. From 776-778.
+- Sorting Govt Take high→low puts Saudi Arabia (`—`, no take value) at rank 1. From 778.
+- `mode-btn-screen` loses its result count when you leave Screener mode. From 778.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-778.
+
+## Resolved this cycle
+- ✅ **The verdict sentence quoted a base case and a downside computed on different contract sets**,
+  so Iraq's country profile said contractor NPV more than doubles when the oil price falls $25/bbl.
+  Open since v786 introduced the one-legged basis switch.
