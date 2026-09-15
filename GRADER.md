@@ -54426,3 +54426,16 @@ analyst guessing whether the citation was real.
 - ✅ **82 of 224 bulk citations linked to a publisher's homepage and looked healthy doing it.**
   Open since v518 identified the address as "not a citation for any particular parameter";
   v860 fixed only the 142 that were also dead.
+
+---
+## Cycle 780 Log — 2026-09-15 10:39
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 780 complete — shipped as **v872**, committed, mirrored, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (Stalest by rotation; 779 was T2, 778 T1, 777 T3, 776 T4, 775 T5.)
+
+## Friction
+Walking Nigeria's Country Profile cold, the Evidence Chain's **Special Tax** and **FTP Rate** rows cite "EY / IHS Markit bulk fiscal harvest (2025)" and rendered as perfectly healthy citations — plain `↗` arrow, tooltip "Open the cited source document", no warning c
