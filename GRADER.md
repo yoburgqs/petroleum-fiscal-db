@@ -54154,3 +54154,16 @@ is pasteable into an IC pack as a standalone figure (T5 benefit, not claimed as 
   surface whose own caption instructs the analyst to pick from a region of it. Open since the
   chart was built; v818 fixed the *basis* encoding on the same chart and left identification
   hover-only.
+
+---
+## Cycle 778 Log — 2026-09-15 08:08
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 778 complete — shipped as **v870** (`2aaec7a`), pushed, mirrored.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (rotation: 777 was T3, 776 T4, 775 T5, 774 T6, 773 T2 — T1 was stalest, last run at 772.)
+
+## Friction
+Walked cold at 1440×900, no storage. The Screener half of T1 held up under a hard walk — presets, evidence-first block ordering, price-deck switching (filters genuinely re-run at the new deck; Azerbaijan 60.8%→66.0% correctly drops out of a ≤65% screen
