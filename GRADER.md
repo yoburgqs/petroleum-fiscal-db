@@ -52521,3 +52521,146 @@ instead of appearing to be ignored.
 Walked it cold — no localStorage, no sessionStorage — by the platform's own headline route: Home → *"15 countries pass the IOC capital screen … open the screen →"* → the Screener, fifteen rows numbered **1…15**.
 
 For T1 that `#` column *is* the deliverable. Nothing on screen said what produced it. `_scSortKey` is `null` on tha
+
+---
+
+## Cycle 767 — v859 — T2
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"*
+(Rotation: 766 was T1, 765 T3, 764 T4, 763 T5, 762 T6 — T2 was stalest, last run at 761.)
+
+### Friction
+
+Walked it cold — storage cleared, reload, Home → **Country Profile** → Norway, which is what a
+first-time analyst reaches for when the question is about *one* country. The page is strong down to
+the Live DCF panel and its closing block, **"Which number goes in the IC memo?"** That block is
+where T2's second half — *"and can I defend that?"* — is actually answered: two cards side by side,
+`✔ CITE THIS NPV` carrying the stored $826M with an **Engine basis:** line, and `SCENARIO NPV —
+LABEL IT` carrying the panel's $754M with a **Panel basis:** line. The Panel basis line is the
+assumptions the tool instructs the analyst to carry when they quote the scenario figure.
+
+On a cold load of Norway, with nothing clicked, it read:
+
+```
+Panel basis: 50k bbl/d peak · 6yr plateau · $1.67B all-in capex · $22/bbl flat opex
+```
+
+The panel was running **North Sea** — 40k bbl/d, $0.6B headline capex — and its own Production
+Profile tiles said so a few hundred pixels above (`40k PEAK BBL/D · 193 TOTAL MMBBL · 6yr PLATEAU ·
+$22/bbl OPEX · $0.6B CAPEX`). Peak overstated by 25%, capex by 178%.
+
+The cause, at `index.html:48451`: `_basisDelta833()` took no argument and read
+`DCF_PROFILES.deepwater` unconditionally. The caller at `index.html:49818` then interleaved its
+output with the *selected* profile — `DCF_PROFILES.deepwater.peakBblDay` and `_bd833.jsCapexMM`
+(deepwater) next to `DCF_PROFILES[profileKey].plateauYears` and `.opexBbl` (selected). Four terms,
+two projects, and the result is a set of assumptions that describes no project that exists. It was
+correct only when `profileKey === 'deepwater'`.
+
+It is not an edge case reached by fiddling with the selector. `defaultProfile` (`index.html:49285`)
+sends **Norway and the United Kingdom to `north_sea`, and Iraq plus every TSC country to
+`onshore_me`** — so the line is wrong on the default, no-click state of those countries, and wrong
+on all five non-deepwater profiles for every other country.
+
+This is the v833/v834 defect — an artifact stating assumptions other than the ones that produced it —
+surviving inside the v833 card written to end it. v833 fixed the *stored* side of this card and left
+the *scenario* side reading off a hardcoded profile.
+
+Two further strings carried the same hardcode:
+
+- **The "Why the two differ" driver** asserted *"This panel runs its own Deepwater profile"* and
+  quoted deepwater's plateau, decline and opex regardless of selection. On Norway that names a
+  project the panel is not running, inside the explainer the analyst opens *because* the numbers
+  disagree. It then closed *"+22% more oil on a cheaper barrel, so the scenario NPV runs **high***"
+  — the wrong direction for `north_sea`, which recovers 20% **less** oil at **$22/bbl against
+  $18/bbl** and returns $754M against the stored $826M. The page explained a gap in the opposite
+  direction to the one it had just measured and printed.
+- **The material-gap NPV verdict** claimed *"the two profiles both named 'Deepwater'"* — true for 1
+  of the 6 selectable profiles.
+
+### Change
+
+1. **`_basisDelta833(profileKey)`** derives from the running profile, and does so through the same
+   `buildProductionProfile()` the DCF itself calls rather than a re-implementation of its loop, so
+   the stated basis and the computed basis cannot drift apart again. Returns `profileName` and
+   `jsProfile` alongside the volumes. Falls back to `deepwater` on an unknown key.
+2. **`Panel basis:`** now reports that profile's peak rate, plateau, **recovered MMbbl**, all-in
+   capex, opex, 25yr life and WACC — reading term for term against the `Engine basis:` line in the
+   card beside it. MMbbl is new and is the single largest driver of the NPV gap.
+3. **The reconciliation driver** names the profile actually running on both sides, and its
+   direction — *runs high* / *runs low*, *a cheaper barrel* / *a dearer barrel* — is computed from
+   the measured NPV delta and opex rather than asserted. The headline still reads "two different
+   'Deepwater' projects" when that is literally the case, and otherwise "the stored figures are not
+   on this panel's *<Profile>* project".
+4. **The material-gap verdict** names the two projects instead of claiming both are Deepwater.
+
+### Result
+
+The analyst can rebuild the scenario NPV from the assumptions printed beside it — on all six
+profiles, and on Norway, the UK and Iraq without touching the selector — and the page no longer
+contradicts its own Production Profile tiles. Where the scenario NPV sits *below* the stored one,
+the explainer now says so instead of explaining the opposite.
+
+### Verification — measured this cycle
+
+| profile (country) | tiles | `Panel basis:` |
+|---|---|---|
+| North Sea (Norway, cold default) | 40k · 193 · 6yr · $22 · $0.6B | 40k · 6yr · **193.4 MMbbl** · $0.83B all-in · $22 ✅ |
+| Onshore ME/Africa (Iraq, cold default) | 80k · 532 · 10yr · $6 · $0.3B | 80k · 10yr · **531.8** · $0.42B all-in · $6 ✅ |
+| Deepwater (Indonesia, cold default) | 50k · 294 · 8yr · $15 · $1.2B | 50k · 8yr · **294.0** · $1.67B all-in · $15 ✅ |
+| Shallow Offshore | 30k · 144 · 6yr · $12 · $0.4B | 30k · 6yr · **144.2** · $0.56B all-in · $12 ✅ |
+| Onshore US | 10k · 33 · 5yr · $15 · $0.1B | 10k · 5yr · **32.8** · $0.21B all-in · $15 ✅ |
+| LNG Project | 200k · 1504 · 12yr · $4 · $5.0B | 200k · 12yr · **1503.7** · $6.95B all-in · $4 ✅ |
+
+(The tile shows the *headline* `capexMM`; `Panel basis` says **all-in**, which adds the 2%/yr
+sustaining across years 4–25 — the same convention as `ENGINE_BASIS` $1.0B all-in. That was already
+the convention; only the profile it was read from was wrong.)
+
+- **Driver direction:** Norway `−20% … on a dearer barrel … runs **low**` against its measured
+  `NPV gap −$72M` ✅. Indonesia and Malaysia `+22% … a cheaper barrel … runs **high**` against
+  `+$1.87B` / `+$2.75B` ✅.
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs** (Country Profile loaded with Norway at each):
+  **0** horizontal-scroll failures, **0** page errors, **0** console errors (`sw.js` 404 excluded —
+  it exists only off Pages).
+- **390 × 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390; **0** controls under 24px in the
+  panel touched; the corrected line renders in full.
+- **Runtime suite RAN** against the modified local build (`~/office/tools/petroleum/tests/runtime_comprehensive.js`,
+  the authoritative copy): **317 PASS / 0 FAIL / 1 WARN** — the WARN being the `sw.js` 404.
+  317 + that WARN reconciles to the harness's 318 on Pages. **Unchanged from before the edit.**
+
+### Carried forward
+
+- **New this cycle, not fixed:** the **Cost Recovery / IRR card in the same panel** quotes
+  *"clears a 15% IOC hurdle (+$490M)"* off the scenario project, directly under a `CONTRACTOR IRR —
+  THIS SCENARIO` of 63.2%. The IRR is correctly scoped to the scenario, but the hurdle sentence has
+  no basis line of its own and sits above the reconciliation block that exists to stop exactly that
+  number travelling unlabelled. Candidate for the next T2.
+- **Mechanic filter is a country-level include-set, not a contract-level one** — ticking TSC returns
+  Mexico's whole-country blended 32.2%. Group-2 trap per `MECHANIC_COMPARABILITY.md`. Data-model
+  fix, not an `index.html` one. Carried from 766.
+- **`#screener-preset-select` resets to "Load a screen…"** after applying a preset
+  (`index.html:3441`). Deliberate, cosmetic. Carried from 766.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against the office copy — repo 303 PASS,
+  office 317, same build. `autonomous_cycle.py` copies office → repo (line 120), so running the suite
+  out of the repo silently tests 14 fewer assertions. Carried from 764, 765, 766.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`, no sort key, direction or
+  filters. `copyScreenerLink()` (v842) is the model. Carried from 763, 765, 766.
+- **Basket pill ✕ glyphs measure 44px tall but only 8px wide** under `pointer: coarse`. Carried from 765, 766.
+- **Norway's State Participation contradiction** (`0%` unsourced in the evidence chain vs `33.4%` in
+  the Live DCF panel). A data gap; not closable from `index.html`. Seen again on this walk — the page
+  flags it honestly in both places.
+- **`.reform-mechanic` / `.reform-take` have `position: relative` and no `::after`** (band 18px).
+  Not controls today.
+- **Still no process check comparing the deployed version string against the local tree** — carried
+  from 758, 761–766.
+
+---
+## Cycle 767 Log — 2026-09-14
+- Test before: 318 PASS / 0 FAIL (harness, against Pages)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (RAN this cycle, local, authoritative suite) = 318 on Pages
+- JS errors: 0
+- Summary: v859 shipped and pushed. The Live DCF's "Panel basis" line — the assumptions attached to
+  the scenario NPV an analyst is told to label and carry — was half-read off the Deepwater profile
+  regardless of which profile was running, so it was wrong on Norway's, the UK's and Iraq's cold
+  default. It now reports the running profile on all six, and the reconciliation explains the gap in
+  the direction it actually measured.
