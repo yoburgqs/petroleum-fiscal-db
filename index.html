@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v863</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v864</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v863</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v864</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v863</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v864</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3788,8 +3788,8 @@ window.copyPlatformCitation = function(btn) {
                v623 (T1): the Breakeven column this comment used to also exempt is GONE from this
                table -- see the note under it. -->
           <th class="sc-selcell" title="Tick rows to build an IC shortlist. &#x2398; Copy for IC Memo, &#8595; CSV and &#8595; Excel then carry ONLY the ticked countries &mdash; with nothing ticked they carry every row the screen returned, which on the cold view is all 185. The ticks survive re-sorting and a price-deck change; use Clear beside the buttons to drop them. This header box ticks or clears every row currently shown."><input type="checkbox" class="sc-sel-all" id="sc-sel-all" onclick="scToggleSelAll(this)" aria-label="Select or clear all Screener rows currently shown"></th><th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
-          <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
-          <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
+          <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take<span id="sc-take-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
+          <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV<span id="sc-npv-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th>
           <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
           <th class="num" data-sc-sort="prodcov" tabindex="0" role="columnheader" aria-sort="none" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" data-sc-sort="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
         </tr>
@@ -30957,7 +30957,7 @@ function _sbsObsCell(row, c) {
   var esc = String(c).replace(/"/g, '\\"');
   return document.querySelectorAll('#cmp-output [data-sbs-row="' + row + '"][data-sbs-c="' + esc + '"]');
 }
-// ── v863 (T3): this grid's spread audit skipped the cohort that could win its ranking ──
+// ── v864 (T3): this grid's spread audit skipped the cohort that could win its ranking ──
 // v719 established, on the Reform Risk card, that a MEASURED dispersion can be refuted by the
 // country's own contract table, and that it is the cohort where the consequence is worse —
 // because since v624 'measured' is the only cohort that carries a graded band and a colour at
@@ -31026,7 +31026,7 @@ function _sbsPaintObsSpread(c, d, obs, token) {
   for (var i = 0; i < spreadCells.length; i++) {
     var cell = spreadCells[i];
     if (cell.dataset.obsPainted) continue;
-    // v863: the one-term path still patches only the cell that makes the claim it refutes.
+    // v864: the one-term path still patches only the cell that makes the claim it refutes.
     // The measured path patches the cell printing the bundled band, and keeps that band on
     // screen, struck through, because it is what the score was charged on and the analyst has
     // to be able to see what was withdrawn rather than watch a number change.
@@ -31047,7 +31047,7 @@ function _sbsPaintObsSpread(c, d, obs, token) {
     var host = fpCells[k];
     if (host.dataset.obsPainted) continue;
     var chip = host.querySelector('.orca-fp-basis');
-    // v863: 'one term' on the refuted one-term path, the bundled spread ('0.4pp') on the
+    // v864: 'one term' on the refuted one-term path, the bundled spread ('0.4pp') on the
     // refuted measured path. Matching the exact string keeps this from repainting a cell that
     // some other pass has already rewritten.
     if (!chip) continue;
@@ -31352,7 +31352,7 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
   if (!out) return;
   window._sbsObsHits = window._sbsObsHits || {};
   window._sbsObsHits[c] = { obs: obs, bound: bound, bLbl: bLbl, fp: fp,
-                            mode: mode || 'single', cl: cl || null };   // v863
+                            mode: mode || 'single', cl: cl || null };   // v864
   var hits = Object.keys(window._sbsObsHits).filter(function(k) {
     return compareList.indexOf(k) !== -1;
   });
@@ -31368,7 +31368,7 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
     if (grid && grid.nextSibling) out.insertBefore(el, grid.nextSibling);
     else out.appendChild(el);
   }
-  // v863: each refuted column states the basis that was withdrawn beside what the contracts
+  // v864: each refuted column states the basis that was withdrawn beside what the contracts
   // hold, because the two cohorts are refuted for different reasons and the notice used to
   // assert the one-term reason over both.
   var parts = hits.map(function(k) {
@@ -31438,7 +31438,7 @@ function _sbsApplyObsSpread() {
   compareList.forEach(function(c) {
     var d = COUNTRY_DATA.filter(function(x) { return x.country === c; })[0];
     if (!d) return;
-    // v863 (T3): BOTH scored dispersion cohorts are checked against the contract table, the
+    // v864 (T3): BOTH scored dispersion cohorts are checked against the contract table, the
     // rule v719 already applies on the Reform Risk card. The line that used to stand here —
     // "only the one-term basis can be refuted; a measured distribution has nothing to withdraw"
     // — is wrong, and it exempted the cohort where the consequence is worse: 'measured' is the
@@ -33117,6 +33117,67 @@ function _scSyncNpvAxis() {
       _den.textContent = '% of $' + price + ' kept';
       _den.style.color = 'var(--muted)';
     }
+  }
+
+  // ── v864 (T1): the two columns the shortlist is DECIDED on now name the deck they were run at ──
+  // v651 put the price deck on this tab so an IC analyst could re-run a screen at $50 / $100 /
+  // $125, and it works — the rows genuinely change. What did not change was the two headers the
+  // analyst reads the decision off. Measured on the shipped build, IOC Capital Screen, deck
+  // switched to $125:
+  //     header "GOVT TAKE"       cell 36.3%    tooltip "Government take at $75/bbl"
+  //     header "CONTRACTOR NPV"  cell $8.44B   tooltip "Contractor NPV at $75/bbl in $M"
+  // Canada's actual $75 figures are 32.7% and $3.91B. So the table printed a $125 number under a
+  // label that told the analyst, in words, that it was a $75 number — and the tooltip is exactly
+  // where someone goes when they are about to cite a figure. The third numeric column already
+  // tracked the deck ("% of $125 kept") since v699, which is what made the other two read as
+  // authoritative rather than stale: one column was clearly deck-aware, so the rest looked fixed.
+  // The deck IS disclosed elsewhere — at the tail of the count paragraph and in every export
+  // header — but a 500-character criteria sentence is not where a number gets copied from.
+  // Nothing computed changes here: take, NPV, tier and the ordering have followed getPriceKey()
+  // since the deck shipped. This makes the two labels tell the truth the cells already told.
+  // Off-default decks are accented, because $75 is the state the analyst assumes by default and
+  // the other three are the ones that mislead.
+  var _isDefaultDeck = (price === '75');
+  var _deckTxt = '@ $' + price + '/bbl';
+  [['sc-take-deck-hdr', null], ['sc-npv-deck-hdr', null]].forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el) return;
+    el.textContent = _deckTxt;
+    el.style.color = _isDefaultDeck ? 'var(--muted)' : 'var(--accent)';
+    el.style.fontWeight = _isDefaultDeck ? '400' : '700';
+  });
+
+  // The tooltips carried the same hardcoded $75. They are rewritten against the live deck, and
+  // dataset.baseTitle is written with them — renderScreener()'s sort loop re-applies baseTitle
+  // over title on every pass, so updating title alone would survive exactly until the next render.
+  var _deckTips = {
+    take: 'Government take at $' + price + '/bbl — the ACTIVE price deck, set by the Price deck '
+        + 'buttons above this table. Share of project economics captured by the state (royalty + '
+        + 'taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. '
+        + 'Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% '
+        + '(high), red >75% (very high/NOC-dominated). Switching the deck recomputes this column, '
+        + 'the Tier beside it, and which countries pass the screen at all.',
+    npv:  'Contractor NPV at $' + price + '/bbl in $M — the ACTIVE price deck, set by the Price '
+        + 'deck buttons above this table. Net present value for an IOC-operated upstream project '
+        + 'using the standardized reference profile (see profile selector for assumptions). '
+        + 'Positive = value-creating for the contractor at $' + price + '. Negative = requires a '
+        + 'higher price or more favorable terms to be economic. Discounted at 10% nominal.',
+    tier: 'Fiscal tier: classification of fiscal regime by government take level at $' + price
+        + '/bbl — the ACTIVE price deck, not a fixed $75 bucket. IF = Investor-Friendly '
+        + '(≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = '
+        + 'NOC-dominated (>75%). A progressive regime can change tier between decks: Azerbaijan is '
+        + 'MOD at $50 and $75 and HI at $125. Used for portfolio-level screening across geographies.'
+  };
+  var _ths = document.querySelectorAll('#tbl-screener thead th[data-sc-sort]');
+  for (var _i = 0; _i < _ths.length; _i++) {
+    var _th = _ths[_i], _k = _th.getAttribute('data-sc-sort'), _t = null;
+    // Tier and Govt Take share data-sc-sort="take"; they are told apart by the sub-line element
+    // the take header carries, so the tier column keeps its own bucket wording.
+    if (_k === 'take') _t = _th.querySelector('#sc-take-deck-hdr') ? _deckTips.take : _deckTips.tier;
+    else if (_k === 'npv') _t = _deckTips.npv;
+    if (!_t) continue;
+    _th.dataset.baseTitle = _t;
+    _th.setAttribute('title', _t);
   }
 
   if (sl) {
