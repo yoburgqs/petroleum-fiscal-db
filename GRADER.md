@@ -53056,3 +53056,130 @@ rows in the card stopped reading as evidence of stability.
 
 ## Friction
 On the Reform Risk tab, the **QUIET SINCE 2010** card is filtered on `since2010 <= 1` — so a country with *one* in-window fiscal law change belongs in it. But every row string in `_quietRow()` was written as though the count were always zero. One branch asserted, in bold orange, *"no fiscal law change since 201
+
+---
+## Cycle 771 Log — 2026-09-15
+- Test before: 318 PASS / 0 FAIL (deployed) · 317 PASS / 0 FAIL / 1 WARN (local baseline)
+- Test after: 317 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the modified local build
+- JS errors: 0
+- Summary: **v863 shipped and pushed.**
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (770 was T4, 769 T5, 768 T6,
+767 T2, 766 T1 — T3 was stalest, last run at 765.)
+
+## Friction
+Walked cold at 1440 with no sessionStorage or localStorage: Home → Side-by-Side → Clear the
+seeded North Sea example → typed **Norway, Angola, Nigeria**, an ordinary IOC screening trio.
+The predictability strip above the grid (`#cmp-verdict-fp`, painted by `_sbsPaintVerdictFp()`)
+read:
+
+> PREDICTABILITY, MOST STABLE FIRST: **Nigeria 73** › Norway ≤52 and Angola ≤26
+
+Nigeria first, and the only graded band on the row — which, per this platform's own v624 rule,
+outranks any UNGRADED score however high.
+
+`_sbsApplyObsSpread()` gated on `_fpDispersion(d).state !== 'single'`, under the comment *"Only
+the one-term basis can be refuted — a measured or absent distribution has nothing to withdraw."*
+So the **'measured' cohort was never checked against its own contract table** — the one cohort
+that still carries a graded band, and therefore the only one that can win this grid's
+predictability order outright.
+
+Nigeria's bundled `p25_take`/`p75_take` are **83.1–83.5% (0.4pp)**, so the IQR term — the score's
+largest, worth up to −40 — was charged **0.3** points. `api/v1/country/nigeria.json` lists its 50
+largest producing contracts running **57.5–91.4%** take at $75/bbl: **33.9pp**, 84× the bundled
+figure, and the second-widest observed dispersion in that very set (Angola 45.2pp, Norway 29.6pp).
+The set notice underneath then named Nigeria as *"the column in this set ORCA does hold a measured
+spread for"* — the sentence written to protect the analyst aimed them at the worst column.
+
+**Reform Risk, for the same country, already printed `≤46 LOW ceiling`** (v719). Two tabs of the
+same tool, opposite stability verdicts, same country.
+
+## Change
+The Side-by-Side spread audit now covers **both scored cohorts**, the rule v719 already applies on
+the Reform Risk card. `_sbsApplyObsSpread()` accepts `'single'` and `'measured'`; `'none'` and
+`'monopoly'` still hold no distribution and still have nothing to withdraw.
+
+Nothing new is computed. The refutation test is `_rrIqrUnderstated()` (v719) and the ceiling is
+`_fpObsCeilingFrom()` (v720) — both already read by Country Profile's Copy for IC Memo and the
+XLSX. The one-term arithmetic is unchanged: `_fpObsCeilingFrom()` with a zero bundled IQR is the
+same expression `_sbsPaintObsSpread()` computed inline (charged 0, cost `min(40, spread × 0.8)`).
+The measured path keeps v719's materiality bar — band moves, or ≥5 points — so a 1-point
+correction is not painted like Nigeria's 27-point one. The one-term path still withdraws on a
+single counterexample, because there it is the *claim* that is refuted, not the size of the score.
+
+On screen, for Nigeria:
+
+| row | before | after |
+|---|---|---|
+| Predictability Score | `73 · MODERATE` `0.4pp` | `73 · MODERATE` `≥33.9pp obs` `▲ best case` `→ carry ≤46 · LOW` |
+| Take spread across contracts | `83.1–83.5% (0.4pp)` | `≥33.9pp observed` / `57.5–91.4% across top 50` / `bundled ~~83.1–83.5% (0.4pp)~~` |
+| strip | `Nigeria 73 › Norway ≤52 and Angola ≤26` | `no order established — Norway ≤52, Nigeria ≤46, Angola ≤26 cannot be placed against each other` |
+
+The withdrawn bundled band stays on screen struck through rather than being silently replaced —
+the analyst has to be able to see *what* was withdrawn, not watch a number change.
+
+The set notice headline no longer asserts the one-term reason over a measured column. It now
+counts the two cohorts separately and each refuted column states the basis that was withdrawn
+beside what the contracts hold: *"Nigeria bundled 0.4pp → its contracts run 57.5–91.4% (33.9pp
+across its top 50)"*.
+
+## Result
+The analyst can no longer carry **"Nigeria is the most fiscally predictable of Norway, Angola and
+Nigeria"** out of this tab — a claim that would not survive an investment committee — and
+Side-by-Side now agrees with Reform Risk on the same country.
+
+Swept all 28 measured-cohort countries against their own `api/v1/country/*.json`: **9 withdraw
+materially** — Nigeria 73→46 LOW, Kazakhstan 73→53 LOW, Mexico 51→27 VERY LOW, Republic of the
+Congo 62→47 LOW, Sao Tome and Principe 70→65 MODERATE, Qatar 67→60 MODERATE, Morocco 45→39 VERY
+LOW, Brazil 61→59 LOW, Mauritania 60→58 LOW. India is immaterial (13.3 vs 15.0pp). The other 18
+hold — **including the United Kingdom**, so the seeded North Sea Trio example is unchanged, and
+the analyst who never touches the search box sees exactly what they saw before.
+
+Because `_fpObsCeiling()` resolves from the `cpObsSpread` cache this tab now populates, the
+ceiling also reaches Side-by-Side's Copy for IC Memo and XLSX for these columns without further
+change.
+
+## Verification
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN** this cycle against the modified local build: **317 PASS / 0 FAIL / 1 WARN**.
+  The WARN is the local `sw.js` 404, and the figure equals the pre-change local baseline recorded
+  in cycle 770. Not assumed — the suite executed and wrote `/tmp/runtime_test_report.txt`.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs:** 0 horizontal-scroll failures, 0 page errors,
+  0 console errors.
+- **390 × 844 `hasTouch`:** Side-by-Side `scrollWidth` 390 = `clientWidth` 390; **0** controls
+  under 24px in `#t2`.
+- **6 comparison sets re-walked** after the change (North Sea Trio, West Africa Trio, Atlantic
+  Frontier Quartet, Mexico/Colombia/Argentina, USA vs Iraq, Kazakhstan/Norway/Guyana): every strip
+  accounts for every column, no set lost a column from the order, 0 errors.
+
+## Also observed on this walk, not fixed
+- **Nigeria's headline take sits outside its own printed quartile band** (81.1% against
+  83.1–83.5%). 3 of 185 countries do this — Nigeria, Republic of the Congo, Sao Tome — and the
+  Take-spread tooltip already names Nigeria and the production-weighting reason. Left alone.
+- **The Contractor NPV rows carry no highest/lowest markers**, unlike all four Govt Take rows, and
+  mix `$826M` against `$1.14B` in one row. The $75 ordering is on the strip; the other three price
+  points are not. Candidate for the next T5 or T3.
+- **The Side-by-Side quickstart presets are unreachable without clicking Clear**, because the
+  seeded example paints over `#cmp-output`'s empty state on every cold load.
+
+## Carried forward
+- `copyExplorerLink()` still serializes a bare `#/explorer`. Carried from 763, 765-770.
+- The Cost Recovery / IRR card's *"clears a 15% IOC hurdle (+$490M)"* still has no basis line.
+  Carried from 767-770.
+- Mechanic filter is a country-level include-set, not a contract-level one — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. Carried from 766-770.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. Carried from 766-770.
+- The repo's `tests/runtime_comprehensive.js` is stale against the office copy. Carried from 764-770.
+- Basket pill ✕ glyphs measure 44px tall but 8px wide under `pointer: coarse`. Carried from 765-770.
+- The evidence grade ignores the D (default-estimate) share entirely. Carried from 768-770.
+- Norway's State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+  Carried.
+- The Scenario Builder modal over-promises production-parameter inputs that do not exist. Carried
+  from 769, 770.
+- The intro strip's IC rule names a `5–8pp` WACC band at "Score ≤ 20", which needs 6+ in-window
+  changes; the maximum on file is the UK at 5. Carried from 770.
+- 4 of the 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi. Carried.
+- Still no process check comparing the deployed version string against the local tree. Carried
+  from 758, 761-770.
