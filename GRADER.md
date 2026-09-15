@@ -54025,3 +54025,16 @@ of only in a strip 700px above it.
   same row depending on what else is in the set. **Verified pre-existing** — reproduced
   identically on the HEAD build served alongside, so it is not a v869 regression. Text-only, so
   not a cycle's fix on its own, but it is a real inconsistency in the gate wording.
+
+---
+## Cycle 777 Log — 2026-09-15 07:07
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 777 shipped as **v869**, pushed to `main` (`360573a` + `81f24dd`). Mirror copied.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (T3 was stalest; last run at cycle 771.)
+
+## Friction
+Walked Side-by-Side cold at 1440×900, no sessionStorage/localStorage. The four **Govt Take** rows have carried red/green "highest of N" / "lowest of N" markers on every rankable column since v593, backed by a whole apparatus. The four **Contractor NPV** rows directly beneath them carrie
