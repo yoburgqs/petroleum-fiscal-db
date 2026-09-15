@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v866</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v867</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v866</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v867</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v866</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v867</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49381,6 +49381,135 @@ function _sbICDeckClause() {
   return out;
 }
 
+// ── v867 (T5) — the Scenario Builder's IC artifact is now a TABLE, not one run-on line ──
+//
+// Walked T5 cold. Every other paste artifact on this platform routes the analyst HERE for the
+// one number a memo needs and the database cannot supply: a project return on the analyst's own
+// capex and opex. The Country Profile IC paste, the Fiscal Compare paste, the Screener CSV, the
+// Side-by-Side paste and the Breakeven CSV all end with the same sentence — "Use Scenario
+// Builder with project capex/opex for a project IRR."
+//
+// The control at the end of that route wrote text/plain ONLY, via writeText(). Measured on the
+// live build, Indonesia PSC / Deepwater / $75: clipboard flavours ["text/plain"], 868 characters,
+// ONE sentence, with twenty-five figures buried inside it behind semicolons —
+//
+//   "PSC, Deepwater profile, $75/bbl — govt take 66.2%, contractor NPV +$2.3B @10% WACC and
+//    +$1.6B @15% IOC hurdle (clears), capital at risk $190M, payback year 3; IRR not quoted —
+//    ...; terms as run — cost recovery cap 71%, FTP 20%, govt profit oil 71%, CIT 25%, royalty
+//    0%; project as run — Deepwater: $1.2B capex, ...; price deck on the same terms — $50 58.3%
+//    / $1.71B, $75 66.2% / $2.35B, $100 70.3% / $2.94B, $125 72.7% / $3.52B; ..."
+//
+// Every sibling control was fixed for exactly this: Side-by-Side (v503), Fiscal Compare (v676),
+// Country Profile summary (v690), Country Profile sensitivity table (v739), Screener (v728) and
+// IOC Portfolio all emit text/html so Word, Google Docs, Outlook and PowerPoint render a real
+// table, plus TSV so Excel splits into columns. This one — the last of the seven, and the only
+// artifact on the platform carrying terms the analyst chose that exist NOWHERE else in ORCA —
+// was still the flat string. To build the memo exhibit the analyst had to re-key a four-price
+// deck and eleven scalars out of a sentence.
+//
+// Nothing is dropped. The four price-deck points become four rows, the scalars become rows, and
+// every qualifying clause — the hypothetical-regime warning, the withheld-IRR reasoning, the
+// flat-NPV comparability rule — becomes a numbered note keyed to the row it qualifies, so a
+// figure and its caveat stay attached however the memo is later cut down.
+function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
+  var rows = [], notes = [];
+  var riskStr = R.atRisk >= 1000 ? '$' + (R.atRisk / 1000).toFixed(1) + 'B' : '$' + Math.round(R.atRisk) + 'M';
+  var noCap   = (R.state === 'no-capital-at-risk');
+
+  rows.push(['Government take @ $' + price + '/bbl', res.take != null ? res.take.toFixed(1) + '%' : '—']);
+  rows.push(['Contractor NPV @ 10% WACC', fmtSigned(res.npv)]);
+  rows.push(['Contractor NPV @ 15% IOC hurdle',
+             fmtSigned(R.npv15) + ' — ' + (clears ? 'CLEARS' : 'FAILS')]);
+  rows.push(['Contractor capital at risk', noCap ? 'none on this profile' : riskStr]);
+  rows.push(['Payback', noCap ? 'n/a — no capital exposed'
+                              : (R.payback ? 'year ' + R.payback : 'never repaid')]);
+
+  // IRR: the head goes in the cell, the reasoning goes in a note — same head/tail split the
+  // Country Profile paste uses, so a row never carries a verdict without its qualification.
+  var irrCell;
+  if (noCap) {
+    irrCell = 'not applicable — no capital at risk';
+    notes.push('IRR, not applicable — the contractor funds no negative year on this profile: '
+      + 'cost recovery reimburses capex in the year it is spent, so there is no capital base for '
+      + 'a rate of return. Read the 15% hurdle row, not a rate.');
+  } else if (R.state === 'inflated' || R.state === 'unbounded') {
+    irrCell = 'withheld — not a project return';
+    notes.push('IRR, withheld — first oil lands in the same year as first capex on this profile, '
+      + 'so the contractor exposure is small and brief and the resulting rate'
+      + (R.irr != null ? ' (' + R.irr.toFixed(1) + '%)' : ' (above 500%)')
+      + ' is not a project return. Quote the 15% hurdle test instead.');
+  } else if (R.state === 'uneconomic') {
+    irrCell = 'none — never repaid';
+    notes.push('IRR, none — the undiscounted contractor cash flow never turns positive on these '
+      + 'terms, so no rate of return exists. ' + riskStr + ' of capital is exposed and not repaid.');
+  } else {
+    irrCell = (R.irr != null) ? R.irr.toFixed(1) + '%' : '—';
+  }
+  rows.push(['IRR', irrCell]);
+
+  // Price deck — four rows, one per price point, instead of a comma list inside a sentence.
+  var deck = window._sbPriceDeck, flat = false;
+  if (deck && deck.length) {
+    var fd = function(v) { return v == null ? '—' : fmtNpvShared(v); };
+    for (var i = 0; i < deck.length; i++) {
+      var d = deck[i];
+      if (d.take == null && d.npv == null) continue;
+      rows.push(['Govt take · contractor NPV @ $' + d.price + '/bbl',
+                 (d.take == null ? '—' : d.take.toFixed(1) + '%') + ' · ' + fd(d.npv)]);
+    }
+    var swing = _sbDeckSwing(deck), kept = _sbDeckKept(deck), lo = _sbDeckAt(deck, 50);
+    flat = _sbDeckFlatNpv(deck);
+    if (swing != null) {
+      rows.push(['Price swing ($50 → $125)', (swing >= 0 ? '+' : '') + swing.toFixed(1) + 'pp']);
+    }
+    if (lo && lo.npv != null) {
+      rows.push(['$50/bbl downside', fd(lo.npv)
+        + ((kept != null && !flat) ? ' — ' + kept + '% of the $75 NPV' : '')
+        + (lo.npv < 0 ? ' — FAILS the downside test' : '')]);
+    }
+    if (flat) {
+      notes.push('Price deck — contractor NPV is flat across the deck: fixed per-barrel '
+        + 'remuneration, no price upside or downside, so government take absorbs the whole swing. '
+        + 'Under the platform comparability rules this take% is NOT rankable against a PSC or '
+        + 'Concession.');
+    }
+  }
+
+  rows.push(['Fiscal mechanic', mech]);
+  if (profile && profile.name) rows.push(['Project profile', profile.name]);
+
+  // Both clauses are reused verbatim from the helpers the one-line artifact used, with their
+  // leading connector stripped — same objects the DCF was run on, so screen and clipboard
+  // cannot drift, and no wording is re-derived here.
+  var tc = _sbICTermsClause(mech, window._sbRunParams).replace(/^;\s*terms as run — /, '');
+  if (tc) rows.push(['Terms as run', tc]);
+  var pc = _sbICProjectClause(profile).replace(/^;\s*project as run — /, '');
+  if (pc) rows.push(['Project as run', pc]);
+
+  // The basis caveat leads the notes: it is the one that can make every figure above the wrong
+  // country's. _sbICBasisClause() emits '; <clause>' or ''.
+  var basis = _sbICBasisClause().replace(/^;\s*/, '');
+  if (basis) notes.unshift(basis.charAt(0).toUpperCase() + basis.slice(1) + '.');
+
+  notes.push('These fiscal terms and this production profile were set in the Scenario Builder. '
+    + 'They are not held in the ORCA database and are recorded in no other export — they travel '
+    + 'with this table, or the numbers above cannot be reproduced.');
+
+  var o = window._sbOrigin;
+  var caption = (o && o.country ? o.country + ' — ' : '')
+    + 'ORCA Scenario Builder — ' + mech + ', ' + ((profile && profile.name) || '') + ' profile, $'
+    + price + '/bbl';
+  var assump = 'Custom scenario: analyst-set fiscal terms run on one synthetic project'
+    + (o && o.country ? ', not ' + o.country + '’s published country average' : '')
+    + '. NPV is at 100% working interest — scale by your WI. The ' + notes.length + ' note'
+    + (notes.length === 1 ? ' below this table qualifies the row it names and travels with it.'
+                          : 's below this table qualify the rows they name and travel with it.');
+  var src = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
+    + ' — yoburgqs.github.io/petroleum-fiscal-db/';
+
+  return { caption: caption, assump: assump, rows: rows, notes: notes, src: src };
+}
+
 function _sbHurdleLine(res, profile, price, mech) {
   var R = _sbReturnReading(res);
   if (R.npv15 === null) return '';
@@ -49407,6 +49536,8 @@ function _sbHurdleLine(res, profile, price, mech) {
     + _sbICDeckClause()
     + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
     + ' — yoburgqs.github.io/petroleum-fiscal-db/';
+  // v867 (T5): the same run, decomposed into the memo table the clipboard now writes.
+  window._sbICTbl = _sbBuildICTable(res, R, profile, price, mech, clears, f);
   var riskTxt;
   if (R.state === 'no-capital-at-risk') {
     riskTxt = 'The contractor funds <strong>no negative year</strong> on this profile'
@@ -49427,10 +49558,13 @@ function _sbHurdleLine(res, profile, price, mech) {
     + '— contractor NPV <strong style="color:var(--text);">' + f(R.npv15) + ' at 15%</strong>'
     + (res.npv != null ? ' (' + f(res.npv) + ' at the 10% WACC above)' : '') + '. '
     + riskTxt
-    + '<div style="margin-top:6px;display:flex;align-items:flex-start;gap:10px;">'
-    + '<div style="font-size:11px;opacity:.85;flex:1;">IC line: <em>' + _esc594(window._sbICLine) + '</em></div>'
-    + '<button onclick="_sbCopyICLine(this)" title="Copy this line as plain text" '
-    + 'style="flex:none;background:var(--accent);border:none;border-radius:4px;color:#fff;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;white-space:nowrap;">&#x2398; Copy IC line</button>'
+    + '<div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+    + '<div style="font-size:11px;opacity:.85;flex:1 1 220px;min-width:0;">Copies as a table — '
+    + window._sbICTbl.rows.length + ' metrics and ' + window._sbICTbl.notes.length + ' note'
+    + (window._sbICTbl.notes.length === 1 ? '' : 's') + ': take, NPV at 10% and 15%, capital at '
+    + 'risk, payback, the $50\u2013$125 price deck, and the terms and project this run was made on.</div>'
+    + '<button onclick="_sbCopyICLine(this)" title="Copy this scenario to the clipboard as a real table — pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as two columns. Carries the terms and the production profile the run was made on, and the notes that qualify each row." '
+    + 'style="flex:none;background:var(--accent);border:none;border-radius:4px;color:#fff;font-size:11px;font-weight:700;padding:7px 12px;min-height:24px;cursor:pointer;white-space:nowrap;">&#x2398; Copy for IC Memo</button>'
     + '</div></div>';
 }
 
@@ -49439,13 +49573,66 @@ function _esc594(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').rep
 // v594 (T5): the Scenario Builder had no clipboard control of any kind. The tab the whole
 // product routes to for a project-specific number produced one that could only be read on
 // screen or re-keyed by hand.
+// v867 (T5): writes BOTH flavours, like every other Copy for IC Memo control on the platform —
+// text/html so Word / Google Docs / Outlook / PowerPoint render a real table, and TSV so Excel
+// splits Metric / Value into two columns. Falls back to the TSV alone where ClipboardItem is
+// unavailable, so no browser loses the artifact.
 function _sbCopyICLine(btn) {
-  var t = window._sbICLine;
-  if (!t) { _icRefuse('Run a DCF first.'); return; }
-  navigator.clipboard.writeText(t).then(function(){
+  var T = window._sbICTbl;
+  if (!T || !T.rows || !T.rows.length) { _icRefuse('Run a DCF first.'); return; }
+
+  var _tsv = T.caption + '\n' + T.assump + '\n\n'
+    + 'Metric\tValue\n'
+    + T.rows.map(function(r){ return r[0] + '\t' + r[1]; }).join('\n')
+    + (T.notes.length
+        ? '\n\nNotes — carried from the ORCA Scenario Builder run above:\n'
+          + T.notes.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n')
+        : '')
+    + '\n\n' + T.src;
+
+  function _e(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var _th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
+  var _td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var _html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + _e(T.caption) + '</p>'
+    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;">' + _e(T.assump) + '</p>'
+    + '<table style="border-collapse:collapse;">'
+    + '<thead><tr><th style="' + _th + '">Metric</th><th style="' + _th + '">Value</th></tr></thead>'
+    + '<tbody>' + T.rows.map(function(r){
+        return '<tr><td style="' + _td + 'font-weight:bold;">' + _e(r[0]) + '</td>'
+             + '<td style="' + _td + '">' + _e(r[1]) + '</td></tr>';
+      }).join('') + '</tbody></table>'
+    + (T.notes.length
+        ? '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">'
+          + _e('Notes — carried from the ORCA Scenario Builder run above:') + '</p>'
+          + '<ol style="font-size:9pt;color:#333;margin:0 0 4px;padding-left:18px;">'
+          + T.notes.map(function(t){ return '<li style="margin-bottom:3px;">' + _e(t) + '</li>'; }).join('')
+          + '</ol>'
+        : '')
+    + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + _e(T.src) + '</p>'
+    + '</div>';
+
+  function _ok() {
     if (btn) { var o = btn.innerHTML; btn.innerHTML = '\u2713 Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
-    showCopyToast('IC line copied — paste into your IC memo.');
-  }).catch(function(){ _icRefuse('Clipboard unavailable — select the line and copy manually.'); });
+    showCopyToast('Copied as a table — ' + T.rows.length + ' metrics + ' + T.notes.length
+      + ' note' + (T.notes.length === 1 ? '' : 's') + '. Pastes as a formatted table into '
+      + 'Word/Docs, as two columns into Excel.');
+  }
+
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([_html], {type:'text/html'}),
+      'text/plain': new Blob([_tsv],  {type:'text/plain'})
+    })]).then(_ok).catch(function(){
+      navigator.clipboard.writeText(_tsv).then(_ok)
+        .catch(function(){ _icRefuse('Clipboard unavailable — select the table and copy manually.'); });
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(_tsv).then(_ok)
+      .catch(function(){ _icRefuse('Clipboard unavailable — select the table and copy manually.'); });
+  } else {
+    _icRefuse('Clipboard unavailable — select the table and copy manually.');
+  }
 }
 
 
