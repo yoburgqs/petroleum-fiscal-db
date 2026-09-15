@@ -53313,3 +53313,18 @@ $125 figure into an IC memo under a header that says $75.
   Somalia, UAE — Abu Dhabi. Carried.
 - Still no process check comparing the deployed version string against the local tree.
   Carried from 758, 761–771.
+
+---
+## Cycle 772 Log — 2026-09-15 01:23
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 772 complete — **v864 shipped and pushed** (`c954803`, log `cdf011a`).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (771 was T3, 770 T4, 769 T5, 768 T6, 767 T2 — T1 was stalest.)
+
+## Friction
+Walked cold at 1440 with storage cleared: Screener → loaded **IOC Capital Screen** (15 countries) → clicked the **$125** price deck. That's the obvious second move for an IC screen, and the whole reason the deck was put on this tab.
+
+The deck works — the rows genuinely re-r
