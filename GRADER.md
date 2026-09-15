@@ -52677,3 +52677,112 @@ the convention; only the profile it was read from was wrong.)
 
 ## Friction
 Walked it cold: storage cleared, reload, Country Profile → Norway. The page holds up all the way down to the Live DCF panel's closing block, **"Which number goes in the IC memo?"** — which is where the *"can I defend that?"* half of T2 is actually answered. Two card
+
+---
+## Cycle 768 Log — 2026-09-14
+- Test before: 318 PASS / 0 FAIL (harness, against Pages)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (**RAN this cycle**, local build, authoritative suite at
+  `~/office/tools/petroleum/tests/runtime_comprehensive.js`) = 318 on Pages. The WARN is the
+  `sw.js` 404, which exists only off Pages. Unchanged from before the edit.
+- JS errors: 0
+- Shipped: **v860**, pushed.
+
+### Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+Rotation: 767 was T2, 766 T1, 765 T3, 764 T4, 763 T5 — T6 was stalest, last run at 762.
+
+### Friction
+Walked cold — `sessionStorage`/`localStorage` cleared, reload — from Home's Sourcing line through
+Fiscal Compare's Quality column and row drilldown into Country Profile's Evidence Quality panel and
+per-parameter Evidence Chain, on Norway, Somalia, Iraq, China, Russia and Côte d'Ivoire.
+
+The evidence layer is in good shape: the grade is limiter-keyed and consistent across five surfaces,
+the chain names unsourced rows, engine overrides and below-divider parameters in full sentences, and
+`_fcOpenTermChain()` routes correctly from the drilldown. The failure is at the **last** step — the
+click that would let the analyst actually read the document.
+
+`buildEvidencePanel()`'s Key sources list (`index.html:24636`) is the platform's most direct offer to
+prove a number. **v850 fixed a dead citation opening a 404 — but only for non-bulk rows**
+(`isDead && !isBulk`). Its stated reason was sound: "EY / KPMG corporate income tax guides (2025)" is
+ORCA's label for its own country-level harvest, not an instrument in a catalogue, so offering to
+"find document" would chase something that does not exist. What it left is the worse half — the bulk
+row kept `href = s.url`, so the row rendered **LINK DEAD and a working arrow side by side**, and the
+click opened the 404.
+
+Measured against the shipped `country_data.json`: **142 of the 185 country profiles** show that row,
+**65,490 facts** behind them. The address is identical on every one —
+`https://taxsummaries.pwc.com/allcountries` — which v518 already identified as an index rather than a
+citation, and v641 measured dead on 4 Sep 2026.
+
+The same defect sat in the per-parameter Evidence Chain (`index.html:37591`), and there it was worse:
+both branches shared `_dTip`, which states *"Clicking this row no longer opens that dead address — it
+searches for the instrument by title"*. On a bulk row that sentence described the other branch.
+Russia's two chain rows were the live case.
+
+### Change
+Re-measured today from this host — full GET, browser UA, one retry on any connection error, all 185
+countries in the shipped bundle and every plausible slug for each:
+
+| | |
+|---|---|
+| `taxsummaries.pwc.com/allcountries` | **404** — confirms v641 independently, today |
+| `taxsummaries.pwc.com/` | 200 |
+| own country page | **127 of 185 return 200**; 58 return 404 (PwC publishes no summary) |
+
+`_PWC_COUNTRY` records the 127 verified slugs the way `_CITE_DEAD` records its measurement.
+`_pwcHref()` **never falls back to the index** — the index is the address that was measured dead.
+
+Of the 142 affected profiles:
+- **108** now link to that country's own PwC page, with an on-screen `⌕ <Country> page ↗` chip.
+- **34** — Somalia, Russia, Timor-Leste, Eritrea, Western Sahara among them — are **no longer links
+  at all**, and carry a muted, non-clickable `no page for <Country>` chip (`.ec-nopage-chip`).
+
+Both tooltips are now written per branch and say which case it is. The `LINK DEAD` chip on a bulk row
+carries the bulk-aware tip instead of "locate the instrument by name", which was the wrong
+instruction for a harvest that has no instrument. No value, tier letter, percentage or grade moves.
+
+### Result
+The analyst's terminal verification step stops opening a 404. On 108 profiles the click now opens the
+secondary guide those facts were actually harvested from for *that country*. On the other 34 the page
+says outright that the document cannot be reached from here — which is the one thing that lets them
+stop looking and go to the statute instead of hunting an index that no longer exists.
+
+### Verification
+- **JS syntax gate:** 11 blocks, **0 failures**.
+- **Runtime suite RAN** against the modified local build: **317 PASS / 0 FAIL / 1 WARN**. Unchanged.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 × 9 tabs:** **0** horizontal-scroll failures, **0** page
+  errors, **0** console errors (`sw.js` 404 excluded — off-Pages only).
+- **390 × 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on Norway, Somalia and Russia;
+  **0** of the chips touched render under 24px (all 24–24.5px).
+- **No new dead link:** every one of the **107 distinct URLs** the page can now emit was re-fetched —
+  **107 / 107 = 200**.
+- Behaviour spot-checked on screen: Norway → `/norway`; Côte d'Ivoire → `/ivory-coast` (the escaped
+  apostrophe key resolves); China → `/peoples-republic-of-china`; Somalia and Russia → `SPAN`, no
+  `href`, both in the panel and in Russia's two chain rows.
+
+### Carried forward
+- **The `isDead` arm of `linkTitle` (`index.html:24627`) is now unreachable** — every dead branch
+  builds its own tip. Harmless, pre-existing shape, not worth a cycle on its own.
+- **58 of 185 countries have no PwC page at all**, and for 34 of them that harvest is a top-3 source.
+  This is now stated on screen but it is a sourcing gap, not an `index.html` one.
+- The **Cost Recovery / IRR card**'s *"clears a 15% IOC hurdle (+$490M)"* still has no basis line of
+  its own. Carried from 767. Candidate for the next T2.
+- **Mechanic filter is a country-level include-set, not a contract-level one** — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. Data-model fix. Carried from 766, 767.
+- **`#screener-preset-select` resets to "Load a screen…"** after applying a preset. Cosmetic.
+  Carried from 766, 767.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against the office copy — repo 303 PASS,
+  office 317, same build. Carried from 764–767.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`. `copyScreenerLink()` (v842)
+  is the model. Carried from 763, 765, 766, 767.
+- **Basket pill ✕ glyphs measure 44px tall but only 8px wide** under `pointer: coarse`. Carried from
+  765, 766, 767.
+- **Norway's State Participation contradiction** (`0%` unsourced vs `33.4%` in the Live DCF panel).
+  Data gap; the page flags it honestly in both places. Carried.
+- **The evidence grade ignores the D (default-estimate) share entirely.** Measured this cycle:
+  14 countries carry any D at all, 5 of them graded A or B with D ≥ 10% — Norway (grade A, 17.0% D),
+  Portugal (B, 39.1%), Malaysia, Timor-Leste, Indonesia. Disclosed in the expanded mix bar and in
+  `_evidenceGradeWhy()`'s "…or defaults", but there is no chip for it the way there is for bulk and
+  multi-jurisdiction. Narrow (5 countries) so it lost to the 142-profile defect this cycle.
+- **Still no process check comparing the deployed version string against the local tree** — carried
+  from 758, 761–767.
