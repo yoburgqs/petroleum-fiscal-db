@@ -53715,3 +53715,16 @@ into it.
 - The Fiscal Compare bulk-copy header reads **"1 countries"** when a filter narrows the table
   to a single row (seen at `#fc-filter-be` + `#fc-filter-reform` + `#fc-filter-prod` on, which
   leaves Australia alone). Text-only, so not a cycle's fix on its own.
+
+---
+## Cycle 775 Log — 2026-09-15 04:53
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 775 shipped as **v867**, pushed to `main`.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (774 was T6, 773 T2, 772 T1, 771 T3, 770 T4 — T5 was stalest.)
+
+## Friction
+I walked every paste and export surface cold: 5 "Copy for IC Memo" buttons, 8 file exports, the print path. The mature surfaces held up under measurement — all 7 workbooks/CSVs open, parse and carry a Basis sheet; Fiscal Compare and the Screener guard a bulk copy with arm-and-confirm; row ticks sur
