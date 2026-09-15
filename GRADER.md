@@ -53728,3 +53728,142 @@ into it.
 
 ## Friction
 I walked every paste and export surface cold: 5 "Copy for IC Memo" buttons, 8 file exports, the print path. The mature surfaces held up under measurement — all 7 workbooks/CSVs open, parse and carry a Basis sheet; Fiscal Compare and the Screener guard a bulk copy with arm-and-confirm; row ticks sur
+
+---
+## Cycle 776 Log — 2026-09-15 05:46
+- Test before: 318 PASS / 0 FAIL (deployed) · 317/0/1 local baseline
+- Test after: 317 PASS / 0 FAIL / 1 WARN — suite **RAN** this cycle against the modified local build
+- JS errors: 0 page errors
+- Summary: Cycle 776 shipped as **v868**, pushed to `main` (`fc8159d`).
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (775 was T5, 774 T6, 773 T2,
+772 T1, 771 T3 — T4 was stalest, last run at 770.)
+
+## Friction
+I walked T4 cold from a fresh context: Home → Reform Risk, the country lookup for 5
+jurisdictions across all branches, the deep-link routes `#/reform/<country>`, the Country
+Profile stability line, the Screener reform filter, and the Fiscal Compare Reform verdict
+column. The mature surfaces held up under measurement — the lookup card, the statute block
+for the 164 uncovered, the `_rrTilt()` four-state direction, the `_fcReformRank()` sort and
+legend all render `_rrClassify()` and agree with each other. Deep links resolved correctly on
+a cold load at 5s.
+
+The break was one layer down, in the drawer the analyst opens **by clicking a row**.
+
+`openFCDrilldown()`'s reform chip — the v466 block, written before the reform vocabulary
+existed — read `_latest.direction` and `_latest.description`. **Neither field has ever been
+present on a single one of the 83 events in `reform_history.json`.** The event schema is
+`year / event / mechanic_to / take_change / notes / fiscal_change / context_kind`. So `_dir`
+was always `''`, `_isHostile` and `_isFriendly` were always false, and the ternary always fell
+to its third arm.
+
+Measured on the live build, opening the drilldown for every covered jurisdiction:
+**21 of 21 printed `Reform — Neutral (YYYY)` in muted grey**, and 21 of 21 tooltips ended
+*"— unknown direction"*. Against the row the analyst had just clicked:
+
+| | FC row cell | drawer said | sourced truth |
+|---|---|---|---|
+| United Kingdom | `WACC +3–5pp` | — Neutral | 2024 EPL raised to 38% **+3pp** |
+| Russia | `TAKE +15pp` | — Neutral | 2022 windfall tax **+15pp** |
+| Norway | `TAKE NET 0pp` | — Neutral | 2022 relief expiry **+12pp** |
+| Ecuador | `TAKE +5pp` | — Neutral | 2010 PSC→RSC **+5pp** |
+| Indonesia | `TAKE NET +6pp` | — Neutral | 2020 **−3pp** |
+
+8 of the 21 carry a take RISE on their newest event and 3 a take CUT; the other 10 are
+`unmeasured` or `context`. **Not one is neutral** — v585 removed that bucket from the platform
+precisely because it merged "no fiscal direction" with "direction not measured", which mean
+opposite things. The worst instance is the United Kingdom: the *only* jurisdiction on the
+platform whose verdict is `WACC +3–5pp`, the only verdict class ORCA says changes a model
+input, and its drawer called it grey and neutral. The other 164 rendered no reform statement
+at all, and silence reads as no exposure.
+
+This is the v460 class — a control that had been silently failing, resolving always to the
+most reassuring of its three outputs.
+
+## Change
+- The chip renders **`_rrClassify()`'s own `icToken` through `_rrTokenTier()`** — the same
+  verdict, the same colour and the same filled/dotted treatment as the cell in the row behind
+  the drawer and as the Country Profile headline chip (v843). No second copy of the rules, so
+  a row and its own drawer can no longer disagree. UK is a filled red `WACC +3–5pp` pill;
+  Nigeria a dotted `SIZE UNKNOWN`; Guyana a green `NO LAW CHANGE`; Malaysia the dashed `n/c`
+  its row already carried. A muted `· N since 2010` follows, matching the cell's second line.
+- **The year comes off the face.** It was the newest event of ANY kind, so on Guyana, Ghana and
+  Libya it dated a discovery, a terms review and a conflict respectively and presented each as
+  a reform — the exact trap `_icReformLine()` guards for the pasted memo. The most recent
+  *fiscal change* moves into the tooltip with its take move, and where the newest sourced entry
+  is later and is not a fiscal change, the tooltip says so and names it.
+- **The chip is now a control** — click or Enter/Space opens that jurisdiction's full verdict
+  and event log via `openReformRiskFor()`, which also arms the v790 "← Fiscal Compare" return.
+- CSS: `.fc-dd-reform::after { inset: -10px 0 }` in the v612 mobile layer — the v713
+  vertical-only hit band, so the drawer's wrapping baseline strip is not shoved and the strip's
+  `scrollWidth` is untouched.
+
+## Result
+Clicking a Fiscal Compare row no longer opens a drawer that contradicts it. 23 of 23 sampled
+jurisdictions now show the same reform verdict in the drawer as in the row, including the 164
+uncovered that showed nothing before. An analyst drilling the United Kingdom reads the 3–5pp
+WACC premium the platform says the memo may not go out without, instead of a grey "Neutral".
+
+## Verification
+- **JS syntax gate: 11/11 blocks PASS** (re-run after the version bump).
+- **Runtime suite RAN** against the modified local build: **317 PASS / 0 FAIL / 1 WARN**. The
+  WARN is the `sw.js` 404 that only occurs over `127.0.0.1` — identical to the 774/775 local
+  baseline, and the single check separating it from 318/0/0 read against the deployed URL.
+  **0 page errors.**
+- **All 21 covered + 2 uncovered opened live** and the chip compared cell-for-cell against
+  `_rrClassify().icToken`: 23/23 match, 0 reading "Neutral" (was 21/21).
+- **Styling verified computed, not assumed:** UK `background rgb(194,65,12)` / white text
+  (the filled WACC treatment); Nigeria `border-bottom-style: dotted` (SIZE UNKNOWN);
+  Guyana `rgb(21,128,61)`; Malaysia dashed muted. Click routing confirmed: lands on Reform
+  Risk with the lookup set to the country and the verdict card painted.
+- **390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on **all 10 tabs**. Chip box
+  44px, tap band 64px — above the 24px floor. Desktop stays 19px, density preserved.
+- **PIXEL GATE PASS** — no surface got worse than baseline; the 5 standing findings are
+  unchanged and none is in the drawer.
+
+## Carried forward (unchanged this cycle)
+- Reform Risk intro reads *"Every sourced fiscal law change across 185 jurisdictions"*, and the
+  tab button's own `title` says the same; `reform_history.json` holds 83 events across **21**,
+  and the Snapshot line 200px below says "21 of 185". Text-only, so not a cycle's fix on its
+  own — but the headline and the snapshot contradict each other on one screen. From 774.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-775.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-775.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-775.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358
+  bytes vs 173,759. The **office copy is the one that was run**. From 764-775.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-775.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-775.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist as
+  fields. From 769-775.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+  From 770-775.
+- Side-by-Side Contractor NPV rows carry no highest/lowest markers. From 771-775.
+- Side-by-Side quickstart presets unreachable without clicking Clear. From 771-775.
+- Evidence grade ignores the D (default-estimate) share. From 768-775.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row. From 775.
+- Still no process check comparing the deployed version string against the local tree. From
+  758, 761-775.
+
+## Resolved this cycle
+- ✅ **The Fiscal Compare drilldown's only reform statement was a dead code path** reading two
+  fields absent from the data file, printing "Reform — Neutral" in grey for 21 of 21 sourced
+  jurisdictions — including the one carrying the platform's only WACC premium — and printing
+  nothing for the other 164.
+
+## New this cycle
+- The FC drilldown's own **IC MEMO block still emits `Stability ◇◇◇◇◇ — pair with Reform Risk
+  tab data`** (the low-predictability branch, ~line 54810). That is the raw diamond glyph v744
+  removed from the FC column and v843 removed from the Country Profile headline, for the reason
+  both give: a count of law changes cannot express a magnitude, so the ramp asserts the
+  opposite of the verdict. It now sits ~700px below a chip that states the verdict correctly.
+  Same class as the defect fixed this cycle; next T4 candidate.
+- The FC drilldown's **Fiscal Predictability badge carries no observed-spread ceiling**. Country
+  Profile (`_cpApplyObsSpread`), Side-by-Side (`_sbsApplyObsSpread`), Explorer
+  (`_expApplyObsSpread`) and Reform Risk (`_rrApplyObsSpread`) all paint it; the FC drilldown
+  has no painter. Measured: Norway reads `76 · UNGRADED · one term` here while the other four
+  say *"carry ≤52 · LOW — refuted by ORCA's own contract table, ≥29.6pp observed"*.
