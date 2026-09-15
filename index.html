@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v867</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v868</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1552,6 +1552,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     padding-top: 6px;
     padding-bottom: 6px;
   }
+  /* v868 (T4): the Fiscal Compare drilldown's Reform verdict chip. It became a control this
+     cycle — it opens that jurisdiction's full verdict and event log — so it has to clear the
+     directive's 24px coarse-pointer floor. 10px text in a 1px/6px box measures ~16px with a
+     thumb. Grown with the v713 invisible band rather than with padding or min-height: the
+     chip sits in the drawer's wrapping baseline strip beside the tier, rank and evidence
+     badges, and a min-height there would shove that whole row; a horizontal reach would raise
+     the strip's scrollWidth and report to pixel_audit as clipped text. Vertical only. */
+  .fc-dd-reform { position: relative; }
+  .fc-dd-reform::after { content: ""; position: absolute; inset: -10px 0; }
   /* v710 (T2): the Peer Comparison / Similar Fiscal Profile fee-basis marks. They are
      title-only glyphs, 7x12px with a mouse, and the directive's floor is 24px under a
      thumb. Given the box height and the same invisible hit area the chips use, so the
@@ -2530,7 +2539,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v867</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v868</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2609,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v867</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v868</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -54306,22 +54315,115 @@ function openFCDrilldown(country) {
       } catch(e) { /* non-critical */ }
     })();
   }
-  // v466: Reform trend signal — most recent reform direction from REFORM_HISTORY
+  // ── v868 (T4): the drawer contradicted the row it was opened from ─────────────────────
+  // This chip is the only reform statement in the Fiscal Compare drilldown — the drawer an
+  // analyst opens BY CLICKING A ROW whose own Reform verdict cell reads WACC +3–5pp or
+  // TAKE +15pp. It was written at v466, before the reform vocabulary existed, and it read two
+  // fields: `direction` and `description`. Neither has ever been present on a single one of
+  // the 83 events in reform_history.json — the event schema is year / event / mechanic_to /
+  // take_change / notes / fiscal_change / context_kind. So `_dir` was always '', both branch
+  // tests were always false, and the ternary always fell to its third arm.
+  //
+  // Measured on the live build, opening the drilldown for every covered jurisdiction:
+  // 21 of 21 printed "Reform — Neutral (YYYY)" in muted grey, and 21 of 21 tooltips ended
+  // "— unknown direction". Against the sourced record that is not a rounding error:
+  //   United Kingdom  row says WACC +3–5pp   drawer said Neutral   2024 EPL +3pp
+  //   Russia          row says TAKE +15pp    drawer said Neutral   2022 windfall tax +15pp
+  //   Norway          row says TAKE NET 0pp  drawer said Neutral   2022 relief expiry +12pp
+  //   Ecuador         row says TAKE +5pp     drawer said Neutral   2010 PSC→RSC +5pp
+  // 8 of the 21 carry a take RISE on their newest event and 3 a take CUT; the other 10 are
+  // unmeasured or context. Not one of them is neutral — v585 removed that bucket from the
+  // platform precisely because it merged "no fiscal direction" with "direction not measured",
+  // which mean opposite things. A dead code path that always resolves to the most reassuring
+  // of its three outputs, on the one jurisdiction the platform says needs a WACC premium.
+  //
+  // It renders _rrClassify()'s own icToken through _rrTokenTier() now — the same verdict, the
+  // same colour and the same filled/dotted treatment as the cell in the row behind the drawer
+  // and as the Country Profile headline chip (v843). No second copy of the rules, so the row
+  // and its own drawer cannot disagree. The year is dropped from the face: it was the newest
+  // event of ANY kind, so on Guyana, Ghana and Libya it dated a discovery, a terms review or a
+  // conflict and presented it as a reform. The most recent FISCAL CHANGE goes in the tooltip,
+  // qualified, the way _icReformLine() already qualifies it for the pasted memo.
+  // The 164 uncovered jurisdictions rendered nothing at all here, and silence reads as no
+  // exposure; they now get the same n/c marker their row carries.
   (function() {
     try {
+      var _q = function(s) {
+        return String(s == null ? '' : s).replace(/<[^>]*>/g, '')
+          .replace(/&middot;/g, '·').replace(/&mdash;/g, '—').replace(/&ndash;/g, '–')
+          .replace(/&nbsp;/g, ' ').replace(/&rarr;/g, '→').replace(/&minus;/g, '−')
+          .replace(/&rsquo;/g, '’').replace(/&amp;/g, '&')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      };
+      var _go = 'onclick="openReformRiskFor(\'' + cEsc + '\')" '
+              + 'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openReformRiskFor(\'' + cEsc + '\');}" '
+              + 'role="button" tabindex="0"';
       var _rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? (REFORM_HISTORY[country] || []) : [];
-      if (_rh.length) {
-        var _latest = _rh.reduce(function(m, ev) { return (ev.year > (m.year || 0)) ? ev : m; }, {});
-        if (_latest.year) {
-          var _dir = (_latest.direction || '').toLowerCase();
-          var _isHostile = _dir === 'hostile' || _dir === 'unfavorable' || _dir === 'increase';
-          var _isFriendly = _dir === 'favorable' || _dir === 'friendly' || _dir === 'decrease';
-          var _rfArrow = _isHostile ? '\u2191 Hostile' : _isFriendly ? '\u2193 Friendly' : '\u2014 Neutral';
-          var _rfCol = _isHostile ? 'var(--negative)' : _isFriendly ? 'var(--green)' : 'var(--muted)';
-          var _rfTitle = 'Most recent fiscal reform: ' + _latest.year + ' — ' + (_latest.description || _dir || 'unknown direction') + '. See Reform Risk tab for full timeline.';
-          html += '<span style="font-size:10px;color:' + _rfCol + ';font-weight:700;border:1px solid currentColor;border-radius:3px;padding:1px 6px;white-space:nowrap;opacity:.9;" title="' + _rfTitle + '">Reform ' + _rfArrow + ' (' + _latest.year + ')</span>';
+      var _rrV = (_rh.length && typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+
+      if (!_rrV) {
+        // Not scored, and that is a finding. Same wording the Reform Risk card, the Country
+        // Profile chip and the pasted IC line already carry for these 164.
+        var _rhAll = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+        var _covN = Object.keys(_rhAll).filter(function(k){ return Array.isArray(_rhAll[k]) && _rhAll[k].length; }).length;
+        var _totN = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) ? COUNTRY_DATA.length : 185;
+        if (_covN) {
+          html += '<span class="fc-dd-reform" ' + _go + ' style="font-size:10px;color:var(--muted);font-weight:700;'
+            + 'border:1px dashed var(--border);border-radius:3px;padding:1px 6px;white-space:nowrap;cursor:pointer;" title="'
+            + _q('Reform exposure NOT SCORED for ' + country + '. ORCA holds a sourced fiscal-reform event log for '
+                 + _covN + ' of ' + _totN + ' jurisdictions and this is not one of them. No events on file means no '
+                 + 'coverage, not a clean record: this is NOT a score of 100, and a reform-frequency premium of zero '
+                 + 'must not be carried into an IC memo on this basis. An external check is required — the Reform Risk '
+                 + 'tab names the statute ORCA read this country’s fiscal terms out of, and whether its year falls '
+                 + 'inside or before the 2010 scoring window, which is where that check starts. Same reading as the '
+                 + 'n/c in the Reform verdict cell of the row behind this drawer. Click to open it.')
+            + '">Reform · n/c</span>';
         }
+        return;
       }
+
+      var _t = (typeof _rrTokenTier === 'function')
+        ? _rrTokenTier(_rrV.icToken, _rrV.icColor)
+        : { col: _rrV.icColor, dotted: false, isAction: false };
+      var _base = 'font-size:10px;font-weight:800;letter-spacing:.02em;border-radius:3px;padding:1px 6px;'
+                + 'white-space:nowrap;cursor:pointer;';
+      var _sty = _t.isAction
+        ? _base + 'background:' + _t.col + ';color:#fff;border:1px solid ' + _t.col + ';'
+        : _base + 'color:' + _t.col + ';border:1px solid ' + _t.col + ';' + (_t.dotted ? 'border-bottom-style:dotted;' : '');
+
+      // Most recent FISCAL CHANGE, not most recent event. The distinction is the whole reason
+      // the year came off the chip face.
+      var _fx = _rh.filter(function(e){ return typeof _rrIsFiscalChange !== 'function' || _rrIsFiscalChange(e); });
+      var _lastFx = _fx.length ? _fx.reduce(function(m, e){ return ((e.year || 0) > (m.year || 0)) ? e : m; }, {}) : null;
+      var _newest = _rh.reduce(function(m, e){ return ((e.year || 0) > (m.year || 0)) ? e : m; }, {});
+      var _newestIsCtx = !!(_newest && _newest.year && typeof _rrIsFiscalChange === 'function' && !_rrIsFiscalChange(_newest));
+
+      var _tip = _q(_rrV.icToken) + ' — ' + _q(_rrV.icLabel) + '. ' + _q(_rrV.icRule)
+        + ' Reform Frequency Score ' + _rrV.score + '/100 (' + _q(_rrV.scoreNote) + '), where 100 means no '
+        + 'sourced fiscal law change since 2010 — not the highest exposure. '
+        + (_lastFx && _lastFx.year
+            ? 'Most recent sourced FISCAL CHANGE (' + _q(_lastFx.year) + '): ' + _q(_lastFx.event)
+              + (_lastFx.take_change ? ' [' + _q(_lastFx.take_change) + ' take]'
+                                     : ' [take effect never quantified by ORCA]') + '. '
+            : 'ORCA holds no sourced fiscal law change for this jurisdiction at any date. ')
+        + (_newestIsCtx
+            ? 'Its newest sourced entry is ' + (_lastFx && _lastFx.year ? 'LATER and is ' : '')
+              + 'not a fiscal change — ' + _q(_newest.year) + ' ' + _q(_newest.event)
+              + ' — so it neither scores nor sets a direction. '
+            : '')
+        + 'EVERY TOKEN CARRYING A NUMBER NAMES ITS OWN UNIT: TAKE +Npp / TAKE NET ±Npp are percentage points of '
+        + 'GOVERNMENT TAKE already moved inside the window and must never be added to a WACC, while WACC +3–5pp / '
+        + '+5–8pp are points to add to the discount rate. SIZE UNKNOWN means terms were rewritten in-window and the '
+        + 'take effect was never quantified — a zero premium there is an absence of measurement, not stability. '
+        + '↑ PRE-2010 means the rupture predates the window, so a high score records where the window starts. '
+        + 'Read from the same _rrClassify() verdict as the Reform verdict cell in the row behind this drawer, the '
+        + 'Country Profile chip and the Reform Risk tab, so those four surfaces cannot hand you four different '
+        + 'premiums for one country. Click for the full sourced event log.';
+
+      html += '<span class="fc-dd-reform" ' + _go + ' style="' + _sty + '" title="' + _tip + '">Reform · '
+        + _q(_rrV.icToken) + '</span>'
+        + '<span style="font-size:10px;color:var(--muted);white-space:nowrap;opacity:.8;margin-left:-6px;">· '
+        + _rrV.since2010 + ' since 2010</span>';
     } catch(e) { /* non-critical */ }
   })();
   html += '</div>';
