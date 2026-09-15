@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v870</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v871</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2543,7 +2543,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v870</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v871</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2613,7 +2613,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v870</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v871</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -39274,16 +39274,49 @@ function cpDownside50(d) {
   out.n1 = d.g1.n;
   out.n2 = fee.reduce(function(a, x) { return a + x.n; }, 0);
   out.names = fee.map(function(x) { return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ');
+  // v871 (T2): the $75 leg of the SAME sentence. v786 switched only the $50 leg, which left every
+  // "Clears at $75 (X) and at the $50/bbl downside (Y)" sentence quoting an all-contract $75 NPV
+  // beside a PSC/Concession-only $50 NPV. On Iraq that printed $642M @$75 against $1.44B @$50 -- a
+  // downside 2.2x the base case, which cannot happen on a monotonic price curve and is the pair an
+  // IC reviewer catches in one glance. 10 countries print a mismatched pair; Iraq is the one where
+  // it inverts. The blend is NOT abandoned: the headline NPV chip, the band pill and the band
+  // sentence still read d.npv_75, and cpDownside50Basis() now prints the blend pair as a pair.
+  out.blend75 = d.npv_75;
+  out.v75 = (d.g1.v75 != null && d.npv_75 != null && fmt(d.g1.v75) !== fmt(d.npv_75)) ? d.g1.v75 : null;
   return out;
 }
 window.cpDownside50 = cpDownside50;
+// The $75 figure that belongs beside a switched $50 leg. Falls back to the blend where the two
+// format identically, so no sentence gains a second figure it does not need.
+function cpPair75(dn, blend75) {
+  return (dn && dn.cmp && dn.v75 != null) ? dn.v75 : blend75;
+}
+window.cpPair75 = cpPair75;
 // Short basis clause for a $50 figure that cpDownside50() switched. '' where nothing switched.
 function cpDownside50Basis(dn) {
   if (!dn || !dn.cmp) return '';
   var fmt = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(v) { return String(Math.round(v)); };
-  return ' on its ' + Number(dn.n1).toLocaleString() + ' PSC/Concession contracts — the all-contract blend reads '
-    + fmt(dn.blend) + ' because it averages in ' + Number(dn.n2).toLocaleString() + ' fee-basis contracts (' + dn.names + ')'
-    + (dn.flips ? ', and that alone flips the sign' : '');
+  var feeClause = Number(dn.n2).toLocaleString() + ' fee-basis contracts (' + dn.names + ')';
+  // No comparable $75 figure to pair with: the single-leg clause is still the honest one.
+  if (dn.v75 == null) {
+    return ' on its ' + Number(dn.n1).toLocaleString() + ' PSC/Concession contracts — the all-contract blend reads '
+      + fmt(dn.blend) + ' because it averages in ' + feeClause
+      + (dn.flips ? ', and that alone flips the sign' : '');
+  }
+  // v871 (T2): both legs of the sentence now read the PSC/Concession basis, so the pair the
+  // analyst carries into the memo is like-for-like. The blend pair stays on screen, one tap away,
+  // because it is what the NPV chip above and every other surface show -- but it is shown as a
+  // PAIR, so neither basis can be read as the downside of the other.
+  return '; both figures read on its ' + Number(dn.n1).toLocaleString() + ' PSC/Concession contracts'
+    + ' <button type="button" class="cp-why-btn" aria-expanded="false" data-label="Blend basis"'
+    + ' onclick="event.stopPropagation();_cpWhyToggle(this)">Blend basis ›</button>'
+    + '<span class="cp-why-body" hidden>The NPV figure at the top of this page, the other tabs, the'
+    + ' XLSX export and the API all read the all-contract blend, which averages in ' + feeClause
+    + '. On that basis the same two figures are ' + fmt(dn.blend75) + ' @$75 and ' + fmt(dn.blend) + ' @$50'
+    + (dn.flips ? ', and the fee-basis contracts alone flip the sign of the $50 figure' : '')
+    + '. Contractor NPV on a fee-basis contract is an artefact of the remuneration mechanic rather'
+    + ' than a fiscal outcome, so the blend is not comparable with another country’s. Quote the'
+    + ' PSC/Concession pair or quote the blend pair — never one figure from each.</span>';
 }
 window.cpDownside50Basis = cpDownside50Basis;
 function cpFloorBase() {
@@ -40086,7 +40119,12 @@ function loadCountryProfile(country) {
       var _nClause734 = (d.n != null ? ' (n=' + Number(d.n).toLocaleString() + ' contracts)' : '');
       var _defendInstr734 = _bandCarries734
         ? '. <strong>' + _cpEsc(d.country) + ' carries ' + _rankWord734 + ' in its own take band ('
-          + cpNpvFmt(d.npv_75) + ' against a ' + cpNpvFmt(_band734.median)
+          // v871 (T2): where the Clears sentence above switched to the PSC/Concession pair, this
+          // band figure is still the blend -- it has to be, because every country is ranked on the
+          // blend. Naming the basis is what keeps two different $75 figures in one paragraph from
+          // reading as a contradiction; the Blend basis disclosure above reconciles them.
+          + cpNpvFmt(d.npv_75) + (_dn786.v75 != null ? ' on the blend' : '')
+          + ' against a ' + cpNpvFmt(_band734.median)
           + ' band median). Defend on the take and its evidence tier' + _nClause734
           + ', and carry that NPV position separately \u2014 they are two findings, not one.</strong>'
         : '. <strong>Defend on the take and its evidence tier' + _nClause734
@@ -40107,7 +40145,7 @@ function loadCountryProfile(country) {
           + '<span class="cp-why-body" hidden>' + cpBandNpvNote(d, _band734) + '</span>'
         : '';
       msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
-          + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(npv)
+          + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(cpPair75(_dn786, npv))
           + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
           + _baseClause589 + (_band734 ? '' : _dependClause589)
           // The contract count travels with the instruction, so "defend on the take" is
@@ -40143,7 +40181,7 @@ function loadCountryProfile(country) {
         ? ' Only ' + _fbF589.nFail + ' of ' + _fbF589.n + ' non-monopoly regimes in ORCA fail this ('
           + _fbF589.failNames.join(', ') + '), so unlike the take reading it is genuinely discriminating.'
         : '';
-      msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 but ' + cpNpvFmt(npv50)
+      msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(cpPair75(_dn786, npv)) + ' @$75 but ' + cpNpvFmt(npv50)
           + ' at $50/bbl' + cpDownside50Basis(_dn786) + ': this regime does not survive a price break on the standardized profile, at '
           + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + _rareF589 + beStr
           // v732 (T4): same control as the passing branch above. This arm carries no `favourable`
@@ -40560,7 +40598,7 @@ function loadCountryProfile(country) {
     var msg = '', col = 'var(--muted)', bg = 'rgba(107,101,96,.07)', border = 'rgba(107,101,96,.2)';
     if (_downFails670) {
       msg = 'IC: cite the NPV here — contractor NPV goes negative at the $50/bbl downside ('
-          + cpNpvFmt(_dn786m.v) + ' vs ' + cpNpvFmt(d.npv_75) + ' @$75' + cpDownside50Basis(_dn786m) + ')'
+          + cpNpvFmt(_dn786m.v) + ' vs ' + cpNpvFmt(cpPair75(_dn786m, d.npv_75)) + ' @$75' + cpDownside50Basis(_dn786m) + ')'
           + ((_fb670 && _fb670.nFail) ? ', which ' + _fb670.nFail + ' of ' + _fb670.n
              + ' non-monopoly regimes reach. On the other ' + (_fb670.n - _fb670.nFail)
              + ' the NPV restates the take; here it does not.' : '.');
