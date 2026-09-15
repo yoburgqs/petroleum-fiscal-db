@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v871</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v872</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1629,7 +1629,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      measured 17px with a thumb. Given its own class rather than widening the `td a` rule
      above, which would also grow every source badge in the Evidence Chain and push the
      table taller on a phone for rows this cycle did not touch. */
-  .cite-dead-chip {
+  /* v872 (T6): .cite-index-chip is the same shape of thing as .cite-dead-chip -- a 10px span
+     whose whole explanation lives in its title="" and which is therefore its own tap target --
+     so it joins this rule rather than getting a second one. Measured 17-19px before. */
+  .cite-dead-chip, .cite-index-chip {
     display: inline-flex;
     align-items: center;
     min-height: 24px;
@@ -2543,7 +2546,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v871</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v872</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2613,7 +2616,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v871</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v872</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -24355,6 +24358,47 @@ function _pwcHref(country) {
 }
 const _PWC_CHECKED = '14 Sep 2026';
 
+// ── v872 (T6) — THE OTHER HALF OF v860: A LIVE LINK TO THE PUBLICATION'S FRONT DOOR ──────────
+// v860 rerouted every BULK citation whose address was measured DEAD. It fixed 142 of the 224
+// bulk source rows in the shipped country_data.json. The remaining 82 carry a different address
+// — `https://taxsummaries.pwc.com`, the bare site root — and that address returns 200. So
+// _citeLinkDead() says it is fine, the row skips the whole v850/v860 branch, and it renders as
+// an ordinary healthy citation: accent-free but arrowed, title "Open the cited source document",
+// no chip, nothing to warn anyone.
+//
+// That is the worse failure of the two. A dead link announces itself; the analyst knows to go
+// looking. A link to a publisher's homepage passes every check this page performs and still
+// delivers nothing — it names no country, no parameter and no rate. On Nigeria it is the ONLY
+// clickable provenance the Special Tax and FTP Rate rows have, because the country's other bulk
+// citation is one of the 142 already marked dead.
+//
+// Neither address is a citation for a parameter, so both now take the same route. 67 of the 82
+// countries have a verified page of their own in _PWC_COUNTRY and link to it; the other 15
+// (Algeria, Iran, Somalia, Sudan, Syria, Timor-Leste, Turkmenistan, Yemen, …) say on screen that
+// the publication does not cover them, which is the one thing that lets an analyst stop looking.
+// The LINK DEAD chip is NOT reused here — the address resolves, and claiming otherwise would be
+// the same kind of untrue-but-reassuring signal this fixes. These rows get INDEX ONLY instead,
+// and the dead-link counts elsewhere on the page keep counting only genuinely dead links.
+function _isBulkIndexUrl(u) {
+  const s = String(u || '').trim().replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+  return s === 'https://taxsummaries.pwc.com'
+      || s === 'http://taxsummaries.pwc.com'
+      || s === 'https://taxsummaries.pwc.com/allcountries'
+      || s === 'http://taxsummaries.pwc.com/allcountries';
+}
+// The clause that opens every rerouted-bulk tooltip. `dead` picks which true thing to say about
+// the address on record: it returned nothing, or it returned the front page of the publication.
+function _bulkAddrClause(url, dead) {
+  return dead
+    ? 'the address ORCA has on record for this harvest — ' + url + ' — returned no document '
+      + 'when checked on ' + _CITE_DEAD_CHECKED + '. It was an index of every country on earth, not a '
+      + 'citation for any parameter on this page. '
+    : 'the address ORCA has on record for this harvest — ' + url + ' — resolves, but it is '
+      + 'the front page of PwC Worldwide Tax Summaries. It names no country, no parameter and no '
+      + 'rate, so it is not a citation for anything on this page and nothing on it can confirm this '
+      + 'figure. Re-checked ' + _PWC_CHECKED + '. ';
+}
+
 const _BULK_SOURCES = ['EY_KPMG_CIT_Guide_2025', 'EY_IHS_BulkHarvest_2025'];
 function _isBulkSource(name) { return _BULK_SOURCES.indexOf(name) !== -1; }
 // v569 (T6): promoted out of buildEvidencePanel() so the per-parameter Evidence Chain table
@@ -24651,10 +24695,13 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
     // 142 of the 185 profiles this list rendered LINK DEAD and a working arrow on the same row,
     // and the arrow opened the 404. It now opens this country's own page in the same publication
     // where one exists, and is not a link at all where one does not.
-    const _pwcUrl = (isDead && isBulk) ? _pwcHref(entry.country) : '';
-    const _pwcTip = (isDead && isBulk) ? _cpEsc(display + ': the address ORCA has on record for this '
-      + 'harvest \u2014 ' + s.url + ' \u2014 returned no document when checked on ' + _CITE_DEAD_CHECKED
-      + '. It was an index of every country on earth, not a citation for any parameter on this page. '
+    // v872 (T6): the live-root arm. `_bulkIdx` is a bulk row whose address resolves but points at
+    // the publication's front page -- not dead, and just as useless as a citation. It takes the
+    // same reroute, with an opening clause that says which of the two it is.
+    const _bulkIdx  = isBulk && !!s.url && !isDead && _isBulkIndexUrl(s.url);
+    const _bulkRedir = isBulk && (isDead || _bulkIdx);
+    const _pwcUrl = _bulkRedir ? _pwcHref(entry.country) : '';
+    const _pwcTip = _bulkRedir ? _cpEsc(display + ': ' + _bulkAddrClause(s.url, isDead)
       + (_pwcUrl
         ? 'PwC Worldwide Tax Summaries does publish a page for ' + entry.country + ', re-checked live on '
           + _PWC_CHECKED + ', and this opens it. That page is the secondary guide these ' + (s.n || 0)
@@ -24667,7 +24714,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
           + 'here at all. Establish these terms from ' + entry.country + '\u2019s own petroleum act '
           + 'before anything on this profile goes in an IC memo.'))
       : '';
-    const nameEl = (isDead && isBulk)
+    const nameEl = _bulkRedir
       ? (_pwcUrl
         ? `<a href="${_pwcUrl}" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;" title="${_pwcTip}">${display}${_noteEl} <span class="ec-find-chip">\u2315 ${_cpEsc(entry.country)} page \u2197</span></a>`
         : `<span style="font-size:11px;color:var(--muted);" title="${_pwcTip}">${display}${_noteEl} <span class="ec-nopage-chip">no page for ${_cpEsc(entry.country)}</span></span>`)
@@ -24679,6 +24726,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
     return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isDead || isBulk || shareList) ? 'opacity:.82;' : ''}">
       <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
       ${isDead ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${isBulk ? _pwcTip : deadTip}">LINK DEAD</span>` : ''}
+      ${_bulkIdx ? `<span class="cite-index-chip" style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.5);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${_pwcTip}">INDEX ONLY</span>` : ''}
       ${isBulk ? '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;" title="Assigned at country level, not verified against this country\u2019s individual contracts.">BULK</span>' : ''}
       ${shareList ? `<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;" title="${shareTip}">${shareList.length} JURISDICTIONS</span>` : ''}
       ${nameEl}
@@ -37841,9 +37889,14 @@ function renderReformTimeline(country) {
             // the document may well be authoritative, ORCA just cannot hand you a copy of it.
             // The anchor stays live so the analyst can still try, and the tip says exactly what
             // was measured, when, and what it does and does not mean.
-            if (_citeLinkDead(srcMeta.url)) {
-              deadLinkCount++;
-              deadLinkLabels.push(label);
+            // v872 (T6): a BULK row pointing at the publication's front page takes this branch
+            // too. It is not dead -- so it is NOT counted in deadLinkCount, and the "N of M cited
+            // sources cannot be retrieved" note below keeps meaning exactly what it says -- but it
+            // is not a citation either, and it must not keep rendering as a healthy one.
+            const _isDeadUrl = _citeLinkDead(srcMeta.url);
+            const _idxOnly   = !_isDeadUrl && isBulk && _isBulkIndexUrl(srcMeta.url);
+            if (_isDeadUrl || _idxOnly) {
+              if (_isDeadUrl) { deadLinkCount++; deadLinkLabels.push(label); }
               // v850 (T6): the click. Until now this anchor still pointed at the address the
               // page had just finished saying returns nothing, so the analyst's one affordance
               // opened a 404 in a new tab. It now runs the search the note asks for, against the
@@ -37875,10 +37928,8 @@ function renderReformTimeline(country) {
               // Both are fixed together: the tip is now written per branch, and the click goes to
               // this country's own page in that publication, or nowhere at all if it has none.
               const _pwcU = isBulk ? _pwcHref(country) : '';
-              const _bTip = !isBulk ? _dTip : _esc(label + ': the address ORCA has on record for this '
-                + 'harvest \u2014 ' + srcMeta.url + ' \u2014 returned no document when checked on '
-                + _CITE_DEAD_CHECKED + '. It was an index of every country on earth, not a citation for '
-                + 'this parameter. The tier letter is unchanged and the rate in the Statutory column was '
+              const _bTip = !isBulk ? _dTip : _esc(label + ': ' + _bulkAddrClause(srcMeta.url, _isDeadUrl)
+                + 'The tier letter is unchanged and the rate in the Statutory column was '
                 + 'read off this harvest when it was taken. '
                 + (_pwcU
                   ? 'PwC Worldwide Tax Summaries does publish a page for ' + country + ', re-checked live '
@@ -37889,9 +37940,15 @@ function renderReformTimeline(country) {
                     + 'on ' + _PWC_CHECKED + ' \u2014 so this row is not a link and there is nothing to '
                     + 'search for. This parameter cannot be checked against its source from here at all. '
                     + 'Establish it from ' + country + '\u2019s own petroleum act before an IC memo.'));
-              const _deadChipB = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
-                + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
-                + 'letter-spacing:.04em;cursor:help;" title="' + _bTip + '">LINK DEAD</span> ';
+              // v872 (T6): an address that resolves does not get a chip claiming it is dead. The
+              // index-only case says what is actually wrong with it instead.
+              const _deadChipB = _idxOnly
+                ? '<span class="cite-index-chip" style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.5);'
+                  + 'color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
+                  + 'letter-spacing:.04em;cursor:help;" title="' + _bTip + '">INDEX ONLY</span> '
+                : '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
+                  + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
+                  + 'letter-spacing:.04em;cursor:help;" title="' + _bTip + '">LINK DEAD</span> ';
               badgeHtml = isBulk
                 ? (_pwcU
                   ? `<a href="${_esc(_pwcU)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.8;" title="${_bTip}">${_deadChipB}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ ${_esc(country)} page ↗</span></a>`
