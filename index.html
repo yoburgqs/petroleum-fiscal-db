@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v869</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v870</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1501,7 +1501,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      these two ids rather than to input[type=checkbox]: the mechanic and IOC grids in the same
      panel hold dozens of boxes, and widening those is how a 390px column starts scrolling.
      accent-color is not set here; only the hit box changes. */
-  #sc-proxy-keep, #sc-floor-keep {
+  /* v870 (T1): #bubble-verified-only joins them for the same reason. It is the control that
+     decides whether the scatter plots 22 measured countries or 185 mostly-inferred ones -- and
+     as of this cycle, whether every bubble on screen carries a name. It measured 22px under a
+     thumb. Same narrow id scope, same hit-box-only change. */
+  #sc-proxy-keep, #sc-floor-keep, #bubble-verified-only {
     min-width: 24px; min-height: 24px; width: 24px; height: 24px;
     flex: 0 0 auto; margin-right: 4px;
   }
@@ -2539,7 +2543,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v869</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v870</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2609,7 +2613,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v869</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v870</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3873,7 +3877,7 @@ window.copyPlatformCitation = function(btn) {
         <span id="bubble-verified-lbl">Verified production only</span>
       </label>
       <span id="bubble-basis-key" style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:#96570A;border:1px solid #96570A;display:inline-block;flex:none;"></span>verified field production</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:#96570A;border:1px solid #96570A;display:inline-block;flex:none;"></span>verified field production &mdash; <strong style="font-weight:700;color:var(--text);">named on the chart</strong></span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:transparent;border:1.5px dashed #96570A;display:inline-block;flex:none;"></span>regional proxy estimate &mdash; indicative only</span>
       </span>
       <span id="bubble-basis-note" style="font-size:11px;color:var(--muted);" aria-live="polite"></span>
@@ -3889,7 +3893,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="bubble-scope-note" style="font-size:11px;color:var(--muted);"></span>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
+      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Countries with verified field production are labelled by name; the unlabelled bubbles are regional proxy estimates. Click a bubble to open its Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
         <button id="download-bubble-png"
           style="padding:6px 14px;background:var(--surface2);color:var(--accent);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.8rem;"
@@ -58054,6 +58058,91 @@ function renderBubbleChart() {
     };
   });
 
+  // ── v870 (T1) — the scatter names the countries it is telling you to pick ────────────────
+  // Walked T1 cold: Home -> Explorer -> Bubble Chart. The caption directly above this canvas
+  // tells the analyst that "the left frontier (low take) with high NPV represents the most
+  // IOC-favorable regimes" -- and then plotted 185 bubbles of which NOT ONE carried a country
+  // name. The only way to learn who any circle was, including every circle on the frontier the
+  // caption had just pointed at, was to hover them one at a time; in the upper-left cluster
+  // twenty of them overlap, so hovering resolves the top one and hides the rest. An analyst
+  // with twenty minutes reads a cloud and moves on, or clicks a bubble blind.
+  //
+  // v818 had already established the encoding that matters here -- filled disc = verified field
+  // production, hollow ring = regional proxy estimate -- and its own comment names the trap:
+  // the frontier's peak is Vanuatu, Bahamas, Montenegro, Greenland, Faroe Islands, none of which
+  // hold a barrel of verified production. That warning lived in a source comment and in a count
+  // ("163 of 185 are proxy"); it was never on the plot.
+  //
+  // Labels are now drawn on the production-backed bubbles, which are exactly the 22 whose take
+  // and NPV are measured rather than inferred -- so the named set IS the investible universe,
+  // and the unnamed hollow cloud in the top-left reads as what it is. When the analyst ticks
+  // "Verified production only", or arrives with a Screener result of 30 or fewer, every plotted
+  // bubble is named instead. Labels are canvas text inside the existing plot area: they add no
+  // DOM node, no control, and cannot widen the document.
+  var _lblPts = (function () {
+    var all = [];
+    datasets.forEach(function (ds, di) {
+      ds.data.forEach(function (pt, pi) {
+        all.push({ di: di, pi: pi, country: pt.country, verified: !!pt.verified, y: pt.y });
+      });
+    });
+    var pool;
+    if (_verifiedOnly) pool = all.slice();
+    else if (_useScreen && all.length <= 30) pool = all.slice();
+    else pool = all.filter(function (q) { return q.verified; });
+    // Verified first, then highest NPV -- if the collision pass has to drop one, it drops the
+    // least interesting one, never the frontier.
+    pool.sort(function (a, b) { return (b.verified - a.verified) || (b.y - a.y); });
+    return pool.slice(0, isMobile ? 6 : 28);
+  })();
+
+  var _bubbleLabelPlugin = {
+    id: 'orcaBubbleLabels',
+    afterDatasetsDraw: function (chart) {
+      if (!_lblPts.length) return;
+      var c = chart.ctx, area = chart.chartArea, placed = [];
+      if (!area) return;
+      var fs = isMobile ? 9 : 10;
+      c.save();
+      c.font = '600 ' + fs + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
+      c.textBaseline = 'middle';
+      c.lineJoin = 'round';
+      _lblPts.forEach(function (q) {
+        var meta = chart.getDatasetMeta(q.di);
+        if (!meta || meta.hidden) return;                 // region switched off in the legend
+        var el = meta.data && meta.data[q.pi];
+        if (!el || el.skip || !isFinite(el.x) || !isFinite(el.y)) return;
+        var r = (el.options && el.options.radius) || el.radius || 4;
+        var name = q.country, w = c.measureText(name).width, h = fs + 4;
+        var cands = [
+          { x: el.x + r + 4, y: el.y,         a: 'left'   },
+          { x: el.x - r - 4, y: el.y,         a: 'right'  },
+          { x: el.x,         y: el.y - r - h, a: 'center' },
+          { x: el.x,         y: el.y + r + h, a: 'center' }
+        ];
+        for (var i = 0; i < cands.length; i++) {
+          var cd = cands[i];
+          var left = cd.a === 'left' ? cd.x : (cd.a === 'right' ? cd.x - w : cd.x - w / 2);
+          var box = { l: left - 2, r: left + w + 2, t: cd.y - h / 2, b: cd.y + h / 2 };
+          if (box.l < area.left || box.r > area.right || box.t < area.top || box.b > area.bottom) continue;
+          var clash = placed.some(function (o) {
+            return !(box.r < o.l || box.l > o.r || box.b < o.t || box.t > o.b);
+          });
+          if (clash) continue;
+          placed.push(box);
+          c.textAlign = cd.a;
+          c.lineWidth = 3;
+          c.strokeStyle = 'rgba(255,255,255,0.92)';
+          c.strokeText(name, cd.x, cd.y);                 // halo, so a name over a disc stays readable
+          c.fillStyle = q.verified ? '#1C1A17' : '#6B6560';
+          c.fillText(name, cd.x, cd.y);
+          break;
+        }
+      });
+      c.restore();
+    }
+  };
+
   var canvas = document.getElementById('explorer-bubble-canvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
@@ -58061,6 +58150,7 @@ function renderBubbleChart() {
   window._bubbleChartInstance = new Chart(ctx, {
     type: 'bubble',
     data: { datasets: datasets },
+    plugins: [_bubbleLabelPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
