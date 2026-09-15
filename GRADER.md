@@ -54439,3 +54439,125 @@ analyst guessing whether the citation was real.
 
 ## Friction
 Walking Nigeria's Country Profile cold, the Evidence Chain's **Special Tax** and **FTP Rate** rows cite "EY / IHS Markit bulk fiscal harvest (2025)" and rendered as perfectly healthy citations — plain `↗` arrow, tooltip "Open the cited source document", no warning c
+
+---
+## Cycle 781 Log — 2026-09-15 11:30
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors — suite **RAN this cycle**
+  (`runtime_comprehensive.js`, office copy, against the local tree served at the deployed
+  path prefix). First run served at `/` reported 317 PASS / 1 WARN; the WARN was
+  `GET /petroleum-fiscal-db/sw.js 404`, a service-worker path artifact of the local root,
+  confirmed by re-serving at `/petroleum-fiscal-db/` and getting 318/0/0.
+- JS syntax gate: PASS — 11 inline scripts, 0 failing.
+- Shipped as **v873**, committed, mirrored to `office/projects/oil-gas-expertise/`, pushed.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo."
+(Rotation: 780 was T6, 779 T2, 778 T1, 777 T3, 776 T4 — T5 last run at 775.)
+
+## Friction
+Walked T5 cold from a fresh context: Screener → tick a shortlist → **Copy for IC Memo**,
+then the same rows through **⬇ CSV** and **⬇ Excel**.
+
+`_scExportRows()` wrote the breakeven straight out of the bundle — `Breakeven_bbl: d.be_75`.
+For **Saudi Arabia, Bahrain and Kuwait** the stored `be_75` is **1.0**: the DCF floor artifact
+for a 100%-government-take regime, not a breakeven. There is no contractor position in those
+three to break even — take is 100.0% and contractor NPV is $0 at every modelled price.
+
+Every rendered surface on the platform already refuses that value, by name:
+- `formatBreakeven()` — `if (val <= 1) return '—'; // sentinel for state-monopoly (Bahrain/Kuwait/Saudi Arabia): no investor perspective`
+- `_beIsTested()` (v513) — exists specifically to reject `0 < v <= 1` as "the DCF floor artifact"
+- `cpBeFor()` — filters `> 1`
+- `getBreakevenBand()` (v564) — rewritten because Country Profile had printed *"Breakeven Price $1/bbl — Resilient at $1 — Ranked #3 of 68"* for exactly these rows
+- Fiscal Compare's workbook — fixed at **v529**: *"a 100%-take regime has no breakeven. Bahrain, Kuwait and Saudi Arabia were exporting '1' ($1/bbl) into the breakeven column of an IC attachment."*
+
+The Screener's three export paths bypassed all of them. Measured on the cold 185-row export:
+`Breakeven_bbl` was populated for **68** rows, and the three lowest values in the entire file
+were `1, 1, 1` — the next is $27. **Sort the XLSX by `Breakeven_bbl` ascending and the three
+regimes with no contractor position rank 1, 2 and 3 of 68, above every country that has one.**
+
+The clipboard table was worse, because it is the artifact that goes straight into the memo.
+Ticking Norway + the three monopolies pasted:
+
+```
+16   Norway         68.0%   $826M   $379M   46%   —                +15.7pp
+22   Saudi Arabia  100.0%   $0M     $0M     —     $1 (untested)    +0.0pp
+139  Bahrain       100.0%   $0M     $0M     —     $1 (untested)    +0.0pp
+140  Kuwait        100.0%   $0M     $0M     —     $1 (untested)    +0.0pp
+```
+
+Norway — a real contractor position with no solved breakeven — printed a blank. The three
+with no contractor position printed the cheapest barrel in the world. `(untested)` reads as
+*an estimate we have not verified*, which is the reading that makes an analyst keep the number;
+and `100.0%` take and `$0M` NPV sit two columns to the left of it in the same row with nothing
+on the page reconciling the three.
+
+This is the v632→v728 pattern again: Fiscal Compare fixed first (v529), the tab whose entire
+job is producing the IC shortlist missed.
+
+## Change
+`_scExportRows()` — the single choke point for clipboard, CSV and XLSX:
+- `Breakeven_bbl` is **null** where the value is the floor artifact or the regime is a state
+  monopoly. The same `> 1 && < 999` guard the screen uses now applies to what leaves the tool.
+  Populated rows **68 → 65**, min $27, max $34 — matching the platform's own published
+  coverage line ("ORCA models one for 65 of 185, every value between $27 and $34/bbl").
+- `Breakeven_Tested` gains a **third state**, `n/a — no contractor position`, so an empty cell
+  is no longer indistinguishable from the 117 rows where a breakeven was simply never modelled.
+- Clipboard cell now prints `n/a — 100% govt take, no contractor position to break even`
+  against `— not modelled` for the ordinary blanks. The `(untested)` suffix is deleted — with
+  the artifact rows gone it was unreachable, and every number now in that cell has been through
+  the screen's own guard.
+- `anyBe` also keeps the column when a row was *suppressed*, so the paste carries the reason
+  rather than dropping the question silently.
+- `_scExportBasisLines()` gains a **BREAKEVEN** note, emitted only when such a row is actually
+  in the file, naming the countries, stating that ORCA stores 1.0 as a DCF floor artifact, that
+  it must not be sorted or cited as a breakeven, and that a blank on any *other* row means the
+  opposite thing.
+
+## Result
+An analyst building an IC screening table from the Screener can no longer carry Saudi Arabia,
+Bahrain or Kuwait into a memo as a **$1/bbl** barrel — by paste, by CSV, or by sorting the XLSX.
+Where the cell is blank they can now tell which of the two reasons it is blank: the regime has
+no contractor position and never will, or the breakeven is not modelled there yet.
+
+## Mobile (Step 5b) — 390×844, `hasTouch: true`
+- `scrollWidth` 390 = `clientWidth` 390 on **all 10 tabs**. 0 horizontal overflow.
+- Touched controls on Screener: Reset 44px, Copy Link 28px, Copy for IC Memo 44px, CSV 44px,
+  Excel 44px. **0 under 24px.** No box sizes changed this cycle — the edit is export-path JS.
+- v612 MOBILE LAYER untouched; `#reference-panel` untouched.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load. From 771-780.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-780.
+- Mechanic filter is a country-level include-set, not contract-level. From 766-780.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-780.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes
+  vs 173,759. **The office copy is the one that was run**, again this cycle. From 764-780.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-780.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-780.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-780.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`. From 776-780. Checked this cycle:
+  `_icStab = 5 - scoredReformCount`, so the glyph row is *earned* (4+ sourced reforms), not a
+  no-data default — but it prints five empty diamonds with no number and no scale beside it.
+  Lower value than the export defect; not fixed.
+- Sorting Govt Take high→low puts Saudi Arabia (`—`, no take value) at rank 1. From 778-780.
+- `mode-btn-screen` loses its result count when you leave Screener mode. From 778-780.
+- Saudi Arabia's Country Profile emits no `Fiscal character` line and no verdict box. From 779.
+- Nigeria's `Profit Oil (Govt) 40%` has **no source of any kind**. From 780.
+- Side-by-Side clipboard Evidence tier row renders `A · primary-law backed · 66% primary law ·
+  of · 63,848 facts` — a stray `· of ·` from the join. New this cycle, cosmetic, not fixed.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-780.
+
+## Resolved this cycle
+- ✅ **Saudi Arabia / Bahrain / Kuwait exported a $1/bbl breakeven from the Screener** into the
+  clipboard IC table, the CSV and the XLSX. The value the rest of the platform has suppressed
+  since v513, and that Fiscal Compare stopped exporting at v529.
