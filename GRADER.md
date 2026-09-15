@@ -55108,3 +55108,16 @@ Scenario Builder presets are Group 2, so this is on the default path, not an edg
   control that is not there. Minor; not taken.
 - A take of `—` still sorts as the maximum in the Screener (carried from 778/784), and Bahamas
   `≥10.0%` still survives a ≤5% ceiling (carried from 784). Neither is on the T2 path.
+
+---
+## Cycle 785 Log — 2026-09-15 16:52
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 785 complete — shipped as **v877** (`e4ca6f0`), grader log `d15bd76`, both pushed, mirror in sync.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; 784 was T1, last T2 at 779.)
+
+## Friction
+Walked cold at 1440×900 with storage cleared: Country Profile → **Iran**. The profile answers the first half well. The second half — *defend it* — has exactly one route on that tab, because v516 removed the bundled country IRR and left **"IRR: → Model in Sc
