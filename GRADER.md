@@ -53589,3 +53589,129 @@ reporting a gate that did not look at the file.
 
 ## Friction
 Walked T6 cold at 1440 with storage cleared. The deep provenance surfaces are genuinely good — the Country Profile evidence panel names both grading legs and which one binds, the Evidence Chain separates rows the model reads from rows it doesn't and flags dead citations. The break is one colum
+
+---
+## Cycle 775 Log — 2026-09-15 04:4x
+- Test before: 318 PASS / 0 FAIL (deployed URL, read from the suite report)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (local 127.0.0.1 build — the WARN is the `sw.js`
+  404 that only occurs over 127.0.0.1, identical to cycle 774's local baseline)
+- JS syntax gate: 11/11 blocks PASS. Pixel gate: PASS. JS errors: 0.
+- Summary: Cycle 775 complete. v867 shipped and pushed.
+
+## Task
+**T5** — *"Give me something I can paste straight into an IC memo."* (774 was T6, 773 T2,
+772 T1, 771 T3, 770 T4 — T5 was stalest, last run at 769.)
+
+## Friction
+Walked T5 cold at 1440 with storage cleared, then exercised every paste and export surface
+on the platform: 5 "Copy for IC Memo" clipboard controls, 8 file exports, and the print
+path. The mature surfaces held up under measurement — all 7 workbooks/CSVs open and parse
+and carry a Basis/Assumptions sheet or trailing block; Fiscal Compare and the Screener guard
+an untargeted bulk copy with an arm-and-confirm; row ticks survive sort, filter and a tab
+round-trip; the paste headers and the citable columns both track `#fc-price` and
+`#fc-profile` correctly (verified at onshore/$100).
+
+The break is at the end of the platform's own routing. Every one of those artifacts tells
+the analyst the same thing for the one number the database cannot supply — a project return
+on their own capex and opex: *"Use Scenario Builder with project capex/opex for a project
+IRR."* The Country Profile paste says it, Fiscal Compare says it, the Screener CSV says it,
+the Side-by-Side paste says it, the Breakeven CSV says it.
+
+`_sbCopyICLine()` — the control at the end of that route — called
+`navigator.clipboard.writeText()`. Measured on the live build, Indonesia PSC / Deepwater /
+$75: clipboard flavours `["text/plain"]`, **868 characters, one sentence**, with
+twenty-five figures buried behind semicolons:
+
+> `PSC, Deepwater profile, $75/bbl — govt take 66.2%, contractor NPV +$2.3B @10% WACC and`
+> `+$1.6B @15% IOC hurdle (clears), capital at risk $190M, payback year 3; IRR not quoted —`
+> `…; terms as run — cost recovery cap 71%, FTP 20%, govt profit oil 71%, CIT 25%, royalty`
+> `0%; project as run — Deepwater: $1.2B capex, …; price deck on the same terms — $50 58.3%`
+> `/ $1.71B, $75 66.2% / $2.35B, $100 70.3% / $2.94B, $125 72.7% / $3.52B; …`
+
+It was the **last of the seven** IC controls still doing this. Side-by-Side (v503), Fiscal
+Compare (v676), the Country Profile summary (v690), the Country Profile sensitivity table
+(v739), the Screener (v728) and IOC Portfolio all emit `text/html` + TSV. This one is also
+the only artifact on the platform whose assumptions were *chosen by the analyst* and are
+held nowhere else in ORCA — so it is the one where losing the basis is unrecoverable.
+
+## Change
+- `_sbBuildICTable()` decomposes the same run into **16-17 Metric/Value rows**: take, NPV at
+  10% WACC, NPV at the 15% IOC hurdle with CLEARS/FAILS, capital at risk, payback, IRR, the
+  four price-deck points as **four rows**, price swing, the $50 downside with retention,
+  mechanic, profile, terms as run, project as run.
+- `_sbCopyICLine()` now writes **both flavours** through `ClipboardItem` — `text/html` so
+  Word / Google Docs / Outlook / PowerPoint render a real table, TSV so Excel splits into
+  two columns — with a `writeText(TSV)` fallback so no browser loses the artifact.
+- **Nothing is dropped.** The terms and project clauses are reused *verbatim* from
+  `_sbICTermsClause()` / `_sbICProjectClause()` with their leading connector stripped, so
+  screen and clipboard cannot drift. Every qualifying clause becomes a numbered note keyed
+  to the row it qualifies: the HYPOTHETICAL REGIME warning (fires on Saudi Arabia), the
+  withheld-IRR reasoning, the no-capital-at-risk reading, the never-repaid reading, and the
+  flat-NPV comparability rule (fires on Iraq TSC — *"NOT rankable against a PSC or
+  Concession"*, per `MECHANIC_COMPARABILITY.md`).
+- On screen: the 868-character run-on italic preview squeezed into `flex:1` beside the
+  button is replaced by a count of what will actually be copied; the button is relabelled
+  from **"Copy IC line"** to **"⎘ Copy for IC Memo"**, matching the other six controls, and
+  padded from 4px to 7px (24px floor under `pointer: coarse`).
+
+## Result
+The analyst pastes a memo exhibit instead of re-keying a four-price deck and eleven scalars
+out of a sentence — and the fiscal terms and production profile behind the numbers, which
+exist in no ORCA export and no country record, travel with the table rather than dissolving
+into it.
+
+## Verification
+- **JS syntax gate: 11/11 blocks PASS** (re-run after the version bump).
+- **Runtime suite RAN** against the modified local build: **317 PASS / 0 FAIL / 1 WARN**. The
+  WARN is the `sw.js` 404 that only occurs over `127.0.0.1` — the same single check that
+  separates this from the 318/0/0 read against the deployed URL, and identical to cycle
+  774's local baseline. **0 page errors**, cold load and after a full tab walk.
+- **All five `_sbReturnReading()` states exercised live**, not reasoned about: `computed`
+  (Iraq TSC 80.1%, Norway 63.2%), `inflated` (Indonesia, Saudi Arabia, Nigeria Rev Share →
+  *withheld — not a project return*), `uneconomic` (Iran Buy-back $3.1B at risk, India RSC →
+  *none — never repaid*), `no-capital-at-risk` (Australia PRRT, Indonesia Gross Split →
+  *not applicable*). Clipboard flavours read back as `["text/plain","text/html"]` on all
+  four countries tested; HTML carries 17 `<tr>` and the note count the toast claims.
+- **390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on **all 10 tabs**. The
+  button renders **28px** tall under `pointer: coarse`, above the 24px floor.
+- **PIXEL GATE PASS** — no surface got worse than baseline.
+
+## Carried forward (unchanged this cycle)
+- Reform Risk intro reads *"Every sourced fiscal law change across 185 jurisdictions"*;
+  `reform_history.json` holds 83 events across **21**, and the tab's own Snapshot line 200px
+  below says "21 of 185". Text-only, so not a cycle's fix on its own — but the headline and
+  the snapshot contradict each other on the same screen. From 774.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-774.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-774.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-774.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358
+  bytes vs 173,759. The **office copy is the one that was run**. From 764-774.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-774.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-774.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs (capex, opex, peak
+  rate, project life) that do not exist as fields — the PROJECT PROFILE selector is the only
+  way to change them. From 769-774. **Note this cycle's change makes the gap sharper**: the
+  paste now states "Project as run" explicitly, so an analyst who tried and failed to edit
+  capex sees the profile default named in their memo.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+  From 770-774.
+- Side-by-Side Contractor NPV rows carry no highest/lowest markers. From 771-774.
+- Side-by-Side quickstart presets unreachable without clicking Clear. From 771-774.
+- Evidence grade ignores the D (default-estimate) share — downgraded at 774; only Portugal
+  would move a letter. From 768-774.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Still no process check comparing the deployed version string against the local tree. From
+  758, 761-774.
+
+## Resolved this cycle
+- ✅ **The Scenario Builder — the destination every other IC artifact routes to for a project
+  return — emitted `text/plain` only**, one 868-character sentence, and was the last of the
+  seven IC controls not writing a real table.
+
+## New this cycle
+- The Fiscal Compare bulk-copy header reads **"1 countries"** when a filter narrows the table
+  to a single row (seen at `#fc-filter-be` + `#fc-filter-reform` + `#fc-filter-prod` on, which
+  leaves Australia alone). Text-only, so not a cycle's fix on its own.
