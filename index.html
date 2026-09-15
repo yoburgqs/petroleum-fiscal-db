@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v864</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v865</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v864</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v865</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v864</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v865</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49865,6 +49865,28 @@ function _execLiveDCF(country, profileKey, price) {
   // through the same function means the two surfaces cannot report the same run differently,
   // and it reports the two figures that exist for every run: contractor capital actually at
   // risk, and NPV at a 15% IOC hurdle, which is the hurdle test the rate was standing in for.
+  //
+  // ── v865 (T2) — the tile leads with the number it tells you to quote ──────────────────
+  //
+  // v703 stopped the card painting a bad rate green, but left the rate itself as the tile's
+  // 20px headline and put the replacement in the 10px note, inside an unlabelled parenthesis.
+  // Measured on this panel's own default profile at $75 across all 185 countries: 165 come
+  // back `inflated`, 1 `unbounded`, 2 `uneconomic` — so on 168 of 185 countries the biggest
+  // number in the middle tile is one the same tile's footnote says is not a project return.
+  // Only 17 print a rate an IC would accept. `npv15` is non-null for 185 of 185.
+  //
+  // Worse, the replacement carried no basis. "clears a 15% IOC hurdle (+$1.9B)" sat two
+  // inches from a "CONTRACTOR NPV — THIS SCENARIO $2.6B" tile with nothing saying the two are
+  // the same cash flow at different discount rates. The obvious misread — that +$1.9B is
+  // headroom above the hurdle — is wrong, and an analyst pasting it into an IC memo had no way
+  // to find out from this card.
+  //
+  // Scenario Builder's `_sbHurdleLine()` has rendered the honest version since v594:
+  // "contractor NPV +$1.9B at 15% (+$2.6B at the 10% WACC above)". Two surfaces, one run,
+  // two different levels of defensibility. So: when the rate is not a project return, the
+  // tile now leads with the hurdle test — NPV at 15%, with "at 15%" on its face — and the
+  // rate drops into the note as the thing NOT to quote. When the rate is usable (the 17),
+  // it stays the headline and the hurdle test joins the note, still labelled.
   const _r703 = (typeof _sbReturnReading === 'function') ? _sbReturnReading(result) : null;
   const _lblEl703  = document.getElementById('ldcf-irr-lbl-' + slug);
   const _noteEl703 = document.getElementById('ldcf-irr-note-' + slug);
@@ -49873,32 +49895,47 @@ function _execLiveDCF(country, profileKey, price) {
     const _m703 = v => v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'B' : '$' + Math.round(v) + 'M';
     const _sgn703 = v => (v < 0 ? '−' : '+') + _m703(Math.abs(v));
     const _inflated703 = (_r703.state === 'inflated' || _r703.state === 'unbounded');
+    // The rate is unusable in three structurally different ways, and in all three the hurdle
+    // test is the figure that answers the question. `uneconomic` is included deliberately:
+    // its "no IRR" is a finding, but a NEGATIVE NPV at 15% states the size of the miss.
+    const _noRate703 = _inflated703 || _r703.state === 'no-capital-at-risk' || _r703.state === 'uneconomic';
+    const _useHurdle703 = _noRate703 && _r703.npv15 !== null;
+    const _clears703 = _r703.npv15 !== null && _r703.npv15 > 0;
 
-    irrEl.textContent = _r703.value;
-    // An inflated or unbounded rate is never painted green. Green is the page telling the
-    // analyst the number is usable, and this one is not.
-    irrEl.style.color = _inflated703 ? 'var(--muted)' : _r703.color;
-    irrEl.style.fontSize = (_r703.value.length > 7) ? '15px' : '';
+    if (_useHurdle703) {
+      // Headline becomes the hurdle test. The dollar figure carries its own discount rate in
+      // the label above it, so it can never be read as headroom over the 10% NPV tile.
+      irrEl.textContent = _sgn703(_r703.npv15);
+      irrEl.style.color = _clears703 ? 'var(--green)' : 'var(--red)';
+      irrEl.style.fontSize = (irrEl.textContent.length > 7) ? '15px' : '';
+    } else {
+      irrEl.textContent = _r703.value;
+      // An inflated or unbounded rate is never painted green. Green is the page telling the
+      // analyst the number is usable, and this one is not.
+      irrEl.style.color = _inflated703 ? 'var(--muted)' : _r703.color;
+      irrEl.style.fontSize = (_r703.value.length > 7) ? '15px' : '';
+    }
 
     if (_lblEl703) {
-      _lblEl703.innerHTML = _inflated703
-        ? 'Contractor IRR &mdash; <span style="color:var(--orange);font-weight:700;">not a project return</span>'
-        : 'Contractor IRR &mdash; this scenario';
+      if (_useHurdle703) {
+        _lblEl703.innerHTML = 'Contractor NPV @ 15% &mdash; '
+          + '<span style="color:' + (_clears703 ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
+          + (_clears703 ? 'clears the IOC hurdle' : 'fails the IOC hurdle') + '</span>';
+      } else {
+        _lblEl703.innerHTML = 'Contractor IRR &mdash; this scenario';
+      }
     }
     if (_noteEl703) {
-      const _hurdle703 = (_r703.npv15 !== null)
-        ? (_r703.npv15 > 0 ? '<span style="color:var(--green);font-weight:700;">clears</span>' : '<span style="color:var(--red);font-weight:700;">fails</span>')
-          + ' a 15% IOC hurdle (' + _sgn703(_r703.npv15) + ')'
-        : '';
       let _body703;
       if (_r703.state === 'no-capital-at-risk') {
         _body703 = 'Contractor funds no negative year'
           + (_capexMM703 ? ' &mdash; cost recovery reimburses the ' + _m703(_capexMM703) + ' capex as it is spent' : '')
           + ', so there is no capital base for a rate of return.';
       } else if (_r703.state === 'uneconomic') {
-        _body703 = _m703(_r703.atRisk) + ' at risk &middot; never repaid.';
+        _body703 = _m703(_r703.atRisk) + ' at risk &middot; never repaid &mdash; no IRR exists.';
       } else if (_inflated703) {
-        _body703 = 'Only <strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong>'
+        _body703 = 'IRR is <strong style="color:var(--text);">' + _r703.value + '</strong> and is not quoted: only '
+          + '<strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong>'
           + (_capexMM703 ? ' of ' + _m703(_capexMM703) + ' capex' : '')
           + ' is ever at risk &mdash; cost recovery reimburses the rest as it is spent'
           + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
@@ -49908,7 +49945,21 @@ function _execLiveDCF(country, profileKey, price) {
           + (_r703.payback ? ' &middot; payback year ' + _r703.payback : ' &middot; never repaid')
           + ' &middot; 25yr project.';
       }
-      _noteEl703.innerHTML = _body703 + (_hurdle703 ? '<br><span style="display:inline-block;margin-top:3px;">Quote this instead: ' + _hurdle703 + '.</span>' : '');
+      // Both figures are the SAME cash flow at two discount rates. Whichever one is the
+      // headline, the closing line names the other and says so — that is the sentence that
+      // was missing, and it is why "+$1.9B" could be misread as headroom.
+      let _tail703 = '';
+      if (_useHurdle703) {
+        _tail703 = 'Same cash flow as the 10% NPV tile, discounted at 15% instead'
+          + (result.npv != null ? ' (' + _sgn703(result.npv) + ' at 10%)' : '') + '.';
+      } else if (_r703.npv15 !== null) {
+        _tail703 = 'Hurdle test: contractor NPV <strong style="color:var(--text);">' + _sgn703(_r703.npv15)
+          + ' at 15%</strong> &mdash; '
+          + '<span style="color:' + (_clears703 ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
+          + (_clears703 ? 'clears' : 'fails') + '</span> a 15% IOC hurdle. Same cash flow, higher discount rate.';
+      }
+      _noteEl703.innerHTML = _body703
+        + (_tail703 ? '<br><span style="display:inline-block;margin-top:3px;">' + _tail703 + '</span>' : '');
       _noteEl703.style.lineHeight = '1.5';
     }
   } else if (irrEl) {

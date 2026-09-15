@@ -53328,3 +53328,118 @@ $125 figure into an IC memo under a header that says $75.
 Walked cold at 1440 with storage cleared: Screener → loaded **IOC Capital Screen** (15 countries) → clicked the **$125** price deck. That's the obvious second move for an IC screen, and the whole reason the deck was put on this tab.
 
 The deck works — the rows genuinely re-r
+
+---
+## Cycle 773 Log — 2026-09-15
+
+- Test before: 318 PASS / 0 FAIL
+- Test after: **317 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the modified local build (same as 772's local-build baseline; the 1 WARN is a 404 on a service-worker fetch, an artifact of local serving, not a code defect)
+- JS errors: 0
+- Summary: **v865 shipped.**
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(772 was T1, 771 T3, 770 T4, 769 T5, 768 T6 — T2 was stalest, last run at 767.)
+
+## Friction
+Walked cold at 1440 with `sessionStorage` and `localStorage` cleared, over a local HTTP
+server so the JSON payloads actually load. Country Profile → Indonesia (the seeded
+default) → read the headline strip, the evidence chain, the 4-price table — all of which
+are candid and defensible — then scrolled to the one panel on the page that answers "at
+*my* assumptions": **⚙ LIVE DCF MODEL**, `_execLiveDCF()` → the middle result tile
+(`#ldcf-irr-*`, index.html:49768-49770, render at 49889-49968).
+
+The tile printed **`155.2%`** at 20px bold (`.dcf-result-value`, index.html:697) — and
+then, in 10px `.dcf-result-note` underneath, told the analyst not to use it:
+
+> *Only $178M of $1.2B capex is ever at risk … The rate is a return on that exposure, not
+> on the project.*
+> *Quote this instead: clears a 15% IOC hurdle (+$1.9B).*
+
+Two separate defects, one moment:
+
+1. **The tile led with the number it disowns.** Measured, not assumed — `runLiveDCF()` +
+   `_sbReturnReading()` over all 185 countries on this panel's own default profile at $75:
+   **165 `inflated`, 1 `unbounded`, 2 `uneconomic` = 168 of 185.** Only **17** print a rate
+   an IC would accept. So on 91% of countries the biggest number in the tile is one the
+   tile's own footnote retracts. `npv15` is non-null for **185 of 185** — the usable figure
+   existed for every single country and was rendered half the size, in a parenthesis.
+
+2. **The replacement carried no basis.** `(+$1.9B)` sat two inches from a
+   `CONTRACTOR NPV — THIS SCENARIO  $2.6B` tile with nothing on screen saying the two are
+   the *same cash flow at different discount rates*. The natural misread — that +$1.9B is
+   headroom above the hurdle — is wrong, and nothing on the card contradicted it. Carried
+   unfixed from cycles 767-772.
+
+Scenario Builder has rendered the honest version since v594 — `_sbHurdleLine()`,
+index.html:49384: *"contractor NPV +$1.9B at 15% (+$2.6B at the 10% WACC above)"*. v703
+routed this card through the shared `_sbReturnReading()` specifically so *"the two surfaces
+cannot report the same run differently."* At the verdict level they still did.
+
+## Change
+The middle tile now leads with whichever figure is actually quotable.
+
+- **When the rate is not a project return** (`inflated` / `unbounded` / `no-capital-at-risk`
+  / `uneconomic` — 168 of 185 countries), the tile's 20px headline becomes the hurdle test:
+  label `CONTRACTOR NPV @ 15% — CLEARS THE IOC HURDLE` (green) or `— FAILS THE IOC HURDLE`
+  (red), value `+$1.9B` / `−$1.1B` coloured to match. The rate drops into the note as the
+  thing explicitly *not* quoted: *"IRR is 155.2% and is not quoted: only $178M of $1.2B
+  capex is ever at risk…"*
+- **When the rate is usable** (the 17), it stays the headline unchanged, and the hurdle test
+  joins the note *with its basis*: *"Hurdle test: contractor NPV +$490M at 15% — clears a
+  15% IOC hurdle. Same cash flow, higher discount rate."*
+- **Either way the 10%/15% relationship is now stated**, which is what was missing:
+  *"Same cash flow as the 10% NPV tile, discounted at 15% instead (+$2.6B at 10%)."*
+- `uneconomic` is deliberately included: its "no IRR" is a finding, but a *negative* NPV at
+  15% states the size of the miss. Iran now reads `−$1.1B · FAILS THE IOC HURDLE` in red
+  instead of a grey "no IRR".
+
+## Result
+The analyst pressure-testing a country at $75/bbl now reads a figure they can defend in an
+IC memo as the tile's headline, with its discount rate on its face, instead of a 155% rate
+the same tile retracts one line below. On 168 of 185 countries that is a different number
+in the largest type on the card. The "+$1.9B" that could be misread as hurdle headroom now
+says "at 15%" in its own label and names the 10% figure it is paired with — so the Country
+Profile and the Scenario Builder can no longer report the same run at two different levels
+of defensibility.
+
+## Verification
+- **JS syntax gate: PASS** (all inline `<script>` blocks extracted, `node --check`).
+- **Runtime suite RAN** this cycle against the modified local build over a threaded HTTP
+  server (the single-threaded `python3 -m http.server` stalls the suite at `networkidle` —
+  first attempt died on a 45s `page.goto` timeout, which is worth knowing).
+- **Both branches walked live** on Indonesia/Guyana/Azerbaijan/Brazil (hurdle headline),
+  Norway/Algeria/Iraq (IRR headline), Iran (fails, red, negative) — 0 page errors.
+- **All 18 profile × price combinations** on Indonesia (6 profiles × $40/$75/$125): every
+  one renders, every one carries the 15% basis in the note, branch switches cleanly at the
+  boundary (deepwater $40 → IRR headline, $75/$125 → hurdle headline).
+- **390 × 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on all 10 tabs. Result
+  card 324×149 with no internal overflow. **No control was added or touched**, so the 24px
+  `pointer: coarse` floor is unaffected by this change.
+
+## Carried forward (unchanged this cycle)
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-772.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-772.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-772.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358
+  bytes vs 173,759. The **office copy is the one that was run**. From 764-772.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse` (`input.sc-sel`,
+  `#sc-sel-all`). Flagged by 772 as the next T1/T5 candidate. Still open.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-772.
+- Evidence grade ignores the D (default-estimate) share. From 768-772.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal over-promises production-parameter inputs that do not exist. From 769-772.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5. From 770-772.
+- Side-by-Side Contractor NPV rows carry no highest/lowest markers. From 771-772.
+- Side-by-Side quickstart presets unreachable without clicking Clear. From 771-772.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Still no process check comparing the deployed version string against the local tree. From
+  758, 761-772.
+
+## Resolved this cycle
+- ✅ **"The Cost Recovery / IRR card's *clears a 15% IOC hurdle (+$490M)* has no basis line"**
+  — carried from 767-772, closed by this change. The figure now carries "at 15%" in its own
+  label when it is the headline, and "at 15% … same cash flow, higher discount rate" in the
+  note when it is not.
