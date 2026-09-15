@@ -55121,3 +55121,118 @@ Scenario Builder presets are Group 2, so this is on the default path, not an edg
 
 ## Friction
 Walked cold at 1440×900 with storage cleared: Country Profile → **Iran**. The profile answers the first half well. The second half — *defend it* — has exactly one route on that tab, because v516 removed the bundled country IRR and left **"IRR: → Model in Sc
+
+---
+## Cycle 786 Log — 2026-09-15 23:10
+
+- Test before: **304 PASS / 0 FAIL / 0 WARN / 0 JS errors**
+- Test after:  **304 PASS / 0 FAIL / 0 WARN / 0 JS errors**
+- **Suite RAN this cycle**, both numbers read from the suite's own `ORCA_REPORT_FILE`. "Before" is
+  a genuine second run, not a carried number: `git show HEAD:index.html` was written into a scratch
+  tree symlinked to the same data files and served on its own port (:8138), so the two figures are
+  one suite over two builds. 304 rather than 318 is the local-prefix target, as recorded at 785 —
+  318 carries assertions that only run against the deployed GitHub Pages URL. Stated, not reconciled.
+- Shipped as **v878** (`03d9196`), committed, mirrored to
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html`, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation;
+785 was T2, 784 T1, 783 T3, 782 T4, 781 T5 — last T6 at 780.)
+
+## Friction
+Walked cold at 1440x900, both storages cleared. Hovering a figure is this platform's universal
+"where did this come from" gesture, and on a government take it was answered by a hand-typed
+literal inside the shared formatter `fmtTake()`:
+
+> Government take on standardized **$1.2B deepwater project**. Production-weighted where coverage
+> data available.
+
+`$1.2B / $15-flat` is **`DCF_PROFILES.deepwater`** — the in-page Live DCF and Scenario Builder
+what-if project. Every take in `COUNTRY_DATA` was produced by `petroleum_dcf.py` on
+`dcf_profiles.py PROFILES.deepwater` = **`ENGINE_BASIS`**: $1.0B all-in, $18/bbl escalating 2%/yr
+real, 5yr plateau, 241.9 MMbbl. Because `fmtTake()` is shared, that one literal was printing over
+the take on **five surfaces at once** — Explorer ($50/$100/$125), the Screener, the IOC Portfolio,
+the Country Profile peer table and the mechanic table.
+
+The same error stood on two more surfaces whose *neighbours* had already been corrected, which is
+what makes it a leftover rather than a policy:
+
+| surface | corrected at | left behind |
+|---|---|---|
+| FC `db · citable` NPV **column header** | v841 (derives `_fcEngShort`) | the **cell** hover under it, still `$1.2B` |
+| Side-by-Side **basis strip** | v835 (derives from `ENGINE_BASIS`) | **4 NPV label/pill** hovers, still `$1.2B` |
+
+So on Fiscal Compare the header warned "these are different projects both called Deepwater" and the
+cell one row below contradicted it.
+
+**The worst moment is not the wrong string — it is that checking it confirms it.** The analyst's
+next move is the route the platform itself advertises ("Model in Scenario Builder"). That modal
+opens on an option reading, character for character, `Deepwater — $1.2B capex · 50k bbl/d ·
+$15/bbl opex`, and `_sbRenderBasis()` asserted underneath it:
+
+> Deepwater is ORCA's standardized reference basis — **it is the same project behind the NPV on
+> every Country Profile and in Fiscal Compare.**
+
+with the non-deepwater branch adding that *only* Deepwater matches — i.e. telling the analyst to
+switch **to** the wrong profile to reproduce the published figure. Three surfaces agreed with each
+other and all three disagreed with the engine, so every cross-check available returned the error.
+The analyst discovers it only from a ~3x NPV gap, with nothing on the path to explain it.
+
+## Change
+Eleven basis strings are now **derived from `ENGINE_BASIS` at call time**, the treatment v574 gave
+the citation versions, v834 the exports, v835 the SbS strip and v839 the CP headline hovers:
+
+- `_takeBasisTip()` / `_takeBasisAttr()` — the take hover on all five shared-formatter surfaces.
+  It now names the engine project and adds, explicitly, that this is **not** the profile of the
+  same name in the Live DCF and Scenario Builder and that running it will not reproduce the number.
+- `_cmpEngBasisAttr()` — the 4 Side-by-Side NPV hovers.
+- `_fcDbNpvCell()` — now uses the same `_fcEngShort` its own column header already derived.
+- `_sbRenderBasis()` — the false identity claim is **withdrawn**, and the correction is put in
+  **visible text, not a hover**: a new block under the profile selector reading *"What-if only —
+  not the basis of any published figure"*, naming the engine basis and stating that **no** option
+  in the selector reproduces the published numbers. This is the modal an analyst opens to defend a
+  figure they are about to cite; the claim it disproves was the reason they opened it.
+
+**Withheld rather than re-pointed.** The tempting fix is to add an "ORCA published basis" profile
+to the Scenario Builder. Measured against the shipped file: fed `ENGINE_BASIS`'s own headline
+parameters, the in-page `buildProductionProfile()` returns **224.6 MMbbl / $1,390M capex** against
+the engine's **241.9 / $1,000M** — the in-page builder applies sustaining and escalation rules the
+Python engine does not. No profile in `DCF_PROFILES` can reproduce a published figure and none
+could be made to by relabelling. Adding one would have manufactured a false claim in place of the
+one being removed. Same precedent as v451 (Govt NPV deleted) and v877 (Group-2 rank withheld):
+removing the untrustworthy assertion **is** the improvement.
+
+Observed after the change, live DOM, all 9 tabs:
+
+| | before | after |
+|---|---|---|
+| titles asserting the `$1.2B / $15` basis over a stored figure | **11** | **0** |
+| titles carrying the derived engine basis | 0 | present on every take and citable-NPV cell |
+| SB basis line, cold open (Angola, deepwater) | claims identity with CP/FC, hover only | visible "What-if only — not the basis of any published figure" |
+| SB basis line, non-deepwater (north_sea) | "only Deepwater matches" | "No profile in this selector reproduces those numbers" |
+
+## Result
+An analyst defending a cited take or NPV now reads the assumptions that **actually produced it** —
+`50k bbl/d peak · 5yr plateau · 241.9 MMbbl · $1.0B all-in capex · $18/bbl opex escalating 2%/yr ·
+25yr life · 10% WACC` — at the moment they hover the number, on every table that prints one. And
+they are told **before** they run the Scenario Builder that the modal cannot reproduce the
+published figure, rather than discovering it afterwards from a ~3x gap that the tool had twice
+told them should not exist. A figure pasted into an IC memo now carries a basis its reviewer can
+rebuild it from.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all 9 tabs reachable at that
+  width, and with the Scenario Builder modal open over the Country Profile.
+- The new basis block measures **315 scrollWidth / 315 clientWidth** — no internal overflow.
+- It adds **no controls**: prose only, so the 24px `pointer: coarse` floor is not engaged.
+
+## Carried forward (unchanged this cycle, re-confirmed while walking T6)
+- The remaining `$1.2B capex` occurrences in the file are **FAQ and Methodology prose** describing
+  the Scenario Builder / model basis, where the figure is correct for what it describes. Not swept
+  — a sweep of 200 prose instances is bookkeeping, and the directive bans it. What was fixed is
+  every string attached to a **published** figure.
+- `▶ Run FC at this price` on the Country Profile still reads `cp-price-select`, which does not
+  exist on that tab (carried from 785). Harmless today; not taken.
+- A take of `—` still sorts as the maximum in the Screener (carried from 778/784), and Bahamas
+  `≥10.0%` still survives a ≤5% ceiling (carried from 784). Neither is on the T6 path.
+- The CP NPV chip / verdict-sentence basis split recorded at 785 stands unreopened.
