@@ -54715,3 +54715,135 @@ contradictory ones.
 The Reform Risk tab itself walked clean. The break was on the other T4 surface: **Country Profile → Predictability**.
 
 For Nigeria, the badge correctly reads `≤46 · LOW` — the platform has withdrawn the printed 73 · MODERATE because Nigeria's own contract table shows a 33.9pp tak
+
+---
+## Cycle 783 Log — 2026-09-15 18:5x
+- Test before: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: **318 PASS / 0 FAIL / 0 WARN / 0 JS errors** — suite RAN this cycle, not assumed.
+- Shipped as **v875**, pushed (`8cd5463`), mirror in sync.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation: 782 was T4,
+781 T5, 780 T6, 779 T2, 778 T1 — T3 last run at 777.)
+
+## Friction
+Walked cold at 1440x900: cleared sessionStorage and localStorage, reloaded, clicked Side-by-Side.
+No typing, no preset — the tab's own seeded example, Norway / United Kingdom / Netherlands.
+
+The **Predictability Score** row painted three badges at equal weight:
+
+| | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| badge (pill, bold) | `76 · UNGRADED` `≥29.6pp obs` ▲ best case | `58 · LOW` `15.0pp` | `84 · UNGRADED` `≥30.8pp obs` ▲ best case |
+| under it (10px orange) | `→ carry ≤52 · LOW` | — | `→ carry ≤59 · LOW` |
+
+A comparison grid is read by scanning a row. Scanned, that row is **76 / 58 / 84**, which ranks
+**Netherlands > Norway > United Kingdom**. The platform's own finding is the reverse, and it says
+so in two other places on the same screen — the strip 300px above (`PREDICTABILITY, MOST STABLE
+FIRST: United Kingdom 58 › Norway ≤52`) and the Copy-for-IC-Memo paste. So the most prominent
+number in the cell was a number the platform had **withdrawn**, and the number it stands behind
+was a footnote under it.
+
+This is not a new finding about the data — v714 computed the ceiling and printed it, v772 got both
+orders onto the strip, v864 extended the refutation to the measured cohort. What none of them
+touched is the **shape of the cell**, which is what actually gets read.
+
+Element: `_sbsPaintObsSpread()`, the `fp`-cell branch, `index.html:31308`.
+
+## Change
+The cell is inverted, at `index.html:31278–31346`:
+
+- The **ceiling moves into the badge** — `≤52 · LOW` with the `≥29.6pp obs` chip, in ceiling-orange.
+- The **stored score moves to the sub-line**, struck through and named: `stored: 7̶6̶ ▲ withdrawn`.
+- The `→ carry ≤52 · LOW` line is **removed** — the badge is that figure now. Its full derivation
+  moves onto the badge `title`, not one clause reworded.
+- `▲ best case` travels down with the stored score; it stays inside the badge only where no
+  ceiling could be computed and the badge is therefore still showing the stored score.
+
+Badge takes **ceiling-orange, not a band colour**: v624's rule is that a graded band and its colour
+are earned by a charged IQR penalty, and a ceiling is a bound, not a score — the same thing the
+strip's `≤ = ceiling, not a score` chip says. Idiom is v864's, already in use one row down on
+**Take spread across contracts**, where the bundled band stays on screen struck through under the
+observed one.
+
+The loop patches the visible cell and the hidden `#cmp-data-table` cell together, so Export PDF and
+both Copy-for-IC-Memo buttons lead with the ceiling as well. The clipboard separator reads
+`stored:` rather than `stored` so `cellText()`'s fuse rule does not insert a stray `·` between the
+word and the number (the `· of ·` family of artifact).
+
+## Result
+The badge row now reads **`≤52 · LOW` / `58 · LOW` / `≤59 · LOW`** — the same order as the strip's
+verdict and the memo paste. An analyst who scans the Predictability row of the tab's own default
+set now writes *"the UK is the most fiscally predictable of the three"* into the IC memo. Before
+this change the row said the Netherlands was, which is the opposite of what this platform concluded.
+
+Verified on a second, independently built set — Angola / Nigeria / Ghana:
+`Angola ≤26 · VERY LOW (stored 6̶2̶)` / `Nigeria ≤46 · LOW (stored 7̶3̶)` / `Ghana 52 · LOW`, with
+Ghana — the only measured column — correctly first, matching its strip.
+
+Both withdrawn figures remain on screen and in every export. Nothing was recomputed or hidden.
+
+## Mobile (Step 5b) — 390×844, `hasTouch: true`
+- `scrollWidth` 390 = `clientWidth` 390 on **all 13 panes**. 0 horizontal overflow.
+- The changed cell at 390: 87px wide, 134px tall, right edge 375 of 390, no overflow.
+- **No control added or resized.** 0 interactive elements inside the fp cells (`button/a/input/select`).
+- v612 MOBILE LAYER untouched; `#reference-panel` untouched.
+- Horizontal scroll also 0 at **1920 / 1440 / 1280 / 1024 / 768** across all 13 panes.
+
+## Process note — cycle 782's "317 PASS / 1 JS error" was the harness, not a regression
+782 logged a drop to 317 PASS with 1 JS error. That is a **test-path artifact, not a defect in the
+build.** `index.html:49` registers the service worker at the absolute path
+`/petroleum-fiscal-db/sw.js`. Served from the repo root on localhost that 404s; served from the
+parent directory — the same path shape GitHub Pages has — it resolves. Reproduced both ways this
+cycle against an unchanged tree:
+
+| server root | sw.js | result |
+|---|---|---|
+| `petroleum-fiscal-db/` on :8899 | 404 | 317 PASS / 0 FAIL / **1 WARN / 1 JS error** |
+| `~/` on :8900, `/petroleum-fiscal-db/index.html` | 200 | **318 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
+
+The 318th assertion is `[ConsoleErrors] no JS errors`. **Any local suite run must be served so that
+`/petroleum-fiscal-db/` is the URL path**, or it will report a phantom regression every time.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load, so `#cmp-output`'s empty state never renders. Confirmed again
+  this cycle by direct read: `quickstartVisible: false` on cold load. This means **v817's whole
+  cycle — computing live take ranges and set-aside counts onto those four preset buttons — is
+  invisible to every cold-load user.** Raised in priority by that observation. From 771-783.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-783.
+- Mechanic filter is a country-level include-set, not contract-level. From 766-783.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-783.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes
+  vs 173,759. **The office copy is the one that was run**, again this cycle. From 764-783.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-783.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-783.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-783.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`. From 776-783.
+- Sorting Govt Take high→low puts Saudi Arabia (`—`, no take value) at rank 1. From 778-783.
+- `mode-btn-screen` loses its result count when you leave Screener mode. From 778-783.
+- Saudi Arabia's Country Profile emits no `Fiscal character` line and no verdict box. From 779.
+- Nigeria's `Profit Oil (Govt) 40%` has **no source of any kind**. From 780.
+- Side-by-Side clipboard Evidence tier row renders a stray `· of ·` from the join. From 781-783.
+  **Root cause found this cycle, not fixed:** `cellText()`'s `walk()` at `index.html:48554` calls
+  `.trim()` on each child piece and then re-inserts ` · ` wherever two pieces "would collide into
+  one token" — so whitespace that was already there is destroyed and then replaced by a separator.
+  A fix would compare against the untrimmed node, but it shifts many pasted cells at once and the
+  suite asserts on several, so it was not taken inside a T3 cycle. Worked around locally.
+- Vintage Analysis pane (`#t4`) holds a second reform table whose country buttons still run the
+  pre-v812 three-statement route into Country Profile. From 782.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-783.
+
+## Resolved this cycle
+- ✅ **The Side-by-Side Predictability row no longer ranks its columns by a withdrawn number.**
+  The badge is the ceiling; the stored score is struck through beneath it. Cold default set
+  re-ordered from a visual `NL 84 > NO 76 > UK 58` to `UK 58, NO ≤52, NL ≤59` — matching the
+  platform's own verdict strip.
