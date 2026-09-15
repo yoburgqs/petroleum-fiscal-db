@@ -54700,3 +54700,18 @@ contradictory ones.
 ## Resolved this cycle
 - ✅ **Kazakhstan and Nigeria no longer rank 2nd and 3rd of 28 on fiscal predictability** on a
   Country Profile that withdraws the band those ranks were computed from. 7 countries corrected.
+
+---
+## Cycle 782 Log — 2026-09-15 13:13
+- Test before: 318 PASS / 0 FAIL
+- Test after: 317 PASS / 0 FAIL
+- JS errors: 1
+- Summary: Cycle 782 complete — shipped as **v874**, pushed (`d30c1e5`, log `7d72588`), mirror in sync.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; last run at 776).
+
+## Friction
+The Reform Risk tab itself walked clean. The break was on the other T4 surface: **Country Profile → Predictability**.
+
+For Nigeria, the badge correctly reads `≤46 · LOW` — the platform has withdrawn the printed 73 · MODERATE because Nigeria's own contract table shows a 33.9pp tak
