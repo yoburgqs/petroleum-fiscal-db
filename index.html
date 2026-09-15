@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v874</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v875</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2546,7 +2546,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v874</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v875</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2616,7 +2616,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v874</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v875</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -31251,7 +31251,11 @@ function _sbsPaintObsSpread(c, d, obs, token) {
         + 'cost ' + cost.toFixed(0) + ' points'
         + (bound == null ? '.' : ', putting ' + c + ' near ' + bound + ' \u00b7 ' + bLbl + ' rather than ' + fp + '.')
         + ' Not recomputed here \u2014 read the printed score as the best case, not the finding.';
-      if (!badge.dataset.obsMarked) {
+      // v875 (T3): the marker stays INSIDE the badge only when no ceiling could be computed and
+      // the withdrawn score is therefore still what the badge shows. Where a ceiling exists the
+      // badge below becomes the ceiling, and "best case" describes the demoted stored score, so
+      // it travels down with it rather than labelling a figure it is not about.
+      if (!badge.dataset.obsMarked && bound == null) {
         badge.dataset.obsMarked = '1';
         badge.insertAdjacentHTML('beforeend',
           '<span style="font-size:9px;font-weight:800;color:var(--orange);margin-left:4px;" '
@@ -31271,28 +31275,75 @@ function _sbsPaintObsSpread(c, d, obs, token) {
     // the UK, the only measured column, goes from last to joint first.
     // Not a recompute: obs.spread is a FLOOR on the true spread, so cost is a floor on the
     // penalty and this is a CEILING on the score. Same rule as v559 and v713.
+    // ── v875 (T3): the withdrawn score kept the badge; the figure to carry was the footnote ──
+    //
+    // v714 computed the ceiling and printed it, and v772 got both orders onto the strip. What
+    // neither touched is the shape of the CELL, and on a grid built to rank countries the cell
+    // is what gets read. Walked T3 cold this cycle — Side-by-Side, no storage, the tab's own
+    // seeded Norway / United Kingdom / Netherlands — and the Predictability Score row painted:
+    //
+    //   Norway  [ 76 · UNGRADED | ≥29.6pp obs ] ▲ best case      United Kingdom [ 58 · LOW | 15.0pp ]
+    //           → carry ≤52 · LOW   (10px, under the pill)
+    //   Netherlands [ 84 · UNGRADED | ≥30.8pp obs ] ▲ best case
+    //           → carry ≤59 · LOW   (10px, under the pill)
+    //
+    // Three pills in a row, at badge weight: 76, 58, 84. Scanned across — which is the only way
+    // a comparison grid is read — that ranks Netherlands over Norway over the UK. The platform's
+    // own finding, on the strip 300px above and in the Copy-for-IC-Memo paste, is the reverse:
+    // United Kingdom 58 first, Norway ≤52 last. So the grid's most prominent number is a number
+    // the platform has WITHDRAWN, and the number it stands behind was in 10px orange underneath.
+    // An analyst reading the row writes "Netherlands is the most fiscally predictable of the
+    // three" into the IC memo, which is the opposite of what this platform concluded.
+    //
+    // This inverts the cell. It does not recompute or hide anything: the ceiling moves INTO the
+    // badge and the stored score moves to the sub-line, struck through and named as withdrawn —
+    // exactly the idiom v864 already uses one row down on Take spread across contracts, where the
+    // bundled band stays on screen struck through under the observed one. The badge takes the
+    // ceiling's orange rather than a band colour, because v624's rule is that a graded band and
+    // its colour are earned by a charged IQR penalty, and a ceiling is a bound, not a score —
+    // the strip says the same thing with its "≤ = ceiling, not a score" chip.
+    //
+    // Both the visible cell and the hidden #cmp-data-table cell are patched by the same loop, so
+    // the PDF and both Copy-for-IC-Memo artifacts lead with the ceiling too.
     if (bound != null && !host.dataset.obsBound) {
       host.dataset.obsBound = '1';
+      // The derivation v714 hung on the "→ carry" line moves onto the badge, because the badge
+      // is now the figure it derives. Not one clause of it is reworded.
+      var _deriv875 = 'Carry ' + bound + ' · ' + bLbl + ' for ' + c + ', not the stored ' + fp + '. '
+        + 'The take-spread component of this score — its largest, worth up to −40 points — '
+        + 'was charged '
+        + (one ? 'ZERO because the bundled p25 and p75 take for ' + c + ' are identical. '
+               : cl.charged.toFixed(1) + ' points because the bundled p25/p75 take for ' + c
+                 + ' are ' + bundled + '. ')
+        + 'ORCA’s own contract file lists the ' + obs.n + ' largest producing contracts running '
+        + range + ' government take at $75/bbl across ' + obs.distinct + ' distinct values, so that '
+        + 'basis does not hold. At ' + obs.spread.toFixed(1) + 'pp the spread term alone costs '
+        + cost.toFixed(0) + ' points. The score is NOT recomputed — a top-' + obs.n
+        + '-by-production sample cannot establish a population IQR across all ' + nAll
+        + ' contracts — but the observed spread is a floor on the real one, so '
+        + cost.toFixed(0) + ' points is a floor on the penalty and ' + bound + ' is a CEILING on '
+        + 'the score: the true figure is at or below it, never above. Cite ' + bound
+        + ' as a ceiling, with the observed range ' + range + ' attached — it places this '
+        + 'column below a measured score at or above it, and against nothing else.';
+      if (badge && !badge.dataset.obsFlipped) {
+        badge.dataset.obsFlipped = '1';
+        var _lead875 = badge.firstChild;
+        if (_lead875 && _lead875.nodeType === 3) _lead875.nodeValue = '≤' + bound + ' · ' + bLbl;
+        badge.style.color = 'var(--orange)';
+        badge.style.borderColor = 'var(--orange)';
+        badge.style.background = 'rgba(194,65,12,.10)';
+        badge.title = (badge.title || '') + '  —— ' + _deriv875;
+      }
       host.insertAdjacentHTML('beforeend',
-        '<span style="display:block;margin-top:3px;font-size:10px;font-weight:800;'
-        + 'color:var(--orange);line-height:1.35;" title="' + _sbsAttr(
-            'Carry ' + bound + ' \u00b7 ' + bLbl + ' for ' + c + ', not the printed ' + fp + '. '
-          + 'The take-spread component of this score \u2014 its largest, worth up to \u221240 points \u2014 '
-          + 'was charged '
-          + (one ? 'ZERO because the bundled p25 and p75 take for ' + c + ' are identical. '
-                 : cl.charged.toFixed(1) + ' points because the bundled p25/p75 take for ' + c
-                   + ' are ' + bundled + '. ')
-          + 'ORCA\u2019s own contract file lists the ' + obs.n + ' largest producing contracts running '
-          + range + ' government take at $75/bbl across ' + obs.distinct + ' distinct values, so that '
-          + 'basis does not hold. At ' + obs.spread.toFixed(1) + 'pp the spread term alone costs '
-          + cost.toFixed(0) + ' points. The score is NOT recomputed \u2014 a top-' + obs.n
-          + '-by-production sample cannot establish a population IQR across all ' + nAll
-          + ' contracts \u2014 but the observed spread is a floor on the real one, so '
-          + cost.toFixed(0) + ' points is a floor on the penalty and ' + bound + ' is a CEILING on '
-          + 'the score: the true figure is at or below it, never above. Cite ' + bound
-          + ' as a ceiling, with the observed range ' + range + ' attached — it places this '
-          + 'column below a measured score at or above it, and against nothing else.')
-        + '">\u2192 carry \u2264' + bound + ' \u00b7 ' + bLbl + '</span>');
+        '<span style="display:block;margin-top:3px;font-size:10px;font-weight:600;'
+        + 'color:var(--muted);line-height:1.35;" title="' + _sbsAttr(
+            'The stored Predictability Score for ' + c + ' is ' + fp + '. It is struck through '
+          + 'because the take-spread basis it was computed on has been withdrawn, and it is kept '
+          + 'on screen so the correction is visible rather than silent — the same treatment the '
+          + 'Take spread row above gives the bundled band. Read the badge instead: ≤' + bound
+          + ' · ' + bLbl + '. ' + _deriv875)
+        + '">stored: <span style="text-decoration:line-through;">' + fp
+        + '</span> <span style="font-weight:800;color:var(--orange);">▲ withdrawn</span></span>');
     }
   }
 
