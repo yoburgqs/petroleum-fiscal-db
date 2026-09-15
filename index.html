@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v873</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v874</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2546,7 +2546,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v873</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v874</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2616,7 +2616,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v873</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v874</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -41700,7 +41700,7 @@ function loadCountryProfile(country) {
            downside contractor NPV, which is computed on the same profile and covers all 185. -->
       <div class="dd-param"><div class="p-key">NPV @ $50 (downside)</div><div class="p-val">${(d.npv_50 != null) ? ('<span title="Contractor NPV at the $50/bbl downside case \u2014 same standardized Deepwater profile, 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break." style="cursor:help;color:' + (d.npv_50 > 0 ? 'var(--positive)' : 'var(--negative)') + ';">' + cpNpvFmt(d.npv_50) + '</span>') : '<span title="Downside NPV not computed for this country. Use Scenario Builder to run a $50/bbl case with project-specific capex and opex." style="color:var(--muted);cursor:help;">\u2014</span>'}</div></div>
       <div class="dd-param" style="grid-column:1/-1;border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'NPV @$50',ok:d.npv_50!=null},{label:'Breakeven',ok:_cpBeR!=null&&_cpBeR>1,bound:(_cpBeR==null||_cpBeR<=1)&&_cpBeB?_cpBeB:null},{label:'Swing',ok:d.swing!=null}];/* v642 (T2): a bounded breakeven is neither present nor absent; this row said "—" beside three slots now printing a range. */return metrics.map(m=>'<span '+(m.label==='Breakeven'?'id="cp-be-complete" ':'')+'style="margin-right:10px;" title="'+(m.bound?_esc594('Breakeven — not solved, bounded '+m.bound.txt+' from the four contractor NPVs on this page. '+m.bound.tip):m.label+(m.ok?' — available':' — not yet computed for this regime'))+'">'+(m.ok?'<span style="color:#15803D;">✓</span>':m.bound?'<span style="color:var(--accent);">&#9686;</span>':'<span style="color:var(--muted);">—</span>')+' <span style="color:var(--muted);">'+m.label+(m.bound?' <span style="opacity:.75;">('+m.bound.txt+', bounded)</span>':'')+'</span></span>').join('');})()}</div></div>
-      <div class="dd-param" style="grid-column:1/-1;"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d), d)}${(function(){var _l=_fpCohortLine(d);return _l?_l.replace('max-width:230px','max-width:640px'):'';})()}</div></div>
+      <div class="dd-param" style="grid-column:1/-1;"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d), d)}<span id="cp-fp-cohort">${(function(){var _l=_fpCohortLine(d);return _l?_l.replace('max-width:230px','max-width:640px'):'';})()}</span></div></div>
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(124,58,237,.4);padding-left:8px;">&#x2731; <strong style="color:var(--purple)">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
     ${(country === 'Ireland' && d.swing != null && d.swing > 20) ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(176,104,0,.4);padding-left:8px;">&#x26A0; <strong style="color:#96570A">Progressive PPT (R-factor sliding scale)</strong> — Ireland\'s Petroleum Production Tax is additive to the 25% CIT and rises from 10% to 40% based on field profitability (R-factor: cumulative revenue / cumulative investment). Total government take therefore spans 35%–65% across low-to-high price scenarios. The wide $50→$125 swing (+' + d.swing.toFixed(1) + 'pp) reflects this progressive PPT mechanic, not royalty or profit-oil variability.</p>' : ''}
@@ -56892,6 +56892,57 @@ function _cpApplyObsSpread(country) {
         + 'above. Carry ' + _cl.bound + ' \u00b7 ' + _cl.band + ' with the range '
         + _cl.obs.min.toFixed(1) + '\u2013' + _cl.obs.max.toFixed(1) + '% attached, not the printed '
         + _cl.printed + '. Same figure the Reform Risk card and the IC-memo clipboard now carry.';
+    }
+
+    // ── v874 (T4): the cohort RANK beside the badge, which v721 left asserting the withdrawn band ──
+    // v721 (above) rewrites the badge itself -- Nigeria's "73 . MODERATE / 0.4pp" becomes
+    // ">=46 . LOW / >=33.9pp obs". It does not touch the paragraph printed directly beneath it by
+    // _fpCohortLine(), and that paragraph is where the ranking claim lives:
+    //
+    //     "3rd of 28 countries ORCA can measure -- not 3rd of 185. The spread penalty is charged in
+    //      this cohort and nowhere else, so it is the only one that carries a graded band at all
+    //      -- ceiling 74, Turkmenistan. MODERATE here outranks any UNGRADED score, however high
+    //      its number."
+    //
+    // Two things are wrong with that sitting under a badge reading "<=46 . LOW".
+    //   1. The rank is computed from the printed score. _fpCohortStats() sorts the measured cohort
+    //      on the stored figure, so Nigeria is 3rd of 28 BECAUSE of the 73 this same function has
+    //      just withdrawn. At the ceiling it is not 3rd.
+    //   2. "MODERATE here outranks any UNGRADED score" names a band that is no longer on screen.
+    //      v721 overwrites the badge's leading text node, so unlike the one-term path -- which
+    //      keeps "printed 62 . UNGRADED" visible beside the ceiling -- the printed MODERATE is
+    //      GONE from the tile. The sentence has no referent at all.
+    //
+    // Measured live against api/v1/country/*.json, not asserted: 7 of the 28 measured-spread
+    // countries have a ceiling that moves the band, and they carry these ranks --
+    //   Kazakhstan  2 of 28   73 MODERATE -> 53 LOW        Nigeria     3 of 28   73 MODERATE -> 46 LOW
+    //   Rep. of Congo 8 of 28 62 MODERATE -> 47 LOW        Brazil      9 of 28   61 MODERATE -> 59 LOW
+    //   Mauritania 10 of 28   60 MODERATE -> 58 LOW        Mexico     22 of 28   51 LOW -> 27 VERY LOW
+    //   Morocco    25 of 28   45 LOW -> 39 VERY LOW
+    // So the two most predictable regimes ORCA claims it can MEASURE -- ranks 2 and 3 of 28, the
+    // top of the only cohort this platform grades -- are both countries whose grade it has already
+    // withdrawn, and the Country Profile was the surface still advertising the rank.
+    //
+    // The rule already exists; it just never reached this tab. v720 put it in the Copy for IC Memo
+    // clipboard ("the cohort rank and the rule that a graded band outranks an UNGRADED score do not
+    // hold here") and v784 put it on the Reform Risk card, which REPLACES the cohort paragraph with
+    // the withdrawal rather than appending a retraction under it. Do the same here, off the same
+    // _fpObsCeiling() object, so the three surfaces cannot hand the analyst three different ranks.
+    // Scoped to bandMoves exactly as v784 is: where the band holds at the ceiling the rank still
+    // means what it says, and where the basis is one-term the printed score stays on screen.
+    var _coh = document.getElementById('cp-fp-cohort');
+    if (_coh && _cl.bandMoves && !_coh.dataset.withdrawn) {
+      _coh.dataset.withdrawn = '1';
+      var _esc = (typeof _rrEsc === 'function') ? _rrEsc : function (v) { return String(v == null ? '' : v); };
+      _coh.innerHTML =
+        '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
+        + 'border-left:2px solid var(--orange);max-width:640px;">'
+        + '<strong style="color:var(--orange);">No cohort rank for ' + _esc(country) + '.</strong> '
+        + 'Its rank among the countries ORCA can measure is computed from the printed '
+        + _cl.printed + ' \u00b7 ' + _cl.printedBand + ', which this country\u2019s own contract table bounds at '
+        + _cl.bound + ' \u00b7 ' + _cl.band + '. At the ceiling ' + _esc(country) + ' is no longer a '
+        + _cl.printedBand + ', so do not rank it above an ungraded score on the strength of the band. '
+        + 'Same withdrawal the Reform Risk card and the IC-memo clipboard print for this country.</div>';
     }
   }
 }
