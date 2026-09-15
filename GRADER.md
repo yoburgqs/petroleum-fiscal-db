@@ -53576,3 +53576,16 @@ reporting a gate that did not look at the file.
   analyst is told to cite carried no evidence grade at all.
 - ✅ **The JS syntax gate was skipping the main 3 MB script block** and had been reporting
   PASS without checking any application code.
+
+---
+## Cycle 774 Log — 2026-09-15 03:37
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 774 complete. v866 shipped and pushed.
+
+## Task
+**T6** — *"Where did this number come from and how solid is the evidence?"* (773 was T2, 772 T1, 771 T3, 770 T4, 769 T5 — T6 was stalest.)
+
+## Friction
+Walked T6 cold at 1440 with storage cleared. The deep provenance surfaces are genuinely good — the Country Profile evidence panel names both grading legs and which one binds, the Evidence Chain separates rows the model reads from rows it doesn't and flags dead citations. The break is one colum
