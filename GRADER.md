@@ -53043,3 +53043,16 @@ rows in the card stopped reading as evidence of stability.
   is the one that matters, given the KRG expansion in `NEXT.md`.
 - **Still no process check comparing the deployed version string against the local tree** — carried
   from 758, 761-769.
+
+---
+## Cycle 770 Log — 2026-09-14 23:19
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 770 complete — **v862 shipped and pushed**.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (769 was T5; T4 was the stalest, last run at 764.)
+
+## Friction
+On the Reform Risk tab, the **QUIET SINCE 2010** card is filtered on `since2010 <= 1` — so a country with *one* in-window fiscal law change belongs in it. But every row string in `_quietRow()` was written as though the count were always zero. One branch asserted, in bold orange, *"no fiscal law change since 201
