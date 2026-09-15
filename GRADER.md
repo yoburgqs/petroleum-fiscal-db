@@ -54561,3 +54561,18 @@ no contractor position and never will, or the breakeven is not modelled there ye
 - ✅ **Saudi Arabia / Bahrain / Kuwait exported a $1/bbl breakeven from the Screener** into the
   clipboard IC table, the CSV and the XLSX. The value the rest of the platform has suppressed
   since v513, and that Fiscal Compare stopped exporting at v529.
+
+---
+## Cycle 781 Log — 2026-09-15 11:36
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 781 complete — shipped as **v873**, committed, mirrored, pushed.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (780 was T6; T5 was last run at 775.)
+
+## Friction
+Walked it cold: Screener → tick a shortlist → **Copy for IC Memo**, then the same rows through **CSV** and **Excel**.
+
+The export wrote the breakeven straight out of the bundle. For **Saudi Arabia, Bahrain and Kuwait** the stored value is **1.0** — a DCF floor artifact for a 100%-government-take regim
