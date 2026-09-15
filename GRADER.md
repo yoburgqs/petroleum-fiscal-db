@@ -52786,3 +52786,18 @@ stop looking and go to the statute instead of hunting an index that no longer ex
   multi-jurisdiction. Narrow (5 countries) so it lost to the 142-profile defect this cycle.
 - **Still no process check comparing the deployed version string against the local tree** — carried
   from 758, 761–767.
+
+---
+## Cycle 768 Log — 2026-09-14 20:54
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 768 complete — **v860 shipped and pushed**.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotation: 767 was T2, 766 T1, 765 T3, 764 T4, 763 T5 — T6 was stalest, last run at 762)
+
+## Friction
+Walked it cold with storage cleared: Home's Sourcing line → Fiscal Compare's Quality column → row drilldown → Country Profile's Evidence Quality panel and per-parameter Evidence Chain, on Norway, Somalia, Iraq, China, Russia and Côte d'Ivoire.
+
+The evidence layer h
