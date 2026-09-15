@@ -53880,3 +53880,148 @@ WACC premium the platform says the memo may not go out without, instead of a gre
 
 ## Friction
 I walked T4 cold: Home → Reform Risk, the country lookup across all its branches, the `#/reform/<country>` deep links, the Country Profile stability line, the Screener reform filter, the Fiscal Comp
+
+---
+## Cycle 777 Log — 2026-09-15 07:00
+- Test before: 317 PASS / 0 FAIL / 1 WARN (local, RAN against the pre-change HEAD build)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (local, RAN against the modified build)
+- JS errors: 0 page errors. The 1 WARN/1 console error is the `sw.js` 404 that only occurs
+  over `127.0.0.1` — the single check separating the local number from the 318/0/0 read
+  against the deployed URL. Present identically before and after.
+- Summary: Cycle 777 shipped as **v869**, committed `360573a`. Mirror copied to
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (776 was T4, 775 T5, 774 T6,
+773 T2, 772 T1 — T3 was stalest, last run at 771.)
+
+## Friction
+Walked T3 cold at 1440x900 with no sessionStorage and no localStorage. The tab seeds
+Norway / United Kingdom / Netherlands, so the grid is the first thing on screen.
+
+The four **Govt Take** rows have carried red/green `highest of N` / `lowest of N` markers on
+every rankable column since v593, with a whole apparatus behind them — `_cmpPriceRank`,
+`_cmpOrderMark`, a per-price flip detector, v600's "the marker must sit on the number it
+ranks", v626's data-basis gate, v678's both-ends rule.
+
+The four **Contractor NPV** rows immediately beneath them carried **nothing**, at any of the
+four prices. `_cmpNpvCell` (line ~28382) had grown four sub-lines — state monopoly, v666's
+PSC/Conc re-base, v705's basis gate, v840's sign change — and no ordering marker.
+
+This is not a gap I inferred; **v829's own source comment states it**: *"the take was rescued
+in words and in rank; the value was rescued only in words."* v829's answer was to state the
+value ordering in the **verdict strip** at the top of the tab. The rows stayed silent — and the
+rows are what the analyst scans, what Export PDF prints, and what Copy for IC Memo pastes.
+
+Three measured consequences on the shipped build:
+
+1. **The NPV rows are the only place on this platform where the compared figures change UNIT
+   mid-row.** The tab's own seeded cold-load set renders `$826M | $1.16B | $3.56B` — the larger
+   of the first two prints the *smaller* digit string. The take rows cannot do this; every cell
+   is a percentage to one decimal.
+2. **The only annotated cell in the row was the disqualified one.** `$3.56B` carries
+   "not comparable · statutory terms" (v705) and is also the visually largest number. So the
+   single ranking-shaped signal in the block sat on the column that must *not* be ranked, while
+   the two that could be were bare.
+3. **Take order and value order can disagree** — the strip ships a `⚠ disagrees with take order`
+   pill for exactly that case. On the tab's own Atlantic Frontier Quartet they do: take says
+   Angola lowest / Nigeria highest, value says Brazil largest at all four prices. The take rows
+   shouted their order in colour; the rows that contradict them said nothing.
+
+## Change
+- **`_cmpNpvPriceRank`** (declared beside `_cmpPriceRank`, filled beside `_vdVal` once every
+  gate exists) and **`_cmpNpvOrderMark`** — deliberately the same object shape, the same
+  two-ended rule, the same colour language and the same sub-line geometry `_cmpOrderMark` uses
+  on the take rows, so the two blocks read as one grid rather than two conventions.
+- **Direction inverts to keep the meaning constant.** On a take row green is the LOWEST number;
+  here green is the LARGEST — both mean *better for the contractor*. Verified computed:
+  `rgb(21,128,61)` on the largest, `rgb(185,28,28)` on the smallest.
+- **Basis rules are `_cmpRankNpv`'s, not a second copy**, so a column set aside from the strip's
+  value ordering cannot pick up a marker in the grid and the two cannot disagree by
+  construction. Gated statutory-terms columns keep "not comparable" and are excluded; state
+  monopolies keep their em dash.
+- **v600's rule honoured.** Where a column's $75 ordering is placed on its PSC/Concession
+  figure, the marker renders BELOW that green sub-line with the same left-border treatment and
+  the tag `· on PSC/Conc`, so it sits on the number it actually ranks.
+- **$50 / $100 / $125 are left unmarked on any set carrying a fee-blended column.** ORCA holds
+  the Group-1 contractor split at $75/bbl alone; ranking the other three would reinstate the
+  blended-figure inversion v666 and v829 exist to stop. The marker's tooltip says so rather
+  than guessing, and the existing PSC/Conc sub-line already states it on screen.
+- **Tie guard in the units the cell prints**: two columns rendering the same string are not
+  ordered on screen, so neither end marks. At two columns that is one comparison, so v678's
+  half-labelled state cannot recur here.
+
+## Result
+Verified live on 6 sets, 0 page errors:
+
+| set | before | after |
+|---|---|---|
+| Guyana / Angola / Iraq (the set v829's comment cites) | `$1.07B · $1.14B · $642M` — Angola appears to beat Iraq 1.8x | Iraq `PSC/Conc $3.04B · largest of 2 · on PSC/Conc`; Angola `smallest of 2 · comparable basis` |
+| Atlantic Frontier Quartet | NPV rows bare while take rows say Angola lowest | Brazil `largest of 3` and Nigeria `smallest of 3` at all four prices — the strip's `⚠ disagrees` now visible in the rows |
+| Norway / UK (seeded default) | `$826M` vs `$1.16B`, unmarked | `smallest of 2` / `largest of 2` at all four prices |
+| Australia / Norway / Guyana (PRRT) | no ordering anywhere in the grid — PRRT is excluded from the take ordering | value rows order Australia `largest of 2` over Norway, matching the strip |
+| Iraq / Indonesia / Malaysia | bare | Iraq `largest of 3 · on PSC/Conc`, Malaysia `smallest of 3 · on PSC/Conc`, v840's `▼ value-negative at $50` preserved |
+| Saudi Arabia / Kuwait | em dashes | unchanged — no markers, correct |
+
+An analyst reading down the Contractor NPV rows now gets the same ordering signal the Govt Take
+rows have given for 270 cycles, on the row an IC actually allocates capital on — and on the two
+sets where take order and value order disagree, the disagreement is visible in the grid instead
+of only in a strip 700px above it.
+
+## Verification
+- **JS syntax gate: 11/11 blocks PASS**, re-run after the version bump.
+- **Runtime suite RAN on both builds** — HEAD served on :8898, modified on :8899, same suite,
+  same run: **317 / 0 / 1 before, 317 / 0 / 1 after**. Not assumed from a prior baseline.
+- **Take rows byte-identical before and after**, checked by serving HEAD side by side and
+  diffing the rendered cells. `git diff` removes exactly 4 lines, all of them `_cmpNpvCell`
+  return statements.
+- **390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on all 9 mobile-visible tabs.
+  Marker box 45px — above the 24px floor; desktop stays 15px, identical to the take markers, so
+  density is preserved.
+- **PIXEL GATE PASS** — no surface got worse than baseline; the 5 standing findings are
+  unchanged and none is in Side-by-Side.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load, so `#cmp-output`'s empty state, its "start with a standard
+  IOC benchmark set" line and all four benchmark buttons never render for a first-time user.
+  From 771-776. **Re-confirmed cold this cycle**; it is now the strongest remaining T3 candidate.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21,
+  and the Snapshot 200px below says "21 of 185". From 774-776.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-776.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-776.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-776.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes
+  vs 173,759. The **office copy is the one that was run**, both times. From 764-776.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-776.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-776.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+  From 769-776.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+  From 770-776.
+- Evidence grade ignores the D (default-estimate) share. From 768-776.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row. From 775-776.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇` (~line 54810). From 776.
+- FC drilldown Fiscal Predictability badge carries no observed-spread ceiling — the other four
+  surfaces all paint it. From 776.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-776.
+
+## Resolved this cycle
+- ✅ **Side-by-Side Contractor NPV rows carry no highest/lowest markers** — open since 771,
+  carried unfixed through 772-776, and named in v829's own source comment as the half of the
+  problem it did not fix.
+
+## New this cycle
+- **A take cell can render the Contractor NPV block's wording.** On a set containing a PRRT
+  column — Australia / Norway / Guyana — the Govt Take ($75/bbl) cell for Guyana reads
+  `not comparable · statutory terms`, which is `_cmpNpvBasisFlag`'s string (line ~28774); on
+  Guyana / Angola / Brazil / Nigeria the same column reads `not ranked · statutory terms`, which
+  is the take-side gate's string (line ~28720). Two different phrases for the same column on the
+  same row depending on what else is in the set. **Verified pre-existing** — reproduced
+  identically on the HEAD build served alongside, so it is not a v869 regression. Text-only, so
+  not a cycle's fix on its own, but it is a real inconsistency in the gate wording.
