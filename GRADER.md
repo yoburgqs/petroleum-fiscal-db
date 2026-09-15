@@ -52664,3 +52664,16 @@ the convention; only the profile it was read from was wrong.)
   regardless of which profile was running, so it was wrong on Norway's, the UK's and Iraq's cold
   default. It now reports the running profile on all six, and the reconciliation explains the gap in
   the direction it actually measured.
+
+---
+## Cycle 767 Log — 2026-09-14 19:42
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 767 complete — v859 shipped and pushed.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (rotation: 766 was T1, 765 T3, 764 T4, 763 T5, 762 T6 — T2 was stalest, last run at 761)
+
+## Friction
+Walked it cold: storage cleared, reload, Country Profile → Norway. The page holds up all the way down to the Live DCF panel's closing block, **"Which number goes in the IC memo?"** — which is where the *"can I defend that?"* half of T2 is actually answered. Two card
