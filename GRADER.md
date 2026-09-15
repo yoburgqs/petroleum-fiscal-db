@@ -54294,3 +54294,18 @@ wrong: the IC citation and `Copy for IC Memo` already quoted a consistent blend/
 - ✅ **The verdict sentence quoted a base case and a downside computed on different contract sets**,
   so Iraq's country profile said contractor NPV more than doubles when the oil price falls $25/bbl.
   Open since v786 introduced the one-legged basis switch.
+
+---
+## Cycle 779 Log — 2026-09-15 09:29
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 779 complete — shipped as **v871**, pushed, mirrored.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (T2 was stalest — last run at cycle 773.)
+
+## Friction
+The Country Profile verdict sentence — the first line under the headline take — reads *"Clears the 10% WACC at $75 (X) and at the $50/bbl downside (Y)"*.
+
+Cycle v786 switched only the **Y leg** to the PSC/Concession basis for countries that blend in fee-basis (TSC/RSC/Buy-back) contracts, and left 
