@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v868</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v869</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2539,7 +2539,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v868</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v869</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2609,7 +2609,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v868</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v869</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28379,6 +28379,60 @@ function renderCompare() {
   // no contractor NPV, no breakeven and no tier"), which was applied to Fiscal Compare and its
   // workbook and never reached this grid. The dash rides the shared `rows` array into
   // #cmp-data-table and both clipboard flavours, so the pasted IC table stops asserting it too.
+  // v869 (T3): the contractor-value ordering marker for one cell. Deliberately the same object
+  // shape, the same two-ended rule (v678), the same colour language and the same sub-line geometry
+  // as _cmpOrderMark uses on the Govt Take rows, so the two blocks read as one grid rather than
+  // two conventions. Direction is the only thing that inverts, and it inverts to keep the MEANING
+  // constant: on a take row green is the LOWEST number, here green is the LARGEST, because both
+  // are "better for the contractor".
+  const _cmpNpvOrderMark = (d, price, onG1) => {
+    const r = _cmpNpvPriceRank[price];
+    if (!r) return '';
+    const hi = r.hi === d.country, lo = r.lo === d.country;
+    if (!hi && !lo) return '';
+    const word = hi ? 'largest' : 'smallest';
+    // v600's rule, applied to value: the marker must sit on the number it actually ranks. Where
+    // this column's $75 ordering is placed on its PSC/Concession figure, that figure is printed in
+    // the green sub-line BELOW the headline, so the marker is rendered below it too and tagged.
+    const tag = onG1 ? ' · on PSC/Conc'
+              : r.reb ? ' · comparable basis'
+              : r.gated ? ' · of the producers' : '';
+    const other = hi ? r.lo : r.hi;
+    return '<span style="display:block;font-size:10px;font-weight:700;color:var('
+      + (hi ? '--green' : '--red') + ');cursor:help;'
+      + (onG1 ? 'padding-left:8px;border-left:2px solid var(--green);margin-top:1px;' : '') + '" title="'
+      + _cmpEsc(d.country + ' carries the ' + word + ' contractor NPV of the ' + r.n
+        + ' comparable column' + (r.n === 1 ? '' : 's') + ' in this set at $' + price + '/bbl — '
+        + fmtNpvShared(hi ? r.hiV : r.loV) + ' against ' + fmtNpvShared(hi ? r.loV : r.hiV) + ' for '
+        + other + ' at the other end. Every column is run on the SAME standardized Deepwater profile, '
+        + 'so this ordering is the fiscal regime’s effect on contractor value and nothing else — '
+        + 'it says nothing about field size or cost in these countries. '
+        + (r.gated
+            ? 'It is “of ' + r.n + '” and not of ' + r.nCols + ' because ' + (r.nCols - r.n)
+              + ' column' + ((r.nCols - r.n) === 1 ? ' in this set carries' : 's in this set carry')
+              + ' no verified field production, so its contractor NPV is the legal regime run on the '
+              + 'standard profile rather than its own fields. Those columns are marked “not comparable '
+              + '· statutory terms” on this row. Across the database the no-production column shows '
+              + 'the LARGER NPV in 74.9% of mixed pairs, so leaving them in would rank the basis, not the regime. '
+            : '')
+        + (onG1
+            ? 'This marker ranks the PSC/Conc figure directly above it, NOT the blended '
+              + fmtNpvShared(d.npv_75) + ' headline at the top of the cell — that headline averages in '
+              + 'fee-basis contracts where the contractor is paid a fixed $/bbl remuneration, and ranking '
+              + 'it can invert this order. '
+            : (r.reb
+                ? 'At least one column in this set is placed on its PSC/Concession contractor NPV rather '
+                  + 'than its blended headline, which is the only basis on which it is comparable with the rest. '
+                : ''))
+        + (r.blocked
+            ? 'ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 rows in this '
+              + 'set carry no ordering marker rather than an ordering built on the blended figure. '
+            : '')
+        + 'Read this against the Govt Take ($' + price + '/bbl) row above: where take and value do not order '
+        + 'the set the same way, the verdict strip at the top of the tab flags it, and the difference is in '
+        + 'the SHAPE of the take, not in the size of the prize.')
+      + '">' + word + ' of ' + r.n + tag + '</span>';
+  };
   const _cmpNpvCell = (d, v, price) => {
     if (isStateMonopoly(d.take_75)) {
       return '<span style="color:var(--muted);cursor:help;" title="' + _cmpEsc(d.country
@@ -28479,12 +28533,12 @@ function renderCompare() {
           + 'Carry the sign change into the memo beside the base case.')
         + '">\u25bc value-negative at $' + price + '</span>'
       : '';
-    if (price !== '75' || v == null) return _npvBase + _npvGate + _npvNegLine;
+    if (price !== '75' || v == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
     const _npvSt = _cmpMixStat(d);
-    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate + _npvNegLine;
+    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
     const _npvG1 = fmtNpvShared(_npvSt.g1.v75);
     // Same convention as the take correction: print it only where it changes the number on screen.
-    if (_npvG1 === _npvPlain) return _npvBase + _npvGate + _npvNegLine;
+    if (_npvG1 === _npvPlain) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
     return _npvBase + _npvGate + _npvNegLine + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
       + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $75/bbl across its '
         + Number(_npvSt.g1.n).toLocaleString() + ' production-sharing and concession contracts only. '
@@ -28495,7 +28549,8 @@ function renderCompare() {
         + 'contractor-side match to the PSC/Conc take printed on the Govt Take rows above, and ranking the '
         + 'blended figure can invert the order those rows give you. ORCA holds the Group-1 split at $75/bbl '
         + 'only, so the $50, $100 and $125 rows remain blended and are NOT on this basis.')
-      + '">PSC/Conc ' + _npvG1 + '</span>';
+      + '">PSC/Conc ' + _npvG1 + '</span>'
+      + _cmpNpvOrderMark(d, price, true);
   };
   // The four Govt Take cells. On a fee-blended column the headline take is kept --
   // it is the platform's published figure -- and the Group-1-only take is printed
@@ -28517,6 +28572,37 @@ function renderCompare() {
   // cash-flow base and may not be carried across price points at all, and that a state monopoly
   // has no contractor position to rank. Those columns are skipped rather than given a placement.
   const _cmpPriceRank = {};
+  // v869 (T3): the ordering marker on the four CONTRACTOR NPV rows. Same shape as _cmpPriceRank
+  // directly above, filled from _cmpRankNpv's gates once `selected` exists (below, beside _vdVal)
+  // and read back here at render time by _cmpNpvOrderMark.
+  //
+  // The four Govt Take rows have carried "highest of N" / "lowest of N" since v593, in red and
+  // green, on every rankable column. The four Contractor NPV rows two inches below carried
+  // NOTHING -- v829's own source comment says so in as many words: "the take was rescued in words
+  // and in rank; the value was rescued only in words." v829 answered it in the VERDICT STRIP at
+  // the top of the tab. The rows themselves stayed silent, and the rows are what the analyst
+  // scans, what Export PDF prints and what Copy-for-IC-Memo pastes.
+  //
+  // It is not a cosmetic gap, for three reasons measured on the shipped build:
+  //
+  //  1. The NPV rows are the only place on this platform where the compared figures change UNIT
+  //     mid-row. The tab's own seeded cold-load set renders "$826M | $1.16B | $3.56B" -- the
+  //     larger of the first two prints the smaller digit string. Take rows cannot do this; every
+  //     cell is a percentage to one decimal.
+  //  2. The one cell in that row carrying any annotation at all is the DISQUALIFIED one
+  //     ($3.56B "not comparable - statutory terms", v705), and it is also the visually largest
+  //     number. So the only ranking-shaped signal in the block sat on the column that must not
+  //     be ranked, and the two that could be were bare.
+  //  3. Take order and value order can disagree -- the strip ships a "disagrees with take order"
+  //     pill for exactly that case. When they do, the take rows shout the order in colour and the
+  //     rows that contradict them say nothing.
+  //
+  // Basis rules are _cmpRankNpv's, not a second copy, so a column set aside from the strip's value
+  // ordering cannot pick up a marker here. ORCA holds the Group-1 contractor split at $75/bbl
+  // ALONE (no v50/v100/v125), so on a set carrying a fee-blended column only the $75 row is
+  // marked; ranking the other three would reinstate the blended-figure inversion v666 and v829
+  // exist to stop, and the row says so rather than guessing.
+  const _cmpNpvPriceRank = {};
   // v626 (T3): the DATA-BASIS gate on the four Govt Take ordering markers. _cmpRankTake had a
   // MECHANIC gate and no basis gate: it dropped state monopolies, PRRT and fee-blended columns
   // (v593 / v549 / v552) and then ranked whatever was left at full confidence — including columns
@@ -29543,6 +29629,40 @@ function renderCompare() {
   };
   const _vdValOut = selected.filter(d => d && _cmpRankNpv(d) == null)
     .map(d => ({ c: d.country, why: _vdValWhy(d) }));
+  // v869 (T3): fill the per-price contractor-value ordering declared beside _cmpPriceRank above.
+  // Runs here, after _cmpRankNpv / _cmpMixStat / _cmpBasisGate are all established, so the grid's
+  // markers and the strip's ordering are computed from one rule and cannot disagree.
+  (function () {
+    // Is any column in this set fee-blended? If so, ORCA holds a comparable contractor NPV for it
+    // at $75 only, so $50 / $100 / $125 have no honest ordering and are left unmarked.
+    const _npvBlended = selected.some(d => d && _cmpMixStat(d).blended);
+    _CMP_PRICES.forEach(pr => {
+      _cmpNpvPriceRank[pr] = null;
+      if (pr !== 75 && _npvBlended) return;
+      const vals = selected.filter(d => d && _cmpRankNpv(d) != null)
+        .map(d => ({ c: d.country, v: pr === 75 ? _cmpRankNpv(d) : d['npv_' + pr] }))
+        .filter(x => typeof x.v === 'number');
+      if (vals.length < 2) return;
+      const srt = vals.slice().sort((a, b) => b.v - a.v);   // largest contractor NPV first
+      const last = srt.length - 1;
+      // Tie guard, in the units the cell actually prints: two columns that render the same string
+      // are not ordered on screen, so neither end is marked. At two columns this is one comparison,
+      // so -- v678's rule -- the two markers fire together or not at all and the half-labelled
+      // state the take rows carried until v678 cannot arise here.
+      if (fmtNpvShared(srt[0].v) === fmtNpvShared(srt[last].v)) return;
+      _cmpNpvPriceRank[pr] = {
+        n: vals.length,
+        hi: srt[0].c, lo: srt[last].c,
+        hiV: srt[0].v, loV: srt[last].v,
+        gated: _cmpBasisGate,
+        nCols: selected.filter(d => !!d).length,
+        // True only where the $75 ordering is placed on a re-based (PSC/Concession) figure for at
+        // least one column -- the case v600 established the marker must not sit above.
+        reb: pr === 75 && _vdValReb.length > 0,
+        blocked: _npvBlended
+      };
+    });
+  })();
   // Does value rank the set the same way take does? Lower take SHOULD mean a larger contractor
   // position; where it does not, the difference is cost structure or profile fit rather than
   // fiscal hardness, and that is a finding the analyst has to carry, not a rendering artefact.
