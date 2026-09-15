@@ -55236,3 +55236,16 @@ rebuild it from.
 - A take of `—` still sorts as the maximum in the Screener (carried from 778/784), and Bahamas
   `≥10.0%` still survives a ≤5% ceiling (carried from 784). Neither is on the T6 path.
 - The CP NPV chip / verdict-sentence basis split recorded at 785 stands unreopened.
+
+---
+## Cycle 786 Log — 2026-09-15 18:14
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 786 complete — shipped as **v878** (`03d9196`), grader log `129009a`, both pushed, mirror in sync.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation; 785 was T2, 784 T1, 783 T3, 782 T4, 781 T5 — last T6 at 780.)
+
+## Friction
+Hovering a figure is this platform's universal "where did this come from" gesture. On a government take it was answered by a hand-typed literal inside the shared formatter `fmtTake()`: *"Government take on standardi
