@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v858</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v859</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2520,7 +2520,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v858</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v859</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2590,7 +2590,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v858</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v859</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -48448,19 +48448,32 @@ function _sbsPaintBasisStrip() {
       + 'column; this grid shows $826M.');
   }
 }
-// Same two projects, expressed for the reconciliation block.
-function _basisDelta833() {
-  var p = DCF_PROFILES.deepwater;
-  var jsProd = 0, jsCapex = 0;
-  for (var y = 1; y <= 25; y++) {
-    var bd = (y <= p.rampYears) ? p.peakBblDay * (y / p.rampYears)
-           : (y <= p.rampYears + p.plateauYears) ? p.peakBblDay
-           : p.peakBblDay * Math.pow(1 - p.declineRate, y - p.rampYears - p.plateauYears);
-    jsProd += Math.max(0, bd) * 365 / 1e6;
-    jsCapex += (y === 1) ? p.capexMM * 0.40 : (y === 2) ? p.capexMM * 0.35
-             : (y === 3) ? p.capexMM * 0.20 : p.capexMM * 0.02;
-  }
-  return { jsProdMM: jsProd, jsCapexMM: jsCapex, engProdMM: ENGINE_BASIS.totalProdMM,
+// ── v859 (T2) — the reconciliation now describes the profile the panel IS RUNNING ──────
+// This function read DCF_PROFILES.deepwater unconditionally, and its caller printed the
+// result as the "Panel basis:" line on the Scenario NPV card — the line the block headed
+// "Which number goes in the IC memo?" tells the analyst to carry when they label that
+// figure. But the panel does not always run deepwater: Norway and the United Kingdom
+// default to north_sea and Iraq / every TSC country to onshore_me, so on a COLD load, with
+// nothing clicked, Norway's card read
+//
+//     Panel basis: 50k bbl/d peak · 6yr plateau · $1.67B all-in capex · $22/bbl flat opex
+//
+// over a run of 40k bbl/d and $0.6B headline capex — the two figures the Production Profile
+// tiles print a few hundred pixels above it. Peak rate and capex came from deepwater, while
+// plateau and opex came from the selected profile, so the line was never right for any
+// profile except deepwater and named a project that exists nowhere. Rebuilding the scenario
+// NPV from the assumptions the tool stated beside it was not possible.
+//
+// It is now derived from the running profile, through the same buildProductionProfile() the
+// DCF itself calls, so the stated basis and the computed basis cannot drift apart again.
+function _basisDelta833(profileKey) {
+  var key = (profileKey && DCF_PROFILES[profileKey]) ? profileKey : 'deepwater';
+  var p = DCF_PROFILES[key];
+  var bp = buildProductionProfile(p);
+  var jsProd = bp.prod.reduce(function(a, b){ return a + b; }, 0);
+  var jsCapex = bp.capex.reduce(function(a, b){ return a + b; }, 0);
+  return { profileKey: key, profileName: p.name, jsProfile: p,
+           jsProdMM: jsProd, jsCapexMM: jsCapex, engProdMM: ENGINE_BASIS.totalProdMM,
            engCapexMM: ENGINE_BASIS.capexAllInMM,
            prodGapPct: (jsProd - ENGINE_BASIS.totalProdMM) / ENGINE_BASIS.totalProdMM * 100 };
 }
@@ -49641,7 +49654,7 @@ function _execLiveDCF(country, profileKey, price) {
     // dominant driver is not the terms — it is that the two "Deepwater" projects are not
     // the same project (see ENGINE_BASIS). Sierra Leone matches on take to 0.4pp and still
     // printed $1,098M beside $3,618M under a green "either figure is defensible".
-    const _bd833   = _basisDelta833();
+    const _bd833   = _basisDelta833(profileKey);   // v859 (T2): the profile on screen, not always deepwater
     const _npvDb833 = (result.dbNpv != null && isFinite(result.dbNpv)) ? result.dbNpv : null;
     const _npvSc833 = (result.npv   != null && isFinite(result.npv))   ? result.npv   : null;
     const _npvOk833 = (_npvDb833 !== null && _npvSc833 !== null);
@@ -49697,8 +49710,11 @@ function _execLiveDCF(country, profileKey, price) {
         _npvVerdict833 = 'NPV is the larger disagreement here: ' + _npvFmt833(_npvDb833)
           + ' against ' + _npvFmt833(_npvSc833)
           + (_npvRatio833 !== null ? ' (' + _npvRatio833.toFixed(1) + 'x)' : '')
-          + '. Most of that is project size, not fiscal terms — the two profiles both named '
-          + '"Deepwater" recover ' + ENGINE_BASIS.totalProdMM.toFixed(0) + ' and '
+          // v859 (T2): only two of the six selectable profiles share the engine's name. Say
+          // which two projects these actually are rather than asserting both are "Deepwater".
+          + '. Most of that is project size, not fiscal terms — ORCA’s engine profile ('
+          + ENGINE_BASIS.name + ') and this panel’s ' + _cpEsc704(_bd833.profileName)
+          + ' profile recover ' + ENGINE_BASIS.totalProdMM.toFixed(0) + ' and '
           + _bd833.jsProdMM.toFixed(0) + ' MMbbl respectively. Quote one NPV with its own '
           + 'assumptions attached; never the headline take beside the scenario NPV.';
       } else {
@@ -49759,17 +49775,33 @@ function _execLiveDCF(country, profileKey, price) {
     // panel is on its default profile, because there the analyst has changed nothing and would
     // otherwise have no reason to suspect the basis differs at all.
     if (_npvOk833) {
-      const _basisDriver833 = '<strong>Project basis \u2014 two different &ldquo;Deepwater&rdquo; projects:</strong> the stored '
+      // v859 (T2): this said "This panel runs its own Deepwater profile" and quoted deepwater's
+      // plateau, decline and opex whatever was selected -- false on Norway, the UK and every TSC
+      // country straight off a cold load. It also asserted "more oil on a cheaper barrel ... so
+      // the scenario NPV runs high", which is the wrong direction for north_sea (less oil, dearer
+      // barrel, scenario NPV BELOW the country average). Both halves now follow the running
+      // profile and the measured NPV gap.
+      const _sameName859 = (_bd833.profileName === ENGINE_BASIS.name);
+      const _bblWord859  = (_bd833.jsProfile.opexBbl <= ENGINE_BASIS.opexBbl) ? 'a cheaper barrel' : 'a dearer barrel';
+      const _basisDriver833 = '<strong>Project basis \u2014 '
+        + (_sameName859
+            ? 'two different &ldquo;' + ENGINE_BASIS.name + '&rdquo; projects:'
+            : 'the stored figures are not on this panel\u2019s ' + _cpEsc704(_bd833.profileName) + ' project:')
+        + '</strong> the stored '
         + 'country figures come from ORCA\u2019s engine profile ('
+        + ENGINE_BASIS.name + ' \u2014 ' + (ENGINE_BASIS.peakBblDay/1000) + 'k bbl/d peak, '
         + ENGINE_BASIS.plateauYears + 'yr plateau, ' + (ENGINE_BASIS.declineRate*100).toFixed(0) + '% decline, '
         + ENGINE_BASIS.totalProdMM.toFixed(1) + ' MMbbl, $' + (ENGINE_BASIS.capexAllInMM/1000).toFixed(1) + 'B all-in capex, $'
         + ENGINE_BASIS.opexBbl + '/bbl opex escalating ' + (ENGINE_BASIS.opexEscal*100).toFixed(0) + '%/yr). '
-        + 'This panel runs its own Deepwater profile (' + DCF_PROFILES.deepwater.plateauYears + 'yr plateau, '
-        + (DCF_PROFILES.deepwater.declineRate*100).toFixed(0) + '% decline, ' + _bd833.jsProdMM.toFixed(1) + ' MMbbl, $'
-        + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex, $' + DCF_PROFILES.deepwater.opexBbl + '/bbl flat). '
-        + 'That is ' + (_bd833.prodGapPct >= 0 ? '+' : '') + _bd833.prodGapPct.toFixed(0)
-        + '% more oil on a cheaper barrel, so the scenario NPV runs high against the country average '
-        + 'even where the two takes agree. It is an assumptions difference, not a fiscal finding.';
+        + 'This panel runs its ' + _cpEsc704(_bd833.profileName) + ' profile ('
+        + (_bd833.jsProfile.peakBblDay/1000) + 'k bbl/d peak, ' + _bd833.jsProfile.plateauYears + 'yr plateau, '
+        + (_bd833.jsProfile.declineRate*100).toFixed(0) + '% decline, ' + _bd833.jsProdMM.toFixed(1) + ' MMbbl, $'
+        + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex, $' + _bd833.jsProfile.opexBbl + '/bbl flat). '
+        + 'That recovers ' + _bd833.jsProdMM.toFixed(0) + ' MMbbl against the engine\u2019s '
+        + ENGINE_BASIS.totalProdMM.toFixed(0) + ' (' + (_bd833.prodGapPct >= 0 ? '+' : '\u2212')
+        + Math.abs(_bd833.prodGapPct).toFixed(0) + '%) on ' + _bblWord859 + ', which is why the scenario NPV runs '
+        + (_npvDelta833 >= 0 ? 'high' : 'low') + ' against the country average even where the two takes agree. '
+        + 'It is an assumptions difference, not a fiscal finding.';
       if (profileKey === 'deepwater') drivers.unshift(_basisDriver833); else drivers.push(_basisDriver833);
     }
 
@@ -49813,9 +49845,16 @@ function _execLiveDCF(country, profileKey, price) {
                 + '<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Scenario NPV \u2014 label it</div>'
                 + '<div style="font-size:19px;font-weight:900;color:var(--muted);margin:3px 0 2px;">' + _npvFmt833(_npvSc833) + '</div>'
                 + '<div style="font-size:11px;color:var(--text);line-height:1.45;">This panel\u2019s ' + result.profileName + ' project @ $' + price + '/bbl</div>'
+                // v859 (T2): every term below now comes from the profile actually running.
+                // Peak rate and capex used to be read off deepwater regardless, which made this
+                // line wrong on every non-deepwater profile -- including Norway's and the UK's
+                // cold-load default. MMbbl and the discount rate are stated so this reads term
+                // for term against the "Engine basis" line in the card beside it.
                 + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">Panel basis: '
-                  + (DCF_PROFILES.deepwater.peakBblDay/1000) + 'k bbl/d peak \u00b7 ' + DCF_PROFILES[profileKey].plateauYears + 'yr plateau \u00b7 $'
-                  + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex \u00b7 $' + DCF_PROFILES[profileKey].opexBbl + '/bbl flat opex.</div>'
+                  + (_bd833.jsProfile.peakBblDay/1000) + 'k bbl/d peak \u00b7 ' + _bd833.jsProfile.plateauYears + 'yr plateau \u00b7 '
+                  + _bd833.jsProdMM.toFixed(1) + ' MMbbl \u00b7 $' + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex \u00b7 $'
+                  + _bd833.jsProfile.opexBbl + '/bbl flat opex \u00b7 25yr life \u00b7 '
+                  + (_bd833.jsProfile.discountRate*100).toFixed(0) + '% WACC.</div>'
               + '</div>'
             + '</div>'
             + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
