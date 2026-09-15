@@ -53456,3 +53456,123 @@ of defensibility.
 **Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (772 was T1, 771 T3, 770 T4, 769 T5, 768 T6 — T2 was stalest.)
 
 **Friction.** Walked Country Profile cold at 1440 with storage cleared, served over HTTP so the JSON payloads actually load. The headline strip, evidence chain and 4-price table are genuinely candid — the page volunteers its own contradictions. The break is the one pane
+
+---
+## Cycle 774 Log — 2026-09-15
+- Test before: 317 PASS / 0 FAIL / 1 WARN (local baseline, unmodified build, same server)
+- Test after: 317 PASS / 0 FAIL / 1 WARN — identical, zero regression
+- JS errors: 0 (the 1 WARN is the sw.js 404 that only occurs over 127.0.0.1)
+- Summary: All steps complete. **v866 shipped and pushed** (`b1bf8b9`).
+
+## Cycle 774 — T6
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"*
+(773 was T2, 772 T1, 771 T3, 770 T4, 769 T5 — T6 was stalest, last run at 768.)
+
+**Friction.** Walked T6 cold at 1440 with storage cleared, served over a threaded HTTP
+server so the JSON payloads load. The deep provenance surfaces are in good shape — the
+Country Profile Evidence Quality panel names both grading legs and which one binds, the
+per-parameter Evidence Chain partitions rows the model reads from rows it does not and
+marks dead citations, and the Reform Risk event log carries a sourced instrument per
+event. The break is one column earlier, on the tab an analyst actually screens from.
+
+The **Quality column on Fiscal Compare** printed a bare hollow **G** and no A/B/C/D grade
+on every generic-default row — **120 of 185, 65% of the table** (`index.html`, the
+`r.termsBasis === 'default'` branch of the row builder).
+
+v505 introduced that and was right at the time: the Quality column then sat beside ONE
+take, the model take, and on a generic row that figure is the mechanic constant — it
+touched none of the country's sourced facts, so a green A there claimed primary-law
+backing for a default.
+
+**v580 changed the table underneath the rule.** The citable DATABASE take is populated
+for all 185 rows, the `#` rank is now built from it, and the header, the drilldown and
+⌘ Copy for IC Memo all tell the analyst to cite *that* figure — computed from the fiscal
+terms ORCA holds for the country, i.e. from exactly the facts the grade measures. v813
+then hoisted this very cell, in its own comment, "so the Quality letter can be emitted
+beside the citable take it grades". On a generic row it went on emitting G — a statement
+about the model column two cells to its **left** — and the grade of the number the
+analyst would actually cite was never drawn at all.
+
+The withheld grades are not uniform: **A 12 / B 43 / C 33 / D 32**. Guatemala (A, 81%
+primary law of 159 facts) and Colombia (C, 21% of 5,081) rendered an identical bare G.
+The column whose only job is to say how solid a row is could not separate them.
+
+The G was no longer load-bearing as the model-column warning either — v748 marks **both**
+model cells generic in the cell itself ("22.2% default"), so spending the whole grade to
+repeat that warning a third time cost the column its job.
+
+**Change.** The generic branch renders the real grade badge for the citable take, then
+the G after it. The grade badge's tooltip scopes it to the citable column by name; the
+G's tooltip now *opens* by saying it marks the two MODEL columns only, not the letter
+beside it; the header tooltip says which badge scopes which column. No grade, letter,
+colour or threshold changed. The 65 non-generic rows render byte-identically.
+
+**Result.** An analyst screening on the citable take column — the one the rank is built
+from and the one they are told to cite — can now read how well sourced each of the 185
+rows is in the table, instead of opening 120 country profiles one at a time. On screen:
+Venezuela reads `C G` against a citable 74.9%, Ireland `B G` against 27.1%, UAE — Dubai
+`D G` against 36.5%. All three previously read `G`.
+
+### Second defect, found by this cycle breaking on it
+
+**The JS syntax gate was checking 172 KB of a 3.2 MB file.** `jscheck` read
+`type="..."` out of the **whole regex match — script body included** — so any block whose
+body contained a string like `type="button"` was classified non-JS and skipped. The main
+3 MB application block was therefore never checked, and the gate reported "10 blocks, 0
+failures" while checking none of the code any cycle edits.
+
+Confirmed live, not by reading: an unescaped apostrophe introduced in this cycle's own
+header-tooltip edit (`that country's own` inside a single-quoted JS string) **passed the
+gate** and broke the page — `switchTab is not defined`, the whole app dead. Only the
+browser walk caught it. The gate now reads attributes from the opening tag only and
+checks **11 of 11 blocks**. Cycles that reported "JS syntax gate: PASS" before this were
+reporting a gate that did not look at the file.
+
+## Verification
+- **JS syntax gate (repaired): 11/11 blocks PASS.**
+- **Runtime suite RAN** against the modified local build: 317 PASS / 0 FAIL / 1 WARN.
+  Then re-run against the **UNMODIFIED** build over the same server: 317 PASS / 0 FAIL /
+  1 WARN — identical. The WARN is the `sw.js` 404 that only occurs over 127.0.0.1 and is
+  the single check separating this from the 318/0/0 read against the deployed URL.
+- **0 page errors, 0 console errors** other than that 404, cold load and after tab walk.
+- **All 120 generic rows verified** to render two badges; all 65 non-generic rows verified
+  to render one, unchanged.
+- **390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 on all 10 tabs. Quality
+  cell 70px wide, both badges 14x14, neither focusable nor clickable — the same
+  `cursor:help` annotation construction as the 65 grade badges already shipped, so **no
+  control was added** and the 24px `pointer: coarse` floor is unaffected.
+
+## Carried forward (unchanged this cycle)
+- Reform Risk intro reads *"Every sourced fiscal law change across 185 jurisdictions"*;
+  `reform_history.json` holds 83 events across **21**, and the tab's own Snapshot line
+  200px below says "21 of 185". Text-only, so not this cycle's fix — but the headline and
+  the snapshot contradict each other on the same screen. **New, from 774.**
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-773.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-773.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-773.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358
+  bytes vs 173,759. The **office copy is the one that was run**. From 764-773.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-773.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-773.
+- Evidence grade ignores the D (default-estimate) share — measured this cycle and it is
+  **smaller than it reads**: only 8 of 185 countries carry `d_pct >= 10`, and on Iraq
+  (27.2%), Paraguay (32.4%) and Somalia the low `a_pct` already drives the grade to D
+  independently. Portugal (39.1% D, graded B) is the one case where it would move the
+  letter. Downgrade this item. From 768-773.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal over-promises production-parameter inputs that do not exist. From 769-773.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5. From 770-773.
+- Side-by-Side Contractor NPV rows carry no highest/lowest markers. From 771-773.
+- Side-by-Side quickstart presets unreachable without clicking Clear. From 771-773.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Still no process check comparing the deployed version string against the local tree. From
+  758, 761-773.
+
+## Resolved this cycle
+- ✅ **The Quality column on Fiscal Compare graded only 65 of 185 rows** — the 120 rows an
+  analyst is told to cite carried no evidence grade at all.
+- ✅ **The JS syntax gate was skipping the main 3 MB script block** and had been reporting
+  PASS without checking any application code.
