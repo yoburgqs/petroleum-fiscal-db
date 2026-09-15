@@ -54847,3 +54847,18 @@ The 318th assertion is `[ConsoleErrors] no JS errors`. **Any local suite run mus
   The badge is the ceiling; the stored score is struck through beneath it. Cold default set
   re-ordered from a visual `NL 84 > NO 76 > UK 58` to `UK 58, NO ≤52, NL ≤59` — matching the
   platform's own verdict strip.
+
+---
+## Cycle 783 Log — 2026-09-15 14:28
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 783 complete, shipped as **v875** (`8cd5463`), pushed, mirror in sync.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation; 782 was T4, last T3 at 777.)
+
+## Friction
+Walked it cold at 1440×900 — cleared sessionStorage and localStorage, reloaded, clicked Side-by-Side. No typing, no preset, just the tab's own seeded Norway / UK / Netherlands.
+
+The Predictability Score row painted three badges at equal weight: **76**, **58**, **84**. Underneath two of t
