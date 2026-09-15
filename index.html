@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v877</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v878</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23957,7 +23957,11 @@ function isStateMonopoly(v) {
 function fmtTake(v) {
   if (v === null || v === undefined) return '—';
   if (isStateMonopoly(v)) return '<span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span>';
-  return `<span class="take-val ${takeClass(v)}" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${Number(v).toFixed(1)}%</span>`;
+  // v878 (T6): basis derived from ENGINE_BASIS at call time, not typed. See _takeBasisTip().
+  const _tb = (typeof window._takeBasisAttr === 'function')
+    ? window._takeBasisAttr()
+    : 'Production-weighted where coverage data exists.';
+  return `<span class="take-val ${takeClass(v)}" title="${_tb}">${Number(v).toFixed(1)}%</span>`;
 }
 // ── v851 (T6): the Explorer stops printing the bundled per-country IRR ──────────────────────
 // `irr_75` is AVG(irr_pct) over every contract in the country. v515 diagnosed it, v516 pulled it
@@ -29341,7 +29345,7 @@ function renderCompare() {
           + '">Equal-weighted · all ' + nc
           + (differs ? ' <span style="font-weight:400;">(≠ take basis)</span>'
              : statGate ? ' <span style="font-weight:400;">(statutory basis)</span>' : '') + '</span>'; }},
-    {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_50, '50')},
+    {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the ' + _cmpEngBasisAttr() + '. This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_50, '50')},
     {label:'Contractor NPV @$75 (base)',  key:(d)=>_cmpNpvCell(d, d.npv_75, '75')},
     // v652 (T3): the Economics block published THREE prices while everything else on this tab
     // published four. The Govt Take block runs $50/$75/$100/$125; the 'Contractor NPV vs Oil
@@ -29355,7 +29359,7 @@ function renderCompare() {
     //   Rides the shared `rows` array, so it lands in #cmp-data-table, the 'Copy for IC Memo'
     // clipboard table and the printed PDF too -- where the pasted memo previously carried a
     // Govt Take @$100 line with no contractor figure beside it.
-    {label:'Contractor NPV @$100 <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $100/bbl on the same standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the fourth published price -- the same one the Govt Take block above and the NPV bar chart below both carry -- and it is the interval in which take orderings most often reverse, so read it against the Govt Take ($100/bbl) row rather than interpolating between $75 and $125. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_100, '100')},
+    {label:'Contractor NPV @$100 <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $100/bbl on the same ' + _cmpEngBasisAttr() + '. This is the fourth published price -- the same one the Govt Take block above and the NPV bar chart below both carry -- and it is the interval in which take orderings most often reverse, so read it against the Govt Take ($100/bbl) row rather than interpolating between $75 and $125. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_100, '100')},
     {label:'Contractor NPV @$125 (upside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $125/bbl on the same standardized profile. Read against the $50 row: the gap is how much of the upside this regime lets the contractor keep, and it is the contractor-side mirror of the Price Swing row above.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_125, '125')},
     // v555 (T3): the 'Govt NPV @$75 (est.)' row is REMOVED. It was Contractor NPV x take/(1-take),
     // computed here in the browser, and it is the one row on this tab that contradicted the
@@ -29838,7 +29842,7 @@ function renderCompare() {
       const _gap = _vdVal[0].v - _vdVal[_vdVal.length - 1].v;
       let _h = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">'
         + '<span title="' + _cmpEsc('Contractor NPV at $75/bbl, largest first — every column run on the same '
-          + 'standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI), so the '
+          + '' + _cmpEngBasisAttr() + ', so the '
           + 'ordering isolates the fiscal regime. A column is ranked here only where ORCA holds a contractor value '
           + 'comparable with the rest of the set: state monopolies carry no contractor position, statutory-terms '
           + 'columns are excluded wherever the set also holds production-weighted ones, and a fee-blended column is '
@@ -29851,7 +29855,7 @@ function renderCompare() {
         + '<span style="font-size:12px;">' + _chain + '</span>'
         + _pill(fmtNpvShared(_gap) + ' apart', 'var(--text)', 'var(--surface2)',
                 'Largest to smallest comparable contractor NPV across the ranked columns at $75/bbl, on the '
-                + 'standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). '
+                + '' + _cmpEngBasisAttr() + '. '
                 + 'Because every column is run on the SAME profile, this gap is the fiscal regime’s effect on '
                 + 'contractor value and nothing else — it is not a statement about field size or cost in these '
                 + 'countries.');
@@ -34759,7 +34763,7 @@ function runScreener() {
       <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
-      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
+      <td class="num" title="${(typeof window._takeBasisAttr === 'function') ? window._takeBasisAttr() : 'Production-weighted where coverage data exists.'}">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="sc-terms-slot" data-tc-country="${attrName}" style="margin-top:2px;"></div></td>
       <td class="num">${_floorLe}${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
@@ -49240,6 +49244,77 @@ function _panelBasisLine() {
 window._engineBasisLine = _engineBasisLine;
 window._panelBasisLine  = _panelBasisLine;
 
+/* ── v878 (T6) — the hover ON a published take named the project that did not produce it ──
+
+   Walked T6 cold at 1440x900, both storages cleared. "Where did this number come from?" is
+   answered, on every table in the tool, by hovering the number. That hover was a hand-typed
+   literal in fmtTake():
+
+       "Government take on standardized $1.2B deepwater project."
+
+   $1.2B / $15-flat is DCF_PROFILES.deepwater — the Live DCF and Scenario Builder what-if
+   project. Every take in COUNTRY_DATA was produced by petroleum_dcf.py on dcf_profiles.py
+   PROFILES.deepwater = ENGINE_BASIS: $1.0B all-in, $18/bbl escalating 2%/yr real, 5yr
+   plateau, 241.9 MMbbl. v833 established this, v834 derived the seven exports from it, v835
+   the Side-by-Side strip and v839 the Country Profile headline hovers. These cell-level
+   hovers were never reached, and they are on FIVE surfaces at once, because fmtTake() is
+   shared: Explorer ($50/$100/$125), Screener (lead take cell + its <td>), IOC Portfolio,
+   the Country Profile peer table and the mechanic table.
+
+   What made it unrecoverable rather than merely wrong is that the analyst's next move
+   CONFIRMED it. The Scenario Builder's profile selector — the control the platform points
+   at with "Model in Scenario Builder" — opens on an option reading, character for
+   character, "Deepwater — $1.2B capex · 50k bbl/d · $15/bbl opex", and _sbRenderBasis()
+   asserted underneath it that this profile "is the same project behind the NPV on every
+   Country Profile and in Fiscal Compare." Three surfaces agreed with each other; all three
+   disagreed with the engine. Every cross-check available to the analyst returned the error.
+
+   Measured on the shipped file: fed ENGINE_BASIS's own headline parameters, the in-page
+   buildProductionProfile() returns 224.6 MMbbl and $1,390M capex against the engine's 241.9
+   and $1,000M — so no profile in DCF_PROFILES reproduces a published figure and none can be
+   added by relabelling one. The claim is therefore withdrawn, not re-pointed. Same
+   precedent as v451 and v877: removing an untrustworthy assertion is the improvement. */
+function _takeBasisTip() {
+  var core = 'Production-weighted where coverage data exists.';
+  if (typeof ENGINE_BASIS === 'undefined' || typeof _engineBasisLine !== 'function') return core;
+  var t = 'Government take on ORCA’s standardized ' + ENGINE_BASIS.name + ' reference project '
+        + '— the basis the stored figures were computed on: ' + _engineBasisLine(true) + '. '
+        + core;
+  var d = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
+  if (d) {
+    t += ' This is NOT the profile named “' + d.name + '” in the Live DCF and Scenario '
+       + 'Builder ($' + (d.capexMM / 1000).toFixed(1) + 'B capex, ' + d.plateauYears
+       + 'yr plateau, $' + d.opexBbl + '/bbl flat opex): that is a different project and '
+       + 'running it will not reproduce this number.';
+  }
+  return t;
+}
+window._takeBasisTip = _takeBasisTip;
+// Attribute-safe form, for the hand-written title="" attributes in the table templates.
+function _takeBasisAttr() { return _takeBasisTip().replace(/"/g, '&quot;'); }
+window._takeBasisAttr = _takeBasisAttr;
+
+// Side-by-Side NPV hovers. v835 derived this tab's BASIS STRIP from ENGINE_BASIS; these four
+// NPV labels and pills kept a hand-typed "$1.2B capex, 50k bbl/d, $15/bbl opex" over the same
+// COUNTRY_DATA npv_* figures the strip governs, so the strip and the hover on the number it
+// describes named two different projects. Contains no straight double quote, so it is safe
+// both in a raw title="" attribute and inside _cmpEsc().
+function _cmpEngBasisAttr() {
+  if (typeof ENGINE_BASIS === 'undefined' || typeof _engineBasisLine !== 'function') {
+    return 'standardized ORCA engine profile';
+  }
+  var s = 'standardized ' + ENGINE_BASIS.name + ' engine profile that produced these figures ('
+        + _engineBasisLine(true) + ')';
+  var d = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
+  if (d) {
+    s += ' — not the $' + (d.capexMM / 1000).toFixed(1) + 'B / $' + d.opexBbl
+       + '-flat profile of the same name in the Live DCF and Scenario Builder, which is a '
+       + 'different project';
+  }
+  return s;
+}
+window._cmpEngBasisAttr = _cmpEngBasisAttr;
+
 // ── v698 (T2) — Scenario Builder profile labels are generated, never typed ──────────────
 // The <select id="sb-profile"> used to carry six hardcoded labels. One of them ("Deepwater
 // ($800M capex, ...)") disagreed with DCF_PROFILES.deepwater.capexMM = 1200, which is the
@@ -49280,13 +49355,39 @@ function _sbRenderBasis() {
     + Math.round(p.declineRate * 100) + '%/yr decline) \u00b7 <strong style="color:var(--text);">$'
     + p.opexBbl + '/bbl</strong> opex \u00b7 25-year life \u00b7 '
     + Math.round(p.discountRate * 100) + '% WACC \u00b7 100% WI';
+
+  // \u2500\u2500 v878 (T6) \u2014 this line used to claim, in its hover, that the Deepwater option "is the
+  // same project behind the NPV on every Country Profile and in Fiscal Compare", and told the
+  // analyst on every other option that Deepwater was the one that matched. Both are false:
+  // the published figures come from ENGINE_BASIS (petroleum_dcf.py on dcf_profiles.py
+  // PROFILES.deepwater), which recovers 241.9 MMbbl on $1.0B all-in at $18/bbl escalating,
+  // against this profile's 294.0 MMbbl on $1,668M at $15/bbl flat. Measured: feeding
+  // ENGINE_BASIS's own parameters to buildProductionProfile() yields 224.6 MMbbl / $1,390M,
+  // so NO option in this selector reproduces a published figure. The correction is VISIBLE,
+  // not a hover: this is the modal an analyst opens to defend a number they are about to
+  // cite, and the claim it disproves was the reason they opened it.
+  var _eb = (typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS : null;
+  if (_eb && typeof _engineBasisLine === 'function') {
+    out.innerHTML += '<div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--border);">'
+      + '<strong style="color:var(--text);">What-if only \u2014 not the basis of any published figure.</strong> '
+      + 'The take, NPV and breakeven on the Country Profile, in Fiscal Compare\u2019s '
+      + '<em>db \u00b7 citable</em> columns, the Explorer, the Screener and the XLSX were computed on a '
+      + 'different project'
+      + (sel.value === 'deepwater' ? ' <em>also called ' + p.name + '</em>' : '')
+      + ' \u2014 ' + _engineBasisLine(false) + '. No profile in this selector reproduces those numbers. '
+      + 'Cite the figures above only as a scenario of your own, on the assumptions printed here.'
+      + '</div>';
+  }
   out.title = 'The exact project the DCF below is run on, read from the engine\u2019s own profile table. '
-    + 'Cite these figures alongside any NPV or IRR you take from this modal. '
-    + (sel.value === 'deepwater'
-        ? 'Deepwater is ORCA\u2019s standardized reference basis \u2014 it is the same project behind the '
-          + 'NPV on every Country Profile and in Fiscal Compare.'
-        : 'Note: only the Deepwater profile matches the standardized basis behind the published '
-          + 'Country Profile and Fiscal Compare NPVs.');
+    + 'Cite these figures alongside any NPV or IRR you take from this modal \u2014 as a scenario, not as '
+    + 'ORCA\u2019s published figure for this country. '
+    + (_eb
+        ? 'The published figures are computed on a separate engine profile (' + _eb.source + ') that '
+          + 'recovers ' + _eb.totalProdMM.toFixed(1) + ' MMbbl on $'
+          + (_eb.capexAllInMM / 1000).toFixed(1) + 'B all-in capex at $' + _eb.opexBbl
+          + '/bbl escalating. No option in this selector runs that project, including the one that '
+          + 'shares its name.'
+        : '');
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _sbBuildProfileOptions);
 else _sbBuildProfileOptions();
@@ -53968,7 +54069,11 @@ function renderFCResults(results, price) {
     if (v == null) {
       return '<td class="num"><span style="color:var(--text-muted);cursor:help;font-size:12px;" title="ORCA holds no contract-database contractor NPV for ' + r.country + ' at $' + _fcSelPrice + '/bbl. The model column to the left is the only NPV on this row, and it is not citable.">\u2014</span></td>';
     }
-    var t = 'CITABLE \u2014 ' + r.country + ' contractor NPV ' + fmtNpvShared(v).replace(/&/g,'and') + ' at $' + _fcSelPrice + '/bbl, from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). '
+    // v878 (T6): was a hand-typed "$1.2B capex ... $15/bbl opex" \u2014 DCF_PROFILES.deepwater, the
+    // Scenario Builder what-if project, printed over the CITABLE figure that ENGINE_BASIS
+    // produced. The column header two rows up already derives _fcEngShort correctly and warns
+    // the two are different projects; this cell contradicted its own header.
+    var t = 'CITABLE \u2014 ' + r.country + ' contractor NPV ' + fmtNpvShared(v).replace(/&/g,'and') + ' at $' + _fcSelPrice + '/bbl, from the fiscal terms ORCA holds in its contract database, on ' + _fcEngShort + '. '
       + 'This is the number Country Profile, the JSON API, this row\'s drilldown citation, the XLSX and \u2318 Copy for IC Memo all carry. It does NOT move with the profile selector.';
     if (r.liveNPV != null) {
       var d = r.liveNPV - v;
