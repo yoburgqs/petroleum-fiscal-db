@@ -53867,3 +53867,16 @@ WACC premium the platform says the memo may not go out without, instead of a gre
   (`_expApplyObsSpread`) and Reform Risk (`_rrApplyObsSpread`) all paint it; the FC drilldown
   has no painter. Measured: Norway reads `76 · UNGRADED · one term` here while the other four
   say *"carry ≤52 · LOW — refuted by ORCA's own contract table, ≥29.6pp observed"*.
+
+---
+## Cycle 776 Log — 2026-09-15 05:53
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 776 shipped as **v868**, pushed to `main` (`fc8159d` + `b107cfb`). Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (775 was T5, 774 T6, 773 T2, 772 T1, 771 T3 — T4 was stalest.)
+
+## Friction
+I walked T4 cold: Home → Reform Risk, the country lookup across all its branches, the `#/reform/<country>` deep links, the Country Profile stability line, the Screener reform filter, the Fiscal Comp
