@@ -52801,3 +52801,123 @@ stop looking and go to the statute instead of hunting an index that no longer ex
 Walked it cold with storage cleared: Home's Sourcing line → Fiscal Compare's Quality column → row drilldown → Country Profile's Evidence Quality panel and per-parameter Evidence Chain, on Norway, Somalia, Iraq, China, Russia and Côte d'Ivoire.
 
 The evidence layer h
+
+---
+## Cycle 769 Log — 2026-09-14 21:55
+- Test before: 317 PASS / 0 FAIL / 1 WARN (local, office suite)
+- Test after: 317 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the modified local build
+- JS errors: 0 page errors, 0 console errors (the 1 WARN is the `sw.js` 404, which is local-only:
+  the SW registers at `/petroleum-fiscal-db/sw.js`, correct on Pages, 404 when served from repo root)
+- Summary: Cycle 769 complete — **v861 shipped and pushed**.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (rotation: 768 was T6, 767 T2,
+766 T1, 765 T3, 764 T4 — T5 was stalest, last run at 763)
+
+## Friction
+Walked T5 cold with storage cleared, through every clipboard artifact the product has: Fiscal Compare
+(`fc-copy-ic-btn` + the `fc-dock-copy` dock), Screener (`screener-copy-ic-btn`), Side-by-Side
+(`cmp-copy-table-btn`), IOC Portfolio (`ioc-copy-ic-btn`), Country Profile (`dd-ic-summary-btn`,
+`dd-cite-btn`), Reform Risk (`rr-copy-verdict`) and the Scenario Builder IC line.
+
+Six of the seven are in good shape. Each writes `text/html` + `text/plain` through a `ClipboardItem`
+with a `writeText` fallback and an `_icRefuse()` terminal arm, and each carries a full basis paragraph
+— the standardized Deepwater project spelled out at length (50k bbl/d peak, 3yr ramp, $1.0B capex,
+$18/bbl opex, 25-year life, 10% WACC), the fee-basis comparability correction, the per-row substitution
+notice. FC's and the Screener's "would copy all 185 rows" confirm-on-second-click guard fires correctly.
+
+**The Scenario Builder's IC line was the exception, and it is the artifact that matters most for T5.**
+It is the one IC artifact on this platform whose assumptions are chosen by the analyst and recorded
+NOWHERE else — not in the database, not in a country record, not in any other export. The whole
+product routes the analyst here for the number the IC actually needs: the Methodology's Stage 4 calls
+it "exactly what an IC memo requires", FAQ A-level text calls it "the number to put in front of an IC",
+and FC, Side-by-Side and IOC all close their own clipboard text by sending the analyst here.
+
+`_sbHurdleLine()` (`index.html:49146`) built `window._sbICLine` from the mechanic and the profile
+**name** only. Measured on the North Sea profile at $75/bbl:
+
+| terms run | govt take | IC line opening |
+|---|---|---|
+| royalty 0%, CIT 22%, special tax 56%, state equity 0% | 42.6% | `Concession, North Sea profile, $75/bbl` |
+| royalty 18%, CIT 22%, special tax 0%, state equity 40% | 41.8% | `Concession, North Sea profile, $75/bbl` |
+
+Two regimes with different levers, different cost-overrun exposure and different negotiating room,
+0.8pp apart on take — pasting into a memo as the same string. Nothing in the artifact separated them,
+and the take difference is inside the noise, so the number gave no clue either. Neither did the project:
+"North Sea profile" means nothing outside this modal, and the peak rate, ramp, plateau, decline, capex,
+opex, life and WACC behind the NPV all travelled nowhere.
+
+The sharpest part: the basis line under the profile selector (`_sbRenderBasis`) carries the tooltip
+*"Cite these figures alongside any NPV or IRR you take from this modal."* The page tells the analyst,
+in writing, to carry those numbers — and the Copy button dropped every one of them.
+
+## Change
+Two new clauses on the IC line, on screen and in the clipboard:
+
+- `_sbICTermsClause(mech, params)` — `; terms as run — royalty 0%, CIT 22%, special tax 56%, state
+  equity 0%, windfall tax 0%, severance 0%`. All **8** mechanics get their own field labels: Concession,
+  PSC, Gross Split (incl. the DMO discount and the effective govt share it was actually run as), TSC,
+  RSC, PRRT, Buy-back, Revenue Share. Zero-valued levies are printed rather than suppressed — a 0%
+  royalty and a 0% state equity are facts about the regime modelled, and they are exactly what
+  separates the two rows in the table above.
+- `_sbICProjectClause(profile)` — `; project as run — North Sea: $600M capex, 40k bbl/d peak (3yr ramp,
+  6yr plateau, 15%/yr decline), $22/bbl opex, 25-year life, 10% WACC, 100% WI — scale NPV by your WI`.
+
+Both are built from the same `params` and `profile` objects the DCF consumed. `params` is published as
+`window._sbRunParams` on the line beside `window._sbPriceDeck`, following the one-source pattern already
+established there, so the clauses cannot be re-read from the DOM after the fact and cannot drift from
+the run. The existing `_sbICBasisClause()` (provenance: whose terms these are) is untouched and
+composes with the new clauses (values: what the terms were) rather than duplicating them.
+
+## Result
+The two runs in the table above now paste as distinguishable lines. An IC reader — or the analyst
+themselves a week later — can reconstruct either scenario from the memo alone, without the tool and
+without the modal still being open. This closes the Scenario Builder against the directive's
+finalization criterion 5, "every export carries the assumptions behind its numbers", on the one
+surface where those assumptions existed only in the analyst's head.
+
+Side effect worth recording: opened from Norway's Country Profile the line now prints
+`state equity 33%`, which names which side of the carried-forward Norway State Participation
+contradiction (`0%` unsourced on the profile vs `33.4%` in the Live DCF panel) the run actually used.
+The contradiction is unchanged; the artifact is no longer silent about which figure it consumed.
+
+## Verification
+- **JS syntax gate:** 16 blocks, **0 failures**.
+- **Runtime suite RAN** against the modified local build: **317 PASS / 0 FAIL / 1 WARN**. Unchanged.
+- **All 8 mechanics x 3 profiles (24 combinations):** **0** producing `NaN`, `undefined`, `null`,
+  an empty terms clause or an empty project clause.
+- **Screen == clipboard:** the rendered `IC line:` preview string and the copied payload compared
+  byte-for-byte equal on both runs.
+- **1920 / 1440 / 1280 / 1024 / 768 / 390 x 9 tabs:** **0** horizontal-scroll failures, **0** page
+  errors, **0** console errors (`sw.js` 404 excluded — local-only).
+- **390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390 with the modal open and a result
+  rendered; the `Copy IC line` button measures **44px** tall.
+- **Origin paths re-walked:** Norway (country record terms), Saudi Arabia (monopoly — the
+  `HYPOTHETICAL REGIME` clause and the new terms clause read correctly together, and the generic
+  defaults are now visible as literally 10%/25%/0%/0%), Iraq (TSC, `contractor fee $6.00/bbl`).
+
+## Carried forward
+- **The Cost Recovery / IRR card**'s *"clears a 15% IOC hurdle (+$490M)"* still has no basis line of
+  its own. Carried from 767, 768.
+- **Mechanic filter is a country-level include-set, not a contract-level one** — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. Data-model fix. Carried from 766-768.
+- **`#screener-preset-select` resets to "Load a screen…"** after applying a preset. Cosmetic.
+  Carried from 766-768.
+- **The repo's `tests/runtime_comprehensive.js` is stale** against the office copy — repo 303 PASS,
+  office 317, same build. Carried from 764-768.
+- **`copyExplorerLink()` still serializes nothing** — bare `#/explorer`. `copyScreenerLink()` (v842)
+  is the model. Carried from 763, 765-768.
+- **Basket pill ✕ glyphs measure 44px tall but only 8px wide** under `pointer: coarse`. Carried from
+  765-768.
+- **The `isDead` arm of `linkTitle`** is unreachable. Harmless, pre-existing. Carried from 768.
+- **The evidence grade ignores the D (default-estimate) share entirely** — 5 countries graded A or B
+  with D >= 10%. Narrow. Carried from 768.
+- **Norway's State Participation contradiction** (`0%` unsourced vs `33.4%` in the Live DCF panel).
+  Data gap. Now at least named in the Scenario Builder IC line (above). Carried.
+- **Still no process check comparing the deployed version string against the local tree** — carried
+  from 758, 761-768.
+- **New, from this walk:** the Scenario Builder modal's own description promises the analyst can "set
+  production parameters (capex, opex, peak rate, project life)". There are no such inputs — production
+  parameters come only from the 6-entry `DCF_PROFILES` preset dropdown. The IC line now states the
+  preset's real numbers, so the artifact is honest, but the modal's description still over-promises
+  a capability that does not exist. Candidate for the next T5 or T2.
