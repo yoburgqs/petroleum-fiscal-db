@@ -54309,3 +54309,120 @@ wrong: the IC citation and `Copy for IC Memo` already quoted a consistent blend/
 The Country Profile verdict sentence — the first line under the headline take — reads *"Clears the 10% WACC at $75 (X) and at the $50/bbl downside (Y)"*.
 
 Cycle v786 switched only the **Y leg** to the PSC/Concession basis for countries that blend in fee-basis (TSC/RSC/Buy-back) contracts, and left 
+
+---
+## Cycle 780 Log — 2026-09-15 10:2x
+
+- Test before: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 318 PASS / 0 FAIL / 0 WARN / 0 JS errors — **suite RUN this cycle**, not assumed,
+  against the local tree served under the `/petroleum-fiscal-db/` prefix (the sw.js path trap).
+  Number read from the suite's own stdout.
+- Shipped as **v872**, committed, mirrored, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (Rotation: 779 T2,
+778 T1, 777 T3, 776 T4, 775 T5 — T6 was stalest, last run at 774.)
+
+## Friction
+Walked cold at 1440×900, storage cleared, Home → Fiscal Compare → Country Profile → Nigeria →
+Evidence Quality → Evidence Chain.
+
+The Evidence Chain's **Special Tax** and **FTP Rate** rows cite `EY / IHS Markit bulk fiscal
+harvest (2025)` and render as ordinary healthy citations — plain `↗`, `title="Open the cited
+source document"`, no chip, full opacity on the link. The href is
+`https://taxsummaries.pwc.com` — the bare site root.
+
+The root returns **200**, so `_citeLinkDead()` clears it, so the row never enters the
+`if (_citeLinkDead(srcMeta.url))` branch (index.html ~37842) and never reaches v850/v860's
+reroute, which is gated entirely on `isDead`. Same gate at the Evidence Quality "Key sources"
+panel: `const _pwcUrl = (isDead && isBulk) ? _pwcHref(entry.country) : ''`.
+
+Measured over the shipped `country_data.json`, all 185 countries:
+
+| bulk source rows | address | prior treatment |
+|---|---|---|
+| 142 | `taxsummaries.pwc.com/allcountries` | measured dead → **v860 already reroutes these** |
+| **82** | `taxsummaries.pwc.com` (root) | 200 → **rendered as a healthy citation** |
+| 224 | total | |
+
+v860 fixed the half that was *measurably* dead. The other half is the worse one: a dead link
+announces itself and the analyst knows to go looking; a link to a publisher's homepage passes
+every check the page performs and still delivers nothing — no country, no parameter, no rate.
+On Nigeria it is the **only** clickable provenance those two rows have, because the country's
+other bulk citation (`EY_KPMG_CIT_Guide_2025`) is one of the 142 already wearing LINK DEAD.
+
+Also found, and deliberately *not* treated as the fix: the non-bulk `linkTitle` for a live bulk
+row claimed the link "opens the PwC Worldwide Tax Summaries country **index**" — untrue for these
+82, which point at the front page. Fixed as a consequence of the reroute, not as its own cycle.
+
+## Change
+`_isBulkIndexUrl()` (new, beside `_pwcHref`) treats the site root and `/allcountries` as the same
+kind of thing — an address that cites no parameter — and both now take v860's reroute. Applied at
+**both** render sites: the Evidence Quality "Key sources" panel and the per-parameter Evidence
+Chain table.
+
+Of the 82: **67 now link to that country's own verified page** (`/nigeria`, `/brazil`, `/angola`,
+…, from the existing `_PWC_COUNTRY` map); the other **15** — Algeria, Guinea, Iran, Mali, Niger,
+Sao Tome and Principe, Sierra Leone, Somalia, South Sudan, Sudan, Suriname, Syria, Timor-Leste,
+Turkmenistan, Yemen — stop being links at all and read `no page for <country>`. Swept after the
+change: **0 bulk rows anywhere still render as a plain healthy link** (224 = 142 dead + 67 → page
++ 15 → no page).
+
+The `LINK DEAD` chip is **not** reused. The address resolves; claiming otherwise would be the same
+untrue-but-confident signal this removes. These rows get a new `INDEX ONLY` chip, and
+`deadLinkCount` / `_srcDeadN` are untouched — Nigeria still reads "3 of the 4 cited sources above
+cannot be retrieved" and "2 of 3 source links dead", both still counting only genuinely dead
+links. Verified unchanged after the edit. No value, tier letter, percentage or grade moves.
+
+## Result
+Every bulk citation on every profile now either **opens a page about that country**, or **says on
+its face that no such page exists**. The analyst tracing Nigeria's 30% Special Tax reaches
+`taxsummaries.pwc.com/nigeria` — the secondary guide the figure was actually harvested from —
+instead of a homepage; the analyst on Algeria is told to stop looking rather than left clicking an
+arrow that resolves to nothing. Either outcome ends the search. The previous one ended it with the
+analyst guessing whether the citation was real.
+
+## Mobile (Step 5b) — 390×844, `hasTouch: true`
+- `scrollWidth` 390 = `clientWidth` 390 on both Nigeria and Algeria. **0 horizontal overflow.**
+- `INDEX ONLY` measured **17–19px** on first render. Added `.cite-index-chip` to v641's existing
+  `.cite-dead-chip` coarse-pointer rule (identical case: a 10px span carrying its whole
+  explanation in a `title=""`, so it is its own tap target) rather than writing a second rule.
+  Re-measured: **0 controls under 24px** across every chip on the touched rows.
+- v612 MOBILE LAYER untouched; `#reference-panel` untouched.
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load. From 771-779.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-779. (The Country
+  Profile's own `Copy link` is correct.)
+- Mechanic filter is a country-level include-set, not contract-level. From 766-779.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-779.
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes vs
+  173,759. **The office copy is the one that was run**, again this cycle. From 764-779.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-779.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-779.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel) —
+  the data conflict is unresolved; the page's handling of it is not the weak point.
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-779.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`. From 776-779.
+- Sorting Govt Take high→low puts Saudi Arabia (`—`, no take value) at rank 1. From 778-779.
+- `mode-btn-screen` loses its result count when you leave Screener mode. From 778-779.
+- Saudi Arabia's Country Profile emits no `Fiscal character` line and no verdict box. From 779.
+- One evidence-chain source link (`EY / IHS Markit bulk fiscal harvest (2025) ↗`) rendered 17px
+  under `pointer: coarse` on Malaysia and Oman — **that row is one of the 82 rerouted this
+  cycle**; re-check next T6 whether the height issue survives the new chip.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-779.
+- Nigeria's `Profit Oil (Govt) 40%` has **no source of any kind** (`No source · contract average`)
+  — flagged on screen, but it is a model input with zero provenance. New this cycle, not fixed.
+
+## Resolved this cycle
+- ✅ **82 of 224 bulk citations linked to a publisher's homepage and looked healthy doing it.**
+  Open since v518 identified the address as "not a citation for any particular parameter";
+  v860 fixed only the 142 that were also dead.
