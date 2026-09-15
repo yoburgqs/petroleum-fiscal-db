@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v860</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v861</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v860</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v861</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v860</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v861</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49070,6 +49070,81 @@ function _sbICBasisClause() {
   return '';
 }
 
+// ── v861 (T5) — the terms and the project the run was actually made on ────────────────
+//
+// The Scenario Builder is the one IC artifact on this platform whose assumptions are chosen
+// by the analyst and recorded NOWHERE else — not in the database, not in a country record,
+// not in any other export. Every other paste artifact spells its basis out at length: the
+// Country Profile, Side-by-Side and IOC clipboard texts all carry the standardized Deepwater
+// project in full (50k bbl/d peak, 3yr ramp, $1.0B capex, $18/bbl opex, 25-year life, 10%
+// WACC) precisely because the NPV means nothing without it.
+//
+// The IC line this modal produced named only the MECHANIC and the PROFILE NAME. Measured on
+// the North Sea profile at $75/bbl:
+//
+//   royalty 0%,  CIT 22%, special tax 56%, state equity  0%  ->  govt take 42.6%
+//   royalty 18%, CIT 22%, special tax  0%, state equity 40%  ->  govt take 41.8%
+//
+// Two regimes with different levers, different cost-overrun exposure and different
+// negotiating room, 0.8pp apart on take — and both pasted into a memo as the same string,
+// "Concession, North Sea profile, $75/bbl". Nothing in the artifact separated them, and the
+// take difference is inside the noise, so the number gave no clue either.
+//
+// The profile basis tooltip under the selector already tells the analyst, in writing, to
+// "cite these figures alongside any NPV or IRR you take from this modal". The Copy button
+// then dropped every one of them. Both clauses are built from the same `params` and
+// `profile` objects the DCF was run on, so the screen and the clipboard cannot drift.
+
+function _sbPctStr(v) {
+  if (v == null || isNaN(v)) return '—';
+  var s = (v * 100).toFixed(1);
+  if (s.slice(-2) === '.0') s = s.slice(0, -2);
+  return s + '%';
+}
+
+function _sbICTermsClause(mech, params) {
+  if (!params) return '';
+  var P = _sbPctStr, t = [];
+  if (mech === 'PSC') {
+    t = ['cost recovery cap ' + P(params.cost_recovery_cap), 'FTP ' + P(params.ftp_rate),
+         'govt profit oil ' + P(params.profit_oil_govt_pct), 'CIT ' + P(params.cit_rate),
+         'royalty ' + P(params.royalty_rate)];
+  } else if (mech === 'Revenue Share') {
+    t = ['govt revenue share ' + P(params.profit_oil_govt_pct), 'CIT ' + P(params.cit_rate),
+         'royalty ' + P(params.royalty_rate), 'gross revenue split, no cost recovery'];
+  } else if (mech === 'Gross Split') {
+    t = ['contractor gross split ' + P(params._gs_cont_pct),
+         'DMO ' + P(params._gs_dmo_pct) + ' at ' + P(params._gs_dmo_price_pct) + ' of ICP',
+         'CIT ' + P(params.cit_rate),
+         'run as ' + P(params.profit_oil_govt_pct) + ' govt share after the DMO discount, no cost recovery'];
+  } else if (mech === 'PRRT') {
+    t = ['PRRT ' + P(params.prrt_rate), 'CIT ' + P(params.cit_rate),
+         'royalty ' + P(params.royalty_rate), 'uplift threshold ' + P(params.uplift_rate)];
+  } else if (mech === 'TSC' || mech === 'RSC') {
+    t = ['contractor fee $' + Number(params.fee_per_bbl).toFixed(2) + '/bbl',
+         'CIT ' + P(params.cit_rate), 'excess-profits tax ' + P(params.ept_rate)];
+  } else if (mech === 'Buy-back' || mech === 'Buyback') {
+    t = ['contractor fee $' + Number(params.fee_per_bbl).toFixed(2) + '/bbl',
+         'capital recovery cap ' + P(params.cost_recovery_cap),
+         'term ' + params.capex_recovery_years + ' yrs', 'CIT ' + P(params.cit_rate)];
+  } else {
+    t = ['royalty ' + P(params.royalty_rate), 'CIT ' + P(params.cit_rate),
+         'special tax ' + P(params.spt_rate), 'state equity ' + P(params.state_equity_pct),
+         'windfall tax ' + P(params.windfall_rate), 'severance ' + P(params.severance_rate)];
+  }
+  return '; terms as run — ' + t.join(', ');
+}
+
+function _sbICProjectClause(profile) {
+  if (!profile) return '';
+  // 25 years is fixed in buildProductionProfile(); ramp/plateau/decline come from the profile.
+  return '; project as run — ' + profile.name + ': ' + _sbFmtCapex(profile.capexMM) + ' capex, '
+       + (profile.peakBblDay / 1000) + 'k bbl/d peak (' + profile.rampYears + 'yr ramp, '
+       + profile.plateauYears + 'yr plateau, ' + Math.round(profile.declineRate * 100)
+       + '%/yr decline), $' + profile.opexBbl + '/bbl opex, 25-year life, '
+       + Math.round(profile.discountRate * 100) + '% WACC, 100% WI — scale NPV by your WI';
+}
+
 // v733 (T5): the price deck, as a clause the memo can carry. Without it the pasted IC line
 // stated a single price, on a platform whose own screens reject a single-price case — the
 // Screener admits a country on its $50/bbl NPV and Side-by-Side tells you in writing to use
@@ -49119,6 +49194,8 @@ function _sbHurdleLine(res, profile, price, mech) {
               ? '; IRR not quoted — first oil lands in the same year as first capex on this profile, so the rate is not a project return'
               : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : '')))
     + _sbICBasisClause()
+    + _sbICTermsClause(mech, window._sbRunParams)
+    + _sbICProjectClause(profile)
     + _sbICDeckClause()
     + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
     + ' — yoburgqs.github.io/petroleum-fiscal-db/';
@@ -50604,6 +50681,9 @@ function runCustomScenario() {
   // Built BEFORE _sbHurdleLine(), which reads window._sbPriceDeck to put the downside and the
   // swing into the copied IC line. One source, so the screen and the clipboard cannot drift.
   window._sbPriceDeck = _sbBuildDeck(mech, params, profile, price, result);
+  // v861 (T5): same one-source rule — the IC line states the terms it was RUN on, read from
+  // the very object the engine just consumed, not re-read from the DOM afterwards.
+  window._sbRunParams = params;
 
   const wf = result.waterfall;
   const wfColors = { royalty:'#96570A', ftp:'#7C3AED', profit_oil:'#C2410C', cit:'#B91C1C', special:'#A16207', state_eq:'#6B6560', base_govt:'rgba(21,128,61,0.68)', ept:'#B91C1C', cost_reimb:'#6B6560', windfall:'#B91C1C', severance:'#C2410C' };
