@@ -54038,3 +54038,119 @@ of only in a strip 700px above it.
 
 ## Friction
 Walked Side-by-Side cold at 1440×900, no sessionStorage/localStorage. The four **Govt Take** rows have carried red/green "highest of N" / "lowest of N" markers on every rankable column since v593, backed by a whole apparatus. The four **Contractor NPV** rows directly beneath them carrie
+
+---
+## Cycle 778 Log — 2026-09-15 07:4x
+- Test before: 318 PASS / 0 FAIL
+- Test after: 317 PASS / 0 FAIL / 1 WARN — **suite actually RUN this cycle**, against the local
+  build at `http://localhost:8899/index.html`. The single WARN is `[ConsoleErrors] non-critical:
+  A bad HTTP response code (404) was received when fetching the script` — `sw.js` registration
+  failing under `python3 -m http.server`. It was present on the PRE-change build in the very
+  first cold walk of this cycle, before any edit. 317 PASS + 1 WARN = the same 318 checks.
+- JS errors: 0 page errors. JS syntax gate PASS (11 inline blocks).
+- Pixel audit: **PIXEL GATE PASS** — no surface worse than baseline, the 5 standing findings
+  unchanged and none in Explorer/Bubble.
+- Shipped as **v870**, `2aaec7a`, pushed to `main`. Mirror copied.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+Rotation: 777 was T3, 776 T4, 775 T5, 774 T6, 773 T2 — T1 was stalest, last run at 772.
+
+## Friction
+Walked T1 cold at 1440×900, no sessionStorage/localStorage: Home → Explorer → **Bubble Chart**.
+
+The Screener half of T1 is in good shape and was walked first — presets, the evidence-first
+block ordering, the $50/$75/$100/$125 deck (the filters genuinely re-run at the new deck and the
+chip flips to MODIFIED — Azerbaijan 60.8%→66.0% correctly drops out of a ≤65% screen), the
+shortlist tick → dock → Copy/CSV/Excel/Side-by-Side path, and the IC clipboard block which names
+the screen, the non-binding leg and the manual pick. No worst moment there.
+
+The worst moment is one mode button away. The caption immediately above the canvas tells the
+analyst, in bold, that *"the **left frontier** (low take) with **high NPV** represents the most
+IOC-favorable regimes"* — and `renderBubbleChart()` (~line 57884) then plotted **185 bubbles, not
+one of which carried a country name**. Identification was hover-only, one bubble at a time, and
+in the exact upper-left cluster the caption points at, ~20 bubbles overlap, so a hover resolves
+the topmost and conceals the rest.
+
+v818 had already put the encoding that matters on this chart — filled disc = verified field
+production, hollow ring = regional proxy estimate — and **v818's own source comment names the
+trap**: the frontier's peak is Vanuatu, Bahamas, Montenegro, Greenland, Faroe Islands, none of
+which hold a barrel of verified production. That warning lived in a code comment and in a count
+("⚠ 163 of the 185 bubbles plotted are proxy estimates"). It was never *on the plot*. An analyst
+with twenty minutes reads an anonymous cloud, or clicks a frontier bubble blind.
+
+## Change
+A Chart.js 4.4 `afterDatasetsDraw` plugin (`orcaBubbleLabels`) draws country names on the
+**production-backed** bubbles — the 22 whose take and NPV are measured rather than inferred.
+
+- Four candidate anchors per point (right / left / above / below), a white halo
+  (`strokeText`, lineWidth 3) so a name over a filled disc stays readable, a plot-area clamp,
+  and a label-vs-label collision pass. Candidates are ranked verified-first then NPV-descending,
+  so if collision forces a drop it drops the least interesting label, never a frontier one.
+- `meta.hidden` is honoured, so switching a region off in the legend takes its labels with it.
+- **Scope widens when the analyst has narrowed:** with "Verified production only" ticked, or
+  arriving with a Screener result of ≤30 (e.g. Stable Fiscal Record → 11), **every** plotted
+  bubble is named, proxy ones included, in muted grey rather than near-black.
+- Mobile caps at 6 labels at 9px. Labels are canvas text inside the existing plot area — no DOM
+  node, no control, and no way to widen the document.
+- The basis key now reads "verified field production — **named on the chart**", so the rule the
+  labels follow is stated rather than inferred. Canvas `aria-label` says the same.
+- `#bubble-verified-only` joins `#sc-proxy-keep, #sc-floor-keep` in the v612 mobile layer's 24px
+  hit-box rule. It measured **22px** under `pointer: coarse` — it is the control that decides
+  whether the scatter plots 22 measured countries or 185 mostly-inferred ones, and now also
+  whether every bubble carries a name. Same narrow id scope, hit box only.
+
+## Result
+The analyst reads the scatter without hovering anything. The named set **is** the investible
+universe — Canada, USA, Argentina, Mexico, Colombia, Australia, Azerbaijan, China, Ecuador,
+Brazil, UK, Angola, India, Kazakhstan, Libya, Indonesia, Malaysia, Norway, Oman, Iraq, Nigeria,
+Saudi Arabia — and the unnamed hollow cloud sitting above and to the LEFT of every one of them
+reads as exactly what it is. The frontier the caption points at is now visibly nameless, and the
+lowest-take *named* bubble is the USA at 23.4%. The PNG export carries the labels, so the chart
+is pasteable into an IC pack as a standalone figure (T5 benefit, not claimed as this cycle's fix).
+
+## Carried forward (unchanged this cycle)
+- Side-by-Side quickstart presets unreachable without clicking Clear — the tab seeds
+  Norway/UK/Netherlands on cold load, so `#cmp-output`'s empty state and all four benchmark
+  buttons never render for a first-time user. From 771-777.
+- Reform Risk intro says "185 jurisdictions", `reform_history.json` holds 83 events across 21.
+  From 774-777.
+- `copyExplorerLink()` still serializes a bare `#/explorer`. From 763, 765-777.
+- Mechanic filter is a country-level include-set, not contract-level — Group-2 trap per
+  `MECHANIC_COMPARABILITY.md`. From 766-777.
+- `#screener-preset-select` resets to "Load a screen…" after applying a preset. From 766-777.
+  (Walked again this cycle: the `#screener-preset-label` chip does carry the active preset name
+  and a ✕, so the state is not lost — only the `<select>` disagrees with it.)
+- `tests/runtime_comprehensive.js` in the repo is stale against the office copy — 157,358 bytes
+  vs the graded copy. **The office copy is the one that was run.** From 764-777.
+- 17 Screener row-selection checkboxes render 13px under `pointer: coarse`. From 772-777.
+- Basket pill ✕ glyphs 44px tall × 8px wide under `pointer: coarse`. From 765-777.
+- Norway State Participation contradiction (`0%` unsourced vs `33.4%` in the Live DCF panel).
+- Scenario Builder modal intro over-promises production-parameter inputs that do not exist.
+- Intro strip's IC rule names a `5-8pp` WACC band at "Score ≤ 20"; max on file is UK at 5.
+- Evidence grade ignores the D (default-estimate) share. From 768-777.
+- 4 of 164 unscored jurisdictions have no statute anchor — Iraq-Kurdistan, Paraguay, Somalia,
+  UAE — Abu Dhabi.
+- Fiscal Compare bulk-copy header reads "1 countries" when a filter leaves one row.
+- FC drilldown IC MEMO block still emits `Stability ◇◇◇◇◇`; FC drilldown Fiscal Predictability
+  badge carries no observed-spread ceiling. From 776-777.
+- A take cell can render the Contractor NPV block's wording (`not comparable · statutory terms`
+  vs `not ranked · statutory terms` for the same column depending on set membership). From 777.
+- Still no process check comparing the deployed version string against the local tree.
+  From 758, 761-777.
+
+## New this cycle
+- **Sorting Govt Take high→low puts a country with no take value first.** Saudi Arabia renders
+  `—` in the take column (state monopoly, no IOC pathway) and sorts to rank 1 of a descending
+  take sort, above Iraq at 84.8%. One row, and the ✕ is arguably defensible as "unknown ranks
+  extreme", but a missing value should not head a ranking. Text-free fix, not this cycle's.
+- **`mode-btn-screen` loses its result count when you leave Screener mode.** In Screener mode it
+  reads "Screener (185) ⋮ ★"; `switchExplorerMode()` (v466) resets it to plain "Screener ⋮ ★" on
+  the way out, so from the Bubble Chart the button no longer says how many rows are waiting
+  behind it — while the bubble scope radio right below it does say "Stable Fiscal Record (11)".
+
+## Resolved this cycle
+- ✅ **Not one of the 185 bubbles on the Explorer scatter carried a country name**, on the one
+  surface whose own caption instructs the analyst to pick from a region of it. Open since the
+  chart was built; v818 fixed the *basis* encoding on the same chart and left identification
+  hover-only.
