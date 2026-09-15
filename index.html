@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v865</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v866</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2530,7 +2530,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v865</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v866</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2600,7 +2600,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v865</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v866</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -53183,7 +53183,7 @@ function renderFCResults(results, price) {
     ? (ENGINE_BASIS.name + ' engine profile \u2014 ' + ENGINE_BASIS.short + ', 100% WI')
     : 'the ORCA standardized engine profile';
   // v813 (T6): built here, emitted straight after the citable-take column below.
-  var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
+  var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. The letter is drawn on every one of the 185 rows and grades the CITABLE database take beside it. A second, hollow G = GENERIC sits after the letter on the 120 rows where ORCA holds no country-specific terms in the compare engine: on those, the two MODEL columns are the standard default for the mechanic \u2014 directional only, not citable \u2014 while the citable take beside this cell is still that country\'s own. The G scopes the model columns; the letter scopes the citable one. Hover either badge for the detail.">Quality</th>';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. Since v580 this is NOT the column the # rank is built from \u2014 the rank follows the citable database take in the next column. Use this one only for profile sensitivity: it is the only take in the tool that moves with the profile selector. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
   // ── v547 (T5) ─────────────────────────────────────────────────
   // Measured on the cold default view: 154 of the 185 rows on this table render an IDENTICAL
@@ -53637,16 +53637,44 @@ function renderFCResults(results, price) {
     // touched those sourced facts — it came from the generic mechanic default. Showing a
     // green "A" next to it told the analyst the number was primary-legislation backed
     // when nothing about it was. Those rows now read GEN.
+    // \u2500\u2500 v866 (T6): the evidence grade was withheld from 120 of the 185 rows \u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    // v505's rule above was right for the table v505 was looking at. The Quality column then sat
+    // beside ONE take \u2014 the model take \u2014 and on a generic row that take had not touched a single
+    // one of the country's sourced facts, so a green A there claimed primary-law backing for a
+    // mechanic constant.
+    // v580 changed the table underneath the rule. The citable DATABASE take is populated for all
+    // 185 rows, it is the column the # rank is now built from, and the header, the drilldown and
+    // \u2318 Copy for IC Memo all tell the analyst to cite THAT figure \u2014 computed from the fiscal
+    // terms ORCA actually holds for the country, i.e. from exactly the facts the grade measures.
+    // v813 then hoisted this cell to sit directly beside it, in its own words, "so the Quality
+    // letter can be emitted beside the citable take it grades". On a generic row it went on
+    // emitting a bare G, which is a statement about the MODEL column two cells to its left, and
+    // the grade of the number the analyst will actually cite was never drawn at all.
+    // That is 120 of 185 rows \u2014 65% of the table \u2014 and the withheld grades are not uniform:
+    // A 12 / B 45 / C 33 / D 30. Guatemala (A, 81% primary law of 159 facts) and Colombia
+    // (C, 21% of 5,081) render an identical bare G today, so the column that exists to say how
+    // solid a row is cannot separate them.
+    // Nor is the G still load-bearing as the model-column warning: v748 marks BOTH model cells
+    // generic in the cell itself ("22.2% default"), so spending the whole grade to repeat that
+    // warning a third time costs this column its only job. Both now render \u2014 the grade for the
+    // citable take, adjacent to it, and G after it, scoped in words to the model columns.
+    // No grade, letter, colour or threshold changes; 65 rows render exactly as before.
     var _qualCell;
     if (r.termsBasis === 'default') {
-      var _genTitle = 'GENERIC TERMS \u2014 ' + r.country + '\'s take of ' + (r.liveTake != null ? r.liveTake.toFixed(1) + '%' : '\u2014')
+      var _genTitle = 'GENERIC TERMS \u2014 this G marks the two MODEL columns only, not the letter beside it. '
+        + r.country + '\'s MODEL take of ' + (r.liveTake != null ? r.liveTake.toFixed(1) + '%' : '\u2014')
         + ' was modelled from the standard ' + r.mechanic + ' default (' + describeDefaultTerms(r.mechanic)
         + '), not from ' + r.country + '\'s own fiscal terms \u2014 ORCA holds no country-specific terms for it in the compare engine. '
         + 'The database does hold ' + (r.n_facts != null ? Number(r.n_facts).toLocaleString() : '?')
         + ' fiscal facts for ' + r.country + ' (' + (r.a_pct||0).toFixed(0) + '% read from primary law)'
-        + ', but this figure used none of them. Directional only: do not cite it in an IC memo. '
-        + 'Open Country Profile for the sourced statutory parameters.';
-      _qualCell = '<span class="tier-badge tier-gen" title="' + _genTitle + '">G</span>';
+        + ', but the model figure used none of them. Directional only: do not cite the model take in an IC memo. '
+        + 'The citable database take to the left DID use those facts, and the letter beside this G grades them.';
+      var _genGradeNote = 'This letter grades the CITABLE database take in the column immediately to the left '
+        + '\u2014 the figure the # rank, the drilldown citation, the XLSX and \u2318 Copy for IC Memo all carry. '
+        + 'It does NOT grade the model take: that one is the generic ' + r.mechanic + ' default, marked G beside '
+        + 'this badge and marked "default" in its own cell.';
+      _qualCell = getTierBadge(r, _genGradeNote)
+        + '<span class="tier-badge tier-gen" title="' + _genTitle + '">G</span>';
     } else {
       var _basisNote = r.termsBasis === 'country'
         ? ' Take modelled from ' + r.country + '\'s own calibrated fiscal terms.'
