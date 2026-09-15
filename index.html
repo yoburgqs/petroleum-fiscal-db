@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v876</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v877</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v876</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v877</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2619,7 +2619,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v876</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v877</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -51605,6 +51605,64 @@ ${(function() {
   var below = takes.filter(function(v){ return v < customTake; }).length;
   var pctRank = Math.round((below / takes.length) * 100);
   var med = takes[Math.floor(takes.length/2)];
+
+  // ── v877 (T2): a fee-basis run has no placing in a take distribution ──────────────────────
+  // Walked cold: Country Profile -> Iran -> "IRR: \u2192 Model in Scenario Builder". v516 made that
+  // button the ONLY IRR route left on the tab, so the "can I defend that?" half of T2 goes
+  // through here. The builder loads Iran's Buy-back terms, runs them, and this panel closes the
+  // screen with "Ranked #3 of 185 by govt take (1=highest) \u00b7 +62.9pp vs median \u00b7 98% of
+  // countries have lower take at $75/bbl". Iraq's TSC reads #4 of 185 / 98%.
+  //   Both are the exact error ~/MECHANIC_COMPARABILITY.md Group 2 exists to prevent. Under a
+  // TSC / RSC / Buy-back the contractor is paid a fixed $/bbl fee, so government take is the
+  // whole residual and climbs toward 97-99% on ANY terms -- it measures the remuneration
+  // structure, not the fiscal burden. Iraq's 415 TSCs average 98.5% take AND +$319M contractor
+  // NPV at the same time. Ranking that against 183 production-sharing regimes tells the analyst
+  // they are looking at the third-harshest regime on earth. That is false, and it is what gets
+  // pasted into the memo -- the panel is titled "vs 185-Country Database", so it reads as the
+  // platform's considered comparison rather than as arithmetic nobody checked.
+  //   Every other surface already re-bases or withholds: cpCmpTakeOf(), getGlobalTakeRank(),
+  // Side-by-Side's comparable take, the Vintage decade bars (VINTAGE_FEE_BASIS) and the Fiscal
+  // Compare census. The Scenario Builder was the last surface still printing a raw percentile.
+  //   On Iraq the contradiction sits on one screen: the price-deck note ~100px above this panel
+  // already says "this take% is not rankable against a PSC or Concession". On Iran even that is
+  // missing -- the Buy-back NPV is not flat across the deck, so that note never fires and the
+  // rank is the ONLY comparability statement on the screen.
+  //   Withheld rather than re-based, because there is no honest re-basing of a fee-basis take.
+  // What replaces it is the comparison that does hold -- the contractor economics already in the
+  // three cards above -- and, where the run came from a country, that country's own Group-1
+  // placing read from getGlobalTakeRank(), i.e. the identical figure its Country Profile prints.
+  var _g2v877 = ['TSC', 'RSC', 'Buy-back', 'Buyback'].indexOf(String(mech)) !== -1;
+  if (_g2v877 && customTake != null && isFinite(customTake)) {
+    var _mLbl877 = (String(mech) === 'Buyback') ? 'Buy-back' : String(mech);
+    // "an RSC", "a TSC" -- RSC is read aloud as a letter string beginning with a vowel sound.
+    var _art877 = (_mLbl877 === 'RSC') ? 'an' : 'a';
+    var _og877  = window._sbOrigin;
+    var _ogC877 = (_og877 && !_og877.monopoly && _og877.country) ? _og877.country : null;
+    var _gr877  = (_ogC877 && typeof getGlobalTakeRank === 'function') ? getGlobalTakeRank(_ogC877) : null;
+    var _cd877  = _ogC877 ? COUNTRY_DATA.filter(function(c){ return c.country === _ogC877; })[0] : null;
+    var _cmp877 = (_cd877 && typeof cpCmpTakeOf === 'function') ? cpCmpTakeOf(_cd877, '75') : null;
+    return '<div style="margin-top:14px;padding:10px 14px;background:var(--surface2);border:1px solid var(--orange);border-radius:6px;font-size:11px;color:var(--muted);">'
+      + '<span style="font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;font-size:10px;">'
+      + 'vs 185-Country Database \u2014 no placing for ' + _art877 + ' ' + _mLbl877 + '</span>'
+      + '<div style="margin-top:6px;line-height:1.55;">' + (_art877 === 'an' ? 'An' : 'A') + ' ' + _mLbl877 + ' pays the contractor a fixed fee per '
+      + 'barrel, so government take is whatever is left over and runs toward 97\u201399% on <em>any</em> terms. '
+      + 'The <strong style="color:var(--text);">' + customTake.toFixed(1) + '%</strong> above measures the '
+      + 'remuneration structure, not the fiscal burden, so it has no placing among the 185 \u2014 those are '
+      + 'production-sharing regimes, where the contractor keeps price upside. '
+      + '<strong style="color:var(--text);">The rank and percentile this panel used to print here were an '
+      + 'artefact of the mechanic</strong> (~/MECHANIC_COMPARABILITY Group 2).</div>'
+      + '<div style="margin-top:6px;line-height:1.55;">What does compare across jurisdictions on this run: '
+      + '<strong style="color:var(--text);">contractor NPV, IRR, capital at risk and payback</strong> in the '
+      + 'cards above \u2014 those are outputs of your project, not properties of the fee formula.'
+      + ((_gr877 && _cmp877 != null)
+          ? ' And ' + _ogC877 + '\u2019s take <em>does</em> have one, read on its production-sharing contracts '
+            + 'alone: <strong style="color:var(--text);">' + _cmp877.toFixed(1) + '% \u2014 #' + _gr877.rank
+            + ' of ' + _gr877.n + '</strong> counting up from the lowest take. That is the placing '
+            + _ogC877 + '\u2019s Country Profile prints, and the one to carry into an IC memo.'
+          : '')
+      + '</div></div>';
+  }
+
   var diffFromMed = (customTake - med).toFixed(1);
   var diffSign = diffFromMed >= 0 ? '+' : '';
   var rankColor = pctRank <= 30 ? '#15803D' : pctRank <= 60 ? '#A16207' : '#B91C1C';
