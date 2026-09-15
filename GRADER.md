@@ -54970,3 +54970,18 @@ learned:
   Bahrain, Kuwait); ascending order is unaffected because the nulls sink. Carried from 778.
   This cycle's change makes the null's *block* legible but not its position — the fix is in the
   comparator, not the ordinal, and belongs to a T1 or T6 cycle of its own.
+
+---
+## Cycle 784 Log — 2026-09-15 15:44
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 784 complete — shipped as **v876** (`7ca8325`), pushed, mirror in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest by rotation; 783 was T3, last T1 at 778.)
+
+## Friction
+Walked it cold at 1440×900 — sessionStorage and localStorage cleared, then Home → Screener → Max Govt Take **40%** → click **GOVT TAKE** to sort ascending. One slider, one click: the shortest path that actually answers T1.
+
+110 rows survive. Rows 1–8 are the real producers — USA 23.4%
