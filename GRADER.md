@@ -55760,3 +55760,134 @@ that actually ran.
 **Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (791 was T1, 790 was T3.)
 
 **Friction.** Country Profile deliberately prints no country IRR and, for Indonesia, no solved breakeven — and for both it sends the analyst to the Scenario Builder. That CTA appears **six times on one page**; it's the most-
+
+---
+## Cycle 793 Log — 2026-09-16 07:4x
+- Test before: 303 PASS / 0 FAIL / 1 WARN (local, actually run this cycle)
+- Test after: 303 PASS / 0 FAIL / 1 WARN (local, actually run this cycle — per-check diff EMPTY)
+- JS errors: 0
+- Shipped as **v884** (`0e675d6`), pushed, mirror in sync.
+
+## Cycle 793 — shipped as v884 (`0e675d6`)
+
+**Task: T6** — *"Where did this number come from and how solid is the evidence?"*
+(Rotation: 792 was T2, 791 T1, 790 T3, 789 and 788 both T4, 787 T5 — T6 was stalest, last run
+at 786.)
+
+## Friction
+Walked T6 cold at 1440x900 with no sessionStorage and no localStorage: Home → **Fiscal Compare**
+→ the ranked table → the column headed **QUALITY**.
+
+Fiscal Compare is the centerpiece tab, the one Home routes to, the one carrying the IC Analyst
+Interpretation Guide, and the table an analyst actually screens from. Its QUALITY column is the
+single place on that table where T6 is asked — and it answered with one letter.
+
+That letter is `_evidenceGrade()`: primary-law **share** and fact **depth** over the country's
+WHOLE fact base, which is mostly contract metadata the DCF never reads. It says nothing about
+the 3–6 fiscal terms `getDCFParams()` actually runs to produce the citable take two cells to its
+left. Measured live over all 185 rows on `_fcTermLeg()`'s own rule (bulk harvest, shared
+multi-jurisdiction instrument and D-confidence excluded):
+
+| | |
+|---|---|
+| rows rendering QUALITY **A or B** | **107** |
+| …of those, citing **half or fewer** model terms | **59** |
+| **A**-graded rows citing half or fewer | **13 of 28** |
+
+USA is **row #1 on a cold load**: QUALITY **B** over 125,336 facts, and it cites **2 of 5**.
+Canada reads **A**, 92.7% primary law, 1,758 facts — and cites **2 of 4**. An analyst ranking on
+this column reads those as the well-evidenced end of the table. On the axis that produces the
+number they will cite, they are not.
+
+The platform had already accepted this argument three times and fixed it everywhere else — the
+Country Profile badge (v660), the Fiscal Compare **drawer's** Src badge (v728), and the
+Screener's Evidence column (v730). The FC **table**, which all three of those are reached *from*,
+had no model-terms leg. It also had **no route to the Evidence Chain at all**: the only one was
+the chip inside the row drawer, which the analyst has to know to open.
+
+## Change
+Every FC row's Quality cell now carries the same chip the Screener has, **inline beside the
+letter**: `N of M terms cited →` — red at ≤half, orange below full, green at full, with a
+tooltip that names the uncited terms and states plainly that this is *not* the letter above it.
+
+It is a **control, not a caption**: click or Enter opens that country's Country Profile scrolled
+to the term-by-term Evidence Chain and flashes it, via `_fcOpenTermChain()` — the same function
+and the same destination the Screener, Side-by-Side and the drawer already use.
+
+Hydrated lazily per row against `api/v1/country/<slug>.json` with an IntersectionObserver rooted
+on the `.tbl-wrap` scroller and observing the `<tr>` (the two-axis reason v730 gives), so a cold
+load fetches **16 rows, not 185**. `_fcTermLegCache` dedupes with the other three surfaces, so a
+re-sort, a region filter or a price-deck change costs no network.
+
+**Inline rather than stacked**, and measured before choosing: stacked under the letter cost
+**16px of row height on all 185 rows** (41→57 desktop, 49→60 at 390) for no width saving, because
+the chip sets the column width either way. That is four fewer rows per screen on a table that is
+scanned vertically. Inline leaves row height **identical** (41 / 49); the Quality column widens
+70→175px and the other columns absorb it — table width 1805→1810px, inside a scroller.
+
+The column header tooltip now says the second line is not the letter, and that the two orderings
+invert (59 of 107).
+
+No grade, letter, percentage, fact count, take, NPV, breakeven, rank, sort or filter result
+changes.
+
+## Result
+An analyst screening on QUALITY now reads, **on the same line as the grade**, how much of the
+model behind that row's citable take is actually cited — and reaches the term-by-term Evidence
+Chain from the ranked table in **one click**, instead of having to open the row drawer first.
+USA reads `B  2 of 5 terms cited →` at rank 1. Somalia reads `D  0 of 5 terms cited →`.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all **9 visible tabs**.
+- `.fc-terms-chip` measures **132 x 24** under `pointer: coarse` — it takes the directive's 24px
+  floor, and takes the same **scoped exemption from the blanket 44px `[role="button"]` rule** that
+  v730 took for `.sc-terms-chip`, for the identical reason: it is in a table cell 185 times and
+  44px would turn the ranked table into a scroll. Scoped to `#tbl-fc .fc-terms-chip`; nothing
+  else is narrowed.
+- FC row height **unchanged** at 41px desktop / 49px mobile.
+
+## Verification
+- **JS syntax gate PASS** (16 script blocks).
+- **Runtime suite actually RAN this cycle, twice**, against the local tree, by swapping
+  `index.html` in place so only the file under test differed: **303 PASS / 0 FAIL / 1 WARN**
+  before and **303 PASS / 0 FAIL / 1 WARN** after. `diff` of the **304** sorted per-check lines is
+  **EMPTY** — zero regression. The 303 (vs 318 from the deployed URL) is the known
+  localhost-vs-GitHub-Pages artifact, present identically on the unmodified file; the 1 WARN is
+  the localhost service-worker 404, also present before.
+- **`pixel_audit.js` PASS** — no surface got worse than baseline. No new `small-touch-target` or
+  `clipped-text` finding for `.fc-terms-chip`. Fiscal Compare screenshot drift is high at every
+  viewport, which is the change: the Quality cell is different on all 185 rows.
+- Row click still opens the drawer (chip `stopPropagation` intact); a price change to $100/bbl
+  re-renders and re-hydrates; chip click lands on `#dd-facts-<slug>` **in view**. 0 page errors,
+  0 console errors.
+
+## Also walked this cycle, no change needed
+- The Evidence Chain itself, Guyana and Norway end to end: `⌕ find document` (`_citeFindHref`),
+  the `LINK DEAD` / `BULK` / `INDEX ONLY` chips, the tier-schedule reconciliation note and the
+  five ⚠ paragraphs all resolve correctly. This surface is mature; the gap was reaching it.
+- Reform Risk event citations carry source name + confidence letter + `↗`. Only **27 distinct
+  `source_url`s across 29 refs** exist in `reform_history` platform-wide (21 countries carry a
+  sourced log), and they were **not** part of the v641 `_CITE_DEAD` sweep, which measured
+  `fiscal_facts_sourced` URLs. Too narrow to spend a cycle on; recorded for a future T4/T6.
+
+## Carried forward
+- **NEW, found this cycle — `sourcedCount` double-counts one model term on 3 countries.**
+  `_MODEL_KEY` maps BOTH `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to
+  `cost_recovery_cap`, and both rows increment the Evidence Chain's row-based `sourcedCount`.
+  Guyana therefore prints `All 4 independently sourced parameters the model reads match` and
+  `4 of the 5 rows the PSC model reads are independently sourced` while all four other surfaces
+  (CP chip, FC drawer, Screener, Side-by-Side) say **3 of 5 model terms cited** for the same
+  country. Measured across all 185 profiles by rendering each one: **Guyana is the only country
+  where the chain's tick count and the chip disagree** (Azerbaijan and Malaysia hold both rows
+  but do not reach the disagreeing branch). Narrow — deferred on evidence, not forgotten.
+  Separately, on **44 countries** the coverage clause's denominator is a *row* count while
+  `_scope625`'s, one sentence later, is a *term* count; each is labelled, so they are confusing
+  rather than wrong.
+- `▶ Run FC at this price` (`#cp-run-fc-btn`) reads `cp-price-select`, which does not exist, and
+  writes to `document.getElementById('price')`, which also does not exist — a double no-op.
+  Lives inside `#fc-nav-bar`, `display:none` until the analyst arrives from Fiscal Compare, so a
+  cold-load user never sees it. Two-line id fix whenever a cycle walks the FC→CP drilldown.
+  Carried from 785/790/791/792.
+- Side-by-Side `Take spread across contracts` still not re-based on fee-blended columns (Iraq
+  prints `65.0–98.5% (33.5pp)`). Carried from 790/791/792.
+- `Low Take · Positive NPV` returns 143 of 185. Not a defect; noted at 791.
