@@ -55908,3 +55908,125 @@ USA reads `B  2 of 5 terms cited →` at rank 1. Somalia reads `D  0 of 5 terms 
 Walked it cold at 1440×900, no sessionStorage/localStorage: Home → **Fiscal Compare** → the ranked table → the column headed **QUALITY**.
 
 That column is the 
+
+---
+## Cycle 794 Log — 2026-09-16
+
+- Test before: 317 PASS / 0 FAIL / 1 WARN (localhost, unmodified tree)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (localhost, patched tree)
+- JS errors: 0 · Console errors: 0 · Shipped as **v885** (`284fb1a`)
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Rotation: 793 was
+T6, 792 T2, 791 T1, 790 T3, 789/788 T4 — T5 was stalest, last run at 787.)
+
+## Friction
+Walked cold at 1440x900, no sessionStorage/localStorage. The five table-level IC copy
+surfaces are mature and all behave: Fiscal Compare (`fc-copy-ic-btn`, arm-then-confirm
+guard fires at 185 rows), Screener (`screener-copy-ic-btn`), Side-by-Side
+(`cmp-copy-table-btn`), IOC Portfolio (`ioc-copy-ic-btn`), Country Profile
+(`dd-ic-summary-btn` / `dd-cite-btn`). All write both text/html and TSV; the Guyana,
+Iraq and Nigeria citations correctly carry the PROXY caveat, the fee-basis comparable
+take (Iraq: published 84.8% vs comparable 34.1%) and the D-tier warning. FC and
+Screener XLSX both download and parse (2 sheets each).
+
+The worst moment is one step further on, at the **Scenario Builder saved-scenario
+set** — which is the IC *sensitivity appendix*, the artifact the FAQ tree instructs
+the analyst to build in at least six places ("Export each Scenario Builder result...
+combine into a single IC appendix table: Scenario / Capex / IRR / Δ vs. Base").
+
+`sbGetParams()` stores snake_case **fractions** — `royalty_rate: 0.10`, `cit_rate`,
+`profit_oil_govt_pct`, `cost_recovery_cap`, `ftp_rate`, `state_equity_pct`. Both
+readers of the saved set asked for camelCase **percents** — `p.royalty`, `p.cit`,
+`p.govtProfitOil`, `p.costRecovery`, `p.ftp`, `p.stateEquity`. **No code path has ever
+written those names.** Every lookup returned `undefined`, so:
+
+- `_refreshSavedTable()` (line ~52754) printed `Key Parameters: —` on **every row of
+  every mechanic, always** — the column whose only job is to say what differed.
+- `_exportScenariosXLSX()` exported **all seven** fiscal-parameter columns blank on
+  every row — Royalty, CIT, Profit Oil (Govt), Profit Oil (Ctct), Cost Recovery, FTP,
+  State Equity.
+
+Measured on the deployed code: two saved runs differing *only* in royalty (0.10 vs
+0.15) exported `Govt Take 22.22%` and `26.03%` — with seven empty parameter columns on
+both rows. The appendix showed the effect and recorded no cause.
+
+Worse than a blank: the Methodology sheet read *"Fiscal parameters — Input parameters
+as set in Scenario Builder — may be 0/blank if not applicable to mechanic."* That told
+the IC reader the blanks were expected and benign. The export **misexplained its own
+defect**. This is a direct failure of finalization criterion 5 ("every export ... carries
+the assumptions behind its numbers"), and a textbook "stable but wrong" — exit 0, no
+error, a downloadable file, nothing in it.
+
+Note: `Save Scenario` opens a name-confirmation modal (`#sb-save-modal`); a first probe
+that skipped the confirm made the save look like a silent no-op. It is not — that was a
+test error, corrected before diagnosis.
+
+## Change
+One reader for both surfaces, so the screen and the export cannot fork again — the same
+pattern `window._sbICLine` already uses:
+
+- **`_sbParamSet(params, mech)`** reads the keys `sbGetParams()` actually writes and
+  converts fraction → percent. A real `0` survives (0% royalty is a term); `undefined`
+  stays blank.
+- **`_sbParamSummary()`** renders the compact on-screen cell from that same set.
+- **New `Other Terms` XLSX column** carries what the seven typed columns cannot express,
+  so all **8** mechanics are covered rather than the 2 the dead keys gestured at: SPT,
+  windfall, severance, EPT, PRRT rate + uplift, service fee $/bbl, capex recovery term,
+  Gross Split contractor share + DMO, and whether a tiered profit-oil ladder was applied.
+- **Methodology line rewritten** — a blank now means the mechanic has no such term
+  (a Concession has no cost-recovery cap; a TSC has no profit-oil split), and says so,
+  with the v885 history recorded.
+
+## Result
+A saved sensitivity set now records what was varied. On screen, four mechanics:
+
+    Base royalty 10     Roy 10% · CIT 25%
+    Reform +5pp         Roy 15% · CIT 25% · SPT 20%
+    PSC case            Roy 0% · CIT 25% · PO govt 60% · CR 60% · FTP 10%
+    Iraq TSC case       CIT 35% · Fee $4/bbl
+
+and the XLSX carries the same across Concession / PSC / TSC, with `Fee $4/bbl` landing
+in Other Terms where no typed column exists. The analyst can attach the appendix and
+have the IC reader see the **cause** of the take spread, not just the spread.
+
+## Verification (all run this cycle, none assumed)
+- **JS syntax gate PASS** on the final shipped file.
+- **Runtime suite RAN twice**, against the local tree, swapping `index.html` in place so
+  only the file under test differed: **317 PASS / 0 FAIL / 1 WARN** before and after.
+  `diff` of the **318** sorted per-check lines is **EMPTY** — zero regression. The 1 WARN
+  is the localhost service-worker 404, present identically on the unmodified file.
+  (An earlier diff in this cycle compared two empty files because a `&&` chain broke on a
+  grep that found nothing; it proved nothing and was redone properly. Recorded because a
+  false green is the failure mode this directive exists to prevent.)
+- **`pixel_audit.js` PASS** — no surface worse than baseline. The 5 listed findings are
+  all pre-existing baseline entries.
+- **Mobile 390x844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390, no
+  sideways scroll; no control under 24px; `#sb-saved-table` scrolls internally
+  (`overflow-x:auto` + `min-width`), which is the v612 opt-out marker, not page overflow.
+- 0 page errors, 0 console errors.
+
+## Also walked, no change needed
+- All five table IC-copy surfaces above, plus `_sbCopyICLine` (the *single-run* Scenario
+  Builder copy, v594/v867) — that one correctly writes both flavours and carries its
+  terms. The gap was only in the *saved set*.
+- FC and Screener XLSX open and parse; Screener clipboard carries the SCREEN APPLIED
+  criteria block above the table.
+
+## Carried forward
+- The saved-scenario table still has **no `Δ vs. Base` column**, which the FAQ explicitly
+  tells the analyst to build ("Scenario / Capex / IRR / Δ vs. Base (pp)"). Now that the
+  parameters are actually populated, this is the natural next T5 — the data to compute it
+  finally exists in the saved set.
+- The saved set has **no clipboard path** — `⬇ Export XLSX` only. Every other results
+  table in the product has `⎘ Copy for IC Memo`. This is the exact argument that justified
+  v660 for the Screener ("download → open Excel → select → copy → paste, out of the
+  browser and back"). Deliberately not bundled into this cycle, which was a correctness fix.
+- `▶ Run FC at this price` (`#cp-run-fc-btn`) reads `cp-price-select` and writes to
+  `#price` — neither exists. Double no-op, hidden until arrival from FC. Carried from
+  785/790/791/792/793.
+- Side-by-Side `Take spread across contracts` still not re-based on fee-blended columns
+  (Iraq prints `65.0–98.5% (33.5pp)`). Carried from 790/791/792/793.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both
+  `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`).
+  Carried from 793.
