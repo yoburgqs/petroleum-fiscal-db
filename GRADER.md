@@ -56134,3 +56134,16 @@ Screen and clipboard agree for the first time.
 - `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both
   `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`).
   Carried from 793/794.
+
+---
+## Cycle 795 Log — 2026-09-16 05:17
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 795 complete — shipped as v886, pushed, mirror in sync.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (794 was T5, 793 T6, 792 T2, 791 T1, 790 T3.)
+
+## Friction
+Walking Reform Risk cold → **Check one country**, the card's one plain-English sentence between the stat tiles and the event log read **"Most recent change (YYYY): …"**. It was built from `latest` — the newest event of *any* kind — and never filtered by `_rrIsFiscalChange`. So on jurisdictions whose newe
