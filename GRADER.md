@@ -55747,3 +55747,16 @@ that actually ran.
 - Side-by-Side `Take spread across contracts` still not re-based on fee-blended columns (Iraq
   prints `65.0–98.5% (33.5pp)`). Carried from 790/791.
 - `Low Take · Positive NPV` returns 143 of 185. Not a defect; noted at 791.
+
+---
+## Cycle 792 Log — 2026-09-16 01:25
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. `CYCLE_STATE.json` and `cycle_log.txt` are loop-owned and I left them untouched.
+
+## Cycle 792 — shipped as v883 (`1717dd2`), pushed, mirror in sync
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (791 was T1, 790 was T3.)
+
+**Friction.** Country Profile deliberately prints no country IRR and, for Indonesia, no solved breakeven — and for both it sends the analyst to the Scenario Builder. That CTA appears **six times on one page**; it's the most-
