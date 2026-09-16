@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v883</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v884</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -271,6 +271,8 @@ table { width: 100%; border-collapse: collapse; }
      it opens that country's Evidence Chain -- so it takes the same 24px floor as everything
      else on this table. On a mouse it stays on the 15px line so 185 rows do not grow. */
   #tbl-screener .sc-terms-chip { min-height: 24px; }
+  /* v884 (T6): the same chip, same call, on Fiscal Compare's Quality column. */
+  #tbl-fc .fc-terms-chip { min-height: 24px; }
 }
 /* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
    title, so under a thumb — where there is no hover — it is treated as a control and takes the
@@ -2364,6 +2366,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      directive's own floor for a control under a thumb (24px) instead of this rule's 44px, and
      the exemption is scoped to that one chip on that one table. Nothing else is narrowed. */
   #tbl-screener .sc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
+  /* v884 (T6): identical exemption for the Fiscal Compare Quality chip, and for the identical
+     reason -- it is in a table cell 185 times, and 44px would turn the ranked table into a
+     scroll. Scoped to that one chip on that one table; nothing else is narrowed. */
+  #tbl-fc .fc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
 }
 /* v801 (T3): the ✕ on each Side-by-Side country chip. Same exemption shape as v730 directly
    above, for the same reason, with a second symptom on top of the lost height.
@@ -2558,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v883</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v884</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -35222,6 +35228,110 @@ function _scHydrateTermChipsSoon() {
 window._scHydrateTermChips = _scHydrateTermChips;
 window._scHydrateTermChipsSoon = _scHydrateTermChipsSoon;
 
+// ── v884 (T6): FISCAL COMPARE'S "QUALITY" COLUMN GRADED THE WRONG THING ──────────────
+// Fiscal Compare is the centerpiece tab, the one Home routes to, the one carrying the IC
+// Analyst Interpretation Guide, and the ranked table an analyst actually screens from. Its
+// column headed QUALITY is the single place on that table where T6 -- "how solid is the
+// evidence?" -- is asked and answered, and it answers with one letter.
+//
+// That letter is _evidenceGrade(): primary-law SHARE and fact DEPTH over the country's WHOLE
+// fact base, which is mostly contract metadata the DCF never reads. It says nothing about the
+// four to six fiscal terms getDCFParams() actually runs to produce the citable take two cells
+// to its left. The platform has already accepted this three times and fixed it everywhere
+// else: the Country Profile badge (v660), the Fiscal Compare DRAWER's Src badge (v728) and the
+// Screener's Evidence column (v730) all now carry the model-terms leg on the same line as the
+// grade. The FC table -- the surface all three of those are reached FROM -- did not.
+//
+// Measured live against the shipped build, over all 185 rows, on _fcTermLeg()'s own rule:
+//   * 107 rows render QUALITY A or B. 59 of those 107 cite HALF OR FEWER of their model terms.
+//   * 13 of the 28 A-graded rows are in that half-or-fewer group.
+//   * USA is row #1 on a cold load. It reads QUALITY B over 125,336 facts and cites 2 of 5.
+//     Canada reads A, 92.7% primary law, 1,758 facts -- and cites 2 of 4.
+// An analyst ranking on this column reads USA and Canada as the well-evidenced end of the
+// table. On the axis that produces the number they will cite, they are not.
+//
+// The chip is the same leg, in the same words, with the same destination as the other three
+// surfaces: it opens that country's Evidence Chain, which names each term, its ORCA value, the
+// statutory value and the source. Before this, the FC table had NO route to that chain at all
+// -- the only one was inside the row drawer, which the analyst has to know to open.
+//
+// Hydrated per row against api/v1/country/<slug>.json (~11 KB), so only rows scrolled into
+// view are fetched; root is the .tbl-wrap scroller, and the observed element is the <tr> for
+// the same two-axis reason v730 gives. _fcTermLegCache dedupes with the drawer, the Screener
+// and Side-by-Side, so a re-sort, a price change or a row already opened costs no network.
+//
+// No grade, letter, percentage, fact count, take, NPV, breakeven, rank, sort or filter result
+// changes. How deep a fact base is and whether the terms in the model are cited are different
+// questions, and the column now answers both instead of one.
+var _fcQualObs = null;
+function _fcFillQualChip(slot) {
+  var country = slot.getAttribute('data-tc-country');
+  if (!country || typeof _fcTermLeg !== 'function') return;
+  _fcTermLeg(country).then(function(t) {
+    if (!t || !slot.isConnected) return;
+    var ratio = t.cited / t.total;
+    var col = ratio <= 0.5 ? 'var(--red)' : (ratio < 1 ? 'var(--orange)' : 'var(--green)');
+    var bg  = ratio <= 0.5 ? 'rgba(185,28,28,.12)' : (ratio < 1 ? 'rgba(194,65,12,.12)' : 'rgba(21,128,61,.12)');
+    var bd  = ratio <= 0.5 ? 'rgba(185,28,28,.45)' : (ratio < 1 ? 'rgba(194,65,12,.45)' : 'rgba(21,128,61,.45)');
+    var tip = 'This counts something different from the letter above it. That grade, its '
+      + 'primary-law share and its fact count all describe ' + country + '’s WHOLE fact base — '
+      + 'mostly contract metadata. This counts only the ' + t.total + ' fiscal terms the '
+      + (t.mech || 'DCF') + ' model runs to produce the citable take and NPV on this row, and asks '
+      + 'of each one whether a citation stands behind it. The bulk harvest, an instrument shared '
+      + 'across jurisdictions and an uncited contract average do not count, on the same rule the '
+      + 'Country Profile Evidence Chain uses. ' + t.cited + ' of ' + t.total + ' clear that bar'
+      + (t.uncited.length ? '; ' + t.uncited.join(', ') + ' '
+          + (t.uncited.length === 1 ? 'does' : 'do') + ' not.' : '.')
+      + ' The two orderings invert: 59 of the 107 rows graded A or B here cite half or fewer of '
+      + 'their model terms, so read this as which row is thinnest where it matters, not as a pass '
+      + 'mark. Click to open ' + country + '’s Evidence Chain, which names each term, its ORCA '
+      + 'value, the statutory value and the source.';
+    var safe = String(country).replace(/'/g, "\\'");
+    slot.innerHTML = '<span class="fc-terms-chip" role="button" tabindex="0"'
+      + ' onclick="event.stopPropagation();_fcOpenTermChain(\'' + safe + '\');"'
+      + ' onkeydown="event.stopPropagation();if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_fcOpenTermChain(\'' + safe + '\');}"'
+      + ' style="font-size:10px;font-weight:700;color:' + col + ';background:' + bg
+      + ';border:1px solid ' + bd + ';border-radius:3px;padding:0 5px;white-space:nowrap;'
+      + 'cursor:pointer;display:inline-flex;align-items:center;line-height:15px;"'
+      + ' title="' + tip.replace(/"/g, '&quot;') + '">'
+      + t.cited + ' of ' + t.total + ' terms cited &rarr;</span>';
+  });
+}
+function _fcHydrateQualChips() {
+  var slots = document.querySelectorAll('#tbl-fc .fc-terms-slot:not([data-tc-done])');
+  if (!slots.length) return;
+  var wrap = document.getElementById('tbl-fc');
+  wrap = wrap ? wrap.closest('.tbl-wrap') : null;
+  function fill(slot) {
+    if (!slot || slot.getAttribute('data-tc-done')) return;
+    slot.setAttribute('data-tc-done', '1');
+    _fcFillQualChip(slot);
+  }
+  if (typeof IntersectionObserver === 'undefined') {
+    Array.prototype.slice.call(slots, 0, 25).forEach(fill);
+    return;
+  }
+  if (_fcQualObs) _fcQualObs.disconnect();
+  _fcQualObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(en) {
+      if (!en.isIntersecting) return;
+      _fcQualObs.unobserve(en.target);
+      fill(en.target.querySelector('.fc-terms-slot'));
+    });
+  }, { root: wrap || null, rootMargin: '120px 0px' });
+  Array.prototype.forEach.call(slots, function(el) {
+    var tr = el.closest('tr');
+    if (tr) _fcQualObs.observe(tr); else fill(el);
+  });
+}
+var _fcQualHydT = null;
+function _fcHydrateQualChipsSoon() {
+  if (_fcQualHydT) clearTimeout(_fcQualHydT);
+  _fcQualHydT = setTimeout(function() { _fcQualHydT = null; _fcHydrateQualChips(); }, 300);
+}
+window._fcHydrateQualChips = _fcHydrateQualChips;
+window._fcHydrateQualChipsSoon = _fcHydrateQualChipsSoon;
+
 // v558 (T5) — the basis block that travels INSIDE the exported shortlist.
 // Both export buttons emit the same lines, so the artifact is defensible whichever one was
 // pressed. Returns an array of plain-text lines; the CSV prepends them, the XLSX puts them on
@@ -54648,7 +54758,7 @@ function renderFCResults(results, price) {
     ? (ENGINE_BASIS.name + ' engine profile \u2014 ' + ENGINE_BASIS.short + ', 100% WI')
     : 'the ORCA standardized engine profile';
   // v813 (T6): built here, emitted straight after the citable-take column below.
-  var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. The letter is drawn on every one of the 185 rows and grades the CITABLE database take beside it. A second, hollow G = GENERIC sits after the letter on the 120 rows where ORCA holds no country-specific terms in the compare engine: on those, the two MODEL columns are the standard default for the mechanic \u2014 directional only, not citable \u2014 while the citable take beside this cell is still that country\'s own. The G scopes the model columns; the letter scopes the citable one. Hover either badge for the detail.">Quality</th>';
+  var _fcQualTh = '<th class="num" title="Where THIS row\'s take came from, and how well sourced this country is. The letter grades TWO things and takes the worse: how much of the country\'s fiscal record was read out of the primary legal instrument (A \u226560% / B \u226540% / C \u226520% / D below), and how many facts are on file (A \u2265150 / B \u226550 / C \u226515 / D below). A high primary-law share over 12 facts is not strong evidence, and a deep file of secondary tax-guide entries is not primary law. The EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward the primary-law leg. The letter is drawn on every one of the 185 rows and grades the CITABLE database take beside it. A second, hollow G = GENERIC sits after the letter on the 120 rows where ORCA holds no country-specific terms in the compare engine: on those, the two MODEL columns are the standard default for the mechanic \u2014 directional only, not citable \u2014 while the citable take beside this cell is still that country\'s own. The G scopes the model columns; the letter scopes the citable one. Under the letter, a second line counts the fiscal terms the DCF actually runs to produce the citable take — royalty, CIT, FTP, cost-recovery cap, profit-oil split, whichever this mechanic uses — and how many of them carry a citation. THAT IS NOT THE LETTER: the letter grades the whole fact base, most of which is contract metadata the model never reads, and the two orderings invert — 59 of the 107 rows graded A or B cite half or fewer of their model terms. Click that line to open the country’s Evidence Chain, which names each term, its ORCA value, the statutory value and the source. Hover any badge for the detail.">Quality</th>';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. Since v580 this is NOT the column the # rank is built from \u2014 the rank follows the citable database take in the next column. Use this one only for profile sensitivity: it is the only take in the tool that moves with the profile selector. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
   // ── v547 (T5) ─────────────────────────────────────────────────
   // Measured on the cold default view: 154 of the 185 rows on this table render an IDENTICAL
@@ -55153,6 +55263,16 @@ function renderFCResults(results, price) {
       // letter means "% of its fiscal facts primary-sourced"; now it actually does.
       _qualCell = getTierBadge(r, _basisNote.trim());
     }
+    // v884 (T6): the model-terms leg, under the letter, on every row. Empty at render and
+    // hydrated by _fcHydrateQualChips() for the rows that scroll into view -- see the block
+    // above _fcFillQualChip() for why the letter alone cannot answer T6 on this table.
+    // Inline beside the letter, not stacked under it: stacked cost this table 16px of row
+    // height on all 185 rows (41 -> 57 desktop, 49 -> 60 at 390) for no width saving, because
+    // the chip sets the column width either way. The ranked table is scanned vertically and
+    // that is four fewer rows per screen.
+    _qualCell += '<span class="fc-terms-slot" data-tc-country="'
+      + String(r.country).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      + '" style="margin-left:6px;"></span>';
     if (_isMono) {
       html += _monoCell('n/c', _monoWhy);
       // v547 (T5): the database take IS the citable fact for a monopoly -- 100% -- so print it
@@ -55256,6 +55376,10 @@ function renderFCResults(results, price) {
   // v632 (T5): re-assert the shortlist against the rows just rendered -- the ticks are held by
   // country name, so a re-sort, a region filter or a price change must not silently drop them.
   if (typeof _fcSyncSelUI === 'function') _fcSyncSelUI();
+  // v884 (T6): hydrate the model-terms chip on the Quality column. Debounced for the same
+  // reason v730 debounced the Screener's -- a price-deck or region change re-renders this body
+  // and each pass would otherwise observe a fresh top-of-table.
+  if (typeof _fcHydrateQualChipsSoon === 'function') _fcHydrateQualChipsSoon();
   // v454: After first run, update Run Compare button to "Re-run" so analyst knows results are already showing
   var _fcRunBtn = document.getElementById('fc-run-btn');
   if (_fcRunBtn && !_fcRunBtn.dataset.hasRun) {
