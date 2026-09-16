@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v886</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v887</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v886</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v887</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4218,7 +4218,14 @@ window.copyPlatformCitation = function(btn) {
     <span id="fc-nav-label" style="font-size:11px;color:var(--muted);white-space:nowrap;"></span>
     <button id="fc-nav-next" onclick="fcNavStep(1)" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;" title="Next country in Fiscal Compare list">Next &#8594;</button>
     <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));" style="background:transparent;border:none;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:4px;" title="Return to Fiscal Compare results">&#8617; Back to FC</button>
-    <button id="cp-run-fc-btn" onclick="(function(){var _priceEl=document.getElementById('cp-price-select')||document.getElementById('fc-price');var _p=_priceEl?_priceEl.value:'75';var _fcP=document.getElementById('price');if(_fcP)_fcP.value=_p;switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);})()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:2px 8px;font-weight:600;white-space:nowrap;" title="Switch to Fiscal Compare and run at the current price — ranks all 185 countries by government take">&#9654; Run FC at this price</button>
+    <!-- v887 (T2): was "Run FC at this price" — it read a #cp-price-select that has never existed
+         and wrote the price to a #price that has never existed either, so both halves of the label
+         were false: there is no price control on this page, and it set none. It now names the one
+         price it can actually put the screen on; the basis strip below says why that matters. -->
+    <button id="cp-run-fc-btn" onclick="_cpReRankAtBase()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:4px 10px;min-height:24px;font-weight:600;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at">&#9654; Re-run FC at $75</button>
+    <!-- v887 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
+         Fiscal Compare run was at a price other than the $75 this profile is computed at. -->
+    <div id="cp-price-basis" style="flex-basis:100%;display:none;"></div>
   </div>
 
   <div id="cp-empty-state">
@@ -43654,6 +43661,11 @@ function loadCountryProfile(country) {
   } else if (chartWrap) {
     chartWrap.style.display = 'none';
   }
+
+  // v887 (T2): every entry point into a profile routes through here — dropdown, peer row, regional
+  // row, deep link, FC drawer, Prev/Next — so this is the one place the FC nav bar and the price-
+  // basis strip can be kept pointed at the country actually on screen.
+  if (typeof _fcNavBarUpdate === 'function') _fcNavBarUpdate();
 }
 
 // Populate country select
@@ -56911,6 +56923,109 @@ function _scTabEnter(btn) {
   }, 50);
 }
 
+// ─── v887 (T2) — the price the profile is computed at, said out loud ────────────────────────
+// Walked cold: Fiscal Compare -> price $100/bbl -> Run Compare -> Norway (row 57) -> Full Profile.
+// FC's citable column ranks Norway at 72.4% take / $1.27B NPV at $100. The profile that opens says
+// 68.0% and $826M. Directly above that headline the nav bar prints "#57 of 185 — Norway", a rank
+// produced by the $100 run — so two different prices sat adjacent on screen with nothing naming
+// either as the other's basis. Everything downstream on the profile is $75: the 61–75% tier band,
+// the NPV rank inside that band, the peer set, the fiscal-character verdict, the IC memo line.
+// An analyst who screened at $100 and drilled in to defend the screen was reading, and quoting,
+// a $75 page. 4.4pp and $444M apart on Norway alone.
+//
+// Second defect in the same widget, same walk: _fcNavBarUpdate() ran only on arrival and on
+// Prev/Next, so changing country with the dropdown left the bar reading "#57 of 185 — Norway"
+// above a Guyana profile — and Next -> then stepped from Norway's index through the $100-ordered
+// list. The bar now re-derives its index from the country actually on screen, on every load.
+var _CP_BASE_PRICE_887 = 75;
+
+// The price of the last Fiscal Compare RUN, not the current state of the #fc-price select — the
+// select can be moved without re-running, and the rank on screen belongs to the run.
+function _cpFcRunPrice887() {
+  var p = window._fcLastPrice != null ? Number(window._fcLastPrice) : null;
+  return [50, 75, 100, 125].indexOf(p) >= 0 ? p : null;
+}
+
+// Put the screen on the profile's own basis. This is the only price reconciliation available from
+// here: the profile cannot be re-based, so the ranking is what moves.
+function _cpReRankAtBase() {
+  var sel = document.getElementById('fc-price');
+  if (sel) sel.value = String(_CP_BASE_PRICE_887);
+  switchTab('t0', document.getElementById('tab-btn-t0'));
+  setTimeout(function () { if (typeof runFiscalCompare === 'function') runFiscalCompare(); }, 200);
+}
+window._cpReRankAtBase = _cpReRankAtBase;
+
+function _cpPriceBasisUpdate(country) {
+  var el = document.getElementById('cp-price-basis');
+  var btn = document.getElementById('cp-run-fc-btn');
+  var p = _cpFcRunPrice887();
+  var off = (p != null && p !== _CP_BASE_PRICE_887);
+  if (btn) {
+    btn.innerHTML = off ? '&#9654; Re-rank all 185 at $75' : '&#9654; Re-run FC at $75';
+    btn.title = off
+      ? 'Your last Fiscal Compare run ranked all 185 countries at $' + p + '/bbl. This profile is '
+        + 'computed at $75/bbl. This re-runs the ranking at $75 so the screen and this page sit on '
+        + 'one price basis.'
+      : 'Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at.';
+    btn.style.borderColor = off ? 'var(--orange)' : 'rgba(176,104,0,.3)';
+  }
+  if (!el) return;
+  var d = (Array.isArray(COUNTRY_DATA) && country)
+    ? COUNTRY_DATA.find(function (x) { return x.country === country; })
+    : null;
+  if (!off || !d) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  var fmtN = (typeof cpNpvFmt === 'function') ? cpNpvFmt
+    : function (v) { return v == null ? '—' : '$' + Math.round(v) + 'M'; };
+  var tAt = d['take_' + p], tBase = d.take_75;
+  var nAt = d['npv_' + p],  nBase = d.npv_75;
+  var mono = (typeof isStateMonopoly === 'function') && (isStateMonopoly(tBase) || isStateMonopoly(tAt));
+  var pp = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + 'pp'; };
+  var dn = function (v) { return (v >= 0 ? '+' : '−') + fmtN(Math.abs(v)); };
+
+  // The figures are COUNTRY_DATA's own take_N / npv_N — the same fields the FC "DB · CITABLE"
+  // columns print — so this strip cannot disagree with the table the analyst arrived from.
+  var pairs = [];
+  if (!mono && tAt != null && tBase != null) {
+    pairs.push('<strong style="color:var(--text);">' + tAt.toFixed(1) + '%</strong> take '
+      + '<span style="opacity:.8;">(' + pp(tAt - tBase) + ' vs the ' + tBase.toFixed(1) + '% below)</span>');
+  }
+  // On a state monopoly both take and NPV are withheld rather than printed as 100% / $0M — see
+  // Saudi Arabia at $125, which otherwise rendered "$0M NPV (+$0M vs $0M)".
+  if (!mono && nAt != null && nBase != null) {
+    pairs.push('<strong style="color:var(--text);">' + fmtN(nAt) + '</strong> NPV '
+      + '<span style="opacity:.8;">(' + dn(nAt - nBase) + ' vs ' + fmtN(nBase) + ')</span>');
+  }
+
+  var tip = 'The Fiscal Compare ranking above this line was run at $' + p + '/bbl. This Country '
+    + 'Profile is computed at $75/bbl throughout — the headline take, the tier band, the '
+    + 'contractor NPV and its rank, the peer set and the IC memo line. The figures in this strip '
+    + 'are ' + country + "'s own take and NPV at $" + p + '/bbl, read from the same fields as '
+    + "Fiscal Compare's citable columns. The 4-price sensitivity table further down this page "
+    + 'carries $50 / $75 / $100 / $125 in full.';
+
+  el.style.display = 'block';
+  el.innerHTML =
+    '<div style="margin-top:6px;font-size:11px;line-height:1.5;padding:6px 10px;'
+    + 'background:rgba(194,65,12,.07);border:1px solid var(--orange);border-radius:5px;color:var(--muted);" '
+    + 'title="' + tip.replace(/"/g, '&quot;') + '">'
+    + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+    + '<span style="color:var(--orange);flex-shrink:0;">&#9888;</span>'
+    + '<strong style="color:var(--orange);">Ranked at $' + p + '/bbl — this profile reads $75/bbl</strong>'
+    + '</div>'
+    + (pairs.length
+        ? '<div style="margin-top:3px;">' + country + ' at $' + p + ': ' + pairs.join(' &middot; ') + '</div>'
+        : '<div style="margin-top:3px;">' + (mono
+            ? country + ' is a state monopoly — it carries no contractor take or NPV at any price, '
+              + 'so there is nothing here that moves between $' + p + ' and $75.'
+            : country + ' carries no $' + p + ' figure to compare against.') + '</div>')
+    + '<div style="margin-top:3px;opacity:.9;">The rank beside it is the $' + p + ' ordering. '
+    + 'Everything below — tier, NPV rank, peers, IC line — is $75.</div>'
+    + '</div>';
+}
+window._cpPriceBasisUpdate = _cpPriceBasisUpdate;
+
 // v313: FC nav bar — step through ranked FC list from Country Profile
 function _fcNavBarUpdate() {
   var bar = document.getElementById('fc-nav-bar');
@@ -56918,12 +57033,21 @@ function _fcNavBarUpdate() {
   var prev = document.getElementById('fc-nav-prev');
   var next = document.getElementById('fc-nav-next');
   var list = window._fcNavList || [];
+  // v887 (T2): trust the country on screen over the index the bar was last left holding.
+  var ddSel = document.getElementById('dd-country-select');
+  var shown = ddSel ? ddSel.value : null;
+  if (shown && list.length) window._fcNavIdx = list.indexOf(shown); // -1 when not in the FC list
   var idx = window._fcNavIdx != null ? window._fcNavIdx : -1;
-  if (!bar || !list.length || idx < 0) { if (bar) bar.style.display = 'none'; return; }
+  if (!bar || !list.length || idx < 0) {
+    if (bar) bar.style.display = 'none';
+    _cpPriceBasisUpdate(null);
+    return;
+  }
   bar.style.display = 'flex';
   if (label) label.textContent = '#' + (idx + 1) + ' of ' + list.length + ' — ' + list[idx];
   if (prev) prev.disabled = idx === 0;
   if (next) next.disabled = idx === list.length - 1;
+  _cpPriceBasisUpdate(list[idx]);
 }
 function fcNavStep(dir) {
   var list = window._fcNavList || [];
