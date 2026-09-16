@@ -55621,3 +55621,129 @@ same country. The XLSX an analyst attaches to a memo carries the basis with the 
 
 ## Friction
 Walked the Screener cold at 1440×900 and clicked the **Swing (pp)** header ascending — the standard move for "which regimes hold up across the price cycle", on a column whose own tooltip says *"Low swing (<10pp, green) = stable fiscal terms across the price c
+
+---
+## Cycle 792 Log — 2026-09-16
+- Test before: 303 PASS / 0 FAIL / 1 WARN (local tree, measured — not assumed)
+- Test after: 303 PASS / 0 FAIL / 1 WARN — outcomes byte-identical to before
+- JS errors: 0 (the 1 WARN is a pre-existing localhost service-worker 404, present on the
+  unmodified file in the same run)
+- Shipped as **v883** (`1717dd2`), pushed, mirror in sync.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (791 was T1,
+790 was T3; T2 last run at 785.)
+
+## Friction
+Walked Country Profile cold at 1440x900 — Indonesia auto-loads as the PSC benchmark, so this
+is the first screen a first-time analyst sees.
+
+The page deliberately prints **no country IRR** and, for Indonesia, **no solved breakeven**,
+and in both cases sends the analyst to the Scenario Builder to get them. That CTA appears
+**six times** on one page (`ddOpenScenarioBuilder`, at `#dd-content` indices 6, 11, 44, 45,
+46, 59): *"For a genuine project IRR, run Scenario Builder with your own capex and opex →"*.
+It is the single most-repeated call to action in the whole T2 flow.
+
+The same page also carries, as one of its loudest warnings, the instruction **not** to use the
+flat profit-oil figure:
+
+> "⚠ The model does not use the value this table prints for Profit Oil (Govt) ... the DCF never
+> reads it. Indonesia carries an R-factor profit-oil ladder of 4 tiers, and the engine resolves
+> the government share off those tiers year by year as R moves, over a range of 60–88% ...
+> **Cite the tier schedule, not this row.**"
+
+The Scenario Builder then ran that exact figure. `dcfPSC()` has resolved the government share
+off `params.tier_schedule` since the engine was written (`index.html:50110`,
+`const tiers = params.tier_schedule && ... ? ... : null`), and `runLiveDCF()` passes `params`
+straight through — which is why the **Live DCF panel on the same page is correct**.
+`sbGetParams()` rebuilt `params` field-by-field from the form and never carried
+`tier_schedule`, so `tiers` resolved to `null` and `getContractorPct()` fell back to the single
+`sb-po-govt` box. **There was no tier UI anywhere in the modal**, so the analyst could neither
+see the ladder nor enter one.
+
+Measured over all 185 countries, not sampled: **51 carry a ladder** (all PSC). **47 of 51 were
+more than 1pp wrong, 37 more than 5pp, 9 more than 10pp**, and 47 of 51 read *too harsh*:
+
+| country | flat (shipped) | ladder (correct) | error |
+|---|---|---|---|
+| Timor-Leste | 72.9% | 52.8% | **+20.2pp** · NPV $1.77B vs $3.67B |
+| Egypt | 69.6% | 54.5% | +15.1pp |
+| Sao Tome and Principe | 65.9% | 52.9% | +13.0pp |
+| Guinea | 75.7% | 63.4% | +12.3pp |
+| Uganda | 62.7% | 50.7% | +12.0pp |
+| Indonesia | 66.3% | 64.1% | +2.2pp |
+
+Worse than the raw error: the modal's reconciliation strip explains the gap against the
+published figure confidently and specifically — "different populations", the
+average-of-NPVs vs NPV-of-averages argument — so the analyst was **actively reassured** about a
+number that was wrong for an entirely different reason.
+
+## Change
+- `sbGetParams()` attaches `tier_schedule` to the PSC params when a ladder is armed. That is the
+  one missing line.
+- New **R-factor ladder block** in `#sb-psc-params`: lists each filed tier's R range and
+  contractor/govt split, headed with the tier count and govt range, with a `#sb-use-tiers`
+  toggle that is **on** by default.
+- While the ladder is on, the flat **Profit Oil - Govt** input is `disabled` and its label reads
+  **"— not used"**. It is not left live-but-overridden, because that is the identical
+  "change it and nothing moves" trap the Country Profile already complains about for this very
+  parameter. Unticking re-enables it and the note states on screen that a flat split is a
+  hypothetical regime, not the country's filed terms.
+- The ladder is armed **only** by `ddOpenScenarioBuilder()`. `loadPreset()`, a mechanic change
+  away from PSC, and a header-opened modal all disarm, so a ladder can never leak onto another
+  country or onto a hand-built scenario. All four paths tested.
+- `_sbICTermsClause()` now prints "govt profit oil on the filed 4-tier R-factor ladder (60–88%,
+  resolved per year from cumulative R)" instead of a flat rate the figure beside it was never
+  built from — otherwise this fix would have left the *pasted IC memo* misstating its own terms.
+- `sb-use-tiers` added to `_sbFormFingerprint()`, so the "edited since load" strip sees the
+  toggle as the regime change it is.
+
+## Result
+The Scenario Builder and the Country Profile's Live DCF panel now agree to **0.00pp on all 51
+ladder countries** — previously up to 20.2pp apart on the same country, same price, same
+profile. Indonesia reads **64.1% / $2.62B** instead of 66.2% / $2.35B. Timor-Leste **52.8%**
+instead of 72.9%. Egypt **54.5%** instead of 69.6%.
+
+An analyst who follows the page's own six-times-repeated instruction now gets the country's
+filed progressive terms, can see the ladder that produced the number, and can switch to a flat
+split **deliberately** rather than without being told. The XLSX/IC-memo clause names the basis
+that actually ran.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all **9 visible tabs**,
+  and **390/390 with the Scenario Builder modal open**.
+- `#sb-use-tiers` measures **24 x 24** under `pointer: coarse` — added to the existing v612
+  narrow-id touch-target rule alongside `#sc-proxy-keep` / `#sc-floor-keep` /
+  `#bubble-verified-only`, hit box only. Its width/height were moved **off the style attribute
+  into CSS**, because a style attribute outranks the media query and the rule would have been
+  silently inert.
+- `#sb-po-govt` 44px (pre-existing rule), label 33px, ladder block `scrollWidth` = `clientWidth`.
+
+## Verification
+- JS syntax gate **PASS** (16 script blocks).
+- Runtime suite **actually ran** this cycle against the local tree, twice: **303 PASS / 0 FAIL /
+  1 WARN** after, and **303 PASS / 0 FAIL / 1 WARN** before, by swapping `index.html` in place so
+  only the file under test differed. `diff` of the sorted PASS/FAIL/WARN lines is **empty** —
+  zero regression. The 303 (vs the 318 reported from the deployed URL) is a
+  localhost-vs-GitHub-Pages artifact, present identically on the unmodified file; the 1 WARN is
+  the localhost service-worker 404, also present before the change.
+
+## Also walked this cycle, no change needed
+- `runLiveDCF()` → `dcfPSC()` already passes the ladder; the Live DCF panel was never wrong.
+  The defect was confined to the modal's form-rebuild path.
+- The Scenario Builder's inflated IRR (Indonesia 136.4%) is already disclosed on screen —
+  "quote the hurdle test, not the rate" — which is the right treatment; left alone.
+- All 62 interactive controls in `#dd-content` were enumerated and their handlers read; the
+  peer-row, `+ Compare`, tier-scroll, evidence-scroll and reform CTAs all resolve correctly.
+
+## Carried forward (re-confirmed, unchanged)
+- `▶ Run FC at this price` (`#cp-run-fc-btn`) reads `cp-price-select`, which does not exist, and
+  writes to `document.getElementById('price')`, which **also does not exist anywhere in the
+  file** — so the price write is a double no-op and the button just re-runs FC at FC's own
+  price. Re-confirmed this cycle and **de-prioritised on evidence**: the button lives inside
+  `#fc-nav-bar`, which is `display:none` until the analyst arrives from Fiscal Compare, so a
+  cold-load T2 user never sees it. Fix is a two-line id correction whenever a cycle walks the
+  FC→CP drilldown. Carried from 785/790/791.
+- Side-by-Side `Take spread across contracts` still not re-based on fee-blended columns (Iraq
+  prints `65.0–98.5% (33.5pp)`). Carried from 790/791.
+- `Low Take · Positive NPV` returns 143 of 185. Not a defect; noted at 791.
