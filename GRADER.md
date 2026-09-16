@@ -55608,3 +55608,16 @@ same country. The XLSX an analyst attaches to a memo carries the basis with the 
 - `Low Take · Positive NPV` returns 143 of 185 — a preset that removes 23% of the universe is a
   weak shortlist, but the take distribution (median 28.4%) is why, and the count line is honest
   about it. Not a defect; noted for a future cycle that wants to re-calibrate the preset ladder.
+
+---
+## Cycle 791 Log — 2026-09-16 00:08
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 791 complete. Shipped as **v882** (`3b9b76e`), grader log `893cdd5`, both pushed, mirror in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest by rotation; 790 was T3, last T1 at 784.)
+
+## Friction
+Walked the Screener cold at 1440×900 and clicked the **Swing (pp)** header ascending — the standard move for "which regimes hold up across the price cycle", on a column whose own tooltip says *"Low swing (<10pp, green) = stable fiscal terms across the price c
