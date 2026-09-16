@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v877</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v880</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v879</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v880</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -36673,6 +36673,126 @@ function _iocDownsideCell(country) {
     + _iocEvEsc(tip) + '">' + pct.toFixed(0) + '%</span></td>';
 }
 
+// ── v880 (T4) — THE "FISCAL EXPOSURE" TAB'S ONLY REFORM SIGNAL FIRED ON 3 OF 31 ROWS ────
+// T4 is "what is my fiscal-stability and reform exposure here?", and this tab is titled
+// "IOC Portfolio — Fiscal Exposure". It is where an IOC analyst asks that question across a
+// whole book rather than one country. Walked cold on the seeded Shell portfolio — 884
+// contracts, 31 countries — the country table carried exactly one reform signal: the v468
+// red chip, `REFORM_HISTORY[c].find(ev => ev.year >= 2023)`. Three defects, all measured
+// against the shipped reform_history.json:
+//
+//   1. ABSENCE WAS SILENT, AND MEANT THREE DIFFERENT THINGS. 28 of Shell's 31 rows rendered
+//      with no chip at all. Among them: Norway (+12pp, 2022), Russia (+15pp windfall, 2022),
+//      Brazil (3 fiscal law changes since 2010 — this platform's own "Actively Reforming"
+//      bucket), Nigeria (2021 Petroleum Industry Act, 2022 implementation), Mexico (2 in-window
+//      changes). And 19 of the 31 are among the 164 jurisdictions with NO sourced reform log at
+//      all — rendered identically to Norway's blank. Every other surface on this platform was
+//      fixed for exactly this: v502/v514 on the Reform Risk lookup, v520/v556 on the Fiscal
+//      Compare Stability column, v644 on the Country Profile sidebar, v662 on the Screener
+//      filter, v879 on the IC-memo clipboard. The IOC Portfolio was the last one still letting
+//      a blank cell read as a clean record.
+//   2. THE TOOLTIP NEVER NAMED THE REFORM. It read `ev.description`; the field in
+//      reform_history.json is `event`. So all three chips fell through to the literal fallback
+//      and printed "Recent fiscal reform: 2023 — reform event."
+//   3. THE YEAR WAS THE EARLIEST QUALIFYING ONE, NOT THE LATEST. `.find()` on a chronologically
+//      ascending array returns the first match. The UK — 89 Shell contracts — showed
+//      "⚠ 2023" (EPL raised to 35%) while its 2024 event, EPL raised to 38% AND EXTENDED TO
+//      MARCH 2030, is the one a 25-year IRR model turns on.
+//   Also: Iraq's chip fired on the 2023 KRG–Baghdad FSC ruling, which carries no quantified
+//   take move, in the same red as the UK's +25/+10/+3pp EPL sequence.
+//
+// The fix introduces no new rule and no new threshold. It calls _rrClassify() — the six-way
+// classification v550 unified and v744 gave a table-width `icToken` for precisely this purpose
+// — and _rrTokenTier() for its colour, so this tab cannot drift from Fiscal Compare, the
+// Country Profile sidebar or the Reform Risk card the way the v468 chip had. It renders on
+// EVERY row, and where there is no sourced log it says n/c rather than nothing.
+function _iocReformChip(country) {
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
+  // Fetch not landed / failed. Do not assert n/c — that is a claim about coverage, and it
+  // would be false. Say nothing until the file is here.
+  if (!rh || !Object.keys(rh).length) return '';
+  var evs = Array.isArray(rh[country]) ? rh[country] : [];
+  if (!evs.length) {
+    return '<span style="display:block;margin-top:2px;font-size:10px;font-weight:700;color:var(--muted);'
+      + 'border:1px dashed var(--border);border-radius:3px;padding:0 4px;cursor:help;" title="'
+      + _iocEvEsc('n/c — ORCA holds a sourced fiscal-reform event log for 21 of 185 jurisdictions and '
+        + country + ' is one of the 164 without one. This is NOT a Reform Frequency Score of 100 and it is '
+        + 'not a clean record: it is missing coverage. Do not carry a zero reform-frequency premium into an '
+        + 'IC memo on this basis — this jurisdiction needs an external check (its own petroleum act, IMF '
+        + 'Article IV, operator annual reports) before that premium is defensible. The Reform Risk tab’s '
+        + 'country lookup names the statute ORCA read ' + country + '’s terms out of, which is where that '
+        + 'check starts. Open the row for the Country Profile.')
+      + '">n/c · no sourced log</span>';
+  }
+  var v = (typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  if (!v) return '';
+  var tier = (typeof _rrTokenTier === 'function') ? _rrTokenTier(v.icToken, v.icColor) : { col: v.icColor, dotted: false };
+  // The most recent event that actually SCORES — a fiscal law change dated 2010 or later.
+  // This is the v468 year done correctly: latest, not first, and never a context event.
+  var lastScored = evs.filter(function(e) { return (typeof _rrScores === 'function') ? _rrScores(e) : false; })
+                      .sort(function(a, b) { return (b.year || 0) - (a.year || 0); })[0] || null;
+  var yrTxt = lastScored ? ' · ' + lastScored.year : '';
+  var tip = country + ' — ' + _icPlain(v.icLabel) + '. Reform Frequency Score ' + v.score + '/100, '
+    + _icPlain(v.rankTxt) + '. ' + v.since2010 + ' sourced fiscal law change'
+    + (v.since2010 === 1 ? '' : 's') + ' since 2010'
+    + (lastScored ? ', most recent ' + lastScored.year + ' — ' + lastScored.event
+        + (lastScored.take_change ? ' (' + lastScored.take_change + ' government take)' : ' (take move not quantified)') : '')
+    + '. ' + _icPlain(v.icRule)
+    + ' Same classification the Fiscal Compare Reform verdict column, the Country Profile reform '
+    + 'sidebar and the Reform Risk card print for this country — all four call _rrClassify(). '
+    + 'Jurisdiction-level: it is a property of the country, not of this operator’s position in it.';
+  return '<span style="display:block;margin-top:2px;font-size:10px;font-weight:800;color:' + tier.col + ';'
+    + 'letter-spacing:.02em;cursor:help;' + (tier.dotted ? 'border-bottom:1px dotted ' + tier.col + ';' : '') + '" title="'
+    + _iocEvEsc(tip) + '">' + _iocEvEsc(v.icToken)
+    + '<span style="font-weight:400;color:var(--muted);"> · ' + v.since2010 + ' chg' + yrTxt + '</span></span>';
+}
+
+// The portfolio roll-up of the same four states, in the stat strip, so the analyst reads the
+// book-level answer to T4 before scrolling a 31-row table. Counted over COUNTRIES, not
+// contracts: reform exposure is a property of the jurisdiction, and two Brunei rows are one
+// jurisdiction. Uses _rrClassify()'s own green/non-green verdict as the divider — no new rule.
+function _iocReformStat(countries) {
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
+  var list = (countries || []).slice();
+  if (!rh || !Object.keys(rh).length || !list.length) return '';
+  var flagged = [], clear = [], nc = [];
+  list.forEach(function(c) {
+    var evs = Array.isArray(rh[c]) ? rh[c] : [];
+    if (!evs.length) { nc.push(c); return; }
+    var v = (typeof _rrClassify === 'function') ? _rrClassify(c) : null;
+    if (!v) { nc.push(c); return; }
+    (v.icColor === 'var(--green)' ? clear : flagged).push(c + ' (' + _icPlain(v.icToken) + ')');
+  });
+  var tip = 'Reform exposure across the ' + list.length + ' jurisdictions in this portfolio, counted by '
+    + 'country rather than by contract. '
+    + (flagged.length
+        ? flagged.length + ' carr' + (flagged.length === 1 ? 'ies' : 'y') + ' a verdict this platform will not '
+          + 'read as a zero reform premium: ' + flagged.sort().join(', ') + '. '
+        : 'None carries a non-clean reform verdict. ')
+    + (clear.length
+        ? clear.length + ' ' + (clear.length === 1 ? 'is' : 'are') + ' scored and clear: ' + clear.sort().join(', ') + '. '
+        : '')
+    + (nc.length
+        ? nc.length + ' ' + (nc.length === 1 ? 'is' : 'are') + ' n/c — ORCA holds no sourced fiscal-reform '
+          + 'event log for ' + (nc.length === 1 ? 'it' : 'them') + ' at all: ' + nc.sort().join(', ') + '. '
+          + 'That is missing coverage, NOT a clean record and NOT a score of 100. It is '
+          + Math.round(nc.length / list.length * 100) + '% of this portfolio by jurisdiction, and every one of '
+          + 'those needs an external check before an IC memo carries a zero reform-frequency premium for it. '
+        : '')
+    + 'Per-country verdicts are under each country name in the table below. Same classification as the '
+    + 'Fiscal Compare Reform verdict column and the Reform Risk tab — all call _rrClassify().';
+  var headCol = flagged.length ? 'var(--orange)' : nc.length ? 'var(--muted)' : '#15803D';
+  return '<div class="ioc-stat" style="flex:1.2;min-width:170px;" title="' + _iocEvEsc(tip) + '">'
+    + '<div class="sv" style="font-size:12px;font-weight:700;color:' + headCol + ';line-height:1.5;">'
+    + (flagged.length ? '<span style="color:var(--orange);">' + flagged.length + ' flagged</span>' : '')
+    + (flagged.length && (clear.length || nc.length) ? ' <span style="color:var(--border);">·</span> ' : '')
+    + (clear.length ? '<span style="color:#15803D;">' + clear.length + ' clear</span>' : '')
+    + (clear.length && nc.length ? ' <span style="color:var(--border);">·</span> ' : '')
+    + (nc.length ? '<span style="color:var(--muted);">' + nc.length + ' n/c</span>' : '')
+    + '</div><div class="sk">Reform exposure<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">'
+    + 'of ' + list.length + ' jurisdiction' + (list.length === 1 ? '' : 's') + ' · n/c = no sourced log, not clean</span></div></div>';
+}
+
 // ── v748 (T6) — THE MECHANIC COLUMN NAMED A DOCUMENT TYPE, NOT A FISCAL MODEL ────────────
 // The Mechanic column is this platform's own answer to "what produced this number". On the
 // IOC Portfolio it is the only thing on the row that says what kind of fiscal regime the take,
@@ -36887,6 +37007,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStrAgg}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
+    ${_iocReformStat(countries)}
     ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPctAgg > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — higher govt take at high oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPctAgg}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
@@ -36911,12 +37032,8 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       const cEsc = r.country.replace(/'/g,"\\'");
       const _cd = COUNTRY_DATA.find(d=>d.country===r.country);
       const _hasR = _cd && _cd.has_r_factor_tiers && r.mechanic==='PSC';
-      // v468: Recent reform flag — show ⚠ in country name cell when REFORM_HISTORY has an event in 2023-2026
-      const _iocRhAgg = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? (REFORM_HISTORY[r.country] || []) : [];
-      const _iocRecentReformAgg = _iocRhAgg.find(function(ev){ return (ev.year || 0) >= 2023; });
-      const _iocReformTagAgg = _iocRecentReformAgg
-        ? (' <span style="font-size:10px;color:var(--negative);font-weight:700;border:1px solid var(--negative);border-radius:3px;padding:0 4px;white-space:nowrap;vertical-align:middle;" title="Recent fiscal reform: ' + _iocRecentReformAgg.year + ' — ' + (_iocRecentReformAgg.description || 'reform event').replace(/"/g,'&quot;').slice(0,80) + '. Open Country Profile → Reform Risk tab for full timeline.">⚠ ' + _iocRecentReformAgg.year + '</span>')
-        : '';
+      // v880 (T4): renders on every row, four states, from _rrClassify(). See _iocReformChip.
+      const _iocReformTagAgg = _iocReformChip(r.country);
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagAgg}</td>
       ${_iocMechCell(r, _hasR)}
@@ -37033,6 +37150,7 @@ window.loadIOC = function(operator) {
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStr}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
+    ${_iocReformStat(countries)}
     ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPct > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — these positions have higher govt take at higher oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPct}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
@@ -37052,12 +37170,8 @@ window.loadIOC = function(operator) {
       const cEsc = r.country.replace(/'/g,"\\'");
       const _cd2 = COUNTRY_DATA.find(d=>d.country===r.country);
       const _hasR2 = _cd2 && _cd2.has_r_factor_tiers && r.mechanic==='PSC';
-      // v468: Recent reform flag — show ⚠ in country name cell when REFORM_HISTORY has an event in 2023-2026
-      const _iocRh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? (REFORM_HISTORY[r.country] || []) : [];
-      const _iocRecentReform = _iocRh.find(function(ev){ return (ev.year || 0) >= 2023; });
-      const _iocReformTag = _iocRecentReform
-        ? (' <span style="font-size:10px;color:var(--negative);font-weight:700;border:1px solid var(--negative);border-radius:3px;padding:0 4px;white-space:nowrap;vertical-align:middle;" title="Recent fiscal reform: ' + _iocRecentReform.year + ' — ' + (_iocRecentReform.description || 'reform event').replace(/"/g,'&quot;').slice(0,80) + '. Open Country Profile → Reform Risk tab for full timeline.">⚠ ' + _iocRecentReform.year + '</span>')
-        : '';
+      // v880 (T4): renders on every row, four states, from _rrClassify(). See _iocReformChip.
+      const _iocReformTag = _iocReformChip(r.country);
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTag}</td>
       ${_iocMechCell(r, _hasR2)}
