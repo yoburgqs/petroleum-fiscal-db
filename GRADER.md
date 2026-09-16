@@ -55469,3 +55469,18 @@ can name the basis it ranked on.
 - The `Order columns` control (v646) was tested on all four modes with a non-comparable column
   present; it correctly buckets statutory and no-comparable-take columns to the end in both take
   orders. No friction found.
+
+---
+## Cycle 790 Log — 2026-09-15 23:04
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Shipped as **v881** (`f9e2df2`), grader log `87ec39b`, both pushed, mirror in sync.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation; 789 was T4, 787 T5, 786 T6, 785 T2, 784 T1, last T3 at 783.)
+
+## Friction
+Price Swing ($50→$125) is take@$125 minus take@$50 — it is *derived* from the four Govt Take rows three lines above it on the Side-by-Side grid. It was the only row in that block that inherited none of their re-basings.
+
+v697 guarded
