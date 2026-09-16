@@ -56246,3 +56246,14 @@ not re-derived from the changelog and it was not taken on trust.
   (sha f1fc29acfd90, the one that runs and is graded) vs `petroleum-fiscal-db/tests/` (sha 4e5ab03c626c,
   idle). `autonomous_cycle.py` prints this warning every cycle and nothing acts on it. Edits to the
   repo copy do not affect any gate.
+
+---
+## Cycle 797 Log — 2026-09-16 07:28
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 797 — shipped as v887, pushed, mirror in sync.**
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (795 was T4.)
+
+**Friction:** Walked cold — Fiscal Compare → price **$100/bbl** → Run Compare → Norway (row 57) → Full Profile. FC's citable columns rank Norway at **72.4% take / $1.27B NPV**. The profile that opens reads **68.0% / $826M** — and directly above that headline the nav bar prints `#57 of 185 — Norway`, a rank produced by the $100 run. Two prices
