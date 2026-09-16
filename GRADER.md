@@ -56371,3 +56371,145 @@ screen did nothing to prevent, and the only way out of the table was a file down
 
 ## Friction
 I walked it cold with storage cleared: Scenario Builder → Run DCF → save "Base case" → raise royalty 10→18 and SPT 0→20 → save "Royalty+SPT reform" → drop price 75→55 → save "Downside $55". Three rows — exactly an IC sensitivity appendix, which is what th
+
+---
+## Cycle 799 Log — 2026-09-16 18:30
+- Test before: 0 PASS / 0 FAIL (no suite result carried in; the gate handed this cycle zeros)
+- Test after: 317 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local v889 tree)
+- JS errors: 0
+- Summary: Cycle 799 complete — shipped as v889 (`fb64239`), pushed, mirror in sync.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** It was the stalest task: 798 was
+T5, 797 T2, 795/794 T4, 793 T6, 792 T2, 791 T1, and T3 was last walked at 790.
+
+## Friction
+Walked cold with `sessionStorage` and `localStorage` cleared, using the tab's OWN shipped
+quickstart — **"USA vs Iraq"**, one of the four buttons on the empty state — plus Nigeria typed
+into `#cmp-search`. Read the GOVT TAKE block downward, which is how an analyst reads it:
+
+```
+Take basis (mechanic)   ⚠ 68% fee-basis · TSC blended with PSC and Concession
+Rank among producers    #6 of 21 · ranked on 34.1% comparable, not 84.8%
+Govt Take ($75/bbl)     84.8%  ·  PSC/Conc 34.1%
+Take spread across…     65.0–98.5% (33.5pp)        <- ORANGE, BOLD, and nothing else
+Price Swing             +6.6pp ·  PSC/Conc +11.1pp
+```
+
+Every row in that block re-bases Iraq and says so on screen — except the one that answers the
+question a three-country comparison is being run to settle: *does block selection matter here?*
+
+v882 fixed Price Swing with the words *"it was the only row in the GOVT TAKE block that inherited
+none of their re-basings."* That was one row short. The row directly above it inherited none of
+them either.
+
+**98.5% is not a contract at the hard end of Iraq's terms.** It is the TSC figure exactly
+(`mech_mix` TSC `t75` = 98.5), and 415 of Iraq's 610 contracts are TSC, so the fee-basis cluster
+fills the entire top quartile by construction. The band's width is the distance between two
+CONTRACT TYPES. The row printed it in orange bold — which its own tooltip defines as *"material
+contract-level variation"* — so the analyst reads "Iraq: low take but wildly inconsistent terms,"
+which is wrong on the second half.
+
+**The damage compounded one row up.** Iraq's Predictability Score rendered `47 · LOW` with a
+GRADED band and a colour, and in the walked set it was the *only* graded score on the row (USA and
+Nigeria both resolve to withdrawn ceilings). Since v624 a graded band is this platform's strongest
+stability claim — awarded only where ORCA measured a spread. 26.8 points were charged by the IQR
+term on that band. So the grid refused to RANK Iraq on 84.8%, then two rows later graded it LOW on
+the dispersion of the same blend.
+
+**And the verdict strip above the grid put it first.** It printed
+`PREDICTABILITY, MOST STABLE FIRST: Iraq 47 › Nigeria ≤46`, and the notice beneath it called Iraq
+*"the column in this set ORCA does hold a measured spread for"* — aiming the analyst at the one
+column whose dispersion is a mechanic artefact. That rode into the Copy-for-IC-Memo clipboard.
+
+`_sbsPaintObsSpread` (v864) could never have caught this: Iraq's `api/v1/country/iraq.json`
+`top_contracts` are 50 of 50 TSC running 98.5–99.5%, a 1.0pp observed spread, so neither
+`_rrIqrUnderstated` (needs observed wider than bundled) nor `cpSpreadConflict` (needs the one-term
+claim) fires on it.
+
+## Change
+- **New module-level `orcaSpreadFeeBoundary(d)`**, beside `cpFeeBasis()`. One predicate, read by
+  both the grid rows and the verdict strip, because two copies of a comparability rule is the
+  exact drift v885 and v552 exist to prevent.
+- **The Take spread cell is re-based.** The published band stays on screen — it is the figure the
+  Predictability Score was charged on, and the analyst must be able to see what was withdrawn —
+  but it is **de-coloured and de-bolded** (verified: `rgb(194,65,12)`/700 → `rgb(107,101,96)`/400),
+  the boundary is named (`⚠ top quartile is fee-basis (TSC)`), and ORCA's Group-1 mechanic take
+  points print beneath it in green: `PSC/Conc 13.9–48.2% · 2 mechanics`.
+- **No substitute IQR is invented.** ORCA holds NO Group-1-only quartiles — `g1` carries
+  `t50/t75/t100/t125` and `n`, and no `p25`/`p75`. The green line is the range of the Group-1
+  *mechanic* take points, and its tooltip says in capitals that it is **not** an interquartile
+  range. An Iraqi Concession prices at 13.9% and an Iraqi PSC at 48.2%; that 34.3pp is the
+  like-for-like answer to whether contract type matters.
+- **The Predictability Score names what it was charged.** `⚠ 26.8pts charged on the fee-basis
+  boundary` beneath the badge. The score is not overwritten and no corrected score is computed,
+  because none can be. The shared `renderStabilityBadge()` is deliberately untouched — it renders
+  on four tabs, and the re-basing data lives in this tab's scope.
+- **The strip no longer ranks it.** A fee-boundary column is dropped from `measured` and joins the
+  unplaced bucket with its own reason. The strip now reads
+  `PREDICTABILITY, MOST STABLE FIRST: no order established — USA ≤82, Nigeria ≤46 cannot be placed
+  against each other · not placed: Iraq 47 (spread is the fee-basis boundary, not comparable)`.
+- **FIRING RULE is arithmetic, not a tuned constant.** The fee-basis mechanics at or above the
+  band's top must be numerous enough to REACH the 75th percentile: their share of the contract set
+  must be ≥ 25%, which is the definition of a quartile. Measured against the shipped
+  `country_data.json` this selects **Iraq and Iraq alone** (415/610 = 68%). India (RSC 4 of 653)
+  and Qatar (RSC 2 of 146) each have a fee mechanic priced above their band and are correctly
+  excluded — at 0.6% and 1.4% they cannot occupy the top quartile, so their bands are genuine
+  Group-1 dispersion. The other seven fee-blended countries never reach the test: their `p75` sits
+  at or below their highest Group-1 mechanic take.
+
+Within the locked list: no new tooltip on an existing control, no page-sub paragraph, no amber
+instructional banner, no routing hint, no new FAQ, tab order unchanged, `#reference-panel`
+untouched, v612 mobile layer untouched, Govt NPV column still removed, CP headline untouched.
+
+## Result
+The analyst comparing Iraq against two production-sharing peers is no longer told, in orange bold,
+that its fiscal terms vary 33.5pp between blocks when that band is the gap between a TSC and a
+PSC. They get the like-for-like number instead — PSC/Conc 13.9–48.2% — and they are told that the
+LOW predictability grade was bought with 26.8 points charged on a mechanic artefact. The strip
+that previously ranked Iraq *most stable in the set* on that same artefact now declines to place
+it and says why. All three corrections ride the shared `rows` array into `#cmp-data-table`, the
+PDF and both Copy-for-IC-Memo clipboard flavours, so the pasted memo carries them too — verified
+by reading the clipboard back.
+
+## Verification (all run this cycle, none assumed)
+- **Runtime suite RAN this cycle** against the local v889 tree over `http://localhost:8777`:
+  **317 PASS / 0 FAIL / 1 WARN**, report `/tmp/runtime_test_report.txt` timestamped
+  `2026-09-16T23:32:00Z`. The 1 WARN / 1 JS error is the pre-existing local-server 404 on the
+  service-worker fetch, present in the 798 run too. The stale-report trap was hit and caught: the
+  file held a 04:03 report from an earlier cycle, and an earlier in-flight run was killed and
+  restarted after the version bump so the suite read one stable file. The number above is read
+  from the report this run wrote, not carried forward.
+- **JS syntax gate PASS** — 11 inline blocks extracted, `node --check` equivalent, 0 failures;
+  re-run after the v888→v889 bump (0 `v888` left, 16 `v889`).
+- **Cold default set BYTE-IDENTICAL to HEAD.** A/B: `git show HEAD:index.html` written beside the
+  live file and served from the same directory so every relative fetch matched, both loaded cold
+  with storage cleared. `#cmp-output` innerText compared — **identical: true**, 0 page errors on
+  either. Norway / UK / Netherlands are not fee-blended, so the predicate returns null and the
+  seeded view is unchanged.
+- **Predicate blast radius measured, not assumed** — ran against all 185 records in the shipped
+  `country_data.json`: 1 hit (Iraq). The looser form of the test hit 3 (Iraq, India, Qatar) and
+  was tightened to the quartile-arithmetic rule before shipping.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." The 5 findings are pre-existing
+  baseline entries on `thome`, `t0` and `t7`; none is on `t2`.
+- **Mobile 390×844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390, 0 page errors, both
+  new sub-lines render inside the existing cell.
+- **Clipboard read back** with `navigator.clipboard.readText()` after a real `#cmp-copy-table-btn`
+  click: the Take spread row, the Predictability row and both set notices all carry the re-basing.
+- **`#cmp-data-table` mirror checked directly** — carries the same three corrections.
+
+## Carried forward
+- Side-by-Side `Take spread across contracts` is now re-based, closing the item carried from
+  790–798. What is NOT closed: ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country, so
+  no fee-blended column can show a true comparable IQR. The fix names the gap rather than filling
+  it. Filling it is a harvest/rebuild job, not a UX one.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–798.
+- The two suite copies remain diverged — `office/tools/petroleum/tests/runtime_comprehensive.js`
+  (the one that runs and is graded) vs `petroleum-fiscal-db/tests/` (idle). Carried from 797–798.
+- Scenario Builder's base case is still fixed to the first saved scenario with no way to
+  re-designate it. Carried from 798.
+- **New:** `/tmp/runtime_test_report.txt` held a report from 04:03 while this cycle's suite was
+  still running. Nothing in the harness distinguishes "this run's report" from "the last run's
+  report" by timestamp — the same shape as the v-cycle 404/405 failure recorded in `~/CLAUDE.md`.
+  This cycle cleared the file before running and checked the timestamp; that is a habit, not a gate.
