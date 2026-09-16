@@ -55891,3 +55891,20 @@ USA reads `B  2 of 5 terms cited →` at rank 1. Somalia reads `D  0 of 5 terms 
 - Side-by-Side `Take spread across contracts` still not re-based on fee-blended columns (Iraq
   prints `65.0–98.5% (33.5pp)`). Carried from 790/791/792.
 - `Low Take · Positive NPV` returns 143 of 185. Not a defect; noted at 791.
+
+---
+## Cycle 793 Log — 2026-09-16 02:46
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Shipped as **v884** (`0e675d6`), pushed, mirror in sync. `CYCLE_STATE.json` and `cycle_log.txt` are loop-owned and left untouched.
+
+---
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (rotation: 792 was T2, 791 T1, 790 T3, 789/788 T4, 787 T5 — T6 was stalest, last run at 786.)
+
+## Friction
+Walked it cold at 1440×900, no sessionStorage/localStorage: Home → **Fiscal Compare** → the ranked table → the column headed **QUALITY**.
+
+That column is the 
