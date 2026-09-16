@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v881</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v882</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v881</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v882</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -25264,6 +25264,66 @@ function _scFeeCmpCount(price) {
   return COUNTRY_DATA.filter(function(d) { return _scFeeCmpAt(d, price).diverges; }).length;
 }
 
+// ── v882 (T1): the Screener's Swing column, on the basis its own Govt Take column already uses ──
+// Price Swing is take@$125 minus take@$50 -- it is DERIVED from the take figures two columns to
+// its left. That take column withdraws state monopolies (fmtTake), carries a comparable sub-cell
+// for fee-blended countries (_takeCmpCell), sorts on the comparable figure (_scSortVal case
+// 'take') and screens the ceiling on it (_scPass). The swing column inherited none of it -- and
+// it is the column an analyst ranks 185 countries on when the question is "which of these regimes
+// holds up across the price cycle".
+//
+// Side-by-Side fixed both halves already: v697 withdrew the state-monopoly swing, v882 re-based
+// the fee-blended one. Country Profile has gated its own swing line on _isMonopoly since v344.
+// The Screener was the last surface still printing the raw figure -- and it is the one that RANKS
+// on it and then hands its top 5 straight into the Side-by-Side that disagrees. Walked cold at
+// 1440x900, Screener -> click "Swing (pp)" ascending, the board read:
+//
+//     1  Saudi Arabia   take —     tier State Monopoly   swing +0.0pp
+//     2  Oman           77.6%                            +6.1pp
+//     3  USA            23.4%                            +6.2pp
+//     4  Iraq           84.8%                            +6.6pp
+//     5  Canada         32.7%                            +8.0pp
+//
+// and "Load top 5 verified-production in Side-by-Side" then handed over exactly that list, where
+// Side-by-Side prints "—" for Saudi Arabia and "+6.6pp · PSC/Conc +11.1pp" for Iraq. Two tabs,
+// one number, and the tab doing the ranking was the wrong one.
+//
+// Measured over country_data.json:
+//   * 3 state-monopoly rows (Saudi Arabia, Kuwait, Bahrain) store take_50..take_125 = 100.0, so
+//     swing computes as 100 - 100 = +0.0pp. On this column's own published legend ("<10pp =
+//     stable fiscal terms across the price cycle") +0.0pp is the BEST score in the database, and
+//     Saudi Arabia carries verified field production, so it took RANK 1 of 185 -- four columns
+//     from its own take cell reading "—" and its tier cell reading "State Monopoly".
+//   * 11 fee-blended rows, 2 of which cross a legend tier: Iraq prints +6.6pp (LOW) against
+//     +11.1pp comparable (MODERATE) and ranked 4th most price-stable in the database; Iran prints
+//     +13.5pp (MODERATE) against +4.6pp comparable (LOW). Wrong in both directions.
+//
+// Unconditional, like v697/v882 and unlike the take ceiling: the sc-fee-cmp box is scoped by its
+// own label to the CEILING ("Test the ceiling on comparable take"), and widening it silently to
+// cover a second column would change a control's meaning without saying so. A withdrawn figure
+// is withdrawn on every view.
+function _scSwingAt(d) {
+  var head = (d && typeof d.swing === 'number' && isFinite(d.swing)) ? d.swing : null;
+  if (d && isStateMonopoly(d.take_75)) {
+    return { head: head, cmp: null, sort: null, diverges: false, monopoly: true, n1: null, n2: 0 };
+  }
+  if (head === null) {
+    return { head: null, cmp: null, sort: null, diverges: false, monopoly: false, n1: null, n2: 0 };
+  }
+  var lo = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, '50')  : null;
+  var hi = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, '125') : null;
+  if (!lo || !hi || !(lo.diverges || hi.diverges) || lo.cmp == null || hi.cmp == null) {
+    return { head: head, cmp: head, sort: head, diverges: false, monopoly: false, n1: null, n2: 0 };
+  }
+  var cmp = +(hi.cmp - lo.cmp).toFixed(1);
+  // Same 0.1pp precision test _scFeeCmpAt() applies: only claim a correction the column prints.
+  var div = (cmp.toFixed(1) !== head.toFixed(1));
+  return { head: head, cmp: div ? cmp : head, sort: div ? cmp : head, diverges: div,
+           monopoly: false, n2: (hi.n2 || lo.n2 || 0),
+           n1: (hi.n1 != null ? hi.n1 : lo.n1) };
+}
+window._scSwingAt = _scSwingAt;
+
 // ── v673 (T6): the Fiscal Regime Breakdown card, rebuilt on the live record ───────────────
 // T6 is "where did this number come from and how solid is the evidence?", and the Fiscal Regime
 // Breakdown card is the one surface on the page whose whole job is to answer it. FAQ A-series
@@ -29360,7 +29420,7 @@ function renderCompare() {
           + '"0pp swing, the most price-stable regime on the board" inverts it: there is no '
           + 'contractor position here whose returns could swing. The same placeholder is why the '
           + 'four Govt Take rows above and the Contractor NPV rows below are also withdrawn.') + '">\u2014</span>';
-      // v881 (T3): v697 guarded this row on isStateMonopoly() alone, and its own comment names
+      // v882 (T3): v697 guarded this row on isStateMonopoly() alone, and its own comment names
       // "Iraq 6.6pp" as a case it meant to catch -- but Iraq's take_75 is 84.8%, so the predicate
       // never fires on it. Price Swing is take@$125 minus take@$50: it is DERIVED from the four
       // Govt Take rows three lines above, and it was the only row in the GOVT TAKE block that
@@ -32265,7 +32325,9 @@ function _scSortVal(d, key, takeKey, npvKey, cmpBasis) {
     case 'npv':      return d[npvKey];
     case 'npv50':    return d.npv_50;
     case 'prodcov':  return d.prod_coverage_pct;
-    case 'swing':    return d.swing;
+    // v882 (T1): the rule stated six lines above -- "the ranking uses the number the screen
+    // used" -- applied to the column it was not applied to. See _scSwingAt().
+    case 'swing':    return (typeof _scSwingAt === 'function') ? _scSwingAt(d).sort : d.swing;
     default:         return null;
   }
 }
@@ -34730,6 +34792,45 @@ function runScreener() {
     const t = `${d.country}: this column is ordered by comparable government take, so it leads with that figure — ${fc.cmp.toFixed(1)}% on its PSC/Concession contracts at $${price}/bbl. The published headline is ${fc.head.toFixed(1)}%, which blends ${fc.n2.toLocaleString()} fee-basis contracts (fixed $/bbl remuneration, no price upside) and measures contract structure rather than fiscal terms. Sort by any other column, or untick "screen on comparable take", to lead with the published figure again.`;
     return `<span class="take-val ${takeClass(fc.cmp)}" style="cursor:help;" title="${t.replace(/"/g,'&quot;')}">${fc.cmp.toFixed(1)}%</span>`;
   };
+  // v882 (T1) — the SWING cell, on the basis _scSwingAt() resolves. See the note on that helper.
+  // Layout follows the v685 take-column precedent exactly: the figure the row IS ORDERED ON leads
+  // and carries the colour, and the one being set aside is named directly beneath it in muted.
+  // Nothing is added to the resting view — the sub-line renders only while this column is the one
+  // doing the ranking, which is the only state in which the two figures can disagree about where
+  // a row sits. The withdrawal, by contrast, applies on every view: +0.0pp is not a measurement
+  // at any sort order.
+  const _swOrdered = (_scSortKey === 'swing') || (!_scSortKey && _screenerRfactorOnly);
+  const _swTxt = (v) => '+' + fmt(v) + 'pp';
+  const _swCol = (v) => (v >= 20 ? 'var(--red)' : v >= 10 ? 'var(--orange)' : 'var(--muted)');
+  const _swWt  = (v) => (v >= 15 ? '700' : '400');
+  const _swingCell = (d) => {
+    const sw = _scSwingAt(d);
+    if (sw.monopoly) {
+      const t = `${d.country}: no price swing is reported. Government take is stored as `
+        + `${d.take_75 != null ? d.take_75.toFixed(1) + '%' : '≥ 99.5%'} at $50, $75, $100 and $125/bbl `
+        + `— a state-monopoly placeholder, not four measured points — so the difference between the `
+        + `ends is 0.0pp by construction. On this column's own legend ("<10pp = stable fiscal terms `
+        + `across the price cycle") that reads as the most price-stable regime in the database. It `
+        + `inverts it: there is no contractor position here whose returns could swing. The same `
+        + `placeholder is why the Govt Take cell on this row reads "—" and the Tier cell reads `
+        + `"State Monopoly". Side-by-Side (v697) and the Country Profile withdraw it for the same reason.`;
+      return `<td class="num" style="color:var(--muted)"><span style="cursor:help;" title="${t.replace(/"/g,'&quot;')}">—</span></td>`;
+    }
+    if (sw.head === null) return `<td class="num" style="color:var(--muted)">—</td>`;
+    if (!(sw.diverges && _swOrdered)) {
+      return `<td class="num" style="color:${_swCol(sw.head)};font-weight:${_swWt(sw.head)}">${_swTxt(sw.head)}</td>`;
+    }
+    const t = `${d.country}: ${Number(sw.n2 || 0).toLocaleString()} of its contracts are fee-basis `
+      + `(fixed $/bbl remuneration, the contractor keeps no price upside). A fee-basis take% is pinned `
+      + `near 97–99% at EVERY price by that remuneration structure, so blending it in flattens the `
+      + `swing toward zero — and on this column's legend a small swing is the most stable tier on the `
+      + `board. This column is ordered by comparable swing, so it leads with that figure: ${_swTxt(sw.cmp)} `
+      + `across its ${sw.n1 != null ? Number(sw.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts. `
+      + `The published blend is ${_swTxt(sw.head)}, which is what this cell prints under every other `
+      + `sort and what the export carries. Side-by-Side prints the same pair for this country.`;
+    return `<td class="num" style="color:${_swCol(sw.cmp)};font-weight:${_swWt(sw.cmp)};cursor:help;" title="${t.replace(/"/g,'&quot;')}">${_swTxt(sw.cmp)}`
+      + `<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;white-space:nowrap;">published ${_swTxt(sw.head)}</div></td>`;
+  };
   // v789 (T1) — on a phone the # column is ranked on a figure the analyst cannot see.
   // Walked cold at 390x844 hasTouch: Home -> "open the screen ->" -> IOC Capital Screen. The pinned
   // strip plus Govt Take is all that fits; Contractor NPV, which the default order is built on,
@@ -34747,7 +34848,10 @@ function runScreener() {
       case 'npv50':    lbl = 'NPV @$50'; val = fmtNpvShared(d.npv_50); break;
       case 'evidence': { const g = _evidenceGrade(d); lbl = 'Evidence'; val = g.letter + ' · ' + Number(g.nFacts || 0).toLocaleString() + ' facts'; break; }
       case 'prodcov':  lbl = 'Prod cov'; val = _scProdCovCell(d); break;
-      case 'swing':    lbl = 'Swing'; val = d.swing != null ? '+' + fmt(d.swing) + 'pp' : '—'; break;
+      // v882 (T1): the phone's pinned rank line names the number the row was PLACED on, so it
+      // takes the same basis the swing sort now runs on. See _scSwingAt().
+      case 'swing':    { const _sw = _scSwingAt(d); lbl = 'Swing';
+                         val = (_sw.monopoly || _sw.sort == null) ? '\u2014' : '+' + fmt(_sw.sort) + 'pp'; break; }
       default:         return '';
     }
     return `<span class="sc-rank-basis" aria-hidden="true">${lbl} <span class="sc-rank-basis-v">${val}</span></span>`;
@@ -34877,7 +34981,7 @@ function runScreener() {
       <td class="num">${_floorLe}${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="${_scProdCovTip(d)}" style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${_scProdCovCell(d)}</td>
-      <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
+      ${_swingCell(d)}
       <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span></td>
     </tr>`;
   }).join('');
@@ -35765,6 +35869,7 @@ function _scExportRows() {
     var fp = getFiscalPredictabilityScore(d);
     var disp = _fpDispersion(d);
     var _fpX = _fpExportCell(d);
+    var _swX = (typeof _scSwingAt === 'function') ? _scSwingAt(d) : { head: d.swing, cmp: d.swing, diverges: false, monopoly: false };
     // v879 (T5): the basis block reports how many rows in THIS file carry a bound, and how many
     // of those move band, so an IC reader opening the workbook cold knows the correction applied
     // before they read a single score. Collected here, from the same object the cell is written
@@ -35836,7 +35941,23 @@ function _scExportRows() {
       // producing the IC shortlist.
       Breakeven_bbl: _beReal ? d.be_75 : null,
       Breakeven_Tested: _beArtifact ? 'n/a — no contractor position' : _beReal ? 'Yes' : 'No',
-      Swing_pp: d.swing,
+      // ── v882 (T1): the same fix v529/v847 gave Breakeven_bbl, on the column beside it ──────
+      // These are the SAME three countries. A bare `d.swing` wrote 0 into the Swing column for
+      // Saudi Arabia, Kuwait and Bahrain, so sorting Swing_pp ascending in Excel put the three
+      // regimes with no contractor position at ranks 1, 2 and 3 of 185 — above every country
+      // that has one — in the workbook an analyst attaches to an IC memo. Withdrawn to null with
+      // the reason in its own column, exactly as Breakeven_Tested does one line above.
+      // Swing_Basis also names the comparable figure on the 11 fee-blended countries, so the
+      // spreadsheet carries what the screen does rather than a number whose basis was dropped
+      // at the export boundary. Published blend stays in Swing_pp: it is the figure printed
+      // everywhere else on the platform, and the basis column says when it is not rankable.
+      Swing_pp: _swX.monopoly ? null : _swX.head,
+      Swing_Comparable_pp: _swX.diverges ? _swX.cmp : null,
+      Swing_Basis: _swX.monopoly
+        ? 'n/a — no contractor position (state-monopoly placeholder take at all four prices)'
+        : _swX.head === null ? 'not computed'
+        : _swX.diverges ? 'published blend includes fee-basis contracts — rank on Swing_Comparable_pp'
+        : 'published',
       // ── v879 (T5): the citable figure, not the withdrawn one ──────────────────────
       // Was `fp` bare, with a basis string ("one statutory term — spread component not
       // exercised") that reads as a technical footnote. On 45 of the 160 scoreable countries
