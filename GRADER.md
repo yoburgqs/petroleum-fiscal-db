@@ -56030,3 +56030,107 @@ have the IC reader see the **cause** of the take spread, not just the spread.
 - `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both
   `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`).
   Carried from 793.
+
+---
+
+## Cycle 795 — shipped as v886 (`80a9483`), pushed, mirror in sync
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"*
+(794 was T5, 793 T6, 792 T2, 791 T1, 790 T3.)
+
+## Friction
+Walked T4 cold over `http://localhost:8777` — no sessionStorage, no localStorage —
+Home → Reform Risk → **Check one country**. The per-country card is otherwise the most
+developed surface on the platform: the no-coverage path (164 of 185) names the statute
+ORCA read the terms out of and refuses to print a zero premium, and the direction logic
+withholds a tilt the unmeasured events could overturn.
+
+The worst moment is one line, in `renderReformCountryVerdict()` (was index.html:47202).
+It printed **"Most recent change (YYYY): …"** from `latest` — the newest event of **any**
+kind. `latest` is not filtered by `_rrIsFiscalChange`, so on a jurisdiction whose newest
+entry is context it asserted a fiscal change that never happened. It is the only
+plain-English sentence sitting between the stat tiles and the event log, so it is the
+line an analyst in a hurry actually reads.
+
+**3 of the 21 covered jurisdictions printed a false fiscal change on a cold load:**
+
+| Country | Printed | Truth | Scored changes since 2010 |
+|---|---|---|---|
+| **Guyana** | `Most recent change (2022): Govt commission reviews Stabroek terms` | Commission concluded **without** renegotiation; the 1999 Stabroek PSA has never been reopened. **Zero** fiscal law changes on record at any date | 0 |
+| **Libya** | `Most recent change (2020): LNA blockade lifted` | A blockade is not a statute. Buried the real answer — EPSA-IV, 2004 | 0 |
+| **Ghana** | `Most recent change (2016): TEN production start + ITLOS ruling` | Production milestone + maritime boundary ruling. **Zero** fiscal law changes at any date | 0 |
+
+Guyana is the sharp case: it is the hottest IOC screening jurisdiction on the board, and
+the card printed **100/100** and **"Reforms since 2010: 0"** in the tile strip, then
+contradicted both one line below.
+
+This was already a *known* defect on the other side of the same card. `_icReformLine`
+(v585, index.html:25752) carries the comment *"The tab's own card calls it 'Most recent
+change'; in a pasted memo that would assert a fiscal change that did not happen"* and
+guards against it. A prior cycle found the bug, fixed the **clipboard**, and left the
+**screen** wrong — so the paste had been telling the truth about a card that wasn't.
+
+A second, quieter case: **Algeria (2005), Colombia (2007), USA (2007)** each score 100
+purely because their most recent change predates the 2010 window. The line named the year
+without saying it fell outside the window, so a 100 read as an untouched regime.
+
+## Change
+New **`_rrLatestLine(events, latest)`** replaces the inline expression.
+
+- **Newest event is context** → `Most recent sourced event (YYYY) — not a fiscal change:`
+  in orange, carrying its `context_kind`, then a second clause answering the question that
+  was actually asked: the most recent **real** fiscal change (Libya → 2004 EPSA-IV), or
+  `No fiscal law change on record at any date` plus the explicit statement that the score
+  is carried entirely by events that never touched the law — *"an absence of recorded
+  change, not a record of stability."*
+- **Newest event is a fiscal change** → `Most recent fiscal change (YYYY)`, and when it
+  predates 2010, ` — before the 2010 scoring window, so it does not score`.
+- An unquantified move now prints `take move not quantified` instead of rendering blank.
+
+No threshold invented, no data changed, nothing in STILL LOCKED touched.
+
+## Result
+The analyst can no longer carry "Guyana last changed its fiscal terms in 2022" into an IC
+memo off this card. It now reads that no fiscal law change exists on record at any date,
+and that this is missing evidence rather than a clean track record. Libya names 2004
+rather than a blockade. Algeria/Colombia/USA declare that their 100 is a window artefact.
+Screen and clipboard agree for the first time.
+
+## Verification (all run this cycle, none assumed)
+- **JS syntax gate PASS** on the shipped file (11 inline script blocks extracted, `node --check`).
+- **Runtime suite RAN twice** against the local tree over `http://localhost:8777`, swapping
+  `index.html` in place so only the file under test differed: **317 PASS / 0 FAIL / 1 WARN**
+  before and after. `diff` of the **318** sorted per-check lines is **EMPTY**. The 1 WARN /
+  1 JS error is the localhost service-worker 404, present identically on the unmodified file.
+  *(The first diff attempt matched 0 lines on both sides — the grep pattern was wrong, not
+  the result. Caught and redone against the real `✓ [PASS] [Section] name` format. Recorded
+  because a false green is the exact failure mode this directive exists to prevent.)*
+- **`pixel_audit.js` PASS** — no surface worse than baseline. The 5 findings are pre-existing
+  baseline entries; none is in Reform Risk.
+- **Mobile 390x844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390 on both Guyana
+  and Libya, no control under 24px inside the verdict, 0 page errors.
+- **All 6 render paths checked live**: Guyana + Ghana (context newest, no fiscal change at any
+  date), Libya (context newest, 2004 real change named), Algeria (pre-2010 change marked),
+  Nigeria (in-window, unquantified), Norway (in-window, +12pp).
+
+## Also walked, no change needed
+- The **no-coverage path** (164 of 185 — Saudi Arabia, Qatar): names the sourced statute,
+  states whether its most recent year falls inside or outside the window, and refuses to
+  print a zero premium. Saudi Arabia correctly withholds the Predictability score entirely
+  on a 100%-take state monopoly. No friction found.
+- **Regional Reform Tilt** table: every row prints its `n of N sourced` denominator and
+  withholds a direction word where the unmeasured count could overturn it.
+- `copyReformVerdict` TSV — already correct, which is how this bug was located.
+
+## Carried forward
+- `▶ Run FC at this price` (`#cp-run-fc-btn`) reads `cp-price-select` and writes to `#price`
+  — **neither element exists**. Double no-op, hidden until arrival from FC. Now carried from
+  785/790/791/792/793/794/795. This is a dead control, not a cosmetic issue; it deserves a
+  cycle of its own.
+- Saved-scenario table still has no `Δ vs. Base` column and no clipboard path (⬇ Export XLSX
+  only) — the natural next T5, and the data to compute Δ now exists after v885.
+- Side-by-Side `Take spread across contracts` not re-based on fee-blended columns (Iraq prints
+  `65.0–98.5% (33.5pp)`). Carried from 790–794.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both
+  `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`).
+  Carried from 793/794.
