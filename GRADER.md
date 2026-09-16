@@ -55342,3 +55342,16 @@ EPL extension to March 2030 rather than its superseded 2023 rate.
 - The Reform Risk tab itself, the per-country lookup, the CP reform sidebar and the FC Reform
   verdict column were all walked cold this cycle and no friction worse than the above was found in
   them — the gap was the surface that never called into them.
+
+---
+## Cycle 789 Log — 2026-09-15 22:08
+- Test before: 318 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 788 complete — shipped as **v880** (`7e59425`), grader log `c561588`, both pushed, mirror in sync.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; the previous cycle v879 was T5, last T4 was 782.)
+
+## Friction
+Asked at book level, T4 lands on **IOC Portfolio** — the tab literally titled *"IOC Portfolio — Fiscal Exposure."* Walked cold on the seeded Shell portfolio (884 contracts, 31 countries), the country table carried exactly **one** reform
