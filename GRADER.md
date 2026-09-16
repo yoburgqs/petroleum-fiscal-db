@@ -56257,3 +56257,104 @@ not re-derived from the changelog and it was not taken on trust.
 **Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (795 was T4.)
 
 **Friction:** Walked cold — Fiscal Compare → price **$100/bbl** → Run Compare → Norway (row 57) → Full Profile. FC's citable columns rank Norway at **72.4% take / $1.27B NPV**. The profile that opens reads **68.0% / $826M** — and directly above that headline the nav bar prints `#57 of 185 — Norway`, a rank produced by the $100 run. Two prices
+
+---
+## Cycle 798 Log — 2026-09-16 09:3x
+- Test before: 317 PASS / 0 FAIL / 1 WARN
+- Test after: 317 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 (the 1 captured is the pre-existing local-server 404)
+- Summary: **Cycle 798 — shipped as v888 (`795087a`), pushed, mirror in sync.**
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* T5 was the stalest
+(797 was T2, 795/794 T4, 793 T6, 792 T2, 791 T1, 790 T3).
+
+## Friction
+Walked cold at 1440×900 with `localStorage` and `sessionStorage` cleared: Home → Scenario
+Builder → **Run DCF** on the default Concession → save "Base case" → royalty 10→18 and SPT
+0→20 → **Run DCF** → save "Royalty+SPT reform" → price 75→55 → **Run DCF** → save
+"Downside $55". Three rows, which is exactly the shape of an IC sensitivity appendix — and
+`_exportScenariosXLSX()`'s own comment already calls the saved set that.
+
+At the moment the analyst turns those rows into memo text, `_refreshSavedTable()` failed twice.
+
+**It printed absolute takes and no delta.** The table read 22.2% / 36.3% / 30.7%. The appendix
+exists to say what the reform *costs*; the analyst had to subtract by hand. And the rows differ
+on **both** price and fiscal terms with nothing saying so — read down the Govt Take column and
+take **falls** from 36.3% to 30.7% between the reform row and the downside row, which reads as
+the reform getting cheaper when only the price moved. A hand-computed row-to-row delta charges
+a price effect to the fiscal change. That is the sentence that reaches the memo, and nothing on
+the screen stopped it.
+
+**It was the only IC-facing table on the platform with no clipboard route.** Screener
+(`screener-copy-ic-btn`), Fiscal Compare (`cmp-copy-table-btn`), Side-by-Side, IOC Portfolio
+(`ioc-copy-ic-btn`), Country Profile (`dd-ic-summary-btn`) and Reform Risk (`rr-copy-verdict`)
+all carry **Copy for IC Memo**. The saved-scenario card offered `⬇ Export XLSX` and `Clear All`
+and nothing else, so the appendix reached Word via a download, an Excel open, a range select
+and a paste.
+
+## Change
+- **New `Δ vs. Base` column**, between Govt Take and IRR. The first saved scenario is the base
+  and now wears a **BASE** pill in its Name cell — an unlabelled base is *why* the column could
+  be read row-to-row. Every other row prints Δ take in pp and Δ NPV, with the driver named
+  beneath it in 10px muted type.
+- **The column refuses to attribute a delta it cannot attribute.** `_sbDeltaVsBase()` classifies
+  each row against the base as `fiscal` / `price` / `both` / `basis`. Only a terms-only move gets
+  the green-red read; a row that moved price **and** terms prints `⚠ price + terms` deliberately
+  uncoloured, and a row on a different mechanic or production profile prints `n/a` with
+  `⚠ different mechanic` rather than a subtraction of two unlike numbers.
+- **New `⎘ Copy for IC Memo`** — the same two-flavour write every other surface uses: `text/html`
+  so Word / Docs / Outlook / PowerPoint get a real table, `text/plain` TSV so Excel gets columns,
+  with `writeText` fallback. It carries the deltas, the `What changed vs. base` column, the fiscal
+  terms each row ran on, and six numbered assumption notes. The two `⚠` notes are emitted **only**
+  when a row actually triggers them, so the caveat means something when it appears.
+- **XLSX gains the same three columns off the same readers** (`_sbDeltaVsBase`, `_sbDeltaDriver`),
+  so the screen and the workbook cannot state different deltas or attribute one differently —
+  the exact drift v885 fixed for the parameter columns. Methodology documents both new entries.
+- `_sbFiscalSig()` reads `_sbParamSet()`, v885's single reader, so the delta's idea of "the terms
+  changed" and the Key Parameters cell's idea of what the terms *were* cannot diverge.
+
+Within the locked list: no new tooltip on an existing control (the two new `title`s are on the
+two new controls), no page-sub paragraph, no amber instructional banner, no routing hint, no new
+FAQ, tab order unchanged, `#reference-panel` untouched, v612 mobile layer untouched.
+
+## Result
+The analyst reads the cost of the fiscal change off the table instead of computing it, is
+actively stopped from quoting a delta that mixes a price move with a fiscal one, and lands the
+whole appendix in the memo with one click, caveats attached. Previously the same three rows
+supported a confident and wrong sentence — "the reform costs 5.6pp less at $55" — that the
+screen did nothing to prevent, and the only way out of the table was a file download.
+
+## Verification (all run this cycle, none assumed)
+- **JS syntax gate PASS** — 11 inline blocks extracted, `node --check`, 0 failures; re-run after
+  the v887→v888 bump (10 occurrences, 0 left behind).
+- **Runtime suite RAN twice** against the local tree over `http://localhost:8777`, swapping
+  `index.html` in place so only the file under test differed: **317 PASS / 0 FAIL / 1 WARN**
+  before and after, and `diff` of the two report bodies (timestamp excluded) is **EMPTY**. The
+  1 WARN is the pre-existing local-server 404, present in both runs.
+- **`pixel_audit.js` PASS** — no surface worse than baseline. The 5 findings are pre-existing
+  baseline entries (thome, t0, t7); none is in the Scenario Builder.
+- **Mobile 390×844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390, 0 page errors,
+  both new buttons above the floor at 36px and 39px. The saved table scrolls inside its own
+  `#sb-saved-table { overflow-x: auto }` wrapper, which predates this cycle; the document does
+  not scroll sideways.
+- **All five delta kinds exercised live, not reasoned about** — base (`— base —` + BASE pill),
+  terms-only (`+14.1pp −$1.43B`, coloured), price+terms (`+8.4pp`, `⚠ price + terms`,
+  uncoloured, note 3 fired), price-only (`$75→$95 price only`), different mechanic (`n/a`,
+  `⚠ different mechanic`, note 4 fired).
+- **Clipboard read back** with `navigator.clipboard.readText()` after a real button click and
+  checked line by line; button label cycled to `✓ Copied!`.
+- **XLSX downloaded and opened with `openpyxl`** — 2 sheets, deltas present as real numbers
+  (`14.09`, `-1425.9`), driver strings intact, Methodology carries both new entries. Directive
+  finalization item 5 holds for this export.
+
+## Carried forward
+- Side-by-Side `Take spread across contracts` not re-based on fee-blended columns (Iraq prints
+  `65.0–98.5% (33.5pp)`). Carried from 790–797.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–797.
+- The two suite copies remain diverged — `office/tools/petroleum/tests/runtime_comprehensive.js`
+  (the one that runs and is graded) vs `petroleum-fiscal-db/tests/` (idle). `autonomous_cycle.py`
+  warns every cycle and nothing acts on it. Carried from 797.
+- **New:** the base case is fixed to the first saved scenario with no way to re-designate it.
+  An analyst who saves the downside first gets every delta measured against it. A "set as base"
+  control on each row is the natural next T5.
