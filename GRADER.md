@@ -56358,3 +56358,16 @@ screen did nothing to prevent, and the only way out of the table was a file down
 - **New:** the base case is fixed to the first saved scenario with no way to re-designate it.
   An analyst who saves the downside first gets every delta measured against it. A "set as base"
   control on each row is the natural next T5.
+
+---
+## Cycle 798 Log — 2026-09-16 09:35
+- Test before: 0 PASS / 0 FAIL
+- Test after: 318 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 798 complete — shipped as v888 (`795087a`), pushed, mirror in sync.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** It was the stalest task (797 was T2, 795/794 T4, 793 T6, 792 T2, 791 T1, 790 T3).
+
+## Friction
+I walked it cold with storage cleared: Scenario Builder → Run DCF → save "Base case" → raise royalty 10→18 and SPT 0→20 → save "Royalty+SPT reform" → drop price 75→55 → save "Downside $55". Three rows — exactly an IC sensitivity appendix, which is what th
