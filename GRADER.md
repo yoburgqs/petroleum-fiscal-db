@@ -56147,3 +56147,102 @@ Screen and clipboard agree for the first time.
 
 ## Friction
 Walking Reform Risk cold → **Check one country**, the card's one plain-English sentence between the stat tiles and the event log read **"Most recent change (YYYY): …"**. It was built from `latest` — the newest event of *any* kind — and never filtered by `_rrIsFiscalChange`. So on jurisdictions whose newe
+
+---
+## Cycle 797 Log — 2026-09-16 12:25
+- Test before: 317 PASS / 0 FAIL / 1 WARN (local, http://localhost:8777)
+- Test after: 317 PASS / 0 FAIL / 1 WARN — diff of the 318 sorted check lines EMPTY
+- JS errors: 1 (localhost service-worker 404, identical on the unmodified file)
+- Summary: Cycle 797 complete — shipped as v887, pushed, mirror in sync.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(795 was T4, 794 T5, 793 T6, 792 T2, 791 T1, 790 T3.)
+
+## Friction
+Walked cold: Fiscal Compare → price **$100/bbl** → Run Compare → Norway (row 57) → Full Profile.
+
+FC's citable columns rank Norway at **72.4% take / $1.27B NPV** at $100. The profile that opens
+reads **68.0% / $826M**. Directly above that headline the nav bar prints `#57 of 185 — Norway`,
+a rank produced by the $100 run. Two different prices sat adjacent on screen with nothing naming
+either as the other's basis. Everything downstream on the profile is $75 — the 61–75% tier band,
+the NPV rank inside that band, the peer set, the fiscal-character verdict, and the IC memo line
+(`take@$75 68.0% … NPV $826M @$75`). An analyst who screened at $100 and drilled in to defend the
+screen was reading, and quoting, a $75 page. **4.4pp and $444M apart on Norway alone**; Guyana is
+7.6pp and $438M.
+
+Two further defects in the same widget, found on the same walk:
+- `#cp-run-fc-btn`, labelled **"▶ Run FC at this price"**, read `#cp-price-select` and wrote the
+  value to `#price`. **Neither element has ever existed** — a double no-op on a page that carries
+  no price control, so both halves of the label were false. Carried unfixed since cycle 785.
+- `_fcNavBarUpdate()` ran only on arrival from FC and on Prev/Next. Changing country with the
+  dropdown left the bar reading `#57 of 185 — Norway` above a Guyana profile, and `Next →` then
+  stepped from Norway's index through the $100-ordered list.
+
+## Change
+- **New `#cp-price-basis` strip** inside the FC nav bar (`_cpPriceBasisUpdate()`, ~line 56955),
+  rendered **only** when the last Fiscal Compare *run* was at a price other than $75 — read from
+  `window._fcLastPrice`, the price of the run, not the current state of the `#fc-price` select,
+  which can be moved without re-running. It prints:
+  `⚠ Ranked at $100/bbl — this profile reads $75/bbl` /
+  `Norway at $100: 72.4% take (+4.4pp vs the 68.0% below) · $1.27B NPV (+$444M vs $826M)` /
+  `The rank beside it is the $100 ordering. Everything below — tier, NPV rank, peers, IC line — is $75.`
+  Figures come from `COUNTRY_DATA.take_N` / `npv_N` — the same fields FC's `DB · CITABLE` columns
+  print — so the strip cannot disagree with the table the analyst arrived from. A **state monopoly**
+  withholds both rather than rendering `$0M NPV (+$0M vs $0M)` (Saudi Arabia at $125).
+- **The dead button now works.** `_cpReRankAtBase()` sets `#fc-price` to 75, switches to FC and
+  re-runs. Its label switches to **"▶ Re-rank all 185 at $75"** and its border goes orange while
+  the two bases differ; back to "▶ Re-run FC at $75" once they agree.
+- **`_fcNavBarUpdate()` re-derives its index from `#dd-country-select`** on every profile load, and
+  `loadCountryProfile()` now calls it — every entry point (dropdown, peer row, regional row, deep
+  link, FC drawer, Prev/Next) routes through there. The rank now always names the country on screen,
+  and the bar hides itself for a country outside the FC list rather than printing a stale rank.
+
+Nothing in STILL LOCKED touched: no page-sub paragraph, no amber instructional banner, no routing
+hint, no new tooltip on an existing control, tab order unchanged, `#reference-panel` untouched.
+
+## Result
+At the moment of drill-in the analyst sees that the rank above and the profile below are on
+different prices, reads the country's own take and NPV at the price they actually screened at, and
+puts the whole screen on one basis with one click. Previously they had to notice a 4.4pp
+discrepancy between two adjacent numbers on their own, and the one control that looked like it
+would reconcile them did nothing at all.
+
+## Verification (all run this cycle, none assumed)
+- **JS syntax gate PASS** — 11 inline blocks extracted, `node --check`, 0 failures, re-run after
+  the version bump.
+- **Runtime suite RAN twice** against the local tree over `http://localhost:8777`, swapping
+  `index.html` in place so only the file under test differed: **317 PASS / 0 FAIL / 1 WARN** before
+  and after; `diff` of the **318** sorted per-check lines is **EMPTY**.
+- **`pixel_audit.js` PASS** — no surface worse than baseline. The 5 findings are pre-existing
+  baseline entries; none is on the Country Profile nav bar.
+- **Mobile 390×844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390 on both Fiscal
+  Compare and the profile with the strip open; 0 elements in the nav bar overflowing the viewport;
+  `#cp-run-fc-btn` 24px; 0 page errors.
+- **Live walk, not inferred**: FC@$100 → Norway (strip renders, 72.4%/$1.27B, deltas correct) →
+  dropdown to Guyana (bar re-ranks to `#32`, strip re-computes to 61.7%/+7.6pp) → `Next →`
+  (`#33 — Cambodia`, dropdown follows) → re-rank button (`_fcLastPrice` 75, FC tab active) →
+  back to Norway (strip hidden, button label reverted).
+- **Strip claims checked against the rendered page**, since a reconciliation that lies is worse
+  than none: the profile's verdict, tier line, contract-spread line and IC citation all print
+  68.0%/$826M/@$75, and the page's own 4-price sensitivity table prints `$100  72.4%  +13.1pp
+  $1.27B` — the same numbers the strip cites.
+
+## Authorship
+The `index.html` edit was written by **cycle 796**, which hit the 1800s `subprocess` timeout after
+writing and before verifying, committing or pushing (traceback in `cycle_log.txt`, 05:47–06:17).
+Cycle 797 found it uncommitted in the working tree, walked the flow live, verified every figure in
+the strip against the rendered page, ran all four gates, bumped v886 → v887 and shipped it. It was
+not re-derived from the changelog and it was not taken on trust.
+
+## Carried forward
+- Saved-scenario table still has no `Δ vs. Base` column and no clipboard path (⬇ Export XLSX only)
+  — the natural next T5. Carried from 795.
+- Side-by-Side `Take spread across contracts` not re-based on fee-blended columns (Iraq prints
+  `65.0–98.5% (33.5pp)`). Carried from 790–795.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793/794/795.
+- **New:** the two suite copies have diverged — `office/tools/petroleum/tests/runtime_comprehensive.js`
+  (sha f1fc29acfd90, the one that runs and is graded) vs `petroleum-fiscal-db/tests/` (sha 4e5ab03c626c,
+  idle). `autonomous_cycle.py` prints this warning every cycle and nothing acts on it. Edits to the
+  repo copy do not affect any gate.
