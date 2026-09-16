@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v887</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v888</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v887</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v888</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4218,12 +4218,12 @@ window.copyPlatformCitation = function(btn) {
     <span id="fc-nav-label" style="font-size:11px;color:var(--muted);white-space:nowrap;"></span>
     <button id="fc-nav-next" onclick="fcNavStep(1)" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;" title="Next country in Fiscal Compare list">Next &#8594;</button>
     <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));" style="background:transparent;border:none;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:4px;" title="Return to Fiscal Compare results">&#8617; Back to FC</button>
-    <!-- v887 (T2): was "Run FC at this price" — it read a #cp-price-select that has never existed
+    <!-- v888 (T2): was "Run FC at this price" — it read a #cp-price-select that has never existed
          and wrote the price to a #price that has never existed either, so both halves of the label
          were false: there is no price control on this page, and it set none. It now names the one
          price it can actually put the screen on; the basis strip below says why that matters. -->
     <button id="cp-run-fc-btn" onclick="_cpReRankAtBase()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:4px 10px;min-height:24px;font-weight:600;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at">&#9654; Re-run FC at $75</button>
-    <!-- v887 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
+    <!-- v888 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
          Fiscal Compare run was at a price other than the $75 this profile is computed at. -->
     <div id="cp-price-basis" style="flex-basis:100%;display:none;"></div>
   </div>
@@ -43662,7 +43662,7 @@ function loadCountryProfile(country) {
     chartWrap.style.display = 'none';
   }
 
-  // v887 (T2): every entry point into a profile routes through here — dropdown, peer row, regional
+  // v888 (T2): every entry point into a profile routes through here — dropdown, peer row, regional
   // row, deep link, FC drawer, Prev/Next — so this is the one place the FC nav bar and the price-
   // basis strip can be kept pointed at the country actually on screen.
   if (typeof _fcNavBarUpdate === 'function') _fcNavBarUpdate();
@@ -52809,7 +52809,8 @@ function _exportScenariosXLSX() {
   // which applied to none of them. The blank now travels with its reason, and beside the two
   // figures that decide the hurdle question for 100% of runs.
   var rows = [['Scenario Name', 'Mechanic', 'Profile', 'Price ($/bbl)',
-    'Govt Take (%)', 'Contractor IRR (%)', 'IRR Basis', 'Contractor NPV @10% ($M)',
+    'Govt Take (%)', 'Delta Govt Take vs. base (pp)', 'Delta NPV @10% vs. base ($M)',
+    'What changed vs. base', 'Contractor IRR (%)', 'IRR Basis', 'Contractor NPV @10% ($M)',
     'Contractor NPV @15% ($M)', 'Clears 15% Hurdle', 'Capital at Risk ($M)', 'Payback Year',
     'Royalty (%)', 'CIT (%)', 'Profit Oil (Govt %)', 'Profit Oil (Ctct %)',
     'Cost Recovery (%)', 'FTP (%)', 'State Equity (%)', 'Other Terms']];
@@ -52821,17 +52822,25 @@ function _exportScenariosXLSX() {
     'computed':           'Computed from the contractor cash flow at 100% WI, pre-tax, unlevered.',
     'unknown':            'Not determinable — this mechanic did not publish a contractor cash flow.'
   };
+  // v888 (T5): same base and the same _sbDeltaVsBase()/_sbDeltaDriver() readers the on-screen
+  // table uses, so the workbook and the screen cannot state different deltas or attribute one
+  // differently -- the failure mode v885 fixed for the parameter columns.
+  const _xBase = saved[0];
   for (const s of saved) {
     const r = s.result;
     const p = s.params || {};
     const _sp = _sbParamSet(p, s.mech);
+    const _xd = _sbDeltaVsBase(_xBase, s);
     const rd = s.reading || { state: 'unknown', npv15: null, atRisk: null, payback: null };
     rows.push([
-      s.name,
+      s.name + (s === _xBase ? ' (base)' : ''),
       s.mech,
       (DCF_PROFILES[s.profileKey] && DCF_PROFILES[s.profileKey].name) || s.profileKey,
       s.price,
       r.take != null ? +r.take.toFixed(2) : '',
+      (_xd.kind === 'base') ? '' : (_xd.kind === 'basis' || _xd.dTake == null) ? 'n/a' : +_xd.dTake.toFixed(2),
+      (_xd.kind === 'base') ? '' : (_xd.kind === 'basis' || _xd.dNpv == null) ? 'n/a' : +_xd.dNpv.toFixed(1),
+      _sbDeltaDriver(_xd),
       (r.irr != null && r.irr < 500) ? +r.irr.toFixed(2) : '',
       _irrBasis[rd.state] || _irrBasis.unknown,
       r.npv != null ? +r.npv.toFixed(1) : '',
@@ -52857,6 +52866,8 @@ function _exportScenariosXLSX() {
     [],
     ['Column definitions:'],
     ['Govt Take (%)', 'Government share of project economics: royalties + taxes + profit oil at the stated price'],
+    ['Delta columns', 'Measured against the FIRST saved scenario, which is the base case and is marked "(base)" in the Scenario Name column. This row minus the base row. A positive Delta Govt Take means government takes more than in the base case.'],
+    ['What changed vs. base', 'What actually moved between that row and the base: fiscal terms only, price only, or both. READ THIS BEFORE QUOTING A DELTA. Where both price and terms moved, the delta is the combined effect and must not be quoted as the cost of the fiscal change — to isolate a fiscal change, hold price constant between the two rows. Where the row runs a different mechanic or production profile it is a separate project rather than a sensitivity, and its delta reads n/a. Until v888 neither this column nor the deltas existed on any surface: the set printed absolute takes only, so a reader subtracting adjacent rows by hand could charge a price move to a fiscal one.'],
     ['Contractor IRR (%)', 'Pre-tax, unlevered IRR at 100% WI. BLANK does not mean missing data — read the IRR Basis cell beside it. An IRR does not exist wherever the contractor funds no negative year, which is the usual outcome for a cost-recovery regime on these profiles.'],
     ['IRR Basis', 'Why the IRR cell reads what it reads, derived from the contractor cash flow for that scenario. Do not quote an IRR into an IC memo without this cell.'],
     ['Contractor NPV @10% ($M)', 'NPV at the profile discount rate (10%), 100% WI basis'],
@@ -52873,12 +52884,206 @@ function _exportScenariosXLSX() {
   var ws = XLSX.utils.aoa_to_sheet(rows);
   var wsMeth = XLSX.utils.aoa_to_sheet(methRows);
   // Column widths
-  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14},{wch:46}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:26},{wch:26},{wch:52},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14},{wch:46}];
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Scenarios');
   XLSX.utils.book_append_sheet(wb, wsMeth, 'Methodology');
   XLSX.writeFile(wb, 'ORCA_scenarios_' + new Date().toISOString().slice(0,10) + '.xlsx');
   showCopyToast('Scenarios exported to XLSX.');
 }
+
+/* ── v888 (T5) — "give me something I can paste straight into an IC memo." ───────────────
+   Walked cold: Scenario Builder → Run DCF → save "Base case" → royalty 10→18, SPT 0→20 →
+   save "Royalty+SPT reform" → price 75→55 → save "Downside $55". The saved set IS the IC
+   sensitivity appendix — the block above says so in its own comment — and at the moment the
+   analyst turns it into memo text it did two things wrong.
+
+   It printed three absolute takes (22.2 / 36.3 / 30.7) and no delta. The appendix exists to
+   say what the reform COSTS, so the analyst subtracted by hand. Worse, the rows differed on
+   BOTH price and fiscal terms and nothing said so: read down the Govt Take column and take
+   FALLS from 36.3% to 30.7% between the reform row and the downside row, which reads as the
+   reform getting cheaper when only the price moved. A hand-computed row-to-row delta charges
+   a price effect to the fiscal change — and that is the sentence that reaches the memo.
+
+   It was also the only IC-facing table on the platform with no clipboard route. Screener,
+   Fiscal Compare, Side-by-Side, IOC Portfolio, Country Profile and Reform Risk all carry
+   "Copy for IC Memo"; this one offered an XLSX file download only, so the appendix reached
+   Word via a save, an Excel open, a range select and a paste.
+
+   Both are the same moment, so both are fixed here: a Δ vs. Base column that names its own
+   driver and REFUSES to attribute a delta it cannot attribute, and the same two-flavour
+   clipboard write every other surface uses. */
+
+// Signature of the fiscal terms a scenario was actually run on. Reads _sbParamSet(), the
+// single reader v885 introduced, so the delta's idea of "the terms changed" and the Key
+// Parameters cell's idea of what the terms were cannot diverge.
+function _sbFiscalSig(s) {
+  var o = _sbParamSet(s.params, s.mech);
+  return [o.royalty, o.cit, o.govtProfitOil, o.costRecovery, o.ftp, o.stateEquity, o.otherStr].join('|');
+}
+
+function _sbDeltaVsBase(base, s) {
+  if (base === s) return { kind: 'base' };
+  // A different mechanic or a different production profile is not a sensitivity on the base —
+  // it is a different project. Say so rather than print a subtraction of two unlike numbers.
+  if (base.mech !== s.mech || base.profileKey !== s.profileKey) {
+    return { kind: 'basis', mech: base.mech !== s.mech, profile: base.profileKey !== s.profileKey };
+  }
+  var priceMoved  = (+base.price !== +s.price);
+  var fiscalMoved = (_sbFiscalSig(base) !== _sbFiscalSig(s));
+  return {
+    kind: (priceMoved && fiscalMoved) ? 'both' : priceMoved ? 'price' : fiscalMoved ? 'fiscal' : 'identical',
+    dTake: (s.result.take != null && base.result.take != null) ? (s.result.take - base.result.take) : null,
+    dNpv:  (s.result.npv  != null && base.result.npv  != null) ? (s.result.npv  - base.result.npv)  : null,
+    fromPrice: base.price, toPrice: s.price
+  };
+}
+
+// Plain-language driver, shared by the cell and the clipboard so the pasted table carries the
+// same refusal the screen does.
+function _sbDeltaDriver(d) {
+  if (!d) return '';
+  if (d.kind === 'base')      return 'base case';
+  if (d.kind === 'basis')     return d.mech ? 'different mechanic — not a sensitivity on the base'
+                                            : 'different production profile — not a sensitivity on the base';
+  if (d.kind === 'fiscal')    return 'fiscal terms only';
+  if (d.kind === 'price')     return 'price only ($' + d.fromPrice + ' → $' + d.toPrice + '/bbl)';
+  if (d.kind === 'both')      return 'price AND fiscal terms both moved — delta not attributable to either';
+  return 'same inputs as base';
+}
+
+function _sbDeltaCell(d) {
+  if (!d || d.kind === 'base') return '<span style="color:var(--muted);font-size:10px;">— base —</span>';
+  var drv = _sbDeltaDriver(d), ttl = drv.replace(/"/g, '&quot;');
+  if (d.kind === 'basis') {
+    return '<div title="' + ttl + '" style="line-height:1.45;"><span style="color:var(--muted);">n/a</span>'
+      + '<br><span style="color:var(--orange);font-size:10px;">⚠ ' + (d.mech ? 'different mechanic' : 'different profile') + '</span></div>';
+  }
+  var tk = d.dTake, nv = d.dNpv;
+  // A delta the analyst cannot attribute is not a finding. It is printed, but it is not
+  // coloured as one — only a terms-only move gets the green/red read.
+  var col = (d.kind !== 'fiscal') ? 'var(--muted)'
+          : tk > 0.05 ? 'var(--negative)' : tk < -0.05 ? 'var(--positive)' : 'var(--muted)';
+  var takeStr = tk == null ? '—' : (tk >= 0 ? '+' : '−') + Math.abs(tk).toFixed(1) + 'pp';
+  var npvStr  = nv == null ? '' : (nv >= 0 ? '+' : '−') + fmtNpvShared(Math.abs(nv));
+  var tag = d.kind === 'fiscal' ? 'terms only'
+          : d.kind === 'price'  ? '$' + d.fromPrice + '→$' + d.toPrice + ' price only'
+          : d.kind === 'both'   ? '⚠ price + terms'
+          : 'same inputs';
+  return '<div title="' + ttl + '" style="line-height:1.45;">'
+    + '<span style="color:' + col + ';font-weight:700;">' + takeStr + '</span>'
+    + (npvStr ? ' <span style="color:var(--muted);font-size:10px;">' + npvStr + '</span>' : '')
+    + '<br><span style="color:' + (d.kind === 'both' ? 'var(--orange)' : 'var(--muted)') + ';font-size:10px;">' + tag + '</span></div>';
+}
+
+// Two flavours, matching every other Copy-for-IC-Memo control on the platform: text/html so
+// Word / Docs / Outlook / PowerPoint receive a real table, text/plain TSV so Excel receives
+// columns. Carries the delta column, its attribution, the terms each row was run on, and the
+// assumptions behind the numbers — an appendix that arrives without its basis is not usable.
+function _copyScenariosForIC() {
+  var saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
+  if (!saved.length) { _icRefuse('No saved scenarios to copy — run a DCF and save it first.'); return; }
+  function E(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var base = saved[0];
+  var HEAD = ['Scenario', 'Mechanic', 'Profile', 'Price ($/bbl)', 'Govt Take (%)',
+              'Δ Govt Take vs. base (pp)', 'Contractor NPV @10% ($M)', 'Δ NPV @10% vs. base ($M)',
+              'Contractor NPV @15% ($M)', 'Clears 15% hurdle', 'Contractor IRR (%)',
+              'What changed vs. base', 'Fiscal terms as run'];
+  var body = [], anyBoth = false, anyBasis = false, anyNoIrr = false;
+  for (var i = 0; i < saved.length; i++) {
+    var s = saved[i], r = s.result, rd = s.reading || {}, d = _sbDeltaVsBase(base, s);
+    if (d.kind === 'both')  anyBoth  = true;
+    if (d.kind === 'basis') anyBasis = true;
+    var irrCell;
+    if (rd.state === 'no-capital-at-risk') { irrCell = 'no IRR — no contractor capital at risk'; anyNoIrr = true; }
+    else if (rd.state === 'uneconomic')    { irrCell = 'no IRR — cash flow never turns positive'; anyNoIrr = true; }
+    else if (rd.state === 'unbounded')     { irrCell = '>500% — exceeds solver bound'; anyNoIrr = true; }
+    else if (r.irr != null && r.irr < 500) { irrCell = r.irr.toFixed(1); }
+    else                                   { irrCell = 'not determinable'; anyNoIrr = true; }
+    body.push([
+      s.name + (i === 0 ? ' (base)' : ''),
+      s.mech,
+      (DCF_PROFILES[s.profileKey] && DCF_PROFILES[s.profileKey].name) || s.profileKey,
+      s.price,
+      r.take != null ? r.take.toFixed(1) : '—',
+      (d.kind === 'base') ? '—' : (d.kind === 'basis' || d.dTake == null) ? 'n/a'
+        : ((d.dTake >= 0 ? '+' : '−') + Math.abs(d.dTake).toFixed(1)),
+      r.npv != null ? r.npv.toFixed(1) : '—',
+      (d.kind === 'base') ? '—' : (d.kind === 'basis' || d.dNpv == null) ? 'n/a'
+        : ((d.dNpv >= 0 ? '+' : '−') + Math.abs(d.dNpv).toFixed(1)),
+      rd.npv15 != null ? rd.npv15.toFixed(1) : '—',
+      rd.npv15 == null ? '—' : (rd.npv15 > 0 ? 'Yes' : 'No'),
+      irrCell,
+      _sbDeltaDriver(d),
+      _sbParamSummary(s.params, s.mech)
+    ]);
+  }
+  var badge = document.querySelector('.badge');
+  var stamp = 'ORCA Petroleum Fiscal Intelligence Platform'
+    + (badge ? ' (' + badge.textContent.trim() + ')' : '')
+    + ' — Scenario Builder sensitivity set, ' + new Date().toISOString().slice(0, 10)
+    + '. yoburgqs.github.io/petroleum-fiscal-db/';
+
+  // Assumption notes. These travel with the table because the numbers are not readable
+  // without them — an IRR blank, an NPV basis and an unattributable delta each change what
+  // the row is allowed to say.
+  var notes = [];
+  notes.push('Base case for every Δ in this table: "' + base.name + '" — ' + base.mech
+    + ', ' + ((DCF_PROFILES[base.profileKey] && DCF_PROFILES[base.profileKey].name) || base.profileKey)
+    + ' profile, $' + base.price + '/bbl.');
+  notes.push('Δ columns are this row minus the base row. A positive Δ Govt Take means government takes more than in the base case.');
+  if (anyBoth) notes.push('⚠ One or more rows moved BOTH price and fiscal terms relative to the base. Their Δ is the combined effect and must not be quoted as the cost of the fiscal change. To isolate a fiscal change, hold price constant between the two rows.');
+  if (anyBasis) notes.push('⚠ One or more rows run a different mechanic or production profile from the base. Those are separate projects, not sensitivities, so their Δ reads n/a. Government take across fiscal-mechanic families is not comparable in any case — a TSC / RSC / Buy-back take is a remuneration artefact, not a fiscal burden.');
+  notes.push('NPV is contractor NPV at 100% working interest, pre-tax and unlevered. @10% is the profile discount rate; @15% is an IOC hurdle rate on the same cash flow, positive = clears the hurdle.');
+  if (anyNoIrr) notes.push('A blank or qualified IRR is a finding, not missing data. These production profiles take first oil in year 1, the same year as first capex, so contractor exposure is small and brief and an IRR is frequently undefined or not a project return. Use NPV @15% for the hurdle question.');
+  notes.push('Fiscal terms as run are read back from each saved run, as percentages. A blank term means the mechanic has no such term, never that it was not recorded.');
+
+  function cell(v, isHead) {
+    var tag = isHead ? 'th' : 'td';
+    return '<' + tag + ' style="border:1px solid #bbb;padding:4px 8px;font-size:9pt;'
+      + (isHead ? 'background:#f0ece4;font-weight:bold;text-align:left;' : '') + '">' + E(v) + '</' + tag + '>';
+  }
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:10pt;font-weight:bold;margin:0 0 6px;">Fiscal sensitivity — '
+    + E(saved.length) + ' scenario' + (saved.length === 1 ? '' : 's') + ', base case "' + E(base.name) + '"</p>'
+    + '<table style="border-collapse:collapse;"><thead><tr>'
+    + HEAD.map(function (h) { return cell(h, true); }).join('') + '</tr></thead><tbody>'
+    + body.map(function (r) { return '<tr>' + r.map(function (c) { return cell(c, false); }).join('') + '</tr>'; }).join('')
+    + '</tbody></table>'
+    + '<p style="font-size:8.5pt;color:#333;margin:8px 0 0;"><b>Basis and assumptions</b></p>'
+    + '<ol style="font-size:8.5pt;color:#333;margin:2px 0 0;padding-left:18px;">'
+    + notes.map(function (n) { return '<li style="margin-bottom:2px;">' + E(n) + '</li>'; }).join('')
+    + '</ol>'
+    + '<p style="font-size:8pt;color:#555;margin:8px 0 0;">' + E(stamp) + '</p></div>';
+
+  var tsv = HEAD.join('\t') + '\n'
+    + body.map(function (r) { return r.join('\t'); }).join('\n')
+    + '\n\nBasis and assumptions\n'
+    + notes.map(function (n, i) { return (i + 1) + '. ' + n; }).join('\n')
+    + '\n\n' + stamp;
+
+  var btn = document.getElementById('sb-copy-ic-btn');
+  var okMsg = 'Copied ' + saved.length + ' scenario' + (saved.length === 1 ? '' : 's')
+    + ' with Δ vs. base' + (anyBoth || anyBasis ? ' and the attribution caveats' : '')
+    + '. Pastes as a formatted table into Word/Docs, as columns into Excel.';
+  function done() {
+    if (btn) { btn.innerHTML = '✓ Copied!'; setTimeout(function () { btn.innerHTML = '⎘ Copy for IC Memo'; }, 2000); }
+    if (typeof showCopyToast === 'function') showCopyToast(okMsg);
+  }
+  function fail() {
+    if (btn) { btn.innerHTML = 'Clipboard unavailable'; setTimeout(function () { btn.innerHTML = '⎘ Copy for IC Memo'; }, 2000); }
+  }
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([tsv],  { type: 'text/plain' })
+    })]).then(done).catch(function () {
+      navigator.clipboard.writeText(tsv).then(done).catch(fail);
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(done).catch(fail);
+  } else { fail(); }
+}
+window._copyScenariosForIC = _copyScenariosForIC;
 
 function _refreshSavedTable() {
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
@@ -52888,23 +53093,32 @@ function _refreshSavedTable() {
   // Export button header
   let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
     + '<span style="font-size:11px;color:var(--muted);">' + saved.length + ' saved scenario' + (saved.length>1?'s':'') + ' (localStorage)</span>'
-    + '<button onclick="_exportScenariosXLSX()" style="background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;" title="Export all saved scenarios to Excel with fiscal parameters and methodology sheet">&#x2B07; Export XLSX</button>'
+    + '<span style="display:flex;gap:8px;align-items:center;">'
+    + '<button id="sb-copy-ic-btn" onclick="_copyScenariosForIC()" style="background:var(--accent);border:1px solid var(--accent);border-radius:5px;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;min-height:24px;" title="Copy this sensitivity set to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the delta against the base case, what drove each delta, the fiscal terms every row was run on, and the assumptions behind the numbers.">&#x2398; Copy for IC Memo</button>'
+    + '<button onclick="_exportScenariosXLSX()" style="background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;min-height:24px;" title="Export all saved scenarios to Excel with fiscal parameters and methodology sheet">&#x2B07; Export XLSX</button>'
+    + '</span>'
     + '</div>';
   html += `<table class="sb-saved-table"><thead><tr>
     <th>Name</th><th>Mechanic</th><th>Profile</th><th>Price</th>
-    <th>Govt Take</th><th title="Blank or 'no IRR' is a finding, not missing data — hover the cell for the reason.">IRR</th><th>NPV @10%</th><th title="NPV at a 15% IOC hurdle rate. Positive clears the hurdle. Populated for every scenario, including those where no IRR exists.">NPV @15%</th><th>Key Parameters</th>
+    <th>Govt Take</th><th title="Change in government take and contractor NPV against the FIRST saved scenario, which is the base case. The line beneath each delta names what actually moved between that row and the base — fiscal terms, price, or both. Where both moved the delta is the combined effect and is deliberately left uncoloured, because it cannot be quoted as the cost of the fiscal change.">&#916; vs. Base</th><th title="Blank or 'no IRR' is a finding, not missing data — hover the cell for the reason.">IRR</th><th>NPV @10%</th><th title="NPV at a 15% IOC hurdle rate. Positive clears the hurdle. Populated for every scenario, including those where no IRR exists.">NPV @15%</th><th>Key Parameters</th>
   </tr></thead><tbody>`;
+  // The first saved scenario is the base every delta is measured against. Naming it on screen
+  // matters as much as the delta does: an unlabelled base is why the column could be read
+  // row-to-row, which is the misattribution this column exists to stop.
+  const _sbBase = saved[0];
   for (const s of saved) {
     const r = s.result;
     const p = s.params || {};
     // Summarize non-zero fiscal parameters inline
     var paramStr = _sbParamSummary(p, s.mech);
+    var _d = _sbDeltaVsBase(_sbBase, s);
     html += `<tr>
-      <td><strong>${s.name}</strong></td>
+      <td><strong>${s.name}</strong>${_d.kind === 'base' ? ' <span style="font-size:9px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:0 4px;vertical-align:middle;letter-spacing:.04em;">BASE</span>' : ''}</td>
       <td>${s.mech}</td>
       <td>${(DCF_PROFILES[s.profileKey] && DCF_PROFILES[s.profileKey].name) || s.profileKey}</td>
       <td>$${s.price}</td>
       <td style="color:${r.take>70?'var(--negative)':r.take>50?'var(--orange)':'var(--positive)'};font-weight:700;">${r.take.toFixed(1)}%</td>
+      <td>${_sbDeltaCell(_d)}</td>
       <td title="${((s.reading && ({'no-capital-at-risk':'No IRR — the contractor funds no negative year on this profile, so there is no capital base to return. Read NPV @15%.','uneconomic':'No IRR — cash flow never turns positive.','unbounded':'IRR exceeds the 500% solver bound.','inflated':'Computed, but first oil lands in the same year as first capex, so this is not a project return.','computed':'Computed from the contractor cash flow.'})[s.reading.state]) || '').replace(/"/g,'&quot;')}">${(s.reading && s.reading.state === 'no-capital-at-risk') ? '<span style="color:var(--muted);font-size:11px;">no IRR</span>' : (s.reading && s.reading.state === 'unbounded') ? '<span style="color:var(--muted);font-size:11px;">&gt;500%</span>' : (r.irr !== null && r.irr < 500) ? r.irr.toFixed(1)+'%' : '—'}</td>
       <td>${r.npv !== null ? fmtNpvShared(r.npv) : '—'}</td>
       <td style="${(s.reading && s.reading.npv15 != null && s.reading.npv15 <= 0) ? 'color:var(--red);' : 'color:var(--green);'}font-weight:700;">${(s.reading && s.reading.npv15 != null) ? fmtNpvShared(s.reading.npv15) : '—'}</td>
@@ -56923,7 +57137,7 @@ function _scTabEnter(btn) {
   }, 50);
 }
 
-// ─── v887 (T2) — the price the profile is computed at, said out loud ────────────────────────
+// ─── v888 (T2) — the price the profile is computed at, said out loud ────────────────────────
 // Walked cold: Fiscal Compare -> price $100/bbl -> Run Compare -> Norway (row 57) -> Full Profile.
 // FC's citable column ranks Norway at 72.4% take / $1.27B NPV at $100. The profile that opens says
 // 68.0% and $826M. Directly above that headline the nav bar prints "#57 of 185 — Norway", a rank
@@ -57033,7 +57247,7 @@ function _fcNavBarUpdate() {
   var prev = document.getElementById('fc-nav-prev');
   var next = document.getElementById('fc-nav-next');
   var list = window._fcNavList || [];
-  // v887 (T2): trust the country on screen over the index the bar was last left holding.
+  // v888 (T2): trust the country on screen over the index the bar was last left holding.
   var ddSel = document.getElementById('dd-country-select');
   var shown = ddSel ? ddSel.value : null;
   if (shown && list.length) window._fcNavIdx = list.indexOf(shown); // -1 when not in the FC list
