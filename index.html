@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v888</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v889</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v888</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v889</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4218,12 +4218,12 @@ window.copyPlatformCitation = function(btn) {
     <span id="fc-nav-label" style="font-size:11px;color:var(--muted);white-space:nowrap;"></span>
     <button id="fc-nav-next" onclick="fcNavStep(1)" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;" title="Next country in Fiscal Compare list">Next &#8594;</button>
     <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));" style="background:transparent;border:none;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:4px;" title="Return to Fiscal Compare results">&#8617; Back to FC</button>
-    <!-- v888 (T2): was "Run FC at this price" — it read a #cp-price-select that has never existed
+    <!-- v889 (T2): was "Run FC at this price" — it read a #cp-price-select that has never existed
          and wrote the price to a #price that has never existed either, so both halves of the label
          were false: there is no price control on this page, and it set none. It now names the one
          price it can actually put the screen on; the basis strip below says why that matters. -->
     <button id="cp-run-fc-btn" onclick="_cpReRankAtBase()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:4px 10px;min-height:24px;font-weight:600;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at">&#9654; Re-run FC at $75</button>
-    <!-- v888 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
+    <!-- v889 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
          Fiscal Compare run was at a price other than the $75 this profile is computed at. -->
     <div id="cp-price-basis" style="flex-basis:100%;display:none;"></div>
   </div>
@@ -25195,6 +25195,47 @@ function cpFeeBasis(d) {
              .map(function(x) { return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ')
   };
 }
+// ── v889 (T3): does this column's take-spread band have its top quartile in the fee-basis
+//    cluster? Module-level, beside cpFeeBasis(), because BOTH the Side-by-Side grid rows and
+//    the verdict strip's `measured` filter read it. See the note above the alias inside
+//    renderCompare() for the walk this came from and the firing arithmetic.
+function orcaSpreadFeeBoundary(d) {
+  var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix : [];
+  var tot = 0, n2 = 0, n3 = 0;
+  for (var i = 0; i < mx.length; i++) {
+    var n = mx[i].n || 0; tot += n;
+    if (mx[i].g === 2) n2 += n; else if (mx[i].g === 3) n3 += n;
+  }
+  if (!tot || !n2) return null;
+  var p25 = d.p25_take, p75 = d.p75_take;
+  if (p25 == null || p75 == null || (p75 - p25) < 0.05) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
+  var g1m = mx.filter(function (x) { return x.g === 1 && x.t75 != null; });
+  var g2m = mx.filter(function (x) { return x.g === 2 && x.t75 != null; });
+  if (!g1m.length || !g2m.length) return null;
+  var g1hi = Math.max.apply(null, g1m.map(function (x) { return x.t75; }));
+  // The top of the band must sit ABOVE every Group-1 mechanic take point. Otherwise the band is
+  // Group-1 dispersion and there is nothing to re-base.
+  if (!(p75 > g1hi + 0.05)) return null;
+  // ...and the fee-basis mechanics at or above the band's top must be numerous enough to REACH
+  // the 75th percentile at all. This is the arithmetic of a quartile, not a tuned threshold:
+  // a cohort holding under 25% of the contracts cannot occupy the top quartile. It selects Iraq
+  // (415 TSC of 610 = 68%) and excludes India (RSC 4 of 653) and Qatar (RSC 2 of 146), whose
+  // bands are genuine Group-1 dispersion with a tiny fee mechanic priced above them.
+  var topMx = g2m.filter(function (x) { return x.t75 >= p75 - 0.05; });
+  var nTop = topMx.reduce(function (s2, x) { return s2 + (x.n || 0); }, 0);
+  if (!(nTop / tot >= 0.25)) return null;
+  var g1lo = Math.min.apply(null, g1m.map(function (x) { return x.t75; }));
+  return {
+    st: { tot: tot, n1: tot - n2 - n3, n2: n2,
+          g1: (d.g1 && d.g1.t75 != null) ? d.g1 : null },
+    p25: p25, p75: p75, iqr: p75 - p25,
+    g1m: g1m, g1lo: g1lo, g1hi: g1hi,
+    nTop: nTop, topNames: topMx.map(function (x) { return x.m; }).join(' · '),
+    cost: Math.min(40, (p75 - p25) * 0.8)
+  };
+}
+
 // ── v710 (T2): the two PEER SETS on Country Profile were still picked on the published blend ──
 // The headline strip has read on the comparable take since v552. Iraq opens as
 // "34.1% govt take @$75 — investor-friendly tier (<=40%)", "#6 of 21 producers",
@@ -28577,6 +28618,60 @@ function renderCompare() {
   const _cmpJoin = (a) => a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
   const _cmpSubLine = (txt, col) => '<span style="display:block;font-size:10px;font-weight:600;color:'
     + col + ';">' + txt + '</span>';
+  // ── v889 (T3): the LAST row in the GOVT TAKE block still on the blended basis ──────────
+  //
+  // Walked cold this cycle on the tab's OWN shipped quickstart — "USA vs Iraq" — plus Nigeria.
+  // Read the block downward as an analyst does and the four Govt Take rows, the Rank row, the
+  // Take basis row and the Price Swing row ALL re-base Iraq and say so on screen:
+  //
+  //   Take basis (mechanic)   ⚠ 68% fee-basis · TSC blended with PSC and Concession
+  //   Rank among producers    #6 of 21 · ranked on 34.1% comparable, not 84.8%
+  //   Govt Take ($75/bbl)     84.8%  ·  PSC/Conc 34.1%
+  //   Take spread across…     65.0–98.5% (33.5pp)          <- orange, bold, NOTHING else
+  //   Price Swing             +6.6pp ·  PSC/Conc +11.1pp
+  //
+  // v882 fixed Price Swing with the words "it was the only row in the GOVT TAKE block that
+  // inherited none of their re-basings." That was one row short: the row directly ABOVE it
+  // inherited none of them either, and it is the row that answers "does block selection matter
+  // here" — the question a three-country comparison is being run to settle.
+  //
+  // 98.5% is not a contract at the hard end of Iraq's terms. It is the TSC figure exactly
+  // (mech_mix TSC t75 = 98.5), and 415 of Iraq's 610 contracts are TSC, so the fee-basis cluster
+  // occupies the entire top quartile by construction. The band's width is the distance between
+  // two CONTRACT TYPES, not variation in fiscal hardness between blocks — and the row prints it
+  // in orange bold, which its own tooltip defines as "material contract-level variation".
+  //
+  // The damage compounds one row up. Iraq's Predictability Score is 47 · LOW with a GRADED band
+  // and a colour, and in the walked set it is the only graded score on the row (USA and Nigeria
+  // both resolve to withdrawn ceilings). Since v624 a graded band is the platform's strongest
+  // stability claim — awarded only where ORCA measured a spread. 26.8 of Iraq's 53 lost points
+  // were charged by the IQR term on this band. So the grid refuses to RANK Iraq on 84.8%, then
+  // two rows later grades it LOW on the dispersion of the same blend.
+  //
+  // FIRING RULE — arithmetic, not a tuned constant. The fee-basis mechanics sitting at or above
+  // the band's top must be numerous enough to REACH the 75th percentile at all: their share of
+  // the contract set must be >= 25%. Measured against the shipped country_data.json this selects
+  // Iraq and Iraq alone (415/610 = 68%). India (RSC 4 of 653) and Qatar (RSC 2 of 146) both have
+  // a fee mechanic priced above their band and are both correctly excluded — at 0.6% and 1.4% of
+  // the set they cannot occupy the top quartile, so their bands are genuine Group-1 dispersion.
+  // The other seven fee-blended countries never reach the test: their p75 sits at or below their
+  // highest Group-1 mechanic take.
+  //
+  // Nothing is recomputed and no substitute IQR is invented. ORCA holds NO Group-1-only quartiles
+  // — g1 carries t50/t75/t100/t125 and n, and no p25/p75 — so what is printed underneath is the
+  // range of ORCA's Group-1 MECHANIC take points, labelled as exactly that and never as an IQR.
+  // For Iraq that is Concession 13.9% and PSC 48.2% across 195 contracts.
+  //
+  // Interaction with _sbsPaintObsSpread (v864), which repaints this same cell asynchronously:
+  // it cannot collide here. Iraq's api/v1/country/iraq.json top_contracts are 50 of 50 TSC
+  // running 98.5–99.5% — a 1.0pp observed spread against a 33.5pp bundled one — so neither
+  // _rrIqrUnderstated (needs observed WIDER than bundled) nor cpSpreadConflict (needs the
+  // one-term claim) fires on it.
+  // Thin alias. The implementation is module-level (orcaSpreadFeeBoundary, beside
+  // cpFeeBasis) because the verdict strip's `measured` filter below renderCompare()
+  // needs the identical predicate, and two copies of a comparability rule is the exact
+  // drift v885 and v552 exist to prevent.
+  const _cmpSpreadFeeBoundary = (d) => orcaSpreadFeeBoundary(d);
   // v614 (T3): the Contractor NPV cells on a state-monopoly column (three at the time; four
   // since v652 added $100). They rendered "$0M"
   // three times, in the same visual weight as Norway's $826M and Guyana's $1.1B, on a column
@@ -29408,7 +29503,31 @@ function renderCompare() {
       key:(d)=>_cmpMechBasisCell(d)},
     {label:'Rank among producers (take @$75) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $75/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
       key:(d)=>_cmpProducerRankCell(d), bold:false},
-    {grp:'ev', label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
+    {grp:'ev', label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>{
+      const _b = renderStabilityBadge(getFiscalPredictabilityScore(d), d);
+      // v889 (T3): this badge is the platform's strongest stability claim -- since v624 a GRADED
+      // band and a colour are awarded only where ORCA measured a spread across the country's own
+      // contracts. On a column whose measured spread is the fee-basis boundary (see the block
+      // above _cmpSpreadFeeBoundary) the IQR term -- the score's largest, up to -40 points -- was
+      // charged on the distance between two contract types. The score is not overwritten and no
+      // comparable score is invented; what was charged, and on what, is stated beneath it. The
+      // shared renderStabilityBadge() is deliberately untouched: it renders on four tabs and the
+      // re-basing data this needs is assembled in this tab's scope.
+      const _fb = _cmpSpreadFeeBoundary(d);
+      if (!_fb) return _b;
+      return _b + '<span style="display:block;font-size:10px;font-weight:600;color:var(--orange);cursor:help;" title="'
+        + _cmpEsc(d.country + ': ' + _fb.cost.toFixed(1) + ' points were taken off this score by '
+          + 'the interquartile-range penalty, charged on the ' + _fb.iqr.toFixed(1) + 'pp band in '
+          + 'the Take spread row below. That band is not fiscal dispersion -- its top quartile is '
+          + 'the ' + _fb.topNames + ' fee-basis cluster ('
+          + Number(_fb.nTop).toLocaleString() + ' of ' + Number(_fb.st.tot).toLocaleString()
+          + ' contracts), so the penalty is charged for holding two contract TYPES rather than '
+          + 'for terms that vary between blocks. The graded band and colour above are earned on '
+          + 'that penalty, so they are not comparable with the other columns in this set. ORCA '
+          + 'holds no PSC/Concession-only quartiles, so no corrected score is computed and none '
+          + 'is shown -- treat this grade as a floor, not as a finding, and read the Take spread '
+          + 'row below on its PSC/Conc line.')
+        + '">\u26a0 ' + _fb.cost.toFixed(1) + 'pts charged on the fee-basis boundary</span>'; }},
     // v701 (T4): see _cmpReformCell above. The reform record now rides the shared `rows` array,
     // so it reaches the visible grid, #cmp-data-table, Export PDF and both Copy-for-IC-Memo
     // clipboard flavours by the same path every other row does.
@@ -29437,6 +29556,60 @@ function renderCompare() {
       // to collapse to "~2.8pp" and hide the band itself, which is the half of the row an analyst
       // comparing three columns actually reads. The band is now always shown.
       if(iqr<0.05) return '<span style="color:var(--muted);" title="' + _cmpEsc(d.country + ': every contract in the set prices to the same government take at $75/bbl -- a single statutory term across ' + (d.n!=null?Number(d.n).toLocaleString():'?') + ' contracts. This is normal for a one-mechanic regime and is NOT evidence of low fiscal risk.') + '">single term</span>';
+      // v889 (T3): re-base before colouring. Where the band's top quartile IS the fee-basis
+      // cluster, the width is the distance between two contract types, so the orange/bold
+      // "material contract-level variation" read is exactly the wrong one -- see the block
+      // above _cmpSpreadFeeBoundary. The band stays on screen (it is the published figure and
+      // it is what the Predictability Score was charged on) but it is de-coloured, the boundary
+      // is named, and ORCA's Group-1 mechanic take points are printed beneath it.
+      const _fb = _cmpSpreadFeeBoundary(d);
+      if (_fb) {
+        const _g1txt = _fb.g1m.length > 1
+          ? _fb.g1lo.toFixed(1) + '\u2013' + _fb.g1hi.toFixed(1) + '%'
+          : _fb.g1lo.toFixed(1) + '%';
+        const _g1n = (_fb.st.g1 && _fb.st.g1.n != null) ? Number(_fb.st.g1.n).toLocaleString()
+                                                        : Number(_fb.st.n1).toLocaleString();
+        return '<span style="color:var(--muted);cursor:help;" title="' + _cmpEsc(d.country
+            + ': the published band is ' + p25.toFixed(1) + '\u2013' + p75.toFixed(1) + '% ('
+            + iqr.toFixed(1) + 'pp), and it is shown here because it is the figure the '
+            + 'Predictability Score above was charged on. It is NOT a like-for-like measure of '
+            + 'how much block selection moves the fiscal outcome. Its upper end, '
+            + p75.toFixed(1) + '%, is the ' + _fb.topNames + ' fee-basis take point exactly, and '
+            + Number(_fb.nTop).toLocaleString() + ' of ' + Number(_fb.st.tot).toLocaleString()
+            + ' contracts price on it \u2014 so the fee-basis cluster fills the entire top '
+            + 'quartile by construction. A fee-basis contractor is paid a fixed $/bbl '
+            + 'remuneration and keeps no oil-price upside, which drives take% toward 97\u201399% '
+            + 'as an artefact of the mechanic. The width of this band is therefore mostly the '
+            + 'distance between two CONTRACT TYPES, not variation in how hard the terms are '
+            + 'between blocks. It is not coloured for that reason; read the PSC/Conc line below '
+            + 'it instead, and do not carry this band into an IC memo as fiscal dispersion.')
+          + '">' + p25.toFixed(1) + '\u2013' + p75.toFixed(1) + '% <span style="font-weight:400;opacity:.75;">('
+          + iqr.toFixed(1) + 'pp)</span></span>'
+          + '<span style="display:block;font-size:10px;font-weight:600;color:var(--orange);cursor:help;" title="'
+          + _cmpEsc('The 75th percentile of this band falls inside the fee-basis contracts, not '
+            + 'among the production-sharing and concession ones. Every other row in this block '
+            + '-- the four Govt Take rows, Rank among producers and Price Swing -- is already '
+            + 'placed on the PSC/Concession figure and says so; this row shows the published '
+            + 'blend, which is why it is marked rather than silently replaced.')
+          + '">\u26a0 top quartile is fee-basis (' + _fb.topNames + ')</span>'
+          + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+          + _cmpEsc(d.country + ': across its ' + _g1n + ' production-sharing and concession '
+            + 'contracts ORCA holds ' + _fb.g1m.length + ' mechanic take point'
+            + (_fb.g1m.length > 1 ? 's' : '') + ' at $75/bbl -- '
+            + _fb.g1m.map(function (x) { return x.m + ' ' + x.t75.toFixed(1) + '% ('
+                + Number(x.n).toLocaleString() + ' contracts)'; }).join(', ')
+            + '. THIS IS NOT AN INTERQUARTILE RANGE and it is not a recomputed spread: ORCA holds '
+            + 'no PSC/Concession-only quartiles for any country, so none is invented here. It is '
+            + 'the range of the mechanic-level take points themselves, which is the like-for-like '
+            + 'answer this row is being read for -- an ' + d.country + ' '
+            + _fb.g1m[0].m.toLowerCase() + ' and an '
+            + _fb.g1m[_fb.g1m.length - 1].m.toLowerCase() + ' are '
+            + Math.abs(_fb.g1hi - _fb.g1lo).toFixed(1) + 'pp apart on government take, and THAT '
+            + 'is the figure that tells you whether contract type matters here. State the basis '
+            + 'in the memo.')
+          + '">PSC/Conc ' + _g1txt + ' \u00b7 ' + _fb.g1m.length + ' mechanic'
+          + (_fb.g1m.length > 1 ? 's' : '') + '</span>';
+      }
       const col = iqr>=10 ? 'var(--orange)' : iqr>=5 ? 'var(--yellow)' : 'var(--text)';
       const _hd = d.take_75; const _off = (_hd != null && (_hd < p25 - 0.5 || _hd > p75 + 0.5))
         ? ' Its headline take (' + _hd.toFixed(1) + '%) sits outside this band because the headline is production-weighted and this spread is not -- the weighted barrels are concentrated in contracts at one end of the range.'
@@ -31629,7 +31802,19 @@ function _sbsBoundOrder(hits, measured, sink) {
     var v  = (dd && typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(dd) : null;
     var one = st === 'single' && v != null;
     if (one) sink.offOneTerm = true;
-    var why = one ? 'one term, ungraded' : st === 'monopoly' ? 'no contractor position' : 'not scored';
+    // v889 (T3): a column dropped from `measured` because its spread is the fee-basis boundary
+    // arrives here with dispersion state 'measured', so without this branch it would be named
+    // "not scored" -- which is false, and is the opposite of its problem. It IS scored; the
+    // score is charged on a band that is not fiscal dispersion.
+    var feeB = (typeof orcaSpreadFeeBoundary === 'function' && dd) ? orcaSpreadFeeBoundary(dd) : null;
+    var why = feeB ? 'spread is the fee-basis boundary, not comparable'
+            : one ? 'one term, ungraded' : st === 'monopoly' ? 'no contractor position' : 'not scored';
+    if (feeB) {
+      sink.unplaced.push('<strong style="color:var(--text);">' + _sbsAttr(k) + '</strong>'
+        + (v != null ? ' ' + v : '') + ' (' + why + ')');
+      offTxt.push(k + (v != null ? ' ' + v : '') + ' (' + why + ')');
+      return;
+    }
     sink.unplaced.push('<strong style="color:var(--text);">' + _sbsAttr(k) + '</strong>'
       + (one ? ' ' + v : '') + ' (' + why + ')');
     offTxt.push(k + (one ? ' ' + v : '') + ' (' + why + ')');
@@ -31843,6 +32028,14 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
   var measured = compareList.filter(function(k) {
     if (hits.indexOf(k) !== -1) return false;
     var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
+    // v889 (T3): a column whose "measured" spread IS the fee-basis boundary is not on the
+    // measured scale. Before this, the walked USA / Iraq / Nigeria set printed
+    //   "PREDICTABILITY, MOST STABLE FIRST: Iraq 47 > Nigeria <=46"
+    // and the notice beneath it called Iraq "the column in this set ORCA does hold a measured
+    // spread for" -- putting the one column whose dispersion is a mechanic artefact at the head
+    // of the stability order, in the clipboard, above a grid that refuses to RANK it on the same
+    // blend. It joins the unplaced bucket below with its own reason, rather than being ranked.
+    if (typeof orcaSpreadFeeBoundary === 'function' && dd && orcaSpreadFeeBoundary(dd)) return false;
     var dp = (dd && typeof _fpDispersion === 'function') ? _fpDispersion(dd) : null;
     return dp && dp.state === 'measured';
   });
@@ -43662,7 +43855,7 @@ function loadCountryProfile(country) {
     chartWrap.style.display = 'none';
   }
 
-  // v888 (T2): every entry point into a profile routes through here — dropdown, peer row, regional
+  // v889 (T2): every entry point into a profile routes through here — dropdown, peer row, regional
   // row, deep link, FC drawer, Prev/Next — so this is the one place the FC nav bar and the price-
   // basis strip can be kept pointed at the country actually on screen.
   if (typeof _fcNavBarUpdate === 'function') _fcNavBarUpdate();
@@ -52822,7 +53015,7 @@ function _exportScenariosXLSX() {
     'computed':           'Computed from the contractor cash flow at 100% WI, pre-tax, unlevered.',
     'unknown':            'Not determinable — this mechanic did not publish a contractor cash flow.'
   };
-  // v888 (T5): same base and the same _sbDeltaVsBase()/_sbDeltaDriver() readers the on-screen
+  // v889 (T5): same base and the same _sbDeltaVsBase()/_sbDeltaDriver() readers the on-screen
   // table uses, so the workbook and the screen cannot state different deltas or attribute one
   // differently -- the failure mode v885 fixed for the parameter columns.
   const _xBase = saved[0];
@@ -52867,7 +53060,7 @@ function _exportScenariosXLSX() {
     ['Column definitions:'],
     ['Govt Take (%)', 'Government share of project economics: royalties + taxes + profit oil at the stated price'],
     ['Delta columns', 'Measured against the FIRST saved scenario, which is the base case and is marked "(base)" in the Scenario Name column. This row minus the base row. A positive Delta Govt Take means government takes more than in the base case.'],
-    ['What changed vs. base', 'What actually moved between that row and the base: fiscal terms only, price only, or both. READ THIS BEFORE QUOTING A DELTA. Where both price and terms moved, the delta is the combined effect and must not be quoted as the cost of the fiscal change — to isolate a fiscal change, hold price constant between the two rows. Where the row runs a different mechanic or production profile it is a separate project rather than a sensitivity, and its delta reads n/a. Until v888 neither this column nor the deltas existed on any surface: the set printed absolute takes only, so a reader subtracting adjacent rows by hand could charge a price move to a fiscal one.'],
+    ['What changed vs. base', 'What actually moved between that row and the base: fiscal terms only, price only, or both. READ THIS BEFORE QUOTING A DELTA. Where both price and terms moved, the delta is the combined effect and must not be quoted as the cost of the fiscal change — to isolate a fiscal change, hold price constant between the two rows. Where the row runs a different mechanic or production profile it is a separate project rather than a sensitivity, and its delta reads n/a. Until v889 neither this column nor the deltas existed on any surface: the set printed absolute takes only, so a reader subtracting adjacent rows by hand could charge a price move to a fiscal one.'],
     ['Contractor IRR (%)', 'Pre-tax, unlevered IRR at 100% WI. BLANK does not mean missing data — read the IRR Basis cell beside it. An IRR does not exist wherever the contractor funds no negative year, which is the usual outcome for a cost-recovery regime on these profiles.'],
     ['IRR Basis', 'Why the IRR cell reads what it reads, derived from the contractor cash flow for that scenario. Do not quote an IRR into an IC memo without this cell.'],
     ['Contractor NPV @10% ($M)', 'NPV at the profile discount rate (10%), 100% WI basis'],
@@ -52891,7 +53084,7 @@ function _exportScenariosXLSX() {
   showCopyToast('Scenarios exported to XLSX.');
 }
 
-/* ── v888 (T5) — "give me something I can paste straight into an IC memo." ───────────────
+/* ── v889 (T5) — "give me something I can paste straight into an IC memo." ───────────────
    Walked cold: Scenario Builder → Run DCF → save "Base case" → royalty 10→18, SPT 0→20 →
    save "Royalty+SPT reform" → price 75→55 → save "Downside $55". The saved set IS the IC
    sensitivity appendix — the block above says so in its own comment — and at the moment the
@@ -57137,7 +57330,7 @@ function _scTabEnter(btn) {
   }, 50);
 }
 
-// ─── v888 (T2) — the price the profile is computed at, said out loud ────────────────────────
+// ─── v889 (T2) — the price the profile is computed at, said out loud ────────────────────────
 // Walked cold: Fiscal Compare -> price $100/bbl -> Run Compare -> Norway (row 57) -> Full Profile.
 // FC's citable column ranks Norway at 72.4% take / $1.27B NPV at $100. The profile that opens says
 // 68.0% and $826M. Directly above that headline the nav bar prints "#57 of 185 — Norway", a rank
@@ -57247,7 +57440,7 @@ function _fcNavBarUpdate() {
   var prev = document.getElementById('fc-nav-prev');
   var next = document.getElementById('fc-nav-next');
   var list = window._fcNavList || [];
-  // v888 (T2): trust the country on screen over the index the bar was last left holding.
+  // v889 (T2): trust the country on screen over the index the bar was last left holding.
   var ddSel = document.getElementById('dd-country-select');
   var shown = ddSel ? ddSel.value : null;
   if (shown && list.length) window._fcNavIdx = list.indexOf(shown); // -1 when not in the FC list
