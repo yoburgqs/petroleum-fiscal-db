@@ -55249,3 +55249,96 @@ rebuild it from.
 
 ## Friction
 Hovering a figure is this platform's universal "where did this come from" gesture. On a government take it was answered by a hand-typed literal inside the shared formatter `fmtTake()`: *"Government take on standardi
+
+---
+## Cycle 788 Log — 2026-09-16 03:0x
+
+- Test before: 303 PASS / 0 FAIL / 1 WARN (local server, controlled baseline — see Verify)
+- Test after: 303 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 page errors; 1 console WARN (`sw.js` 404, local-server artefact, present in baseline)
+- Shipped as **v880** (`7e59425`), pushed, mirror in sync.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation;
+787/v879 was T5, 786 T6, 785 T2, 784 T1, 783 T3 — last T4 at 782.)
+
+## Friction
+T4 asked at book level lands on **IOC Portfolio**, the tab literally titled *"IOC Portfolio —
+Fiscal Exposure"*. Walked cold on the seeded Shell portfolio — 884 contracts, 31 countries — the
+country table carried exactly **one** reform signal: the v468 chip at `index.html:36917` and
+`:37058`, `REFORM_HISTORY[c].find(ev => ev.year >= 2023)`. It fired on **3 of 31 rows**. Three
+defects, all measured against the shipped `reform_history.json`:
+
+1. **Absence was silent, and meant three different things.** 28 of 31 rows rendered with no chip.
+   Among them Norway (+12pp 2022), Russia (+15pp windfall 2022), Brazil (3 in-window changes —
+   this platform's own **ACTIVELY REFORMING** bucket, score 55), Nigeria (2021 Petroleum Industry
+   Act + 2022 implementation), Mexico (2 in-window). And **19 of the 31 are among the 164
+   jurisdictions with no sourced reform log at all** — rendered identically to Norway's blank.
+   Every other surface on this platform was fixed for exactly this: v502/v514 (Reform Risk
+   lookup), v520/v556 (Fiscal Compare Stability), v644 (Country Profile sidebar), v662 (Screener
+   filter), v879 (IC-memo clipboard). IOC Portfolio was the last surface where a blank cell read
+   as a clean record.
+2. **The tooltip never named the reform.** It read `ev.description`; the field in the JSON is
+   `event`. All three chips fell through to the literal fallback — *"Recent fiscal reform: 2023 —
+   reform event."*
+3. **The year was the earliest qualifying one, not the latest.** `.find()` on a chronologically
+   ascending array returns the first match. The UK — 89 Shell contracts — showed **2023** (EPL
+   raised to 35%) while its **2024** event, *EPL raised to 38% and extended to March 2030*, is the
+   one a 25-year IRR model turns on. Separately, Iraq's chip fired on the 2023 KRG–Baghdad FSC
+   ruling, which carries **no quantified take move**, in the same red as the UK's +25/+10/+3pp EPL
+   sequence.
+
+## Change
+No new rule and no new threshold. `_iocReformChip()` calls **`_rrClassify()`** — the six-way
+classification v550 unified and v744 gave a table-width `icToken` for precisely this purpose — and
+`_rrTokenTier()` for its colour, so this tab cannot drift from Fiscal Compare, the CP sidebar or
+the Reform Risk card the way the v468 chip had. It renders on **every** row, on both the group
+roll-up and the single-entity table, and where there is no sourced log it says so.
+
+| Shell row | before | after |
+|---|---|---|
+| United Kingdom | `⚠ 2023` | `WACC +3–5pp · 5 chg · 2024` |
+| Russia | *(blank)* | `TAKE +15pp · 1 chg · 2022` |
+| Brazil | *(blank)* | `WACC +3–5pp · 3 chg · 2021` |
+| Norway | *(blank)* | `TAKE NET 0pp · 2 chg · 2022` |
+| Nigeria | *(blank)* | `SIZE UNKNOWN · 2 chg · 2022` |
+| Iraq | `⚠ 2023`, same red as UK | `SIZE UNKNOWN · 1 chg · 2023` |
+| USA, Colombia | *(blank)* | `↑ PRE-2010 · 0 chg` |
+| 19 others | *(blank)* | `n/c · no sourced log` |
+| rows carrying a reform verdict | **3 of 31** | **31 of 31** |
+
+`_iocReformStat()` adds the book-level roll-up to the stat strip, counted by **jurisdiction** not
+by contract (two Brunei rows are one jurisdiction). Shell reads **"12 flagged · 19 n/c"**, and the
+tile names every country in each bucket and states that n/c is missing coverage — *not* a clean
+record and *not* a score of 100.
+
+## Result
+An analyst screening an operator's book for reform exposure reads a verdict on **all 31**
+jurisdictions instead of 3; learns that this platform cannot speak to **19 of them (61% by
+jurisdiction)** rather than inferring a clean record from white space; and gets the UK's **2024**
+EPL extension to March 2030 rather than its superseded 2023 rate.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all 10 tabs.
+- IOC table wrap **1131 / 360** — narrower than the 1148 baseline: the chip renders on a second
+  line under the country name, so column 1 did not widen.
+- **0 of 60** IOC controls under 24px under `pointer: coarse`. The chip is a non-interactive
+  `<span>` with `title`, as the v468 chip it replaces was — no new control, and no nested click
+  target inside an already-clickable row.
+
+## Verify
+- JS syntax gate **PASS** — 11 inline `<script>` blocks extracted, `node --check` on each.
+- Playwright `runtime_comprehensive.js` **actually ran this cycle**, as a controlled A/B against
+  the same local server: pre-change build (`git stash`) **303 PASS / 0 FAIL / 1 WARN**, post-change
+  **303 PASS / 0 FAIL / 1 WARN**. The two reports are **byte-identical apart from the timestamp**.
+  The local 303 vs the live-URL 318 is a local-vs-live artefact (the `sw.js` 404 WARN), not a
+  regression — it is present identically on both sides of the A/B.
+
+## Carried forward (unchanged this cycle, re-confirmed while walking T4)
+- `▶ Run FC at this price` on the Country Profile still reads `cp-price-select`, which does not
+  exist on that tab (carried from 785).
+- A take of `—` still sorts as the maximum in the Screener (carried from 778/784), and Bahamas
+  `≥10.0%` still survives a ≤5% ceiling (carried from 784).
+- The Reform Risk tab itself, the per-country lookup, the CP reform sidebar and the FC Reform
+  verdict column were all walked cold this cycle and no friction worse than the above was found in
+  them — the gap was the surface that never called into them.
