@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v882</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v883</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -872,6 +872,11 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   color: var(--text);
   font-size: 12px;
 }
+/* v883 (T2): sized in CSS, not on the element, so the v612 pointer:coarse 24px hit-box rule
+   further down can actually take effect -- a style attribute would have outranked it. */
+#sb-use-tiers {
+  width: 16px; height: 16px; flex: 0 0 auto; cursor: pointer; margin: 0;
+}
 .sb-section-hdr {
   font-size: 11px;
   color: var(--accent);
@@ -1505,7 +1510,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      decides whether the scatter plots 22 measured countries or 185 mostly-inferred ones -- and
      as of this cycle, whether every bubble on screen carries a name. It measured 22px under a
      thumb. Same narrow id scope, same hit-box-only change. */
-  #sc-proxy-keep, #sc-floor-keep, #bubble-verified-only {
+  /* v883 (T2): #sb-use-tiers joins them, same narrow-id scope, hit box only. It decides
+     whether the Scenario Builder runs a PSC country's filed R-factor ladder or a single flat
+     profit-oil rate -- worth up to 20.2pp of government take (Timor-Leste) -- so mis-hitting
+     it on a phone changes the regime, not the styling. */
+  #sc-proxy-keep, #sc-floor-keep, #bubble-verified-only, #sb-use-tiers {
     min-width: 24px; min-height: 24px; width: 24px; height: 24px;
     flex: 0 0 auto; margin-right: 4px;
   }
@@ -2549,7 +2558,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v882</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v883</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23096,11 +23105,30 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
             <div class="sb-control-group"><label>FTP / First Tranche (%)</label><input type="number" id="sb-ftp" value="10" min="0" max="30" step="1" title="FTP (First Tranche Petroleum) — percentage of gross production taken by government or NOC before cost recovery begins. Government's priority slice regardless of contractor's cost recovery position. Typical range: 0% (Nigeria, Indonesia old PSC), 10% (Angola, Ghana), 15–20% (Malaysia Petronas, some MENA PSCs). High FTP = contractor earns nothing until the FTP tranche is cleared."></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Profit Oil - Govt (%)</label><input type="number" id="sb-po-govt" value="60" min="10" max="90" step="5" title="Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier."></div>
+            <div class="sb-control-group"><label id="sb-po-lbl" for="sb-po-govt">Profit Oil - Govt (%)</label><input type="number" id="sb-po-govt" value="60" min="10" max="90" step="5" title="Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier."></div>
             <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-psc-cit" value="25" min="0" max="60" step="1" title="CIT Rate in PSC — applied to contractor's profit oil tranche after cost recovery. In some PSCs (Nigeria, Angola), the NOC pays CIT on behalf of contractor from the government profit oil, making the headline CIT invisible to contractor cash flow. Typical range: 25–35% where contractor-paid; 0–15% where NOC-paid-on-behalf arrangements apply."></div>
           </div>
           <div class="sb-row2">
             <div class="sb-control-group"><label>Royalty Rate (%)</label><input type="number" id="sb-psc-royalty" value="0" min="0" max="20" step="1" title="Royalty in PSC — most pure PSCs have 0% royalty (FTP substitutes). Some hybrid PSCs add a small royalty on top. W. Africa: typically 0–5%; SE Asia: 0–10%. If modeling a hybrid concession-PSC or a PSC with production levy, enter the royalty rate here. Pure PSC = 0%."></div>
+          </div>
+          <!-- v883 (T2): R-FACTOR LADDER. getDCFParams() loads tier_schedule for 51 of 185
+               countries and dcfPSC() resolves the government profit-oil share off it year by
+               year (see the `tiers` const in dcfPSC). runLiveDCF() passes that object straight
+               through, so the Country Profile's Live DCF panel runs the ladder. sbGetParams()
+               rebuilt params from the form instead and never carried tier_schedule, so this
+               modal silently flattened every ladder to the single Profit Oil - Govt box -- the
+               one figure the Country Profile tells the analyst NOT to cite. 47 of the 51 came
+               out more than 1pp wrong, 37 more than 5pp, worst Timor-Leste +20.2pp / -$1.9B.
+               The ladder is armed only by ddOpenScenarioBuilder(); loadPreset(), a mechanic
+               change and a header-opened modal all disarm it, so a stale ladder can never
+               silently override a hand-built regime. -->
+          <div id="sb-tier-block" style="display:none;margin:10px 0 2px;padding:9px 11px;background:var(--surface2);border:1px solid rgba(176,104,0,.30);border-left:3px solid var(--accent);border-radius:6px;">
+            <label for="sb-use-tiers" style="display:flex;align-items:center;gap:8px;min-height:24px;cursor:pointer;margin:0;font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;">
+              <input type="checkbox" id="sb-use-tiers" checked onchange="_sbTierToggle()" aria-describedby="sb-tier-note">
+              <span id="sb-tier-hdr">R-factor ladder — as filed</span>
+            </label>
+            <div id="sb-tier-rows" style="margin-top:7px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text);"></div>
+            <div id="sb-tier-note" style="margin-top:6px;font-size:11px;color:var(--muted);line-height:1.55;"></div>
           </div>
         </div>
 
@@ -50395,8 +50423,20 @@ function _sbICTermsClause(mech, params) {
   if (!params) return '';
   var P = _sbPctStr, t = [];
   if (mech === 'PSC') {
+    // v883 (T2): when the R-factor ladder ran, the flat profit-oil figure is NOT the term this
+    // scenario was computed on -- dcfPSC() ignores it entirely whenever tier_schedule is set.
+    // The memo clause has to name the ladder, or the pasted artifact states a rate the number
+    // beside it was never built from.
+    var _ld883 = (Array.isArray(params.tier_schedule) && params.tier_schedule.length)
+      ? params.tier_schedule.map(function (x) { return Number(x.govt); }).filter(isFinite)
+      : null;
     t = ['cost recovery cap ' + P(params.cost_recovery_cap), 'FTP ' + P(params.ftp_rate),
-         'govt profit oil ' + P(params.profit_oil_govt_pct), 'CIT ' + P(params.cit_rate),
+         (_ld883 && _ld883.length
+            ? 'govt profit oil on the filed ' + params.tier_schedule.length + '-tier R-factor ladder ('
+              + Math.min.apply(null, _ld883) + '\u2013' + Math.max.apply(null, _ld883)
+              + '%, resolved per year from cumulative R)'
+            : 'govt profit oil ' + P(params.profit_oil_govt_pct)),
+         'CIT ' + P(params.cit_rate),
          'royalty ' + P(params.royalty_rate)];
   } else if (mech === 'Revenue Share') {
     t = ['govt revenue share ' + P(params.profit_oil_govt_pct), 'CIT ' + P(params.cit_rate),
@@ -51916,6 +51956,8 @@ function loadPreset(name) {
   window._sbOrigin = null;
   var _sbPfB = document.getElementById('sb-prefill-banner');
   if (_sbPfB) _sbPfB.style.display = 'none';
+  // v883 (T2): drop any armed R-factor ladder with it, for the same reason.
+  if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
   document.getElementById('sb-mechanic').value = p.mechanic;
   document.getElementById('sb-profile').value = p.profile;
   if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): .value= does not fire onchange
@@ -51960,6 +52002,85 @@ function loadPreset(name) {
   }
 }
 
+// v883 (T2): the flat box's own tooltip, restored verbatim when the ladder is switched off.
+var _SB_PO_TITLE = "Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier.";
+
+// ── v883 (T2): R-factor ladder state for the Scenario Builder ────────────────
+// The ladder the modal is currently allowed to run, or null. Armed ONLY from a country
+// pre-fill; every other entry point disarms, so the box below can never apply one country's
+// tiers to another country's -- or to a hand-built -- regime.
+window._sbTiers = null;
+
+function _sbTierFmt(t) {
+  var lo = (t.lo == null ? 0 : Number(t.lo));
+  var hi = (t.hi == null ? null : Number(t.hi));
+  return 'R ' + lo.toFixed(1) + (hi == null ? '+' : '\u2013' + hi.toFixed(1));
+}
+
+// Shows the ladder, arms it, and makes the flat Profit Oil box inert -- because leaving it live
+// while the ladder overrides it is the "change it and nothing moves" trap the Country Profile
+// already warns about for this exact parameter.
+function _sbArmTiers(tiers, country) {
+  var block = document.getElementById('sb-tier-block');
+  if (!block || !Array.isArray(tiers) || !tiers.length) { _sbDisarmTiers(); return; }
+  window._sbTiers = tiers;
+  var govts = tiers.map(function (t) { return Number(t.govt); }).filter(isFinite);
+  var lo = Math.min.apply(null, govts), hi = Math.max.apply(null, govts);
+  var hdr = document.getElementById('sb-tier-hdr');
+  if (hdr) hdr.textContent = 'R-factor ladder \u2014 ' + tiers.length + ' tiers, govt '
+    + lo + '\u2013' + hi + '% (as filed)';
+  var rows = document.getElementById('sb-tier-rows');
+  if (rows) {
+    rows.innerHTML = tiers.map(function (t) {
+      return '<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;">'
+        + '<span style="color:var(--muted);">' + _sbTierFmt(t) + '</span>'
+        + '<span>contractor <strong>' + Number(t.cont) + '%</strong>'
+        + ' \u00b7 govt <strong>' + Number(t.govt) + '%</strong></span></div>';
+    }).join('');
+  }
+  var use = document.getElementById('sb-use-tiers');
+  if (use) use.checked = true;
+  block.style.display = '';
+  _sbTierToggle(true);
+}
+
+function _sbDisarmTiers() {
+  window._sbTiers = null;
+  var block = document.getElementById('sb-tier-block');
+  if (block) block.style.display = 'none';
+  var po = document.getElementById('sb-po-govt');
+  if (po) { po.disabled = false; po.style.opacity = ''; po.title = _SB_PO_TITLE; }
+  var lbl = document.getElementById('sb-po-lbl');
+  if (lbl) lbl.textContent = 'Profit Oil - Govt (%)';
+}
+
+// Keeps the flat box and the ladder from both claiming to set the same number.
+function _sbTierToggle(skipRun) {
+  var use = document.getElementById('sb-use-tiers');
+  var on  = !!(use && use.checked && window._sbTiers);
+  var po  = document.getElementById('sb-po-govt');
+  var lbl = document.getElementById('sb-po-lbl');
+  if (po) {
+    po.disabled = on;
+    po.style.opacity = on ? '.45' : '';
+    po.title = on
+      ? 'Not in use. The R-factor ladder below sets the government profit-oil share year by year, so this single figure is not read by the engine. Untick the ladder to model a flat split instead.'
+      : _SB_PO_TITLE;
+  }
+  if (lbl) lbl.textContent = on ? 'Profit Oil - Govt (%) \u2014 not used' : 'Profit Oil - Govt (%)';
+  var note = document.getElementById('sb-tier-note');
+  if (note) {
+    note.innerHTML = on
+      ? 'Running the ladder \u2014 the engine resolves the government share each year from '
+        + 'cumulative R (revenue \u00f7 cost), the same basis as this country\u2019s published take '
+        + 'and its Live DCF panel on Country Profile. Untick to model a flat split from the box above instead.'
+      : 'Ladder off \u2014 running the single <strong>Profit Oil - Govt</strong> figure above at every '
+        + 'R. That is a hypothetical flat regime, not this country\u2019s filed terms, and on a '
+        + 'progressive PSC it usually overstates government take. Re-tick to restore the filed ladder.';
+  }
+  if (!skipRun && typeof runCustomScenario === 'function') runCustomScenario();
+}
+
 function sbUpdateMechanic() {
   const mech = document.getElementById('sb-mechanic').value;
   document.getElementById('sb-concession-params').style.display = mech === 'Concession' ? '' : 'none';
@@ -51969,6 +52090,8 @@ function sbUpdateMechanic() {
   document.getElementById('sb-buyback-params').style.display = mech === 'Buy-back' ? '' : 'none';
   document.getElementById('sb-revshare-params').style.display = mech === 'Revenue Share' ? '' : 'none';
   document.getElementById('sb-grosssplit-params').style.display = mech === 'Gross Split' ? '' : 'none';
+  // v883 (T2): a ladder belongs to a PSC country. Switching mechanic makes it stale.
+  if (mech !== 'PSC' && typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
 }
 
 function sbGetParams() {
@@ -51994,6 +52117,11 @@ function sbGetParams() {
       cit_rate:            (parseFloat(document.getElementById('sb-psc-cit').value) || 0) / 100,
       royalty_rate:        (parseFloat(document.getElementById('sb-psc-royalty').value) || 0) / 100,
     };
+    // v883 (T2): the one line that was missing. dcfPSC() has read tier_schedule since the
+    // engine was written and runLiveDCF() has always passed it; this rebuild dropped it, so
+    // the modal ran a flat split on all 51 ladder countries.
+    var _useT883 = document.getElementById('sb-use-tiers');
+    if (window._sbTiers && _useT883 && _useT883.checked) params.tier_schedule = window._sbTiers;
   } else if (mech === 'PRRT') {
     params = {
       prrt_rate:   +(document.getElementById('sb-prrt-rate').value || 40) / 100,
@@ -52646,7 +52774,11 @@ function _sbFormFingerprint() {
     'sb-fee','sb-tsc-cit','sb-ept','sb-prrt-rate','sb-prrt-cit','sb-prrt-royalty','sb-prrt-uplift',
     'sb-bb-fee','sb-bb-cap','sb-bb-term','sb-bb-cit','sb-rs-govt','sb-rs-cit','sb-rs-royalty',
     'sb-gs-cont','sb-gs-dmo','sb-gs-dmo-price','sb-gs-cit'];
-  return ids.map(function(i){ var e = document.getElementById(i); return e ? String(e.value) : ''; }).join('|');
+  // v883 (T2): the ladder toggle changes the regime that runs, so it is part of the form
+  // state the "edited since load" strip is comparing.
+  var _ut = document.getElementById('sb-use-tiers');
+  return ids.map(function(i){ var e = document.getElementById(i); return e ? String(e.value) : ''; }).join('|')
+    + '|tiers:' + (window._sbTiers ? (_ut && _ut.checked ? 'on' : 'off') : 'none');
 }
 
 // The provenance strip rendered directly under the Scenario Builder result header whenever the
@@ -52911,6 +53043,13 @@ function ddOpenScenarioBuilder(country) {
     if (el('sb-po-govt')) el('sb-po-govt').value = Math.round((params.profit_oil_govt_pct || 0.6) * 100);
     if (el('sb-psc-cit')) el('sb-psc-cit').value = Math.round((params.cit_rate || 0) * 100);
     if (el('sb-psc-royalty')) el('sb-psc-royalty').value = Math.round((params.royalty_rate || 0) * 100);
+    // v883 (T2): carry this country's R-factor ladder into the modal. Without it the flat box
+    // above was the whole profit-oil term, which is the figure Country Profile explicitly says
+    // the engine does not read -- and the modal is where that page sends the analyst.
+    if (typeof _sbArmTiers === 'function') {
+      if (Array.isArray(params.tier_schedule) && params.tier_schedule.length) _sbArmTiers(params.tier_schedule, country);
+      else _sbDisarmTiers();
+    }
   } else if (mechEl && mechEl.value === 'TSC') {
     const el = id => document.getElementById(id);
     if (el('sb-fee')) el('sb-fee').value = params.fee_per_bbl || 4;
@@ -59426,6 +59565,9 @@ function openScenarioBuilder() {
   // v607 (T2): and drop the country provenance with it. ddOpenScenarioBuilder() calls this
   // first and re-arms _sbOrigin afterwards, so a header-opened scenario carries no country claim.
   window._sbOrigin = null;
+  // v883 (T2): and no ladder either. ddOpenScenarioBuilder() calls this first and re-arms
+  // afterwards, so only a country pre-fill can leave one armed.
+  if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
   // Focus trap: move focus to first focusable element inside modal
   var focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
   if (focusable.length) focusable[0].focus();
