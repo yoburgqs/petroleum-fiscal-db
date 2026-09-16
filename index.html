@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v878</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v879</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -25767,6 +25767,50 @@ function _fpMonopolyReason(d) {
     + '100/100 HIGH, this platform\u2019s top stability grade, for a regime closed to IOC equity. '
     + 'Read it as a state monopoly, not as stability. Carry no predictability claim for ' + nm + ' into an IC memo.';
 }
+// ── v879 (T5): the contractor-NPV analogue of v564's breakeven refusal ──────────────────────
+//
+// Walked T5 cold: Country Profile -> Saudi Arabia -> "Copy for IC Memo" -> paste into a memo.
+// The pasted assumption table carried
+//
+//     Contractor NPV @ $50/bbl (downside)    $0M
+//     Contractor NPV @ $75/bbl (base case)   $0M
+//     Contractor NPV @ $125/bbl (upside)     $0M
+//
+// in the same column, same format and same weight as Norway's $826M. Kuwait and Bahrain paste
+// the identical three rows. $0M there is not a valuation: government take is 100.0% at every
+// modelled price, the acreage is held by the national oil company, and the DCF returns zero
+// because a 100% take leaves nothing to discount. It is the arithmetic of the take, not a
+// contractor position an IOC could hold and found worthless -- and pasted into a screening memo
+// beside modelled NPVs it ranks the three largest Gulf producers LAST on contractor value, which
+// is a category error rather than a fiscal finding.
+//
+// The rest of the platform already refuses it for exactly these three. v529 set the rule (state
+// monopolies carry no rank, no contractor NPV, no breakeven and no tier); v614 applied it to the
+// Side-by-Side Contractor NPV rows, which print an em dash; Fiscal Compare partitions them out;
+// _fpNoContractorPosition() refuses them a predictability score; formatBreakeven() and v564
+// refuse the be_75 = 1.0 solver floor on this very page. The Country Profile's NPV column was the
+// last surface still asserting the number -- on screen, in the 4-price paste, in the IC citation,
+// in the assumption table and in the workbook: the five places that leave the tool.
+//
+// Same treatment as the breakeven it sits beside: withhold the figure, say why in the cell, and
+// carry the reason as a note so it survives an editor who keeps the table and deletes the prose.
+var CP_MONO_NPV = 'n/a \u2014 no contractor position';
+function _cpNpvRefused(d) {
+  return (typeof _fpNoContractorPosition === 'function') && _fpNoContractorPosition(d);
+}
+function _cpMonoNpvNote(d) {
+  var nm = (d && d.country) ? d.country : 'This country';
+  var t  = (d && d.take_75 != null) ? d.take_75.toFixed(1) : '100.0';
+  return 'Contractor NPV, ' + CP_MONO_NPV + ' \u2014 ' + nm + ' is a state monopoly: government take is '
+    + t + '% at $50, $75, $100 and $125/bbl alike, the acreage is held by the national oil company, and '
+    + 'ORCA models no investor cash flow for it. The DCF does return $0M at every price, but that is the '
+    + 'arithmetic of a 100% take leaving nothing to discount \u2014 not a contractor position valued at zero. '
+    + 'Printed as $0M next to a modelled NPV it ranks ' + nm + ' last on contractor value, which is the '
+    + 'absence of a contractor and not a poor return, so the figure is withheld here the way this platform '
+    + 'already withholds ' + nm + '\u2019s breakeven, its rank and its predictability score. Carry the '
+    + t + '% take and the closure to IOC equity into the IC memo; carry no contractor NPV, and no '
+    + 'breakeven \u2014 there is no price at which contractor NPV crosses zero.';
+}
 function _fpDispersion(d) {
   if (!d) return { state: 'none', iqr: null };
   if (_fpNoContractorPosition(d)) return { state: 'monopoly', iqr: null };
@@ -26844,6 +26888,11 @@ function renderExplorer() {
 // cache (cpObsSpread) means each country is fetched at most once per session, and a row whose
 // file is missing or unreadable is left exactly as it rendered rather than guessed at.
 function _expApplyObsSpread() {
+  // v879 (T5): the Explorer's XLSX reads the same ceiling through _fpXlsx(), but this observer
+  // only ever resolved the rows that scrolled into view — so a workbook exported after a glance
+  // at the top of the table carried the bound on the visible rows and the withdrawn score on the
+  // rest. Same warm the Screener fires, once per session, so the FILE is whole.
+  if (typeof _scWarmObsCeilingsSoon === 'function') _scWarmObsCeilingsSoon();
   if (typeof _fpObsCeiling !== 'function' || typeof cpObsSpread !== 'function') return;
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return;
   // A re-render replaces the cells the previous observer was watching, so drop it first.
@@ -34868,6 +34917,12 @@ function runScreener() {
   // entering this tab re-renders the body several times as the price deck and the grouping
   // settle, and each pass would otherwise observe a different top-of-table and fetch it.
   if (typeof _scHydrateTermChipsSoon === 'function') _scHydrateTermChipsSoon();
+
+  // v879 (T5): load the contract samples the predictability ceiling is read from, once per
+  // session and deferred to idle, so that pressing "Copy for IC Memo" / CSV / XLSX writes the
+  // bound rather than the withdrawn score — and writes it from a synchronous path, which is
+  // what keeps the clipboard call inside the analyst's own click.
+  if (typeof _scWarmObsCeilingsSoon === 'function') _scWarmObsCeilingsSoon();
 }
 
 // ── v730 (T6): the Screener Evidence column graded the wrong thing for a T6 analyst ──
@@ -35129,10 +35184,26 @@ function _scExportBasisLines() {
   })();
   // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
   L.push(_icIrrNote('IRR is not reported'));
-  L.push('Fiscal_Predictability is the same score the Country Profile and Side-by-Side show '
-    + '(100 less IQR, price-swing and multi-mechanic penalties). Countries with no contract-level '
-    + 'take distribution read "not scored" — absence of a distribution is not evidence of stability. '
-    + 'Distinct from the Reform Risk tab, which counts legislative changes since 2010.');
+  // v879 (T5): this line used to promise agreement with the Country Profile and Side-by-Side
+  // while the column below it disagreed with both on 45 of the 160 scoreable countries. The
+  // column now carries the ceiling those tabs print; the note says what a "≤" cell means.
+  L.push((function(){
+    var nCeil = 0, nBand = 0;
+    try {
+      (window._scExportCeilStats || []).forEach(function(x){ nCeil++; if (x.bandMoves) nBand++; });
+    } catch (e) {}
+    return 'Fiscal_Predictability is the same reading the Country Profile, Side-by-Side, the Explorer '
+      + 'and the Reform Risk card print — 100 less IQR, price-swing and multi-mechanic penalties, and '
+      + 'then BOUNDED where ORCA\u2019s own contract table for that country refutes the take spread the '
+      + 'score was penalised on. A cell beginning "\u2264" is a CEILING, not a score: the stored figure '
+      + 'beside it is WITHDRAWN and must not be carried into a memo, and the true value is at or below '
+      + 'the bound, never above. ' + (nCeil ? nCeil + ' row' + (nCeil === 1 ? ' in this file is' : 's in this file are')
+      + ' bounded this way' + (nBand ? ', ' + nBand + ' of them into a different band' : '') + '. ' : '')
+      + 'Nothing is recomputed: a top-N-by-production sample cannot establish a population IQR, so the '
+      + 'correction is stated as a bound. Countries with no contract-level take distribution read '
+      + '"not scored" — absence of a distribution is not evidence of stability. Distinct from the '
+      + 'Reform Risk tab, which counts legislative changes since 2010.';
+  })());
   L.push('Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
     + ' — yoburgqs.github.io/petroleum-fiscal-db/  |  Exported ' + new Date().toISOString().slice(0, 10));
   return L;
@@ -35142,27 +35213,171 @@ function _scExportBasisLines() {
 // Both read from the same functions the screens render from. Where a reading does not exist
 // these return the words the screens print — 'not scored', 'n/c' — never a number, and never
 // a blank that a spreadsheet sorts as zero. An absent reading is not a good one.
-function _fpXlsx(d) {
+// ── v879 (T5): the predictability score that LEAVES this platform was the withdrawn one ──
+//
+// Walked T5 cold at 1440x900: Home -> Screener -> "Copy for IC Memo" -> paste into Word.
+// The pasted shortlist's Fiscal predictability column read, for every row:
+//     Norway       76/100 - one statutory term - spread component not exercised
+//     Colombia     72/100 - one statutory term - spread component not exercised
+//     Netherlands  84/100 - one statutory term - spread component not exercised
+// Open the Explorer in the same session and its STABILITY cell for those same countries reads
+// "<=52 | LOW | 76 | >=29.6pp obs", "<=40 | VERY LOW | 72 | >=39.4pp obs", "<=59 | LOW". Country
+// Profile, Side-by-Side and the Reform Risk card all print the same bound and all say in so many
+// words: carry the ceiling, NOT the stored score, which is withdrawn.
+//
+// Measured live this cycle against api/v1/country/*.json for all 185, not asserted: 160 countries
+// are scoreable, 51 resolve to a ceiling, 45 clear the materiality bar and on 41 the BAND MOVES.
+//     Uzbekistan  89 HIGH     -> <=49 LOW        (40 points)
+//     Angola      62 MODERATE -> <=26 VERY LOW   (36)
+//     Colombia    72 MODERATE -> <=40 VERY LOW   (32)
+//     Norway      76 HIGH     -> <=52 LOW        (24)
+//     Nigeria     73 MODERATE -> <=46 LOW        (27, measured cohort)
+// Every one of those 45 went into the clipboard, the CSV and the XLSX as a bare number with a
+// basis string - "spread component not exercised" - that reads like a technical footnote rather
+// than like a withdrawal.
+//
+// This is worse than the four surfaces already fixed (v644 CP paragraph, v719/v720 Reform Risk
+// and CP graded branch, v758 CP one-term branch, v863/v875 Side-by-Side), because the Screener
+// prints NO predictability column on screen at all. There is nothing on the tab for the analyst
+// to notice the contradiction against. The number only becomes visible once it is in the
+// committee document, which is the one place it cannot be walked back.
+//
+// _fpExportCell() is now the single source for every predictability figure that leaves the
+// platform in a file or on the clipboard, and it reads the SAME _fpObsCeiling() object the
+// screens paint from - so the artifact and the tab can no longer disagree. Nothing is
+// recomputed: a top-N-by-production sample cannot establish a population IQR, so the bound is
+// stated as a ceiling and never as a score.
+function _fpExportCell(d) {
   var score = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
   var disp  = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : { state: 'none', iqr: null };
   if (score === null || score === undefined) {
-    return { score: 'not scored', band: 'not scored',
+    return { score: 'not scored', band: 'not scored', material: false, resolved: true,
+             brief: disp.state === 'monopoly'
+               ? 'no contractor position to score — state monopoly'
+               : 'no contract-level take distribution held — not computed, not a spread of zero',
              basis: disp.state === 'monopoly'
                ? 'no contractor position to score — state monopoly'
                : 'no contract-level take distribution held — not computed, not a spread of zero' };
   }
-  if (disp.state === 'single') {
-    // The v624 rule, carried into the file: a one-term score was never charged the IQR
-    // penalty, so the band its number would fall in was not earned. UNGRADED, as on screen.
-    return { score: score, band: 'UNGRADED',
-             basis: 'one term — every contract prices identically, so the take-spread penalty '
-                  + '(the largest of the three, up to −40) was never charged. Price swing and '
-                  + 'mechanic count only. Do not rank this above a graded score.' };
+  // The v624 rule, carried into every file: a one-term score was never charged the IQR penalty,
+  // so the band its number would fall in was not earned. UNGRADED, as on screen.
+  var baseBand = disp.state === 'single'
+    ? 'UNGRADED'
+    : ((typeof _fpBandLabel === 'function') ? _fpBandLabel(score) : '');
+  var baseBasis = disp.state === 'single'
+    ? 'one term — every contract prices identically, so the take-spread penalty '
+      + '(the largest of the three, up to −40) was never charged. Price swing and '
+      + 'mechanic count only. Do not rank this above a graded score.'
+    : disp.iqr.toFixed(1) + 'pp measured spread across this country’s own contracts '
+      + '— the take-spread penalty IS charged here. Only the measured cohort carries a graded band.';
+
+  var c = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+  if (!c) {
+    // No contract sample in memory for this country, or one that does not conflict. Say which,
+    // rather than letting a bare score read as a checked one. _scWarmObsCeilings() loads the
+    // samples in the background as soon as the Screener renders, so 'unchecked' is the rare case.
+    var have = (typeof cpObsSpread === 'function') && !!cpObsSpread(d.country);
+    return { score: score, band: baseBand, material: false, resolved: have,
+             brief: baseBasis + (have ? '' : ' — ceiling NOT checked: this country’s contract '
+               + 'table was not loaded when the file was written. Open its Country Profile before citing this score.'),
+             basis: baseBasis + (have
+               ? ' Checked against this country’s own contract table: it does not contradict the basis above.'
+               : ' CEILING NOT CHECKED — this country’s contract table was not loaded when the file was '
+                 + 'written, so the correction ORCA applies on 45 of 160 scoreable countries was not tested here. '
+                 + 'Open its Country Profile on the platform before citing this score.') };
   }
-  return { score: score, band: (typeof _fpBandLabel === 'function') ? _fpBandLabel(score) : '',
-           basis: disp.iqr.toFixed(1) + 'pp measured spread across this country\u2019s own contracts '
-                + '— the take-spread penalty IS charged here. Only the measured cohort carries a graded band.' };
+
+  var rng = c.obs.min.toFixed(1) + '–' + c.obs.max.toFixed(1) + '%';
+  var refuted = 'ORCA’s own contract file '
+    + (c.oneTerm ? 'refutes the one-term basis' : 'contradicts the ' + c.iqr.toFixed(1) + 'pp bundled spread')
+    + ' this score was built on: the ' + c.obs.n + ' largest producing contracts it holds for this country run '
+    + rng + ' government take at $75/bbl across ' + c.obs.distinct + ' distinct values ('
+    + c.obs.spread.toFixed(1) + 'pp). The interquartile-range term, the score’s largest at up to −40 '
+    + 'points, was charged ' + c.charged.toFixed(0) + ' where the observed dispersion costs ' + c.cost.toFixed(0)
+    + '. Nothing is recomputed — a top-' + c.obs.n + '-by-production sample cannot establish a population '
+    + 'IQR — but that dispersion is a FLOOR on the real spread, so ' + c.bound + ' is a CEILING on the '
+    + 'score: the true figure is at or below it, never above.';
+
+  if (!c.material) {
+    return { score: score, band: baseBand, material: false, resolved: true,
+             brief: baseBasis + ' · bounded at ≤' + c.bound + ' by this country’s own contract table ('
+               + rng + ' observed)',
+             basis: baseBasis + ' Bounded at ≤' + c.bound + '/100 by this country’s own contract table. '
+               + refuted };
+  }
+  // Material: the cell itself must state the figure to carry. An editor who keeps the table and
+  // cuts the notes is the case v752 fixed for take, and it is the case that sends 76 to committee.
+  return {
+    score: '≤' + c.bound, band: c.band + ' (ceiling)', material: true, resolved: true,
+    withdrawn: score, bandMoves: !!c.bandMoves,
+    brief: 'carry this, not the stored ' + score
+      + (c.bandMoves ? ' · ' + c.printedBand : '') + ', which is withdrawn; this country’s own contracts run '
+      + rng + ' (' + c.obs.spread.toFixed(1) + 'pp across its ' + c.obs.n + ' largest producers)',
+    basis: 'CARRY ≤' + c.bound + ' · ' + c.band + ' INTO THE MEMO, NOT the ' + score
+      + (c.bandMoves ? ' · ' + c.printedBand : '') + ' this platform stores — that figure is withdrawn. '
+      + refuted + ' Quote ≤' + c.bound + ' · ' + c.band + ' with the observed range ' + rng
+      + ' attached. Country Profile, Side-by-Side, the Explorer and the Reform Risk card all print this same '
+      + 'bound. For context on the withdrawn figure: ' + baseBasis };
 }
+
+// ── v879 (T5): warm the contract samples the ceiling is read from ─────────────────────────
+// _fpObsCeiling() resolves out of window._cpObsSpread, which until now was only ever filled by
+// opening a Country Profile, an Explorer row scrolling into view, or a Side-by-Side column. An
+// analyst who lands on the Screener, screens, and copies has filled none of them, so the ceiling
+// was null for every row and the export pasted the stored score bare.
+// The samples are api/v1/country/<slug>.json, the same files the Explorer already fetches one at
+// a time. Measured: all 185 at concurrency 8 complete in 77ms against a local server. Fired once
+// per session, deferred to idle, and only for the countries whose dispersion state can carry a
+// ceiling at all - so the export path stays SYNCHRONOUS and the clipboard write keeps its user
+// gesture. Where a row is somehow still unresolved at write time, _fpExportCell() says so in the
+// cell rather than printing an unchecked score as though it had been checked.
+window._scObsWarmed = window._scObsWarmed || false;
+function _scWarmObsCeilings() {
+  if (window._scObsWarmed) return;
+  if (typeof fetch !== 'function') return;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+  if (typeof cpObsSpread !== 'function' || typeof cpRecordObsSpread !== 'function') return;
+  if (typeof _fpDispersion !== 'function') return;
+  window._scObsWarmed = true;
+  var want = [];
+  for (var i = 0; i < COUNTRY_DATA.length; i++) {
+    var d = COUNTRY_DATA[i];
+    if (!d || !d.country || cpObsSpread(d.country)) continue;
+    var st = _fpDispersion(d).state;
+    if (st !== 'single' && st !== 'measured') continue;   // monopoly / no distribution: nothing to bound
+    want.push(d.country);
+  }
+  if (!want.length) return;
+  var next = 0;
+  var lane = function() {
+    if (next >= want.length) return Promise.resolve();
+    var c = want[next++];
+    var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return fetch('api/v1/country/' + slug + '.json')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(j) {
+        if (j && j.top_contracts && j.top_contracts.length) cpRecordObsSpread(c, j.top_contracts);
+      })
+      .catch(function() {})
+      .then(lane);
+  };
+  var lanes = [];
+  for (var k = 0; k < 8; k++) lanes.push(lane());
+  Promise.all(lanes).then(function() {
+    window._scObsWarmReady = true;
+    // The Screener prints no predictability column, so nothing on screen needs repainting. The
+    // surfaces that DO paint one resolve it themselves and now find the sample already cached.
+  });
+}
+window._scWarmObsCeilings = _scWarmObsCeilings;
+function _scWarmObsCeilingsSoon() {
+  if (window._scObsWarmed) return;
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(_scWarmObsCeilings, { timeout: 2000 });
+  else setTimeout(_scWarmObsCeilings, 0);
+}
+window._scWarmObsCeilingsSoon = _scWarmObsCeilingsSoon;
+
+function _fpXlsx(d) { return _fpExportCell(d); }
 function _rrXlsx(d) {
   var ev = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY && d)
              ? (REFORM_HISTORY[d.country] || []) : [];
@@ -35484,10 +35699,17 @@ function _scExportRows() {
   // v728 (T5): one choke point for all three export paths — clipboard, CSV and XLSX — so a
   // hand-ticked shortlist cannot apply to one button and not the others.
   var _sel = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+  var _ceilStats = [];
   var _all = data.map(function(d, i) {
     var fc = _scFeeCmpAt(d, '75');
     var fp = getFiscalPredictabilityScore(d);
     var disp = _fpDispersion(d);
+    var _fpX = _fpExportCell(d);
+    // v879 (T5): the basis block reports how many rows in THIS file carry a bound, and how many
+    // of those move band, so an IC reader opening the workbook cold knows the correction applied
+    // before they read a single score. Collected here, from the same object the cell is written
+    // from, rather than read back out of the rendered prose.
+    if (_fpX.material) _ceilStats.push({ c: d.country, bandMoves: !!_fpX.bandMoves });
     // v873 (T5): see the Breakeven_bbl note below. True for the three regimes whose stored
     // be_75 is the DCF floor artifact rather than a breakeven.
     var _beArtifact = (disp.state === 'monopoly') || (d.be_75 != null && d.be_75 > 0 && d.be_75 <= 1);
@@ -35555,13 +35777,28 @@ function _scExportRows() {
       Breakeven_bbl: _beReal ? d.be_75 : null,
       Breakeven_Tested: _beArtifact ? 'n/a — no contractor position' : _beReal ? 'Yes' : 'No',
       Swing_pp: d.swing,
-      Fiscal_Predictability: fp == null ? 'not scored' : fp,
+      // ── v879 (T5): the citable figure, not the withdrawn one ──────────────────────
+      // Was `fp` bare, with a basis string ("one statutory term — spread component not
+      // exercised") that reads as a technical footnote. On 45 of the 160 scoreable countries
+      // the Explorer, Country Profile, Side-by-Side and Reform Risk card all print a CEILING
+      // instead, and on 41 of those the band moves — Uzbekistan 89 HIGH to <=49 LOW, Colombia
+      // 72 MODERATE to <=40 VERY LOW, Norway 76 HIGH to <=52 LOW. The Screener prints no
+      // predictability column on screen, so the contradiction only became visible once the
+      // score was already in the committee document. _fpExportCell() reads the same
+      // _fpObsCeiling() object those screens paint from; all three Screener export paths —
+      // clipboard, CSV and XLSX — build from this one object.
+      Fiscal_Predictability: _fpX.score,
+      Predictability_Band: _fpX.band,
       Predictability_Basis: disp.state === 'monopoly' ? 'not scored — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% take at every price, contractor NPV $0'
         : disp.state === 'none' ? 'no contract-level take distribution held'
-        : disp.state === 'single' ? 'one statutory term — spread component not exercised'
-        : 'measured spread ' + disp.iqr.toFixed(1) + 'pp'
+        : disp.state === 'single' && !_fpX.material && _fpX.resolved && !/bounded at/.test(_fpX.brief) ? 'one statutory term — spread component not exercised'
+        : disp.state === 'measured' && !_fpX.material && _fpX.resolved && !/bounded at/.test(_fpX.brief) ? 'measured spread ' + disp.iqr.toFixed(1) + 'pp'
+        : _fpX.brief
     };
   });
+
+  window._scExportCeilStats = _ceilStats;
+
   // Rank is left at the position each country held in the FULL screen, not renumbered 1..N.
   // "Norway, #14 of the 143 that passed" is a defensible line in a memo; "Norway, #2" of a
   // hand-picked six is not a screening result at all.
@@ -35703,7 +35940,12 @@ function _scCopyColumns(rows, price) {
       if (r.Fiscal_Predictability === 'not scored') {
         return /^not scored/.test(basis) ? basis : 'not scored — ' + basis;
       }
-      return r.Fiscal_Predictability + '/100 — ' + basis;
+      // v879 (T5): where the stored score is withdrawn, the CELL leads with the ceiling and its
+      // band. An editor who keeps this table and cuts the notes below it must not be able to send
+      // the withdrawn figure to committee — the same rule v752 established for take.
+      var sc = String(r.Fiscal_Predictability);
+      if (/^≤/.test(sc)) return sc + '/100 · ' + String(r.Predictability_Band || '') + ' — ' + basis;
+      return sc + '/100 — ' + basis;
     } });
   // v844 (T6): the EVIDENCE column the screen prints beside Govt Take, which the clipboard
   // table dropped. "Data basis" below is production vs proxy — a different question — and was
@@ -42082,8 +42324,21 @@ function loadCountryProfile(country) {
           const npvAbs = Math.abs(npv || 0);
           // v816 (T3): 2dp in the B range. These four rows are one country's NPV at four prices
           // read against each other -- the CP analogue of the Side-by-Side Contractor NPV rows.
-          const npvStr = npv != null ? (npv < 0 ? '-' : '') + '$' + (npvAbs >= 1000 ? (npvAbs/1000).toFixed(2)+'B' : Math.round(npvAbs)+'M') : '—';
-          const npvSpark = npvSparkbar(npv, maxNpv);
+          // v879 (T5): the three state monopolies rendered $0M here at all four prices, and this
+          // is the table the "Copy as IC table" button under it serialises. Withheld on the same
+          // grounds v564 withholds their breakeven one column to the right — see _cpMonoNpvNote().
+          const _npvMono879 = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
+          const npvStr = _npvMono879
+            ? '<span style="color:var(--muted);font-size:11px;cursor:help;" title="' + (d.country || 'This country')
+              + ' is a state monopoly — government take is ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0')
+              + '% at every modelled price and the acreage is held by the national oil company, so ORCA models no '
+              + 'investor cash flow for it. The DCF returns $0M because a 100% take leaves nothing to discount; that '
+              + 'is the arithmetic of the take, not a contractor position valued at zero. Printed as $0M beside a '
+              + 'modelled NPV it would rank this country last on contractor value, which is the absence of a '
+              + 'contractor and not a poor return — so it is withheld here, as its breakeven, its rank and its '
+              + 'predictability score already are.">n/a &mdash; no contractor position</span>'
+            : npv != null ? (npv < 0 ? '-' : '') + '$' + (npvAbs >= 1000 ? (npvAbs/1000).toFixed(2)+'B' : Math.round(npvAbs)+'M') : '—';
+          const npvSpark = _npvMono879 ? '' : npvSparkbar(npv, maxNpv);
           // v456: Govt NPV (est.) removed — derived formula (Ctct NPV × take/(1−take)) undermines credibility
           // at the point of IC decision; same removal as v451 FC table. Use Contractor NPV directly.
           const beId = 'dd-be-' + safe + '-' + priceKey;
@@ -42291,14 +42546,18 @@ function loadCountryProfile(country) {
       const _beR      = _cpIcBe(d, country);
       const _beCell   = _beR.cell;
       const _beNote   = _beR.note;
+      // v879 (T5): same refusal as the on-screen NPV column this table serialises.
+      const _monoNpv879 = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
+      const _npvCell879 = function(v){ return _monoNpv879 ? CP_MONO_NPV : _npvC(v); };
       const _hdr  = ['Price', 'Govt Take %', 'Delta vs $50', 'Contractor NPV ($M)', 'Breakeven'];
       const _body = [
-        ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',                _npvC(d.npv_50),  ''],
-        ['$75',  d.take_75  != null ? d.take_75.toFixed(1)+'%'  : '—', _dlt(d.take_75),    _npvC(d.npv_75),  _beCell],
-        ['$100', d.take_100 != null ? d.take_100.toFixed(1)+'%' : '—', _dlt(d.take_100),   _npvC(d.npv_100), ''],
-        ['$125', d.take_125 != null ? d.take_125.toFixed(1)+'%' : '—', _dlt(d.take_125),   _npvC(d.npv_125), '']
+        ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',                _npvCell879(d.npv_50),  ''],
+        ['$75',  d.take_75  != null ? d.take_75.toFixed(1)+'%'  : '—', _dlt(d.take_75),    _npvCell879(d.npv_75),  _beCell],
+        ['$100', d.take_100 != null ? d.take_100.toFixed(1)+'%' : '—', _dlt(d.take_100),   _npvCell879(d.npv_100), ''],
+        ['$125', d.take_125 != null ? d.take_125.toFixed(1)+'%' : '—', _dlt(d.take_125),   _npvCell879(d.npv_125), '']
       ];
       const _notes = [];
+      if (_monoNpv879 && typeof _cpMonoNpvNote === 'function') _notes.push(_cpMonoNpvNote(d));
       if (_beNote) _notes.push(_beNote);
       // v516: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page.
       _notes.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
@@ -43134,6 +43393,7 @@ function exportCountryProfile() {
   const _cpBasis  = (typeof _icProdBasisCell === 'function') ? _icProdBasisCell(d) : '';
   const _cpFb     = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
   const _cpMono   = (typeof _fpNoContractorPosition === 'function') && _fpNoContractorPosition(d);
+  const _cpMonoNpv = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);   // v879 (T5)
   const _cpCmp    = (_cpFb && _cpFb.diverges)
       ? 'NOT comparable as published — ' + Number(_cpFb.n2).toLocaleString() + ' of '
         + Number(_cpFb.tot).toLocaleString() + ' contracts (' + _cpFb.feePct.toFixed(0)
@@ -43201,10 +43461,16 @@ function exportCountryProfile() {
     { Metric: 'Take P75 @$75 (%)', Value: d.p75_take != null ? +d.p75_take.toFixed(1) : null },
     { Metric: '', Value: '' },
     { Metric: 'Contractor NPV basis', Value: _cpNpvBasis },
-    { Metric: 'Contractor NPV @$50 ($M)', Value: d.npv_50 != null ? +d.npv_50.toFixed(1) : null },
-    { Metric: 'Contractor NPV @$75 ($M)', Value: d.npv_75 != null ? +d.npv_75.toFixed(1) : null },
-    { Metric: 'Contractor NPV @$100 ($M)', Value: d.npv_100 != null ? +d.npv_100.toFixed(1) : null },
-    { Metric: 'Contractor NPV @$125 ($M)', Value: d.npv_125 != null ? +d.npv_125.toFixed(1) : null },
+    // v879 (T5): a numeric 0 in an NPV column sorts, charts and ranks as the worst value in the
+    // book. For the three state monopolies it is not a value at all — see _cpMonoNpvNote(). The
+    // cell carries the refusal in words so the workbook cannot be sorted on a number that is the
+    // absence of a contractor, and the reason follows on its own row.
+    { Metric: 'Contractor NPV @$50 ($M)', Value: _cpMonoNpv ? CP_MONO_NPV : (d.npv_50 != null ? +d.npv_50.toFixed(1) : null) },
+    { Metric: 'Contractor NPV @$75 ($M)', Value: _cpMonoNpv ? CP_MONO_NPV : (d.npv_75 != null ? +d.npv_75.toFixed(1) : null) },
+    { Metric: 'Contractor NPV @$100 ($M)', Value: _cpMonoNpv ? CP_MONO_NPV : (d.npv_100 != null ? +d.npv_100.toFixed(1) : null) },
+    { Metric: 'Contractor NPV @$125 ($M)', Value: _cpMonoNpv ? CP_MONO_NPV : (d.npv_125 != null ? +d.npv_125.toFixed(1) : null) },
+    ...(_cpMonoNpv ? [{ Metric: '   \u26a0 Contractor NPV \u2014 why the four rows above carry no figure',
+      Value: (typeof _cpMonoNpvNote === 'function') ? _cpMonoNpvNote(d) : '' }] : []),
     // v516: the four IRR @$price rows are gone. They were AVG(irr_pct) over each country's contract
     // set -- median 333% across the 165 countries that carry one, and non-monotonic in price for 29
     // of them, because the 999 sentinel drops a different subset of contracts at each price point.
@@ -48112,8 +48378,15 @@ function copyICCitation() {
   // "USA: Govt Take 23.4% @$75/bbl, $3308M NPV, 421.4% IRR" into an IC memo. It is now the $50/bbl
   // downside NPV -- same profile, computed for all 185 countries, and it is the figure an IC
   // actually interrogates next to a base-case NPV.
-  var npvStr = (d.npv_75 != null) ? cpNpvFmt(d.npv_75) + ' NPV @$75' : '';
-  var downStr = (d.npv_50 != null) ? cpNpvFmt(d.npv_50) + ' @$50 downside' : '';
+  // v879 (T5): this cite pasted "$0M NPV @$75, $0M @$50 downside" for Saudi Arabia, Kuwait and
+  // Bahrain — a modelled-looking contractor NPV for three jurisdictions closed to IOC equity, in
+  // the one string that goes into a memo footnote whole. See _cpMonoNpvNote().
+  var _citeNpvRefused = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
+  var npvStr = _citeNpvRefused
+    ? 'no contractor NPV — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0')
+      + '% take at every modelled price and no investor cash flow modelled'
+    : (d.npv_75 != null) ? cpNpvFmt(d.npv_75) + ' NPV @$75' : '';
+  var downStr = _citeNpvRefused ? '' : (d.npv_50 != null) ? cpNpvFmt(d.npv_50) + ' @$50 downside' : '';
   var _beRes = cpBeFor(d);   // v512: resolved value, not the bundled-table null
   // v642 (T2): the profile now prints an NPV-bracketed breakeven bound where no solved figure
   // exists. It travels with the cite, marked as a bound, so the pasted line cannot be read as a
@@ -48209,8 +48482,16 @@ function _cpIcBe(d, country) {
           ? 'Breakeven ' + bound.txt + ' is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
             + country + '. The range is arithmetic on the four contractor NPVs in this table, on the same '
             + 'standardized Deepwater profile. Cite it as a bound, not as a price.'
-          : 'Breakeven is not reported for ' + country + ': ORCA carries no solved value, and the four '
-            + 'contractor NPVs in this table do not bracket one.'
+          : ((typeof _cpNpvRefused === 'function') && _cpNpvRefused(d))
+            // v879 (T5): this branch told the analyst the four contractor NPVs "do not bracket one"
+            // — reasoning from four $0M values that are now withheld as not being a contractor
+            // position at all. For a state monopoly the reason is the closure, not a failed solve.
+            ? 'Breakeven is not reported for ' + country + ': government take is '
+              + (d && d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% at every modelled price, '
+              + 'so no investor cash flow is modelled and there is no price at which contractor NPV '
+              + 'crosses zero. Not a failed solve — there is no contractor position to break even.'
+            : 'Breakeven is not reported for ' + country + ': ORCA carries no solved value, and the four '
+              + 'contractor NPVs in this table do not bracket one.'
   };
 }
 function cpCopyICTable(safe) {
@@ -48220,7 +48501,12 @@ function cpCopyICTable(safe) {
   if (_d) {
     var _be = _cpIcBe(_d, P.country);
     P.body[1][4] = _be.cell;   // the $75 row carries the breakeven cell
-    P.notes = [_be.note, typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '']
+    // v879 (T5): this rebuild replaced the whole notes array, so the state-monopoly NPV note the
+    // render attached was dropped at click time — i.e. in the paste, the only place it matters.
+    // It leads, because the NPV column sits left of Breakeven.
+    var _monoN = ((typeof _cpNpvRefused === 'function') && _cpNpvRefused(_d)
+                  && typeof _cpMonoNpvNote === 'function') ? _cpMonoNpvNote(_d) : '';
+    P.notes = [_monoN, _be.note, typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '']
       .filter(function(t){ return !!t; });
   }
 
@@ -48417,9 +48703,12 @@ function copyICSummary() {
   var swingStr = (d.take_125 != null && d.take_50 != null && d.take_125 < 200 && d.take_50 < 200)
     ? (d.take_125 - d.take_50).toFixed(1) + 'pp'
     : '—';
-  var npvStr = (d.npv_75 != null) ? cpNpvFmt(d.npv_75) : '—';
-  var npv50Str = (d.npv_50 != null) ? cpNpvFmt(d.npv_50) : '—';
-  var npv125Str = (d.npv_125 != null) ? cpNpvFmt(d.npv_125) : '—';
+  // v879 (T5): the three state monopolies pasted $0M here in the same column as Norway's $826M.
+  // See _cpMonoNpvNote() — the figure is withheld, not reformatted, and it carries a note.
+  var _npvRefused = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
+  var npvStr    = _npvRefused ? CP_MONO_NPV : (d.npv_75 != null) ? cpNpvFmt(d.npv_75) : '—';
+  var npv50Str  = _npvRefused ? CP_MONO_NPV : (d.npv_50 != null) ? cpNpvFmt(d.npv_50) : '—';
+  var npv125Str = _npvRefused ? CP_MONO_NPV : (d.npv_125 != null) ? cpNpvFmt(d.npv_125) : '—';
   var _beRes = cpBeFor(d);   // v512: resolved value, not the bundled-table null
   var _beBnd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;   // v642 (T2)
   var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl'
@@ -48507,6 +48796,8 @@ function copyICSummary() {
   var _notes = [];
   // Table order: the $75 take row sits above breakeven, so its note leads.
   if (_disp && _disp.note) _notes.push(_disp.note);
+  // v879 (T5): table order — the three Contractor NPV rows sit above Breakeven, so this note leads it.
+  if (_npvRefused) _notes.push(_cpMonoNpvNote(d));
   // The head is repeated inside the note so the note still identifies its own row after an
   // editor moves it; a comma rather than a second em dash, because the tail already opens with one.
   if (_beHT.tail)   _notes.push('Breakeven, ' + _beHT.head + ' — ' + _beHT.tail);
