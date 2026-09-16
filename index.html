@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v885</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v886</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v885</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v886</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46953,6 +46953,70 @@ function copyReformVerdict() {
 }
 window.copyReformVerdict = copyReformVerdict;
 
+// ── v886 (T4): the "Most recent change" line asserted changes that never happened ──────────
+// `latest` is the most recent event of ANY kind. On a jurisdiction whose newest entry is a
+// discovery, a first-oil date, a blockade or a terms review that concluded without
+// renegotiation, it is not a change at all — and this line called it one, unconditionally,
+// in the only plain-English sentence sitting between the stat tiles and the event log.
+// Three of the 21 covered jurisdictions printed a false fiscal change on a cold load:
+//   Guyana  "Most recent change (2022): Govt commission reviews Stabroek terms" — the 1999
+//           Stabroek PSA was never reopened; the commission concluded without renegotiation.
+//           Zero fiscal law changes on record at any date. Directly above it the same card
+//           prints score 100/100 and "Reforms since 2010: 0".
+//   Libya   "Most recent change (2020): LNA blockade lifted" — a blockade is not a statute,
+//           and it buried the real answer, EPSA-IV in 2004.
+//   Ghana   "Most recent change (2016): TEN field production start + ITLOS boundary ruling."
+// v585's IC-memo line (_icReformLine) already guards this and says so in its own comment —
+// "The tab's own card calls it 'Most recent change'" — so the clipboard has been telling the
+// truth while the screen it was copied from did not. This closes that gap the same way, and
+// then answers the question the analyst actually asked: when did the law last move. Where the
+// newest event is context, the real most-recent fiscal change is named beneath it, or its
+// absence is stated outright. A pre-2010 change is marked as outside the scoring window, so
+// Algeria (2005), Colombia (2007) and USA (2007) no longer read as untouched regimes that
+// happen to score 100.
+function _rrLatestLine(events, latest) {
+  if (!latest) return '';
+  var evs = events || [];
+  var wrap = function(h) { return '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px;">' + h + '</div>'; };
+  var takeChip = function(e) {
+    return e.take_change
+      ? ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:'
+        + (String(e.take_change).charAt(0) === '+' ? 'var(--red)' : 'var(--green)')
+        + ';">' + _rrEsc(e.take_change) + ' take</span>'
+      : ' <span style="color:var(--muted);">&mdash; take move not quantified</span>';
+  };
+
+  // The newest event IS a fiscal law change: the old line was correct, only under-specified.
+  if (_rrIsFiscalChange(latest)) {
+    return wrap('<strong>Most recent fiscal change (' + _rrEsc(latest.year) + '):</strong> '
+      + _rrEsc(latest.event) + takeChip(latest)
+      + ((latest.year || 0) < 2010
+          ? '<span style="color:var(--orange);font-weight:700;"> &mdash; before the 2010 scoring window, so it does not score</span>'
+          : ''));
+  }
+
+  // The newest event is CONTEXT. Say so, then answer the question that was actually asked.
+  var lastFiscal = evs.filter(_rrIsFiscalChange)
+                      .sort(function(a, b) { return (b.year || 0) - (a.year || 0); })[0] || null;
+  var ctxCount = evs.filter(function(e) { return !_rrIsFiscalChange(e); }).length;
+  var head = '<strong style="color:var(--orange);">Most recent sourced event ('
+    + _rrEsc(latest.year) + ') &mdash; not a fiscal change:</strong> ' + _rrEsc(latest.event)
+    + ' <em style="color:var(--muted);">(' + _rrEsc(latest.context_kind || 'no change to fiscal terms') + ')</em>';
+  var tail = lastFiscal
+    ? '<br><strong>Most recent fiscal change (' + _rrEsc(lastFiscal.year) + '):</strong> '
+      + _rrEsc(lastFiscal.event) + takeChip(lastFiscal)
+      + ((lastFiscal.year || 0) < 2010
+          ? '<span style="color:var(--orange);font-weight:700;"> &mdash; before the 2010 scoring window, so it does not score</span>'
+          : '')
+    : '<br><strong style="color:var(--orange);">No fiscal law change on record at any date.</strong> '
+      + '<span style="color:var(--muted);">All ' + ctxCount + ' sourced event'
+      + (ctxCount === 1 ? '' : 's') + ' for this jurisdiction changed no fiscal terms, '
+      + 'so the score is carried entirely by events that never touched the law. '
+      + 'That is an absence of recorded change, not a record of stability.</span>';
+  return wrap(head + tail);
+}
+window._rrLatestLine = _rrLatestLine;
+
 function renderReformCountryVerdict() {
   var sel = document.getElementById('rr-country-lookup');
   var out = document.getElementById('rr-country-verdict');
@@ -47199,11 +47263,7 @@ function renderReformCountryVerdict() {
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
     + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
     + '</div>'
-    + (latest
-        ? '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px;"><strong>Most recent change (' + _rrEsc(latest.year) + '):</strong> ' + _rrEsc(latest.event)
-          + (latest.take_change ? ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:' + (String(latest.take_change).charAt(0) === '+' ? 'var(--red)' : 'var(--green)') + ';">' + _rrEsc(latest.take_change) + ' take</span>' : '')
-          + '</div>'
-        : '')
+    + _rrLatestLine(events, latest)
     // v598 (T4): the events themselves, on the tab three other surfaces send the analyst to
     // for exactly this. Sits between the IC action and the profile route so the sentence
     // "size the premium against the rupture in the event log" now has the log under it.
