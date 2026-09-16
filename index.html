@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v880</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v881</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2549,7 +2549,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v880</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v881</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -29360,7 +29360,67 @@ function renderCompare() {
           + '"0pp swing, the most price-stable regime on the board" inverts it: there is no '
           + 'contractor position here whose returns could swing. The same placeholder is why the '
           + 'four Govt Take rows above and the Contractor NPV rows below are also withdrawn.') + '">\u2014</span>';
-      return d.swing !== null ? '+'+fmt(d.swing)+'pp' : '\u2014';
+      // v881 (T3): v697 guarded this row on isStateMonopoly() alone, and its own comment names
+      // "Iraq 6.6pp" as a case it meant to catch -- but Iraq's take_75 is 84.8%, so the predicate
+      // never fires on it. Price Swing is take@$125 minus take@$50: it is DERIVED from the four
+      // Govt Take rows three lines above, and it was the only row in the GOVT TAKE block that
+      // inherited none of their re-basings. Both are now inherited, from the same helpers those
+      // rows use, so the block cannot state one basis at four price points and a different one
+      // on the statistic computed from them.
+      //   1. Fee-blended columns. _cmpTakeCell prints "PSC/Conc x%" under every Govt Take cell on
+      //      a column that blends TSC/RSC/Buy-back; the swing derived from those same cells did
+      //      not. A fee-basis take% is pinned near 97-99% by the remuneration-fee structure at
+      //      EVERY price, so blending it in flattens the swing toward zero -- which on this
+      //      platform's own published legend ("<10pp = royalty-dominant, stable; preferred for
+      //      certainty mandates") is the BEST tier on the board. Measured over country_data.json,
+      //      11 columns are fee-blended and not state-monopoly, and 2 cross a legend tier:
+      //      Iraq prints +6.6pp (LOW) against +11.1pp comparable (MODERATE), and Iran prints
+      //      +13.5pp (MODERATE) against +4.6pp comparable (LOW) -- wrong in both directions.
+      //      In the walked Norway/Indonesia/Iraq set, Iraq's +6.6pp is the LOWEST swing on
+      //      screen, so the fee-basis artefact won the price-stability comparison outright.
+      //   2. Statutory-terms columns. Where the set mixes bases, _cmpBasisNote withdraws the
+      //      ordering marker and _cmpStatTakeFigure strips the tier colour from all four Govt
+      //      Take cells; the swing off those cells printed bare and full-weight. In the cold
+      //      default set the Netherlands showed "+10.4pp" with no marker, four rows under its own
+      //      "not ranked - statutory terms" take cells.
+      // Both paths ride the shared `rows` array into #cmp-data-table, the PDF and both clipboard
+      // flavours, so the IC-memo paste carries the comparable figure too.
+      if (d.swing == null || typeof d.swing !== 'number' || !isFinite(d.swing)) return '—';
+      const _swTxt = (v) => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1) + 'pp';
+      const _swBase = _swTxt(d.swing);
+      const _swSt = _cmpMixStat(d);
+      const _swNc = d.n != null ? Number(d.n).toLocaleString() : '?';
+      if (_cmpBasisGate && !_cmpHasProd(d)) {
+        return '<span style="color:var(--muted);cursor:help;" title="'
+          + _cmpEsc(d.country + ': ' + _swBase + ' is not on the same basis as the '
+            + 'production-weighted columns beside it, and it is not a ranking. It is the '
+            + 'difference between two simple averages of statutory terms across its ' + _swNc
+            + ' contracts -- ORCA holds no verified field production here, so nothing in this row '
+            + 'is weighted by barrels. The four Govt Take rows this figure is computed from are '
+            + 'already marked the same way, with the same hollow ring. Read the number; do not '
+            + 'read its position in the row, and do not carry it into an IC memo as the '
+            + 'price-stability ranking of this set.')
+          + '">○ ' + _swBase + '</span>'
+          + _cmpSubLine('not ranked · statutory terms', 'var(--muted)');
+      }
+      if (_swSt.blended && _swSt.g1 && _swSt.g1.t50 != null && _swSt.g1.t125 != null) {
+        const _swCmp = _swSt.g1.t125 - _swSt.g1.t50;
+        return _swBase + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+          + _cmpEsc(d.country + ': ' + _swTxt(_swCmp) + ' is the price swing across its '
+            + Number(_swSt.g1.n).toLocaleString() + ' production-sharing and concession contracts '
+            + 'alone -- take at $125/bbl (' + _swSt.g1.t125.toFixed(1) + '%) minus take at $50/bbl ('
+            + _swSt.g1.t50.toFixed(1) + '%). The headline ' + _swBase + ' above is computed off the '
+            + 'blended Govt Take rows, which fold in ' + Number(_swSt.n2).toLocaleString()
+            + ' fee-basis contracts (' + _cmpMechNames(_swSt, 2) + '). A fee-basis contractor is '
+            + 'paid a fixed $/bbl remuneration and keeps none of the oil-price upside, so that '
+            + 'take% sits near 97-99% at EVERY price -- blending it in flattens the swing toward '
+            + 'zero and makes the column look more price-stable than its fiscal terms are. On the '
+            + 'legend under this grid (<10pp stable / 10-20pp moderate / >20pp high) the two '
+            + 'figures can fall in different tiers. Compare THIS figure against the other columns, '
+            + 'and state the basis in the memo.')
+          + '">PSC/Conc ' + _swTxt(_swCmp) + '</span>';
+      }
+      return _swBase;
     }},
     {label:'Take weighting <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How the four Govt Take rows above are averaged across this country’s contracts — and ONLY those rows. Prod-weighted = weighted by verified production per block (most accurate — use for IC memos). Blended = mix of production and equal weighting. Equal-weighted = simple average across all contracts, common for frontier or pre-production countries with no output history. The Economics block below is averaged differently; see NPV weighting.">ⓘ</span>',      key:(d)=>d.weighting === 'prod_weighted' ? 'Prod-weighted' : d.weighting === 'prod_weighted_blended' ? 'Blended' : 'Equal-weighted'},
     {label:'─── Economics ───', key:()=>'', bold:true, divider:true},
@@ -30376,7 +30436,7 @@ function renderCompare() {
         // v666 (T3): the same correction now exists on the contractor side, so this instruction
         // names it. Without the pointer the analyst applies the basis to take and not to value --
         // which is the ranking inversion the Economics block used to publish.
-        + ' The <strong style="color:var(--text);">Contractor NPV @$75</strong> row carries the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 NPV rows are still blended.';
+        + ' The <strong style="color:var(--text);">Price Swing</strong> row carries its own PSC/Conc figure for the same reason — a fee-basis take% barely moves with price, so the blended swing understates how progressive the comparable terms are. The <strong style="color:var(--text);">Contractor NPV @$75</strong> row carries the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 NPV rows are still blended.';
     }
     if (_cmpPrrt.length && _cmpPrrt.length < selected.length) {
       _mb += (_mb ? '<br><br>' : '')
