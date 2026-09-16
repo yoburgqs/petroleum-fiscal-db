@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v884</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v885</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v884</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v885</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -52672,6 +52672,61 @@ function clearSavedScenarios() {
   }
 }
 
+/* ── v885 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+   The saved-scenario set IS the IC sensitivity appendix: the analyst runs base / reform /
+   downside, saves each, and attaches the table. Both readers of that set asked for parameter
+   keys that no code path has ever written. sbGetParams() stores snake_case FRACTIONS
+   (royalty_rate: 0.10); _refreshSavedTable() and _exportScenariosXLSX() both read camelCase
+   PERCENTS (p.royalty). Every lookup returned undefined, so the on-screen "Key Parameters"
+   cell printed "—" on every row of every mechanic, and all seven fiscal-parameter columns of
+   the XLSX exported blank on every row — while the Methodology sheet told the reader a blank
+   meant "not applicable to mechanic", which excused the defect instead of exposing it.
+   Take and NPV moved row to row with nothing recording what was varied.
+   One reader for both surfaces so the screen and the export cannot drift again. */
+function _sbPct(v) { return (v == null || isNaN(v)) ? null : +(v * 100).toFixed(2); }
+
+function _sbParamSet(params, mech) {
+  var p = params || {};
+  var o = {
+    royalty:       _sbPct(p.royalty_rate),
+    cit:           _sbPct(p.cit_rate),
+    govtProfitOil: _sbPct(p.profit_oil_govt_pct),
+    costRecovery:  _sbPct(p.cost_recovery_cap),
+    ftp:           _sbPct(p.ftp_rate),
+    stateEquity:   _sbPct(p.state_equity_pct),
+    other: []
+  };
+  // Mechanic-specific terms the seven typed columns cannot express. Zeros are omitted here
+  // (an unset SPT is not a finding); the six typed fields above keep a real 0.
+  function addPct(label, v) { var n = _sbPct(v); if (n) o.other.push(label + ' ' + n + '%'); }
+  addPct('SPT', p.spt_rate);
+  addPct('Windfall', p.windfall_rate);
+  addPct('Severance', p.severance_rate);
+  addPct('EPT', p.ept_rate);
+  addPct('PRRT', p.prrt_rate);
+  addPct('PRRT uplift', p.uplift_rate);
+  if (p.fee_per_bbl) o.other.push('Fee $' + p.fee_per_bbl + '/bbl');
+  if (p.capex_recovery_years) o.other.push('Capex recovery ' + p.capex_recovery_years + 'yr');
+  if (p._gs_cont_pct != null) o.other.push('Gross Split contractor ' + _sbPct(p._gs_cont_pct) + '%');
+  if (p._gs_dmo_pct) o.other.push('DMO ' + _sbPct(p._gs_dmo_pct) + '% @ ' + _sbPct(p._gs_dmo_price_pct) + '% ICP');
+  if (p.tier_schedule && p.tier_schedule.length) o.other.push('tiered ladder (' + p.tier_schedule.length + ' tiers)');
+  o.otherStr = o.other.join(' \u00b7 ');
+  return o;
+}
+
+// Compact one-cell rendering for the saved-scenario table. Same source as the XLSX.
+function _sbParamSummary(params, mech) {
+  var o = _sbParamSet(params, mech), parts = [];
+  if (o.royalty       != null) parts.push('Roy ' + o.royalty + '%');
+  if (o.cit           != null) parts.push('CIT ' + o.cit + '%');
+  if (o.govtProfitOil != null) parts.push('PO govt ' + o.govtProfitOil + '%');
+  if (o.costRecovery  != null) parts.push('CR ' + o.costRecovery + '%');
+  if (o.ftp           != null) parts.push('FTP ' + o.ftp + '%');
+  if (o.stateEquity)           parts.push('State eq ' + o.stateEquity + '%');
+  if (o.other.length)          parts.push(o.otherStr);
+  return parts.length ? parts.join(' \u00b7 ') : '\u2014';
+}
+
 function _exportScenariosXLSX() {
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
   if (!saved.length) { _icRefuse('No saved scenarios to export.'); return; }
@@ -52685,7 +52740,7 @@ function _exportScenariosXLSX() {
     'Govt Take (%)', 'Contractor IRR (%)', 'IRR Basis', 'Contractor NPV @10% ($M)',
     'Contractor NPV @15% ($M)', 'Clears 15% Hurdle', 'Capital at Risk ($M)', 'Payback Year',
     'Royalty (%)', 'CIT (%)', 'Profit Oil (Govt %)', 'Profit Oil (Ctct %)',
-    'Cost Recovery (%)', 'FTP (%)', 'State Equity (%)']];
+    'Cost Recovery (%)', 'FTP (%)', 'State Equity (%)', 'Other Terms']];
   var _irrBasis = {
     'no-capital-at-risk': 'No IRR — contractor funds no negative year on this profile; cost recovery reimburses capex in the year it is spent, so there is no capital base to return. Use NPV @15%.',
     'uneconomic':         'No IRR — contractor cash flow never turns positive at any discount rate.',
@@ -52697,6 +52752,7 @@ function _exportScenariosXLSX() {
   for (const s of saved) {
     const r = s.result;
     const p = s.params || {};
+    const _sp = _sbParamSet(p, s.mech);
     const rd = s.reading || { state: 'unknown', npv15: null, atRisk: null, payback: null };
     rows.push([
       s.name,
@@ -52711,13 +52767,14 @@ function _exportScenariosXLSX() {
       rd.npv15 == null ? '' : (rd.npv15 > 0 ? 'Yes' : 'No'),
       rd.atRisk != null ? +rd.atRisk.toFixed(1) : '',
       rd.payback != null ? rd.payback : (rd.npv15 == null ? '' : rd.state === 'no-capital-at-risk' ? 'n/a — no capital at risk' : 'never repaid'),
-      p.royalty != null ? p.royalty : '',
-      p.cit != null ? p.cit : '',
-      p.govtProfitOil != null ? p.govtProfitOil : '',
-      p.govtProfitOil != null ? +(100 - p.govtProfitOil).toFixed(1) : '',
-      p.costRecovery != null ? p.costRecovery : '',
-      p.ftp != null ? p.ftp : '',
-      p.stateEquity != null ? p.stateEquity : ''
+      _sp.royalty != null ? _sp.royalty : '',
+      _sp.cit != null ? _sp.cit : '',
+      _sp.govtProfitOil != null ? _sp.govtProfitOil : '',
+      _sp.govtProfitOil != null ? +(100 - _sp.govtProfitOil).toFixed(2) : '',
+      _sp.costRecovery != null ? _sp.costRecovery : '',
+      _sp.ftp != null ? _sp.ftp : '',
+      _sp.stateEquity != null ? _sp.stateEquity : '',
+      _sp.otherStr || ''
     ]);
   }
   // Methodology sheet
@@ -52736,7 +52793,7 @@ function _exportScenariosXLSX() {
     ['Capital at Risk ($M)', 'Sum of the contractor negative cash-flow years — the money actually exposed, which is far below project capex wherever cost recovery reimburses capex as it is spent. 0 means no contractor capital is exposed at any point.'],
     ['Payback Year', 'First year cumulative contractor cash flow turns positive.'],
     ['Profile', 'Standard production profile. NOTE: these profiles take first oil in year 1, the same year as the first capex tranche, with no development lag. That compresses contractor exposure and is the reason IRR is either undefined or implausibly high on most runs. NPV is unaffected in sign.'],
-    ['Fiscal parameters', 'Input parameters as set in Scenario Builder — may be 0/blank if not applicable to mechanic'],
+    ['Fiscal parameters', 'The terms this scenario was actually run on, read back from the saved run — percentages, not fractions. A blank means the mechanic has no such term (a Concession has no cost-recovery cap; a TSC has no profit-oil split), never that the value was not recorded. Terms with no column of their own — SPT, windfall, severance, EPT, PRRT rate and uplift, service fee per barrel, capex recovery term, Gross Split contractor share and DMO, and whether a tiered profit-oil ladder was applied — are carried in Other Terms. Until v885 all seven of these columns exported blank on every row regardless of mechanic, because the export read parameter names the Scenario Builder never wrote; a saved set could not tell its IC reader what had been varied between scenarios.'],
     [],
     ['Cite as:', 'ORCA Petroleum Fiscal Intelligence Platform, ' + new Date().toISOString().slice(0,7) + '. yoburgqs.github.io/petroleum-fiscal-db/']
   ];
@@ -52744,7 +52801,7 @@ function _exportScenariosXLSX() {
   var ws = XLSX.utils.aoa_to_sheet(rows);
   var wsMeth = XLSX.utils.aoa_to_sheet(methRows);
   // Column widths
-  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14},{wch:46}];
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Scenarios');
   XLSX.utils.book_append_sheet(wb, wsMeth, 'Methodology');
   XLSX.writeFile(wb, 'ORCA_scenarios_' + new Date().toISOString().slice(0,10) + '.xlsx');
@@ -52769,13 +52826,7 @@ function _refreshSavedTable() {
     const r = s.result;
     const p = s.params || {};
     // Summarize non-zero fiscal parameters inline
-    var paramParts = [];
-    if (p.royalty) paramParts.push('Roy ' + p.royalty + '%');
-    if (p.cit) paramParts.push('CIT ' + p.cit + '%');
-    if (p.govtProfitOil) paramParts.push('PO govt ' + p.govtProfitOil + '%');
-    if (p.costRecovery) paramParts.push('CR ' + p.costRecovery + '%');
-    if (p.ftp) paramParts.push('FTP ' + p.ftp + '%');
-    var paramStr = paramParts.length ? paramParts.join(' · ') : '—';
+    var paramStr = _sbParamSummary(p, s.mech);
     html += `<tr>
       <td><strong>${s.name}</strong></td>
       <td>${s.mech}</td>
