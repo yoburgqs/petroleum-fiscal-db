@@ -55355,3 +55355,117 @@ EPL extension to March 2030 rather than its superseded 2023 rate.
 
 ## Friction
 Asked at book level, T4 lands on **IOC Portfolio** — the tab literally titled *"IOC Portfolio — Fiscal Exposure."* Walked cold on the seeded Shell portfolio (884 contracts, 31 countries), the country table carried exactly **one** reform
+
+---
+## Cycle 790 Log — 2026-09-16 04:00
+- Test before: 303 PASS / 0 FAIL / 1 WARN (local, pre-change build on port 8778)
+- Test after: 303 PASS / 0 FAIL / 1 WARN (local, post-change build on port 8777)
+- Suite ACTUALLY RAN this cycle, as a controlled A/B. The two reports are byte-identical
+  apart from the timestamp. Local 303 vs the live-URL 318 is the `sw.js` 404 WARN, a
+  local-server artefact present identically on both sides — not a regression.
+- JS errors: 0 page errors. 1 console WARN (`sw.js` 404, as above).
+- JS syntax gate: PASS — 11 inline `<script>` blocks extracted, `node --check` on each.
+- Shipped as **v881** (`f9e2df2`), pushed, mirror in sync.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation:
+789/v880 was T4, 787 T5, 786 T6, 785 T2, 784 T1 — last T3 at 783.)
+
+## Friction
+Walked cold at 1440x900 — no sessionStorage, no localStorage. Side-by-Side seeds the North Sea
+Trio, then re-walked with Norway / Indonesia / Iraq, the set a first-time analyst builds when the
+question spans basins.
+
+**Price Swing ($50→$125) is take@$125 minus take@$50.** It is *derived* from the four Govt Take
+rows three lines above it, and it was the only row in the GOVT TAKE block that inherited none of
+their withdrawals or re-basings.
+
+v697 guarded this row, and its own comment names **"Iraq 6.6pp"** as one of the cases it meant to
+catch. The predicate it shipped is `isStateMonopoly(d.take_75)` — Iraq's `take_75` is **84.8%**, so
+it never fired on Iraq. The guard caught Kuwait and Saudi Arabia (the ≥99.5% placeholder) and
+missed the two classes the cells above it already handle:
+
+1. **Fee-blended columns.** `_cmpTakeCell` prints a green `PSC/Conc x%` sub-line under every Govt
+   Take cell on a column blending TSC / RSC / Buy-back; the swing computed off those same cells did
+   not. A fee-basis contractor is paid a fixed $/bbl remuneration and keeps no price upside, so its
+   take% sits near 97–99% at *every* price — blending it in flattens the swing toward zero. On this
+   platform's own published legend (`<10pp` = royalty-dominant, stable, *"preferred for certainty
+   mandates"*) that is the **best tier on the board**. Measured over `country_data.json`, **11**
+   columns are fee-blended and not state-monopoly, and **2 cross a legend tier**:
+
+   | column | printed | comparable (PSC/Conc) | printed tier | true tier |
+   |---|---|---|---|---|
+   | Iraq | **+6.6pp** | **+11.1pp** | LOW `<10` | MODERATE `10–20` |
+   | Iran | **+13.5pp** | **+4.6pp** | MODERATE `10–20` | LOW `<10` |
+   | Ecuador | +18.7pp | +14.1pp | MOD | MOD |
+   | South Sudan | +13.6pp | +17.0pp | MOD | MOD |
+   | India / Malaysia / Azerbaijan / Qatar / Mexico / Russia / Oman | ≤1.3pp delta | — | — | — |
+
+   Wrong in **both** directions. In the walked Norway / Indonesia / Iraq set, Iraq's `+6.6pp` was
+   the **lowest swing on screen** against Norway `+15.7pp` and Indonesia `+23.4pp` — so the
+   fee-basis artefact won the price-stability comparison outright, on the one row an IC memo cites
+   for fiscal leverage, three rows under a `⚠ 68% fee-basis` cell that says the take% is an
+   artefact.
+
+2. **Statutory-terms columns.** Where a set mixes bases, `_cmpBasisNote` withdraws the ordering
+   marker and `_cmpStatTakeFigure` strips the tier colour and adds a hollow ring to all four Govt
+   Take cells. The swing off those cells printed **bare and full-weight**. The shipped cold-load
+   default set — Norway / UK / Netherlands — showed Netherlands `+10.4pp`, unmarked, four rows
+   below its own `○ 17.6% · not ranked · statutory terms` take cells.
+
+## Change
+The Price Swing key function now runs the same three predicates, **in the same order and from the
+same helpers**, that `_cmpTakeCell` runs. No new rule and no new threshold: the re-basis is
+`st.g1.t125 − st.g1.t50`, the same `g1` block the Govt Take cells already print from.
+
+| set walked | column | before | after |
+|---|---|---|---|
+| Norway / UK / Netherlands (cold default) | Netherlands | `+10.4pp` | `○ +10.4pp` · *not ranked · statutory terms* |
+| Norway / Indonesia / Iraq | Iraq | `+6.6pp` | `+6.6pp` · **PSC/Conc +11.1pp** |
+| Iran / Qatar | Iran | `+13.5pp` | `+13.5pp` · **PSC/Conc +4.6pp** |
+| Iran / Qatar | Qatar | `+5.5pp` | `+5.5pp` · **PSC/Conc +5.2pp** |
+| Kuwait / Iraq / Norway | Kuwait | `—` | `—` (v697 withdrawal, unchanged) |
+| Australia / Norway | Australia (PRRT) | `+17.7pp` | `+17.7pp` (unchanged — Group 3 take is a real fiscal measure, caveated on the Take basis row) |
+| any all-producer price-linked set | — | unchanged | unchanged |
+
+Iran hits the statutory gate *before* the fee-blended branch, exactly as its Govt Take cells do —
+the two rows cannot now disagree about which caveat applies to a column.
+
+The row rides the shared `rows` array, so `#cmp-data-table`, the **mobile card render**, the PDF
+and both clipboard flavours carry the comparable figure too — the IC-memo paste now reads
+`Price Swing ($50→$125)  +15.7pp  +23.4pp  +6.6pp · PSC/Conc +11.1pp`.
+
+One sentence added to the fee-blend notice under the grid so the narrative names the row it now
+re-bases, beside the Contractor NPV clause that already did.
+
+## Result
+An analyst comparing three countries side by side can **rank them on price stability**. Iraq no
+longer reads as the most price-stable regime in a North Sea / Asia / Middle East set on a number
+produced by its remuneration-fee structure rather than its fiscal terms; Iran no longer reads as
+2.9x more price-leveraged than it is; and a statutory proxy no longer sits unmarked in a row whose
+four source cells are all marked. Every fee-blended column now states both figures, so the memo
+can name the basis it ranked on.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all **9 visible tabs**.
+- **0 of the SbS pane's controls under 24px** under `pointer: coarse`. The sub-line is a
+  non-interactive `<span>` with `title`, identical in kind to the `PSC/Conc x%` sub-line the Govt
+  Take cells four rows above already render — no new control, no new click target.
+- The SbS `<table>` is `display:none` at 390px; the mobile card render is built from the same
+  `rows` array and was confirmed to show `+6.6pp / PSC/Conc +11.1pp` on a phone viewport.
+
+## Carried forward (unchanged this cycle, re-confirmed while walking T3)
+- `▶ Run FC at this price` on the Country Profile (`index.html:4206`) reads `cp-price-select`,
+  which does not exist on that tab. It falls back to `fc-price`, then writes to
+  `getElementById('price')` — **also not in the document** — so the write is a no-op and the button
+  runs FC at whatever FC's own price already is. Harmless in effect, but the label promises the
+  CP's price and the CP has no price selector. Carried from 785.
+- A take of `—` still sorts as the maximum in the Screener, and Bahamas `≥10.0%` still survives a
+  ≤5% ceiling. Carried from 778 / 784.
+- The SbS `Take spread across contracts` row is not re-based on fee-blended columns either — Iraq
+  prints `65.0–98.5% (33.5pp)`, a band that includes its TSC contracts at 98.5%. Smaller than the
+  Price Swing defect (it is a stated range, not a single rankable statistic, and the ⚠ notice under
+  the grid already describes it), but it is the next thing in this block to fix.
+- The `Order columns` control (v646) was tested on all four modes with a non-comparable column
+  present; it correctly buckets statutory and no-comparable-take columns to the end in both take
+  orders. No friction found.
