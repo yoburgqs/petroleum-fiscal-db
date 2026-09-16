@@ -55484,3 +55484,127 @@ can name the basis it ranked on.
 Price Swing ($50→$125) is take@$125 minus take@$50 — it is *derived* from the four Govt Take rows three lines above it on the Side-by-Side grid. It was the only row in that block that inherited none of their re-basings.
 
 v697 guarded
+
+---
+## Cycle 791 Log — 2026-09-16
+- Test before: 303 PASS / 0 FAIL / 1 WARN (local harness, pre-change file via git stash)
+- Test after:  303 PASS / 0 FAIL / 1 WARN (same harness) — zero delta
+- JS errors: 0 · JS syntax gate: PASS · Suite RAN this cycle (not assumed)
+- Note on 303 vs the 318 in the cycle emails: 318 is the figure against the deployed
+  GitHub Pages origin; 15 tests require that origin (sw.js / caching) and are not
+  reachable from a local `python3 -m http.server`. Both numbers above come from the
+  SAME harness on the same URL, so the comparison is valid and the delta is 0.
+- Summary: Shipped as **v882** (`3b9b76e`), pushed, mirror in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest by rotation;
+790 was T3, 789 T4, 787 T5, 786 T6, 785 T2, last T1 at 784.)
+
+## Friction
+Walked cold at 1440x900, no sessionStorage/localStorage: Home → Screener → click the
+**Swing (pp)** header ascending. That is the standard T1 narrowing move on a column whose
+own header tooltip reads *"Low swing (<10pp, green) = stable fiscal terms across the price
+cycle. Useful for stress-testing IOC economics in oil price scenarios."* The board read:
+
+| # | country | Govt Take cell | Tier cell | Swing cell |
+|---|---|---|---|---|
+| 1 | **Saudi Arabia** | **—** | **State Monopoly** | **+0.0pp** |
+| 2 | Oman | 77.6% | NOC/Concession | +6.1pp |
+| 3 | USA | 23.4% | Inv-Friendly | +6.2pp |
+| 4 | **Iraq** | 84.8% | NOC/Concession | **+6.6pp** |
+| 5 | Canada | 32.7% | Inv-Friendly | +8.0pp |
+
+Price Swing is take@$125 minus take@$50 — it is **derived** from the take figures two
+columns to its left. That column withdraws state monopolies (`fmtTake`), carries a
+comparable sub-cell for fee-blended countries (`_takeCmpCell`), sorts on the comparable
+figure (`_scSortVal` case `'take'`) and screens the ceiling on it (`_scPass`). The Swing
+column inherited **none** of it, at four sites: the cell render (`index.html` row builder),
+`_scSortVal` case `'swing'`, the phone's `_rankBasisCell`, and `Swing_pp` in `_scExportRows()`.
+
+Two populations, measured over `country_data.json`:
+
+- **3 state-monopoly rows.** Saudi Arabia, Kuwait and Bahrain store `take_50..take_125 = 100.0`
+  — a placeholder, not four measured points — so swing is `100 − 100 = +0.0pp` by construction.
+  On this column's own legend that is the **best score in the database**, and Saudi Arabia
+  carries verified field production, so it took **rank 1 of 185**.
+- **11 fee-blended rows, 2 crossing a legend tier.** A fee-basis take% is pinned near 97–99%
+  at every price by the remuneration structure, so blending it flattens the swing toward zero.
+  Iraq printed **+6.6pp (LOW)** against **+11.1pp comparable (MODERATE)**; Iran printed
+  **+13.5pp (MODERATE)** against **+4.6pp comparable (LOW)** — wrong in both directions.
+
+The platform had already fixed both halves **everywhere except the ranking surface**:
+Side-by-Side v697 (withdrawal) and v881 (fee re-basing, last cycle), Country Profile gated on
+`_isMonopoly` at line 41093. So the Screener was the last surface printing the raw figure —
+and it is the one that RANKS 185 countries on it and then hands its top 5 straight into the
+Side-by-Side that disagrees. `⇌ Load top 5 verified-production in Side-by-Side →` handed over
+**Saudi Arabia · Oman · USA · Iraq · Canada**, where Side-by-Side then prints `—` for Saudi
+Arabia and `+6.6pp · PSC/Conc +11.1pp` for Iraq. Two tabs, one number, and the tab doing the
+ranking was the wrong one.
+
+The comment block directly above `_scSortVal` is a previous cycle's fix for this exact defect
+on the **take** column, and states the rule in one line: *"the ranking uses the number the
+screen used."* `case 'swing': return d.swing;` sat four lines below it.
+
+## Change
+New **`_scSwingAt(d)`** beside `_scFeeCmpAt()`, resolving both guards from the same helpers the
+take column already uses, returning `{head, cmp, sort, diverges, monopoly, n1, n2}`. Wired into
+all four consumers so none can drift from the others:
+
+1. **Cell render.** Monopolies print a muted `—` carrying the v697 reason (why `+0.0pp` inverts
+   rather than wins, and that the same placeholder is why Govt Take reads `—` and Tier reads
+   State Monopoly). When the table is **ordered by swing**, fee-blended rows lead with the
+   comparable figure, carry the colour on it, and name the published blend beneath as
+   `published +6.6pp` — the v685 take-column precedent exactly. Outside a swing sort the cell is
+   byte-identical to v881, so the resting view gains no sub-lines and no row height.
+2. **`_scSortVal` case `'swing'`** ranks on the comparable value; withdrawn rows return `null`
+   and `_scSortCmp` already sends nulls to the bottom "whichever way the column points", so they
+   cannot lead in either direction.
+3. **The phone's pinned rank-basis line** takes the same basis — it names the number the row was
+   placed on, so it had to move with the sort.
+4. **Export.** `Swing_pp` is `null` for the three monopolies, with the reason in a new
+   `Swing_Basis` column and the comparable figure in `Swing_Comparable_pp`. This is the same fix
+   v529/v847 gave `Breakeven_bbl` for these same three countries, on the column beside it: a bare
+   `0` meant sorting Swing_pp ascending in Excel ranked the three regimes with no contractor
+   position 1, 2 and 3 of 185 inside an IC attachment.
+
+Applied unconditionally, like v697/v881 and unlike the take ceiling: the `sc-fee-cmp` box is
+scoped by its own label to the ceiling, and widening it silently to a second column would change
+a control's meaning without saying so.
+
+## Result
+An analyst screening 185 countries for price-cycle stability now gets a ranking of measured
+swings. Swing ascending reads **Oman +6.1 / USA +6.2 / Canada +8.0 / China +9.9 / Argentina
++10.6**. Saudi Arabia moves from **rank 1 → the foot of its data-basis block** as `—`; Kuwait
+and Bahrain to 139 and 140 of 185. Iraq re-bases to **+11.1pp (rank 4 → 7)** and Iran to
+**+4.6pp (rank 33)**. The one-click handoff now loads **Oman · USA · Canada · China ·
+Argentina**, and the Screener and Side-by-Side can no longer print different numbers for the
+same country. The XLSX an analyst attaches to a memo carries the basis with the figure.
+
+## Mobile (390 x 844, `hasTouch: true`)
+- `document.documentElement.scrollWidth` **390 = clientWidth 390** on all **9 visible tabs**.
+- **0 controls under 24px inside a Swing cell.** Nothing interactive was added: the withdrawal is
+  a `<span title>` and the sub-line a non-interactive `<div>`, the same kind the Govt Take cell
+  four columns left already renders. The 17 sub-24px inputs measured on the Screener are
+  pre-existing collapsed mechanic/IOC grid checkboxes, unchanged by this cycle.
+- The phone's pinned rank line was confirmed reading `Swing +6.1pp` for the new rank 1.
+
+## Also walked this cycle, no change needed
+- **All 11 Screener presets fire correctly** and match their advertised counts, including the two
+  numbers the Home quick-start card asserts (`IOC Capital Screen` 15, `Downside Resilience` 24).
+- **All 9 sortable columns** cycle asc → desc → off correctly; `Load top 5` follows the live sort
+  and names the five countries before you click.
+- The `_npv75Inert` / `_npv50Inert` disclosure (v706) fires correctly — it correctly reports the
+  `$75` NPV leg as "not binding — the $50 floor is the same and removes these already" on the IOC
+  Capital Screen, and "removes nothing here" on Low Take · Positive NPV. **No country in the
+  database has a negative contractor NPV at $75** (0 of 185), so every preset advertising "NPV
+  positive" has an inert leg — but the slider already says so on screen, which is the disclosure
+  v706 was built for. Noted, not re-fixed.
+
+## Carried forward (re-confirmed, unchanged)
+- `▶ Run FC at this price` on Country Profile still reads `cp-price-select`, which does not exist
+  on that tab; the write is a no-op. Carried from 785/790.
+- The Side-by-Side `Take spread across contracts` row is still not re-based on fee-blended
+  columns (Iraq prints `65.0–98.5% (33.5pp)`). Next in that block. Carried from 790.
+- `Low Take · Positive NPV` returns 143 of 185 — a preset that removes 23% of the universe is a
+  weak shortlist, but the take distribution (median 28.4%) is why, and the count line is honest
+  about it. Not a defect; noted for a future cycle that wants to re-calibrate the preset ladder.
