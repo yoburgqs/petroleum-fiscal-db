@@ -56527,3 +56527,145 @@ Final state, unchanged from the report above:
 - `1460889` — cycle 799 GRADER log
 - Both pushed; `HEAD` and `origin/main` are the same commit
 - Mirror at `office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-matches the committed `ind
+
+## Cycle 800 Log — 2026-09-16 19:2x
+- Test before: 318 PASS / 0 FAIL (carried in from the gate)
+- Test after: 318 PASS / 0 FAIL / 1 WARN — suite RAN this cycle, report timestamped 2026-09-17T00:25:57Z
+- JS errors: 1 (pre-existing local-server 404 on the service-worker fetch; present in the 799 run)
+- Summary: shipped as v890 (`168fcef`), pushed, mirror byte-identical.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest by rotation: 799 was T3,
+798 T2, 797 T2, 795 T4, 794 T5, 793 T6, 792 T2, and T1 was last walked at 791.
+
+## Friction
+Walked cold at 1440×900 with `sessionStorage` and `localStorage` cleared: Home → Screener, and
+then **nothing else**. No preset, no slider, no sort. That is not a contrived starting point — it
+is the Screener's own default, the count line says so (`All 185 countries — no filters applied
+yet`), and it is the first surface a first-time T1 analyst reads. The rows are ranked by
+contractor NPV inside the data-basis blocks, and the analyst scans the GOVT TAKE and TIER columns
+downward to decide who is even worth a second look.
+
+On that view, Iraq read:
+
+```
+GOVT TAKE @ $75/BBL     84.8%              <- bare number, no sub-line
+TIER                    NOC/Concession     <- bare pill, no qualifier
+```
+
+Iraq's government take on its **195 PSC/Concession contracts is 34.1%** — an Inv-Friendly regime,
+better than Norway, better than Brazil. The 84.8% is a blend across **415 fee-basis TSC
+contracts** where the contractor is paid a fixed $/bbl remuneration and keeps no price upside, so
+the figure measures contract structure rather than how hard the fiscal terms are. `MECHANIC_
+COMPARABILITY.md` puts TSC in Group 2 and says it may not be compared against Group 1 at all.
+
+**The platform already held the correction, already computed it, and already rendered it — just
+not here.** `runScreener()` gated the reconciliation on
+`_cmpBasisActive = takeCeilingActive || _screenerSetOnCmp` (`index.html:34998`), and neither is
+true cold. Both the take sub-line (`_takeCmpCell`) and the comparable basis (`_feeCmpOf`) returned
+empty. Move the Max Govt Take slider one notch and the whole correction appears. Do not touch it —
+which is exactly what someone deciding *whether a country is worth screening at all* does — and it
+never appears.
+
+The gap is sharpest against this same view's own export: **`exportScreenerExcel()` has written
+`FeeBasis_Blend: Yes/No` unconditionally since v554** (line 36255). The downloaded spreadsheet was
+more honest than the screen it was downloaded from.
+
+Measured against the shipped `country_data.json`, not assumed — **10 countries diverge at $75**,
+and on **5 of them the tier bucket flips**:
+
+| country | published | tier | comparable | tier | |
+|---|---|---|---|---|---|
+| Iraq | 84.8% | NOC/Concession | **34.1%** | **Inv-Friendly** | 415 fee-basis of 610 |
+| Ecuador | 46.5% | Moderate | 39.3% | Inv-Friendly | 31 of 169 |
+| Azerbaijan | 60.8% | High Take | 59.8% | Moderate | 1 of 168 |
+| Iran | 75.7% | NOC/Concession | 74.4% | High Take | 284 of 547 |
+| Qatar | 77.2% | NOC/Concession | 74.5% | High Take | 5 of 146 |
+| India · Malaysia · Mexico · Oman · South Sudan | | | | *tier unchanged* | |
+
+Iraq is the extreme: **50.7pp, and the pill travels from the worst bucket on the page to the
+best.** A screening list built off that cold view excludes it.
+
+## Change
+- **The gate is gone.** `_feeCmpOf` is now `(d) => _scFeeCmpAt(d, price)` and `_takeCmpCell` drops
+  its `if (!_cmpBasisActive) return ''`. `_cmpBasisActive` is *kept* — it still decides the
+  wording — but it no longer decides whether the reconciliation renders at all.
+- **A third wording branch, because neither existing label was true cold.** "→ screened at" names
+  a ceiling that is not set; "→ in list on" names a membership decision that was not made. The
+  cold label is **`PSC/Conc 34.1%`** — the same vocabulary Fiscal Compare and the Country Profile
+  already use for this figure (v889), so the three tabs now say it the same way. Its tooltip says
+  outright that nothing has been filtered on either figure and what would be tested if a ceiling
+  were set.
+- **New `_tierCmpSub` on the TIER cell.** That cell is the only column on the row that is a
+  **word**, so it is what an eye scanning 185 rows for a shortlist actually reads, and it was
+  contradicting the corrected take figure in one word. It fires **only where the comparable take
+  lands in a different bucket** — 5 rows of 185 at $75, 1 at $50, 1 at $100, 2 at $125 — and
+  prints `PSC/Conc: Inv-Friendly` beneath the pill. On India, Malaysia, Mexico, Oman and South
+  Sudan nothing is added, because their pill is already right. **The pill itself is untouched:**
+  it still reads and colours on the published headline, which is what this table shows and exports
+  everywhere.
+- **Nothing about which figure leads, colours, sorts, filters or exports changed.** The published
+  headline still leads on the cold view. The v685 sort-on-take swap (lead = comparable, sub-line =
+  `published 84.8%`, and correctly **no** tier sub-line because the pill is already on the
+  comparable basis) and the v554 ceiling path both render exactly as before.
+
+Within the locked list: no page-sub paragraph, no amber instructional banner, no routing hint, no
+new FAQ, no new tooltip on an existing control, tab order unchanged, `#reference-panel` untouched,
+v612 mobile layer untouched, Govt NPV column still removed, CP headline untouched.
+
+## Result
+An analyst who opens the Screener cold and touches nothing can now see that Iraq's
+84.8% / NOC-Concession headline is a fee-basis blend, and that its comparable reading is
+34.1% / Inv-Friendly. Iraq gets considered for the screening list instead of being struck off on a
+mechanic artefact — and the same holds for Ecuador, Azerbaijan, Iran and Qatar, whose tier also
+moves. The screen is now at least as honest as the XLSX it exports.
+
+## Verification (all run this cycle, none assumed)
+- **A/B against `HEAD` on the cold view.** `git show HEAD:index.html` written beside the live file
+  and served from the same directory so every relative fetch matched; both loaded cold with
+  storage cleared, both driven to the Screener, every row's `innerHTML` compared.
+  **Exactly 10 rows differ — the 10 diverging countries — and the other 175 are byte-identical.**
+  Row set identical, ordering identical, `#screener-count` identical.
+- **Both regression paths walked, not reasoned about.** Ceiling at 70% still prints
+  `→ screened at 34.1%`; `setScreenerSort('take')` still leads `34.1%` with `published 84.8%`
+  beneath and adds **no** tier sub-line. 0 page errors on any of the three states.
+- **Blast radius measured against all 185 records** at all four decks: 10 diverge at $50/$75/$100,
+  11 at $125; tier flips 1 / 5 / 1 / 2.
+- **Runtime suite RAN this cycle** against the local v890 tree over `http://localhost:8777`:
+  **318 PASS / 0 FAIL / 1 WARN**, `/tmp/runtime_test_report.txt` timestamped
+  `2026-09-17T00:25:57Z`. The stale-report trap was pre-empted: the file was deleted before each
+  run and the number read back from the file that run wrote.
+  - **The first run was 316 PASS / 1 FAIL and the FAIL was real.** `[ScreenerSortRender] default
+    order keeps the published tier` read `tierTd.innerText` — the whole cell — and got
+    `"NOC/Concession\nPSC/Conc: Inv-Friendly"`. The assertion's *intent* (the pill is bucketed on
+    the published figure) still holds, so the reader was narrowed to `.tier` rather than the
+    assertion weakened, **and a new assertion was added** requiring the comparable tier to be named
+    beneath it — the pill staying on the published blend is only defensible while that line exists.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures; re-run after the
+  v889→v890 bump. Live version strings only (`<title>`, `#hdr-version`); the 15 remaining `v889`
+  strings are historical code comments and were deliberately left.
+- **Mobile 390×844, `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390 on Home and on the
+  Screener, 0 page errors, and 9 of 9 visible tabs clean. Both new sub-lines render at 13px inside
+  their existing cells with no horizontal overflow of the cell.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." The 5 findings are pre-existing
+  baseline entries on `thome`, `t0` and `t7`; none is on `texplorer`.
+
+## Honest note on the 24px rule
+The two new sub-lines are **13px**. They are static text with `cursor:help`, not controls — no
+click handler, no tab stop — and they match the `_takeCmpCell` / `_retentionSub` / `_swingCell`
+sub-lines that have shipped in this table since v554. Growing them to 24px would add ~11px of row
+height to the two most-scanned columns across 185 rows. Recording the number rather than claiming
+a pass.
+
+## Carried forward
+- The published-vs-comparable split is now surfaced on the Screener's cold view, Fiscal Compare
+  and the Country Profile. **The Explorer's Browse-mode table was not checked this cycle** and may
+  still have the pre-v890 gap. Natural next T1.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country, so no fee-blended column can show
+  a true comparable IQR. Carried from 799.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–799.
+- The two suite copies were diverged; **both were edited identically this cycle**, so they agree on
+  this assertion. Whether they agree elsewhere was not re-checked. Carried from 797–799.
+- Scenario Builder's base case is still fixed to the first saved scenario with no way to
+  re-designate it. Carried from 798–799.
