@@ -2510,7 +2510,11 @@ async function testScreenerTakeSortRender(page) {
           country: nameTd.innerText.split('\n')[0].replace(/^\+/, '').replace(/[↗◆].*$/, '').trim(),
           lead: parseFloat((takeTd.querySelector('.take-val') || {}).textContent || 'NaN'),
           sub: (takeTd.querySelector('div') || {}).textContent || '',
-          tier: tierTd.innerText.trim(),
+          // v890 (T1): read the PILL, not the whole cell. The cell now carries a second line on
+          // the rows whose comparable take lands in a different bucket, and this assertion is
+          // about which figure the PILL is bucketed on — that is unchanged.
+          tier: ((tierTd.querySelector('.tier') || tierTd).innerText || '').trim(),
+          tierSub: ((tierTd.querySelector('div') || {}).textContent || '').trim(),
         };
       });
     });
@@ -2534,6 +2538,12 @@ async function testScreenerTakeSortRender(page) {
       f(S, 'default order still leads with the published blend', JSON.stringify(dIraq));
     if (dIraq && dIraq.tier === 'NOC/Concession') p(S, 'default order keeps the published tier', dIraq.tier);
     else f(S, 'default order keeps the published tier', dIraq ? dIraq.tier : 'Iraq not in the screen');
+    // v890 (T1): ...and says so. The pill staying on the published blend is only defensible while
+    // the comparable bucket is named beside it; without this the row reads NOC/Concession alone.
+    if (dIraq && /PSC\/Conc:\s*Inv-Friendly/.test(dIraq.tierSub))
+      p(S, 'default order names the comparable tier beneath the pill', dIraq.tierSub);
+    else
+      f(S, 'default order names the comparable tier beneath the pill', dIraq ? JSON.stringify(dIraq.tierSub) : 'Iraq not in the screen');
 
     // (1) ascending: the printed column must ascend.
     await page.evaluate(() => setScreenerSort('take'));

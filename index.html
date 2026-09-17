@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v889</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v890</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v889</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v890</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34996,13 +34996,21 @@ function runScreener() {
   // reconciliation the analyst needed. Ordering, colouring, tiering and export are untouched:
   // this adds a sub-line, it does not change which figure leads.
   const _cmpBasisActive = takeCeilingActive || _screenerSetOnCmp;
-  const _feeCmpOf = (d) => (_cmpBasisActive ? _scFeeCmpAt(d, price) : { diverges: false });
+  // v890 (T1): the gate is GONE. _cmpBasisActive is kept because it still decides the WORDING
+  // below, but it no longer decides whether the reconciliation renders at all. The cold, unfiltered
+  // table is the Screener's own default and the first thing a T1 analyst reads, and it was the one
+  // view where Iraq printed 84.8% / NOC/Concession with nothing beside it -- while the XLSX export
+  // of that same view has carried FeeBasis_Blend unconditionally since v554. The correction now
+  // renders wherever the divergence exists. Ordering, colouring and the leading figure are
+  // untouched: on the cold view the published headline still leads, still colours, still sorts.
+  const _feeCmpOf = (d) => _scFeeCmpAt(d, price);
   const _takeCmpCell = (d) => {
-    if (!_cmpBasisActive) return '';
     const fc = _scFeeCmpAt(d, price);
     if (!fc.diverges) return '';
     const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure the platform comparability rules permits comparing against other countries. `
-      + (!takeCeilingActive
+      + (!_cmpBasisActive
+          ? `Nothing on this screen has been filtered on either figure — no take ceiling is set. The line is here because the ${fc.head.toFixed(1)}% above it cannot be ranked against the ${fc.head >= 50 ? 'lower' : 'other'} takes in this column: it is measuring how many of ${d.country}'s contracts pay a fee rather than how hard its fiscal terms are. Set a Max Govt Take ceiling and it is ${fc.cmp.toFixed(1)}% that gets tested.`
+          : !takeCeilingActive
           ? `This row is in the list because ${fc.cmp.toFixed(1)}% met the scope stated above the table — the ${fc.head.toFixed(1)}% printed beside it did not, and is shown because it is the published figure everywhere else on the platform.`
           : feeCmpOn
           ? `The ≤${maxTake}% ceiling was tested against ${fc.cmp.toFixed(1)}%.`
@@ -35014,7 +35022,10 @@ function runScreener() {
     if (_takeLeadCmp) return `<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">published ${fc.head.toFixed(1)}%</div>`;
     // v728 (T2): on the set-basis path there is no ceiling, so "screened at" would name a control
     // that is not on. "in list on" says why this row is here against a headline that says it should not be.
-    const _cmpLbl = !takeCeilingActive ? '→ in list on ' : (feeCmpOn ? '→ screened at ' : 'cmp ');
+    // v890 (T1): on the cold view no control has been touched, so neither "screened at" nor
+    // "in list on" is true. "PSC/Conc" is the label Fiscal Compare and the Country Profile already
+    // use for the same figure (v889), so the vocabulary is the same one across the three tabs.
+    const _cmpLbl = !_cmpBasisActive ? 'PSC/Conc ' : (!takeCeilingActive ? '→ in list on ' : (feeCmpOn ? '→ screened at ' : 'cmp '));
     return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">${_cmpLbl}${fc.cmp.toFixed(1)}%</div>`;
   };
   // v685: the leading figure in the GOVT TAKE cell. Identical to fmtTake(d[takeKey]) unless the
@@ -35153,6 +35164,19 @@ function runScreener() {
     const _floorLe = _rowFloor ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_floorTip}">&le;</span>` : '';
     const _tierOn = (_takeLeadCmp && _rowFc.diverges) ? _rowFc.cmp : d[takeKey];
     const tc = tierClass(_tierOn);
+    // v890 (T1): the TIER cell is the only column on this row that is a WORD, so it is what an eye
+    // scanning 185 rows for a shortlist actually reads. Where the take cell now prints a comparable
+    // figure that lands in a DIFFERENT bucket, the pill above it was contradicting that figure in
+    // one word. At $75 this fires on 5 rows of 185 — Iraq (NOC/Concession -> Inv-Friendly, the
+    // 50.7pp case), Ecuador, Azerbaijan, Iran, Qatar — and on 1 row at $50 and $100. Where the tier
+    // does NOT move (India, Malaysia, Mexico, Oman, South Sudan) nothing is added, because the pill
+    // is already right. The pill itself is unchanged: it still reads and colours on the published
+    // headline, which is what this table shows and exports everywhere.
+    const _tierCmpFlip = (!_takeLeadCmp && _rowFc.diverges && _rowFc.cmp != null
+                          && tierLabel(_rowFc.cmp) !== tierLabel(_tierOn));
+    const _tierCmpSub = _tierCmpFlip
+      ? `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:3px;cursor:help;" title="${(d.country + ': on its PSC/Concession contracts alone government take is ' + _rowFc.cmp.toFixed(1) + '% at $' + price + '/bbl, which is a ' + tierLabel(_rowFc.cmp) + ' regime. The pill above reads ' + tierLabel(_rowFc.head) + ' because it is bucketed on the published ' + _rowFc.head.toFixed(1) + '%, and that figure blends ' + Number(_rowFc.n2).toLocaleString() + ' fee-basis contracts (fixed $/bbl remuneration, no price upside) whose take% measures contract structure rather than fiscal terms. Use the ' + tierLabel(_rowFc.cmp) + ' reading when deciding whether this country belongs on a screening list.').replace(/"/g,'&quot;')}">PSC/Conc: ${tierLabel(_rowFc.cmp)}</div>`
+      : '';
     // v507: labelled divider at the point the ranking stops being production-backed. Without it
     // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
     // carry that, because every row above it was badged PROXY too and it read as decoration.
@@ -35216,7 +35240,7 @@ function runScreener() {
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="${_scProdCovTip(d)}" style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${_scProdCovCell(d)}</td>
       ${_swingCell(d)}
-      <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span></td>
+      <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span>${_tierCmpSub}</td>
     </tr>`;
   }).join('');
   window._screenerData = data;
