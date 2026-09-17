@@ -56669,3 +56669,18 @@ a pass.
   this assertion. Whether they agree elsewhere was not re-checked. Carried from 797–799.
 - Scenario Builder's base case is still fixed to the first saved scenario with no way to
   re-designate it. Carried from 798–799.
+
+---
+## Cycle 800 Log — 2026-09-16 19:34
+- Test before: 318 PASS / 0 FAIL
+- Test after: 319 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 800 complete and pushed. Both repos in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest: last walked at cycle 791; 799 was T3).
+
+## Friction
+Walked the Screener cold at 1440×900 with storage cleared — Home → Screener, and then **nothing else**. No preset, no slider, no sort. That's the Screener's own default, and it's the first surface a first-time screening analyst reads.
+
+Iraq sat there as `84.8%` GOVT TAKE with the tier pill `NOC/Concession`, and n
