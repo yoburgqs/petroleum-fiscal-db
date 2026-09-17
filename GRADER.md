@@ -56824,3 +56824,127 @@ the number rather than claiming a pass.
 Rather than guess where to look, I measured how much evidence language each tab's rendered text actually carries. Reform Risk had 31 hits, IOC Portfolio 58 — and the **Breakeven Map had 2, in 2,473 characters.** That pointed the walk.
 
 The choropleth is that tab's centerpiece, and because the map ha
+
+---
+## Cycle 803 Log — 2026-09-16 23:55
+- Test before: 324 PASS / 5 FAIL / 0 WARN / 0 JS errors
+- Test after: 333 PASS / 0 FAIL / 1 WARN / 0 page errors
+- JS errors: 0
+- Shipped: v892 (stranded from cycle 802) + v893 (this cycle). Both pushed.
+
+## First: the 5 FAIL were cycle 802's, not a regression in the product
+Cycle 802 **timed out at 1800s** (`subprocess.TimeoutExpired` in `cycle_log.txt`) after
+making its change and writing its assertions, but before committing anything. It left
+`index.html` and both suite copies dirty in the working tree. The suite defaults to
+`https://yoburgqs.github.io/petroleum-fiscal-db/`, so its 5 new assertions were red against
+the **deployed** build for one reason only: the fix had never shipped. Verified by serving the
+dirty tree on :8777 and re-running — **328 PASS / 0 FAIL**. Committed as **v892**: the Fiscal
+Predictability badge printed a score, a band word and a dispersion basis and never the metric
+name, rendering as a bare `62 · UNGRADED ≥37.2pp obs → carry ≤32 · VERY LOW` between
+`667 contracts` and `Contract take: 42.5–79.7% observed`, in a row that also prints `Moderate`
+(the TAKE tier) and under a strip printing `Stability: ◆◆◆◇◇` (the REFORM score) — two labelled
+band words with opposite subjects either side of one anonymous one. The name lived only in the
+`title` attribute, which a thumb cannot reach. Same naked badge in the FC drilldown drawer.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** — the stalest task.
+Rotation: 797 T2, 798 T5, 799 T3, 800 T1, 801 T6, 802 T4.
+
+## Friction
+The Country Profile headline strip prints take, NPV, downside, breakeven and swing as **numbers**,
+and prints one metric as an **instruction**: `IRR: → Model in Scenario Builder`. Confirmed live —
+that button is a real `<button onclick="ddOpenScenarioBuilder(...)">` on every country walked
+(Nigeria, Norway, Guyana, Angola), and it is the **only route to an IRR anywhere on the platform**;
+the country-level IRR column was withdrawn because it was an arithmetic mean of per-contract IRRs
+with a 333% platform median. So whoever arrives in that modal is, by construction, the analyst
+who came **for the IRR**.
+
+What met them, on Nigeria:
+
+| | reconciled against published? |
+|---|---|
+| Govt take 47.3% | **yes** — `Nigeria published @$75 81.1%`, **−33.8pp**, flagged red |
+| Contractor NPV $1.59B | **yes** — `$302M`, `5.3× higher`, plus a paragraph naming the mechanism |
+| **Contractor IRR 39.5%** | **nothing at all** |
+
+`_sbOriginNote()` builds `_takeRow740` and `_npvRow740` and no third row. The silence is the
+dangerous one: 39.5% is the return of a project bearing roughly **half** Nigeria's actual fiscal
+burden, computed on the very terms the strip has just finished calling 33.8pp off. The two
+neighbours carry "this is not what you think it is" warnings; the one the analyst came for
+carried none — and it is the figure that gets pasted into the memo as "Nigeria IRR ~40%".
+
+Measured live, scenario-vs-published take gap: **Nigeria 33.8pp · Norway 18.1pp** · Guyana 1.3pp.
+
+## Change
+**`_sbIrrBasis893()`** — one builder feeding **both** the strip row and the tile flag off a single
+`_sbReturnReading()` + `_sbPubAt740()` call, so the two cannot fork (the v891 `_beProvenance()`
+pattern).
+
+- New third row: `CONTRACTOR IRR | This scenario 39.5% | Nigeria published no IRR (ORCA publishes
+  no country-level IRR)`. Shape deliberately differs from `_row740()` — an em-dash in a
+  "published" slot reads as a *missing* value rather than a *deliberate absence*, so the slot
+  says why it is empty. **No counterpart is invented.**
+- Where the scenario take sits **≥5pp** off the published take — the same bar the take row already
+  reddens — the row ends `not Nigeria's IRR`, the **tile sub-note** gains ` · not Nigeria's IRR`,
+  and a paragraph names the gap, the direction the true figure moves, and why nothing exists to
+  check it against.
+- **Direction only, never a magnitude.** Government take and contractor IRR move opposite ways on
+  an otherwise identical project — monotone, safe to assert. No single set of terms reproduces a
+  production-weighted country average, so no number is claimed that was not computed.
+- **Stays quiet where the basis is close** (Guyana 1.3pp — no warning) and leaves the
+  **state-monopoly** path to its existing red banner (Saudi Arabia — no duplicate row).
+
+## Result
+The analyst the page routed into that modal *for an IRR* is now told **on the tile itself** that
+39.5% is not Nigeria's IRR, what take it was actually earned at, and which way the real figure
+moves. Previously the page sent them for the number and then went silent about the only thing
+that made it wrong.
+
+## Verification — all of it ran this cycle
+- **Runtime suite RAN**, office/graded copy against the local tree on `http://localhost:8777`:
+  **333 PASS / 0 FAIL / 1 WARN**. The WARN is the pre-existing localhost service-worker 404,
+  present in the baseline walk before any edit. Report deleted before the run.
+- **The new assertions were proven to fire, not assumed to.** The pre-change build was served
+  separately on **:8778** and the same suite run against it: **3 of the 5 FAIL**, failure text
+  verbatim the friction above — `gap 33.81897637363294pp but flagged=false para=false` and
+  `tile unflagged while the strip warns`. The other 2 guard against *over*-firing
+  (quiet-when-aligned, monopoly-untouched) and pass on both builds by design.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures; re-run after the
+  v891→v893 bump. Live version strings only (`<title>` line 42, `#hdr-version`).
+- **Mobile 390×844, `hasTouch: true`** — **9 of 9 tabs** `scrollWidth` 390 = `clientWidth` 390,
+  **plus the Scenario Builder modal open**, 0 page errors. The new row wraps to `h=90` inside a
+  315px note; the paragraph wraps to `h=245`. Nothing overflows.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`; **none in the Scenario Builder**.
+
+## Honest note on the 24px rule
+The added elements are static text — a label span (`h=16`) and the red flag span (`h=19`). No
+click handler, no tab stop, not controls. Recording the numbers rather than claiming a pass.
+
+## Carried forward
+- **The two suite copies are still diverged** and the divergence is now **five cycles old**. The
+  cycle runner prints the warning itself every run: *"SUITE COPIES HAVE DIVERGED — graded (runs):
+  office … repo (idle): petroleum-fiscal-db … Test edits made to the repo copy DO NOT affect this
+  result."* My assertions went into **both** byte-identically, but the gate's number still depends
+  on which copy runs. **This is the most concrete debt on the list and it is compounding.**
+- **`autonomous_cycle.py` has no partial-work guard.** Cycle 802 timed out mid-cycle and left a
+  dirty tree whose tests asserted behaviour the deployed build did not have — so the *next* cycle
+  opened on 5 red assertions that described no product defect at all. A cycle that dies after
+  editing should either stash or say loudly what it left behind. New this cycle.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country, so no fee-blended column can show
+  a true comparable IQR. Carried from 799–801.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–801.
+- Scenario Builder's base case is still fixed to the first saved scenario with no way to
+  re-designate it. Carried from 798–801.
+- **Still open, still Zach's call** (carried from 801): the Breakeven Map paints a 5-colour
+  green→red ramp across a **$27–$34** spread while that tab's own card says breakeven
+  "does not rank them". The ramp ranks them, emphatically. Whether a ramp over $7 of rounding
+  should be drawn at all is a design decision, not a loop decision.
+- **Noted this cycle, not fixed:** the Scenario Builder returns IRRs of **275.3% (Guyana)** and
+  **154.8% (Indonesia)**. `_sbReturnReading()` already classifies these as state `inflated`
+  ("first oil lands in the same year as first capex, so this is not a project return") — but the
+  tile still prints the number full-size in **green**, which is the colour it uses for a *good*
+  return. An inflated IRR is not a good IRR; it is a non-return. The v893 basis flag does not
+  cover this, because it keys on take divergence and these two countries are aligned on take.
+  Plausibly the next T2.
