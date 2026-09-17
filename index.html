@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v906</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v907</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2568,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v906</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v907</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -36169,6 +36169,65 @@ function _scExportBasisLines() {
       + 'moves take up and NPV down, so a low take here is missing record rather than favourable terms. '
       + 'See the Take_Basis column.');
   })();
+  // ── v907 (T5): REFORM RECORD — the split of the rows actually in this file ────────────
+  // The criteria block above may already state the reform CRITERION ("at most one sourced
+  // fiscal law change since 2010"). It never stated the VERDICT on the rows that passed it,
+  // and those are not the same thing: on the Stable Fiscal Record preset, 4 of the 11 rows
+  // that pass carry a verdict this platform will not read as a clean record, two of them
+  // because they raised government take inside the window. A criterion without its outcome
+  // reads as a clean bill of health. Counted off the rows in THIS file, like the four blocks
+  // around it, so a hand-ticked shortlist is described by its own rows.
+  (function(){
+    if (typeof _scReformExport !== 'function') return;
+    var _s4 = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+    var _inR = (window._screenerData || []);
+    if (_s4 && _s4.length) _inR = _inR.filter(function(x){ return _s4.indexOf(x.country) >= 0; });
+    if (!_inR.length) return;
+    // The five token families _rrClassify() actually emits, measured across all 21 logged
+    // jurisdictions rather than assumed: WACC +3-5pp / TAKE ...pp / SIZE UNKNOWN / PRE-2010 /
+    // NO LAW CHANGE. Bucketing on the TOKEN, not on icColor: every one of the 21 comes back
+    // var(--orange), so a colour test collapses all five families into one and reports the
+    // wrong thing -- it put Ghana and Guyana, which have NO post-2010 fiscal change, in the
+    // "rewrote terms, size never quantified" bucket beside Iraq.
+    var wacc = [], took = [], unk = [], pre = [], none = [], other = [], nc = [], any = false;
+    _inR.forEach(function(x) {
+      var v = _scReformExport(x.country);
+      if (!v) { return; }
+      any = true;
+      if (!v.sourced) { nc.push(x.country); return; }
+      var t = String(v.verdict || '');
+      var yr = v.year ? ', ' + v.year : '';
+      if (/WACC/.test(t))               wacc.push(x.country + ' (' + t + yr + ')');
+      else if (/TAKE/.test(t))          took.push(x.country + ' (' + t + yr + ')');
+      else if (/SIZE UNKNOWN/.test(t))  unk.push(x.country + (v.year ? ' (' + v.year + ')' : ''));
+      else if (/PRE-2010/.test(t))      pre.push(x.country);
+      else if (/NO LAW CHANGE/.test(t)) none.push(x.country);
+      else                              other.push(x.country + ' (' + t + ')');
+    });
+    if (!any) return;
+    var seg = [];
+    if (wacc.length)  seg.push(wacc.length + ' carr' + (wacc.length === 1 ? 'ies' : 'y') + ' a WACC premium (Actively Reforming): ' + wacc.join(', '));
+    // "MOVED", not "raised": this family includes Norway at TAKE NET 0pp, where take was raised
+    // inside the window and then cut back to net zero. Each row carries its own token, so the
+    // direction and the size are read off the name rather than off this sentence.
+    if (took.length)  seg.push(took.length + ' MOVED GOVERNMENT TAKE inside the window: ' + took.join(', '));
+    if (unk.length)   seg.push(unk.length + ' rewrote terms in-window with the size never quantified: ' + unk.join(', '));
+    if (pre.length)   seg.push(pre.length + ' last raised take BEFORE 2010, so they are quiet only because the window opens there: ' + pre.join(', '));
+    if (none.length)  seg.push(none.length + ' hold a sourced log in which nothing post-2010 is a fiscal change: ' + none.join(', '));
+    if (other.length) seg.push(other.length + ' other: ' + other.join(', '));
+    if (nc.length)    seg.push(nc.length + ' hold NO sourced reform log (n/c) \u2014 missing coverage, NOT a clean record, and not a zero reform premium: '
+                        + (nc.length > 12 ? nc.slice(0, 12).join(', ') + ' and ' + (nc.length - 12) + ' more' : nc.join(', ')));
+    L.push('REFORM RECORD — what the sourced fiscal-reform event log says about these '
+      + _inR.length + ' row' + (_inR.length === 1 ? '' : 's') + ': ' + seg.join('; ') + '. '
+      + 'This is the same _rrClassify() verdict the Screener row chip, the Fiscal Compare Reform '
+      + 'column, the Country Profile reform sidebar and the Reform Risk card print. It counts '
+      + 'sourced fiscal law changes and nothing else — renegotiation pressure, contract disputes, '
+      + 'sanctions and political risk are not in it. A count is not a magnitude: a single change '
+      + 'of +15pp passes a "at most one change" filter. It is NOT the same reading as '
+      + 'Fiscal_Predictability, which is a dispersion statistic computed from the contract table '
+      + 'and has no knowledge of the events listed here. See the Reform_Verdict, '
+      + 'Reform_Last_Change and Reform_Basis columns.');
+  })();
   // v844 (T6): the sourcing basis. Counted off the rows actually in this file — the same two
   // sources the data-basis split above uses — so a hand-ticked shortlist is described by its own
   // grade mix and not by the pre-shortlist match set. Production coverage and evidence grade are
@@ -36750,6 +36809,77 @@ function _scEvidExport(d) {
 }
 window._scEvidExport = _scEvidExport;
 
+// ── v907 (T5): THE REFORM VERDICT NOW LEAVES THE TOOL ──────────────────────────
+// Walked T5 cold at 1440x900, storage cleared: Screener -> "Stable Fiscal Record" -> 11 rows ->
+// export. On SCREEN each of those 11 rows carries a reform verdict under the country name
+// (v906), and four of them are not clean:
+//     Ecuador  TAKE +5pp  · 1 chg · 2010      Russia  TAKE +15pp · 1 chg · 2022
+//     India    SIZE UNKNOWN · 1 chg · 2016    Iraq    SIZE UNKNOWN · 1 chg · 2023
+// _scExportRows() returned 31 keys and NOT ONE of them was the reform record — measured, not
+// inferred: the key list contains no /reform/i match at all. So all three export paths (the
+// clipboard memo table, the CSV and the XLSX) handed back eleven rows that read as equally
+// stable, under a criteria line that says "at most one sourced fiscal law change since 2010".
+// Russia passes that filter BECAUSE +15pp in 2022 is one change. The file said the quiet part
+// and dropped the loud one.
+//
+// This is the export half of the shortlist the analyst attaches to the IC memo, so it is worse
+// than a missing column: the export does not merely omit the reform reading, it omits the one
+// reading that contradicts the impression the filter name creates. Fiscal_Predictability is
+// already carried and is NOT this — it is 100 less IQR/swing/mechanic penalties, a dispersion
+// statistic, and it has no knowledge of the 2022 windfall tax.
+//
+// No new rule and no new threshold: this reads the same _rrClassify() verdict the screen chip,
+// Fiscal Compare's Reform column, the Country Profile sidebar and the Reform Risk card all
+// print. The 164 jurisdictions with no sourced log export as "n/c", with the platform's own
+// sentence that n/c is missing coverage rather than a clean record — because a blank cell in a
+// spreadsheet column headed Reform is read as "nothing to report".
+function _scReformExport(country) {
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
+  // Fetch not landed. Say nothing rather than assert a coverage claim that would be false —
+  // same refusal _rrRowChip() makes on screen.
+  if (!rh || !Object.keys(rh).length) return null;
+  var evs = Array.isArray(rh[country]) ? rh[country] : [];
+  if (!evs.length) {
+    return {
+      verdict: 'n/c — no sourced reform log',
+      scored: null, since2010: null, year: null, last: null,
+      clean: false, sourced: false,
+      basis: 'ORCA holds a sourced fiscal-reform event log for 21 of 185 jurisdictions and '
+        + country + ' is one of the 164 without one. This is NOT a Reform Frequency Score of 100 '
+        + 'and it is NOT a clean record — it is missing coverage. Do not carry a zero reform-risk '
+        + 'premium into an IC memo on this basis; this jurisdiction needs an external check (its own '
+        + 'petroleum act, IMF Article IV, operator annual reports) before that premium is defensible.'
+    };
+  }
+  var v = (typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  if (!v) return null;
+  // The most recent event that actually SCORES — a fiscal law change dated 2010 or later.
+  // Same selection the on-screen chip makes: latest, not first, and never a context event.
+  var lastScored = evs.filter(function(e) { return (typeof _rrScores === 'function') ? _rrScores(e) : false; })
+                      .sort(function(a, b) { return (b.year || 0) - (a.year || 0); })[0] || null;
+  var plain = function(x) { return (typeof _icPlain === 'function') ? _icPlain(String(x || '')) : String(x || ''); };
+  var tok = plain(v.icToken);
+  return {
+    verdict: tok,
+    scored: v.score,
+    since2010: v.since2010,
+    year: lastScored ? lastScored.year : null,
+    last: lastScored
+      ? lastScored.year + ' — ' + lastScored.event
+        + (lastScored.take_change ? ' (' + lastScored.take_change + ' government take)' : ' (take move not quantified)')
+      : null,
+    // NOT icColor: all 21 logged jurisdictions come back var(--orange), so a colour test
+    // cannot separate "nothing post-2010 is a fiscal change" from "raised take +15pp".
+    // This is the token family, which is what the verdict actually turns on.
+    clean: /NO LAW CHANGE/.test(tok),
+    sourced: true,
+    basis: plain(v.icLabel) + '. Reform Frequency Score ' + v.score + '/100, ' + plain(v.rankTxt)
+      + '. ' + v.since2010 + ' sourced fiscal law change' + (v.since2010 === 1 ? '' : 's')
+      + ' since 2010. ' + plain(v.icRule)
+  };
+}
+window._scReformExport = _scReformExport;
+
 function _scExportRows() {
   var data = window._screenerData || [];
   // v699 (T1): the deck the shortlist was actually screened at. Every export used to carry
@@ -36766,6 +36896,8 @@ function _scExportRows() {
     var fp = getFiscalPredictabilityScore(d);
     var disp = _fpDispersion(d);
     var _fpX = _fpExportCell(d);
+    // v907 (T5): the reform verdict for this row, from the same _rrClassify() the screen chip reads.
+    var _rfX = _scReformExport(d.country);
     var _swX = (typeof _scSwingAt === 'function') ? _scSwingAt(d) : { head: d.swing, cmp: d.swing, diverges: false, monopoly: false };
     // v879 (T5): the basis block reports how many rows in THIS file carry a bound, and how many
     // of those move band, so an IC reader opening the workbook cold knows the correction applied
@@ -36871,7 +37003,18 @@ function _scExportRows() {
         : disp.state === 'none' ? 'no contract-level take distribution held'
         : disp.state === 'single' && !_fpX.material && _fpX.resolved && !/bounded at/.test(_fpX.brief) ? 'one statutory term — spread component not exercised'
         : disp.state === 'measured' && !_fpX.material && _fpX.resolved && !/bounded at/.test(_fpX.brief) ? 'measured spread ' + disp.iqr.toFixed(1) + 'pp'
-        : _fpX.brief
+        : _fpX.brief,
+      // ── v907 (T5): the sourced reform record ────────────────────────────────────
+      // Sits beside Fiscal_Predictability because an IC reader comparing the two columns is
+      // exactly the point: predictability is a dispersion statistic computed from the contract
+      // table, this is the event log. Russia exports Fiscal_Predictability 85/100 and
+      // Reform_Verdict "TAKE +15pp / 2022 windfall tax". Both are true; only one of them is
+      // what "is this jurisdiction stable?" was asking.
+      Reform_Verdict: _rfX ? _rfX.verdict : null,
+      Reform_Changes_Since_2010: _rfX ? _rfX.since2010 : null,
+      Reform_Last_Change: _rfX ? _rfX.last : null,
+      Reform_Frequency_Score: _rfX ? _rfX.scored : null,
+      Reform_Basis: _rfX ? _rfX.basis : null
     };
   });
 
@@ -37053,6 +37196,23 @@ function _scCopyColumns(rows, price) {
       if (/^≤/.test(sc)) return sc + '/100 · ' + String(r.Predictability_Band || '') + ' — ' + basis;
       return sc + '/100 — ' + basis;
     } });
+  // ── v907 (T5): the reform verdict, in the pasted memo table ───────────────────────────
+  // Carried only where ORCA actually holds a sourced reform log for at least one row in the
+  // file. Where every row is n/c the column would be a column of "n/c" — the REFORM RECORD
+  // block below the table states that case in one sentence instead of costing the memo a
+  // column. Unlike the on-screen chip this is NOT conditional on the reform filter: an analyst
+  // who screened on take and NPV alone and happens to hold Russia still gets the 2022 windfall
+  // tax in the file, which is the whole point of an export carrying its own assumptions.
+  if (rows.some(function(r){ return r.Reform_Verdict && r.Reform_Verdict !== 'n/c — no sourced reform log'; })) {
+    cols.push({ h: 'Reform record (sourced log)',
+      f: function(r){
+        if (!r.Reform_Verdict) return '—';
+        if (r.Reform_Verdict === 'n/c — no sourced reform log') return 'n/c — no sourced log; missing coverage, not a clean record';
+        return r.Reform_Verdict
+          + ' · ' + r.Reform_Changes_Since_2010 + ' chg since 2010'
+          + (r.Reform_Last_Change ? ' · last: ' + r.Reform_Last_Change : '');
+      } });
+  }
   // v844 (T6): the EVIDENCE column the screen prints beside Govt Take, which the clipboard
   // table dropped. "Data basis" below is production vs proxy — a different question — and was
   // the only quality signal a pasted shortlist carried. C and D rows say so in the cell, because
