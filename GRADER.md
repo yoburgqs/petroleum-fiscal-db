@@ -58123,3 +58123,89 @@ belongs on a screening list, they previously could not.
 Cold load, storage cleared. Home → **"open the screen →"** → IOC Capital Screen → price deck **$100** → **12 countries** → the Screener's own **🔗 Copy Link**.
 
 The link was `#/screener/iochurdle` and the toast said *"opens the Screener with this preset applied."* Opened cold in a second browser, that link returns **
+
+---
+## Cycle 814 Log — 2026-09-17 18:2x
+- Test before: 354 PASS / 0 FAIL / 1 WARN (local tree, TEST_URL)
+- Test after: 354 PASS / 0 FAIL / 1 WARN (local tree, TEST_URL) — suite RAN this cycle
+- JS errors: 0 page errors. The 1 WARN is `sw.js` registered at the absolute GitHub
+  Pages path `/petroleum-fiscal-db/sw.js`, which 404s when the repo is served at a
+  local root. The PRE-CHANGE backup was run on the same server and produced the same
+  354/0/1 — so the WARN is a serving artefact, not a regression and not introduced here.
+  The 355 in the cycle prompt is the deployed run, where that path resolves.
+- Shipped as **v903**.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(Rotation: 813 T1, 812 T5, 811 T4, 810 T6, 809 T3 — T2 was stalest, last run at 808.)
+
+## Friction
+Cold load, storage cleared, served over HTTP. Home → Country Profile → Nigeria →
+scroll to the **Live DCF Model** panel → drag the price slider off $75.
+
+The panel's closing card is titled **"WHICH NUMBER GOES IN THE IC MEMO?"** — the most
+authoritative instruction on the page, and the exact surface T2's "can I defend that?"
+lands on. It reconciles the stored country figure against this panel's scenario.
+
+The stored figure is `take_75` / `npv_75` — **fixed at $75/bbl, always**
+(`runLiveDCF`, index.html:51775-51776). The scenario is whatever the slider says. The
+gap subtracted one from the other directly (`_execLiveDCF`, ~52243), so **any price but
+$75 folded a PRICE move into a number the card presents as a basis disagreement** — and
+then graded its severity on the total.
+
+Nigeria at $40 read:
+> Take gap **−57.6pp** · **Material gap** — do not put these two numbers in the same sentence.
+
+The basis gap is −33.8pp. The other 23.8pp was the analyst's own slider. The NPV pill
+was worse — it asserted *"Most of that is project size, not fiscal terms"* while the
+price move was the larger of the two drivers.
+
+Measured across all 185 countries, dragging $75 → $40 alone:
+
+| effect | count |
+|---|---|
+| severity band changes | **142 of 185** — Afghanistan, Belgium, Botswana and 100+ others go from GREEN *"either figure is defensible"* to YELLOW/RED on a move that says nothing about their terms |
+| NPV sentence becomes false | **173 of 185** |
+
+This is the worst moment in the T2 walk because it is not a hard-to-find corner: the
+natural thing to do when asked "is this attractive at $75" is to test the downside, and
+the moment you do, the platform's own citation guidance misdiagnoses the country.
+
+## Change
+The gap now re-runs the same country/profile at $75 and measures there. `runLiveDCF` is
+pure and `getDCFParams({record:true})` writes only to its own params object, so the
+second run is safe and idempotent.
+
+- Both pills carry a **"both at $75"** basis label.
+- The scenario cards still print the analyst's price, and now add what that price is
+  worth on its own: *"At $75 the same project takes 47.3% — that is the figure the gap
+  below uses. Your $40 setting moves it −23.8pp."* Same line for NPV.
+- The `Price:` entry in "Why the two differ" no longer claims to explain the gap; it
+  states the price move is excluded from it and quantifies it.
+- `_ppFmt903` is declared beside the other v903 values rather than with the render
+  helpers, because the drivers list is built first and would hit the TDZ (the v452 trap).
+
+## Result
+The severity verdict now describes **the regime instead of the slider**. Guyana holds
+"+1.3pp · Consistent" at $55/$75/$110 where it previously swung. An analyst stress-testing
+a downside no longer reads a red "Material gap" caused by their own price setting, and
+the NPV attribution sentence is true at every price.
+
+- Post-fix: **0 of 185** band flips on price; NPV attribution correct **185/185**.
+- At price 75 the card renders **byte-identical to v902** — the change is inert at the default.
+- Mobile 390x844 `hasTouch`: no horizontal scroll (390/390); both added elements 29px tall.
+- JS syntax gate PASS (11 blocks). 0 page errors.
+
+## Debt found this cycle, NOT fixed
+- **The Country Profile tells the analyst to cite four different take figures in four
+  places, and only reconciles each within its own card.** On Nigeria: the headline strip
+  and the Live DCF card both say cite **81.1%**; the regime breakdown says *"Cite the
+  regime row your asset sits in, not the headline"* (**77.5%** / **68.8%**); the contract
+  distribution says *"cite **83.1%** as the central contract, and 81.1% only where you are
+  ranking"*. Each is individually correct and individually reconciled. Nothing on the page
+  resolves them against each other, and the analyst only discovers the conflict by reading
+  all four. A natural next T2 or T5.
+- **`runLiveDCF` is now called twice per slider move** on off-$75 prices. Measured as
+  imperceptible at 185 countries, but it is a real doubling on a path that fires on every
+  `input` event — if a heavier mechanic is added later, memoise the $75 result per
+  (country, profile).
