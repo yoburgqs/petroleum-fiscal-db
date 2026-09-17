@@ -58729,3 +58729,18 @@ said Russia's `Fiscal_Predictability` was 85; the exported value is **75**, band
   real DOM (`#tab-btn-tscreener`) and the real button rather than call the functions. That is
   arguably a better test, but it was rediscovered by hitting the wall, exactly as 817 predicted.
   Nothing marks the boundary and nothing detects a crossing.
+
+---
+## Cycle 818 Log — 2026-09-17 18:54
+- Test before: 355 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed. Here is the cycle summary.
+
+## Cycle 818 — v907
+
+**Task: T5** — "Give me something I can paste straight into an IC memo."
+
+**Friction.** I walked it cold at 1440×900 with storage cleared: Screener → **Stable Fiscal Record** → 11 of 185 countries pass → export for the IC attachment.
+
+On screen, four of those eleven rows are visibly *not* clean — Ecuador `TAKE +5pp` (2010), Russia `TAKE +15pp` (2022), India and Iraq `SIZE UNKNOWN`. But `_scExportRows()` returned **31
