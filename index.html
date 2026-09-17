@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v897</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v898</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v897</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v898</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -28488,15 +28488,24 @@ function _sbsPresetStat(names) {
   // comparable take AND is not the statutory-terms block of a mixed-basis set.
   var nProd = rec.filter(_sbsHasProd).length;
   var mixed = nProd > 0 && nProd < rec.length;
-  var ranked = [], aside = [];
+  var ranked = [], aside = [], rebased = [];
   rec.forEach(function(d) {
     var v = _sbsCmpTake(d, 75);
     if (v == null || (mixed && !_sbsHasProd(d))) aside.push({ c: d.country, v: v });
     else ranked.push({ c: d.country, v: v });
+    // v898 (T3): a Group-2 (TSC / RSC / Buy-back) column is RE-BASED by _sbsCmpTake onto its
+    // Group-1 figure before it is ranked. That is the correct number to order on, but it is NOT
+    // the take ORCA publishes for the country, and the delta is 50.7pp on Iraq. Bucketing on
+    // _sbsCmpTake alone cannot see it, which is why this preset menu was advertising the one
+    // fee-blended set in the platform as "all 2 comparable".
+    if (v != null && _sbsMechGroups(d).blended && d['take_75'] != null &&
+        Math.abs(d['take_75'] - v) >= 0.1) {
+      rebased.push({ c: d.country, pub: d['take_75'], v: v });
+    }
   });
   var vals = ranked.map(function(x) { return x.v; });
   return {
-    n: rec.length, ranked: ranked, aside: aside,
+    n: rec.length, ranked: ranked, aside: aside, rebased: rebased,
     lo: vals.length > 1 ? Math.min.apply(null, vals) : null,
     hi: vals.length > 1 ? Math.max.apply(null, vals) : null
   };
@@ -28512,9 +28521,16 @@ function _sbsPaintQuickstart() {
     var head = (s.lo == null)
       ? (s.ranked.length === 1 ? 'only ' + s.ranked[0].c + ' ranks' : 'nothing ranks')
       : Math.round(s.lo) + '–' + Math.round(s.hi) + '% take @ $75';
-    var tail = s.aside.length
-      ? s.aside.length + ' of ' + s.n + ' set aside'
-      : 'all ' + s.n + ' comparable';
+    // v898 (T3): both conditions get their own clause. "all N comparable" is now only
+    // printed when nothing is set aside AND nothing was re-based off a fee basis.
+    var bits = [];
+    if (s.aside.length) bits.push(s.aside.length + ' of ' + s.n + ' set aside');
+    if (s.rebased.length) {
+      bits.push(s.rebased.length === 1
+        ? s.rebased[0].c + ' re-based ' + Math.round(s.rebased[0].pub) + '\u2192' + Math.round(s.rebased[0].v) + '%'
+        : s.rebased.length + ' of ' + s.n + ' re-based off fee basis');
+    }
+    var tail = bits.length ? bits.join(' \u00b7 ') : 'all ' + s.n + ' comparable';
     b.innerHTML = b.dataset.qsName
       + '<span style="display:block;font-size:10px;font-weight:600;opacity:.78;'
       + 'margin-top:2px;letter-spacing:.1px;white-space:nowrap;">'
@@ -28522,11 +28538,26 @@ function _sbsPaintQuickstart() {
     var ranks = s.ranked.map(function(x) { return x.c + ' ' + x.v.toFixed(1) + '%'; }).join(' · ');
     var t = names.join(', ') + ' at $75/bbl. Comparable take, in the order this grid ranks them: '
           + (ranks || 'none — fewer than two columns share a basis') + '.';
-    t += s.aside.length
-      ? ' Set aside (statutory terms — ORCA holds no verified production behind them): '
+    if (s.aside.length) {
+      t += ' Set aside (statutory terms — ORCA holds no verified production behind them): '
         + s.aside.map(function(x) { return x.c + (x.v == null ? '' : ' ' + x.v.toFixed(1) + '%'); }).join(', ')
-        + '. Their take rows print and are correct on their own basis; they are not rank positions in this set.'
-      : ' All ' + s.n + ' columns are on one basis — nothing is set aside.';
+        + '. Their take rows print and are correct on their own basis; they are not rank positions in this set.';
+    }
+    if (s.rebased.length) {
+      // v898 (T3): the figure in the range above is the re-based one. Say so, and give the
+      // published number beside it — the grid's own notice tells the analyst to carry both.
+      t += ' Re-based to rank: '
+        + s.rebased.map(function(x) {
+            return x.c + ' is placed at ' + x.v.toFixed(1) + '% (its PSC/Concession contracts alone), '
+                 + 'not at the ' + x.pub.toFixed(1) + '% ORCA publishes for it';
+          }).join('; ')
+        + '. A fee-basis contract (TSC / RSC / Buy-back) pays a fixed $/bbl remuneration, so its '
+        + 'take% is an artefact of the mechanic and is not rankable against a PSC or Concession '
+        + 'column. Carry both numbers into the memo.';
+    }
+    if (!s.aside.length && !s.rebased.length) {
+      t += ' All ' + s.n + ' columns are on one basis — nothing is set aside or re-based.';
+    }
     b.setAttribute('title', t + ' Read live from the same figures the grid prints.');
   }
 }
