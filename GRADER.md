@@ -57429,3 +57429,110 @@ and it needs a human read. Flagged, not taken unilaterally.
 **Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
 
 **Friction.** Country Profile, cold load, Indonesia. The sensitivity tornado draws four rows. Three read normally — red left of zero, green right. **Opex read inverted**: the green "Upside" bar ran *left* to −$317M and the red "Downside" bar ran *right* to +$294M. Read literally, the chart told an IC analyst that
+
+---
+## Cycle 809 Log — 2026-09-17
+- Test before: 344 PASS / 0 FAIL (deployed build, from cycle prompt)
+- Test after: 343 PASS / 0 FAIL / 1 WARN (LOCAL tree via TEST_URL=localhost; the 1 WARN is the
+  service-worker 404 that only fires off a local server — identical to 807/808's local baseline)
+- JS errors: 0 page errors across 54 tab-viewport combos
+- Version: v897 -> v898
+
+## Cycle 809 — v898
+
+**Task: T3** — "How do these three countries compare side by side?" (rotation: 808 was T2,
+807 T1, 806 T5, 804/805 T4, 801 T6 — T3 had not been walked since 799.)
+
+**Friction.** Side-by-Side, cold load at 1440x900 with sessionStorage and localStorage cleared.
+The tab does not open empty — it preloads North Sea Trio — so the four curated benchmark sets
+in `#cmp-output.empty-state` are reached by clicking **Clear**. That menu is the platform's
+own entry point into T3, named in the Home card and in several FAQ workflows.
+
+On that menu the button **"USA vs Iraq"** read:
+
+    23–34% take @ $75 · all 2 comparable
+
+Both halves are wrong, in the same direction. `_sbsCmpTake()` silently re-bases a Group-2
+(TSC / RSC / Buy-back) column onto its Group-1 PSC/Concession figure — correct as a *ranking*
+basis, and the reason the range says 34 — but **ORCA publishes 84.8% for Iraq**, and 415 of its
+610 contracts are TSC. So the menu printed Iraq's re-based figure as if it were the country's
+take, and then explicitly asserted that nothing in the set needed re-basing.
+
+Measured across the whole platform: Iraq is the **only** re-based column in any of the four
+presets, 84.8% -> 34.1%, a **50.7pp** substitution — and it sits on the one button claiming
+"all 2 comparable". Loading that preset immediately prints the opposite in the grid: the
+verdict strip says *"Re-based to rank — 1 of 2 ranked columns is not placed on the take ORCA
+publishes for it"*, the Take-basis row prints `⚠ 68% fee-basis`, and a red Group-2 notice runs
+under the grid. **The menu was contradicting the grid.**
+
+**Root cause.** `_sbsPresetStat()` buckets on exactly two predicates — `_sbsCmpTake()` and
+`_sbsHasProd()` — so it can see a column that is SET ASIDE (no verified production) but is
+structurally blind to one that is RE-BASED: `_sbsCmpTake()` returns the corrected number with
+no signal that it differs from the published one. This is the same bug class already found and
+fixed in the verdict strip — the comment on that branch records the analyst being told
+*"all 3 columns are on one basis — nothing is set aside"* directly above an ordering whose
+first entry was 50.7pp from its published take. The preset menu was written later and
+reintroduced it, despite its own header comment promising "a preset cannot advertise a figure
+the grid contradicts."
+
+**Change.** `_sbsPresetStat()` now returns a third bucket, `rebased` — a column where
+`_sbsMechGroups(d).blended` holds and `take_75` differs from the ranked figure by ≥0.1pp.
+`_sbsPaintQuickstart()` builds its tail from both buckets instead of an either/or:
+
+| button | before | after |
+|---|---|---|
+| USA vs Iraq | `23–34% take @ $75 · all 2 comparable` | `23–34% take @ $75 · Iraq re-based 85→34%` |
+| Atlantic Frontier Quartet | `53–81% · 1 of 4 set aside` | unchanged |
+| North Sea Trio | `49–68% · 1 of 3 set aside` | unchanged |
+| West Africa Trio | `53–81% · 1 of 3 set aside` | unchanged |
+
+`all N comparable` is now printed **only** when nothing is set aside AND nothing was re-based;
+where both apply the two clauses print together. The tooltip gained the published figure beside
+the ranked one and the reason they differ, replacing the flatly false sentence
+*"All 2 columns are on one basis — nothing is set aside."*
+
+**Result.** An analyst choosing a comparison off the benchmark menu learns about Iraq's 50.7pp
+re-basing **before** loading the set rather than after. Iraq no longer presents as a 34%-take
+jurisdiction sitting between USA (23%) and Angola (53%) — which, per `MECHANIC_COMPARABILITY.md`,
+is precisely the Group-2 error this platform exists to prevent.
+
+## Verification — every number produced this cycle, against the working tree
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures.
+- **Runtime suite RAN** (not assumed) against the LOCAL tree via `TEST_URL` — **343 PASS /
+  0 FAIL / 1 WARN**. Suite copies verified identical by sha256 before running
+  (`d98409...3b941`, repo copy vs the graded copy in `office/tools/petroleum/tests/`).
+- **Horizontal scroll** — **0 failures across 54 tab-viewport combos** (9 tabs x
+  1920/1440/1280/1024/768/390, fresh context, storage cleared each time). **0 page errors.**
+- **Mobile 390x844 `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390. The one control
+  touched this cycle measures **237 x 44px**, clearing the 24px floor under `pointer: coarse`.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." The 5 findings are the same
+  pre-existing baseline entries as 807/808 (`thome`, `t0`, `t7`); **none on `t2`**.
+- Mirror `office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-identical to
+  `index.html` (sha256 `2324af46...218f`).
+
+## Carried forward
+- **The benchmark menu is unreachable on a cold load.** `#cmp-output` opens with North Sea Trio
+  already rendered into it, so the four preset buttons — and the comparability summaries this
+  cycle just corrected — only appear after clicking **Clear**, which reads as discarding work.
+  Found this cycle while walking T3; not fixed, because the false claim was the worse moment.
+  Natural next T3.
+- **The re-basing blind spot may not be confined to this menu.** `_sbsCmpTake()` returns a
+  corrected figure with no signal attached, so any caller that buckets on it alone inherits the
+  same defect. The verdict strip and this menu are two sites found so far; the other callers
+  were not audited this cycle.
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`** — FC median IRR still
+  138.4%, 128 rows above 100%. From 808.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked
+  around again with `TEST_URL=http://localhost:8899/index.html`; should probably become the
+  default. From 806-808.
+- **`autonomous_cycle.py` has no partial-work guard** — sixth cycle running. From 805.
+- **Needs Zach, from 808:** the PSC CIT base still omits the opex deduction `petroleum_dcf.py:945`
+  takes. One-term fix, but `cit` feeds `govtTake`, which is what Fiscal Compare sorts on — it
+  re-ranks 58 of 185 countries. Flagged, not taken unilaterally.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green->red ramp across a $27-$34
+  spread while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
