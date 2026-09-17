@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v901</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v902</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v901</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v902</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -33691,6 +33691,11 @@ function _labelScreenerPresets() {
   if (sel.dataset.countedDeck === deck) return;
   var total = COUNTRY_DATA.length;
   var snap = _scSnapshotState();
+  // v902: this pass LOADS each preset to count it, and runScreener() now republishes the route.
+  // Without the hold the address bar would end the pass holding whichever preset was counted
+  // last — the same hazard the v842 note above _scRouteSetPreset() describes for the URL.
+  var _holdWas = _explRouteHold;
+  _explRouteHold = true;
   try {
     [].slice.call(sel.options).forEach(function(o) {
       if (!o.value) return;
@@ -33726,6 +33731,9 @@ function _labelScreenerPresets() {
   _scRestoreState(snap);
   sel.selectedIndex = 0;
   sel.dataset.countedDeck = deck;
+  // v902: released before the restoring run, so the route ends this pass describing the screen
+  // the analyst is actually looking at rather than the last preset counted.
+  _explRouteHold = _holdWas;
   if (typeof runScreener === 'function') { try { runScreener(); } catch (e) {} }
 }
 window._labelScreenerPresets = _labelScreenerPresets;
@@ -35594,6 +35602,14 @@ function runScreener() {
   // bound rather than the withdrawn score — and writes it from a synchronous path, which is
   // what keeps the clipboard call inside the analyst's own click.
   if (typeof _scWarmObsCeilingsSoon === 'function') _scWarmObsCeilingsSoon();
+
+  // v902 (T1): republish the route now the result set is settled. _explSyncRoute() is a
+  // replaceState and returns early unless this pane is the active tab, so this costs one hash
+  // write per screen change and adds no history entries. The _explRouteHold bracket around
+  // _labelScreenerPresets() is what stops the menu's eleven counting runs writing eleven hashes.
+  if (window._explorerMode === 'screen' && typeof _explSyncRoute === 'function') {
+    try { _explSyncRoute('screen'); } catch (e) {}
+  }
 }
 
 // ── v730 (T6): the Screener Evidence column graded the wrong thing for a T6 analyst ──
@@ -36604,7 +36620,7 @@ function _scExportRows() {
   // hand-picked six is not a screening result at all.
   var _out = _sel ? _all.filter(function(r){ return _sel.indexOf(r.Country) >= 0; }) : _all;
 
-  // ── v901 (T5): the ceiling count says "in this file", so it is counted AFTER the ──────
+  // ── v902 (T5): the ceiling count says "in this file", so it is counted AFTER the ──────
   // hand-ticked shortlist is applied, not before it.
   //
   // Walked T5 cold at 1440x900, storage cleared: Screener -> preset "IOC Capital Screen"
@@ -49393,6 +49409,11 @@ function parseAndNavigate(hash) {
   } else if (section === 'screener') {
     // v842 (T1): the Screener's own route. #/screener, or #/screener/<preset>.
     var scBtn = _tabBtnFor('tscreener') || _tabBtnFor('texplorer');
+    // v902 (T1): the thresholds ride in the query string and are applied OVER the preset the
+    // path named. Read here, at the top of the branch, because switchExplorerMode('screen')
+    // below republishes the route from the still-default controls and would erase it first.
+    // _scRouteEnter() consumes it once the data and the preset-counting pass have both landed.
+    window._scRoutePendingQuery = (hash.indexOf('?') === -1) ? '' : hash.slice(hash.indexOf('?'));
     _explRouteHold = true;
     switchTab('texplorer', scBtn);
     setTimeout(function () {
@@ -57842,8 +57863,13 @@ function _explSyncRoute(mode) {
     b.classList.toggle('active', on);
     b.setAttribute('aria-selected', on ? 'true' : 'false');
   });
+  // v902: the Screener's route carries its control surface, not just the preset name. Built
+  // from the live DOM on every sync, so the address bar is always the screen on screen — which
+  // is what makes the browser Back button, a bookmark and a hand-copied URL agree with the
+  // Copy Link button instead of all four resolving to a different shortlist.
   var want = screen
     ? '#/screener' + (window._scRoutePreset ? '/' + window._scRoutePreset : '')
+      + (typeof _scRouteQuery === 'function' ? _scRouteQuery() : '')
     : '#/explorer';
   var cur = window.location.hash || '';
   // Never overwrite a Browse filter link (#/explorer?mech=...) or #/explorer/rfactor with the
@@ -57863,6 +57889,155 @@ function _scRouteSetPreset(id) {
 }
 window._scRouteSetPreset = _scRouteSetPreset;
 
+/* ─── v902 (T1) — the screen travels with the link ─────────────────────────────────────────
+   Walked T1 cold at 1440x900, storage cleared: Home -> "open the screen" -> IOC Capital Screen
+   -> price deck $100 -> TWELVE countries -> the Screener's own "Copy Link".
+
+   The link produced was "#/screener/iochurdle" and the toast said "opens the Screener with this
+   preset applied". Opened cold in a second browser context, that link returns FIFTEEN countries
+   at $75 — Azerbaijan, India and Indonesia back on a shortlist the sender's screen had just
+   removed, each with a reason printed under NOT ON THIS LIST ("comparable take 65.1% > 65%",
+   "68.6% > 65%", "66.4% > 65%"). At the moment of the copy the sender's own chip read
+   "IOC Capital Screen — MODIFIED: price deck $75 -> $100": the page knew the state was modified,
+   said so on screen, and then shipped a link that dropped the modification.
+
+   With no preset loaded it was worse. A hand-built take<=45% screen returning 110 countries
+   copied as the bare "#/screener", which opens on the unfiltered 185 — every threshold the
+   analyst had set silently discarded, with nothing in the toast to say so.
+
+   So the one artefact a T1 analyst produces — "here is the list, and here is why these and not
+   those" — could not be sent. The route now carries the control surface, the same way Browse has
+   carried "#/explorer?mech=PSC&region=Africa". Only legs that differ from a COLD Screener are
+   written — a preset's own thresholds therefore appear in the query too, which is deliberate:
+   it makes a sent link describe the screen that ran, not a preset name whose definition may
+   move under the recipient. The query is applied OVER the preset named in the path, which is
+   what lets a MODIFIED preset round-trip as itself rather than as its unmodified baseline. */
+
+var _SC_ROUTE_DEFAULTS = { take: '100', npv: '-500', npv50: '-500', evid: '0' };
+
+// Serialise only what differs from a cold Screener. Returns '' or '?a=1&b=2'.
+function _scRouteQuery() {
+  var q = [];
+  var push = function (k, v) { q.push(k + '=' + encodeURIComponent(v)); };
+  var val = function (id) { var e = document.getElementById(id); return e ? String(e.value) : null; };
+  var box = function (id) { var e = document.getElementById(id); return e ? !!e.checked : null; };
+
+  var deck = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+  if (deck !== '75') push('d', deck);
+
+  var t = val('sl-take');   if (t !== null && t !== _SC_ROUTE_DEFAULTS.take)   push('t', t);
+  var n = val('sl-npv');    if (n !== null && n !== _SC_ROUTE_DEFAULTS.npv)    push('n', n);
+  var n5 = val('sl-npv50'); if (n5 !== null && n5 !== _SC_ROUTE_DEFAULTS.npv50) push('n5', n5);
+  var e = val('sl-evid');   if (e !== null && e !== _SC_ROUTE_DEFAULTS.evid)   push('e', e);
+
+  // The four modifier checkboxes all ship CHECKED, so only an unticked one is state.
+  if (box('sc-fee-cmp') === false)      push('fc', '0');
+  if (box('sc-evid-depth') === false)   push('ed', '0');
+  if (box('sc-proxy-keep') === false)   push('px', '0');
+  if (box('sc-floor-keep') === false)   push('fl', '0');
+  if (box('sc-evidence-first') === false) push('ef', '0');
+
+  var rg = val('sc-region'); if (rg) push('rg', rg);
+  var rf = val('sc-reform'); if (rf) push('rf', rf);
+
+  var mechAll = [].slice.call(document.querySelectorAll('#sc-mech-checks input[type=checkbox]'));
+  var mechOn  = mechAll.filter(function (c) { return c.checked; });
+  if (mechAll.length && mechOn.length !== mechAll.length) {
+    push('m', mechOn.map(function (c) { return c.value; }).join('|'));
+  }
+  var iocOn = [].slice.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked'));
+  if (iocOn.length) push('o', iocOn.map(function (c) { return c.value; }).join('|'));
+
+  return q.length ? '?' + q.join('&') : '';
+}
+window._scRouteQuery = _scRouteQuery;
+
+// Apply a serialised screen over whatever the path's preset already set. Returns true if it
+// wrote anything, so the caller knows whether a re-run is owed.
+function _scRouteApplyQuery(qs) {
+  if (!qs || qs.indexOf('?') === -1) return false;
+  var params = {};
+  qs.slice(qs.indexOf('?') + 1).split('&').forEach(function (kv) {
+    if (!kv) return;
+    var i = kv.indexOf('=');
+    var k = i === -1 ? kv : kv.slice(0, i);
+    params[k] = i === -1 ? '' : decodeURIComponent(kv.slice(i + 1));
+  });
+  var wrote = false;
+  // A hand-edited or truncated URL must not move a threshold to something the slider itself
+  // would never have produced: "t=zzz" assigned straight through left the take ceiling on the
+  // input's fallback (55%) while the query still claimed to describe the sender's screen.
+  var slider = function (id, readout, key) {
+    if (!(key in params)) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    var v = Number(params[key]);
+    if (!isFinite(v)) return;
+    var lo = Number(el.min), hi = Number(el.max);
+    if (isFinite(lo) && v < lo) return;
+    if (isFinite(hi) && v > hi) return;
+    el.value = String(v);
+    var ro = document.getElementById(readout);
+    if (ro) ro.textContent = el.value;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    wrote = true;
+  };
+  var check = function (id, key) {
+    if (!(key in params)) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.checked = params[key] !== '0';
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    wrote = true;
+  };
+  var pick = function (id, key) {
+    if (!(key in params)) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.value = params[key];
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    wrote = true;
+  };
+
+  // Deck first: _scSyncNpvAxis() re-scales the NPV slider's travel to the live deck, so the NPV
+  // floors have to be written after the price they were recorded at is in place.
+  if (params.d && ['50', '75', '100', '125'].indexOf(params.d) !== -1) {
+    if (typeof _scSetDeck === 'function') { _scSetDeck(params.d); wrote = true; }
+  }
+  slider('sl-take', 'sv-take', 't');
+  slider('sl-npv', 'sv-npv', 'n');
+  slider('sl-npv50', 'sv-npv50', 'n5');
+  slider('sl-evid', 'sv-evid', 'e');
+  check('sc-fee-cmp', 'fc');
+  check('sc-evid-depth', 'ed');
+  check('sc-proxy-keep', 'px');
+  check('sc-floor-keep', 'fl');
+  if ('ef' in params) {
+    var ef = document.getElementById('sc-evidence-first');
+    if (ef) { ef.checked = params.ef !== '0'; _screenerEvidenceFirst = ef.checked; wrote = true; }
+  }
+  pick('sc-region', 'rg');
+  pick('sc-reform', 'rf');
+  if ('m' in params) {
+    var want = params.m ? params.m.split('|') : [];
+    [].slice.call(document.querySelectorAll('#sc-mech-checks input[type=checkbox]')).forEach(function (c) {
+      c.checked = want.indexOf(c.value) !== -1;
+    });
+    wrote = true;
+  }
+  if ('o' in params) {
+    var wantO = params.o ? params.o.split('|') : [];
+    [].slice.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]')).forEach(function (c) {
+      c.checked = wantO.indexOf(c.value) !== -1;
+    });
+    wrote = true;
+  }
+  if (wrote && typeof runScreener === 'function') runScreener();
+  return wrote;
+}
+window._scRouteApplyQuery = _scRouteApplyQuery;
+
 // Arrival from the hash. On a cold load this runs before country_data.json has landed, so it
 // waits for the data AND for _labelScreenerPresets() to finish its counting pass (which ends by
 // restoring the unfiltered state) before applying the routed preset over the top of it.
@@ -57876,13 +58051,22 @@ function _scRouteEnter(presetId, tries) {
     setTimeout(function () { _scRouteEnter(presetId, tries + 1); }, 250);
     return;
   }
-  if (!presetId) { if (typeof runScreener === 'function') runScreener(); _explSyncRoute('screen'); return; }
+  // v902: every post-ready exit ends the same way — lay the shared thresholds over whatever the
+  // preset (or the reset default) just set, then republish. One exit point, so a bare
+  // "#/screener?t=45&d=100" and a modified "#/screener/iochurdle?d=100" restore by one path.
+  var _finish = function () {
+    var q = window._scRoutePendingQuery;
+    window._scRoutePendingQuery = undefined;
+    if (q && typeof _scRouteApplyQuery === 'function') { try { _scRouteApplyQuery(q); } catch (e) {} }
+    _explSyncRoute('screen');
+  };
+  if (!presetId) { if (typeof runScreener === 'function') runScreener(); _finish(); return; }
   var known = sel && [].slice.call(sel.options).some(function (o) { return o.value === presetId; });
-  if (!known) { window._scRoutePreset = null; _explSyncRoute('screen'); return; }
+  if (!known) { window._scRoutePreset = null; _finish(); return; }
   if (sel) sel.value = '';
   window._scRoutePreset = presetId;
   if (typeof applyScreenerPreset === 'function') applyScreenerPreset(presetId);
-  _explSyncRoute('screen');
+  _finish();
 }
 window._scRouteEnter = _scRouteEnter;
 
@@ -57891,10 +58075,18 @@ window._scRouteEnter = _scRouteEnter;
 function copyScreenerLink() {
   _explSyncRoute('screen');
   var url = window.location.href.split('#')[0] + (window.location.hash || '#/screener');
+  // v902: the confirmation names what the recipient will actually see — the row count and the
+  // deck it was screened at. The old wording ("opens the Screener with this preset applied")
+  // was true of a link that had thrown the deck and every slider away, which is how a 12-country
+  // $100 screen could be sent and arrive as a 15-country $75 one with nobody told.
   var done = function () {
-    showCopyToast(window._scRoutePreset
-      ? 'Link copied \u2014 opens the Screener with this preset applied'
-      : 'Link copied \u2014 opens the Screener');
+    var n = document.querySelectorAll('#tbody-screener tr[data-country]').length;
+    var deck = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+    var name = (typeof _activePresetName !== 'undefined' && _activePresetName) ? _activePresetName : '';
+    var mod = (typeof _activePresetModified !== 'undefined' && _activePresetModified);
+    var who = name ? (' \u00b7 ' + name + (mod ? ' (modified)' : '')) : '';
+    showCopyToast('Link copied \u2014 opens this screen: ' + n + ' countr' + (n === 1 ? 'y' : 'ies')
+      + ' at $' + deck + '/bbl' + who);
   };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(done).catch(function () {
