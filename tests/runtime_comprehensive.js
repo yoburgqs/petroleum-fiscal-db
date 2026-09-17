@@ -579,6 +579,212 @@ async function testExplorer(page) {
       await page.waitForTimeout(300);
     }
 
+    // ── v854 (T6): the column headers must REVERSE, not just fire once ────────────────
+    // Written because the defect was invisible to every existing assertion: setExplorerSort()
+    // did set the right key and did re-render, so "clicking Evidence sorts by evidence" passed
+    // while clicking it a second time changed nothing at all. The assertion is therefore
+    // stated as a DIFFERENCE between click 1 and click 2, and as a RETURN on click 3, rather
+    // than against any hard-coded country order — so it tests the behaviour and will not go
+    // stale when the underlying evidence grades move.
+    try {
+      await switchTab(page, 'texplorer');
+      await page.waitForTimeout(400);
+      const order = () => page.evaluate(() =>
+        [...document.querySelectorAll('#tbody-explorer tr[data-country]')]
+          .slice(0, 12).map(r => r.getAttribute('data-country')).join(','));
+      const ariaOf = k => page.evaluate(kk =>
+        (document.querySelector('#tbl-explorer th[data-sort-key="' + kk + '"]') || {})
+          .getAttribute ? document.querySelector('#tbl-explorer th[data-sort-key="' + kk + '"]').getAttribute('aria-sort') : null, k);
+      const click = k => page.evaluate(kk => {
+        const th = document.querySelector('#tbl-explorer th[data-sort-key="' + kk + '"]');
+        if (th) th.click();
+      }, k);
+
+      // Evidence is the T6 column: the one control this table offers for "how solid is it?"
+      await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change')); });
+      await page.waitForTimeout(400);
+      await click('evidence'); await page.waitForTimeout(500);
+      const ev1 = await order(), evA1 = await ariaOf('evidence');
+      await click('evidence'); await page.waitForTimeout(500);
+      const ev2 = await order(), evA2 = await ariaOf('evidence');
+      await click('evidence'); await page.waitForTimeout(500);
+      const ev3 = await order();
+
+      if (ev1 && ev2 && ev1 !== ev2)
+        p(S, 'EXPL-SORT-DIR evidence reverses', `click 2 returns a different order (${ev1.split(',')[0]} -> ${ev2.split(',')[0]})`);
+      else
+        f(S, 'EXPL-SORT-DIR evidence reverses', `second click left the order unchanged: ${String(ev1).slice(0, 60)}`);
+
+      if (ev1 && ev3 && ev1 === ev3)
+        p(S, 'EXPL-SORT-DIR evidence returns', 'click 3 restores the default order');
+      else
+        f(S, 'EXPL-SORT-DIR evidence returns', `click 3 did not restore: ${String(ev3).slice(0, 60)}`);
+
+      if (evA1 === 'ascending' && evA2 === 'descending')
+        p(S, 'EXPL-SORT-DIR aria-sort tracks direction', `${evA1} -> ${evA2}`);
+      else
+        f(S, 'EXPL-SORT-DIR aria-sort tracks direction', `got ${evA1} -> ${evA2}, expected ascending -> descending`);
+
+      // Every sortable header, not just the one this cycle walked — all eight were stuck.
+      const keys = await page.evaluate(() =>
+        [...document.querySelectorAll('#tbl-explorer th[data-sort-key]')].map(h => h.getAttribute('data-sort-key')));
+      const stuck = [];
+      for (const k of keys) {
+        await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change')); });
+        await page.waitForTimeout(250);
+        await click(k); await page.waitForTimeout(400); const a = await order();
+        await click(k); await page.waitForTimeout(400); const b = await order();
+        if (a === b) stuck.push(k);
+      }
+      if (!stuck.length) p(S, 'EXPL-SORT-DIR all headers reverse', `${keys.length} of ${keys.length} sortable headers toggle direction`);
+      else f(S, 'EXPL-SORT-DIR all headers reverse', `one-way headers: ${stuck.join(', ')}`);
+
+      // The grouping terms must NOT flip: reversing must never lift regional-proxy economics
+      // above verified production, nor rows with no breakeven above the 65 that have one.
+      await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'evidence'; s.dispatchEvent(new Event('change')); });
+      await page.waitForTimeout(400);
+      await click('evidence'); await page.waitForTimeout(600);
+      const grouping = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('#tbody-explorer tr[data-country]')];
+        const isProxy = r => /PROXY/.test(r.innerText);
+        const firstProxy = rows.findIndex(isProxy);
+        let lastProd = -1;
+        rows.forEach((r, i) => { if (!isProxy(r)) lastProd = i; });
+        return { firstProxy, lastProd, ok: firstProxy === -1 || lastProd < firstProxy };
+      });
+      if (grouping.ok) p(S, 'EXPL-SORT-DIR grouping survives reversal', 'verified-production block still ranks above the regional-proxy block');
+      else f(S, 'EXPL-SORT-DIR grouping survives reversal', `proxy row at ${grouping.firstProxy} precedes a production row at ${grouping.lastProd}`);
+
+      // The count line must state the order that is actually in force.
+      const note = await page.evaluate(() => (document.getElementById('explorer-count') || {}).innerText || '');
+      if (/best-evidenced first/i.test(note))
+        p(S, 'EXPL-SORT-DIR count line names the order', 'reads "best-evidenced first" while reversed');
+      else
+        f(S, 'EXPL-SORT-DIR count line names the order', `count line does not name the reversed order: ${note.replace(/\s+/g, ' ').slice(0, 120)}`);
+
+      await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change')); });
+      await page.waitForTimeout(300);
+    } catch (e) { f(S, 'EXPL-SORT-DIR', e.message); }
+
+    // ── v855 (T5) EXPL-XL-BASIS ────────────────────────────────────────────────────────────
+    // The Explorer workbook states its own row order and its own data basis on the
+    // "Filters & Assumptions" sheet. Those two cells are the only thing an analyst reading the
+    // file inside an IC pack has to go on, and both were re-implemented copies of sentences the
+    // page already renders correctly, so both had drifted:
+    //   • "Ranked by" was one hard-coded string per sort key. It read "Evidence quality (best
+    //     first)" for the DEFAULT evidence sort, which is weakest-first — the file led Iraq (D)
+    //     under a heading claiming the best-evidenced were on top. It had no entry for the
+    //     stability column and printed the raw key. And after v854 made all eight headers
+    //     reverse, a reversed export and its exact opposite carried identical text.
+    //   • "Ranking basis" tested proxy === 0 and sent every other state to "No country in this
+    //     file has verified field production" — including the MIXED case, which is what the cold
+    //     view produces with the grouping toggle off.
+    // Asserted against the workbook OBJECT, by stubbing XLSX.writeFile, so this reads what would
+    // actually be written to disk rather than what the page says. Stated as agreement between the
+    // file and the screen, not against any fixed country order, so it cannot go stale as the data
+    // moves.
+    try {
+      await switchTab(page, 'texplorer');
+      await page.waitForTimeout(400);
+      const clickH = k => page.evaluate(kk => {
+        const th = document.querySelector('#tbl-explorer th[data-sort-key="' + kk + '"]');
+        if (th) th.click();
+      }, k);
+      await page.evaluate(() => {
+        if (!window.__xlOrig) window.__xlOrig = XLSX.writeFile;
+        XLSX.writeFile = function (wb, name) { window.__xlCap = { wb: wb, name: name }; };
+      });
+      // Pull the Field/Value pairs and the first data row out of the captured workbook.
+      const grab = () => page.evaluate(() => {
+        window.__xlCap = null;
+        document.getElementById('explorer-excel-btn').click();
+        if (!window.__xlCap) return null;
+        const wb = window.__xlCap.wb;
+        const ws = wb.Sheets['Filters & Assumptions'];
+        const ctx = {};
+        Object.keys(ws).forEach(k => {
+          const m = /^A(\d+)$/.exec(k);
+          if (m && ws[k] && ws[k].v !== undefined) {
+            const v = ws['B' + m[1]];
+            ctx[String(ws[k].v)] = v && v.v !== undefined ? String(v.v) : '';
+          }
+        });
+        const s1 = wb.Sheets['Screening List'];
+        return { ctx: ctx, firstRow: s1 && s1.B2 ? String(s1.B2.v) : null,
+                 screenFirst: (document.querySelector('#tbody-explorer tr[data-country]') || {})
+                                .getAttribute ? document.querySelector('#tbody-explorer tr[data-country]').getAttribute('data-country') : null };
+      });
+
+      await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change')); });
+      await page.waitForTimeout(400);
+      await clickH('evidence'); await page.waitForTimeout(600);
+      const xA = await grab();
+      await clickH('evidence'); await page.waitForTimeout(600);
+      const xB = await grab();
+
+      if (!xA || !xB) {
+        f(S, 'EXPL-XL-BASIS capture', 'XLSX.writeFile was never reached — the Excel button did not build a workbook');
+      } else {
+        const rbA = xA.ctx['Ranked by'] || '', rbB = xB.ctx['Ranked by'] || '';
+
+        // 1. The default evidence export must not claim the best-evidenced are on top.
+        if (/weakest/i.test(rbA) && !/best-evidenced/i.test(rbA))
+          p(S, 'EXPL-XL-BASIS default order stated', `"Ranked by" reads ${JSON.stringify(rbA.slice(0, 70))}`);
+        else
+          f(S, 'EXPL-XL-BASIS default order stated', `default evidence export claims: ${JSON.stringify(rbA.slice(0, 90))}`);
+
+        // 2. The reversed export must say so.
+        if (/best-evidenced first/i.test(rbB))
+          p(S, 'EXPL-XL-BASIS reversed order stated', `"Ranked by" reads ${JSON.stringify(rbB.slice(0, 70))}`);
+        else
+          f(S, 'EXPL-XL-BASIS reversed order stated', `reversed export claims: ${JSON.stringify(rbB.slice(0, 90))}`);
+
+        // 3. Two opposite files must not carry the same sentence.
+        if (rbA && rbB && rbA !== rbB) p(S, 'EXPL-XL-BASIS direction changes the cell', 'reversing the header changes "Ranked by"');
+        else f(S, 'EXPL-XL-BASIS direction changes the cell', `both directions wrote the same "Ranked by": ${JSON.stringify(rbA.slice(0, 90))}`);
+
+        // 4. The file's first row is the screen's first row — the order claim is about real rows.
+        if (xB.firstRow && xB.screenFirst && xB.firstRow === xB.screenFirst)
+          p(S, 'EXPL-XL-BASIS file matches screen', `row 1 is ${xB.firstRow} in both`);
+        else
+          f(S, 'EXPL-XL-BASIS file matches screen', `workbook row 1 = ${xB.firstRow}, screen row 1 = ${xB.screenFirst}`);
+      }
+
+      // 5. Every sortable header must resolve to a named metric — no raw internal keys.
+      await page.evaluate(() => { const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change')); });
+      await page.waitForTimeout(300);
+      await clickH('stability'); await page.waitForTimeout(600);
+      const xS = await grab();
+      const rbS = xS ? (xS.ctx['Ranked by'] || '') : '';
+      if (rbS && !/^stability$/i.test(rbS.trim()) && /predictab/i.test(rbS))
+        p(S, 'EXPL-XL-BASIS every header named', `stability resolves to ${JSON.stringify(rbS.slice(0, 60))}`);
+      else
+        f(S, 'EXPL-XL-BASIS every header named', `stability export wrote ${JSON.stringify(rbS.slice(0, 80))} — raw key or unnamed`);
+
+      // 6. A mixed-basis file must not be described as having no verified production at all.
+      await page.evaluate(() => {
+        const c = document.getElementById('expl-evidence-first');
+        if (c && c.checked) { c.checked = false; if (typeof _toggleExplorerEvidenceFirst === 'function') _toggleExplorerEvidenceFirst(c); }
+        const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change'));
+      });
+      await page.waitForTimeout(700);
+      const xM = await grab();
+      const rbasis = xM ? (xM.ctx['Ranking basis'] || '') : '';
+      if (rbasis && !/^No country in this file/i.test(rbasis))
+        p(S, 'EXPL-XL-BASIS mixed basis not called all-proxy', `reads ${JSON.stringify(rbasis.slice(0, 80))}`);
+      else
+        f(S, 'EXPL-XL-BASIS mixed basis not called all-proxy', `a file holding verified-production countries is described as: ${JSON.stringify(rbasis.slice(0, 100))}`);
+
+      // restore
+      await page.evaluate(() => {
+        if (window.__xlOrig) XLSX.writeFile = window.__xlOrig;
+        const c = document.getElementById('expl-evidence-first');
+        if (c && !c.checked) { c.checked = true; if (typeof _toggleExplorerEvidenceFirst === 'function') _toggleExplorerEvidenceFirst(c); }
+        const s = document.getElementById('flt-sort'); s.value = 'take'; s.dispatchEvent(new Event('change'));
+      });
+      await page.waitForTimeout(300);
+    } catch (e) { f(S, 'EXPL-XL-BASIS', e.message); }
+
   } catch(e) { f(S, 'exception', e.message); }
 }
 
@@ -724,6 +930,60 @@ async function testComparison(page) {
     await page.evaluate(() => { if (typeof clearCompare === 'function') clearCompare(); });
     await page.waitForTimeout(150);
 
+    // ── v853 (T2): the Country Profile "Similar Fiscal Profile" launcher must actually land ──
+    // its countries in the Side-by-Side grid. It pushed them into window.compareBasket -- the
+    // floating basket bar's Set, which renderCompare() never reads -- while clearCompare()
+    // emptied compareList. Arriving at t2 with an empty compareList re-seeded the canned
+    // example, so an analyst on Norway asking for its three closest fiscal analogues got
+    // ["Norway","United Kingdom","Netherlands"] and an "Example loaded:" banner. Two different
+    // comparison stores with near-identical names; nothing asserted which one t2 renders.
+    // Driven through a real click on the real button, because the bug was in the onclick string.
+    try {
+      await switchTab(page, 't7');
+      await page.waitForTimeout(400);
+      await page.selectOption('#dd-country-select', 'Norway').catch(() => {});
+      await page.waitForTimeout(1600);
+      const found = await page.evaluate(() => {
+        const bs = [...document.querySelectorAll('#t7 button')]
+          .filter(x => /peers?\s+in\s+(SbS|Side-by-Side)/i.test(x.innerText));
+        if (!bs.length) return null;
+        const btn = bs[bs.length - 1];
+        btn.setAttribute('data-cpsbs', '1');
+        // the peer names the section itself advertises, read off the rows above the button
+        const sec = btn.closest('.dd-section');
+        const rows = sec ? [...sec.querySelectorAll('[onclick*="loadCountryProfile"]')] : [];
+        const peers = rows.map(r => {
+          const m = (r.getAttribute('onclick') || '').match(/loadCountryProfile\('([^']+)'\)/);
+          return m ? m[1] : null;
+        }).filter(Boolean);
+        return { label: btn.innerText.replace(/\s+/g, ' ').trim(), peers: peers.slice(0, 3) };
+      });
+      if (!found) {
+        w(S, 'CP-PEER-SBS launcher lands in the grid', 'peer Side-by-Side button not found on Norway profile');
+      } else {
+        await page.click('[data-cpsbs="1"]');
+        await page.waitForTimeout(1200);
+        const got = await page.evaluate(() => ({
+          cl: (typeof compareList !== 'undefined') ? compareList.slice() : null,
+          ex: /Example loaded/.test((document.getElementById('t2') || {}).innerText || ''),
+          hash: location.hash
+        }));
+        const want = ['Norway'].concat(found.peers);
+        const listOk = JSON.stringify(got.cl) === JSON.stringify(want);
+        if (listOk) p(S, 'CP-PEER-SBS launcher lands in the grid',
+          'clicking "' + found.label + '" rendered ' + JSON.stringify(got.cl) + ' -- the set the section advertises');
+        else f(S, 'CP-PEER-SBS launcher lands in the grid',
+          'expected ' + JSON.stringify(want) + ', grid rendered ' + JSON.stringify(got.cl));
+        if (!got.ex) p(S, 'CP-PEER-SBS no seeded example survives the launch',
+          'no "Example loaded" banner; share hash = ' + got.hash);
+        else f(S, 'CP-PEER-SBS no seeded example survives the launch',
+          'the canned example re-seeded over the analyst\'s peer set');
+      }
+      await page.evaluate(() => { if (typeof clearCompare === 'function') clearCompare(); });
+      await switchTab(page, 't2');
+      await page.waitForTimeout(300);
+    } catch (e) { f(S, 'CP-PEER-SBS launcher lands in the grid', e.message); }
+
     // ── v892 (T4): the Fiscal Predictability badge must NAME ITSELF on screen ──────────────
     // renderStabilityBadge() prints a score, a band word and a dispersion basis and never the
     // metric. On the Country Profile header strip it rendered as a bare
@@ -810,6 +1070,68 @@ async function testComparison(page) {
       else f(S, 'FC drawer predictability label',
         `text="${dr.text}" visible=${dr.visible} adjacent=${dr.adjacent} badge="${dr.badge}"`);
     } catch (e) { f(S, 'CP/FC predictability label', e.message); }
+
+    // ── v894 (T4): the CP Stability chip must carry NO five-position scale ─────────────────
+    // The chip drew the in-window reform count as diamonds (5 minus the count) with the verdict
+    // token beside them. Because diamonds are a RANK and a count is not a magnitude, that put
+    // Libya (1971 nationalization, +35pp) at a full 5 of 5 and Norway (net 0pp in-window) at 3,
+    // and left Venezuela (Orinoco nationalized 2007, +55pp cumulative) ABOVE Norway. It is the
+    // identical failure that made Fiscal Compare delete its diamond column at v744.
+    //
+    // v843 had already de-coloured the diamonds and added the verdict pill; it did not settle
+    // the read, and the tooltip it left is the proof -- it opened "READ THE TOKEN, NOT THE
+    // DIAMONDS." Measured at 1440x900 the diamonds rendered at 13px FIRST and the token at 10px
+    // second: the element the tooltip said to ignore was larger and read first.
+    //
+    // Three assertions. (1) no glyph of the scale survives anywhere in the chip, on any of the
+    // three verdict shapes. (2) the verdict token is the chip's FIRST and LARGEST element, so a
+    // later edit cannot reinstate a leading rank by other means. (3) the count is still on
+    // screen -- deleting the scale must not delete the fact, which is the whole basis for
+    // removing the redundant encoding rather than the information.
+    try {
+      await switchTab(page, 't7');
+      await page.waitForTimeout(400);
+      // Libya/Venezuela are the countries the old scale ranked wrongly; Norway is what they
+      // outranked; UK is the opposite end (0 diamonds); Saudi Arabia is the uncovered n/c arm.
+      const SC = [
+        { c: 'Libya',         tok: /PRE-2010/,     why: 'scored 5 of 5 on the old scale; 1971 nationalization +35pp' },
+        { c: 'Venezuela',     tok: /PRE-2010/,     why: 'scored 4 of 5; Orinoco nationalized 2007, +55pp cumulative' },
+        { c: 'Norway',        tok: /TAKE NET/,     why: 'scored 3 of 5 — BELOW Libya and Venezuela' },
+        { c: 'United Kingdom',tok: /WACC \+3.5pp/, why: '0 of 5; the only end of the scale that read true' },
+        { c: 'Saudi Arabia',  tok: /n\/c/,         why: 'no sourced log — must not acquire a scale either' }
+      ];
+      for (const t of SC) {
+        await page.selectOption('#dd-country-select', t.c).catch(() => {});
+        await page.waitForTimeout(1500);
+        const r = await page.evaluate(() => {
+          const sp = [...document.querySelectorAll('#t7 span')]
+            .find(x => x.textContent.trim().startsWith('Stability:'));
+          if (!sp) return { missing: true };
+          const kids = [...sp.querySelectorAll('span')]
+            .map(k => { const q = k.getBoundingClientRect(); const cs = getComputedStyle(k);
+              return { t: k.textContent.trim(), w: q.width, x: q.left,
+                       fs: parseFloat(cs.fontSize) }; })
+            .filter(k => k.w > 0);
+          return { missing: false, all: sp.innerText.replace(/\s+/g, ' ').trim(), kids };
+        });
+        if (r.missing) { f(S, `CP stability chip no scale (${t.c})`, 'no "Stability:" chip in the profile strip'); continue; }
+        // (1) neither the filled nor the hollow diamond may appear
+        const scaled = /[\u25C6\u25C7]/.test(r.all);
+        // (2) the verdict token leads and is the largest glyph in the chip
+        const verdict = r.kids.find(k => t.tok.test(k.t));
+        const bigger  = verdict ? r.kids.filter(k => k.fs > verdict.fs && /[\u25C6\u25C7]/.test(k.t)) : [];
+        const leading = verdict ? !r.kids.some(k => k.x < verdict.x - 1 && /[\u25C6\u25C7]/.test(k.t)) : false;
+        // (3) the raw count survives in words (n/c arm states its coverage instead)
+        const kept = /fiscal law change|no sourced reform log/i.test(r.all);
+        if (!scaled && verdict && leading && !bigger.length && kept)
+          p(S, `CP stability chip no scale (${t.c})`,
+            `reads "${r.all.slice(0, 74)}" — verdict leads at ${verdict.fs}px, no diamond glyph, count kept (${t.why})`);
+        else
+          f(S, `CP stability chip no scale (${t.c})`,
+            `diamondGlyph=${scaled} verdictFound=${!!verdict} verdictLeads=${leading} ` +
+            `biggerGlyphsBefore=${bigger.length} countKept=${kept} :: "${r.all.slice(0, 110)}"`);
+      }
+    } catch (e) { f(S, 'CP stability chip no scale', e.message); }
 
     // Empty state
     await page.evaluate(() => { compareList = []; renderCompare(); });

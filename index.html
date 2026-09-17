@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v893</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v894</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v893</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v894</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41343,9 +41343,11 @@ function loadCountryProfile(country) {
   // v346: Headline strip — mechanic tag, take@$75, stability dots, reform count
   const _rh344 = (typeof REFORM_HISTORY !== 'undefined') ? (REFORM_HISTORY[d.country] || []) : [];
   const _reforms344 = _rrCountScored(_rh344);
+  // v894 (T4): _stab344 survives as a NUMBER only -- _cpIcMemo454 reads it at `stab <= 1` to decide
+  // whether the IC MEMO line calls for a stability discount. The _stabDots344 glyph run it used to
+  // feed is deleted; see the v894 note at _stabGlyph344 for why a five-position scale over this
+  // count could not be kept, in any colour.
   const _stab344 = Math.max(0, 5 - _reforms344);
-  var _stabDots344 = '';
-  for(var _i344=0;_i344<5;_i344++){_stabDots344 += (_i344 < _stab344 ? '\u25C6' : '\u25C7');}
   // v843 (T4): _stabColor344 -- the green/amber/orange/red ramp over the diamond COUNT -- is deleted,
   // not left dangling. It is the thing that painted Russia's +15pp windfall tax green at 4 of 5.
   // Severity now comes from _rrClassify()'s verdict token; the diamonds are a count in neutral grey.
@@ -41428,9 +41430,36 @@ function loadCountryProfile(country) {
       .replace(/&nbsp;/g, ' ').replace(/&rarr;/g, '→').replace(/&amp;/g, '&')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   };
+  // ── v894 (T4): THE DIAMONDS ARE DELETED FROM THIS CHIP ────────────────────────────────────────
+  // v843 took the colour ramp off them and put _rrClassify()'s verdict token beside them. It did
+  // not settle the read, and the tooltip it left behind is the admission: it has to open with
+  // "READ THE TOKEN, NOT THE DIAMONDS." A tooltip that instructs the analyst which of two adjacent
+  // glyphs to believe is not a fix; it is a label on an unfixed contradiction, and it is only read
+  // on hover, which a first-time analyst on a 20-minute screening run does not do.
+  //
+  // Measured at 1440x900, the chip rendered left-to-right as: diamonds at 13px, 45-52px wide,
+  // FIRST -- then the token at 10px, the smallest text in the chip. The element the tooltip says
+  // to ignore was 30% larger than the element it says to read, and it was read first. Grey does
+  // not stop a five-position scale from being a rank.
+  //
+  // And the rank is wrong where it matters most. Diamonds are 5 minus the in-window count, so:
+  //   Libya      ◆◆◆◆◆  full marks -- 1971 nationalization, +35pp, verdict ↑ PRE-2010
+  //   Algeria    ◆◆◆◆◆  full marks -- 2005 windfall tax, 2 rises on record, +35pp cumulative
+  //   USA / Colombia ◆◆◆◆◆ full marks -- last take rise 2007
+  //   Venezuela  ◆◆◆◆◇  -- Orinoco nationalized 2007, forced IOC conversion, +55pp cumulative
+  //   Norway     ◆◆◆◇◇  -- 2020 relief, 2022 restore, net 0pp inside the window
+  // Venezuela outranking Norway, and Libya scoring a clean sweep, is the identical failure that
+  // made Fiscal Compare DELETE its diamond-count column at v744 ("put Libya and Algeria at a full
+  // ◆◆◆◆◆ and Norway below them"). FC replaced the diamonds with the verdict and kept the raw
+  // count as a small grey second line, "a fact, not the finding". This chip now reads the same way.
+  //
+  // Nothing factual is lost. The diamonds ARE the count, re-encoded: _stab344 = 5 - _reforms344,
+  // and _stabSub344 prints "(N fiscal law changes since 2010)" three words to the right of them.
+  // What goes is one redundant encoding of that number -- the only one shaped like a ranking.
+  // The verdict token takes first position at 12px, matching the "Stability:" label it follows.
+  // The red ! keeps its v583 scope untouched (the 5 jurisdictions with in-window context events).
   const _stabGlyph344 = _rrCovered344
-    ? '<span style="color:var(--muted);font-size:13px;letter-spacing:1px;">' + _stabDots344 + '</span>'
-      + (_rrMute843 ? '<span style="color:var(--negative);font-weight:800;font-size:12px;margin:0 2px 0 3px;">!</span>' : '')
+    ? (_rrMute843 ? '<span style="color:var(--negative);font-weight:800;font-size:12px;margin-right:1px;">!</span>' : '')
       + (_rrV843
           ? (function() {
               // Same tier Fiscal Compare's cell uses, from the same helper: WACC verdicts are the
@@ -41439,15 +41468,20 @@ function loadCountryProfile(country) {
               var _t = (typeof _rrTokenTier === 'function')
                 ? _rrTokenTier(_rrV843.icToken, _rrV843.icColor)
                 : { col: _rrV843.icColor, dotted: false, isAction: false };
-              var _base = 'display:inline-block;font-size:10px;font-weight:800;letter-spacing:.02em;'
-                + 'line-height:1.5;padding:0 5px;margin-left:6px;white-space:nowrap;border-radius:3px;';
+              var _base = 'display:inline-block;font-size:12px;font-weight:800;letter-spacing:.02em;'
+                + 'line-height:1.6;padding:1px 7px;white-space:nowrap;border-radius:3px;';
               var _sty = _t.isAction
                 ? _base + 'background:' + _t.col + ';color:#fff;border:1px solid ' + _t.col + ';'
                 : _base + 'color:' + _t.col + ';border:1px solid ' + _t.col + ';'
                   + (_t.dotted ? 'border-bottom-style:dotted;' : '');
               return '<span style="' + _sty + '">' + _rrTxt843(_rrV843.icToken) + '</span>';
             })()
-          : '')
+          // v894: with the diamonds gone this branch would otherwise render an EMPTY chip. It is
+          // only reachable if _rrClassify is undefined at paint time, but a covered jurisdiction
+          // must never print a blank where its reform exposure goes. Fall back to the count in
+          // words -- never to a five-position scale, which is the thing this cycle removed.
+          : '<span style="color:var(--muted);font-size:12px;font-weight:700;border:1px dashed var(--border);'
+            + 'border-radius:3px;padding:1px 7px;white-space:nowrap;">' + _reforms344 + ' since 2010</span>')
     : '<span style="color:var(--muted);font-size:11px;font-weight:700;border:1px dashed var(--border);border-radius:4px;padding:1px 6px;">n/c</span>';
   const _stabSub344 = _rrCovered344
     ? '(' + _reforms344 + ' fiscal law change' + (_reforms344 !== 1 ? 's' : '') + ' since 2010'
@@ -41461,10 +41495,12 @@ function loadCountryProfile(country) {
     ? (_rrV843
         ? _rrTxt843(_rrV843.icToken) + ' \u2014 ' + _rrTxt843(_rrV843.icLabel) + '. Reform Frequency Score '
           + _rrV843.score + '/100, ' + _rrTxt843(_rrV843.scoreNote) + '. '
-          + 'READ THE TOKEN, NOT THE DIAMONDS. The diamonds are 5 minus the count of sourced fiscal law '
-          + 'changes since 2010 \u2014 a fact about the jurisdiction, which is why they carry no colour. A count '
-          + 'never reads how large a change was: Russia\u2019s 2022 windfall tax (+15pp) moves it exactly as far '
-          + 'as a 1pp administrative tweak would, and left on the old green ramp it sat at 4 of 5. '
+          + 'THE TOKEN IS THE FINDING; THE COUNT BESIDE IT IS A FACT ABOUT THE JURISDICTION, NOT A RANK. '
+          + 'A count never reads how large a change was: Russia\u2019s 2022 windfall tax (+15pp) moves it exactly '
+          + 'as far as a 1pp administrative tweak would. Until v894 this chip also drew that count as a '
+          + '5-diamond scale, which ranked Libya (1971 nationalization, +35pp) at a full 5 of 5 and Norway '
+          + '(net 0pp inside the window) at 3 \u2014 the same reason Fiscal Compare deleted its diamond column at '
+          + 'v744. The scale is gone; the count stays, in words. '
           + (_rrQual843
               ? 'The finding for ' + _rrTxt843(d.country || 'this country') + ' is ' + _rrTxt843(_rrV843.icToken)
                 + ' \u2014 size against what that token names. '
@@ -41474,8 +41510,9 @@ function loadCountryProfile(country) {
           + '+5\u20138pp are points to add to the discount rate. SIZE UNKNOWN means terms were rewritten in-window and the '
           + 'take effect was never quantified \u2014 a zero premium there is an absence of measurement, not stability. '
           + '\u2191 PRE-2010 means the rupture predates the window, so a high score records where the window starts. '
-          + 'For the count in isolation only: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 \u2192 3\u20135pp WACC premium; '
-          + '3\u20134 \u2192 note 1\u20132 reforms, 1\u20132pp; 5 \u2192 no frequency premium. That ladder reads frequency and nothing else.'
+          + 'For the count in isolation only: 5+ changes since 2010 \u2192 probability-weighted NPV required; 3\u20134 \u2192 '
+          + '3\u20135pp WACC premium; 1\u20132 \u2192 note the reforms, 1\u20132pp; 0 \u2192 no frequency premium. That ladder reads '
+          + 'frequency and nothing else, which is exactly why it is no longer drawn as a scale.'
           + (_rrCtxIn344.length
               ? ' The count also leaves out ' + _rrCtxIn344.length + ' in-window event'
                 + (_rrCtxIn344.length === 1 ? '' : 's') + ' that changed no fiscal terms ('
@@ -41486,7 +41523,7 @@ function loadCountryProfile(country) {
           + ' This token is _rrClassify()\u2019s own verdict \u2014 the same one Fiscal Compare\u2019s Reform verdict column '
           + 'and the Reform Risk tab print, so the three surfaces cannot hand you three different premiums for this country. '
           + 'Click to open the full reform verdict and event log.'
-        : 'Diamonds = 5 minus the number of sourced FISCAL LAW CHANGES since 2010. IC rule: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 diamonds \u2192 add 3\u20135pp WACC premium; 3\u20134 diamonds \u2192 note 1\u20132 reforms, 1\u20132pp premium; 5 diamonds \u2192 no discount warranted.'
+        : 'Sourced FISCAL LAW CHANGES since 2010, as a count \u2014 never as a rank. IC rule: 5+ changes \u2192 probability-weighted NPV required; 3\u20134 \u2192 add 3\u20135pp WACC premium; 1\u20132 \u2192 note the reforms, 1\u20132pp premium; 0 \u2192 no frequency premium. The count never reads how LARGE a change was, so it is not a stability finding on its own.'
       + (_rrCtxIn344.length
           ? ' MUTED WITH A RED ! \u2014 the count is not the whole record here. '
             + _rrCtxIn344.length + ' sourced event' + (_rrCtxIn344.length === 1 ? ' dated 2010 or later is' : 's dated 2010 or later are')
