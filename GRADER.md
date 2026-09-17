@@ -57702,3 +57702,120 @@ Country Profile, cold load, storage cleared. The box the page stamps **IC MEMO**
 > `Evidence A · 97% primary law · n=135`
 
 T
+
+---
+## Cycle 811 Log — 2026-09-17
+- Test before: 344 PASS / 0 FAIL (deployed baseline, from the cycle prompt)
+- Test after: **suite RAN this cycle** against the LOCAL tree via `TEST_URL` — 343 PASS / 0 FAIL / 1 WARN.
+  A/B on the same local server: the PRE-change file scores 343/0/1 identically, so the
+  one-test delta and the WARN are that server's `sw.js` 404, not this change.
+- JS errors: 0 page errors across all 10 tabs; 0 in the Explorer across all 8 sorts.
+- Pixel gate: PASS, same 5 baseline findings (`thome`, `t0`, `t7` cp-terms-chip), none on the new cells.
+- Mobile 390x844 `hasTouch`: `scrollWidth` 390 = `clientWidth`; no control added under 24px.
+- v900. Mirror `office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-identical
+  (sha256 `0235dd68…86d3d`).
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" Stalest by rotation:
+810 was T6, 809 T3, 808 T2, 807 T1, 806 T5 — last T4 at 804.
+
+## Friction
+Explorer → Stability sort, "least predictable first" — `_fpSortVal()`, `index.html:24162`.
+
+This column carries a **ceiling** (`_fpObsCeiling()`) for 51 of 185 countries, 45 of them
+material, and *every other surface in the product* tells the analyst to carry it **instead of**
+the stored score: Country Profile, Side-by-Side, the Reform Risk card, Copy for IC Memo and the
+XLSX all print *"carry ≤46 · LOW, not 73 · MODERATE"*. The sort ranked the row on the withdrawn
+score.
+
+Measured against the shipped data, over the 160 scored rows:
+
+| country | ranked | should rank | stored | ceiling |
+|---|---|---|---|---|
+| Mexico | 7th | 1st | 51 | ≤27 |
+| Nigeria | 27th | 6th | 73 | ≤46 |
+| Kazakhstan | 26th | 14th | 73 | ≤53 |
+| Republic of the Congo | 21st | 9th | 62 | ≤47 |
+
+58 of 160 rows moved five places or more. The printed column read `47, 51, 52, 58, 61, 72, 73,
+73,` then `≤43, ≤41, ≤39, ≤26, ≤32, ≤40` — **non-monotonic under a header promising ascending
+order**. Angola at ≤26, the weakest one-term reading on the page, sat 12th. An analyst ranking a
+screening list on fiscal predictability and reading top-down stopped before reaching the regimes
+the product itself rates worst.
+
+**Why it was there, and why that reason had expired.** v758 left the sort alone *deliberately* and
+its reasoning was sound at the time — ceilings resolved only for rows that had been scrolled into
+view, so ranking on them would have made the order depend on scroll position. **v879 then added
+`_scWarmObsCeilings()`**, which fetches every resolvable country's contract sample once per session
+(all 185 at concurrency 8 in 77ms). The blocker was gone and nothing came back to re-decide. This
+is the same class of finding as v612→v611: a later cycle removed the constraint an earlier cycle
+had reasoned around, and no one re-opened the decision.
+
+## Change
+- **`_fpSortVal()` carries the ceiling** where it is material — gated on `window._scObsWarmReady`,
+  so the ceiling enters the ordering only once the WHOLE set has resolved. That preserves exactly
+  the property v758 asked for: the order is identical however far anyone has scrolled, and until
+  the warm lands the comparator is byte-for-byte the previous one. Block structure (measured →
+  one-term → no distribution) untouched. No new threshold; the carried value is
+  `_fpObsCeiling().bound`, the same object the cell, the clipboard and the workbook already read.
+- **The measured cohort gets the ceiling hooks the one-term cohort already had** (new
+  `.exp-fp-res`). `_expPaintObsSpread()` only ever ran against `.exp-fp-one`, so the **10 measured
+  countries whose own contract file refutes their BUNDLED quartiles** — Nigeria (0.4pp bundled vs
+  33.9pp observed), Mexico, Kazakhstan, Brazil, Morocco, R. of Congo, India, Mauritania — printed
+  the withdrawn score here and **drew a bar at its length**. The bar is now redrawn at the bound
+  (the v649 rule: length is the only pre-attentive signal in a bar column). The painter mints the
+  band chip for measured cells rather than forking into two renderers, and removes it again where
+  the correction is immaterial.
+- **Once the warm lands, every resolved cell paints, not just the visible ones.** Without this a
+  row 60 places down would be *ranked* on ≤26 while still *printing* 62 — the same cell/order
+  disagreement this cycle set out to remove, pointing the other way. No fetch: the samples are
+  already in the v559 cache.
+- **Explorer re-renders once on warm completion** when the Stability sort is live, so a cold-load
+  analyst gets the corrected order without touching anything.
+- The legend, the count line and the cell tooltip all stated *"the sort is unaffected"*. They now
+  state what it does, and the count line names the **live** count: *"45 rows are ranked on their
+  ceiling — the ≤N this platform tells you to carry instead of the stored score — so the order and
+  the number printed in the cell agree."*
+
+## Result
+Sorting Stability least-predictable-first now returns **Mexico ≤27, Nigeria ≤46, Iraq 47, India 52,
+Kazakhstan ≤53, UK 58, Brazil ≤59, China 72** — ascending — and **45 of 45 material rows print
+exactly the number they are ranked on**, verified at both 1440x900 and 390x844. Reversed, the USA
+ranks on ≤82 rather than 91 and correctly falls below Argentina 84 and Oman 83.
+
+The analyst can now read the top of that list and see the jurisdictions this platform rates worst
+on fiscal predictability, instead of finding them at ranks 9 through 27 behind countries it rates
+better. The Stability column now holds the property the Reform column has held since v744 — *the
+order and the cell can never disagree.*
+
+## Carried forward
+- **The Explorer's measured branch prints a ceiling only where one is material.** 6 of the 51
+  ceilings are immaterial and leave the score standing with a corrected tooltip. That is
+  deliberate (the v719 materiality rule) but means two measured rows can show the same number on
+  different evidence. Not fixed; minor.
+- **`cp-terms-chip` is clipped at tablet-768** — `pixel_audit` finding 3, pre-existing baseline:
+  `scrollWidth 143 > clientWidth 90`. Natural next T6. From 810.
+- **The Evidence Quality badge and the Evidence Chain disagree about dead links** on Indonesia —
+  badge counts documents, chain counts parameter rows, wording identical. From 810.
+- **All three of Indonesia's "independently sourced" model terms are one document, and its link is
+  dead** — stated across three paragraphs, never as one sentence. From 810.
+- **The benchmark menu is unreachable on a cold load** in Side-by-Side. From 809.
+- **The re-basing blind spot may not be confined to that menu** — `_sbsCmpTake()` returns a
+  corrected figure with no signal attached. Two sites found, others unaudited. From 809.
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`** — FC median IRR 138.4%,
+  128 rows above 100%. From 808.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked
+  around again with `TEST_URL` — and this cycle that mattered, because the local server's `sw.js`
+  404 shifts the count by one and adds a WARN. **`TEST_URL` should become the default**, with the
+  deployed run a separate post-push check. From 806-811.
+- **`autonomous_cycle.py` has no partial-work guard** — eighth cycle running. From 805.
+- **Needs Zach, from 808:** the PSC CIT base still omits the opex deduction `petroleum_dcf.py:945`
+  takes. One-term fix, but `cit` feeds `govtTake`, which Fiscal Compare sorts on — it re-ranks 58
+  of 185 countries. Flagged, not taken unilaterally.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27-$34 spread
+  while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
