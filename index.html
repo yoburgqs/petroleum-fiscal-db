@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v898</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v899</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v898</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v899</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41966,14 +41966,43 @@ function loadCountryProfile(country) {
         + (_npvRestates670 ? ', because unlike contractor NPV it is not derived from the take' : '')
         + '. Full breakdown in Evidence '
         + 'Quality and the Key Fiscal Parameters chain below.';
-      _evSeg670 = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;'
-        + 'padding:2px 8px;border-radius:12px;white-space:nowrap;cursor:help;'
+      // v899 (T6): this pill is the ONLY evidence signal in the box the page stamps IC MEMO,
+      // and the verdict line beside it says outright "cite it with the evidence grade on this
+      // strip". The grade it shows is a property of the country's WHOLE fact base -- primary-law
+      // share and fact depth, mostly contract metadata the DCF never reads. It does not look at
+      // the 3-6 fiscal terms getDCFParams() actually runs to produce the take, NPV and IRR
+      // printed directly above it. That correction was made on the CP Data Quality badge at
+      // v660, the Fiscal Compare drawer's Src badge at v728 and the Screener column at v846.
+      // This strip was added at v670 and never received it.
+      //
+      // Measured across all 185 shipped api/v1/country files, on _fcTermLeg()'s own rule:
+      //   - 59 of 185 render an A or B pill here over HALF OR FEWER model terms cited.
+      //   - Netherlands prints "Evidence A - 97% primary law" over 1 of 4 Concession terms,
+      //     its uncited terms including the royalty rate. Namibia B/98% over 1 of 4.
+      //     Denmark B/98% over 1 of 3. Canada and Brazil A over 2 of 4.
+      //   - 19 countries cite ZERO. No country on the platform cites all of them.
+      // And the pill was cursor:help -- a caption with no route out of itself, while the
+      // term-by-term Evidence Chain that answers it sits ~2,750px lower.
+      //
+      // It is now a control on the same rule as its three siblings: it carries the model-term
+      // leg, it takes the WORSE of the two colours so an A letter over 1 of 4 cited terms no
+      // longer reads green at the decision point, and clicking it opens the Evidence Chain.
+      // The letter, the percentage and the fact count are unchanged -- how deep a fact base is
+      // and whether the model's terms are cited are different questions, and it now shows both.
+      var _evSlug899 = String(country).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      _evSeg670 = '<span id="cp-ic-ev-pill" role="button" tabindex="0"'
+        + ' data-ev-country="' + String(country).replace(/"/g, '&quot;') + '"'
+        + ' onclick="event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + _evSlug899 + '\');"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + _evSlug899 + '\');}"'
+        + ' style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:10px;'
+        + 'padding:2px 8px;border-radius:12px;white-space:normal;cursor:pointer;max-width:100%;'
         + 'min-height:24px;box-sizing:border-box;'
         + 'border:1px solid ' + _ev670.color + '55;background:' + _ev670.color + '14;" title="'
         + _evTip670.replace(/"/g, '&quot;') + '">'
-        + '<strong style="color:' + _ev670.color + ';font-weight:800;">Evidence ' + _ev670.letter + '</strong>'
-        + '<span style="color:var(--muted);">' + _ev670.aPct.toFixed(0) + '% primary law'
+        + '<strong style="color:' + _ev670.color + ';font-weight:800;white-space:nowrap;">Evidence ' + _ev670.letter + '</strong>'
+        + '<span style="color:var(--muted);white-space:nowrap;">' + _ev670.aPct.toFixed(0) + '% primary law'
         + (d.n != null ? ' · n=' + Number(d.n).toLocaleString() : '') + '</span>'
+        + '<span id="cp-ic-ev-terms"></span>'
         + '</span>';
     }
     return '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:5px 10px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-top:8px;">'
@@ -43990,6 +44019,50 @@ function loadCountryProfile(country) {
     </div>`;
 
   content.innerHTML = html;
+
+  // ── v899 (T6): hydrate the IC MEMO evidence pill with the model-term leg ──────────────
+  // Reuses _fcTermLeg()'s cached api/v1/country/<slug>.json read -- the same request the
+  // Evidence Quality chip, the Fiscal Compare drawer, the Screener column and Side-by-Side
+  // already share, so this adds no network call. Additive and late-binding: if the fetch
+  // fails or the regime carries no model terms the placeholder stays empty and the pill is
+  // exactly the v670 pill.
+  (function() {
+    if (typeof _fcTermLeg !== 'function') return;
+    var _c899 = country;
+    _fcTermLeg(_c899).then(function(t) {
+      var pill = document.getElementById('cp-ic-ev-pill');
+      var slot = document.getElementById('cp-ic-ev-terms');
+      if (!pill || !slot || !t || !t.total) return;
+      // Guard against a stale resolve after the analyst has changed country: the pill is
+      // rebuilt per profile and stamped with the country it was rendered for.
+      if (pill.getAttribute('data-ev-country') !== String(_c899)) return;
+      var ratio = t.cited / t.total;
+      var col = ratio <= 0.5 ? 'var(--red)' : (ratio < 1 ? 'var(--orange)' : 'var(--green)');
+      var raw = ratio <= 0.5 ? '#B91C1C' : (ratio < 1 ? '#C2410C' : '#15803D');
+      slot.outerHTML = '<span id="cp-ic-ev-terms" style="color:' + col
+        + ';font-weight:800;white-space:nowrap;">' + t.cited + ' of ' + t.total
+        + ' model terms cited \u2192</span>';
+      // The pill takes the WORSE of the two signals. An A letter over 1 of 4 cited model
+      // terms is the case this exists for: it must not read green in the IC MEMO box.
+      if (ratio < 1) {
+        pill.style.border = '1px solid ' + raw + '66';
+        pill.style.background = raw + '14';
+      }
+      var uncited = (t.uncited && t.uncited.length) ? t.uncited.join(', ') : '';
+      pill.setAttribute('title',
+        'Two different questions, both on this pill. The LETTER and the primary-law share grade '
+        + _c899 + '\u2019s whole fact base \u2014 depth and sourcing across every fact ORCA holds, '
+        + 'most of it contract metadata the DCF never reads. The COUNT grades the model: of the '
+        + t.total + ' fiscal terms the ' + (t.mech || 'DCF') + ' engine runs to produce the take, NPV '
+        + 'and IRR above, ' + t.cited + ' have a citation standing behind them'
+        + (uncited ? ' and ' + uncited + ' ' + (t.uncited.length === 1 ? 'does' : 'do') + ' not' : '')
+        + '. The bulk harvest, an instrument shared across jurisdictions and an uncited contract '
+        + 'average do not count, on the same rule the Evidence Chain uses. 59 of 185 countries '
+        + 'carry an A or B letter here over half or fewer cited model terms, and no country on the '
+        + 'platform cites all of them \u2014 so the letter alone is not what makes this take '
+        + 'defensible. Click to open the term-by-term Evidence Chain.');
+    }).catch(function() {});
+  })();
 
   // v454: Timeout fallback for Key Fiscal Parameters — if still "Loading from API…" after 6s, show actionable error
   // This fires if the API fetch in renderReformTimeline() fails or hangs without triggering the .catch()
