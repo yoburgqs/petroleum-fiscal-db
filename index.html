@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v903</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v905</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -273,6 +273,8 @@ table { width: 100%; border-collapse: collapse; }
   #tbl-screener .sc-terms-chip { min-height: 24px; }
   /* v884 (T6): the same chip, same call, on Fiscal Compare's Quality column. */
   #tbl-fc .fc-terms-chip { min-height: 24px; }
+  /* v905 (T6): the same chip, same call, on the Explorer's Evidence column. */
+  #tbl-explorer .expl-terms-chip { min-height: 24px; }
 }
 /* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
    title, so under a thumb — where there is no hover — it is treated as a control and takes the
@@ -2564,7 +2566,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v904</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v905</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -26934,7 +26936,7 @@ function renderExplorer() {
       })()} ↗</td>
       <td>${mechs}</td>
       ${makeTakeCellWithEvidence(take, d)}
-      <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
+      <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="expl-terms-slot" data-tc-country="${String(d.country).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="margin-top:2px;"></div></td>
       <td class="num expl-sm-off">${makeTakeSparkline(d, price)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
@@ -27093,6 +27095,15 @@ function renderExplorer() {
   // the select's own label goes stale the moment a header flips it. The order is now printed
   // where the analyst reads the row count, and it names the reverse gesture the first time --
   // this is the affordance that was missing, not the arrow.
+  // ── v905 (T6): the Evidence sort names the axis it is NOT ranking on ──────────────────────
+  // This is the one evidence column on the platform that sorts, so it is the one place the grade
+  // stops being a caption and becomes an ordering the analyst works the top of. The grade ranks
+  // the whole fact base; the chip now on each row counts the model's own terms, and the two
+  // disagree on 41.5% of the cross-grade pairs inside the 22 production-backed rows. Said here,
+  // beside the count it qualifies, on the v660/v735/v854 pattern — not as a banner.
+  const _explEvidNote = (sort === 'evidence')
+    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on the <strong style="color:var(--text);">evidence grade</strong> — primary-law share and fact depth over each country&rsquo;s whole fact base, most of which is contract metadata the DCF never reads. <strong style="color:var(--orange);">That is not the same question as whether the terms behind the take were cited.</strong> The <strong style="color:var(--text);">N of M terms cited</strong> chip under each grade counts only the fiscal terms this row&rsquo;s model runs, and the two orderings invert: Kazakhstan ranks third-weakest here and cites 4 of 5; Canada closes the producer block as best-evidenced and cites 2 of 4. Click any chip for that country&rsquo;s Evidence Chain.<span id="expl-terms-note-n"></span></div>`
+    : '';
   const _explOrderPair = _EXPL_SORT_ORDER[sort] || null;
   const _explOrderNote = _explOrderPair
     ? `<div style="margin-top:4px;line-height:1.55;">Ordered <strong style="color:var(--text);">${_explOrderPair[_explDir === -1 ? 1 : 0]}</strong>`
@@ -27103,6 +27114,7 @@ function renderExplorer() {
     + _explBeNote
     + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`)
     + _explOrderNote
+    + _explEvidNote
     + _explStabNote;
   // Update sort indicator on column headers
   const _curSort = document.getElementById('flt-sort').value;
@@ -27125,6 +27137,9 @@ function renderExplorer() {
   _syncExplorerDownsideControls();   // v851 (T6): chip label carries the live count, not a literal
   setTimeout(renderIRRScatter, 50);
   if (typeof _expApplyObsSpread === 'function') _expApplyObsSpread();
+  // v905 (T6): hydrate the model-terms leg on the Evidence column. Debounced for the same reason
+  // v730 debounced the Screener's — a price-deck, region or sort change re-renders every row.
+  if (typeof _explHydrateTermChipsSoon === 'function') _explHydrateTermChipsSoon();
 }
 
 // ── v849 (T4): the fourth surface finally reads the same number as the other three ──────────
@@ -35732,7 +35747,10 @@ function _scFillTermChip(slot) {
       + country + '\u2019s Evidence Chain, which names each term, its ORCA value, the statutory '
       + 'value and the source.';
     var safe = String(country).replace(/'/g, "\\'");
-    slot.innerHTML = '<span class="sc-terms-chip" role="button" tabindex="0"'
+    // v905 (T6): the Explorer reuses this filler verbatim; only the class differs, because each
+    // table carries its own 24px coarse-pointer rule keyed on its own id.
+    var chipCls = slot.getAttribute('data-tc-class') || 'sc-terms-chip';
+    slot.innerHTML = '<span class="' + chipCls + '" role="button" tabindex="0"'
       + ' onclick="event.stopPropagation();_fcOpenTermChain(\'' + safe + '\');"'
       + ' onkeydown="event.stopPropagation();if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_fcOpenTermChain(\'' + safe + '\');}"'
       + ' style="font-size:10px;font-weight:700;color:' + col + ';background:' + bg
@@ -35782,6 +35800,112 @@ function _scHydrateTermChipsSoon() {
 }
 window._scHydrateTermChips = _scHydrateTermChips;
 window._scHydrateTermChipsSoon = _scHydrateTermChipsSoon;
+
+// ── v905 (T6): THE EXPLORER'S "EVIDENCE" COLUMN — THE ONE YOU CAN SORT ON — CARRIED NO TERMS LEG
+//
+// Four country tables on this platform show an evidence grade. Three of them already say, on the
+// same line as the letter, how many of the fiscal terms the DCF actually runs have a citation
+// behind them: the Country Profile badge (v660), the Fiscal Compare drawer (v728), the Screener
+// (v730) and the Fiscal Compare table (v884). Side-by-Side carries it as its own row. The
+// EXPLORER did not — and the Explorer is the only one of them whose evidence column SORTS.
+//
+// That is what makes it the worst of the four to be missing. `flt-sort` offers
+// "Evidence (weakest first)", the header is clickable, and v854 prints the direction under the
+// row count. So this is the one surface where an analyst does not merely READ a grade, they ask
+// the platform to RANK on it and then work the top of the list. The rank is _evidenceSortVal():
+// grade, then primary-law share, then fact depth — all three computed over the country's WHOLE
+// fact base, which is mostly contract metadata the model never reads.
+//
+// Measured live against the shipped build, over all 185 rows, on _fcTermLeg()'s own rule — the
+// 22 production-backed rows are the block the analyst sees first, because "Verified production
+// first" is checked by default:
+//
+//     Evidence sort, weakest first          grade   model terms cited
+//      1. Iraq                                D        1 of 3   (33%)
+//      3. Kazakhstan                          C        4 of 5   (80%)
+//      7. Mexico                              C        3 of 4   (75%)
+//     19. Brazil                              A        2 of 4   (50%)
+//     22. Canada                              A        2 of 4   (50%)
+//
+// Kazakhstan is filed third-weakest and cites 80% of its model terms. Canada closes the list as
+// the best-evidenced producer on the platform and cites half of its. Across the 22, 66 of the
+// 159 pairs that differ in grade are ordered BACKWARDS on the terms axis — 41.5%. Over all 185:
+// 1,851 of 12,063 cross-grade pairs (15.3%) invert, 13 of the 28 A-graded countries cite half or
+// fewer, and the Netherlands — grade A, 97% primary law — cites 1 of 4, its uncited terms
+// including the royalty rate.
+//
+// This changes no grade, no letter, no percentage, no fact count, no take, no NPV, no order and
+// no filter result. The sort still ranks on the grade and still says so. What changes is that
+// the column now prints the second number beside the first, so the analyst can SEE that the
+// ranking they asked for is not the ranking they wanted — and can click through to the Evidence
+// Chain, which the Explorer previously had no route to at all.
+var _explTermObs = null;
+function _explHydrateTermChips() {
+  var slots = document.querySelectorAll('#tbl-explorer .expl-terms-slot:not([data-tc-done])');
+  if (!slots.length || typeof _scFillTermChip !== 'function') return;
+  function fill(slot) {
+    if (!slot || slot.getAttribute('data-tc-done')) return;
+    slot.setAttribute('data-tc-done', '1');
+    slot.setAttribute('data-tc-class', 'expl-terms-chip');
+    _scFillTermChip(slot);
+    _explTermNoteSoon();
+  }
+  if (typeof IntersectionObserver !== 'function') {
+    Array.prototype.slice.call(slots, 0, 25).forEach(fill);
+    return;
+  }
+  // Same two corrections v730 and v900 each had to make on this table: the ROOT is the
+  // .tbl-wrap scroller, not the viewport, and the observed TARGET is the <tr>, not the cell —
+  // Evidence is the 8th of 19 columns on a wrap that scrolls horizontally too, so the cell
+  // itself reports ratio 0 on a narrow screen even when its row is under the analyst's eyes.
+  var root = null;
+  for (var a = slots[0].parentElement; a; a = a.parentElement) {
+    var ov = getComputedStyle(a).overflowY;
+    if (ov === 'auto' || ov === 'scroll') { root = a; break; }
+  }
+  if (_explTermObs) { try { _explTermObs.disconnect(); } catch (e) {} }
+  _explTermObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(en) {
+      if (!en.isIntersecting) return;
+      _explTermObs.unobserve(en.target);
+      fill(en.target.querySelector('.expl-terms-slot'));
+    });
+  }, { root: root, rootMargin: '200px 0px' });
+  Array.prototype.forEach.call(slots, function(el) {
+    var tr = el.closest ? el.closest('tr') : null;
+    if (tr) _explTermObs.observe(tr); else fill(el);
+  });
+}
+// The count leg on the sort note. Counted off the legs that have ACTUALLY resolved, and it says
+// so — hydration is lazy by row, so a total over all 185 is not something this has measured. It
+// stays silent until at least five have landed rather than flashing "1 of 1".
+var _explTermNoteT = null;
+function _explTermNoteSoon() {
+  if (_explTermNoteT) clearTimeout(_explTermNoteT);
+  _explTermNoteT = setTimeout(function() {
+    _explTermNoteT = null;
+    var el = document.getElementById('expl-terms-note-n');
+    if (!el) return;
+    var n = 0, half = 0;
+    document.querySelectorAll('#tbl-explorer .expl-terms-chip').forEach(function(c) {
+      var m = /^(\d+) of (\d+)/.exec(String(c.textContent || '').trim());
+      if (!m) return;
+      n++;
+      if (Number(m[1]) / Number(m[2]) <= 0.5) half++;
+    });
+    if (n < 5) { el.innerHTML = ''; return; }
+    el.innerHTML = ' <strong style="color:var(--text);">' + half + ' of the ' + n
+      + ' rows resolved so far cite half or fewer</strong> — counted off the chips on screen,'
+      + ' not over all 185; scroll to resolve more.';
+  }, 400);
+}
+var _explTermHydT = null;
+function _explHydrateTermChipsSoon() {
+  if (_explTermHydT) clearTimeout(_explTermHydT);
+  _explTermHydT = setTimeout(function() { _explTermHydT = null; _explHydrateTermChips(); }, 450);
+}
+window._explHydrateTermChips = _explHydrateTermChips;
+window._explHydrateTermChipsSoon = _explHydrateTermChipsSoon;
 
 // ── v884 (T6): FISCAL COMPARE'S "QUALITY" COLUMN GRADED THE WRONG THING ──────────────
 // Fiscal Compare is the centerpiece tab, the one Home routes to, the one carrying the IC
