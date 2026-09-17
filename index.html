@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v902</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v903</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v902</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v903</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -52242,7 +52242,42 @@ function _execLiveDCF(country, profileKey, price) {
       + '</div>';
   } else if (vsEl && result.dbTake != null) {
     const cd = COUNTRY_DATA.find(x => x.country === country);
-    const delta = result.take - result.dbTake;
+
+    // ── v903 (T2) — reconcile at a COMMON price, not across two different ones ──────
+    // This card answers "which number goes in the IC memo?" by measuring the distance
+    // between the stored country figure and this panel's scenario. The stored figure is
+    // take_75 / npv_75 — fixed at $75/bbl, always. The scenario is whatever the price
+    // slider is set to. Until now the gap subtracted one from the other directly, so any
+    // price other than $75 folded a PRICE move into a number the card presents as a basis
+    // disagreement, and then classified its severity on the total.
+    //
+    // Measured across all 185 countries on the Deepwater profile, dragging the slider from
+    // $75 to $40 alone:
+    //     142 of 185 change severity band     — Afghanistan, Belgium, Botswana and 100+
+    //                                            others go from GREEN "either figure is
+    //                                            defensible" to YELLOW/RED on a price move
+    //                                            that says nothing about their terms.
+    //     173 of 185 make the NPV sentence false — it asserts "most of that is project
+    //                                            size, not fiscal terms" while the price
+    //                                            move is the larger of the two drivers.
+    // Nigeria at $40: the pill read "Take gap −57.6pp · Material gap". The basis gap is
+    // −33.8pp; the other 23.8pp was the analyst's own price setting.
+    //
+    // runLiveDCF() is pure and getDCFParams({record:true}) only writes to its own params
+    // object, so re-running the same country/profile at $75 is safe and idempotent. The
+    // gap, its severity and both verdicts are now measured there. The analyst's chosen
+    // price is still reported — as its own figure, beside the gap rather than inside it.
+    // At price === 75 every value below is identical to what this card printed before.
+    const _lf903    = (price !== 75) ? runLiveDCF(country, profileKey, 75) : result;
+    const _lfOk903  = !!(_lf903 && isFinite(_lf903.take));
+    const _offPr903 = (price !== 75) && _lfOk903;
+    const _takeCmp903 = _lfOk903 ? _lf903.take : result.take;
+    const _takePriceMove903 = _offPr903 ? (result.take - _takeCmp903) : 0;
+    // Declared here, not beside the render helpers below: the drivers list is built before
+    // that block and would hit the temporal dead zone (same trap v452 recorded).
+    const _ppFmt903 = function(v){ return (v >= 0 ? '+' : '\u2212') + Math.abs(v).toFixed(1) + 'pp'; };
+
+    const delta = _takeCmp903 - result.dbTake;
     const adelta = Math.abs(delta);
     const sign = delta >= 0 ? '+' : '';
 
@@ -52258,11 +52293,16 @@ function _execLiveDCF(country, profileKey, price) {
     const _bd833   = _basisDelta833(profileKey);   // v859 (T2): the profile on screen, not always deepwater
     const _npvDb833 = (result.dbNpv != null && isFinite(result.dbNpv)) ? result.dbNpv : null;
     const _npvSc833 = (result.npv   != null && isFinite(result.npv))   ? result.npv   : null;
-    const _npvOk833 = (_npvDb833 !== null && _npvSc833 !== null);
-    const _npvDelta833 = _npvOk833 ? (_npvSc833 - _npvDb833) : null;
-    const _npvSignFlip833 = _npvOk833 && ((_npvDb833 >= 0) !== (_npvSc833 >= 0));
+    // v903 (T2): _npvSc833 is what the panel PRINTS (the analyst's price). _npvCmp903 is
+    // what the gap MEASURES (the same project at $75, where the stored figure lives).
+    // They are the same object at price 75.
+    const _npvCmp903 = (_offPr903 && _lf903.npv != null && isFinite(_lf903.npv)) ? _lf903.npv : _npvSc833;
+    const _npvOk833 = (_npvDb833 !== null && _npvSc833 !== null && _npvCmp903 !== null);
+    const _npvPriceMove903 = (_npvOk833 && _offPr903) ? (_npvSc833 - _npvCmp903) : 0;
+    const _npvDelta833 = _npvOk833 ? (_npvCmp903 - _npvDb833) : null;
+    const _npvSignFlip833 = _npvOk833 && ((_npvDb833 >= 0) !== (_npvCmp903 >= 0));
     // Ratio only means something when the reference is a real positive number.
-    const _npvRatio833 = (_npvOk833 && _npvDb833 > 1) ? (_npvSc833 / _npvDb833) : null;
+    const _npvRatio833 = (_npvOk833 && _npvDb833 > 1) ? (_npvCmp903 / _npvDb833) : null;
     function _npvFmt833(v) {
       if (v == null) return 'n/a';
       const a = Math.abs(v);
@@ -52279,7 +52319,8 @@ function _execLiveDCF(country, profileKey, price) {
       verdict = 'Modest gap \u2014 quote the country average as ' + country + '\u2019s take, and cite this scenario only if you also state the profile and price you set.';
     } else {
       sevCol = 'var(--red)'; sevBg = 'rgba(185,28,28,.05)'; sevBorder = 'rgba(185,28,28,.3)';
-      verdict = 'Material gap \u2014 do not put these two numbers in the same sentence. Quoting ' + result.take.toFixed(1)
+      verdict = 'Material gap \u2014 do not put these two numbers in the same sentence. Quoting '
+              + _takeCmp903.toFixed(1)
               + '% as \u201c' + country + '\u2019s government take\u201d would understate/overstate it by ' + adelta.toFixed(1)
               + 'pp against every other tab, the API and the XLSX export.';
     }
@@ -52304,12 +52345,12 @@ function _execLiveDCF(country, profileKey, price) {
         || Math.abs(_npvDelta833) >= 500;
       if (_npvSignFlip833) {
         _npvVerdict833 = 'The two NPVs do not even agree on sign: the country average is '
-          + _npvFmt833(_npvDb833) + ' and this scenario is ' + _npvFmt833(_npvSc833)
+          + _npvFmt833(_npvDb833) + ' and this scenario is ' + _npvFmt833(_npvCmp903)
           + '. One of them clears a 10% WACC and the other does not — do not carry a viability '
           + 'conclusion out of this panel without saying which project it came from.';
       } else if (_matGap833) {
         _npvVerdict833 = 'NPV is the larger disagreement here: ' + _npvFmt833(_npvDb833)
-          + ' against ' + _npvFmt833(_npvSc833)
+          + ' against ' + _npvFmt833(_npvCmp903)
           + (_npvRatio833 !== null ? ' (' + _npvRatio833.toFixed(1) + 'x)' : '')
           // v859 (T2): only two of the six selectable profiles share the engine's name. Say
           // which two projects these actually are rather than asserting both are "Deepwater".
@@ -52335,7 +52376,19 @@ function _execLiveDCF(country, profileKey, price) {
     // Why they differ — every driver below is read off the data, none is asserted blind.
     const drivers = [];
     if (price !== 75) {
-      drivers.push('<strong>Price:</strong> this scenario is set to $' + price + '/bbl; the country average shown at the top of the page is fixed at $75/bbl.');
+      // v903 (T2): this used to be listed as a reason the two figures differ, which made the
+      // gap above look as though it contained a price effect. It no longer does — the gap is
+      // measured with both sides at $75. Price is now stated as what it is: a separate move,
+      // already quantified on the scenario cards, and excluded from the gap.
+      drivers.push('<strong>Price \u2014 not in the gap above:</strong> this scenario is set to $' + price
+        + '/bbl and the stored country figure exists only at $75/bbl, so the two are never subtracted across prices. '
+        + 'The gap is measured with the same project re-run at $75 ('
+        + _takeCmp903.toFixed(1) + '% take'
+        + ((_npvOk833 && _npvCmp903 != null) ? ', ' + _npvFmt833(_npvCmp903) + ' NPV' : '')
+        + '). Moving the slider to $' + price + ' is worth ' + _ppFmt903(_takePriceMove903)
+        + ((_npvOk833 ? ' and ' + (_npvPriceMove903 >= 0 ? '+' : '\u2212')
+                        + _npvFmt833(Math.abs(_npvPriceMove903)).replace('\u2212','') : ''))
+        + ' on its own, and says nothing about ' + _cpEsc704(country) + '\u2019s terms.');
     }
     if (profileKey !== 'deepwater') {
       const _dw = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES.deepwater) ? DCF_PROFILES.deepwater : null;
@@ -52406,6 +52459,28 @@ function _execLiveDCF(country, profileKey, price) {
       if (profileKey === 'deepwater') drivers.unshift(_basisDriver833); else drivers.push(_basisDriver833);
     }
 
+    // v903 (T2): the price the analyst set, reported as its own effect rather than folded
+    // into the basis gap. Rendered beside each pill so the two drivers stay separable.
+    const _atNote903 = _offPr903
+      ? '<div style="font-size:10px;color:var(--accent);line-height:1.45;margin-top:4px;font-weight:600;">'
+        + 'At $75 the same project takes ' + _takeCmp903.toFixed(1) + '% \u2014 that is the figure the gap below uses. '
+        + 'Your $' + price + ' setting moves it ' + _ppFmt903(_takePriceMove903) + '.</div>'
+      : '';
+    const _atNoteNpv903 = (_offPr903 && _npvOk833)
+      ? '<div style="font-size:10px;color:var(--accent);line-height:1.45;margin-top:4px;font-weight:600;">'
+        + 'At $75 the same project returns ' + _npvFmt833(_npvCmp903) + ' \u2014 that is the figure the gap below uses. '
+        + 'Your $' + price + ' setting moves it ' + (_npvPriceMove903 >= 0 ? '+' : '\u2212')
+        + _npvFmt833(Math.abs(_npvPriceMove903)).replace('\u2212','') + '.</div>'
+      : '';
+    const _gapBasis903 = _offPr903
+      ? '<span style="font-size:10px;font-weight:700;color:var(--muted);margin-left:6px;">both at $75</span>'
+      : '';
+    const _priceTail903 = _offPr903
+      ? ' <em style="color:var(--muted);">Measured with both sides at $75, so it is the basis difference alone. '
+        + 'Your $' + price + '/bbl setting is reported on the scenario card above and is deliberately not counted here \u2014 '
+        + 'the stored country figure exists only at $75, so a raw subtraction would charge the price move to the regime.</em>'
+      : '';
+
     vsEl.innerHTML =
       '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Which number goes in the IC memo?</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'
@@ -52427,11 +52502,13 @@ function _execLiveDCF(country, profileKey, price) {
                 ? 'Carries no ' + _cpEsc704(country) + '-specific terms'
                   + (_p704.shared > 1 ? ' \u2014 ' + _p704.shared + ' countries return this same figure' : '') + '.'
                 : 'Answers \u201cwhat would <em>my</em> project pay here\u201d. If you use it, say so in the memo.') + '</div>'
+          + _atNote903
         + '</div>'
       + '</div>'
       + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
         + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">Take gap ' + sign + delta.toFixed(1) + 'pp</span>'
-        + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + verdict + '</span>'
+        + _gapBasis903
+        + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + verdict + _priceTail903 + '</span>'
       + '</div>'
       // v833 (T2): the same question, asked of the number an IC actually votes on.
       + (_npvOk833
@@ -52456,12 +52533,14 @@ function _execLiveDCF(country, profileKey, price) {
                   + _bd833.jsProdMM.toFixed(1) + ' MMbbl \u00b7 $' + (_bd833.jsCapexMM/1000).toFixed(2) + 'B all-in capex \u00b7 $'
                   + _bd833.jsProfile.opexBbl + '/bbl flat opex \u00b7 25yr life \u00b7 '
                   + (_bd833.jsProfile.discountRate*100).toFixed(0) + '% WACC.</div>'
+                + _atNoteNpv903
               + '</div>'
             + '</div>'
             + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
               + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">NPV gap '
                 + (_npvDelta833 >= 0 ? '+' : '\u2212') + _npvFmt833(Math.abs(_npvDelta833)).replace('\u2212','') + '</span>'
-              + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + _npvVerdict833 + '</span>'
+              + _gapBasis903
+              + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + _npvVerdict833 + _priceTail903 + '</span>'
             + '</div>'
           : '')
       + '<details style="font-size:11px;color:var(--muted);">'
