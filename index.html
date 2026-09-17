@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v894</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v895</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v894</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v895</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -36761,6 +36761,11 @@ function initPlatform() {
     fetch('api/v1/country/' + slug + '.json')
       .then(r => r.ok ? r.json() : null)
       .then(j => {
+        // v895 (T5): this fetch already happened. Harvest the breakeven out of the same
+        // response before the reform guard below returns, so Norway and the UK — the only two
+        // countries ORCA publishes a breakeven for and does not bundle — are resolved at load,
+        // for every surface, at zero extra network cost.
+        if (typeof _orcaAdoptApiBe === 'function') _orcaAdoptApiBe(country, j);
         if (!j || !j.reform_history) return;
         const srcMap = {};
         j.reform_history.forEach(ev => { if (ev.year) srcMap[ev.year] = ev; });
@@ -54912,11 +54917,14 @@ function renderFCResults(results, price) {
       return b.liveNPV - a.liveNPV;
     });
   } else if (sortField === 'breakeven') {
+    // v895 (T5): through _fcBe(), so a row whose breakeven ORCA publishes but did not bundle
+    // sorts on the figure this column now prints instead of falling to the bottom as "no data".
     sorted.sort(function(a,b) {
-      if (a.be_75 == null && b.be_75 == null) return 0;
-      if (a.be_75 == null) return 1;
-      if (b.be_75 == null) return -1;
-      return a.be_75 - b.be_75;
+      var av = _fcBe(a), bv = _fcBe(b);
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      return av - bv;
     });
   } else if (sortField === 'reform') {
     // v831 (T4): worst reform exposure first, banded off _rrClassify()'s own verdict token.
@@ -54941,7 +54949,10 @@ function renderFCResults(results, price) {
   // v313: Apply IRR / Breakeven data-only filters
   var _fIRR = null;   // v525 (T3): 'IRR only' checkbox removed together with the IRR column
   var _fBE = document.getElementById('fc-filter-be');
-  if (_fBE && _fBE.checked) sorted = sorted.filter(function(r) { return r.be_75 != null; });
+  // v895 (T5): "breakeven only" keeps the rows whose breakeven this table PRINTS. At r.be_75 != null
+  // it both admitted the three state-monopoly 1.0 floor values whose cell renders "—" and dropped
+  // Norway and the United Kingdom, whose cell now prints $29 and $20.
+  if (_fBE && _fBE.checked) sorted = sorted.filter(function(r) { return _fcBe(r) != null; });
   // ── v633 (T4): reform-scored-only filter ─────────────────────────────────────
   // Same predicate stabCell() uses to decide between a diamond ramp and n/c, so the
   // filtered set and the rendered column can never disagree about who is scored.
@@ -55019,7 +55030,7 @@ function renderFCResults(results, price) {
   sorted.forEach(function(c, idx) {
     var hasValue = true;
     if (sortField === 'npv' && c.liveNPV == null) hasValue = false;
-    if (sortField === 'breakeven' && c.be_75 == null) hasValue = false;
+    if (sortField === 'breakeven' && _fcBe(c) == null) hasValue = false;   // v895 (T5)
     if (sortField === 'take' && c.liveTake == null) hasValue = false;
     // v831 (T4): an n/c row carries no reform reading, so it is not a placing on this sort.
     if (sortField === 'reform' && !_fcHasReformLog(c.country)) hasValue = false;
@@ -55377,11 +55388,14 @@ function renderFCResults(results, price) {
           // _beIsTested() and formatBreakeven() both reject. The strip therefore announced
           // "Best BE: $1/bbl (Bahrain)" -- a state monopoly with no contractor position, whose
           // breakeven cell in the table below correctly renders an em dash.
-          var _beRecs = sorted.filter(function(r){return _beIsTested(r.be_75) && r.be_75 > 0 && r.be_75 < 999;}).sort(function(a,b){return a.be_75-b.be_75;});
+          // v895 (T5): through _fcBe(), so the strip cannot name a "best" that excludes a row
+          // whose breakeven this table prints. The United Kingdom at $20/bbl is exactly that row.
+          var _beRecs = sorted.filter(function(r){return _fcBe(r) != null;}).sort(function(a,b){return _fcBe(a)-_fcBe(b);});
           if (!_beRecs.length) return '';
           var _bestBe = _beRecs[0];
-          return '<span title="Best breakeven in this view: ' + _bestBe.country + ' at $' + _bestBe.be_75.toFixed(0) + '/bbl — sort by Breakeven to rank all ' + _beRecs.length + ' countries with verified data. Breakeven = minimum oil price for positive NPV at the current profile and 10% WACC." style="cursor:pointer;" onclick="fcSetSort(\'breakeven\')">'
-            + '<strong style="color:var(--text);">Best BE: </strong><span style="color:var(--green);font-weight:600;">$' + _bestBe.be_75.toFixed(0) + '/bbl</span> (' + _bestBe.country + ')</span>';
+          var _bestBeV = _fcBe(_bestBe);
+          return '<span title="Best breakeven in this view: ' + _bestBe.country + ' at $' + _bestBeV.toFixed(0) + '/bbl — sort by Breakeven to rank all ' + _beRecs.length + ' countries with verified data. Breakeven = minimum oil price for positive NPV at the current profile and 10% WACC." style="cursor:pointer;" onclick="fcSetSort(\'breakeven\')">'
+            + '<strong style="color:var(--text);">Best BE: </strong><span style="color:var(--green);font-weight:600;">$' + _bestBeV.toFixed(0) + '/bbl</span> (' + _bestBe.country + ')</span>';
         })()
       + (function(){
           // v563 (T6): this counted every row under 40%, and 119 of the 120 rows it returned
@@ -55628,7 +55642,7 @@ function renderFCResults(results, price) {
     // account, with a row that has no terms.
     if (_fcGenericLast && r.termsBasis === 'default') return null;
     if (sortField === 'npv')     return r.liveNPV == null ? null : r.liveNPV;
-    if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
+    if (sortField === 'breakeven') return _fcBe(r);   // v895 (T5): rank on the printed figure
     if (sortField === 'swing')   return r.swing == null ? null : Number(r.swing);
     // v831 (T4): reform is ordinal. Tie groups are the verdict BAND -- the 7 ↑ PRE-2010 rows
     // genuinely share one reading, and printing them 12,13,14... would assert an order between
@@ -55672,7 +55686,7 @@ function renderFCResults(results, price) {
     var gFirst = {}, gCount = {}, gMech = {};
     var _gField = function(r) {
       if (sortField === 'npv') return r.liveNPV;
-      if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
+      if (sortField === 'breakeven') return _fcBe(r);   // v895 (T5): group on the printed figure
       if (sortField === 'swing') return r.swing == null ? null : Number(r.swing);
       if (sortField === 'reform') return _fcHasReformLog(r.country) ? Number(_fcReformRank(r.country).band) : null;
       return r.liveTake;
@@ -55777,13 +55791,14 @@ function renderFCResults(results, price) {
       }
     }
     // v468: Breakeven threshold dividers — inserted when sorted by breakeven ascending (most resilient first)
-    if (sortField === 'breakeven' && r.be_75 != null && !_rowIsGeneric) {
-      if (!_be50DividerInserted && r.be_75 > 50) {
+    var _beDiv = _fcBe(r);   // v895 (T5): the dividers cut the order the table is actually in
+    if (sortField === 'breakeven' && _beDiv != null && !_rowIsGeneric) {
+      if (!_be50DividerInserted && _beDiv > 50) {
         var _b50Colspan = showStability ? 14 : 13;   // v568 (T5): +1 for the citable database NPV column; v632 (T5): +1 for the shortlist select column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b50Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Breakeven &gt;$50/bbl</div></td></tr>';
         _be50DividerInserted = true;
       }
-      if (!_be80DividerInserted && r.be_75 > 80) {
+      if (!_be80DividerInserted && _beDiv > 80) {
         var _b80Colspan = showStability ? 14 : 13;   // v568 (T5): +1 for the citable database NPV column; v632 (T5): +1 for the shortlist select column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b80Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Breakeven &gt;$80/bbl</div></td></tr>';
         _be80DividerInserted = true;
@@ -55821,7 +55836,14 @@ function renderFCResults(results, price) {
         _rrBandLast = _rrB;
       }
     }
-    var beStr = formatBreakeven(r.be_75);
+    // v895 (T5): the cell reads the platform's resolved breakeven, not the raw bundle column.
+    var _beCell = _fcBe(r);
+    var beStr = (_beCell != null && (r.be_75 == null || r.be_75 <= 1))
+      ? '<span title="Breakeven $' + _beCell.toFixed(1) + '/bbl \u2014 ORCA publishes this for '
+        + r.country + ' in api/v1/country, averaged over the same contract set as the take on this '
+        + 'row. The bundled table carries none, which is why this cell read \u2014 before v895. Same '
+        + 'number the Country Profile prints and its IC citation pastes.">$' + _beCell.toFixed(0) + '</span>'
+      : formatBreakeven(r.be_75);
     var cEsc = r.country.replace(/'/g, "\\'");
 
     var _rankBorderStyle = '';
@@ -55995,14 +56017,14 @@ function renderFCResults(results, price) {
       html += '<td class="num">' + _qualCell + '</td>';
         html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + npvStr + '</span><span class="fc-gen-tag">default</span></td>';
         html += _fcDbNpvCell(r);
-        html += '<td class="num">' + beStr + '</td>';
+        html += '<td class="num" data-fcbe="' + r.country.replace(/"/g, '&quot;') + '">' + beStr + '</td>';
       } else {
       html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
       html += _fcDbTakeCell(r);
       html += '<td class="num">' + _qualCell + '</td>';
       html += '<td class="num">' + npvStr + '</td>';
       html += _fcDbNpvCell(r);
-      html += '<td class="num">' + beStr + '</td>';
+      html += '<td class="num" data-fcbe="' + r.country.replace(/"/g, '&quot;') + '">' + beStr + '</td>';
       }
     }
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
@@ -56343,9 +56365,21 @@ function openFCDrilldown(country) {
   // price and npv_75 = $0, and this branch printed their floor as "BE $1/bbl" in GREEN — the
   // most resilient breakeven on the platform, for the three jurisdictions closed to IOC equity.
   // Fiscal Compare's own BE column already prints "—" for them. All three now fall through.
-  if (_beIsTested(d.be_75) && d.be_75 > 1 && d.be_75 < 999) {
-    const beCol = d.be_75 < 50 ? 'var(--green)' : d.be_75 < 80 ? 'var(--yellow)' : 'var(--red)';
-    html += '<span style="font-size:11px;color:' + beCol + ';font-family:\'IBM Plex Mono\',monospace;margin-left:4px;">BE $' + d.be_75.toFixed(0) + '/bbl</span>';
+  // v895 (T5): _fcBe(), not the raw bundle column. Norway and the United Kingdom carry no
+  // bundled be_75 and ORCA publishes one for both, so this chip said "BE: — (not modelled)"
+  // four feet from a Country Profile printing "$29/bbl" in green. The id and data-country let
+  // _fcAdoptBePaint() replace the chip if the api response lands after the drawer opened.
+  var _ddBe = _fcBe(d);
+  var _ddBeAttr = ' id="fc-dd-be-chip" data-country="' + String(country).replace(/"/g, '&quot;') + '"';
+  if (_ddBe != null) {
+    const beCol = _ddBe < 50 ? 'var(--green)' : _ddBe < 80 ? 'var(--yellow)' : 'var(--red)';
+    html += '<span' + _ddBeAttr + ' style="font-size:11px;color:' + beCol + ';font-family:\'IBM Plex Mono\',monospace;margin-left:4px;"'
+      + ((d.be_75 == null || d.be_75 <= 1)
+          ? ' title="Breakeven $' + _ddBe.toFixed(1) + '/bbl — ORCA publishes this for ' + String(country).replace(/"/g, '&quot;')
+            + ' in api/v1/country, averaged over the same contract set as the take on this row. The bundled table carries none. '
+            + 'Same number the Country Profile prints and its IC citation pastes."'
+          : '')
+      + '>BE $' + _ddBe.toFixed(0) + '/bbl</span>';
   } else {
     // v693 (T6): was a regional peer median (v500). Two faults, either one fatal to a T6 answer.
     //   1. Its peer filter was `x.be_75 > 0`, so the three floor values above sat INSIDE the
@@ -56380,7 +56414,7 @@ function openFCDrilldown(country) {
               + 'all 65 modelled breakevens fall between $27 and $34/bbl and 43 of them sit on two '
               + 'integers, so a regional median off that axis is the global constant with a region name '
               + 'on it. Use the $50/bbl NPV in the price table below for this country\'s downside.';
-          html += '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
+          html += '<span' + _ddBeAttr + ' style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
             + 'margin-left:4px;cursor:help;" title="' + _esc(_t0) + '">BE: — <span style="font-style:italic;'
             + 'opacity:.7;">(' + (_mono ? 'no contractor position' : 'not modelled') + ')</span></span>';
         } else {
@@ -56994,7 +57028,13 @@ function openFCDrilldown(country) {
     var _citeVer = (function(){ var b=document.querySelector('header .badge, .badge'); var m=b&&/v\d+/.exec(b.textContent||''); return m?m[0]:''; })();
     var _citeDate = new Date().toISOString().slice(0,10);
     var _dbNpv = _pricePoints[_selIdx][2];
-    var _cBe = (d.be_75 != null && d.be_75 > 0 && d.be_75 < 999) ? '$' + d.be_75.toFixed(0) + '/bbl' : 'not available';
+    // v895 (T5): this line is the defect. It read the raw bundle column, so the citation the FC
+    // IC Analyst Guide routes the analyst to pasted "BE not available" for Norway while the
+    // Country Profile citation for the same country, same build, same basis pasted "BE $29/bbl".
+    // _fcBe() is the platform's read point; _fcAdoptBePaint() patches this token in place if the
+    // api response lands after the drawer was built.
+    var _cBeV = _fcBe(d);
+    var _cBe = (_cBeV != null) ? '$' + _cBeV.toFixed(0) + '/bbl' : 'not available';
     var _cN = d.n ? ', n=' + d.n.toLocaleString() + ' contracts' : '';
     var _lines = [];
     // v774 (T6): a fee-basis-blended row pastes the comparable take it is ranked on, and the
@@ -57223,6 +57263,10 @@ function _fcTermLeg(country) {
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(j) {
       var out = null;
+      // v895 (T5): same response, second question. Opening a row drawer, hydrating a Screener
+      // row or painting a Side-by-Side column all come through here, so each one also resolves
+      // that country's breakeven into the single store cpBeFor() reads.
+      if (typeof _orcaAdoptApiBe === 'function') _orcaAdoptApiBe(country, j);
       try {
         if (j) {
           var fs = j.fiscal_facts_sourced || {};
@@ -57863,6 +57907,91 @@ function cpBeFor(d) {
   var r = window._cpBeResolved[d.country];
   return (r != null && r > 1 && r < 999) ? r : null;
 }
+window.cpBeFor = cpBeFor;
+
+// ── v895 (T5) — one breakeven, one read point. Fiscal Compare joins it. ──────────────
+// Walked T5 cold at 1440x900, storage cleared. Country Profile -> Norway -> "⎘ IC Citation"
+// pastes "BE $29/bbl". Fiscal Compare -> Norway row -> "⎘ IC Citation" — the button the FC IC
+// Analyst Guide routes the analyst to, one tab away, same session, same build — pasted
+// "BE not available". The FC Breakeven cell read "—", the drawer chip read "BE: — (not
+// modelled)" over a tooltip stating "Breakeven is not modelled for Norway. It needs complete
+// royalty and cost data", and "Copy for IC Memo" carried the same cause in its basis block.
+// Two paste artifacts, one platform, one version, one country, one standardized basis,
+// assembled into the same memo, disagreeing about a citable number. That is the v687 scar
+// repeating on a different field.
+//
+// v512 resolved it for the Country Profile ALONE: COUNTRY_DATA.be_75 is null for Norway and
+// the United Kingdom while ORCA's own published api/v1/country/<slug>.json carries
+// avg_breakeven_usd 28.7 and 20.3 for them, averaged over the same contract set as the take.
+// Measured this cycle across all 185 bundled rows against all 239 shipped api files, not
+// asserted: 65 agree, 0 disagree, and exactly 2 are published by the API and missing from the
+// bundle — Norway and the United Kingdom. They are the two largest European producers, both
+// sit in the default Side-by-Side set, and Norway is the default Country Profile, so a cold
+// visitor meets the contradiction on the first country they open.
+//
+// The fix is not a second copy of the number. _orcaAdoptApiBe() is the single harvest point:
+// every place the page ALREADY parses an api/v1 country file hands the JSON here, the value
+// lands in the same window._cpBeResolved the Country Profile reads, and Fiscal Compare reads
+// it back through cpBeFor() like every other surface. No new network request is issued.
+function _orcaAdoptApiBe(country, j) {
+  try {
+    if (!country || !j) return null;
+    var t = (j.four_price_table || []).filter(function (x) { return x && +x.price_usd_bbl === 75; })[0];
+    var be = t ? t.avg_breakeven_usd : null;
+    if (be == null || !(be > 1) || !(be < 999)) return null;   // nulls and the 1.0 solver floor
+    if (window._cpBeResolved[country] === be) return be;
+    window._cpBeResolved[country] = be;
+    if (typeof _fcAdoptBePaint === 'function') _fcAdoptBePaint(country, be);
+    return be;
+  } catch (e) { return null; }
+}
+window._orcaAdoptApiBe = _orcaAdoptApiBe;
+
+// Fiscal Compare's breakeven read point. Same value the Country Profile prints and cites:
+// bundled where the bundle has one, api-resolved where ORCA publishes one it did not bundle.
+// Never the be_75 = 1.0 state-monopoly solver floor — cpBeFor() rejects that by name.
+function _fcBe(r) {
+  if (!r) return null;
+  if (typeof cpBeFor === 'function') return cpBeFor(r);
+  return (_beIsTested(r.be_75) && r.be_75 > 1 && r.be_75 < 999) ? r.be_75 : null;
+}
+window._fcBe = _fcBe;
+
+// The grid paints synchronously and must not wait on the network, so a value that arrives
+// after first paint has to reach the three FC surfaces that were already drawn: the Breakeven
+// cell of that country's row, the drawer chip, and the one token inside the drawer's baked
+// citation string. Additive — if none of them is on screen, every branch is a no-op.
+function _fcAdoptBePaint(country, be) {
+  try {
+    var txt = '$' + be.toFixed(0) + '/bbl';
+    var why = 'Breakeven $' + be.toFixed(1) + '/bbl — ORCA publishes this for ' + country
+      + ' in api/v1/country, averaged over the same contract set as the take on this row. The '
+      + 'bundled table carries none, which is why this cell read "—" before v895. It is the same '
+      + 'number the Country Profile prints and the same one its IC citation pastes.';
+    var cells = document.querySelectorAll('#tbl-fc td[data-fcbe]');
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].getAttribute('data-fcbe') !== country) continue;
+      cells[i].innerHTML = '$' + be.toFixed(0);
+      cells[i].title = why;
+    }
+    var chip = document.getElementById('fc-dd-be-chip');
+    if (chip && chip.getAttribute('data-country') === country) {
+      chip.style.color = be < 50 ? 'var(--green)' : be < 80 ? 'var(--yellow)' : 'var(--red)';
+      chip.style.fontSize = '11px';
+      chip.style.fontStyle = 'normal';
+      chip.textContent = 'BE ' + txt;
+      chip.title = why;
+    }
+    var btn = document.getElementById('fc-dd-copy-cite-' + String(country).replace(/[^a-zA-Z0-9]/g, '_'));
+    if (btn) {
+      var oc = btn.getAttribute('onclick');
+      if (oc && oc.indexOf('BE not available') !== -1) {
+        btn.setAttribute('onclick', oc.split('BE not available').join('BE ' + txt));
+      }
+    }
+  } catch (e) {}
+}
+window._fcAdoptBePaint = _fcAdoptBePaint;
 
 // v642 (T2): breakeven BOUND for the 117 countries that carry no solved breakeven.
 //
@@ -59375,7 +59504,7 @@ function copyFCForIC(btn) {
     var mono = (typeof isStateMonopoly === 'function') && dv != null && isStateMonopoly(dv);
     if (mono) nMono++;
     if (!mono && r.termsBasis === 'default') nGeneric++;
-    var hasBe = (!mono && r.be_75 != null && r.be_75 > 0 && r.be_75 < 999);
+    var hasBe = (!mono && _fcBe(r) != null);   // v895 (T5): the resolved figure, as the table prints it
     if (hasBe) nBe++;
     // v568 (T5): a row where the citable database NPV and this screen's model NPV disagree on the
     // SIGN is a row where the two artifacts give opposite verdicts on project viability. Name them.
@@ -59396,7 +59525,7 @@ function copyFCForIC(btn) {
       r.mechanic || '',
       num(_feeAt[c] ? _feeAt[c].cmp : dv, 1),   // v777 (T5): the figure the # rank is built on
       mono ? '' : num(meta['npv_' + P], 0),
-      hasBe ? num(r.be_75, 1) : '',
+      hasBe ? num(_fcBe(r), 1) : '',   // v895 (T5): the resolved figure, matching the caption's count
       num(r.swing, 1),
       mono ? '' : num(r.liveTake, 1),
       mono ? '' : num(r.liveNPV, 0),
@@ -59442,7 +59571,14 @@ function copyFCForIC(btn) {
         : 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. ')
     + 'That contractor NPV is on the ' + _icEngineBasis() + ' It is a fixed basis and does not move with the profile selector. '
     + 'The last numeric column is this screen’s model NPV on the ' + profName + ' profile you had selected — the figure that was on screen when you copied. Cite the database column; the model column is for profile sensitivity only.'
-    + ' Breakeven is populated for ' + nBe + ' of these ' + N + ' rows (it requires verified per-contract royalty and cost data).';
+    // v895 (T5): the parenthetical used to assert a cause — "it requires verified per-contract
+    // royalty and cost data" — that this platform's own v642 audit disproved: breakeven is on
+    // file for more non-producers than producers, and the driver is not recorded anywhere this
+    // page can read. A memo should not carry a reason the tool cannot support, so it states the
+    // coverage and points at the downside figure that IS present on every row.
+    + ' Breakeven is populated for ' + nBe + ' of these ' + N + ' row' + (N === 1 ? '' : 's')
+    + '; ORCA does not hold a modelled breakeven for the rest, and no reason for the gap is recorded '
+    + 'in the database, so none is given here. Use the $50/bbl contractor NPV column as the downside test.';
   var warn = '';
   if (nGeneric) warn += nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. '
     + (_isShortlist
@@ -59817,7 +59953,9 @@ function exportFCResults() {
         r.swing != null ? +r.swing.toFixed(1) : null,
         // v529: a 100%-take regime has no breakeven. Bahrain, Kuwait and Saudi Arabia were
         // exporting "1" ($1/bbl) into the breakeven column of an IC attachment.
-        (!_mono && r.be_75 != null && r.be_75 > 0 && r.be_75 < 999) ? +r.be_75.toFixed(1) : null,
+        // v895 (T5): the same resolved figure the on-screen column and the row citation carry,
+        // so the IC attachment cannot contradict the memo body it is attached to.
+        (!_mono && _fcBe(r) != null) ? +_fcBe(r).toFixed(1) : null,
         tier ? tier.label : (_mono ? 'n/c — state monopoly' : null),
         // Evidence describes the country's fiscal facts. On a generic-default row those
         // facts were not used, so publishing a grade here would be a false credential.

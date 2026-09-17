@@ -3126,6 +3126,108 @@ async function testScreenerTakeSortRender(page) {
   }
 }
 
+// ─── v895 (T5): ONE BREAKEVEN, ONE READ POINT ───────────────────────────────────────
+// Regression guard for the defect this cycle fixed: the Country Profile IC citation for
+// Norway pasted "BE $29/bbl" while Fiscal Compare's row-drilldown IC citation for the same
+// country, same build, same standardized basis pasted "BE not available". COUNTRY_DATA
+// carries no be_75 for Norway or the United Kingdom; ORCA's own api/v1/country/<slug>.json
+// publishes 28.7 and 20.3 for them. v512 resolved that for Country Profile alone.
+//
+// These assertions do NOT hardcode $29. They assert the two artifacts AGREE, and that the
+// state-monopoly 1.0 solver floor is still refused — so the guard cannot be satisfied by
+// making both surfaces wrong in the same direction.
+async function testBreakevenOneReadPoint(page) {
+  const S = 'BE-OneReadPoint';
+  try {
+    await switchTab(page, 't0');
+    await page.waitForTimeout(2500);
+
+    // 1. the resolver is populated from an api response the page already fetched
+    const res = await page.evaluate(() => {
+      const m = window._cpBeResolved || {};
+      return { norway: m['Norway'] == null ? null : +m['Norway'], uk: m['United Kingdom'] == null ? null : +m['United Kingdom'] };
+    });
+    if (res.norway > 1 && res.norway < 999 && res.uk > 1 && res.uk < 999)
+      p(S, 'api breakeven adopted at load', `Norway $${res.norway} / UK $${res.uk} resolved without a new fetch`);
+    else f(S, 'api breakeven adopted at load', `expected both resolved, got ${JSON.stringify(res)}`);
+
+    // 2. the Fiscal Compare cell prints it rather than an em dash
+    const cells = await page.evaluate(() => {
+      const t = [...document.querySelectorAll('#tbl-fc td[data-fcbe]')];
+      const g = c => { const x = t.find(y => y.getAttribute('data-fcbe') === c); return x ? x.textContent.trim() : 'NO-CELL'; };
+      return { tagged: t.length, norway: g('Norway'), uk: g('United Kingdom'), saudi: g('Saudi Arabia') };
+    });
+    if (/^\$\d+$/.test(cells.norway) && /^\$\d+$/.test(cells.uk))
+      p(S, 'FC breakeven column', `Norway ${cells.norway}, UK ${cells.uk} (${cells.tagged} rows tagged)`);
+    else f(S, 'FC breakeven column', `expected a price in both cells, got ${JSON.stringify(cells)}`);
+
+    // 3. over-firing guard: the three state monopolies carry be_75 = 1.0 and must stay out
+    if (cells.saudi === 'NO-CELL' || cells.saudi === '—')
+      p(S, 'monopoly floor still refused', `Saudi Arabia prints "${cells.saudi}", not "$1"`);
+    else f(S, 'monopoly floor still refused', `Saudi Arabia printed "${cells.saudi}" — the 1.0 DCF floor leaked back in`);
+
+    // 4. the two IC citations for the same country must carry the same breakeven token
+    const grab = await page.evaluate(async () => {
+      const cap = [];
+      const orig = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = t => { cap.push(String(t)); return Promise.resolve(); };
+      const row = document.querySelector('#tbl-fc tr[data-country="Norway"]');
+      if (row) row.click();
+      await new Promise(r => setTimeout(r, 1200));
+      const fcBtn = document.getElementById('fc-dd-copy-cite-Norway');
+      if (fcBtn) fcBtn.click();
+      await new Promise(r => setTimeout(r, 400));
+      const fc = cap.pop() || '';
+      const tab = document.getElementById('tab-btn-t7'); if (tab) tab.click();
+      await new Promise(r => setTimeout(r, 800));
+      const sel = document.getElementById('dd-country-select');
+      if (sel) { sel.value = 'Norway'; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+      await new Promise(r => setTimeout(r, 2000));
+      const cpBtn = document.getElementById('dd-cite-btn');
+      if (cpBtn) cpBtn.click();
+      await new Promise(r => setTimeout(r, 400));
+      const cp = cap.pop() || '';
+      navigator.clipboard.writeText = orig;
+      const tok = s => { const m = /BE ([^—,]+)/.exec(s); return m ? m[1].trim() : null; };
+      return { fc: tok(fc), cp: tok(cp), fcLen: fc.length, cpLen: cp.length };
+    });
+    if (grab.fc && grab.cp && grab.fc === grab.cp && !/not available/i.test(grab.fc))
+      p(S, 'FC and CP citations agree', `both cite "BE ${grab.fc}" for Norway`);
+    else f(S, 'FC and CP citations agree', `FC="${grab.fc}" CP="${grab.cp}" (lens ${grab.fcLen}/${grab.cpLen})`);
+
+    // 5. the Copy-for-IC basis block no longer asserts a cause v642 disproved
+    await switchTab(page, 't0');
+    await page.waitForTimeout(1500);
+    const basis = await page.evaluate(async () => {
+      let cap = '';
+      const ow = navigator.clipboard.write ? navigator.clipboard.write.bind(navigator.clipboard) : null;
+      const ot = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = t => { cap += String(t); return Promise.resolve(); };
+      if (navigator.clipboard.write) navigator.clipboard.write = async items => {
+        for (const it of items) { try { cap += await (await it.getType('text/plain')).text(); } catch (e) {} }
+        return Promise.resolve();
+      };
+      ['Norway', 'United Kingdom', 'USA'].forEach(c => {
+        const tr = document.querySelector('#tbl-fc tr[data-country="' + c + '"]');
+        const cb = tr && tr.querySelector('input[type=checkbox]');
+        if (cb) cb.click();
+      });
+      await new Promise(r => setTimeout(r, 400));
+      const b = document.getElementById('fc-copy-ic-btn'); if (b) b.click();
+      await new Promise(r => setTimeout(r, 700));
+      navigator.clipboard.writeText = ot; if (ow) navigator.clipboard.write = ow;
+      return cap;
+    });
+    const claimsFalseCause = /requires verified per-contract royalty and cost data/.test(basis);
+    const countsTwo = /Breakeven is populated for 2 of these 3 rows/.test(basis);
+    if (!claimsFalseCause && countsTwo)
+      p(S, 'FC IC-memo basis block', 'counts 2 of 3 populated and states no unrecorded cause');
+    else f(S, 'FC IC-memo basis block', `falseCause=${claimsFalseCause} countsTwo=${countsTwo} (len ${basis.length})`);
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testConsoleErrors() {
   const S = 'ConsoleErrors';
   if (consoleErrors.length === 0) {
@@ -3153,6 +3255,7 @@ async function testConsoleErrors() {
 
     await testLoad(page);
     await testFiscalCompare(page);
+    await testBreakevenOneReadPoint(page);
     await testFCExportMethodology(page);
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
