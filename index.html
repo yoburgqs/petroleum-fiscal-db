@@ -37007,9 +37007,10 @@ function _scExportRows() {
       // ── v907 (T5): the sourced reform record ────────────────────────────────────
       // Sits beside Fiscal_Predictability because an IC reader comparing the two columns is
       // exactly the point: predictability is a dispersion statistic computed from the contract
-      // table, this is the event log. Russia exports Fiscal_Predictability 85/100 and
-      // Reform_Verdict "TAKE +15pp / 2022 windfall tax". Both are true; only one of them is
-      // what "is this jurisdiction stable?" was asking.
+      // table, this is the event log. Russia exports Fiscal_Predictability 75 (band UNGRADED)
+      // and Reform_Verdict "TAKE +15pp", last change 2022 windfall tax — with a Reform Frequency
+      // Score of 85, which is a COUNT of law changes and is not the predictability figure.
+      // All three are true; only the verdict answers "is this jurisdiction stable?".
       Reform_Verdict: _rfX ? _rfX.verdict : null,
       Reform_Changes_Since_2010: _rfX ? _rfX.since2010 : null,
       Reform_Last_Change: _rfX ? _rfX.last : null,
