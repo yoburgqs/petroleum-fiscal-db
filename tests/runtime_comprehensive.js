@@ -3228,6 +3228,87 @@ async function testBreakevenOneReadPoint(page) {
   }
 }
 
+// ── v901 (T5) — the Screener IC memo's own counts must describe the file it built ────────
+// Screener -> preset -> tick 3 rows -> "Copy for IC Memo" pasted a 3-row table over a note
+// reading "8 rows in this file are bounded this way, 7 of them into a different band". 8 was
+// the count over the 15 rows the SCREEN returned: window._scExportCeilStats was published one
+// line above the hand-tick filter that actually builds the file. The assertion is the invariant,
+// not the number -- the ceiling count may never exceed the row count, and must equal the count
+// of rows in the returned file that _fpExportCell() marks material.
+async function testScreenerICCeilingCount(page) {
+  const S = 'ScreenerICCeilCount';
+  try {
+    await switchTab(page, 'tscreener');
+    await page.waitForTimeout(2200);
+
+    for (const preset of ['iochurdle', 'lowrisk', 'atlanticfrontier']) {
+      const r = await page.evaluate((pre) => {
+        // clear any ticks left by a previous iteration, then apply the preset
+        [...document.querySelectorAll('#tbl-screener tbody input[type=checkbox]')]
+          .filter(c => c.checked).forEach(c => c.click());
+        applyScreenerPreset(pre);
+        return null;
+      }, preset);
+      await page.waitForTimeout(1800);
+
+      const out = await page.evaluate(() => {
+        const screened = (window._screenerData || []).length;
+        [...document.querySelectorAll('#tbl-screener tbody input[type=checkbox]')]
+          .slice(0, 3).forEach(c => c.click());
+        const rows = _scExportRows();
+        const stat = window._scExportCeilStats || [];
+        const truth = rows.filter(x => {
+          const f = _fpExportCell((window._screenerData || []).find(d => d.country === x.Country));
+          return f && f.material;
+        });
+        const truthBand = truth.filter(x => {
+          const f = _fpExportCell((window._screenerData || []).find(d => d.country === x.Country));
+          return f && f.bandMoves;
+        }).length;
+        const line = (_scExportBasisLines() || [])
+          .filter(l => /in this file (is|are) bounded/.test(l))[0] || '';
+        const m = line.match(/(\d+) rows? in this file (?:is|are) bounded/);
+        return { screened, inFile: rows.length, claims: stat.length,
+                 claimsBand: stat.filter(x => x.bandMoves).length,
+                 truth: truth.length, truthBand, printed: m ? +m[1] : null };
+      });
+
+      if (out.claims <= out.inFile) p(S, `${preset}: count cannot exceed the file`, `${out.claims} bounded of ${out.inFile} rows (screen returned ${out.screened})`);
+      else f(S, `${preset}: count cannot exceed the file`, `note claims ${out.claims} bounded rows in a ${out.inFile}-row file`);
+
+      if (out.claims === out.truth && out.claimsBand === out.truthBand)
+        p(S, `${preset}: count matches the ticked rows`, `${out.claims} bounded / ${out.claimsBand} band-moving, both measured off the returned rows`);
+      else f(S, `${preset}: count matches the ticked rows`, `claims ${out.claims}/${out.claimsBand}, truth ${out.truth}/${out.truthBand}`);
+
+      if (out.printed === null || out.printed === out.truth)
+        p(S, `${preset}: pasted sentence agrees`, out.printed === null ? 'no bounded rows, sentence correctly omitted' : `sentence prints ${out.printed}`);
+      else f(S, `${preset}: pasted sentence agrees`, `sentence prints ${out.printed}, file holds ${out.truth}`);
+    }
+
+    // the unticked full screen is the case that was always right -- it must stay right
+    const full = await page.evaluate(() => {
+      [...document.querySelectorAll('#tbl-screener tbody input[type=checkbox]')]
+        .filter(c => c.checked).forEach(c => c.click());
+      resetScreenerAll();
+      return null;
+    });
+    await page.waitForTimeout(1800);
+    const fu = await page.evaluate(() => {
+      const rows = _scExportRows();
+      const stat = window._scExportCeilStats || [];
+      const truth = rows.filter(x => {
+        const f = _fpExportCell((window._screenerData || []).find(d => d.country === x.Country));
+        return f && f.material;
+      }).length;
+      return { rows: rows.length, claims: stat.length, truth };
+    });
+    if (fu.claims === fu.truth && fu.rows > 100)
+      p(S, 'unticked full universe unchanged', `${fu.claims} bounded of ${fu.rows} rows`);
+    else f(S, 'unticked full universe unchanged', JSON.stringify(fu));
+
+  } catch (e) { f(S, 'suite', String(e).slice(0, 160)); }
+}
+
 async function testConsoleErrors() {
   const S = 'ConsoleErrors';
   if (consoleErrors.length === 0) {
@@ -3264,6 +3345,7 @@ async function testConsoleErrors() {
     await testCountryProfile(page);
     await testExplorer(page);
     await testScreener(page);
+    await testScreenerICCeilingCount(page);
     await testHomeICScreenAgreement(page);
     await testICSourcingTier(page);
     await testIOC(page);

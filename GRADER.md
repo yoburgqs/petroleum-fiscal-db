@@ -57832,3 +57832,122 @@ order and the cell can never disagree.*
 **Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (stalest; last walked at 804)
 
 **Friction.** Explorer → sort by Stability, "least predictable first." The column carries a **ceiling** for 51 of 185 countries, and every other surface in the product — Country Profile, Side-by-Side, the Reform Risk card, Copy for IC Memo, the XLSX — tells the analyst to carry it *instead of* the stored score: *"carry ≤46 · LOW, not 73 · MODERATE."* The sor
+
+---
+## Cycle 812 — v901
+
+**Task: T5** — *"Give me something I can paste straight into an IC memo."*
+(rotation: 811 was T4, 810 T6, 809 T3, 808 T2, 807 T1 — T5 last ran at 806.)
+
+**Friction.** Screener, cold load at 1440x900 with sessionStorage and localStorage cleared.
+The tab exists to build an IC shortlist, and it asks the analyst to hand-pick one: the
+`screener-copy-ic-btn` tooltip says *"Tick rows in the left-hand column to copy just those"*,
+and the copy-confirm toast repeats it — *"tick the rows you want in the highlighted left-hand
+column and copy just those."* So: preset **IOC Capital Screen** (15 of 185 pass) → tick
+Canada, USA, Azerbaijan → **Copy for IC Memo** → paste into Word.
+
+The pasted table has **three** rows. Three lines under it, in the basis block that travels
+with the table, the predictability note read:
+
+> *"8 rows in this file are bounded this way, 7 of them into a different band."*
+
+Two of those three rows are bounded (USA ≤82, Azerbaijan ≤39); Canada is an unbounded 80.
+8 is the count over the 15 rows the **screen** returned, not the file. An IC reader can count
+the rows in front of them, and the file asserts eight of a thing in a file that holds three of
+anything — the failure mode the v687 comment in this codebase names exactly: *"That is the kind
+of thing an IC catches, and what it catches is the tool."*
+
+**Cause, measured not asserted.** `index.html:36602` published
+`window._scExportCeilStats = _ceilStats` **one line above** the `_sel` filter at 36607 that
+actually builds the file. `_ceilStats` is accumulated inside the `_all = data.map(...)` over the
+whole screened set; `_scExportBasisLines()` then reads that global and writes "N rows in this
+file". So the note counted the screen while the table printed the shortlist. The four sibling
+blocks in the same basis builder — the data-basis split, `TAKE BASIS`, `EVIDENCE GRADE` and
+`BREAKEVEN` — each re-apply `_scSelOrdered()` before they count, which is why they were right
+and this one was not. It is the only block that did not, and it is the newest (v879).
+
+Measured this cycle, ticking the first 3 rows of each preset, claimed vs. real:
+
+| Preset | rows in file | note claimed | actually bounded |
+|---|---|---|---|
+| IOC Capital Screen | 3 | **8** (7 band-moving) | 2 (1) |
+| Stable Fiscal Record | 3 | 4 (3) | 2 (1) |
+| Atlantic Frontier | 3 | 4 (4) | 3 (3) |
+| Two-Price Return Screen | 3 | 3 (2) | 2 (1) |
+| PSC Africa | 3 | 18 (…) | 3 (2) |
+| **no preset, tick 4 of 185** | **4** | **45** (41 band-moving) | **3 (2)** |
+
+Ticking nothing was the only state that reported honestly — and it fires on all three export
+paths, because the clipboard, the CSV and the XLSX all read the same global.
+
+**Change.** `_scExportCeilStats` is now published **after** the hand-tick filter, from the rows
+actually returned: the `_sel` filter is applied to `_ceilStats` by the same country list that
+filters the table. No fifth private copy of the selection logic — the count is taken off the
+file the function returns. The unticked full-screen path is untouched by construction.
+
+**Result.** The 3-row IOC shortlist now pastes *"2 rows in this file are bounded this way, 1 of
+them into a different band"* over a table with exactly two `≤` cells; the 4-row hand-pick that
+claimed 45 now says 3. The analyst can hand the pasted shortlist to an IC and have its own
+footnote survive someone counting the rows — which, on the tab whose entire job is producing
+that shortlist, it previously could not.
+
+## Verification — every number produced this cycle, against the working tree
+- **Runtime suite RAN**, local server (`TEST_URL=http://localhost:8080`), cold contexts.
+  Before the fix: **343 PASS / 0 FAIL / 1 WARN**. After, with 10 new assertions: see below.
+  The 1 WARN / 1 JS error is the pre-existing service-worker 404 on a local server, present in
+  every prior local run (the deployed build reports 344 because `sw.js` resolves there).
+- **10 new assertions, `testScreenerICCeilingCount()`** — for each of three presets: the ceiling
+  count may not exceed the row count; it must equal the count of returned rows `_fpExportCell()`
+  marks material; and the rendered sentence must print that same number. Plus one that the
+  unticked 185-row universe still reports 45 — the case that was always right.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures.
+- **Horizontal scroll** — clean 10/10 tabs at **1920 / 1440 / 1280 / 1024 / 768**, each tab from a
+  fresh context with storage cleared. 0 page errors at every width.
+- **Mobile 390x844 `hasTouch: true`** — 10/10 tabs `scrollWidth` 390 = `clientWidth` 390,
+  0 page errors, **0 of the 5 Screener toolbar controls under 24px** (copy/CSV/Excel/Reset all
+  44px; Copy Link 28px).
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 reported findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`; none on the Screener export surface.
+
+## Debt found this cycle, NOT fixed
+- **The Screener IC memo prints `— not modelled` for Norway and the United Kingdom's breakeven
+  while Fiscal Compare, one tab over, prints 28.7 and 20.3 for the same two countries in the same
+  cold session.** This is precisely the v895/806 defect one surface over: `_scExportRows()` reads
+  `d.be_75` raw at `index.html:36501` and `:36563`, bypassing the `cpBeFor()` / `_fcBe()` read
+  point 806 built. `window._cpBeResolved` already holds both countries on a cold load — measured
+  this cycle, keys `['United Kingdom','Norway','Australia']` before any tab is clicked — so the
+  value is present and simply not read. FC carries 67 breakevens, the Screener 65; the delta is
+  exactly those two. Two "Copy for IC Memo" buttons, one build, one session, disagreeing about a
+  citable number. Natural next T5, and a two-line fix.
+
+## Carried forward
+- **`cp-terms-chip` is clipped at tablet-768** — `pixel_audit` finding 3, pre-existing baseline:
+  `scrollWidth 143 > clientWidth 90`. Natural next T6. From 810.
+- **The Explorer's measured branch prints a ceiling only where one is material.** 6 of the 51
+  ceilings are immaterial and leave the score standing with a corrected tooltip. Deliberate
+  (the v719 materiality rule) but means two measured rows can show the same number on different
+  evidence. From 811.
+- **The Evidence Quality badge and the Evidence Chain disagree about dead links** on Indonesia —
+  badge counts documents, chain counts parameter rows, wording identical. From 810.
+- **All three of Indonesia's "independently sourced" model terms are one document, and its link is
+  dead** — stated across three paragraphs, never as one sentence. From 810.
+- **The benchmark menu is unreachable on a cold load** in Side-by-Side. From 809.
+- **The re-basing blind spot may not be confined to that menu** — `_sbsCmpTake()` returns a
+  corrected figure with no signal attached. Two sites found, others unaudited. From 809.
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`** — FC median IRR 138.4%,
+  128 rows above 100%. From 808.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked
+  around again with `TEST_URL`. **`TEST_URL` should become the default**, with the deployed run a
+  separate post-push check. From 806-811. Note this cycle ships 10 new assertions that describe
+  LOCAL behaviour — they pass against the deployed build only after this push lands.
+- **`autonomous_cycle.py` has no partial-work guard** — ninth cycle running. From 805.
+- **Needs Zach, from 808:** the PSC CIT base still omits the opex deduction `petroleum_dcf.py:945`
+  takes. One-term fix, but `cit` feeds `govtTake`, which Fiscal Compare sorts on — it re-ranks 58
+  of 185 countries. Flagged, not taken unilaterally.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27-$34
+  spread while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
