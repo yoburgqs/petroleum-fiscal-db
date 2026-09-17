@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v899</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v900</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v899</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v900</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3436,7 +3436,7 @@ window.copyPlatformCitation = function(btn) {
     <strong>Color keys</strong> &mdash;
     <strong>Breakeven</strong>: <span style="color:var(--green)">&#9632;</span> &lt;$50 &nbsp; <span style="color:var(--yellow)">&#9632;</span> $50–75 &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;$75 &nbsp;|&nbsp;
     <strong>Swing</strong> (take@$125 − take@$50): <span style="color:var(--green)">&#9632;</span> &lt;10pp (royalty-stable) &nbsp; <span style="color:var(--yellow)">&#9632;</span> 10–20pp (moderate) &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;20pp (profit-progressive) &nbsp;|&nbsp;
-    <strong>Stability</strong> (Fiscal Predictability, 0&ndash;100 &mdash; <em>not</em> the diamond reform-event score on the Reform Risk tab): a coloured bar and a band are drawn only where ORCA measured a take spread across the country&rsquo;s own contracts &mdash; <span style="color:var(--green)">&#9632;</span> &ge;75 HIGH &nbsp; <span style="color:var(--yellow)">&#9632;</span> 60&ndash;74 MODERATE &nbsp; <span style="color:var(--orange)">&#9632;</span> 45&ndash;59 LOW &nbsp; <span style="color:var(--red)">&#9632;</span> &lt;45 VERY LOW. A row showing a bare number with <strong>UNGRADED &middot; one term</strong> was never charged the spread penalty, so its higher number is not the steadier regime. <strong style="color:var(--orange);">Where ORCA&rsquo;s own contract file refutes that one-term basis</strong> the row resolves as you scroll it into view and prints the ceiling instead &mdash; <strong style="color:var(--orange);">&le;52 &middot; LOW &#9650;</strong> beside the struck-through stored score and the observed spread (<strong>&ge;29.6pp obs</strong>). Carry the ceiling, not the stored score; it is the same number Country Profile, Side-by-Side and Reform Risk print. The sort is unaffected &mdash; click the header to rank measured regimes first. &nbsp;|&nbsp;
+    <strong>Stability</strong> (Fiscal Predictability, 0&ndash;100 &mdash; <em>not</em> the diamond reform-event score on the Reform Risk tab): a coloured bar and a band are drawn only where ORCA measured a take spread across the country&rsquo;s own contracts &mdash; <span style="color:var(--green)">&#9632;</span> &ge;75 HIGH &nbsp; <span style="color:var(--yellow)">&#9632;</span> 60&ndash;74 MODERATE &nbsp; <span style="color:var(--orange)">&#9632;</span> 45&ndash;59 LOW &nbsp; <span style="color:var(--red)">&#9632;</span> &lt;45 VERY LOW. A row showing a bare number with <strong>UNGRADED &middot; one term</strong> was never charged the spread penalty, so its higher number is not the steadier regime. <strong style="color:var(--orange);">Where ORCA&rsquo;s own contract file refutes that one-term basis</strong> the row resolves as you scroll it into view and prints the ceiling instead &mdash; <strong style="color:var(--orange);">&le;52 &middot; LOW &#9650;</strong> beside the struck-through stored score and the observed spread (<strong>&ge;29.6pp obs</strong>). Carry the ceiling, not the stored score; it is the same number Country Profile, Side-by-Side and Reform Risk print. <strong style="color:var(--orange);">Since v900 the ranking carries it too</strong> &mdash; a row is ordered on the ceiling wherever one supersedes its score, so the order and the printed number can no longer disagree. Measured rows carry one as well: Nigeria ranks on &le;46, not on the 73 this column stores. The measured / one-term / no-distribution blocks are unchanged &mdash; click the header to reverse the direction. &nbsp;|&nbsp;
     <strong>Evidence A/B/C</strong>: hover any badge for source detail &nbsp;|&nbsp;
     <strong>IRR / Breakeven dash (—)</strong>: country lacks sufficient cost data for computation, or value &ge;500% (unbounded) &mdash; not a data error
   </div>
@@ -24133,11 +24133,43 @@ window._evidenceSortVal = _evidenceSortVal;
 //                               one that carries a graded band at all
 //   1  one term (UNGRADED)      IQR contributed nothing; price swing and mechanic count only
 //   2  not scored / monopoly    no dispersion input, or no contractor position to score
+// ── v900 (T4): rank on the number the cell PRINTS, not on the one it withdraws ──────────────
+// This column has a ceiling (_fpObsCeiling) for 51 of 185 countries -- 45 of them material -- and
+// every surface in the product tells the analyst to carry it INSTEAD of the stored score: Country
+// Profile, Side-by-Side, the Reform Risk card, Copy for IC Memo and the XLSX all print "carry
+// <=46 . LOW, not 73 . MODERATE". The Explorer printed the ceiling in the cell and then ranked
+// the row on the withdrawn score.
+//
+// Measured on the shipped data, sorting "least predictable first" across the 160 scored rows:
+// Nigeria ranked 27th on a stored 73 while the product tells you to carry <=46, which is 6th --
+// 21 countries this platform rates as MORE predictable than Nigeria sat above it. Mexico, at <=27
+// the single worst predictability reading in the database, ranked 7th. Kazakhstan <=53 ranked 26th.
+// 58 of 160 rows moved five places or more. An analyst ranking a screening list on fiscal
+// predictability read the order top-down and stopped before reaching the worst regimes on it.
+//
+// v758 left this deliberately, and its reason was sound AT THE TIME: "re-ranking on ceilings that
+// exist only for the rows fetched so far would make the order depend on how far the analyst had
+// scrolled." v879 then added _scWarmObsCeilings(), which fetches every resolvable country's
+// contract sample once per session (measured: all 185 at concurrency 8 in 77ms). The blocker is
+// gone and nothing came back to re-decide. The guard below is what keeps the v758 property: the
+// ceiling is only allowed into the ordering once window._scObsWarmReady says the WHOLE set has
+// resolved, so the order is identical however far anyone has scrolled -- and until then this is
+// byte-for-byte the previous comparator.
+//
+// No new threshold and no recomputation: the block structure (measured, then one-term, then no
+// distribution) is untouched, and the carried value is _fpObsCeiling().bound -- the same object
+// the cell, the clipboard and the workbook already read.
 function _fpSortVal(entry) {
   const disp  = _fpDispersion(entry);
   const block = disp.state === 'measured' ? 0 : disp.state === 'single' ? 1 : 2;
   const sc    = getFiscalPredictabilityScore(entry);
-  return block * 1000 + (sc == null ? 999 : sc);
+  let carried = (sc == null ? 999 : sc);
+  if (window._scObsWarmReady && sc != null && typeof _fpObsCeiling === 'function') {
+    let cl = null;
+    try { cl = _fpObsCeiling(entry); } catch (e) { cl = null; }
+    if (cl && cl.material && typeof cl.bound === 'number') carried = cl.bound;
+  }
+  return block * 1000 + carried;
 }
 window._fpSortVal = _fpSortVal;
 
@@ -26974,7 +27006,14 @@ function renderExplorer() {
           // the bundled quartiles; the contract file that can refute them lands on a later fetch.
           return `<div class="exp-fp-one" data-fp-country="${encodeURIComponent(d.country)}" style="display:flex;align-items:center;gap:5px;justify-content:flex-end;" title="${_fpTip}"><span class="exp-fp-score" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);">${score}</span><span class="exp-fp-band" style="font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--muted);border:1px solid var(--muted);border-radius:3px;padding:0 4px;line-height:1.5;">UNGRADED</span><span class="exp-fp-basis" style="font-size:10px;color:var(--muted);white-space:nowrap;">one term</span></div>`;
         }
-        return `<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;" title="${_fpTip}"><div style="width:48px;flex:0 0 48px;background:var(--surface);border-radius:3px;overflow:hidden;"><div style="height:8px;width:${score}%;background:${barCol};border-radius:3px;"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${barCol};">${score}</span><span style="font-size:10px;color:var(--muted);white-space:nowrap;">${_fpBasis}</span></div>`;
+        // ── v900 (T4): the MEASURED branch gets the same ceiling hooks the one-term branch has ──
+        // _expPaintObsSpread() only ever ran against .exp-fp-one, so the 10 measured countries whose
+        // own contract file refutes their BUNDLED quartiles never had the correction printed here --
+        // Nigeria (bundled 0.4pp, observed 33.9pp, ceiling <=46 against a stored 73), Mexico (<=27
+        // against 51), Kazakhstan (<=53 against 73), Republic of the Congo, Morocco, India, Brazil,
+        // Mauritania. Country Profile, Side-by-Side and the Reform Risk card all print those
+        // ceilings; this column printed the withdrawn score and drew a bar at its length.
+        return `<div class="exp-fp-res" data-fp-country="${encodeURIComponent(d.country)}" style="display:flex;align-items:center;gap:5px;justify-content:flex-end;" title="${_fpTip}"><div style="width:48px;flex:0 0 48px;background:var(--surface);border-radius:3px;overflow:hidden;"><div class="exp-fp-bar" style="height:8px;width:${score}%;background:${barCol};border-radius:3px;"></div></div><span class="exp-fp-score" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${barCol};">${score}</span><span class="exp-fp-basis" style="font-size:10px;color:var(--muted);white-space:nowrap;">${_fpBasis}</span></div>`;
       })()}</td>
       <td class="num" style="font-size:11px;" title="Physical take rate. PSC: approx oil vol% govt receives (FTP + profit oil portion after cost recovery). Concession: royalty rate as % of gross production.">${(function(){
         const mechList = d.mechanics ? d.mechanics.split(',') : [];
@@ -27026,8 +27065,20 @@ function renderExplorer() {
   // the numbers alone would give, and the reason lives in a header tooltip they have already
   // stopped reading by the time they see the rows. State it under the result set instead.
   const _fpK = (typeof _fpCnt === 'function') ? _fpCnt() : null;
+  // v900 (T4): state, at the result set, that the ranking carries the ceiling. Counted live off
+  // the resolved set rather than hardcoded, and silent until the warm has actually finished --
+  // which is exactly when the ordering starts using it.
+  let _explCeilNote = '';
+  if (sort === 'stability' && window._scObsWarmReady && typeof _fpObsCeiling === 'function') {
+    let _nC = 0;
+    for (const _d of COUNTRY_DATA) {
+      let _c = null; try { _c = _fpObsCeiling(_d); } catch (e) {}
+      if (_c && _c.material) _nC++;
+    }
+    if (_nC) _explCeilNote = `<strong style="color:var(--orange);">${_nC} rows are ranked on their ceiling</strong> — the ≤N this platform tells you to carry instead of the stored score — so the order and the number printed in the cell agree. `;
+  }
   const _explStabNote = (sort === 'stability' && _fpK)
-    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on <strong style="color:var(--text);">Fiscal Predictability</strong>, basis before number${_explGrouped ? ', inside each data-basis block above' : ''}: <strong style="color:var(--text);">countries with a measured take spread come first, ${_explDir === -1 ? 'most predictable first' : 'least predictable first'}</strong> — ${_fpK.nMeas} of 185, and the only ones the score’s largest penalty (IQR, up to −40) was ever charged against or that this column grades. The ${_fpK.nSingle} one-term <strong style="color:var(--text);">UNGRADED</strong> regimes follow, then the ${_fpK.nNone} ORCA holds no contract distribution for. A one-term 100 is not a steadier regime than a measured ${_fpK.ceil} — it is the one ORCA holds less contract evidence against. This column is the Fiscal Predictability Score; reform-event counts are the separate Reform Frequency Score on the Reform Risk tab.</div>`
+    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on <strong style="color:var(--text);">Fiscal Predictability</strong>, basis before number${_explGrouped ? ', inside each data-basis block above' : ''}: <strong style="color:var(--text);">countries with a measured take spread come first, ${_explDir === -1 ? 'most predictable first' : 'least predictable first'}</strong> — ${_fpK.nMeas} of 185, and the only ones the score’s largest penalty (IQR, up to −40) was ever charged against or that this column grades. The ${_fpK.nSingle} one-term <strong style="color:var(--text);">UNGRADED</strong> regimes follow, then the ${_fpK.nNone} ORCA holds no contract distribution for. A one-term 100 is not a steadier regime than a measured ${_fpK.ceil} — it is the one ORCA holds less contract evidence against. ${_explCeilNote}This column is the Fiscal Predictability Score; reform-event counts are the separate Reform Frequency Score on the Reform Risk tab.</div>`
     : '';
   // v735 (T1): the breakeven sort states its own coverage before the row numbers are read. The
   // header already carried "BREAKEVEN (65/185 COUNTRIES)", but that is a column caption; it does
@@ -27129,7 +27180,8 @@ function _expApplyObsSpread() {
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return;
   // A re-render replaces the cells the previous observer was watching, so drop it first.
   if (window._expObsIO) { try { window._expObsIO.disconnect(); } catch (e) {} }
-  var cells = document.querySelectorAll('.exp-fp-one:not([data-fp-done])');
+  // v900 (T4): .exp-fp-res is the measured cohort, added this cycle. Same resolver, same painter.
+  var cells = document.querySelectorAll('.exp-fp-one:not([data-fp-done]), .exp-fp-res:not([data-fp-done])');
   if (!cells.length) return;
 
   var resolve = function(host) {
@@ -27153,6 +27205,21 @@ function _expApplyObsSpread() {
       })
       .catch(function() {});
   };
+
+  // ── v900 (T4): once the warm has landed, paint every cell, not just the visible ones ────────
+  // The sort now carries the ceiling for all 45 material rows the moment _scObsWarmReady is set.
+  // If painting stayed lazy, a row 60 places down would be RANKED on ≤26 while still PRINTING 62
+  // until it was scrolled past -- the same cell/order disagreement this cycle set out to remove,
+  // pointing the other way. No fetch is involved: every sample is already in the v559 cache, so
+  // this is DOM work over rows that are going to be painted anyway.
+  if (window._scObsWarmReady) {
+    Array.prototype.forEach.call(cells, function(h) {
+      var c; try { c = decodeURIComponent(h.dataset.fpCountry || ''); } catch (e) { return; }
+      if (c && cpObsSpread(c)) resolve(h);
+    });
+    cells = document.querySelectorAll('.exp-fp-one:not([data-fp-done]), .exp-fp-res:not([data-fp-done])');
+    if (!cells.length) return;
+  }
 
   if (typeof IntersectionObserver !== 'function') {
     // No observer available: resolve only what the cache already holds, so the fallback path
@@ -27181,7 +27248,7 @@ function _expApplyObsSpread() {
     entries.forEach(function(en) {
       if (!en.isIntersecting) return;
       io.unobserve(en.target);
-      var h = en.target.querySelector('.exp-fp-one');
+      var h = en.target.querySelector('.exp-fp-one, .exp-fp-res');
       if (h) resolve(h);
     });
   }, { root: root, rootMargin: '300px 0px' });
@@ -27203,6 +27270,16 @@ function _expPaintObsSpread(host, d, c) {
   var scoreEl = host.querySelector('.exp-fp-score');
   var bandEl  = host.querySelector('.exp-fp-band');
   var basisEl = host.querySelector('.exp-fp-basis');
+  var barEl   = host.querySelector('.exp-fp-bar');
+  // v900 (T4): a MEASURED row carries no UNGRADED chip to overwrite -- it prints a bar, a number
+  // and its measured spread. Mint the band chip on first correction so both cohorts end in the
+  // same shape, rather than forking the painter.
+  if (!bandEl && scoreEl) {
+    bandEl = document.createElement('span');
+    bandEl.className = 'exp-fp-band';
+    bandEl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:.04em;border:1px solid var(--muted);border-radius:3px;padding:0 4px;line-height:1.5;color:var(--muted);';
+    scoreEl.insertAdjacentElement('afterend', bandEl);
+  }
   if (!scoreEl || !bandEl || !basisEl) return;
   var O = 'var(--orange)';
 
@@ -27220,6 +27297,9 @@ function _expPaintObsSpread(host, d, c) {
     // printed score visible and struck through so the swap is traceable rather than silent.
     scoreEl.textContent = '≤' + cl.bound;
     scoreEl.style.color = O;
+    // v900 (T4): bar LENGTH is the pre-attentive signal (the v649 finding). Leaving it at the
+    // withdrawn score would draw Nigeria a 73-length bar beside the text "≤46".
+    if (barEl) { barEl.style.width = cl.bound + '%'; barEl.style.background = O; }
     bandEl.textContent = cl.band + ' ▲';
     bandEl.style.color = O;
     bandEl.style.borderColor = O;
@@ -27241,10 +27321,23 @@ function _expPaintObsSpread(host, d, c) {
         + '. NOT a recomputed score: a top-' + obs.n + ' sample is a FLOOR on the true spread, so '
         + cl.bound + ' is a CEILING. Carry ≤' + cl.bound + ' · ' + cl.band + ' into the IC memo, '
         + 'not ' + cl.printed + ' — the same ceiling the Country Profile, Side-by-Side and Reform '
-        + 'Risk panels print for ' + c + '. The column sort is unchanged: it still ranks the '
-        + 'measured-spread countries first.';
+        + 'Risk panels print for ' + c + '. The column sort carries this same ceiling (v900), so '
+        + c + ' is ranked on ≤' + cl.bound + ' rather than on the withdrawn ' + cl.printed + '; '
+        + 'measured-spread countries still come first as a block.';
   } else {
-    tip = 'Fiscal Predictability ' + cl.printed + '/100 — UNGRADED. The basis is NOT "one term": '
+    // v900 (T4): an immaterial correction on a measured row leaves the number standing, so the
+    // chip minted above has nothing to say. Remove it rather than render an empty box.
+    if (bandEl && !bandEl.textContent) { try { bandEl.remove(); } catch (e) {} }
+    tip = barEl
+      ? 'Fiscal Predictability ' + cl.printed + '/100 — ' + cl.printedBand + '. The spread penalty '
+        + 'WAS charged here, on bundled quartiles of ' + cl.iqr.toFixed(1) + 'pp. ORCA’s own contract '
+        + 'file shows a wider one: the ' + obs.n + ' largest producing contracts run ' + range
+        + ' government take at $75/bbl (' + obs.spread.toFixed(1) + 'pp). At that dispersion the '
+        + 'penalty would cost ' + cl.cost.toFixed(0) + ' points rather than '
+        + cl.charged.toFixed(0) + ', taking the score to about ' + cl.bound + ' — inside the same '
+        + 'band, which is why the number is left standing. Carry the contract range into the IC '
+        + 'memo alongside the score.'
+      : 'Fiscal Predictability ' + cl.printed + '/100 — UNGRADED. The basis is NOT "one term": '
         + c + '’s bundled quartiles are identical, but ORCA’s own contract file shows the '
         + obs.n + ' largest producing contracts running ' + range + ' government take at $75/bbl ('
         + obs.spread.toFixed(1) + 'pp). Block selection changes the fiscal outcome here. At that '
@@ -36049,6 +36142,16 @@ function _scWarmObsCeilings() {
     window._scObsWarmReady = true;
     // The Screener prints no predictability column, so nothing on screen needs repainting. The
     // surfaces that DO paint one resolve it themselves and now find the sample already cached.
+    // v900 (T4): _fpSortVal() is allowed to carry the ceiling only once this flag is set, so an
+    // Explorer already showing the Stability ranking is holding the pre-ceiling order at this
+    // instant. Re-render it ONCE, and only when that sort is actually live -- this is the moment
+    // the order becomes scroll-independent, which is the property v758 asked for.
+    try {
+      var _sv = document.getElementById('flt-sort');
+      var _tb = document.getElementById('texplorer');
+      if (_sv && _sv.value === 'stability' && _tb && _tb.classList.contains('active')
+          && typeof renderExplorer === 'function') renderExplorer();
+    } catch (e) {}
   });
 }
 window._scWarmObsCeilings = _scWarmObsCeilings;
