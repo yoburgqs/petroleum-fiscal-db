@@ -57193,3 +57193,107 @@ for the same country paste the **same** breakeven token into the same memo.
 **Task: T5** — "Give me something I can paste straight into an IC memo."
 
 **Friction.** Country Profile → Norway → `⎘ IC Citation` pastes `BE $29/bbl`. Fiscal Compare → Norway row → `⎘ IC Citation` — the button FC's own IC Analyst Guide routes you to, one tab away, same build, same standardized basis — pasted `BE not available`. The FC Breakeven cell read `—`, the drawer chip read `BE: — (not modelled)`, and
+
+---
+## Cycle 807 — v896
+
+**Task: T1** — "Which countries should even be on my screening list?"
+
+**Friction.** Screener → price deck → Downside Resilience, walked cold at 1440x900 and 390x844,
+both storages cleared, over http. The preset machinery is honest and was checked before anything
+was changed: all 11 presets against their own menu counts at all four decks, **44 of 44 agree**,
+and the menu line, the active-preset chip and the NPV @$50 column sub-head are all deck-aware.
+The defect was not in the count. It was in **which row the count was counting**.
+
+Retention = `npv_50 / npv_<deck>`, measured on the shipped data:
+
+| deck | passes ≥50% | max retention | inverted (≥100%) |
+|---|---|---|---|
+| $75 | 24 | 75% | 0 |
+| $100 | 4 | 60% | 0 |
+| $125 | **1** | **125%** | **1 — Venezuela, and it WAS the list** |
+
+At the $125 deck the entire Downside Resilience shortlist was **one country**, and that country
+cleared the floor **only because its ratio is inverted**: Venezuela's contractor NPV is $345M at
+$125 and $433M at $50 — worth *more* at fifty-dollar oil than at one-hundred-and-twenty-five.
+That is a regime with no price gearing (the state absorbs the whole increment), which is a real
+fact about Venezuela and the exact opposite of what a resilience screen selects for. Every regime
+that genuinely holds value through a price break — Turkmenistan, Uzbekistan, Iran — had already
+fallen below the floor at that deck, because the denominator grows with the deck.
+
+It rendered at the **top of the ranking, bold, green, tooltip "top of the range"**. Nothing on
+screen said the ratio was inverted. An analyst running an ordinary high-price case and clicking
+this preset was handed a one-row IC shortlist consisting of Venezuela, presented as the most
+downside-resilient jurisdiction on earth. `runScreener()` line 34047; the cell at
+`_retentionSub()` line 24984.
+
+This is the "stable but wrong" class, not the "broken" class: the screen ran, exited cleanly,
+returned a row, and printed a correct number. Only the *shortlist* was nonsense.
+
+**Change.**
+- New shared predicate **`_scRetentionPasses(d, ref, floor)`** rejects a null ratio (already the
+  rule for the three state monopolies — "absence of a measurement is not a passed stress test"),
+  a ratio below the floor, and now a ratio **≥100%**. The filter, the count line, the zero-result
+  diagnostic, the removal-reason panel and the export criteria text all screen through it, so
+  they cannot drift apart about which rows passed.
+- **`_retentionSub()`** renders an inverted ratio as **`125% — inverted`** in amber, checked
+  *before* the colour bands, with a tooltip stating what it means and that the screen excludes
+  it. The true ratio is still printed — the number was correct, its reading was not.
+- The **count line** names the exclusion by country and ratio, and only when it removed something
+  at that deck, so the line carries no standing caveat about an empty case.
+- The **zero-result panel** states the per-deck counts (`$75: 24 · $100: 4 · $125: 0`), explains
+  that the floor tightens as the deck rises because the denominator is that deck's NPV, and
+  carries a **`Re-run at $75`** button that changes only the deck and leaves every other filter.
+- The **exported criteria line** named `$75` whatever deck ran; it now names the real deck and
+  states the inversion rule.
+
+`_npvRetentionAt()` is deliberately **not capped**. The Breakeven Map retention cards and the
+Country Profile downside line call the canonical $75 `_npvRetention()` and correctly report 125%
+for Venezuela; what changes is that the SCREEN excludes it and the CELL stops calling it a top
+score.
+
+**Result.** At the $125 deck the analyst now gets an empty screen that explains itself and one
+click back to the deck where the screen discriminates, instead of a one-row shortlist naming
+Venezuela the world's most downside-resilient jurisdiction. At every deck, an inverted ratio is
+legible as an inversion rather than as the best score on the board.
+
+**Scope, measured.** Result sets at **$75 (24 rows)** and **$100 (4 rows)** are unchanged — no
+country is inverted at either deck — so the shipped default and every count in the preset menu,
+the Home card and the Quick Start panel are byte-identical. The only behavioural change is
+$125: 1 row → 0.
+
+## Verification — every number produced this cycle, against the working tree
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures. Live version strings
+  only (`<title>` line 42, `#hdr-version` line 2567); the 19 remaining `v895` hits are comments.
+- **Runtime suite RAN**, local server, **343 PASS / 0 FAIL / 1 WARN**. The 1 WARN and 1 JS error
+  are the pre-existing service-worker 404 on a local server, present in prior local runs. (The
+  cycle prompt's 344/0/0 was measured against the DEPLOYED build, where the SW resolves — the
+  delta is exactly that 404. See carried-forward note below.)
+- **Preset integrity, pre-change baseline:** 11 presets × 4 decks = **44 of 44** advertised menu
+  counts equal actual returned rows.
+- **Horizontal scroll** — clean **9/9 tabs** at **1920 / 1440 / 1280 / 1024 / 768**, each tab
+  from a fresh context with storage cleared. **0 page errors** at every width.
+- **Mobile 390x844 `hasTouch: true`** — 9/9 tabs `scrollWidth` 390 = `clientWidth` 390, 0 page
+  errors. New `Re-run at $75` button **24px tall**, right edge at 321px inside 390.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 reported findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`; **none on the Screener surface**.
+
+## Carried forward
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Run
+  locally this cycle deliberately, which is why the number is 343/1WARN rather than the prompt's
+  344/0. `pixel_audit` already solves this with a local server (line 298-307); the runtime suite
+  should adopt the same, or the cycle log should stop calling it "test after". From 806.
+- **`autonomous_cycle.py` has no partial-work guard** — fourth cycle running. From 805.
+- Scenario Builder prints IRRs of 275.3% (Guyana) and 154.8% (Indonesia) full-size in green
+  while `_sbReturnReading()` classifies them `inflated`. Plausibly the next T2. From 803.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27-$34
+  spread while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
+- **New, and worth Zach's eye:** at the $125 deck the Downside Resilience screen is now legitimately
+  **empty**. That is the honest answer — no country retains half its $125 contractor NPV at $50 —
+  but a preset that returns nothing at one of its four decks may be better re-stated as a fixed
+  $75→$50 axis that does not follow the deck at all. The v699 decision to make it deck-following
+  is defensible and was left in place; flagging rather than reversing it.
