@@ -58579,3 +58579,16 @@ countries into the country lookup one at a time.
   Score ≤ 20". Score = 100 − 15 × changes since 2010, so ≤20 needs ≥6 changes, and the most-reformed
   jurisdiction on file is the UK at 5 (score 25). That branch has never fired and cannot fire on
   the current data. Not touched this cycle — it is a documented rule, not a defect in the walk.
+
+---
+## Cycle 817 Log — 2026-09-17 17:50
+- Test before: 355 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed as `c0f1e8f`, mirror in sync.
+
+## Cycle 817 — v906
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 816 was T6)
+
+**Friction.** Cold load → Screener → the preset built for this exact question: *"Stable Fiscal Record — ≤1 sourced fiscal law change since 2010 · Take ≤70%"*. It returns 11 countries in a twelve-column table — #, Country, Region, Mechanics, Govt Take, Evidence, Contractor NPV, NPV@$50, Prod Cov, Swing, Tier. **None of them is the ref
