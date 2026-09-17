@@ -57819,3 +57819,16 @@ order and the cell can never disagree.*
   while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 811 Log — 2026-09-17 09:44
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed as v900.
+
+## Cycle 811 — T4
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (stalest; last walked at 804)
+
+**Friction.** Explorer → sort by Stability, "least predictable first." The column carries a **ceiling** for 51 of 185 countries, and every other surface in the product — Country Profile, Side-by-Side, the Reform Risk card, Copy for IC Memo, the XLSX — tells the analyst to carry it *instead of* the stored score: *"carry ≤46 · LOW, not 73 · MODERATE."* The sor
