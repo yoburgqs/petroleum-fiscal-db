@@ -57180,3 +57180,16 @@ for the same country paste the **same** breakeven token into the same memo.
   cycle adds Norway $28.7 and UK $20.3 to that surface's resolvable set — the UK at $20 now
   sits meaningfully below the old floor, which slightly strengthens the case for the ramp.
 - FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
+
+---
+## Cycle 806 Log — 2026-09-17 03:43
+- Test before: 340 PASS / 4 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Only the runner's own state files remain modified.
+
+## Cycle 806 — v895
+
+**Task: T5** — "Give me something I can paste straight into an IC memo."
+
+**Friction.** Country Profile → Norway → `⎘ IC Citation` pastes `BE $29/bbl`. Fiscal Compare → Norway row → `⎘ IC Citation` — the button FC's own IC Analyst Guide routes you to, one tab away, same build, same standardized basis — pasted `BE not available`. The FC Breakeven cell read `—`, the drawer chip read `BE: — (not modelled)`, and
