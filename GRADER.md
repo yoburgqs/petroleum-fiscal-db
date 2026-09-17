@@ -57553,3 +57553,135 @@ Side-by-Side, cold load, storage cleared. The tab preloads North Sea Trio, so th
 > `23–34% take @ $75 · all 2 comparable`
 
 Both halves were wrong the same way. `_sbsCmpTake()` silently re-bases a Group-2 (TSC/RSC/Buy-back) column onto i
+
+---
+## Cycle 810 Log — 2026-09-17 13:30
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" Stalest by
+rotation: 809 was T3, 808 T2, 807 T1, 806 T5, 804 T4 — last T6 at 801.
+
+## Friction
+Country Profile, cold load, sessionStorage and localStorage cleared. The box the page
+stamps **IC MEMO** is where the analyst composes the citation, and its verdict line says
+outright *"cite it with the evidence grade on this strip."* The only evidence signal on
+that strip was the pill built at v670 (`index.html:41957`, `_evSeg670`):
+
+> `Evidence A · 97% primary law · n=135`
+
+That letter grades the country's **whole fact base** — depth and primary-law share across
+every fact ORCA holds, most of it contract metadata the DCF never reads. It never looks at
+the 3–6 fiscal terms `getDCFParams()` actually runs to produce the take, NPV and IRR printed
+directly above it. The platform already knows this: the Methodology tab
+(`index.html:4456`) says *"the grade is a property of the fact base, not of the model … so
+check the N of N model terms cited chip as well as the letter."* That chip lives in a
+collapsed panel further down; the IC MEMO box got the bare letter and the instruction to
+defend on it.
+
+Measured across all 185 shipped `api/v1/country` files, on `_fcTermLeg()`'s own rule
+(bulk harvest, shared-regional instruments and D-confidence rows excluded):
+
+| | |
+|---|---|
+| A or B pill here over **half or fewer** model terms cited | **59 of 185** |
+| Countries citing **zero** model terms | 19 |
+| Countries citing **all** model terms | **0** |
+
+| country | pill said | model terms cited |
+|---|---|---|
+| Netherlands | `Evidence A · 97% primary law · n=135` | **1 of 4** (uncited incl. royalty rate) |
+| Namibia | `Evidence B · 98% primary law` | 1 of 4 |
+| Denmark | `Evidence B · 98% primary law` | 1 of 3 |
+| Canada | `Evidence A · 93% primary law · n=944` | 2 of 4 |
+| Brazil | `Evidence A · 65% primary law · n=1,193` | 2 of 4 |
+| Somalia | `Evidence D · 0% primary law` | 0 of 5 |
+
+And the pill was `cursor:help` — a caption with **no route out of itself**. The
+term-by-term Evidence Chain that answers the question renders ~2,750px lower.
+
+This correction was already made three times: the CP Data Quality badge at **v660**, the
+Fiscal Compare drawer's Src badge at **v728**, the Screener column at **v846**. The IC MEMO
+strip was added at v670 and never received it. This is a gap in a finished sweep, not new work.
+
+## Change
+The pill carries the model-term leg beside the letter and **takes the worse of the two
+colours**, so it no longer reads green at the decision point where the letter and the model
+disagree:
+
+- Netherlands → `Evidence A · 97% primary law · n=135 · 1 of 4 model terms cited →`, drawn **red**
+- Denmark, Somalia, Iraq → red · Indonesia, Norway, Nigeria → amber
+- It is a control, not a caption: `role="button"`, `tabindex="0"`, `cursor:pointer`,
+  Enter/Space, and clicking it opens that country's Evidence Chain and flashes it
+  (`_cpScrollToEvidenceChain`) — measured landing at `top: 0`, from `scrollY 0 → 3447`.
+
+Hydrated from `_fcTermLeg()`'s cached `api/v1/country/<slug>.json` read — the same request
+the Evidence Quality chip, the FC drawer, the Screener column and Side-by-Side already
+share, so **no extra network call**. Additive and late-binding: a failed fetch or a regime
+with no model terms leaves the v670 pill exactly as it was. Stale resolves after a country
+change are guarded by a `data-ev-country` stamp on the pill. No letter, percentage, fact
+count, take, NPV, IRR, tier, order or filter result changes.
+
+## Result
+An analyst writing the memo out of the IC MEMO box now sees, **in that box**, that the
+Netherlands A grade stands over a model whose royalty rate is uncited — and reaches the
+term-by-term Evidence Chain in one click instead of a 2,750px scroll hunt. On the 59
+countries where the letter and the model disagree the pill no longer reads as
+reassurance.
+
+## Verification — every number produced this cycle, against the working tree
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures. Re-run after the
+  version bump.
+- **Runtime suite RAN** (not assumed) against the LOCAL tree via
+  `TEST_URL=http://localhost:8899/index.html` — **343 PASS / 0 FAIL / 1 WARN**, report
+  written to disk and read back. The WARN is the pre-existing localhost 404 script fetch,
+  identical to 808/809. Suite copy sha256 `d98409…3b941`.
+- **Horizontal scroll** — **0 failures across 48 tab-viewport combos** (8 tabs ×
+  1920/1440/1280/1024/768/390, fresh context, storage cleared each time). **0 page errors.**
+- **Mobile 390×844 `hasTouch: true`** — `scrollWidth` 390 = `clientWidth` 390. The control
+  added this cycle measures **329 × 44px** on Netherlands (324×44 Somalia, 340×44 Norway),
+  clearing the 24px floor under `pointer: coarse`; it wraps internally rather than widening
+  the page.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." Same 5 baseline findings
+  as 807/808/809 (`thome`, `t0`, `t7`); **none on the new control.**
+- Mirror `office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-identical to
+  `index.html` (sha256 `1af682df…e604f`).
+
+## Carried forward
+- **`cp-terms-chip` is clipped at tablet-768** — `pixel_audit` finding 3, a pre-existing
+  baseline entry: `scrollWidth 143 > clientWidth 90`. The Evidence Quality summary's own
+  terms chip truncates at that width, so the count is unreadable there on a tablet. Not
+  fixed this cycle (it is not the IC MEMO pill, which wraps). Natural next T6.
+- **The Evidence Quality badge and the Evidence Chain disagree about dead links.** On
+  Indonesia the badge reads `2 of 3 source links dead` while the chain below reads
+  `3 of the 4 cited sources above cannot be retrieved`. Both are correct on their own
+  basis — the badge counts distinct **documents** (`_srcDeadN`/`_srcCitedN`,
+  `index.html:24683`), the chain counts **parameter rows**, and one dead document backs
+  three rows — but the two sentences are worded identically and the analyst has no way to
+  tell that from the screen. Found this cycle, not fixed: the IC MEMO pill was the worse
+  moment because it sat at the decision point.
+- **All three of Indonesia's "independently sourced" model terms are one document, and its
+  link is dead.** The chain states this across three separate paragraphs but never as one
+  statement, so the honest summary — *not one of the five terms behind 59.5% can be
+  verified from this page* — is never said outright. Found this cycle.
+- **The benchmark menu is unreachable on a cold load** in Side-by-Side. `#cmp-output` opens
+  with North Sea Trio already rendered, so the four preset buttons appear only after
+  clicking **Clear**, which reads as discarding work. From 809.
+- **The re-basing blind spot may not be confined to that menu** — `_sbsCmpTake()` returns a
+  corrected figure with no signal attached, so any caller bucketing on it alone inherits the
+  defect. Two sites found; the other callers were not audited. From 809.
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`** — FC median IRR still
+  138.4%, 128 rows above 100%. From 808.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked
+  around again with `TEST_URL`; should probably become the default. From 806–809.
+- **`autonomous_cycle.py` has no partial-work guard** — seventh cycle running. From 805.
+- **Needs Zach, from 808:** the PSC CIT base still omits the opex deduction
+  `petroleum_dcf.py:945` takes. One-term fix, but `cit` feeds `govtTake`, which is what
+  Fiscal Compare sorts on — it re-ranks 58 of 185 countries. Flagged, not taken unilaterally.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799–803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate.
+  From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27–$34
+  spread while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
