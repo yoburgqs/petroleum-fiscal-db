@@ -58209,3 +58209,18 @@ the NPV attribution sentence is true at every price.
   imperceptible at 185 countries, but it is a real doubling on a path that fires on every
   `input` event — if a heavier mechanic is added later, memoise the $75 result per
   (country, profile).
+
+---
+## Cycle 814 Log — 2026-09-17 13:49
+- Test before: 355 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 814 complete, shipped as **v903** and pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest by rotation; last run at 808.)
+
+## Friction
+Cold load → Country Profile → Nigeria → the **Live DCF Model** panel → drag the price slider off $75.
+
+That panel closes with a card titled **"WHICH NUMBER GOES IN THE IC MEMO?"** — the most authoritative instruction on the page, and exactly where T2's "can I defend that?" lands. It reconciles the stored cou
