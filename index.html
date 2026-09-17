@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v905</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v906</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -271,6 +271,8 @@ table { width: 100%; border-collapse: collapse; }
      it opens that country's Evidence Chain -- so it takes the same 24px floor as everything
      else on this table. On a mouse it stays on the 15px line so 185 rows do not grow. */
   #tbl-screener .sc-terms-chip { min-height: 24px; }
+  /* v906 (T4): the reform verdict chip carries a tooltip, so under a thumb it is a target. */
+  #tbl-screener .sc-reform-chip > span { min-height: 24px; display: flex; align-items: center; }
   /* v884 (T6): the same chip, same call, on Fiscal Compare's Quality column. */
   #tbl-fc .fc-terms-chip { min-height: 24px; }
   /* v905 (T6): the same chip, same call, on the Explorer's Evidence column. */
@@ -2566,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v905</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v906</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34231,6 +34233,74 @@ function _scToggleOutMore(btn) {
   btn.textContent = opening ? 'Show fewer' : ('+' + (btn.getAttribute('data-sc-more') || extra.length) + ' more');
 }
 
+// ── v906 (T4): the axis the Screener let you filter on and would not let you read ──────────
+// Walking T4 cold: Screener -> preset "Stable Fiscal Record - <=1 sourced law change since
+// 2010 . Take <=70%". It returns 11 countries. The results table has twelve columns --
+// #, Country, Region, Mechanics, Govt Take, Evidence, Contractor NPV, NPV@$50, Prod Cov,
+// Swing, Tier -- and not one of them is the reform record. The one axis the analyst screened
+// on is the one axis the shortlist does not print, so all eleven rows read as equally stable.
+//
+// They are not. Measured against the shipped reform_history.json, that shortlist contains:
+//   Ecuador   rank 4   3 take rises on record, +55pp cumulative (2008 +35pp, 2010 +5pp,
+//                      the PSC->RSC forced conversion). Reform Risk calls it net-tightening.
+//   Russia    P4       2022 windfall tax +15pp -- this tab's OWN worked example of why a
+//                      count is not a magnitude. It passes a "<=1 change" filter because
+//                      +15pp is one change.
+//   Algeria   P2       +35pp cumulative, last rise 2005. Scores 100/100, top of the scale,
+//                      purely because the window opens in 2010.
+//   Colombia  3        2 rises, +8pp, net-tightening.
+// The filter is not wrong -- it counts what it says it counts. But a list headed "Stable
+// Fiscal Record" that cannot show Ecuador and Russia differ from Ghana and Guyana is a list
+// an analyst carries to an IC believing something the platform already knows to be false.
+//
+// This adds no rule, no threshold and no column. It renders _rrRowChip() -- the same chip the
+// IOC Portfolio has carried since v880, from the same _rrClassify() verdict Fiscal Compare,
+// Country Profile and the Reform Risk tab print -- inside the existing Country cell, and only
+// when the reform axis is actually engaged. Default screens are untouched and no wider.
+function _scReformChip(country) {
+  if (typeof window._rrRowChip !== 'function') return '';
+  return window._rrRowChip(country,
+    'This is the axis this screen filtered on. The filter counts fiscal law changes in the '
+    + '2010 window and nothing else, so it cannot see a rise dated before the window or read '
+    + 'how large one was \u2014 that is what this verdict is for. Open the row for the Country '
+    + 'Profile, or the Reform Risk tab for the full sourced event log.');
+}
+
+// ── v906 (T4): the shortlist's own reform split, above the rows ────────────────────────────
+// The count bar already names how many countries the reform filter DROPPED (_reformNote, v662).
+// It never said anything about the ones it KEPT, which is the list that goes to the IC. Buckets
+// the surviving rows by _rrClassify()'s own icToken families -- no new rule, no new threshold --
+// and names the countries in the two buckets that change a number, because those are the rows
+// an analyst would otherwise carry forward as clean.
+function _scReformRollup(rows) {
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
+  if (!rh || !Object.keys(rh).length || !rows || !rows.length) return '';
+  var prem = [], inwin = [], pre = [], unk = [], clear = [], nc = [];
+  rows.forEach(function (d) {
+    var c = d.country;
+    var v = (Array.isArray(rh[c]) && rh[c].length && typeof _rrClassify === 'function') ? _rrClassify(c) : null;
+    if (!v) { nc.push(c); return; }
+    var t = String(v.icToken || '');
+    if (/^WACC /.test(t))                          prem.push(c + ' ' + _icPlain(t));
+    else if (/^TAKE /.test(t))                     inwin.push(c + ' ' + _icPlain(t));
+    else if (/PRE-2010/.test(t))                   pre.push(c);
+    else if (/^SIZE UNKNOWN/.test(t))              unk.push(c);
+    else                                           clear.push(c);
+  });
+  var seg = [];
+  if (prem.length)  seg.push('<strong style="color:#B91C1C;">' + prem.length + ' carr' + (prem.length === 1 ? 'ies' : 'y') + ' a WACC premium</strong> (' + prem.join(', ') + ')');
+  if (inwin.length) seg.push('<strong style="color:#C2410C;">' + inwin.length + ' raised take inside the window</strong> (' + inwin.join(', ') + ')');
+  if (unk.length)   seg.push('<strong style="color:#C2410C;">' + unk.length + ' rewrote terms in-window, size never quantified</strong> (' + unk.join(', ') + ')');
+  if (pre.length)   seg.push('<span style="color:#A16207;font-weight:700;">' + pre.length + ' last raised take BEFORE 2010</span> \u2014 quiet only because the window starts there');
+  if (clear.length) seg.push('<span style="color:#15803D;font-weight:700;">' + clear.length + ' clear</span>');
+  if (nc.length)    seg.push('<span style="color:var(--muted);font-weight:700;">' + nc.length + ' n/c</span> \u2014 no sourced log, not a clean record');
+  if (!seg.length) return '';
+  return ' <span style="color:var(--text);font-weight:600;">\u2014 on this list: </span>'
+    + '<span style="font-weight:400;">' + seg.join('<span style="color:var(--border);"> \u00b7 </span>') + '.</span>'
+    + '<span style="color:var(--muted);font-weight:400;"> Verdicts under each country name, from the same _rrClassify() '
+    + 'the Reform Risk tab prints \u2014 the filter counts changes, these read them.</span>';
+}
+
 function runScreener() {
   // v743 (T1): the floor-take population is read off the live data, not written into the label.
   (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
@@ -34983,7 +35053,7 @@ function runScreener() {
     host.innerHTML = _html;
     host.style.display = 'flex';
   })();
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${reformSet ? _scReformRollup(data) : ''}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -35569,7 +35639,7 @@ function runScreener() {
            all still work and are still covered by the runtime suite. Same precedent as v451
            (Govt NPV), v517 (IRR) and v623: the fix for a control that answers the wrong question
            is to delete it, not to label it. -->
-      <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
+      <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}${reformSet ? `<span class="sc-reform-chip">${_scReformChip(d.country)}</span>` : ''}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
       <td class="num" title="${(typeof window._takeBasisAttr === 'function') ? window._takeBasisAttr() : 'Production-weighted where coverage data exists.'}">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
@@ -37747,7 +37817,14 @@ function _iocDownsideCell(country) {
 // — and _rrTokenTier() for its colour, so this tab cannot drift from Fiscal Compare, the
 // Country Profile sidebar or the Reform Risk card the way the v468 chip had. It renders on
 // EVERY row, and where there is no sourced log it says n/c rather than nothing.
-function _iocReformChip(country) {
+// v906 (T4): generalised so a second table can render it without a second copy.
+// The only surface-specific thing in the chip was the closing sentence of its tooltip, which
+// named "this operator's position" — true on the IOC Portfolio, wrong anywhere else. That
+// sentence is now an argument. Everything that decides what the chip SAYS — _rrClassify() for
+// the verdict, _rrTokenTier() for the colour, _rrScores() for the year — is untouched and
+// still lives in one place, which is the whole point: v660/v728/v730/v884/v905 were five
+// cycles each finding one more surface that had grown its own copy of a shared reading.
+function _rrRowChip(country, ctxSentence) {
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
   // Fetch not landed / failed. Do not assert n/c — that is a claim about coverage, and it
   // would be false. Say nothing until the file is here.
@@ -37781,11 +37858,20 @@ function _iocReformChip(country) {
     + '. ' + _icPlain(v.icRule)
     + ' Same classification the Fiscal Compare Reform verdict column, the Country Profile reform '
     + 'sidebar and the Reform Risk card print for this country — all four call _rrClassify(). '
-    + 'Jurisdiction-level: it is a property of the country, not of this operator’s position in it.';
+    + (ctxSentence || '');
   return '<span style="display:block;margin-top:2px;font-size:10px;font-weight:800;color:' + tier.col + ';'
     + 'letter-spacing:.02em;cursor:help;' + (tier.dotted ? 'border-bottom:1px dotted ' + tier.col + ';' : '') + '" title="'
     + _iocEvEsc(tip) + '">' + _iocEvEsc(v.icToken)
     + '<span style="font-weight:400;color:var(--muted);"> · ' + v.since2010 + ' chg' + yrTxt + '</span></span>';
+}
+
+// v906 (T4): exported, because this region is not global scope — the Screener's own caller
+// lives beside runScreener() and reaches the renderer through window rather than copying it.
+window._rrRowChip = _rrRowChip;
+// The two callers. Each names what the chip is a property of on ITS table; nothing else differs.
+function _iocReformChip(country) {
+  return _rrRowChip(country,
+    'Jurisdiction-level: it is a property of the country, not of this operator\u2019s position in it.');
 }
 
 // The portfolio roll-up of the same four states, in the stat strip, so the analyst reads the

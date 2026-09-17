@@ -58458,3 +58458,124 @@ no way to reach.
 Cold load → Explorer → sort **Evidence (weakest first)** → the EVIDENCE column.
 
 Four country tables on this platform show an evidence grade. Three already print, on the same line as the letter, how many of the fiscal terms the DCF actually runs have a citation behind them — C
+
+---
+## Cycle 817 Log — 2026-09-17 18:05
+- Test before: 355 PASS / 0 FAIL
+- Test after: **353 PASS / 0 FAIL / 1 WARN** (read from the suite's own report file)
+- JS errors: 0 page errors; 1 console 404 (service worker) present before this change
+- Summary: Cycle 817 complete, shipped as **v906** and pushed.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation:
+811 T4 → 812 T5 → 813 T1 → 814 T2 → 815 T3 → 816 T6)
+
+## Friction
+Cold load → **Screener** → preset **"Stable Fiscal Record — ≤1 sourced fiscal law change since
+2010 · Take ≤70%"**. This is the one preset on the platform built for T4, and it is the shortest
+path an analyst with 20 minutes takes to the question.
+
+It returns 11 countries. The results table (`#tbl-screener`, row template at `index.html:35572`)
+has twelve columns — #, Country, Region, Mechanics, Govt Take, Evidence, Contractor NPV,
+NPV @ $50, Prod Cov, Swing, Tier — and **not one of them is the reform record.** The single axis
+the analyst just screened on is the single axis the shortlist does not print, so all eleven rows
+read as equally stable.
+
+They are not. Measured against the shipped `reform_history.json`:
+
+| row | country | sourced reform record |
+|---|---|---|
+| 4 | **Ecuador** | 3 take rises, **+55pp cumulative** — 2008 +35pp, 2010 +5pp (PSC→RSC forced conversion). Reform Risk calls it *net-tightening against the contractor*. |
+| P4 | **Russia** | 2022 windfall tax **+15pp** — this platform's *own* worked example, printed in the Reform Risk intro strip, of why a count is not a magnitude. It passes a "≤1 change" filter because +15pp is one change. |
+| P2 | **Algeria** | **+35pp cumulative**, last rise 2005. Scores **100/100**, top of the scale, purely because the window opens in 2010. |
+| 3 | **Colombia** | 2 rises, +8pp, net-tightening. |
+
+The filter is not wrong — it counts what it says it counts, and `_reformNote` (v662) already names
+what was *dropped*. Nothing said anything about what was **kept**, and that is the list that goes
+to the IC. Three other surfaces (Fiscal Compare's Reform verdict column, Country Profile's reform
+sidebar, IOC Portfolio's row chip since v880) already print this verdict per row. The Screener,
+which owns the preset named for the task, was the fourth surface without it.
+
+## Change
+- **Reform verdict under each country name on the Screener**, and *only* when the reform axis is
+  actually engaged (`reformSet` truthy — set by the preset or by the Advanced-Filters Reform
+  Record select). Default screens are untouched and no wider; verified 0 chips on a cleared screen.
+- **A roll-up of the surviving shortlist in the count bar**, in the two colours that mean "this
+  changes a number". On the Stable Fiscal Record screen it now reads, live:
+  *"on this list: **2 raised take inside the window** (Ecuador TAKE +5pp, Russia TAKE +15pp) ·
+  **2 rewrote terms in-window, size never quantified** (India, Iraq) · **5 last raised take BEFORE
+  2010** — quiet only because the window starts there · 2 clear."*
+  Two of eleven rows on the platform's stability preset are clean.
+- **No new rule, no new threshold, no new column.** Both render `_rrClassify()`'s own `icToken`
+  and `_rrTokenTier()`'s own colour — the same verdict the other three surfaces print.
+- Rather than typing a fifth copy of the chip, `_iocReformChip()` was **generalised into
+  `_rrRowChip(country, ctxSentence)`** with the one surface-specific sentence as an argument.
+  Two thin callers, one renderer. This is the debt v905's log named: v660/v728/v730/v884/v905 were
+  five consecutive cycles each finding one more surface that had grown its own copy of a shared
+  reading.
+
+## Result
+An analyst who loads the preset named **Stable Fiscal Record** can now see, without leaving the
+Screener, that only 2 of its 11 countries carry a clean reform verdict — that Ecuador and Russia
+raised government take *inside* the scoring window, that India and Iraq rewrote terms whose take
+effect was never quantified, and that 5 more are quiet only because the window opens in 2010.
+Previously that required leaving the Screener, opening Reform Risk, and typing each of the eleven
+countries into the country lookup one at a time.
+
+## Verification
+- **JS syntax gate: PASS** (11 inline blocks, `node --check`).
+- **Playwright runtime suite RAN this cycle** against the shipped build on a local server:
+  **353 PASS / 0 FAIL / 1 WARN**, read from `/tmp/runtime_test_report.txt` after confirming its
+  mtime matched the run. The 1 WARN and 1 JS error are the same service-worker `404` present on
+  the cold walk *before* any edit — a local-server artifact, not a page error.
+  **Caught a stale read of that report on the way.** A first `cat` returned `PASS: 354 … JS
+  errors: 2` stamped `18:41:33Z`, which was a *previous* run's content read mid-write. That is
+  exactly the failure mode `~/CLAUDE.md` records for cycles 404/405 — a killed or unfinished run
+  reporting the prior run's number. The figure above is the one whose in-file timestamp
+  (`22:32:16Z`) matches its mtime (`17:32:16` CDT) to the second.
+- **The −2 against the 355 baseline in the cycle prompt is NOT attributed, and I am not claiming
+  it is unrelated to this change.** A control run of the same suite against `git show
+  HEAD:index.html` (full asset tree, index.html the only variable) was started and reached only
+  32 PASS / 0 FAIL in ~30 minutes — roughly half the throughput of the main run on the same
+  machine — and was stopped to keep the cycle from overrunning further. Its terminal line reads
+  63 PASS / 44 FAIL; **those 44 are the SIGTERM cascade after the browser was killed, not
+  results, and must not be read as a baseline.** What is established: 0 FAIL on the shipped
+  build, and byte-identical value parity below. What is not: whether 353 vs 355 is this change,
+  or the harness (the prompt's baseline is produced by the cycle runner against its own URL;
+  this run used an ad-hoc `127.0.0.1:8901`, and several suite blocks are conditional on assets).
+  Attributing it is the second thing to do next cycle, after the export gap.
+- **No value moved.** Screener cell text diffed pre/post against `git show HEAD:index.html` served
+  on a second port, across the default screen, `lowrisk` and `iochurdle`: **byte-identical on all
+  three** (187 / 12 / 15 rows) once the added chip is excluded. No take, NPV, rank, order, filter
+  result or row count changes.
+- **IOC Portfolio unaffected** by the shared-renderer refactor — verified live: 118 rows, 37 chips,
+  original tokens and its own closing tooltip sentence intact.
+- **Mobile 390x844 `hasTouch`:** no horizontal scroll on any of 10 tabs (390/390); 11 added chips,
+  heights 24–31px, **0 under 24px**. Desktop 1920/1440/1280/1024/768: no horizontal scroll, 0 errors.
+
+## Debt found this cycle, NOT fixed
+- **`_rrRowChip` and its whole neighbourhood are not in global scope.** `_iocEvEsc`,
+  `_iocDownsideCell`, `_iocReformStat` and `_iocReformChip` all evaluate inside a nested scope
+  inside the single 23338–63658 `<script>` block, so a caller elsewhere in that block gets
+  `ReferenceError` despite hoisting. This cycle worked around it with `window._rrRowChip = …`.
+  Nothing marks the boundary and nothing detects a crossing; the next cycle that reaches for one
+  of those four functions will hit the same wall and will have to rediscover it.
+- **The reform chip is conditional on the reform filter.** That is deliberate — it keeps the
+  default 185-row screen no wider and free of 164 grey n/c lines. But it means an analyst who
+  screens on take and NPV alone still gets no reform signal, and there is no cue telling them the
+  axis exists. Whether the Screener should surface reform unprompted is a real question and is
+  left open rather than answered unilaterally.
+- **Screen/export parity gap, created by this change.** The XLSX/CSV export already carries the
+  reform *criterion* (`crit.push('Reform record: …')`), but not the per-row *verdict* this cycle
+  added to the screen. So an analyst who exports the Stable Fiscal Record shortlist for an IC
+  attachment gets back the eleven rows without the two lines that say Ecuador and Russia raised
+  take inside the window. The directive's finalization criterion 5 ("every export … carries the
+  assumptions behind its numbers") is not met for this new field. Deliberately not fixed in the
+  same cycle: the export path is covered by the runtime suite, which was already mid-run against
+  this build, and changing it would have invalidated the number reported above. It is the first
+  thing to fix next.
+- **`Reform Frequency Score ≤ 20` is unreachable.** The Reform Risk intro strip and the Fiscal
+  Compare column tooltip both state the IC rule as "5–8pp and a probability-weighted NPV at
+  Score ≤ 20". Score = 100 − 15 × changes since 2010, so ≤20 needs ≥6 changes, and the most-reformed
+  jurisdiction on file is the UK at 5 (score 25). That branch has never fired and cannot fire on
+  the current data. Not touched this cycle — it is a documented rule, not a defect in the walk.
