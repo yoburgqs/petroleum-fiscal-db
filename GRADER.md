@@ -57297,3 +57297,16 @@ $125: 1 row → 0.
   but a preset that returns nothing at one of its four decks may be better re-stated as a fixed
   $75→$50 axis that does not follow the deck at all. The v699 decision to make it deck-following
   is defensible and was left in place; flagging rather than reversing it.
+
+---
+## Cycle 807 Log — 2026-09-17 05:09
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here is the summary.
+
+## Cycle 807 — v896
+
+**Task: T1** — "Which countries should even be on my screening list?" (last cycle was T5)
+
+**Friction.** Walking Screener → price deck → Downside Resilience cold, I first checked the preset machinery itself: all 11 presets against their own menu counts at all four price decks — **44 of 44 agree**, and the menu line, the active-preset chip and the column sub-head are all deck-aware. The defect wasn't the count. It was *which ro
