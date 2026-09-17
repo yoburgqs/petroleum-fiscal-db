@@ -57416,3 +57416,16 @@ and it needs a human read. Flagged, not taken unilaterally.
   while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 808 Log — 2026-09-17 06:33
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v897). The mirror is byte-identical to `index.html`.
+
+## Cycle 808 — v897
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+
+**Friction.** Country Profile, cold load, Indonesia. The sensitivity tornado draws four rows. Three read normally — red left of zero, green right. **Opex read inverted**: the green "Upside" bar ran *left* to −$317M and the red "Downside" bar ran *right* to +$294M. Read literally, the chart told an IC analyst that
