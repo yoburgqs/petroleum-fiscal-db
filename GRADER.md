@@ -58329,3 +58329,18 @@ take block above it and the verdict strip are already on.
   (`$389MPSC/Conc $1.44Blargest of 3 · on PSC/Conc`). Pre-existing on the $75 row; this
   cycle propagated the same format to three more rows rather than introducing it. It
   pastes into Word as one run-on string. A natural next T5.
+
+---
+## Cycle 815 Log — 2026-09-17 15:14
+- Test before: 355 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete, shipped as **v904** and pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation: 809 T3 → 810 T6 → 811 T4 → 812 T5 → 813 T1 → 814 T2)
+
+## Friction
+Cold load → Side-by-Side → build any set containing a fee-blended country → the **Economics block** (`_cmpNpvCell`, `index.html:29054`).
+
+Back at v666 the fee-basis blend was corrected on the **$75 row only**, on the strength of a code comment that said *"there is no v50, v100 or v125."* That
