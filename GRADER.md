@@ -56959,3 +56959,111 @@ click handler, no tab stop, not controls. Recording the numbers rather than clai
 ## Cycle 803 — summary
 
 **First, the 5 FAIL were not a product regression.** Cycle 802 timed out at 1800s after making its change and writing its assertions but before committing. The suite tests the *deployed* URL, so its new assertions were red for one reason: the fix had never shipped. I verified the stranded work against the local tree (328 PASS / 0 FAIL) and committed it as **v892** — the Fiscal Predictability badge printed a score and a band word but
+
+---
+## Cycle 804 — shipped as v894 (`08afcfe`), pushed, mirror byte-identical
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation:
+803 was T2, 801 T6, 800 T1, 799 T3, 798 T5, and T4 was last walked at 795.
+
+## Friction
+Walked cold at 1440×900, `sessionStorage` and `localStorage` cleared. T4's analyst arrives
+with a country, so the walk was Country Profile → pick a country → read the headline strip,
+which is where that page states reform exposure. I read the chip for **all 21 jurisdictions
+that carry a sourced reform log**, not a sample.
+
+The chip (`_stabGlyph344`, index.html ~41459) drew the in-window reform count as a
+**5-diamond scale**. Diamonds are `5 − count`, and a count is not a magnitude, so it ranked:
+
+| country | chip pre-change | what is actually on file |
+|---|---|---|
+| Libya | **◆◆◆◆◆** | 1971 nationalization, +35pp; verdict `↑ PRE-2010` |
+| Algeria | **◆◆◆◆◆** | 2005 windfall tax, 2 rises on record, +35pp cumulative |
+| USA / Colombia | **◆◆◆◆◆** | last take rise 2007 |
+| Venezuela | **◆◆◆◆◇** | Orinoco nationalized 2007, forced IOC conversion, +55pp |
+| Norway | **◆◆◆◇◇** | 2020 relief, 2022 restore — net **0pp** inside the window |
+
+**Venezuela outranked Norway, and Libya swept.** This is the identical failure that made
+Fiscal Compare **delete** its diamond-count column at v744 — its own header says so: the count
+"put Libya and Algeria at a full ◆◆◆◆◆ and Norway below them."
+
+v843 had already de-coloured these diamonds and put `_rrClassify()`'s verdict pill beside them.
+It did not settle the read, and **the tooltip it left behind is the admission** — it opened
+*"READ THE TOKEN, NOT THE DIAMONDS."* Measured, not inferred, at 1440×900:
+
+| element | font | order | width |
+|---|---|---|---|
+| diamonds `◆◆◆◆◆` | **13px** | **first** | 45–52px |
+| verdict token `↑ PRE-2010` | **10px** | second | 73–92px |
+
+The element the tooltip instructed the analyst to ignore was **30% larger and read first**; the
+element it instructed them to read was the smallest text in the chip, and the instruction itself
+only existed on hover — which a first-time analyst on a 20-minute screening run does not do.
+Grey does not stop a five-position scale from being a rank.
+
+## Change
+The scale is **removed**, not re-coloured and not re-thresholded. The verdict token takes first
+position at **12px** (was 10px, second). The chip now reads:
+
+    pre :  Stability: ◆◆◆◆◆↑ PRE-2010 (0 fiscal law changes since 2010 · …)
+    post:  Stability: ↑ PRE-2010 (0 fiscal law changes since 2010 · …)
+
+Nothing factual is lost — the diamonds **were** the count re-encoded, and `_stabSub344` already
+printed that count in words three words to the right. What goes is the one encoding shaped like
+a ranking. `_stab344` survives as a *number* for `_cpIcMemo454`'s `stab <= 1` branch; the glyph
+loop is deleted. The red `!` keeps its v583 scope untouched (5 of 21). The `n/c` arm for the 164
+uncovered jurisdictions is untouched. A fallback was added so a covered country whose classifier
+is unavailable at paint time prints the count in words rather than an empty chip. Both tooltip
+IC ladders are restated in counts, since there are no diamonds left to count in.
+
+## Result
+An analyst reading Libya's profile sees **`↑ PRE-2010`** as the first and largest thing in the
+chip instead of a perfect five-of-five, and **can no longer rank Venezuela above Norway on fiscal
+stability from the headline strip.** Fiscal Compare's Reform verdict column, the Reform Risk tab
+and this chip now print the same verdict in the same shape — which is what FC's own column header
+has *claimed* since v744 ("the three surfaces cannot give you three different premiums").
+
+## Verification — every number below was produced this cycle
+- **Runtime suite RAN.** **338 PASS / 0 FAIL / 1 WARN**, report timestamped
+  `2026-09-17T06:08:42.323Z`. The 1 WARN and 1 JS error are the pre-existing local-server 404
+  on the service-worker fetch, present in prior runs.
+- **5 new assertions, executed against BOTH builds:** **4 FAIL pre-change / 5 PASS post-change.**
+  They assert three things per country — no `◆`/`◇` glyph survives; the verdict token leads and
+  no larger glyph precedes it; the raw count is still on screen. The 5th (Saudi Arabia `n/c`)
+  guards against *over*-firing and passes on both builds by design.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures; re-run after the
+  v893→v894 bump. Live version strings only (`<title>` line 42, `#hdr-version` line 2567).
+- **Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768** — clean, 9/9 tabs at every width, each
+  measured from a fresh context. (A 1024 `t5` overflow in an earlier pass was my harness resizing
+  without a reload; re-measured cold on both builds it is clean. Recording it rather than hiding it.)
+- **Mobile 390×844, `hasTouch: true`** — 9/9 tabs `scrollWidth` 390 = `clientWidth` 390, 0 page
+  errors. Chip 44px tall, verdict token 23px.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." On `t7`, the tab changed:
+  `small-touch-target` **0** vs baseline 3, `clipped-text` **1** vs baseline 1. All 5 reported
+  findings are pre-existing baseline entries on `thome`, `t0` and `t7`; none on the stability chip.
+
+## Debt CLEARED this cycle
+- **The two runtime-suite copies are byte-identical again.** They had been diverged for five
+  cycles and the cycle runner printed the warning on every run. Diffed before touching anything:
+  the graded `office` copy was a **strict superset** — the `petroleum-fiscal-db` copy had **zero**
+  unique lines — so syncing office → repo lost nothing. Both `node --check` clean afterwards.
+
+## Carried forward
+- **`autonomous_cycle.py` has no partial-work guard.** Cycle 802 timed out mid-cycle and left a
+  dirty tree whose tests asserted behaviour the deployed build did not have. Carried from 803.
+- Scenario Builder prints IRRs of 275.3% (Guyana) and 154.8% (Indonesia) full-size **in green**,
+  the colour it uses for a good return, while `_sbReturnReading()` already classifies them as
+  `inflated`. An inflated IRR is not a good IRR. Plausibly the next T2. Carried from 803.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country, so no fee-blended column can show
+  a true comparable IQR. Carried from 799–803.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–803.
+- Scenario Builder's base case is still fixed to the first saved scenario with no way to
+  re-designate it. Carried from 798–803.
+- **Still open, still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a
+  **$27–$34** spread while that tab's own card says breakeven "does not rank them". Carried from 801.
+- **Noted this cycle, not fixed:** FAQ A-text still instructs "Filter to Stability ≥4 dots" and
+  "Stability Score (1–5 dots in Explorer)" in several places. Those are FAQ strings, frozen at 974
+  and text-only, so they were left; but they now name a scale that no longer exists on the Country
+  Profile chip. Worth a sweep on a cycle that is touching the FAQ surface anyway.
