@@ -57951,3 +57951,16 @@ that shortlist, it previously could not.
   spread while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 812 Log — 2026-09-17 11:06
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 812 complete and pushed as **v901**.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Rotation: 811 T4, 810 T6, 809 T3, 808 T2, 807 T1 — T5 was stalest, last run at 806.)
+
+## Friction
+Screener, cold load at 1440×900, storage cleared. The tab exists to build an IC shortlist and it explicitly asks the analyst to hand-pick one — the button tooltip says *"Tick rows in the left-hand column to copy just those,"* and the copy-confirm toast repeats it. So: preset **IOC 
