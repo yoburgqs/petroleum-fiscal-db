@@ -58108,3 +58108,18 @@ belongs on a screening list, they previously could not.
   spread while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 813 Log — 2026-09-17 12:28
+- Test before: 344 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 813 complete and pushed as **v902**.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (T5 ran last cycle; T1 was stalest, last run at 807.)
+
+## Friction
+Cold load, storage cleared. Home → **"open the screen →"** → IOC Capital Screen → price deck **$100** → **12 countries** → the Screener's own **🔗 Copy Link**.
+
+The link was `#/screener/iochurdle` and the toast said *"opens the Screener with this preset applied."* Opened cold in a second browser, that link returns **
