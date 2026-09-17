@@ -57536,3 +57536,20 @@ is precisely the Group-2 error this platform exists to prevent.
   spread while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 809 Log — 2026-09-17 07:33
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 809 complete and pushed (v898).
+
+## Task
+**T3** — "How do these three countries compare side by side?" Last walked at cycle 799; 808 was T2.
+
+## Friction
+Side-by-Side, cold load, storage cleared. The tab preloads North Sea Trio, so the four curated benchmark sets are reached via **Clear**. On that menu, the **USA vs Iraq** button read:
+
+> `23–34% take @ $75 · all 2 comparable`
+
+Both halves were wrong the same way. `_sbsCmpTake()` silently re-bases a Group-2 (TSC/RSC/Buy-back) column onto i
