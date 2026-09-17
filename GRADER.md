@@ -58344,3 +58344,102 @@ take block above it and the verdict strip are already on.
 Cold load → Side-by-Side → build any set containing a fee-blended country → the **Economics block** (`_cmpNpvCell`, `index.html:29054`).
 
 Back at v666 the fee-basis blend was corrected on the **$75 row only**, on the strength of a code comment that said *"there is no v50, v100 or v125."* That
+
+---
+## Cycle 816 Log — 2026-09-17 21:30
+- Test before: 355 PASS / 0 FAIL (deployed baseline as reported to the cycle)
+- Test after: **353 PASS / 0 FAIL / 1 WARN** — suite RUN this cycle against the local build.
+  Pre-change build, same host, same command: **353 PASS / 0 FAIL / 1 WARN**. Identical, so the
+  change costs nothing. The 353-vs-355 gap and the single WARN are localhost artefacts — the
+  service worker cannot register off the deployed origin — and were reproduced on the
+  unmodified build before the number was recorded.
+- JS errors: 1, pre-existing (the same sw.js 404), reproduced on `git show HEAD:index.html`.
+- Summary: shipped as **v905** and pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation:
+810 T6 → 811 T4 → 812 T5 → 813 T1 → 814 T2 → 815 T3)
+
+## Friction
+Cold load → Explorer → sort **Evidence (weakest first)** → the EVIDENCE column
+(`getEvidenceBar`, `index.html:24084`; cell at `:26937`).
+
+Four country tables on this platform show an evidence grade, and three of them already say, on
+the same line as the letter, how many of the fiscal terms the DCF actually runs have a citation
+behind them — the Country Profile badge (v660), the Fiscal Compare drawer (v728), the Screener
+(v730) and the Fiscal Compare table (v884). Side-by-Side carries it as its own row. **The
+Explorer did not — and the Explorer is the only one of them whose evidence column SORTS.**
+
+That is what made it the worst of the four to be missing. `flt-sort` offers "Evidence (weakest
+first)", the header is clickable, and v854 prints the direction under the row count. This is the
+one surface where an analyst does not merely *read* a grade — they ask the platform to **rank**
+on it and then work the top of the list. The rank is `_evidenceSortVal()`: grade, then
+primary-law share, then fact depth, all three computed over the country's **whole** fact base,
+which is mostly contract metadata the model never reads. The Explorer also had **no route to the
+Evidence Chain at all** — the other three tabs all click through to it.
+
+Measured live against the shipped build, over all 185 rows, on `_fcTermLeg()`'s own rule. The 22
+production-backed rows are the block read first, because "Verified production first" is checked
+by default:
+
+| Evidence sort, weakest first | grade | model terms cited |
+|---|---|---|
+| 1. Iraq | D | 1 of 3 (33%) |
+| 3. Kazakhstan | C | **4 of 5 (80%)** |
+| 7. Mexico | C | 3 of 4 (75%) |
+| 19. Brazil | A | 2 of 4 (50%) |
+| 22. Canada | A | **2 of 4 (50%)** |
+
+Kazakhstan is filed third-weakest and cites 80% of its model terms. Canada closes the list as the
+best-evidenced producer on the platform and cites half of its. **66 of the 159 cross-grade pairs
+inside those 22 rows are ordered backwards on the terms axis — 41.5%.** Over all 185: **1,851 of
+12,063 cross-grade pairs (15.3%) invert**, 13 of the 28 A-graded countries cite half or fewer,
+and the Netherlands — grade A, 97% primary law — cites **1 of 4**, its uncited terms including
+the royalty rate.
+
+## Change
+- Every Explorer Evidence cell now carries the same **"N of M terms cited →"** chip, in the same
+  words, with the same destination as the other three tabs: it opens that country's **Evidence
+  Chain**, scrolled to the term-by-term table. Verified end to end — clicking Iraq's chip lands
+  on `KEY FISCAL PARAMETERS — EVIDENCE CHAIN` at 115px with the Income Tax Rate row in view.
+- Hydrated lazily per row against `api/v1/country/<slug>.json` (~11 KB), reusing `_scFillTermChip`
+  rather than duplicating it — the filler now reads its chip class off `data-tc-class`. Observer
+  **rooted on the `.tbl-wrap` scroller and targeting the `<tr>`**, the two corrections v730 and
+  v900 each had to make on this table: Evidence is the 8th of 19 columns on a wrap that scrolls
+  horizontally, so the cell reports ratio 0 on a narrow screen even when its row is on screen.
+- On the Evidence sort only, the result-set line now **names the axis it is not ranking on** and
+  carries a live count of how many resolved rows cite half or fewer — counted off the chips
+  actually on screen and labelled as such, never a total it has not measured (silent under 5).
+
+## Result
+An analyst who ranks 185 countries weakest-evidence-first can now see that the ordering is on the
+whole fact base and **not** on whether the terms behind the take were cited, tell the two apart
+row by row, and click straight through to the Evidence Chain — which the Explorer previously had
+no way to reach.
+
+- **No value moved.** The Explorer table's full cell text was diffed pre/post across the take,
+  npv, npv50, swing, evidence and stability sorts, by rendering `git show HEAD:index.html` on a
+  second port: **byte-identical on all six** once the added chip is excluded. No grade, letter,
+  percentage, fact count, take, NPV, order or filter result changes.
+- **The other three surfaces are untouched** by the shared-filler refactor — verified live:
+  Screener still renders 17 `.sc-terms-chip`, Fiscal Compare 16 `.fc-terms-chip`, Side-by-Side
+  its "Model terms cited" row, all with their original classes and text.
+- Mobile 390x844 `hasTouch`: no horizontal scroll on any of 9 reachable tabs (390/390);
+  **15 added chips, 0 under 24px** — 44px each. Desktop 1920/1440/1280/1024/768: no horizontal
+  scroll.
+
+## Debt found this cycle, NOT fixed
+- **The parity gap took five cycles to close and nothing detects the next one.** v660, v728, v730
+  and v884 each found one surface printing the grade without the terms leg; v905 found the fifth.
+  There is no assertion that a surface rendering `getEvidenceBar()` also renders a terms slot —
+  the same class of fault as the stale comment v904 found, and the same answer: a cheap check
+  against the DOM rather than a fifth cycle of noticing. `getEvidenceBar()` has two remaining
+  callers without a slot (`index.html:37435` Side-by-Side, which carries the leg as its own row
+  and is fine, and `:45385` in the IOC recommended table, which does **not** and is a candidate).
+- **The Evidence sort still ranks on the grade.** This cycle made the divergence *visible* rather
+  than resolving it — deliberately, since v900's rule is that the order must agree with what the
+  cell prints, and the cell prints the grade. Whether the column should offer a second ordering on
+  the terms axis is a real question and is left open rather than answered unilaterally.
+- **19 countries cite ZERO model terms** (Ascension Island, Cook Islands, Micronesia, Nauru,
+  Paraguay, Somalia, Tuvalu and 12 more — all grade D). Their chip renders "0 of N" in red, which
+  is correct, but nothing upstream stops them entering a screening set.
