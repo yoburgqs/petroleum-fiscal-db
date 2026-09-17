@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v903</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v904</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -28935,17 +28935,14 @@ function renderCompare() {
             : '')
         + (onG1
             ? 'This marker ranks the PSC/Conc figure directly above it, NOT the blended '
-              + fmtNpvShared(d.npv_75) + ' headline at the top of the cell — that headline averages in '
+              + fmtNpvShared(d['npv_' + price]) + ' headline at the top of the cell — that headline averages in '
               + 'fee-basis contracts where the contractor is paid a fixed $/bbl remuneration, and ranking '
               + 'it can invert this order. '
             : (r.reb
                 ? 'At least one column in this set is placed on its PSC/Concession contractor NPV rather '
                   + 'than its blended headline, which is the only basis on which it is comparable with the rest. '
                 : ''))
-        + (r.blocked
-            ? 'ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 rows in this '
-              + 'set carry no ordering marker rather than an ordering built on the blended figure. '
-            : '')
+        + (r.blocked ? '' : '')
         + 'Read this against the Govt Take ($' + price + '/bbl) row above: where take and value do not order '
         + 'the set the same way, the verdict strip at the top of the tab flags it, and the difference is in '
         + 'the SHAPE of the take, not in the size of the prize.')
@@ -29031,42 +29028,68 @@ function renderCompare() {
     // a finding about the regime. The gate's own sub-line still prints beside it and says on what
     // basis. Rides the shared `rows` array into #cmp-data-table, so Export PDF and both
     // Copy-for-IC-Memo flavours carry it too.
+    // v904 (T3): the sign marker has to know which basis it is judging.
+    //
+    // Malaysia is the only column in the database where this collides, and it collides on exactly
+    // the row an IC reads first. Its BLENDED npv_50 is -$33M, which fires this elimination; its
+    // Group-1 (PSC/Concession) v50 is +$46M, positive. 385 of Malaysia's contracts are PSC and 106
+    // are fee-basis, and it is the fee-basis mean that drags the blended figure under zero. So the
+    // platform was printing a binary "does not survive a downturn" verdict against a country whose
+    // comparable terms do survive it. The marker is kept -- the blended figure is still published
+    // and still negative -- but where a comparable figure exists at this price and is positive, it
+    // states that the crossing belongs to the blend rather than to the terms.
+    const _npvStE = _cmpMixStat(d);
+    const _npvG1Here = (_npvStE.blended && _npvStE.g1 && _npvStE.g1['v' + price] != null)
+      ? _npvStE.g1['v' + price] : null;
     const _npvNeg = (typeof v === 'number' && v < 0);
+    const _npvNegRescued = _npvNeg && _npvG1Here != null && _npvG1Here >= 0;
     const _npvPlain = fmtNpvShared(v);
     const _npvBase = _npvNeg
       ? '<span style="color:var(--negative);font-weight:700;">' + _npvPlain + '</span>'
       : (_npvGate ? '<span style="color:var(--muted);">' + _npvPlain + '</span>' : _npvPlain);
     const _npvNegLine = _npvNeg
-      ? '<span style="display:block;font-size:10px;font-weight:700;color:var(--negative);cursor:help;" title="'
-        + _cmpEsc(d.country + ': contractor NPV is NEGATIVE at $' + price + '/bbl \u2014 ' + _npvPlain
+      ? '<span style="display:block;font-size:10px;font-weight:700;color:var('
+        + (_npvNegRescued ? '--muted' : '--negative') + ');cursor:help;" title="'
+        + _cmpEsc(d.country + ': the BLENDED contractor NPV is negative at $' + price + '/bbl \u2014 ' + _npvPlain
           + ' on the standardized Deepwater profile every column here is run on. '
-          + (d.npv_75 != null && d.npv_75 > 0
-              ? 'The same country returns ' + fmtNpvShared(d.npv_75) + ' at $75/bbl, so this is a SIGN CHANGE inside the published price deck, not a weak result. '
-                + 'ORCA models a negative contractor NPV at $50/bbl for 2 of 185 countries and for none at $75, $100 or $125, so a column that crosses zero here is a '
-                + 'two-in-185 case and not a matter of degree. '
-              : '')
-          + 'This platform screens the crossing as a pass/fail elsewhere: the Screener carries a '
-          + '"Set $0 \u27f5 survives $50/bbl" control whose stated rule is that a regime NPV-positive at $75 and negative at $50 '
-          + 'does not survive a downturn. Ranking this column on its $75 figure alone states the opposite of what the downside row says. '
-          + 'Carry the sign change into the memo beside the base case.')
-        + '">\u25bc value-negative at $' + price + '</span>'
+          + (_npvNegRescued
+              ? 'On the comparable PSC/Concession basis printed below this line it is '
+                + fmtNpvShared(_npvG1Here) + ' \u2014 POSITIVE. ' + Number(_npvStE.n2).toLocaleString()
+                + ' of this column\u2019s contracts are fee-basis (' + _cmpMechBare(_npvStE, 2)
+                + '), where the contractor is paid a fixed $/bbl remuneration and the DCF returns a far '
+                + 'smaller position; averaging those in is what puts the blended figure under zero. '
+                + 'So the crossing is a property of the BLEND, not of the terms you would be signing. '
+                + 'Do NOT carry this column into the memo as failing a $' + price + '/bbl downside screen '
+                + 'without saying which basis the test was run on \u2014 on the comparable basis it passes. '
+              : ((d.npv_75 != null && d.npv_75 > 0)
+                  ? 'The same country returns ' + fmtNpvShared(d.npv_75) + ' at $75/bbl, so this is a SIGN CHANGE inside the published price deck, not a weak result. '
+                    + 'ORCA models a negative contractor NPV at $50/bbl for 2 of 185 countries and for none at $75, $100 or $125, so a column that crosses zero here is a '
+                    + 'two-in-185 case and not a matter of degree. '
+                  : '')
+                + 'This platform screens the crossing as a pass/fail elsewhere: the Screener carries a '
+                + '"Set $0 \u27f5 survives $50/bbl" control whose stated rule is that a regime NPV-positive at $75 and negative at $50 '
+                + 'does not survive a downturn. Ranking this column on its $75 figure alone states the opposite of what the downside row says. '
+                + 'Carry the sign change into the memo beside the base case.'))
+        + '">' + (_npvNegRescued ? '\u25bc blended only \u2014 comparable basis is positive' : '\u25bc value-negative at $' + price) + '</span>'
       : '';
-    if (price !== '75' || v == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
-    const _npvSt = _cmpMixStat(d);
-    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
-    const _npvG1 = fmtNpvShared(_npvSt.g1.v75);
+    if (v == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
+    const _npvSt = _npvStE;
+    const _npvG1V = _npvG1Here;
+    if (_npvG1V == null) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
+    const _npvG1 = fmtNpvShared(_npvG1V);
     // Same convention as the take correction: print it only where it changes the number on screen.
     if (_npvG1 === _npvPlain) return _npvBase + _npvGate + _npvNegLine + _cmpNpvOrderMark(d, price, false);
     return _npvBase + _npvGate + _npvNegLine + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
-      + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $75/bbl across its '
+      + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $' + price + '/bbl across its '
         + Number(_npvSt.g1.n).toLocaleString() + ' production-sharing and concession contracts only. '
         + 'The ' + _npvPlain + ' above is an unweighted mean over all ' + (d.n != null ? Number(d.n).toLocaleString() : _npvSt.tot ? Number(_npvSt.tot).toLocaleString() : '?')
         + ' contracts, ' + Number(_npvSt.n2).toLocaleString() + ' of them fee-basis ('
         + _cmpMechNames(_npvSt, 2) + '), where the contractor is paid a fixed $/bbl remuneration and the '
         + 'DCF returns a far smaller position. Compare THIS figure against the other columns \u2014 it is the '
-        + 'contractor-side match to the PSC/Conc take printed on the Govt Take rows above, and ranking the '
-        + 'blended figure can invert the order those rows give you. ORCA holds the Group-1 split at $75/bbl '
-        + 'only, so the $50, $100 and $125 rows remain blended and are NOT on this basis.')
+        + 'contractor-side match to the PSC/Conc take printed on the Govt Take ($' + price + '/bbl) row above, '
+        + 'and ranking the blended figure can invert the order those rows give you. ORCA holds this '
+        + 'Group-1 split at all four published prices, so every Contractor NPV row carries it where it '
+        + 'changes the figure \u2014 read the whole block on one basis.')
       + '">PSC/Conc ' + _npvG1 + '</span>'
       + _cmpNpvOrderMark(d, price, true);
   };
@@ -30254,19 +30277,33 @@ function renderCompare() {
   // contractor NPV on the standardized deepwater profile is a cash result and is comparable.
   // That is the same treatment _cmpNpvCell and _cmpNpvBasisFlag already give it.
   //
-  // ORCA holds the Group-1 contractor-side split at $75/bbl ALONE — there is no v50, v100 or
-  // v125 — so this line is $75 only and says so. Ranking $50/$100/$125 would have to fall back
-  // on the blended figure, which is the inversion this exists to stop.
-  const _cmpRankNpv = (d) => {
+  // v904 (T3): the Group-1 contractor-side split is held at ALL FOUR published prices.
+  //
+  // v666 read g1.v75 and wrote "there is no v50, v100 or v125", and every surface downstream was
+  // built on that sentence: this ranker, the per-price ordering below, the green PSC/Conc sub-line
+  // in _cmpNpvCell, and four blocks of prose telling the analyst the other three rows "stay
+  // blended". The shipped country_data.json carries v50, v75, v100 AND v125 for all 11 fee-blended
+  // countries. Measured on Iraq, blended against comparable: $389M/$1,438M at $50, $642M/$3,043M at
+  // $75, $840M/$4,508M at $100, $1,046M/$6,038M at $125. Only the $75 row was ever corrected, so
+  // three of the four rows in the block the IC decision turns on published the fee-blended figure
+  // at full strength with no marker at all — beneath a Govt Take block that re-bases all four of
+  // its price rows. The page teaches "a green sub-line means the comparable basis", then omits it
+  // on the rows where the correction is largest, and the omission reads as "no correction needed".
+  // Read per price, from the same object, so the value block matches the take block row for row.
+  const _cmpRankNpvAt = (d, price) => {
     if (!d) return null;
-    const v = d.npv_75;
+    const v = d['npv_' + price];
     if (v == null) return null;
     if (isStateMonopoly(d.take_75)) return null;          // no contractor position to value
     if (_cmpBasisGate && !_cmpHasProd(d)) return null;    // v705's statutory-basis gate
     const st = _cmpMixStat(d);
-    if (st.blended) return (st.g1 && st.g1.v75 != null) ? st.g1.v75 : null;
+    if (st.blended) {
+      const g = st.g1 ? st.g1['v' + price] : null;
+      return (g != null) ? g : null;
+    }
     return v;
   };
+  const _cmpRankNpv = (d) => _cmpRankNpvAt(d, 75);
   const _vdVal = selected.filter(d => _cmpRankNpv(d) != null)
     .map(d => {
       const _v = _cmpRankNpv(d);
@@ -30289,14 +30326,15 @@ function renderCompare() {
   // Runs here, after _cmpRankNpv / _cmpMixStat / _cmpBasisGate are all established, so the grid's
   // markers and the strip's ordering are computed from one rule and cannot disagree.
   (function () {
-    // Is any column in this set fee-blended? If so, ORCA holds a comparable contractor NPV for it
-    // at $75 only, so $50 / $100 / $125 have no honest ordering and are left unmarked.
+    // v904 (T3): every price row now orders on the comparable basis, because the Group-1 split is
+    // held at all four. A fee-blended column no longer blocks the $50/$100/$125 orderings — it is
+    // placed on its own PSC/Concession figure at that price, exactly as $75 always was. A column
+    // that is blended and carries NO g1 value at this price still drops out via _cmpRankNpvAt.
     const _npvBlended = selected.some(d => d && _cmpMixStat(d).blended);
     _CMP_PRICES.forEach(pr => {
       _cmpNpvPriceRank[pr] = null;
-      if (pr !== 75 && _npvBlended) return;
-      const vals = selected.filter(d => d && _cmpRankNpv(d) != null)
-        .map(d => ({ c: d.country, v: pr === 75 ? _cmpRankNpv(d) : d['npv_' + pr] }))
+      const vals = selected.filter(d => d && _cmpRankNpvAt(d, pr) != null)
+        .map(d => ({ c: d.country, v: _cmpRankNpvAt(d, pr) }))
         .filter(x => typeof x.v === 'number');
       if (vals.length < 2) return;
       const srt = vals.slice().sort((a, b) => b.v - a.v);   // largest contractor NPV first
@@ -30312,10 +30350,16 @@ function renderCompare() {
         hiV: srt[0].v, loV: srt[last].v,
         gated: _cmpBasisGate,
         nCols: selected.filter(d => !!d).length,
-        // True only where the $75 ordering is placed on a re-based (PSC/Concession) figure for at
-        // least one column -- the case v600 established the marker must not sit above.
-        reb: pr === 75 && _vdValReb.length > 0,
-        blocked: _npvBlended
+        // True where THIS price's ordering is placed on a re-based (PSC/Concession) figure for at
+        // least one column -- the case v600 established the marker must not sit above. v904: read
+        // at the row's own price rather than at $75, so the $50/$100/$125 rows state their basis
+        // instead of inheriting the base case's.
+        reb: selected.some(d => {
+          if (!d || _cmpRankNpvAt(d, pr) == null) return false;
+          const pub = d['npv_' + pr];
+          return pub != null && fmtNpvShared(pub) !== fmtNpvShared(_cmpRankNpvAt(d, pr));
+        }),
+        blocked: false
       };
     });
   })();
@@ -30480,10 +30524,14 @@ function renderCompare() {
           + ' correct on their own basis — ' + (_vdValOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
           + ' in this set.</div>'
         : '';
+      // v904 (T3): was "$75/bbl only — ... the $50, $100 and $125 rows stay blended and are not
+      // ordered here". That was written at v666 from a stale reading of country_data.json and is
+      // false: the Group-1 split is held at v50, v75, v100 and v125 for all 11 fee-blended
+      // countries. The line now states the basis that IS in force across the whole block.
       const _valOnly75 = '<div style="font-size:10.5px;color:var(--muted);line-height:1.5;font-style:italic;">'
-        + '$75/bbl only — ORCA holds the PSC/Concession contractor-side split at the base case alone, so the $50, '
-        + '$100 and $125 Contractor NPV rows below stay blended and are not ordered here.</div>';
-      // The $75-only caveat earns its line only where a column is actually re-based; on a set with
+        + 'Re-based at every price — the column(s) above are ordered on their PSC/Concession contractor NPV, '
+        + 'not the blended headline, and all four Contractor NPV rows below carry that same basis.</div>';
+      // The re-basing note earns its line only where a column is actually re-based; on a set with
       // no fee-blended column the four price rows are all on one basis and there is nothing to warn about.
       return _h + _valAside + (_vdValReb.length ? _valOnly75 : '');
     })();
@@ -30517,18 +30565,36 @@ function renderCompare() {
       ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
         + '<strong style="color:var(--negative);">\u25bc Value-negative at the $50 downside \u2014 '
         + _vdDown.length + ' of ' + selected.filter(d => !!d).length + ':</strong> '
-        + _vdDown.map(d => '<strong style="color:var(--text);">' + _cmpEsc(d.country) + '</strong> '
-            + fmtNpvShared(d.npv_50) + ' at $50/bbl'
-            + (d.npv_75 != null && d.npv_75 > 0 ? ', against ' + fmtNpvShared(d.npv_75) + ' at $75' : '')
-            + ((_cmpBasisGate && !_cmpHasProd(d)) ? ' (statutory terms \u2014 the legal regime on the standard profile, not this country\u2019s own fields)' : '')
-          ).join('; ')
+        + _vdDown.map(d => {
+            // v904 (T3): name the basis the crossing is on. Malaysia's blended npv_50 is -$33M and
+            // its comparable PSC/Concession v50 is +$46M, so this line was asserting a pass/fail
+            // downside failure that the grid cell beneath it (and the platform's own comparable
+            // basis) does not support. Where the comparable figure exists and is positive, the
+            // crossing is reported as a property of the blend, matching _cmpNpvCell exactly.
+            const _st = _cmpMixStat(d);
+            const _g1 = (_st.blended && _st.g1 && _st.g1.v50 != null) ? _st.g1.v50 : null;
+            return '<strong style="color:var(--text);">' + _cmpEsc(d.country) + '</strong> '
+              + fmtNpvShared(d.npv_50) + ' at $50/bbl'
+              + (d.npv_75 != null && d.npv_75 > 0 ? ', against ' + fmtNpvShared(d.npv_75) + ' at $75' : '')
+              + ((_cmpBasisGate && !_cmpHasProd(d)) ? ' (statutory terms \u2014 the legal regime on the standard profile, not this country\u2019s own fields)' : '')
+              + (_g1 != null && _g1 >= 0
+                  ? ' \u2014 <strong style="color:var(--text);">blended figure only</strong>: on the comparable PSC/Concession basis it is '
+                    + fmtNpvShared(_g1) + ', positive, so the crossing comes from averaging in its '
+                    + Number(_st.n2).toLocaleString() + ' fee-basis contracts and not from the terms'
+                  : '');
+          }).join('; ')
         + '. Every ordering above is read at $75/bbl and none of them shows this. '
-        + 'ORCA models a negative contractor NPV for 2 of 185 countries at $50/bbl and for none at $75, $100 or $125, '
+        + 'ORCA models a negative BLENDED contractor NPV for 2 of 185 countries at $50/bbl and for none at $75, $100 or $125, '
         + 'so a column that crosses zero here is not a weaker result on the same scale \u2014 it is the price-break '
         + 'survival test this platform screens as pass/fail in the Screener\u2019s '
         + '\u201cSet $0 \u27f5 survives $50/bbl\u201d control. '
+        + (_vdDown.some(d => { const s = _cmpMixStat(d);
+              const g = (s.blended && s.g1 && s.g1.v50 != null) ? s.g1.v50 : null;
+              return g != null && g >= 0; })
+            ? 'Run that test on the basis you are ranking: a column marked \u201cblended figure only\u201d above passes it on its comparable terms and fails it only on the blend. '
+            : '')
         + (_vdDown.length === 1 ? 'Do not carry this column' : 'Do not carry these columns')
-        + ' into the memo on the $75 ordering alone; state the sign change beside it.</div>'
+        + ' into the memo on the $75 ordering alone; state the sign change and its basis beside it.</div>'
       : '';
     // ── v845 (T3): the way out of "NOTHING RANKS HERE". ──────────────────────────────────────
     //
@@ -30924,7 +30990,7 @@ function renderCompare() {
         // v666 (T3): the same correction now exists on the contractor side, so this instruction
         // names it. Without the pointer the analyst applies the basis to take and not to value --
         // which is the ranking inversion the Economics block used to publish.
-        + ' The <strong style="color:var(--text);">Price Swing</strong> row carries its own PSC/Conc figure for the same reason — a fee-basis take% barely moves with price, so the blended swing understates how progressive the comparable terms are. The <strong style="color:var(--text);">Contractor NPV @$75</strong> row carries the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 NPV rows are still blended.';
+        + ' The <strong style="color:var(--text);">Price Swing</strong> row carries its own PSC/Conc figure for the same reason — a fee-basis take% barely moves with price, so the blended swing understates how progressive the comparable terms are. All four <strong style="color:var(--text);">Contractor NPV</strong> rows carry the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at every published price, so the value block re-bases row for row with the take block above it — read the two on one basis.';
     }
     if (_cmpPrrt.length && _cmpPrrt.length < selected.length) {
       _mb += (_mb ? '<br><br>' : '')
