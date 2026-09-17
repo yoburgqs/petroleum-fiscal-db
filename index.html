@@ -42307,7 +42307,16 @@ function loadCountryProfile(country) {
     <span class="count-badge" style="margin-left:8px;cursor:help;" title="Fiscal contracts in ORCA database for ${country} — Take% and NPV are production-weighted averages across these contracts. More contracts = more representative averages. Countries with <10 contracts show a data-coverage warning.">${d.n} contracts</span>
     ${_hdrBeCallout}
     ${_cpSpread}
-    <span style="margin-left:8px;">${renderStabilityBadge(getFiscalPredictabilityScore(d), d)}</span>
+    <!-- v892 (T4): the badge said what the number was WORTH and never what it was OF. In this
+         strip it rendered as a bare "62 · UNGRADED  ≥37.2pp obs  → carry ≤32 · VERY LOW" between
+         "667 contracts", "Breakeven: …" and "Contract take: 42.5–79.7% observed" — every one of
+         which names its own subject. The metric name lived only in the title attribute, which a
+         phone cannot reach at all, and this page already prints the word "Moderate" (the TAKE
+         tier) in the same row and "Stability: ◆◆◆◇◇" (the REFORM score) in the strip above it.
+         So the one number that answers "how predictable are the fiscal terms here" was the only
+         unlabelled chip on the page, sitting between two labelled readings whose band words mean
+         the opposite thing. Named on screen; nothing recomputed, no tooltip added. -->
+    <span style="margin-left:8px;display:inline-flex;align-items:baseline;gap:5px;flex-wrap:wrap;"><span class="cp-fp-lbl" style="font-size:11px;color:var(--muted);white-space:nowrap;">Fiscal predictability:</span>${renderStabilityBadge(getFiscalPredictabilityScore(d), d)}</span>
     <button class="btn btn-sm btn-outline" style="margin-left:auto;font-size:11px;" onclick="ddAddCompare('${ddCountryEsc}',this)">+ Compare</button>
     <button class="btn btn-sm btn-outline" style="margin-left:6px;font-size:11px;" onclick="ddOpenScenarioBuilder('${ddCountryEsc}')">Scenario</button>
   </div>
@@ -56192,6 +56201,11 @@ function openFCDrilldown(country) {
   // v679 (T6): filled by _fcRenderTermLeg() once api/v1/country/{slug}.json resolves.
   html += '<span id="fc-dd-terms-chip"></span>';
   if (mc) html += '<span class="mc-badge" title="Price scenario range ($50\u2013$125/bbl)">' + Math.min(mc.p10,mc.p90).toFixed(1) + '\u2013' + Math.max(mc.p10,mc.p90).toFixed(1) + '% range</span>';
+  // v892 (T4): same naked badge as the Country Profile strip. In this drawer it read
+  // "91 · UNGRADED / one term" between "19.9–26.1% range" and "BE: —", with "Src B",
+  // "model terms cited" and "Reform · ↑ PRE-2010" either side of it — every neighbour naming
+  // its subject, this one naming none. Labelled on screen for the same reason.
+  html += '<span class="fc-dd-fp-lbl" style="font-size:10px;color:var(--muted);margin-left:8px;margin-right:4px;white-space:nowrap;">Fiscal predictability</span>';
   html += renderStabilityBadge(getFiscalPredictabilityScore(d), d);
   // v693 (T6): the guard here was `d.be_75 > 0` — the last place on the platform still using
   // it. Everywhere else gates on `> 1`: the Explorer's BE-only checkbox, the Breakeven Map's

@@ -724,6 +724,93 @@ async function testComparison(page) {
     await page.evaluate(() => { if (typeof clearCompare === 'function') clearCompare(); });
     await page.waitForTimeout(150);
 
+    // ── v892 (T4): the Fiscal Predictability badge must NAME ITSELF on screen ──────────────
+    // renderStabilityBadge() prints a score, a band word and a dispersion basis and never the
+    // metric. On the Country Profile header strip it rendered as a bare
+    //   "62 · UNGRADED  ≥37.2pp obs  → carry ≤32 · VERY LOW"
+    // between "667 contracts", "Breakeven: …" and "Contract take: 42.5–79.7% observed" — every
+    // neighbour naming its own subject — while the SAME row prints "Moderate" (the TAKE tier)
+    // and the strip above it prints "Stability: ◆◆◆◇◇" (the REFORM score). The metric name was
+    // reachable only through the title attribute, i.e. not at all under a thumb. Two band words
+    // with opposite subjects, one of them anonymous. Asserted on all four badge branches so a
+    // future edit cannot drop the label on the monopoly or not-scored path only.
+    try {
+      await switchTab(page, 't7');
+      await page.waitForTimeout(400);
+      const FPL = [
+        { c: 'Indonesia',        want: /UNGRADED/,                 why: 'one-term, refuted — carries the ceiling chip too' },
+        { c: 'Ghana',            want: /\d+ · (HIGH|MODERATE|LOW|VERY LOW)/, why: 'measured spread — graded band' },
+        { c: 'Ascension Island', want: /not scored/,               why: 'no distribution held' },
+        { c: 'Saudi Arabia',     want: /no contractor position/,   why: 'state monopoly' }
+      ];
+      for (const t of FPL) {
+        await page.selectOption('#dd-country-select', t.c).catch(() => {});
+        await page.waitForTimeout(1600);
+        const r = await page.evaluate(() => {
+          const lbl = document.querySelector('#dd-profile-head .cp-fp-lbl');
+          if (!lbl) return { missing: true, hasBadge: !!document.querySelector('#dd-profile-head .orca-fp-badge') };
+          // The badge is the label's IMMEDIATE next sibling, read positionally rather than by
+          // class: renderStabilityBadge()'s "not scored" arm emits a span with no .orca-fp-badge
+          // class at all, so a class-based probe would report the label orphaned on exactly the
+          // branch where an analyst most needs to know which metric is missing.
+          const bdg = lbl.nextElementSibling;
+          const lr = lbl.getBoundingClientRect();
+          return {
+            missing: false,
+            text: lbl.innerText.replace(/\s+/g, ' ').trim(),
+            visible: lr.width > 0 && lr.height > 0 && getComputedStyle(lbl).visibility !== 'hidden',
+            adjacent: !!(bdg && bdg.getBoundingClientRect().width > 0),
+            badge: bdg ? bdg.innerText.replace(/\s+/g, ' ').trim() : '(no badge)'
+          };
+        });
+        if (r.missing) {
+          f(S, `CP predictability label (${t.c})`,
+            `no .cp-fp-lbl in the profile header strip — the score renders anonymous again (badge present: ${r.hasBadge})`);
+          continue;
+        }
+        const named = /fiscal predictability/i.test(r.text);
+        const branchOk = t.want.test(r.badge);
+        if (named && r.visible && r.adjacent && branchOk)
+          p(S, `CP predictability label (${t.c})`,
+            `"${r.text}" rendered beside "${r.badge}" — ${t.why}`);
+        else
+          f(S, `CP predictability label (${t.c})`,
+            `named=${named} visible=${r.visible} adjacent=${r.adjacent} branch=${branchOk} ` +
+            `label="${r.text}" badge="${r.badge}"`);
+      }
+
+      // Same badge, same defect, in the Fiscal Compare drilldown drawer, where it sat between
+      // "19.9–26.1% range" and "BE: —" as a bare "91 · UNGRADED / one term".
+      await page.evaluate(() => { if (typeof switchTab === 'function') switchTab('t0', null); });
+      await page.waitForTimeout(400);
+      await page.evaluate(() => { if (typeof runFiscalCompare === 'function') runFiscalCompare(); });
+      await page.waitForTimeout(3000);
+      const dr = await page.evaluate(async () => {
+        if (typeof openFCDrilldown !== 'function') return { err: 'no openFCDrilldown' };
+        openFCDrilldown('Norway');
+        await new Promise(res => setTimeout(res, 900));
+        const d = document.querySelector('.fc-drawer.open');
+        if (!d) return { err: 'drawer did not open' };
+        const lbl = d.querySelector('.fc-dd-fp-lbl');
+        if (!lbl) return { missing: true, hasBadge: !!d.querySelector('.orca-fp-badge') };
+        const bdg = lbl.nextElementSibling;
+        const lr = lbl.getBoundingClientRect();
+        return {
+          text: lbl.innerText.replace(/\s+/g, ' ').trim(),
+          visible: lr.width > 0 && lr.height > 0,
+          adjacent: !!(bdg && bdg.getBoundingClientRect().width > 0),
+          badge: bdg ? bdg.innerText.replace(/\s+/g, ' ').trim() : '(no badge)'
+        };
+      });
+      if (dr.err) f(S, 'FC drawer predictability label', dr.err);
+      else if (dr.missing) f(S, 'FC drawer predictability label',
+        `no .fc-dd-fp-lbl in the open drawer — the score renders anonymous again (badge present: ${dr.hasBadge})`);
+      else if (/fiscal predictability/i.test(dr.text) && dr.visible && dr.adjacent)
+        p(S, 'FC drawer predictability label', `"${dr.text}" immediately precedes "${dr.badge}"`);
+      else f(S, 'FC drawer predictability label',
+        `text="${dr.text}" visible=${dr.visible} adjacent=${dr.adjacent} badge="${dr.badge}"`);
+    } catch (e) { f(S, 'CP/FC predictability label', e.message); }
+
     // Empty state
     await page.evaluate(() => { compareList = []; renderCompare(); });
     await page.waitForTimeout(200);
