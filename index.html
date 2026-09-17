@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v895</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v896</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v895</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v896</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -24962,6 +24962,79 @@ function _npvRetentionAt(d, deck) {
 }
 window._npvRetentionAt = _npvRetentionAt;
 
+/* ── v896 (T1) — a retention ratio at or above 100% is not resilience, and the Downside
+   Resilience screen no longer treats it as the best score on the board. ────────────────
+
+   Walked T1 cold at 1440x900 and 390x844, both storages cleared, over http, straight down
+   the path the Home card offers: Screener -> price deck -> Downside Resilience. The preset
+   machinery is honest — all 11 presets were checked against their own menu counts at all
+   four decks, 44 of 44 agree, and the menu line, the active-preset chip and the NPV @$50
+   column sub-head are all deck-aware. The defect is not in the count. It is in WHICH row
+   the count is counting.
+
+   Measured on the shipped data, retention = npv_50 / npv_<deck>:
+
+       deck    passes >=50%    max retention    inverted (>=100%)
+       $75           24             75%                0
+       $100           4             60%                0
+       $125           1            125%                1   <- Venezuela, and it is the row
+
+   At the $125 deck the entire Downside Resilience shortlist was ONE country, and that
+   country cleared the floor only because its ratio is inverted: Venezuela's contractor NPV
+   is $345M at $125 and $433M at $50. Its position is worth MORE at fifty-dollar oil than at
+   one-hundred-and-twenty-five-dollar oil. That is a regime with no price gearing — the
+   state takes more than the whole increment — which is a real and interesting fact about
+   Venezuela and the exact opposite of what a resilience screen selects for. Every regime
+   that genuinely holds its value through a price break (Turkmenistan, Uzbekistan, Iran) had
+   already dropped below the floor at that deck, because the denominator grows with the deck.
+
+   It rendered at the top of the ranking, in green, bold, with a tooltip reading "top of the
+   range". Nothing on screen said the ratio was inverted. An analyst running a high-price
+   case and clicking this preset was handed a one-row IC shortlist consisting of Venezuela,
+   presented as the most downside-resilient jurisdiction on earth.
+
+   This is the same doctrine _npvRetention() already states for the three state monopolies:
+   "absence of a measurement is not a passed stress test", and callers must treat it as NOT
+   PASSING. An inverted ratio is the other half of that rule — a ratio that is arithmetically
+   fine and is not measuring the thing the screen is named for.
+
+   Scope, measured: this changes the result set at the $125 deck only (1 row -> 0). At $75 —
+   the shipped default and every count in the menu, the Home card and the Quick Start panel —
+   and at $100, no country is inverted, so those shortlists are byte-identical to before.
+
+   _npvRetentionAt() itself is deliberately NOT capped. The Breakeven Map's retention cards
+   and the Country Profile downside line report the true ratio, and 125% is the correct
+   number to print for Venezuela. What changes is that the SCREEN excludes it and the CELL
+   stops calling it a top score. */
+var SC_RET_INVERTED = 1.0;   // npv_50 >= npv_deck: no price gearing left to erode
+
+function _scRetentionInverted(d, ref) {
+  var r = _npvRetentionAt(d, ref);
+  return r !== null && r >= SC_RET_INVERTED;
+}
+window._scRetentionInverted = _scRetentionInverted;
+
+// The single predicate the filter, the count line, the zero-result diagnostic and the export
+// criteria text all screen on, so they cannot drift apart about which rows passed.
+function _scRetentionPasses(d, ref, floor) {
+  var r = _npvRetentionAt(d, ref);
+  if (r === null) return false;                 // no contractor position — untested, not passing
+  if (r >= SC_RET_INVERTED) return false;       // inverted — not a downside result
+  return r >= floor;
+}
+window._scRetentionPasses = _scRetentionPasses;
+
+// How many rows the inversion rule removes at a given deck and floor. Used to name the
+// exclusion on screen only when it actually removed something.
+function _scRetentionInvertedCount(ref, floor) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return 0;
+  return COUNTRY_DATA.filter(function (d) {
+    var r = _npvRetentionAt(d, ref);
+    return r !== null && r >= SC_RET_INVERTED && r >= floor;
+  }).length;
+}
+window._scRetentionInvertedCount = _scRetentionInvertedCount;
+
 function _scDeckKey() {
   return (typeof getPriceKey === 'function') ? getPriceKey() : '75';
 }
@@ -24995,6 +25068,23 @@ function _retentionSub(d) {
     return '<span style="display:block;font-size:10px;color:var(--muted);letter-spacing:.02em;" title="No downside retention defined: contractor NPV at $' + _ref + ' is $0 or below, so there is no contractor value for a price break to erode. This is a state-monopoly regime — the question here is access, not price resilience.">no position</span>';
   }
   const pct = r * 100;
+  // v896 (T1): an inverted ratio is called out before the bands, because the bands read it as
+  // the best possible score. Venezuela at the $125 deck printed "125% kept" in bold green with
+  // a tooltip saying "top of the range", and it was the single row the Downside Resilience
+  // preset returned there. npv_50 >= npv_deck means the contractor position is worth MORE at
+  // $50 than at the deck price -- the state absorbs the whole price increment -- so there is no
+  // price gearing for a downturn to erode. That is a finding about the regime, not a resilience
+  // score, and the cell now says which of the two it is. The true ratio is still printed: the
+  // number is correct, its reading was not.
+  if (r >= SC_RET_INVERTED) {
+    return '<span style="display:block;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.02em;'
+      + 'font-family:\'IBM Plex Mono\',monospace;cursor:help;" title="INVERTED: this contractor position is worth '
+      + pct.toFixed(0) + '% of its $' + _ref + '/bbl value at $50/bbl — i.e. MORE at $50 oil than at $'
+      + _ref + '. The state captures the whole price increment (fee-based or steeply progressive terms), so the '
+      + 'contractor has no price upside and equally no price gearing for a downturn to erode. This is a fact about '
+      + 'the fiscal structure, not a downside result, so the Downside Resilience preset excludes it rather than '
+      + 'ranking it first — which is what it did before v896.">' + pct.toFixed(0) + '% — inverted</span>';
+  }
   const col = pct < 0 ? 'var(--red)' : pct >= 50 ? '#15803D' : pct >= 35 ? 'var(--muted)' : 'var(--orange)';
   const wt  = (pct < 0 || pct >= 50) ? '700' : '400';
   const tip = 'Retains ' + pct.toFixed(0) + '% of its $' + _ref + '/bbl contractor NPV when oil falls to $50 — '
@@ -34044,10 +34134,13 @@ function runScreener() {
     // the Downside Resilience shortlist while the "% kept" printed on it reads below the floor.
     // At the $50 deck the ratio is 1.0 for every row, so the canonical $75 reference is kept and
     // the count line says which reference was used.
+    // v896 (T1): routed through the shared predicate, which also rejects an INVERTED ratio
+    // (npv_50 >= npv_deck). At the $125 deck that was the only row left in the whole screen —
+    // Venezuela at 125%, worth more at $50 oil than at $125 — ranked top, green, "top of the
+    // range". A position with no price gearing has nothing for a price break to erode; it is
+    // not a resilient regime, and it is no longer counted as one. See _scRetentionPasses().
     if (_screenerMinRetention !== null) {
-      const _ret = _npvRetentionAt(d, _scRetRefDeck());
-      if (_ret === null) return false;
-      if (_ret < _screenerMinRetention) return false;
+      if (!_scRetentionPasses(d, _scRetRefDeck(), _screenerMinRetention)) return false;
     }
 
     // v517 — data-basis filter. The page has ranked by verified field production since v507 and drawn
@@ -34414,8 +34507,15 @@ function runScreener() {
   // v699 (T1) \u2014 the Downside Resilience preset's defining criterion was the one screen criterion
   // the count line never stated, and it is the one whose denominator moves with the price deck.
   const _retRef = _scRetRefDeck();
+  // v896 (T1): the inversion exclusion is named on screen, and only when it removed something
+  // at this deck, so the line does not carry a standing caveat about an empty case.
+  const _retInv = (_screenerMinRetention === null) ? 0 : _scRetentionInvertedCount(_retRef, _screenerMinRetention);
+  const _retInvNames = (_retInv === 0) ? '' : COUNTRY_DATA
+    .filter(d => { const r = _npvRetentionAt(d, _retRef); return r !== null && r >= SC_RET_INVERTED && r >= _screenerMinRetention; })
+    .map(d => `${d.country} (${Math.round(_npvRetentionAt(d, _retRef)*100)}%)`).join(', ');
   const _retNote = (_screenerMinRetention === null) ? ''
-    : ` <span style="color:var(--accent);font-weight:600;" title="Retention is contractor NPV at $50/bbl divided by contractor NPV at the reference deck. Both legs are modelled for 185 of 185 countries. Countries with no contractor position at the reference deck (npv <= 0 \u2014 the three state monopolies) have no ratio and are treated as untested, not as passing.">\u2014 downside retention \u2265${Math.round(_screenerMinRetention*100)}% of the $${_retRef}/bbl contractor NPV still standing at $50${price === '50' ? ', measured against $75 because the screen deck is already $50 and a row cannot retain less than 100% of itself' : ''}, and that share is printed on every row</span>`;
+    : ` <span style="color:var(--accent);font-weight:600;" title="Retention is contractor NPV at $50/bbl divided by contractor NPV at the reference deck. Both legs are modelled for 185 of 185 countries. Countries with no contractor position at the reference deck (npv <= 0 \u2014 the three state monopolies) have no ratio and are treated as untested, not as passing.">\u2014 downside retention \u2265${Math.round(_screenerMinRetention*100)}% of the $${_retRef}/bbl contractor NPV still standing at $50${price === '50' ? ', measured against $75 because the screen deck is already $50 and a row cannot retain less than 100% of itself' : ''}, and that share is printed on every row</span>`
+      + (_retInv === 0 ? '' : ` <span style="color:var(--accent);font-weight:600;" title="A ratio at or above 100% means contractor NPV is no lower at $50/bbl than at $${_retRef} \u2014 the state absorbs the whole price increment, so the position has no price gearing for a downturn to erode. That is a fact about the fiscal structure, not a downside result, and it would otherwise sort to the top of this screen ahead of every regime that actually holds its value through a price break.">\u2014 and ${_retInv === 1 ? '1 country whose ratio is INVERTED is excluded' : `${_retInv} countries whose ratios are INVERTED are excluded`} rather than ranked first: ${_retInvNames}, worth no less at $50 than at $${_retRef}</span>`);
   // v554 — the take basis states BOTH directions, by name and with both numbers, so the analyst
   // can see exactly which countries the ceiling treats differently and check the claim.
   const _fmtBasisList = arr => arr.map(d => {
@@ -34578,6 +34678,9 @@ function runScreener() {
       if (_screenerMinRetention !== null) {
         const k = _npvRetentionAt(d, _scRetRefDeck());
         if (k === null) r.push('no NPV retention ratio');
+        // v896 (T1): an inverted row is now removed by the retention leg, so it needs a reason
+        // here or it would drop out of the screen with nothing on the panel explaining it.
+        else if (k >= SC_RET_INVERTED) r.push('retention ' + Math.round(k * 100) + '% is INVERTED \u2014 no lower at $50 than at $' + _scRetRefDeck() + ', so nothing for a price break to erode');
         else if (k < _screenerMinRetention) r.push('keeps ' + Math.round(k * 100) + '% of NPV < ' + Math.round(_screenerMinRetention * 100) + '%');
       }
       if (minEvid > 0 && (d.a_pct || 0) < minEvid) r.push('tier-A ' + Math.round(d.a_pct || 0) + '% < ' + minEvid + '%');
@@ -34717,7 +34820,10 @@ function runScreener() {
       + (evidDepthOn ? ', on a record of at least ' + SC_EVID_MIN_FACTS + ' fiscal facts — a share on a thinner record is not evidence'
                      : ', on a record of ANY depth — fact-depth floor switched OFF, so a 100% share on a 2-fact record passes'));
     if (_screenerMinFacts > 0) crit.push('Min facts on file: ≥' + _screenerMinFacts);
-    if (_screenerMinRetention !== null) crit.push('Downside retention: keeps ≥' + Math.round(_screenerMinRetention*100) + '% of its $75/bbl contractor NPV at $50/bbl — measured for the 182 countries with a positive $75 NPV; the 3 state monopolies have no contractor position and are excluded rather than carried');
+    // v896 (T1): the exported criteria line named $75 whatever deck the screen ran at, and said
+    // nothing about the inversion rule that now decides rows at the high decks. Both fixed here
+    // so the XLSX/CSV assumptions block states the screen that actually ran.
+    if (_screenerMinRetention !== null) crit.push('Downside retention: keeps ≥' + Math.round(_screenerMinRetention*100) + '% of its $' + _scRetRefDeck() + '/bbl contractor NPV at $50/bbl — measured for the ' + COUNTRY_DATA.filter(function(x){return _npvRetentionAt(x,_scRetRefDeck())!==null;}).length + ' countries with a positive $' + _scRetRefDeck() + ' NPV; the 3 state monopolies have no contractor position and are excluded rather than carried. Ratios at or above 100% (contractor NPV no lower at $50 than at the deck price) are INVERTED — no price gearing for a downturn to erode — and are excluded rather than ranked first');
     if (checkedIOCs.length > 0) crit.push('IOC presence: ' + checkedIOCs.join(', '));
     // v802 (T1): the empty selection gets its own sentence. It used to fall through the same
     // branch and export as "Fiscal mechanics:  only" -- a claimed criterion with nothing in it.
@@ -34879,7 +34985,26 @@ function runScreener() {
       + ' — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (!evidDepthOn || (x.n_facts||0)>=SC_EVID_MIN_FACTS);}).length + ' of ' + COUNTRY_DATA.length + ' countries clear that'
       + (evidDepthOn ? ' (' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (x.n_facts||0)<SC_EVID_MIN_FACTS;}).length + ' more hold the share on a record thinner than ' + SC_EVID_MIN_FACTS + ' facts)' : ''));
     if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
-    if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $' + _scRetRefDeck() + ' NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetentionAt(x,_scRetRefDeck());return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    // v896 (T1): counted through the shared predicate so the hint agrees with the screen, and
+    // it now names the deck the screen actually discriminates at. The retention denominator
+    // grows with the price deck, so this floor tightens as the deck rises -- 24 countries clear
+    // it at $75, 4 at $100, none at $125 -- and an analyst who reached an empty screen had no
+    // way to know the fix was the deck button rather than the criteria.
+    if (_screenerMinRetention !== null) {
+      var _dRef = _scRetRefDeck();
+      var _dPass = COUNTRY_DATA.filter(function(x){return _scRetentionPasses(x,_dRef,_screenerMinRetention);}).length;
+      var _dInv  = _scRetentionInvertedCount(_dRef, _screenerMinRetention);
+      var _dByDeck = ['75','100','125'].map(function(k){
+        return '$' + k + ': ' + COUNTRY_DATA.filter(function(x){return _scRetentionPasses(x,k,_screenerMinRetention);}).length;
+      }).join(' \u00b7 ');
+      _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $' + _dRef
+        + ' NPV at $50/bbl \u2014 that is ' + _dPass + ' of ' + COUNTRY_DATA.length + ' countries before any other filter'
+        + (_dInv > 0 ? ', after excluding ' + _dInv + ' whose ratio is inverted (no lower at $50 than at $' + _dRef + ', so nothing for a price break to erode)' : '')
+        + '. This floor tightens as the price deck rises, because the denominator is that deck\u2019s NPV \u2014 countries clearing it by deck: ' + _dByDeck
+        + '. <button onclick="(function(){var b=[].slice.call(document.querySelectorAll(\'#sc-deck-btns button\')).filter(function(x){return x.textContent.trim()===\'$75\';})[0];if(b)b.click();})()" '
+        + 'style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);color:var(--accent);border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;min-height:24px;" '
+        + 'title="Re-run this same screen at the $75/bbl deck, where the retention floor is measured against a smaller denominator. Every other filter is left exactly as it is.">Re-run at $75</button>');
+    }
     if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
     if (reformSet) _diagHints.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
       + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
