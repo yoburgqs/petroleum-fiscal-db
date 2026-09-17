@@ -57310,3 +57310,109 @@ $125: 1 row → 0.
 **Task: T1** — "Which countries should even be on my screening list?" (last cycle was T5)
 
 **Friction.** Walking Screener → price deck → Downside Resilience cold, I first checked the preset machinery itself: all 11 presets against their own menu counts at all four price decks — **44 of 44 agree**, and the menu line, the active-preset chip and the column sub-head are all deck-aware. The defect wasn't the count. It was *which ro
+
+---
+## Cycle 808 Log — 2026-09-17
+- Test before: 344 PASS / 0 FAIL (deployed build, from cycle prompt)
+- Test after: 343 PASS / 0 FAIL / 1 WARN (LOCAL tree, TEST_URL=localhost — the 1 WARN is the
+  service-worker 404 that only fires off a local server; identical to cycle 807's local run)
+- JS errors: 0 page errors across 54 tab-viewport combos
+- Version: v896 -> v897
+
+## Cycle 808 — v897
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(last cycle was T1)
+
+**Friction.** Country Profile, cold load at 1440x900 with sessionStorage and localStorage
+cleared — Indonesia, the default. The sensitivity tornado at `#dd-tornado-container` draws four
+rows. Three read normally: red bar left of zero, green bar right. **Opex read inverted** — the
+green "Upside" bar ran LEFT to **-$317M** and the red "Downside" bar ran RIGHT to **+$294M**.
+Taken at face value the chart told the analyst that a 25% operating-cost overrun makes the
+project **$294M better off**, and that cutting opex 25% destroys $317M.
+
+`_buildTornadoChart()` (line 52239) was not at fault — it maps `low` to the adverse case and
+`high` to the favourable one, correctly. The signs genuinely were that way, and they came from
+`dcfPSC()`.
+
+**Root cause.** In `dcfPSC()` opex entered `unrecoveredCost` — so it was reimbursed to the
+contractor inside `costRecovery` — and then no line ever charged it out again:
+
+    const contractorNet = contractorGross - capex_y - cit;   // opex never subtracted
+
+`dcfPSC` was the only engine of five to do this. `dcfConcession` subtracts `cOpex`; `dcfPRRT`
+subtracts `opex_y`; `dcfBuyback` subtracts `opex_y` under the comment "contractor also bears
+opex during recovery"; `dcfTSC` nets it deliberately because the NOC reimburses it; and the
+Python engine ORCA actually publishes from does it too — `petroleum_dcf.py:943`,
+`cf = cont_entitle - opex - capex - itax`. On the standardized Deepwater profile the omission is
+**294.0 MMbbl x $15/bbl = $4.41B** of cost the contractor never funded.
+
+This is also the root of an artifact three earlier cycles wrote narrative text to explain rather
+than fix: the 155-204% IRRs that `_sbReturnReading()` classifies `inflated` (carried forward from
+803), and the v525 note that the compare engine's IRR "has a MEDIAN of 138.4% and a MINIMUM of
+39.5% — no country is anywhere near 15%", which was answered by deleting the hurdle count.
+
+**Change.** `contractorNet` now subtracts `opex`. One line.
+
+| | NPV before | NPV after | IRR before | IRR after | opex +25% before -> after |
+|---|---|---|---|---|---|
+| Indonesia | $2,616M | $713M | 155.2% | 44.9% | +$294M -> **-$182M** |
+| Angola | $2,807M | $903M | 122.2% | 41.7% | +$228M -> **-$248M** |
+| Libya | $1,437M | **-$467M** | 77.0% | none | +$119M -> **-$357M** |
+| Malaysia | $3,372M | $1,469M | 203.5% | 74.3% | — |
+| Egypt | $3,464M | $1,560M | 170.5% | 65.6% | — |
+
+Across all 185 Fiscal Compare rows: max IRR **485.5% -> 207.4%**, rows above 100% IRR
+**176 -> 128**, rows failing a 15% hurdle **0 -> 1**.
+
+**Government take is unchanged at every row.** `take` is
+`(royalty + ftp + profitOilGovt + cit) / revenue` and none of those four moved, so `liveTake`,
+the Fiscal Compare sort order and every published figure are identical to v896. Verified: median
+`|liveTake - take_75|` is 4.68pp all-rows / 4.75pp PSC-rows both before and after.
+
+**Result.** An analyst running a country at $75 now gets a contractor NPV and IRR that charge the
+project's operating cost, and an Opex row that points the same way as its Capex row — so "what if
+opex runs 25% over" is answerable off this page without reading as a gain. The Live DCF card stops
+suppressing its own number: it printed *"IRR is 155.2% and is not quoted: only $178M of $1.2B
+capex is ever at risk"* and now quotes **44.9% on $314M at risk, payback year 4**. High-take
+jurisdictions show the consequence — Libya returns **-$467M** rather than +$1,437M on the same terms.
+
+## Verification — every number produced this cycle, against the working tree
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures.
+- **Runtime suite RAN** against the LOCAL tree via `TEST_URL` — **343 PASS / 0 FAIL / 1 WARN**,
+  byte-identical to cycle 807's local baseline. Suite copies verified identical by sha256 before
+  running (graded copy in `office/tools/petroleum/tests/` vs the repo copy).
+- **Horizontal scroll** — **0 failures across 54 tab-viewport combos**: 9 tabs x
+  1920/1440/1280/1024/768/390, fresh context with storage cleared each time. **0 page errors.**
+- **Mobile 390x844 `hasTouch: true`** — 9/9 tabs `scrollWidth` 390 = `clientWidth` 390. No control
+  was added or touched this cycle, so the 24px rule had nothing new to measure.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." The 5 findings are the same
+  pre-existing baseline entries cycle 807 reported (`thome`, `t0`, `t7`).
+
+## Needs Zach — the second half of this bug, measured but NOT shipped
+The CIT base one line above still omits the opex deduction that `petroleum_dcf.py:945` takes
+(`taxable = cont_entitle - opex - capex`), so the PSC contractor is still taxed on cost-recovery
+that is reimbursement rather than income. It is a real defect and the fix is one term. It was not
+shipped because `cit` feeds `govtTake`, and `govtTake` is the `liveTake` **Fiscal Compare sorts
+on** — correcting it re-ranks **58 of 185 countries on the platform's headline screen**. Both ways
+were measured on the live data: shipping it moves Indonesia's Live DCF take 64.1% -> 59.2% (against
+a published 59.5%, so that row gets *better*), but moves the **median PSC row from 4.75pp to 6.71pp
+further** from its published `take_75`. That is a judgement about the ranking basis, not a bug fix,
+and it needs a human read. Flagged, not taken unilaterally.
+
+## Carried forward
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`.** After this fix the FC median
+  IRR is still **138.4%** and 128 rows still exceed 100%. The PSC cohort is only 58 of 185; the
+  median sits in the Concession cohort, which charges opex correctly, so its inflation has a
+  different cause and is unexamined. Plausibly the next T2.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked around
+  again this cycle with `TEST_URL=http://localhost:8899/index.html`, which works and should probably
+  become the default. From 806-807.
+- **`autonomous_cycle.py` has no partial-work guard** — fifth cycle running. From 805.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green->red ramp across a $27-$34 spread
+  while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
