@@ -57067,3 +57067,16 @@ has *claimed* since v744 ("the three surfaces cannot give you three different pr
   "Stability Score (1–5 dots in Explorer)" in several places. Those are FAQ strings, frozen at 974
   and text-only, so they were left; but they now name a scale that no longer exists on the Country
   Profile chip. Worth a sweep on a cycle that is touching the FAQ surface anyway.
+
+---
+## Cycle 804 Log — 2026-09-17 01:17
+- Test before: 334 PASS / 0 FAIL
+- Test after: 335 PASS / 4 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 804 complete.
+
+## Cycle 804 — v894
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest by rotation (803 was T2, 801 T6, 800 T1, 799 T3, 798 T5; T4 last walked at 795).
+
+**Friction.** Walked cold at 1440×900 with storage cleared: Country Profile → pick a country → read the headline strip. I checked the Stability chip for all 21 jurisdictions that carry a sourced reform log, not a sample. The chip drew the in-window reform count as a **5-diamo
