@@ -57964,3 +57964,147 @@ that shortlist, it previously could not.
 
 ## Friction
 Screener, cold load at 1440×900, storage cleared. The tab exists to build an IC shortlist and it explicitly asks the analyst to hand-pick one — the button tooltip says *"Tick rows in the left-hand column to copy just those,"* and the copy-confirm toast repeats it. So: preset **IOC 
+
+---
+## Cycle 813 Log — 2026-09-17
+
+- Test before: 343 PASS / 0 FAIL / 1 WARN (local, `TEST_URL`)
+- Test after: **354 PASS / 0 FAIL / 1 WARN** — +11 new `ScreenerLink` assertions
+- JS errors: 1, the pre-existing `sw.js` 404 on a local server (deployed resolves it)
+- Shipped as **v902**, pushed `9edd37b..295571c`
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+(Rotation: 812 T5, 811 T4, 810 T6, 809 T3, 808 T2 — T1 was stalest, last run at 807.)
+
+## Friction
+Cold load at 1440x900, `sessionStorage` and `localStorage` cleared. Home →
+**"open the screen →"** → IOC Capital Screen → price deck **$100** → **12 countries** → the
+Screener's own **🔗 Copy Link**.
+
+The link it produced was `#/screener/iochurdle`, and the toast said *"Link copied — opens the
+Screener with this preset applied."* Opened cold in a second browser context, that link returns
+**15 countries at $75** — **Azerbaijan, India and Indonesia back on a shortlist the sender's own
+NOT ON THIS LIST panel had removed by name and by reason** (`comparable take 65.1% > 65%`,
+`68.6% > 65%`, `66.4% > 65%`). At the moment of the copy the sender's chip read
+*"IOC Capital Screen — MODIFIED: price deck $75 → $100"*: the page knew the state was modified,
+wrote it on screen, and then shipped a link that dropped the modification while the toast
+asserted the preset was "applied".
+
+With no preset loaded it was worse. A hand-built `take ≤45%` + Africa screen returning
+**24 countries** copied as the bare `#/screener` — which opens on the **unfiltered 185**. Every
+threshold discarded, nothing in the toast to say so.
+
+Cause: `_explSyncRoute()` (`index.html:57997`) built the hash from `window._scRoutePreset`
+alone. The price deck, four sliders, five checkboxes, the region and reform selects, the
+mechanic set and the operator set were never serialised — v842 shipped the Screener its first
+route and encoded only the preset's *name*.
+
+So the one artefact a T1 analyst produces — *"here is the shortlist, and here is why these and
+not those"* — could not be sent. It was silently substituted with a different list.
+
+## Change
+The Screener route now carries its control surface, the way Browse has carried
+`#/explorer?mech=PSC&region=Africa` since v41.
+
+- **`_scRouteQuery()`** serialises only legs that differ from a *cold* Screener:
+  `d` deck · `t` take ceiling · `n` NPV floor · `n5` downside floor · `e` evidence floor ·
+  `fc` `ed` `px` `fl` `ef` the five unticked-only checkboxes · `rg` region · `rf` reform ·
+  `m` mechanic set · `o` operator set. A preset's own thresholds therefore appear in the query
+  too — deliberate: the link then describes the screen that **ran**, not a preset name whose
+  definition may move under the recipient.
+- **`_scRouteApplyQuery()`** lays the query back **over** the preset named in the path, which is
+  what lets a *modified* preset round-trip as itself rather than as its baseline. Deck first,
+  because `_scSyncNpvAxis()` rescales the NPV slider's travel to the live deck.
+- **`runScreener()`** republishes the route once the result set settles, so the address bar, a
+  bookmark, the browser Back button and the Copy Link button resolve to one screen. It is a
+  `replaceState` and returns early off-tab, so it adds no history entries.
+- **`_labelScreenerPresets()`** is bracketed by `_explRouteHold` (saved and restored, not blind-set):
+  that pass *loads* each of the eleven presets to count it, and would otherwise leave the address
+  bar holding whichever preset was counted last.
+- Numeric legs are range-checked against each slider's own `min`/`max`. `?t=zzz` previously
+  assigned straight through and left the ceiling on the input's fallback of 55% while the query
+  still claimed to describe the sender's screen; it now degrades to the cold 185.
+- The confirmation toast names what the recipient will see:
+  *"Link copied — opens this screen: 12 countries at $100/bbl · IOC Capital Screen (modified)"*.
+
+Nothing on the LOCKED list was touched: no tooltip, no FAQ, no text-only edit, no tab
+restructure, and the v612 mobile layer is untouched.
+
+## Result
+Sender and recipient were measured **name for name identical** in both cases:
+
+| screen | sender | recipient before | recipient after |
+|---|---|---|---|
+| IOC Capital Screen, deck $100 | 12 countries | **15 at $75** | **12 at $100** |
+| hand-built take ≤45% + Africa | 24 countries | **185, unfiltered** | **24** |
+
+The analyst can now send the shortlist they are looking at, and the colleague who opens it sees
+the same countries at the same price — which, on the tab whose entire job is deciding what
+belongs on a screening list, they previously could not.
+
+## Verification — every number produced this cycle, against the working tree
+- **Runtime suite RAN** (`TEST_URL=http://localhost:8080/index.html`, cold contexts).
+  Before: **343 PASS / 0 FAIL / 1 WARN**. After: **354 PASS / 0 FAIL / 1 WARN**.
+- **11 new assertions, `testScreenerLinkFidelity()`** — for two screens (modified preset, and
+  hand-built with no preset): the sender's hash must carry state at all; row count, price deck
+  and the full sorted country list must match across a genuinely **cold second context**. Plus
+  one that a malformed query (`?d=999&t=zzz&rg=Nowhere&o=Bogus`) degrades to 185 rows / 100%
+  ceiling / $75 deck rather than to a threshold no slider could produce.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures.
+- **Horizontal scroll** — clean **10/10 tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390**, each tab
+  from a fresh context with storage cleared. **0 page errors at every width.**
+- **Mobile 390x844 `hasTouch: true`** — 10/10 tabs `scrollWidth` 390 = `clientWidth` 390,
+  0 page errors, **0 controls under 24px** among those this cycle touched.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 reported findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`.
+- Also re-measured while walking, and found **clean**, so they are not defects: all 11 preset
+  menu counts equal the rows actually returned; the region filter partitions exactly 185
+  (54+33+31+26+17+16+5+3); the three cold deep-links `#/screener`, `#/screener/iochurdle`,
+  `#/screener/downsideresilience` restore 185 / 15 / 24 with 0 page errors; the take ceiling is
+  monotonic and distinct across 30/40/45/55/65/80 → 95/110/116/143/167/179.
+
+## Debt found this cycle, NOT fixed
+- **Cycle 812's "10 new assertions, `testScreenerICCeilingCount()`" are not in the suite.**
+  `grep` finds the symbol nowhere in `office/tools/petroleum/tests/runtime_comprehensive.js`, and
+  that file's last commit is `ca54f624f` — **cycle 806**. So 812's log records assertions that
+  were never committed, and its "343 before" figure is the same 343 this cycle measured before
+  its own work. Either the edit was lost before the commit or it was written to a copy. Worth a
+  cycle: the log is the enforcement record, and it is currently describing tests that do not run.
+- **A stale query survives a mechanic-set change made through the zero-result panel.**
+  `_scAllMechanics()` re-ticks the boxes directly and does not itself call `runScreener()`, so the
+  republish rides on whatever re-runs afterwards. Observed correct in the paths walked, not
+  audited across all of them.
+- **The Screener IC memo prints `— not modelled` for Norway and the United Kingdom's breakeven**
+  while Fiscal Compare prints 28.7 and 20.3 for the same two in the same cold session.
+  `_scExportRows()` reads `d.be_75` raw, bypassing the `cpBeFor()` / `_fcBe()` read point 806
+  built. Two-line fix. From 812.
+
+## Carried forward
+- **`cp-terms-chip` is clipped at tablet-768** — `pixel_audit` finding 3, pre-existing baseline:
+  `scrollWidth 143 > clientWidth 90`. Natural next T6. From 810.
+- **The Explorer's measured branch prints a ceiling only where one is material.** 6 of the 51
+  ceilings are immaterial and leave the score standing with a corrected tooltip. From 811.
+- **The Evidence Quality badge and the Evidence Chain disagree about dead links** on Indonesia —
+  badge counts documents, chain counts parameter rows, wording identical. From 810.
+- **All three of Indonesia's "independently sourced" model terms are one document, and its link is
+  dead** — stated across three paragraphs, never as one sentence. From 810.
+- **The benchmark menu is unreachable on a cold load** in Side-by-Side. From 809.
+- **The re-basing blind spot may not be confined to that menu** — `_sbsCmpTake()` returns a
+  corrected figure with no signal attached. Two sites found, others unaudited. From 809.
+- **The remaining inflated IRRs are in `dcfConcession`, not `dcfPSC`** — FC median IRR 138.4%,
+  128 rows above 100%. From 808.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Worked
+  around again with `TEST_URL`. **`TEST_URL` should become the default**, with the deployed run a
+  separate post-push check. From 806-813.
+- **`autonomous_cycle.py` has no partial-work guard** — tenth cycle running. From 805.
+- **Needs Zach, from 808:** the PSC CIT base still omits the opex deduction `petroleum_dcf.py:945`
+  takes. One-term fix, but `cit` feeds `govtTake`, which Fiscal Compare sorts on — it re-ranks 58
+  of 185 countries. Flagged, not taken unilaterally.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana. From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27-$34
+  spread while that tab's own card says breakeven "does not rank them". From 801.
+- FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
+- At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
