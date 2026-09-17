@@ -1616,6 +1616,60 @@ async function testBreakevenMap(page) {
     if (lowestHTML.includes('$') || lowestHTML.includes('bbl')) p(S, 'lowest list', 'Lowest breakeven list populated');
     else w(S, 'lowest list', 'Lowest list empty or no data');
 
+
+    // ── v891 (T6): the map's readout must carry provenance ──────────────────────────────
+    // The choropleth is this tab's centerpiece and the hover readout is its only "row". It
+    // printed a breakeven and a take with no evidence grade at all, while 47 of the 65 painted
+    // countries grade C or D. Netherlands and Belgium are the load-bearing pair: identical
+    // $27 breakeven, identical greenest fill, and A/278 facts versus D/6 facts behind them.
+    const _pvPair = await page.evaluate(async () => {
+      const out = {};
+      for (const iso of [528, 56]) {
+        const el = [...document.querySelectorAll('#breakeven-map-svg path')].find(e => {
+          const d = window.d3 && window.d3.select(e).datum(); return d && +d.id === iso; });
+        if (!el) { out[iso] = null; continue; }
+        el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+        await new Promise(r => setTimeout(r, 120));
+        const tt = document.getElementById('breakeven-map-tooltip');
+        const nm = iso === 528 ? 'Netherlands' : 'Belgium';
+        const entry = (window.COUNTRY_DATA || []).find(c => c.country === nm);
+        out[iso] = {
+          name: nm,
+          tip: tt ? tt.innerText : '',
+          title: el.querySelector('title') ? el.querySelector('title').textContent : '',
+          want: entry && window._evidenceGrade ? window._evidenceGrade(entry).letter : null,
+          be: entry ? entry.be_75 : null
+        };
+      }
+      return out;
+    });
+    const _nl = _pvPair[528], _be = _pvPair[56];
+    if (_nl && _be) {
+      // the letter on the readout is the grader's letter, not a second opinion
+      const _okNl = _nl.want && new RegExp('(^|\\n)' + _nl.want + '\\b').test(_nl.tip);
+      const _okBe = _be.want && new RegExp('(^|\\n)' + _be.want + '\\b').test(_be.tip);
+      if (_okNl && _okBe) p(S, 'hover carries evidence grade', `${_nl.name} ${_nl.want} / ${_be.name} ${_be.want} on the map readout, matching _evidenceGrade()`);
+      else f(S, 'hover carries evidence grade', `map readout lost the grade — ${_nl.name} wanted ${_nl.want} got "${_nl.tip.replace(/\n/g,' | ')}"; ${_be.name} wanted ${_be.want} got "${_be.tip.replace(/\n/g,' | ')}"`);
+
+      // the pair that proves it discriminates: same breakeven, same fill, different letter
+      if (_nl.be === _be.be && _nl.want !== _be.want) p(S, 'same breakeven, different grade', `both $${_nl.be} yet ${_nl.want} vs ${_be.want} — the readout separates what the colour cannot`);
+      else w(S, 'same breakeven, different grade', `pair no longer diverges: ${_nl.name} $${_nl.be}/${_nl.want} vs ${_be.name} $${_be.be}/${_be.want}`);
+
+      // a D must say what to do about it, not just wear a letter
+      if (_be.want !== 'D' || /petroleum act/i.test(_be.tip)) p(S, 'D readout names the action', 'a D-graded country tells the analyst to establish terms from the petroleum act');
+      else f(S, 'D readout names the action', `Belgium reads D with no action clause: "${_be.tip.replace(/\n/g,' | ')}"`);
+
+      // touch devices have no hover — the SVG <title> is the only readout there
+      if (_nl.title.includes('evidence ' + _nl.want) && /modelled/.test(_nl.title)) p(S, 'SVG title provenance', 'touch fallback carries the grade and says the breakeven is modelled');
+      else f(S, 'SVG title provenance', `SVG <title> missing provenance: "${_nl.title}"`);
+    } else w(S, 'hover carries evidence grade', 'Netherlands/Belgium paths not found in SVG');
+
+    // the legend says what each colour band rests on, so the caveat is readable without hovering
+    const _legend = await page.evaluate(() => [1,2,3,4,5].map(i => {
+      const el = document.getElementById('be-legend-t' + i); return el ? el.textContent : ''; }).join(' '));
+    if (/\d+\s*·\s*\d+ C\/D/.test(_legend)) p(S, 'legend states C/D per band', `legend reads "${_legend.trim()}"`);
+    else f(S, 'legend states C/D per band', `legend carries no C/D count: "${_legend.trim()}"`);
+
     // Re-click tab — should NOT re-render (guard)
     await switchTab(page, 't0');
     await page.waitForTimeout(100);

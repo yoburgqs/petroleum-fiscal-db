@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v890</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v891</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v890</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v891</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -22973,7 +22973,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$75</span>
       <span style="font-size:10px;color:var(--muted);opacity:.7;" title="Use arrow keys to adjust in $5 increments">← →</span>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;font-size:11px;">
+    <div style="display:flex;gap:8px;align-items:center;font-size:11px;flex-wrap:wrap;">
       <span style="display:inline-block;width:12px;height:12px;background:var(--green);border-radius:2px;"></span><span id="be-legend-t1" style="color:var(--muted);">&lt;$40</span>
       <span style="display:inline-block;width:12px;height:12px;background:rgba(21,128,61,0.68);border-radius:2px;"></span><span id="be-legend-t2" style="color:var(--muted);">$40–55</span>
       <span style="display:inline-block;width:12px;height:12px;background:var(--yellow);border-radius:2px;"></span><span id="be-legend-t3" style="color:var(--muted);">$55–70</span>
@@ -60643,6 +60643,40 @@ function beColor(be) {
   return RAMP[_beBands.length];
 }
 
+/* ── v891 (T6): one provenance builder for the breakeven map's hover readout and its SVG
+   <title> touch fallback, so the two cannot disagree. Returns plain text for the title and
+   HTML for the tooltip off the same grade call. Uses _evidenceGrade() -- the platform's only
+   evidence grader -- so the letter here is the same letter Fiscal Compare, Explorer, the
+   Screener, Side-by-Side and the Country Profile print for that country. */
+function _beProvenance(entry, be) {
+  const g = (entry && typeof _evidenceGrade === 'function') ? _evidenceGrade(entry) : null;
+  if (!g) return { html: '', text: '' };
+  const nf = Number(g.nFacts || 0);
+  const nfTxt = (g.byN === 'd' ? 'only ' : '') + nf.toLocaleString() + ' fact' + (nf === 1 ? '' : 's');
+  const aTxt  = g.aPct.toFixed(1) + '% primary law';
+  /* the leg that SET the letter reads bold; the other is stepped back -- same treatment the
+     Country Profile Evidence Quality chip has used since v619, so the two read alike. */
+  const aEm  = (g.limiter === 'depth')    ? 'opacity:.6;' : 'font-weight:700;';
+  const nfEm = (g.limiter === 'sourcing') ? 'opacity:.6;' : 'font-weight:700;';
+  /* What the analyst should DO about the letter. The wording is the Methodology tab's own tier
+     guidance: a C is screening-only, a D does not belong in a recommendation document. */
+  const act = g.grade === 'd'
+    ? 'Not a shortlist candidate on this record \u2014 establish the terms from the country\u2019s own petroleum act first.'
+    : g.grade === 'c'
+    ? 'Screening only on this record \u2014 confirm the terms before it reaches a memo.'
+    : '';
+  let html = '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">'
+    + '<span style="background:' + g.color + '22;border:1px solid ' + g.color + ';color:' + g.color
+    + ';font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;">' + g.letter + '</span>'
+    + ' <span style="font-size:11px;color:' + g.color + ';font-weight:600;">' + g.label + '</span>'
+    + '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'
+    + '<span style="' + aEm + '">' + aTxt + '</span> \u00b7 <span style="' + nfEm + '">' + nfTxt + '</span></div>';
+  if (act) html += '<div style="font-size:10px;color:' + g.color + ';margin-top:3px;max-width:230px;line-height:1.45;">' + act + '</div>';
+  html += '</div>';
+  const text = 'evidence ' + g.letter + ' (' + g.label + ', ' + aTxt + ', ' + nfTxt + ')';
+  return { html: html, text: text, grade: g.grade, letter: g.letter };
+}
+
 async function renderBreakevenMap() {
   if (_beMapRendered) return;
   _beMapRendered = true;
@@ -60725,9 +60759,22 @@ async function renderBreakevenMap() {
               : function(v) { return v != null && (v <= 0 || v > 1); };
   const beLookup = {};
   const takeLookup = {};
+  // v891 (T6): the map could not reach the evidence grader at all. The choropleth is this tab's
+  // centerpiece and its hover readout is its only row, and it printed a breakeven and a take with
+  // no provenance of any kind -- no grade, and no statement that the breakeven is MODELLED off a
+  // standardised deepwater project rather than read off a field. Measured on the shipped
+  // country_data.json: of the 65 countries this map paints, 47 grade C or D (A:5 B:13 C:18 D:29),
+  // and the greenest band -- `<$29`, the best-looking colour on the tab -- is 4 D's out of 9:
+  // Belgium $27 on 6 facts, Sweden $27 on 12, Vanuatu $28 on 14, UAE-Abu Dhabi $28 on 36.
+  // The right-hand Downside Resilience card got the letter on the face of every row at v722;
+  // Fiscal Compare, Explorer, Screener, Side-by-Side and the Country Profile all carry it. This
+  // map was the one primary artifact left where the analyst had to click through, one country at
+  // a time, to learn that the country they liked the colour of is a 6-fact record.
+  const entryLookup = {};
   COUNTRY_DATA.forEach(d => {
     beLookup[d.country] = _beOK(d.be_75) ? d.be_75 : null;
     takeLookup[d.country] = d.take_75;
+    entryLookup[d.country] = d;
   });
   // v470: Update breakeven legend with live country counts so analysts immediately see distribution
   (function() {
@@ -60742,6 +60789,41 @@ async function renderBreakevenMap() {
     var _cntRange = function(lo, hi) {
       return _beAll.filter(function(v){ return v!=null && (lo==null || v>=lo) && (hi==null || v<hi); }).length;
     };
+    // ── v891 (T6): the legend said how MANY countries wear each colour, never what they rest on ──
+    // Bands are data-derived (v579) over a $27-$34 spread, so the colours are the only thing on
+    // this tab that looks like a ranking, and the greenest band is the one an analyst screens INTO.
+    // That band is 9 countries of which 4 grade D. Stating the C/D count per band puts the caveat
+    // where the colour is read, without a hover and without opening 9 profiles to find it.
+    var _cdRange = function(lo, hi) {
+      if (typeof _evidenceGrade !== 'function') return 0;
+      return COUNTRY_DATA.filter(function(d){
+        var v = _beOK(d.be_75) ? d.be_75 : null;
+        if (v == null) return false;
+        if (lo != null && v <  lo) return false;
+        if (hi != null && v >= hi) return false;
+        var g = _evidenceGrade(d).grade;
+        return g === 'c' || g === 'd';
+      }).length;
+    };
+    var _bandTip = function(label, n, cd) {
+      if (!n) return label + ' \u2014 no country in this band.';
+      return n + ' of the ' + (COUNTRY_DATA.length) + ' countries model a breakeven in ' + label
+        + '. ' + (cd
+          ? cd + ' of those ' + (cd === 1 ? 'grades' : 'grade') + ' C or D on the platform\u2019s '
+            + 'evidence grader \u2014 the same A/B/C/D the Explorer, Screener and Country Profile '
+            + 'print \u2014 so the colour of this band is not a statement about how well evidenced '
+            + 'it is. A C is screening-only and a D does not belong in a recommendation document. '
+            + 'Hover any country on the map for its own letter.'
+          : 'All of them grade A or B on the platform\u2019s evidence grader.');
+    };
+    var _updBand = function(id, label, lo, hi) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var n = _cntRange(lo, hi), cd = _cdRange(lo, hi);
+      el.textContent = label + ' (' + n + (cd ? ' \u00b7 ' + cd + ' C/D' : '') + ')';
+      el.setAttribute('title', _bandTip(label, n, cd));
+      el.style.cursor = 'help';
+    };
     if (_beBands) {
       var _edges = [null].concat(_beBands).concat([null]);
       for (var _i = 0; _i < 5; _i++) {
@@ -60752,14 +60834,14 @@ async function renderBreakevenMap() {
         var _label = _lo == null ? '<' + _fmt(_hi)
                    : _hi == null ? '\u2265' + _fmt(_lo)
                    : _fmt(_lo) + '\u2013' + _fmt(_hi);
-        _el.textContent = _label + ' (' + _cntRange(_lo, _hi) + ')';
+        _updBand(_id, _label, _lo, _hi);
       }
     } else {
-      _upd('be-legend-t1', '<$40 (' + _cntRange(null,40) + ')');
-      _upd('be-legend-t2', '$40\u201355 (' + _cntRange(40,55) + ')');
-      _upd('be-legend-t3', '$55\u201370 (' + _cntRange(55,70) + ')');
-      _upd('be-legend-t4', '$70\u201385 (' + _cntRange(70,85) + ')');
-      _upd('be-legend-t5', '>$85 (' + _cntRange(85,null) + ')');
+      _updBand('be-legend-t1', '<$40',        null, 40);
+      _updBand('be-legend-t2', '$40\u201355',   40,   55);
+      _updBand('be-legend-t3', '$55\u201370',   55,   70);
+      _updBand('be-legend-t4', '$70\u201385',   70,   85);
+      _updBand('be-legend-t5', '>$85',         85,   null);
     }
     _upd('be-legend-t6', 'No data (' + _cntNoData + ')');
   })();
@@ -60846,13 +60928,24 @@ async function renderBreakevenMap() {
       const take = name ? takeLookup[name] : null;
       if (!name) return;
       d3.select(this).attr('stroke', '#96570A').attr('stroke-width', 2);
+      // v891 (T6): the readout now answers both halves of "where did this number come from".
+      //   (a) the breakeven is MODELLED off the standardised deepwater project named at the top
+      //       of this tab, not an observed field breakeven -- said on the line itself;
+      //   (b) how solid the record behind it is -- the evidence letter, both legs, and what to
+      //       do about a C or a D.
+      // A grey country gets the letter too, and that is the point of adding it there: grey means
+      // ORCA has modelled no cost structure, which is a different gap from not knowing the fiscal
+      // terms. Netherlands-grade sourcing with no cost model and a 2-fact record both paint grey.
+      const _pv = _beProvenance(entryLookup[name], be);
       let html = '<strong style="color:#96570A">' + name + '</strong><br>';
       if (be != null) {
-        html += 'Breakeven: <strong>$' + be.toFixed(1) + '/bbl</strong><br>';
+        html += 'Breakeven: <strong>$' + be.toFixed(1) + '/bbl</strong>'
+             +  ' <span style="font-size:10px;color:var(--muted);">modelled</span><br>';
         if (take != null) html += 'Govt take @$75: <strong>' + take.toFixed(1) + '%</strong>';
       } else {
-        html += '<span style="color:var(--muted)">No breakeven data</span>';
+        html += '<span style="color:var(--muted)">No modelled cost structure \u2014 no breakeven</span>';
       }
+      html += _pv.html;
       tooltip.innerHTML = html;
       tooltip.style.display = 'block';
     })
@@ -60887,9 +60980,13 @@ async function renderBreakevenMap() {
     const name = ISO_MAP[+d.id];
     if (name) {
       const be = beLookup[name];
+      // v891 (T6): on a touch device this <title> is the ONLY readout -- there is no hover -- so
+      // it carries the same provenance the tooltip now does, off the same _beProvenance() call.
+      const _pvT = _beProvenance(entryLookup[name], be);
+      const _evT = _pvT.text ? ' — ' + _pvT.text : '';
       const titleText = be != null
-        ? name + ' — Breakeven $' + be.toFixed(1) + '/bbl — click for Country Profile'
-        : name + ' — click for Country Profile';
+        ? name + ' — breakeven $' + be.toFixed(1) + '/bbl (modelled)' + _evT + ' — click for Country Profile'
+        : name + ' — no modelled cost structure' + _evT + ' — click for Country Profile';
       d3.select(this).append('title').text(titleText);
     }
   });
