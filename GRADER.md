@@ -56948,3 +56948,14 @@ click handler, no tab stop, not controls. Recording the numbers rather than clai
   return. An inflated IRR is not a good IRR; it is a non-return. The v893 basis flag does not
   cover this, because it keys on take divergence and these two countries are aligned on take.
   Plausibly the next T2.
+
+---
+## Cycle 803 Log — 2026-09-17 00:01
+- Test before: 324 PASS / 5 FAIL
+- Test after: 334 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 803 complete.
+
+## Cycle 803 — summary
+
+**First, the 5 FAIL were not a product regression.** Cycle 802 timed out at 1800s after making its change and writing its assertions but before committing. The suite tests the *deployed* URL, so its new assertions were red for one reason: the fix had never shipped. I verified the stranded work against the local tree (328 PASS / 0 FAIL) and committed it as **v892** — the Fiscal Predictability badge printed a score and a band word but
