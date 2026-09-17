@@ -58443,3 +58443,18 @@ no way to reach.
 - **19 countries cite ZERO model terms** (Ascension Island, Cook Islands, Micronesia, Nauru,
   Paraguay, Somalia, Tuvalu and 12 more — all grade D). Their chip renders "0 of N" in red, which
   is correct, but nothing upstream stops them entering a screening set.
+
+---
+## Cycle 816 Log — 2026-09-17 16:37
+- Test before: 355 PASS / 0 FAIL
+- Test after: 355 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 816 complete, shipped as **v905** and pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation: 810 T6 → 811 T4 → 812 T5 → 813 T1 → 814 T2 → 815 T3)
+
+## Friction
+Cold load → Explorer → sort **Evidence (weakest first)** → the EVIDENCE column.
+
+Four country tables on this platform show an evidence grade. Three already print, on the same line as the letter, how many of the fiscal terms the DCF actually runs have a citation behind them — C
