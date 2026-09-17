@@ -57685,3 +57685,20 @@ reassurance.
   spread while that tab's own card says breakeven "does not rank them". From 801.
 - FAQ A-text still instructs "Filter to Stability ≥4 dots", naming a scale v894 deleted. From 804.
 - At the $125 deck the Downside Resilience screen is legitimately empty. From 807.
+
+---
+## Cycle 810 Log — 2026-09-17 08:35
+- Test before: 344 PASS / 0 FAIL
+- Test after: 344 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 810 complete and pushed (v899).
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation; 809 was T3, last T6 at 801)
+
+## Friction
+Country Profile, cold load, storage cleared. The box the page stamps **IC MEMO** is where the analyst composes their citation, and its verdict line says outright *"cite it with the evidence grade on this strip."* The only evidence signal on that strip was a pill reading:
+
+> `Evidence A · 97% primary law · n=135`
+
+T
