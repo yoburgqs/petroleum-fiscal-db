@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v891</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v893</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2564,7 +2564,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v891</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v893</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -52806,7 +52806,7 @@ ${_sbOriginNote(result, price, profileKey)}
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor IRR</div>
     <div class="sb-result-value" style="color:${irrColor};${reading.value.length > 6 ? 'font-size:19px;' : ''}">${irrHtml}</div>
-    <div class="sb-result-note">${reading.note}</div>
+    <div class="sb-result-note">${reading.note}${_sbIrrTileFlag893(result, price)}</div>
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor NPV</div>
@@ -53468,6 +53468,56 @@ function _sbPubAt740(map, price) {
   return null;
 }
 
+// ── v893 (T2): the IRR is the ONE headline number with no published counterpart ──────────
+// The Country Profile headline strip prints take, NPV, downside, breakeven and swing as numbers,
+// and prints IRR as an instruction: "IRR: → Model in Scenario Builder". That button is the only
+// route to an IRR anywhere on the platform, so an analyst who lands in this modal is, by
+// construction, the analyst who came FOR the IRR. What they met was a strip that reconciles the
+// two figures they did not come for -- Govt take (Nigeria: 47.3% here vs 81.1% published, flagged
+// red at -33.8pp) and Contractor NPV ($1.59B vs $302M, with a paragraph naming the mechanism) --
+// and says nothing at all about the one they did.
+//
+// That silence is the dangerous one. The IRR is computed on the same scenario terms the strip has
+// just finished saying are 33.8pp off the country's published take, so 39.5% is the return of a
+// project bearing roughly half Nigeria's actual fiscal burden. Its two neighbours carry "this is
+// not what you think it is" warnings; the IRR tile carried none, and it is the figure that gets
+// pasted into the memo as "Nigeria IRR ~40%".
+//
+// There is no published country IRR to reconcile against -- the country-level IRR was withdrawn
+// because it was an arithmetic mean of per-contract IRRs with a 333% platform median -- so this
+// does not invent a counterpart. It states the basis the rate was earned on, and when that basis
+// is materially off the published take it says so and names the direction the true figure moves.
+// One builder feeds both the strip row and the tile sub-note so the two cannot fork.
+function _sbIrrBasis893(result, sbPrice) {
+  var o = window._sbOrigin;
+  if (!o || o.monopoly) return null;                 // monopoly already has its own red banner
+  var reading = _sbReturnReading(result);
+  var sbTake  = (result && result.take != null && isFinite(result.take)) ? Number(result.take) : null;
+  var pub     = _sbPubAt740(o.cpTakes, sbPrice);
+  if (!pub && o.cpTake != null) pub = { v: o.cpTake, price: 75, exact: (Number(sbPrice) === 75) };
+  var gap = (pub && sbTake != null) ? (sbTake - pub.v) : null;
+  return {
+    reading:  reading,
+    sbTake:   sbTake,
+    pub:      pub,
+    gap:      gap,
+    // Same 5pp bar the take row already uses to turn red. Below it the IRR is close enough to
+    // the published basis that a caveat would be noise.
+    material: (gap != null && Math.abs(gap) >= 5),
+    hasRate:  (reading.state === 'computed' || reading.state === 'inflated')
+  };
+}
+
+// v893 (T2): the same finding, shortened, on the tile itself -- an analyst who reads only the
+// three big numbers and never the strip above them is exactly the one who misquotes this figure.
+// Shares _sbIrrBasis893() with the strip row so the two cannot disagree.
+function _sbIrrTileFlag893(result, sbPrice) {
+  var b = _sbIrrBasis893(result, sbPrice);
+  if (!b || !b.material || !b.hasRate) return '';
+  return '<span style="color:var(--red);font-weight:700;"> \u00b7 not '
+       + _esc594(window._sbOrigin.country) + '\u2019s IRR</span>';
+}
+
 function _sbOriginNote(result, sbPrice, sbProfileKey) {
   var o = window._sbOrigin;
   if (!o) return '';
@@ -53617,8 +53667,49 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
     }
   }
 
-  if (_takeRow740 || _npvRow740) {
-    cmpRow = '<div style="margin-top:9px;">' + _takeRow740 + _npvRow740 + '</div>' + _reconcile740;
+  // v893 (T2): the third row. Shape differs from _row740() on purpose -- there is no published
+  // IRR, and printing an em-dash in a "published" slot would read as a missing value rather than
+  // as a deliberate absence, so the slot says why it is empty.
+  var _irrRow893 = '', _irrNote893 = '';
+  var _ib893 = _sbIrrBasis893(result, sbPrice);
+  if (_ib893 && _ib893.reading) {
+    var _mono893 = 'font-family:\'IBM Plex Mono\',monospace;';
+    _irrRow893 = '<div style="display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-top:5px;">'
+      + '<span style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-width:104px;">Contractor IRR</span>'
+      + '<span style="font-size:11px;color:var(--muted);">This scenario <strong style="color:var(--text);font-size:15px;' + _mono893 + '">'
+        + _esc594(_ib893.reading.value) + '</strong></span>'
+      + '<span style="font-size:11px;color:var(--muted);">' + cn + ' published <strong style="color:var(--text);">no IRR</strong>'
+        + '<span style="opacity:.8;"> (ORCA publishes no country-level IRR)</span></span>'
+      + (_ib893.material && _ib893.hasRate
+          ? '<span style="font-size:12px;font-weight:800;color:var(--red);">not ' + cn + '\u2019s IRR</span>'
+          : '')
+      + '</div>';
+
+    if (_ib893.material && _ib893.hasRate) {
+      // Direction only. Government take and contractor IRR move opposite ways on an otherwise
+      // identical project, which is monotone and safe to assert; the magnitude is not, because
+      // no single set of terms is defined that reproduces a production-weighted country average.
+      var _pubHigher893 = (_ib893.gap < 0);
+      _irrNote893 = '<div style="margin-top:8px;padding:7px 10px;background:var(--surface);'
+        + 'border:1px solid var(--border);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">'
+        + '<strong style="color:var(--text);">This IRR is not ' + cn + '\u2019s IRR.</strong> '
+        + '<strong style="color:var(--text);">' + _esc594(_ib893.reading.value) + '</strong> is the return earned at the '
+        + '<strong style="color:var(--text);">' + _ib893.sbTake.toFixed(1) + '%</strong> take in the row above, not at '
+        + cn + '\u2019s published <strong style="color:var(--text);">' + _ib893.pub.v.toFixed(1) + '%</strong> at $'
+        + _ib893.pub.price + ' \u2014 a gap of ' + Math.abs(_ib893.gap).toFixed(1) + 'pp. '
+        + 'The government takes ' + (_pubHigher893 ? 'more' : 'less') + ' of every barrel across '
+        + cn + '\u2019s actual contracts than this run assumes, so the same project run at the published take returns '
+        + '<strong style="color:var(--text);">' + (_pubHigher893 ? 'less' : 'more') + '</strong> than '
+        + _esc594(_ib893.reading.value) + '. '
+        + 'ORCA publishes no country IRR to check it against: the country-level figure was withdrawn because it was an '
+        + 'arithmetic mean of per-contract IRRs, median 333% platform-wide. '
+        + '<strong style="color:var(--text);">Quote this only as your own project at the terms, capex and opex in the form above \u2014 never as ' + cn + '\u2019s IRR.</strong>'
+        + '</div>';
+    }
+  }
+
+  if (_takeRow740 || _npvRow740 || _irrRow893) {
+    cmpRow = '<div style="margin-top:9px;">' + _takeRow740 + _npvRow740 + _irrRow893 + '</div>' + _reconcile740 + _irrNote893;
   }
 
   var editedNote = edited

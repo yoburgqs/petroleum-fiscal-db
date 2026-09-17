@@ -2513,6 +2513,67 @@ async function testSBProvenance(page) {
       p(S, 'Norway IC line', 'own-terms IC line carries no basis warning, correctly');
     else f(S, 'Norway IC line', 'own-terms IC line wrongly warned: ' + String(norway.ic).slice(0, 140));
 
+
+    // ── v893 (T2): the IRR must state the take basis it was earned on ──────────────────────
+    // The Country Profile headline prints IRR as an instruction ("→ Model in Scenario Builder"),
+    // making this modal the only route to an IRR on the platform — so the analyst who arrives
+    // here is the one who came FOR the IRR. The strip reconciled Govt take and Contractor NPV
+    // against the published figures and said nothing about the IRR, which is computed on the
+    // very terms the strip has just called 33.8pp off Nigeria's published take. Asserted on a
+    // materially-diverged country (Nigeria), a close one (Guyana, where the caveat must STAY
+    // QUIET), and the monopoly path (Saudi Arabia, which has its own red banner instead).
+    const _irr893 = await page.evaluate(async () => {
+      const read = async (cn) => {
+        ddOpenScenarioBuilder(cn);
+        await new Promise(r => setTimeout(r, 1400));
+        const el = document.getElementById('sb-origin-note');
+        const t = el ? el.innerText.replace(/\s+/g, ' ') : '';
+        const tile = [...document.querySelectorAll('#sb-output .sb-result-card')]
+          .map(c => c.innerText.replace(/\s+/g, ' '))
+          .find(x => /Contractor IRR/i.test(x)) || '';
+        const d = COUNTRY_DATA.find(x => x.country === cn);
+        const sbTake = window._lastScenario && window._lastScenario.result ? window._lastScenario.result.take : null;
+        return {
+          strip: t, tile: tile,
+          hasRow:   /CONTRACTOR IRR[\s\S]{0,120}publishes no country-level IRR/i.test(t),
+          flagged:  new RegExp('not ' + cn + '’s IRR').test(t),
+          tileFlag: new RegExp('not ' + cn + '’s IRR').test(tile),
+          para:     /This IRR is not/.test(t),
+          gap: (sbTake != null && d && d.take_75 != null) ? Math.abs(sbTake - d.take_75) : null
+        };
+      };
+      return { ng: await read('Nigeria'), gy: await read('Guyana'), sa: await read('Saudi Arabia') };
+    });
+
+    // 1. the row exists at all, on a country with its own terms
+    if (_irr893.ng.hasRow)
+      p(S, 'SB IRR basis row', 'the IRR now carries a reconciliation row naming the absent published counterpart');
+    else f(S, 'SB IRR basis row', 'no IRR row in the origin strip — the one number with no published check is silent again: ' + _irr893.ng.strip.slice(0, 200));
+
+    // 2. on a materially diverged country it must say the IRR is NOT the country's
+    if (_irr893.ng.gap !== null && _irr893.ng.gap >= 5 && _irr893.ng.flagged && _irr893.ng.para)
+      p(S, 'SB IRR divergence named', 'Nigeria runs ' + _irr893.ng.gap.toFixed(1) + 'pp off its published take and the IRR is marked not-Nigeria’s with the reason');
+    else if (_irr893.ng.gap !== null && _irr893.ng.gap < 5)
+      w(S, 'SB IRR divergence named', 'Nigeria’s scenario/published take gap narrowed to ' + _irr893.ng.gap.toFixed(1) + 'pp — pick another diverged country for this assertion');
+    else f(S, 'SB IRR divergence named', 'gap ' + _irr893.ng.gap + 'pp but flagged=' + _irr893.ng.flagged + ' para=' + _irr893.ng.para);
+
+    // 3. the tile carries the same flag — an analyst reading only the three big numbers
+    if (_irr893.ng.tileFlag)
+      p(S, 'SB IRR tile flag', 'the IRR tile itself reads "' + _irr893.ng.tile.slice(0, 80) + '"');
+    else f(S, 'SB IRR tile flag', 'tile unflagged while the strip warns — the two forked: ' + _irr893.ng.tile.slice(0, 120));
+
+    // 4. and it must NOT cry wolf where the basis is close
+    if (_irr893.gy.gap !== null && _irr893.gy.gap < 5 && !_irr893.gy.flagged)
+      p(S, 'SB IRR quiet when aligned', 'Guyana sits ' + _irr893.gy.gap.toFixed(1) + 'pp from its published take and draws no warning');
+    else if (_irr893.gy.gap !== null && _irr893.gy.gap >= 5 && _irr893.gy.flagged)
+      w(S, 'SB IRR quiet when aligned', 'Guyana now diverges ' + _irr893.gy.gap.toFixed(1) + 'pp and is correctly flagged — this assertion needs a closer country');
+    else f(S, 'SB IRR quiet when aligned', 'warning fired on an aligned basis: gap=' + _irr893.gy.gap + ' flagged=' + _irr893.gy.flagged);
+
+    // 5. monopoly keeps its own banner and does not grow a second, weaker one
+    if (/no contractor regime in ORCA/.test(_irr893.sa.strip) && !_irr893.sa.hasRow)
+      p(S, 'SB IRR monopoly untouched', 'Saudi Arabia still leads with the state-monopoly banner, no duplicate IRR row');
+    else f(S, 'SB IRR monopoly untouched', 'monopoly path changed: hasRow=' + _irr893.sa.hasRow + ' strip=' + _irr893.sa.strip.slice(0, 160));
+
     // ---- 4. rank direction label must match the rank the code computes -------
     // pctLower is the share BELOW; a rank counted from the bottom would satisfy
     // rank-1 === pctLower% of n. The code computes (n - below), i.e. 1 = highest.
