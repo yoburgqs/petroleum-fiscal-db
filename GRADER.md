@@ -56684,3 +56684,128 @@ a pass.
 Walked the Screener cold at 1440×900 with storage cleared — Home → Screener, and then **nothing else**. No preset, no slider, no sort. That's the Screener's own default, and it's the first surface a first-time screening analyst reads.
 
 Iraq sat there as `84.8%` GOVT TAKE with the tier pill `NOC/Concession`, and n
+
+---
+## Cycle 801 Log — 2026-09-16 20:1x
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest: last walked
+at cycle 793; 800 was T1, 799 T3, 798 T5, 797 T2, 795 T4).
+
+## Friction
+Walked T6 cold at 1440×900, fresh context, no sessionStorage or localStorage. Rather than assume
+where the friction was, I first measured how much evidence language each tab's rendered text
+actually carries: Reform Risk 31 hits, IOC Portfolio 58, Side-by-Side and Explorer-Browse a few
+each — and **Breakeven Map 2, in 2,473 characters.** That pointed the walk.
+
+The Breakeven Map choropleth is the tab's centerpiece, and its **hover readout is its only "row"**
+— the map has no table, so the tooltip is where a country's numbers are read. Pre-change it
+rendered, in full:
+
+    Netherlands                      Belgium
+    Breakeven: $27.0/bbl             Breakeven: $27.0/bbl
+    Govt take @$75: 23.4%            Govt take @$75: 16.6%
+
+Identical breakeven, identical greenest fill, and **nothing** separating 278 facts at 97.1%
+primary law (grade A) from 6 facts (grade D). No evidence grade, and no statement that the
+breakeven is *modelled* off the standardised deepwater project named at the top of the tab rather
+than read off a field. Both halves of the T6 question went unanswered at the point of decision.
+
+Measured against the shipped `country_data.json`:
+- Of the **65** countries this map paints, **47 grade C or D** — A:5 B:13 C:18 D:29.
+- The **greenest band (`<$29`)**, the best-looking colour on the tab and the one an analyst
+  screens *into*, is **9 countries of which 4 are D**: Belgium $27 on 6 facts, Sweden $27 on 12,
+  Vanuatu $28 on 14, UAE—Abu Dhabi $28 on 36. 5 of the 9 are C or D.
+- The legend said only how *many* countries wore each colour, never what they rested on.
+
+The right-hand Downside Resilience card got the letter on the face of every row at **v722**, and
+Fiscal Compare (Quality), Explorer, Screener, Side-by-Side and the Country Profile all carry it.
+The map was the **one primary artifact left** where the analyst had to click through to the
+Country Profile, one country at a time, to learn that the country they liked the colour of is a
+6-fact record. `renderBreakevenMap()` could not even reach the grader — it built only `beLookup`
+and `takeLookup`, no country entry.
+
+## Change
+- **`_beProvenance()`** — one new builder feeding *both* the hover tooltip and the SVG `<title>`
+  touch fallback off a single `_evidenceGrade()` call, so the two cannot fork. The readout now
+  carries the letter, its label, both legs with the **binding** one weighted and the other stepped
+  back (the same v619 treatment as the Country Profile Evidence Quality chip, so they read alike),
+  and for a C or D the action the Methodology tab's own tier guidance prescribes.
+- **The breakeven line says `modelled` on its face.**
+- **Grey countries carry the letter too** — deliberately. Grey means ORCA modelled no cost
+  structure, which is a *different* gap from not knowing the fiscal terms: Russia paints grey at
+  3,929 facts, and so does a 2-fact record.
+- **Legend bands state the C/D count they rest on** — `<$29 (9 · 5 C/D)` — so the caveat is
+  readable without hovering nine countries, each band with its own tooltip naming the grader.
+- **Legend row gains `flex-wrap`**, so the longer labels wrap rather than overflow at 390.
+- `entryLookup` added alongside `beLookup`/`takeLookup`.
+
+Post-change, the same two countries:
+
+    Netherlands                          Belgium
+    Breakeven: $27.0/bbl  modelled       Breakeven: $27.0/bbl  modelled
+    Govt take @$75: 23.4%                Govt take @$75: 16.6%
+    [A] primary-law backed               [D] too few facts to grade
+    97.1% primary law · 278 facts        66.7% primary law · only 6 facts
+                                         Not a shortlist candidate on this record —
+                                         establish the terms from the country's own
+                                         petroleum act first.
+
+## Result
+The analyst hovering the greenest country on the breakeven map is told **in place** that it is a
+D on 6 facts and not a shortlist candidate, and can tell it apart from the Netherlands sitting on
+the identical $27 and the identical green. Previously the only way to learn that was to click
+into the Country Profile 65 times.
+
+## Verification — all of it ran this cycle
+- **Runtime suite RAN**, office copy, against the local v891 tree over `http://localhost:8777`:
+  **323 PASS / 0 FAIL / 1 WARN**. The WARN is the pre-existing localhost script 404, present in
+  the baseline walk before any edit. Report deleted before the run and the number read back from
+  the file that run wrote.
+  - The petroleum-repo copy scores **304 PASS / 0 FAIL / 1 WARN** on the same tree. **The two
+    copies remain diverged** — 2,940 lines vs 2,680, 260 lines apart, which is the pre-existing
+    gap carried from 797–800 and is unchanged by this cycle. My five assertions went into **both**
+    copies byte-identically; the divergence count did not move.
+- **The new assertions were proven to fire, not assumed to.** The pre-change `index.html` was
+  served separately on :8778 and the suite run against it: **4 of the 5 new assertions FAIL**, and
+  their failure text is verbatim the friction described above — `Netherlands wanted A got
+  "Netherlands | Breakeven: $27.0/bbl | Govt take @$75: 23.4%"`. The 5th (`same breakeven,
+  different grade`) passes on both builds by design: it guards that the Netherlands/Belgium pair
+  stays load-bearing, and warns rather than fails if the data moves.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures; re-run after the
+  v890→v891 bump. Live version strings only (`<title>` line 42, `#hdr-version` line 2567).
+- **Mobile 390×844, `hasTouch: true`** — **8 of 8 tabs** `scrollWidth` 390 = `clientWidth` 390,
+  0 page errors. The legend row now wraps to two lines (41px) instead of overflowing; the
+  `flex-wrap` was added for exactly this and was verified, not assumed.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`; **none on `tbreakevenmap`.**
+- **Checked and found already correct, so not touched:** `be-legend-t5` renders empty because the
+  data-derived bands (v579) produce only 4 bands, and the pre-existing code correctly hides its
+  colour swatch (`swatchVisible=false`). No dangling red key.
+
+## Honest note on the 24px rule
+The legend band labels measure **17px** tall at 390. They are static text with `cursor:help` — no
+click handler, no tab stop — not controls, and they are unchanged in size from before this cycle;
+only their text got longer. The tooltip itself is `pointer-events:none` by construction. Recording
+the number rather than claiming a pass.
+
+## Carried forward
+- **The two suite copies are still 260 lines diverged** (petroleum 2,680 / office 2,940, scoring
+  304 vs 323 on the same tree). My additions are identical in both, but the underlying
+  divergence is untouched and now four cycles old. This is the most concrete piece of debt in
+  this list — the gate's number depends on which copy runs.
+- The Explorer's Browse-mode table was **confirmed this cycle to carry an EVIDENCE column**
+  (`B|125,336 facts` on the USA row), so the pre-v890 gap flagged in cycle 800's carry-forward
+  does **not** apply there. Closing that item.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country, so no fee-blended column can show
+  a true comparable IQR. Carried from 799–800.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both `Cost Recovery Cap`
+  and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). Carried from 793–800.
+- Scenario Builder's base case is still fixed to the first saved scenario with no way to
+  re-designate it. Carried from 798–800.
+- **Noted, not fixed, and arguably the next T6:** the map paints a 5-colour green→red ramp across
+  a **$27–$34** spread, while this tab's own left-hand card states in plain text that "breakeven
+  tells you ORCA has modelled a cost structure for these 65 — **it does not rank them**." The
+  colour ramp does rank them, emphatically, and it is the loudest thing on the tab. This cycle put
+  the evidence caveat where the colour is read; it did not resolve whether a ramp over $7 of
+  rounding should be drawn at all. That is a design call worth Zach's input, not a loop decision.
