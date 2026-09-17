@@ -57080,3 +57080,103 @@ has *claimed* since v744 ("the three surfaces cannot give you three different pr
 **Task: T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest by rotation (803 was T2, 801 T6, 800 T1, 799 T3, 798 T5; T4 last walked at 795).
 
 **Friction.** Walked cold at 1440×900 with storage cleared: Country Profile → pick a country → read the headline strip. I checked the Stability chip for all 21 jurisdictions that carry a sourced reform log, not a sample. The chip drew the in-window reform count as a **5-diamo
+
+---
+## Cycle 806 — v895
+
+**Task: T5** — *"Give me something I can paste straight into an IC memo."*
+
+**Note on provenance, recorded because it is the point of this cycle.** Cycle 805 timed
+out mid-flight (`subprocess.TimeoutExpired` after 1800s) and left v895 uncommitted in a
+dirty tree. This cycle did not start a new task. It validated, completed and shipped 805's
+work, because the 4 FAILs the runner reported were not a defect in that work — see below.
+
+**Why the suite read 4 FAIL.** `runtime_comprehensive.js` line 13 defaults
+`TEST_URL` to `https://yoburgqs.github.io/petroleum-fiscal-db/`, and `autonomous_cycle.py`
+sets `TEST_URL` only for `pixel_audit` (line 307), never for the runtime suite (line 98).
+So the suite tests the **deployed** build. 805 wrote five assertions for behaviour it had
+implemented locally and never pushed; they ran against deployed v894, which has none of
+it, and correctly failed. Re-run this cycle against the working tree on a local server:
+**343 PASS / 0 FAIL**, all five green. The tests were right and the code was right; only
+the commit was missing. This is the third appearance of the carried-forward
+`autonomous_cycle.py` has no partial-work guard debt, and the first time it produced a
+red suite rather than a silent one.
+
+**Friction.** Walked T5 cold at 1440x900, storage cleared. Country Profile -> Norway ->
+`⎘ IC Citation` pastes `BE $29/bbl`. Fiscal Compare -> Norway row -> `⎘ IC Citation` — the
+button FC's own IC Analyst Guide routes the analyst to, one tab away, same session, same
+build, same standardized basis — pasted `BE not available`. The FC Breakeven cell read
+`—`, the drawer chip read `BE: — (not modelled)` over a tooltip claiming breakeven "needs
+complete royalty and cost data", and `Copy for IC Memo` carried that same cause in its
+basis block. Two paste artifacts, one platform, one version, one country, assembled into
+the same memo, disagreeing about a citable number.
+
+**Cause, measured not asserted.** `COUNTRY_DATA` carries no `be_75` for Norway or the
+United Kingdom; ORCA's own `api/v1/country/<slug>.json` publishes `avg_breakeven_usd`
+28.7 and 20.3 for them, averaged over the same contract set as the take. Compared all 185
+bundled rows against all 212 shipped api files this cycle: exactly **2** countries are
+published-by-API and missing-from-bundle, and they are those two. (The 61 rows that differ
+numerically differ only because the bundle stores `round(api)` — 31.0 vs 31.2. Not
+disagreement. Correcting 805's draft note, which called them 65 agree / 0 disagree.)
+Both are the largest European producers, both sit in the default Side-by-Side set, and
+Norway is the default Country Profile — so a cold visitor meets the contradiction on the
+first country they open. v512 had resolved this for the Country Profile **alone**.
+
+**Change.** Not a second copy of the number — a single harvest point.
+`_orcaAdoptApiBe(country, j)` takes the breakeven out of api responses the page **already**
+fetches (the load-time reform-source loop in `initPlatform`, and `_fcTermLeg`), and writes
+it into the same `window._cpBeResolved` the Country Profile reads. No new network request.
+`_fcBe(r)` becomes Fiscal Compare's read point, replacing 13 raw `r.be_75` reads: Breakeven
+cell, drawer chip, row IC citation, `copyFCForIC`, XLSX export, the "Best BE" summary strip,
+and the breakeven sort / rank / tie-group / `>$50` and `>$80` dividers / "breakeven only"
+filter. `_fcAdoptBePaint()` patches cell, chip and baked citation if the response lands
+after first paint. The `be_75 = 1.0` state-monopoly solver floor stays refused on every
+path — Saudi Arabia still prints `—`, asserted by a dedicated over-firing guard. The IC
+basis block stops asserting a cause this platform's own v642 audit disproved, and instead
+states coverage and points at the $50/bbl contractor NPV column as the downside test.
+
+**Result.** Norway prints **$29** and the United Kingdom **$20** in the Fiscal Compare
+Breakeven column instead of an em dash; both now rank inside the breakeven sort rather than
+sinking to the bottom as "no data"; and the FC row citation and the Country Profile citation
+for the same country paste the **same** breakeven token into the same memo.
+
+## Verification — every number produced this cycle, against the working tree
+- **Runtime suite RAN, local server, cold contexts: 343 PASS / 0 FAIL / 1 WARN.** The 1 WARN
+  and 1 JS error are the pre-existing service-worker 404 on a local server, present in prior runs.
+- **The 5 BE-OneReadPoint assertions, all PASS:** api adopted at load (`Norway $28.7 / UK $20.3`
+  resolved without a new fetch) · FC column (`Norway $29, UK $20`, 182 rows tagged) · monopoly
+  floor still refused (Saudi Arabia not `$1`) · **FC and CP citations agree — both cite
+  `BE $29/bbl` for Norway** · IC basis block counts 2 of 3 and states no unrecorded cause.
+- **JS syntax gate PASS** — 11 inline blocks, `node --check`, 0 failures. Live version strings
+  only (`<title>` line 42, `#hdr-version` line 2567); the 5 remaining `v894` hits are comments.
+- **Horizontal scroll** — clean 9/9 tabs at **1920 / 1440 / 1280 / 1024 / 768**, each tab from a
+  fresh context with storage cleared. 0 page errors at every width.
+- **Mobile 390x844 `hasTouch: true`** — 9/9 tabs `scrollWidth` 390 = `clientWidth` 390, 0 page
+  errors. **182 Breakeven cells, 0 under 24px**; Norway's cell 49px.
+- **`pixel_audit.js` PASS** — "no surface got worse than baseline." All 5 reported findings are
+  pre-existing baseline entries on `thome`, `t0` and `t7`; none on the breakeven surface.
+
+## Debt CLEARED this cycle
+- Cycle 805's orphaned working tree is committed and pushed; the suite goes green on the next
+  run against the deployed build. The two runtime-suite copies are byte-identical.
+
+## Carried forward
+- **`autonomous_cycle.py` has no partial-work guard** — third cycle running. Now demonstrably
+  costly: it cost 805 its entire commit and cost 806 most of its budget re-deriving what 805
+  had already established. Worth a guard that commits or stashes on timeout.
+- **The runtime suite tests the DEPLOYED build while the cycle edits the LOCAL tree.** Every
+  cycle's "test after" number therefore describes the PREVIOUS cycle's deployed code, not the
+  work just done. This is why 801 and 804 also reported 4 FAIL and why the count keeps
+  flapping. `pixel_audit` already solves this with a local server (line 298-307);
+  the runtime suite should do the same, or the cycle log should stop calling it "test after".
+- Scenario Builder prints IRRs of 275.3% (Guyana) and 154.8% (Indonesia) full-size in green
+  while `_sbReturnReading()` classifies them `inflated`. Plausibly the next T2. From 803.
+- ORCA holds no PSC/Concession-only `p25`/`p75` for ANY country. From 799-803.
+- `sourcedCount` double-counts one model term on Guyana (`_MODEL_KEY` maps both
+  `Cost Recovery Cap` and `Cost Recovery Ceiling (contractual cap)` to `cost_recovery_cap`). From 793.
+- Scenario Builder's base case is fixed to the first saved scenario, no way to re-designate. From 798.
+- **Still Zach's call:** the Breakeven Map paints a 5-colour green→red ramp across a $27-$34
+  spread while that tab's own card says breakeven "does not rank them". From 801. Note this
+  cycle adds Norway $28.7 and UK $20.3 to that surface's resolvable set — the UK at $20 now
+  sits meaningfully below the old floor, which slightly strengthens the case for the ramp.
+- FAQ A-text still instructs "Filter to Stability >=4 dots", naming a scale v894 deleted. From 804.
