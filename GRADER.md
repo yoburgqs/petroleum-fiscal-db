@@ -58592,3 +58592,140 @@ countries into the country lookup one at a time.
 **Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 816 was T6)
 
 **Friction.** Cold load → Screener → the preset built for this exact question: *"Stable Fiscal Record — ≤1 sourced fiscal law change since 2010 · Take ≤70%"*. It returns 11 countries in a twelve-column table — #, Country, Region, Mechanics, Govt Take, Evidence, Contractor NPV, NPV@$50, Prod Cov, Swing, Tier. **None of them is the ref
+
+---
+## Cycle 818 — v907
+
+**Task: T5** — "Give me something I can paste straight into an IC memo." (817 was T4; the
+export gap logged as *"the first thing to fix next"* in the 817 debt list is exactly a T5 defect.)
+
+**Friction.** Walked T5 cold at 1440x900, `sessionStorage` and `localStorage` cleared, driving
+the real DOM (`#tab-btn-tscreener`, then `applyScreenerPreset('lowrisk')`): Screener → **Stable
+Fiscal Record** → 11 of 185 pass → export for the IC attachment.
+
+On SCREEN all 11 rows carry a reform verdict under the country name (v906), and four of them are
+not clean:
+
+| row | verdict on screen |
+|---|---|
+| Ecuador (4) | `TAKE +5pp · 1 chg · 2010` |
+| Russia (P4) | `TAKE +15pp · 1 chg · 2022` |
+| India (6) | `SIZE UNKNOWN · 1 chg · 2016` |
+| Iraq (7) | `SIZE UNKNOWN · 1 chg · 2023` |
+
+`_scExportRows()` returned **31 keys and not one matched `/reform/i`** — measured in the live page,
+not inferred from the changelog. So all three export paths (clipboard memo table, CSV, XLSX) handed
+back eleven rows that read as **equally stable**, under a criteria line that says *"Reform record: at
+most one sourced fiscal law change since 2010"*. Russia passes that filter **because** +15pp in 2022
+is one change. The file carried the criterion and dropped the one verdict that contradicts the
+impression the criterion creates.
+
+`Fiscal_Predictability` was already exported and is **not** this reading — it is 100 less IQR /
+price-swing / multi-mechanic penalties, a dispersion statistic over the contract table. Russia
+exports `Fiscal_Predictability 75` and knows nothing about the 2022 windfall tax.
+
+**Change.**
+- `_scReformExport(country)` — reads the same `_rrClassify()` verdict the Screener row chip, the
+  Fiscal Compare Reform column, the Country Profile sidebar and the Reform Risk card print.
+  No new rule, no new threshold, no new data.
+- Five columns now ride in **CSV and XLSX** (both derive their columns from `_scExportRows()`):
+  `Reform_Verdict`, `Reform_Changes_Since_2010`, `Reform_Last_Change`, `Reform_Frequency_Score`,
+  `Reform_Basis`.
+- The **pasted memo table** gains `Reform record (sourced log)`, carried whenever any row in the
+  file has a sourced log. Deliberately **not** gated on the reform filter — that closes the second
+  open item from the 817 debt list: an analyst who screened on take and NPV alone and happens to
+  hold Russia now gets the windfall tax in the file.
+- A **`REFORM RECORD`** block joins the four sibling blocks in `_scExportBasisLines()`, splitting
+  the rows *actually in the file* across the five token families, and stating in one sentence that
+  it is not the same reading as `Fiscal_Predictability`.
+- The 164 jurisdictions with no sourced log export as `n/c` carrying the platform's own sentence
+  that this is **missing coverage, not a clean record** — a blank cell under a column headed
+  Reform is read as "nothing to report".
+
+**A real bug found and fixed inside this cycle.** The first cut bucketed the roll-up on
+`icColor === 'var(--green)'`. Measured across all 21 logged jurisdictions, **every one returns
+`var(--orange)`** — no green ever fires on the current data — so the colour test collapsed all five
+families into one and filed **Ghana and Guyana, which have zero post-2010 fiscal changes**, under
+*"rewrote terms in-window, size never quantified"* beside Iraq. Bucketing now keys on the token
+family. Related wording fix: the TAKE family includes Norway at `TAKE NET 0pp`, so the block says
+**MOVED** government take, not *raised*, and each row carries its own token.
+
+**Result.** An analyst who exports the Stable Fiscal Record shortlist for an IC attachment now gets,
+in the file, the two rows that moved government take inside the window and the two whose terms were
+rewritten by an amount ORCA never quantified — instead of eleven rows that all look alike. The
+directive's finalization criterion 5 ("every export … carries the assumptions behind its numbers")
+now holds for the reform axis, which it did not at v906.
+
+### Verification — all run this cycle, none assumed
+- **JS syntax gate:** 16/16 inline blocks parse.
+- **Family split on the full 185-row universe:** 2 WACC (Brazil, UK) + 5 TAKE (Australia, Ecuador,
+  Norway, Indonesia, Russia) + 5 SIZE UNKNOWN + 7 PRE-2010 + 2 NO LAW CHANGE + 164 n/c = **185**.
+- **CSV** downloaded and re-read: header carries all five columns; Russia's row carries
+  `TAKE +15pp,1,2022 — Windfall tax on oil export revenues (+15pp government take),85`; the
+  `REFORM RECORD` block is in the tail.
+- **XLSX** downloaded and **re-parsed through the page's own XLSX library**: 2 sheets, 11 rows,
+  five `Reform_*` columns present, block present on `Screen & Basis`.
+- **Clipboard** read back through `navigator.clipboard.readText()` after clicking the real
+  `#screener-copy-ic-btn` twice (arm + copy): the `Reform record (sourced log)` column is in the
+  header row and Russia's cell names the 2022 windfall tax.
+- **No value moved.** Parity against `git show HEAD:index.html`, served from the same directory so
+  every asset path resolves identically, across three screens (`lowrisk` 11 rows, `iochurdle` 15,
+  cold universe 185): every non-reform field **byte-identical**, every basis line except the new
+  block **byte-identical**, same row order, same row counts.
+- **Viewports:** no horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 10 tabs;
+  **0 controls under 24px** at 390x844 `hasTouch`; **0 page errors** at every width. (The change adds
+  no DOM to the page — it is export-only — but the check was run rather than reasoned about.)
+
+### The 817 "-2 unattributed" question, answered
+Cycle 817 could not tell whether its 353-vs-355 gap was the change or the harness. It is the
+**harness**. The graded suite (`office/tools/petroleum/tests/runtime_comprehensive.js`, run by
+`autonomous_cycle.py:run_playwright()`) sets `NODE_PATH` and `ORCA_REPORT_FILE` but **no
+`TEST_URL`**, so it falls through to its default — the **live** `yoburgqs.github.io` build. The 355
+baseline is therefore measured against the deployed site, and any run pointed at an ad-hoc local
+port is a different harness, not a regression signal. Measured directly this cycle: the same suite
+against `python3 -m http.server` managed **22 checks in ~12 minutes** (~33 s/check) before being
+stopped, because `http.server` is single-threaded and serialises the asset fetches behind a 9 MB
+document. Against the live URL it runs at normal speed. **Local-port suite numbers are not
+comparable to the prompt's baseline and should not be logged as if they were.**
+
+### Test result — the suite RAN this cycle
+Against the **live deployed v907** build (`https://yoburgqs.github.io/petroleum-fiscal-db/`), i.e.
+the same URL and the same graded suite `autonomous_cycle.py` uses, report written
+2026-09-17T23:47:30Z:
+
+```
+PASS: 355   FAIL: 0   WARN: 0   JS errors: 0
+FAILURES: none      CONSOLE ERRORS: none
+```
+
+Baseline in the cycle prompt was **355 PASS / 0 FAIL**. Unchanged — no regression, and the number
+was read out of the suite's own report file, not assumed.
+
+**Shipped as** `68eabfe` (the change) and `993cc6b` (a comment-accuracy follow-up: the code comment
+said Russia's `Fiscal_Predictability` was 85; the exported value is **75**, band UNGRADED — 85 is the
+*Reform Frequency Score*, a count of law changes. Comment-only, no behaviour change). Mirror at
+`office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-identical.
+
+## Debt found this cycle, NOT fixed
+- **`Reform_Frequency_Score` and `Fiscal_Predictability` are two 0-100 columns that sit beside each
+  other in the workbook and mean different things.** Russia exports 85 and 75. The `REFORM RECORD`
+  block now says in prose that they are different readings, and `Reform_Basis` spells out what 85
+  counts — but nothing stops an IC reader from averaging two same-shaped scores, or from quoting
+  the wrong one. Whether the Screener should export a raw reform *score* at all, as opposed to the
+  verdict and the event, is a real question and is left open rather than answered unilaterally.
+- **`_scReformExport()` returns `null` when `REFORM_HISTORY` has not loaded, and the five columns
+  then export as empty.** That is the correct refusal — asserting `n/c` would be a coverage claim
+  the page cannot back — but an empty cell and "no log for this country" are indistinguishable in
+  the file. The `REFORM RECORD` block is also suppressed in that state (`if (!any) return`), so a
+  fetch failure produces an export that is silently missing the axis rather than one that says the
+  axis was unavailable. Building for absence rather than error is exactly the failure mode
+  `TACIT_KNOWLEDGE.md` names; the fix is a "reform log did not load" line, not a fabricated verdict.
+- **Still true from 817, still not fixed: `Reform Frequency Score ≤ 20` is unreachable.** Score =
+  100 − 15 × changes since 2010, so ≤20 needs ≥6 changes; the most-reformed jurisdiction on file is
+  the UK at 5 (score 25). The Reform Risk intro strip and the Fiscal Compare column tooltip both
+  state the IC rule using that threshold. It has never fired and cannot fire on current data.
+- **The scope boundary logged at 817 is still unmarked and bit again this cycle.** `showTab` and
+  `_scExportCols`/`_scCopyColumns` are not reachable from page scope, so the walk had to drive the
+  real DOM (`#tab-btn-tscreener`) and the real button rather than call the functions. That is
+  arguably a better test, but it was rediscovered by hitting the wall, exactly as 817 predicted.
+  Nothing marks the boundary and nothing detects a crossing.
