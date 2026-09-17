@@ -56809,3 +56809,18 @@ the number rather than claiming a pass.
   colour ramp does rank them, emphatically, and it is the loudest thing on the tab. This cycle put
   the evidence caveat where the colour is read; it did not resolve whether a ramp over $7 of
   rounding should be drawn at all. That is a design call worth Zach's input, not a loop decision.
+
+---
+## Cycle 801 Log — 2026-09-16 20:37
+- Test before: 319 PASS / 0 FAIL
+- Test after: 320 PASS / 4 FAIL
+- JS errors: 0
+- Summary: Cycle 801 complete and pushed to both repos.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** — the stalest task (last walked at cycle 793; 800 was T1).
+
+## Friction
+Rather than guess where to look, I measured how much evidence language each tab's rendered text actually carries. Reform Risk had 31 hits, IOC Portfolio 58 — and the **Breakeven Map had 2, in 2,473 characters.** That pointed the walk.
+
+The choropleth is that tab's centerpiece, and because the map ha
