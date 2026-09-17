@@ -58224,3 +58224,108 @@ the NPV attribution sentence is true at every price.
 Cold load → Country Profile → Nigeria → the **Live DCF Model** panel → drag the price slider off $75.
 
 That panel closes with a card titled **"WHICH NUMBER GOES IN THE IC MEMO?"** — the most authoritative instruction on the page, and exactly where T2's "can I defend that?" lands. It reconciles the stored cou
+
+---
+## Cycle 815 Log — 2026-09-17 15:05
+- Test before: 355 PASS / 0 FAIL (live-URL baseline)
+- Test after: 354 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the local tree.
+  Identical test-for-test to the pre-change build run the same way, so the delta vs 355
+  is the local `python -m http.server` (404 on a script the live deploy serves), not this
+  change. Both builds measured; not assumed.
+- JS errors: 0
+- Pixel gate: PASS. Shipped as **v904** and pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation:
+809 T3 → 810 T6 → 811 T4 → 812 T5 → 813 T1 → 814 T2.)
+
+## Friction
+Cold load (no sessionStorage/localStorage) → Side-by-Side → build a set containing a
+fee-blended column → the **Economics block**, `_cmpNpvCell` at `index.html:29054`.
+
+v666 corrected the fee-basis blend on the **$75 row alone** and wrote, in the code
+comment that has governed every surface since, *"there is no v50, v100 or v125."*
+The shipped `country_data.json` carries **v50, v75, v100 AND v125** for all 11
+fee-blended countries. The comment was stale and nothing had re-read the data.
+
+So three of the four rows in the block an IC decision turns on published the
+fee-blended figure at full strength **with no marker of any kind** — sitting directly
+beneath a Govt Take block that re-bases all four of *its* price rows. The page teaches
+the convention "a green PSC/Conc sub-line means the comparable basis" four rows up,
+then omits it exactly where the correction is largest. On an established convention,
+an omission does not read as missing — it reads as *"no correction needed here."*
+
+Iraq, blended against comparable:
+
+| price | published (blended) | comparable (PSC/Conc) | ratio |
+|---|---|---|---|
+| $50 | $389M | $1,438M | 3.7x |
+| $75 | $642M | $3,043M | 4.7x ← the only row ever corrected |
+| $100 | $840M | $4,508M | 5.4x |
+| $125 | $1,046M | $6,038M | 5.8x |
+
+In an Iraq / Norway / Angola set the $125 row put Iraq **last** ($1.05B against $1.71B
+and $2.25B). On the platform's own comparable basis Iraq is **first**, at $6.04B — 2.7x
+the next column. The analyst who followed the instruction printed four rows up ("rank
+Iraq on its PSC/Concession terms") read down into the value block and got the opposite
+answer, with nothing on screen saying why.
+
+Second defect, same root: **Malaysia's sign-change elimination fired on the wrong
+basis.** Blended `npv_50` is **-$33M**, which triggers the "▼ value-negative at $50"
+marker — this platform's binary "does not survive a downturn" verdict, the one the
+Screener ships a dedicated pass/fail control for. Its comparable Group-1 `v50` is
+**+$46M, positive.** The crossing belongs to the blend, not to the terms.
+
+## Change
+- **`_cmpRankNpvAt(d, price)`** replaces the $75-hardcoded ranker; `g1['v'+price]` is
+  read per row. All four Contractor NPV rows now carry the green **"PSC/Conc $X"**
+  sub-line and the largest/smallest ordering marker, in the same position and wording
+  the Govt Take rows already use. **30 cells corrected across 11 countries.**
+- The per-price ordering IIFE no longer blanks $50/$100/$125 when any column is
+  fee-blended (`if (pr !== 75 && _npvBlended) return;` removed); each price orders on
+  its own comparable figure. `reb` is computed at the row's own price, not inherited
+  from $75.
+- **The sign marker is basis-aware.** Malaysia's $50 cell now reads *"▼ blended only —
+  comparable basis is positive"* over `PSC/Conc $46M`, and the verdict strip's downside
+  line says the same thing, so the strip and the grid stop contradicting each other.
+  **Yemen keeps the hard elimination unchanged** — it carries no Group-1 split, so
+  nothing rescues it, which is correct.
+- Four blocks of prose asserting *"ORCA holds that contractor-side split at $75/bbl
+  only, so the $50, $100 and $125 rows stay blended"* removed. They were false.
+
+## Result
+The analyst reads the whole value block on **one basis**, and it is the same basis the
+take block above it and the verdict strip are already on.
+
+- Measured over every fee-blended column against every other country at $50/$100/$125:
+  **522 of 6,072 pairwise orderings (8.6%) were backwards** before this change — **245
+  of them Iraq's**, then Iran 80, South Sudan 51, Qatar 50, Oman 27, India 26,
+  Ecuador 21, Mexico 12, Azerbaijan 7, Malaysia 3.
+- Ordering a screening set on the upside row no longer inverts the ranking the take
+  rows just gave.
+- Malaysia is no longer eliminated by a downside screen it passes on the basis the rest
+  of the page ranks it on.
+- **Regression: byte-identical on every set with no fee-blended column** — Guyana/
+  Angola/Brazil, Norway/UK/Netherlands, USA/Canada/Brazil. The change is inert where it
+  should be, verified by rendering the pre-change build from `git show HEAD:index.html`
+  and diffing the tab's full innerText across 10 sets.
+- Export path carries it: the cells ride the shared `rows` array into `#cmp-data-table`,
+  so Copy-for-IC-Memo and Save-as-PDF print the re-based figures too — checked.
+- Mobile 390x844 `hasTouch`: no horizontal scroll (390/390); **0 of 76** added elements
+  under 24px.
+
+## Debt found this cycle, NOT fixed
+- **A stale code comment silently governed five surfaces for 238 cycles.** v666's
+  "there is no v50, v100 or v125" was load-bearing for `_cmpRankNpv`, the ordering
+  IIFE, `_cmpNpvCell` and four blocks of user-facing prose, and no cycle re-read the
+  data behind it. Anywhere a comment asserts what the data does *not* contain is worth
+  a cheap assertion against `country_data.json` instead — the same class of fault as
+  the delta assertion in `overnight_chain.py`.
+- **`g1` carries `t50/t75/t100/t125` for take but the take rows were already re-basing
+  at all four**, so take and value are now aligned. Worth checking whether any *other*
+  `g1` field is read at one price and assumed absent at the rest — `n` is scalar, but
+  this was not audited beyond `v*`.
+- **The hidden `#cmp-data-table` concatenates a cell's sub-lines without separators**
+  (`$389MPSC/Conc $1.44Blargest of 3 · on PSC/Conc`). Pre-existing on the $75 row; this
+  cycle propagated the same format to three more rows rather than introducing it. It
+  pastes into Word as one run-on string. A natural next T5.
