@@ -59501,3 +59501,122 @@ path and does not produce the spurious 404 WARN noted in cycle 824.
 Walked cold at 1440×900 with storage cleared, capturing every paste artifact off a stubbed clipboard and cross-checking all 185 Fiscal Compare rows against all 185 Screener rows, column by column. One column disagreed — about whether the number exists at all.
 
 `_scExportRows()` — the single choke point behind th
+
+---
+## Cycle 826 Log — 2026-09-18 05:10 — v915
+- Test before: 416 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 416 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite **RAN** this cycle, local v915, number read from `/tmp/runtime_test_report.txt`)
+- JS errors: 0
+- Summary: Cycle 826 shipped as **v915**, pushed, mirror copied.
+
+## Task
+
+**T1 — "Which countries should even be on my screening list?"**
+Rotation: 825 was T5, 824 T4, 823 T6, 821 T2, 820 T1, 819 T3.
+
+## Friction
+
+Walked T1 cold at 1440×900 with `sessionStorage` and `localStorage` cleared: Home → Screener →
+Explorer. The Screener is in good shape — the preset menu carries live hit counts, the count line
+names the data basis before the ranking, and v568's deletion of the inert breakeven ceiling still
+holds.
+
+The Explorer was the last surface on the platform still dereferencing the bundled `be_75` field
+directly rather than going through `cpBeFor()` — the single breakeven read point v895 established
+and cycle 825 joined the Screener's CSV / XLSX / clipboard to. Five call sites: `_beTested()`
+(`index.html:26512`), the `be` sort comparator (`:26796`), the BE-only filter (`:26757`), the cell
+renderer (`:26962`) and the XLSX row builder (`:45543`).
+
+`COUNTRY_DATA` carries no `be_75` for **Norway** or the **United Kingdom**, while ORCA's own
+`api/v1/country` files publish **28.7** and **20.3** for them — the same numbers the Country
+Profile prints, Fiscal Compare shows and the Screener exports. Measured cold, not inferred:
+`COUNTRY_DATA.filter(raw be_75)` = **65**; `filter(cpBeFor)` = **67**.
+
+So on this one tab both countries printed an em dash, the BE-only checkbox dropped them, and — the
+reason this is a screening defect and not a cosmetic one — **the `be` sort scored them 999**:
+
+| sort by Breakeven, low first | before | after |
+|---|---|---|
+| rank 1 | Australia $28 | **United Kingdom $20** |
+| rank 2 | Argentina $31 | Australia $28 |
+| rank 3 | (divider) Belgium $27 | Norway $29 |
+| United Kingdom | **row 86**, unranked alphabetical tail | **row 1** |
+| Norway | row 82, unranked tail | row 3 |
+
+The UK's $20.3 is the **lowest breakeven in the entire database**. An analyst sorting this column
+to find the most price-resilient regimes got the wrong country at rank 1 and never saw the right
+one — and the UK is one of only 22 countries with verified field production, at the highest
+coverage on the platform (37.6%).
+
+Three coverage captions on the tab were hand-typed, and two of the three were wrong:
+
+| caption | said | truth |
+|---|---|---|
+| Breakeven column header | `(65/185 countries)` | 67 |
+| BE-only checkbox tooltip | "the **68** countries" | 67 |
+| coverage strip | `Breakeven 65/185` | 67 |
+
+And the Screener legend, which sits in the **same tab shell** (`#texplorer`, Screener mode vs
+Browse mode), independently computed **65** from `_beIsTested(d.be_75)` — so the two halves of one
+tab disagreed about how many breakevens ORCA holds. Its claim that "every value falls between $27
+and $34/bbl" is falsified by the UK's $20.3.
+
+## Change
+
+- **One predicate.** `_explBe(d)` routes through `cpBeFor()`; `_beTested()` is now
+  `_explBe(d) != null`. Column, filter, sort comparator, XLSX and every caption read it.
+- Breakeven sort ranks **United Kingdom #1 at $20**, Australia #2, Norway #3.
+- Norway and the UK print **$29** and **$20** instead of `—`, each with a tooltip naming
+  `api/v1/country` as the source, on the `_fcAdoptBePaint` provenance pattern.
+- **BE-only keeps 67 rows instead of 65**, and production-backed rows inside that set go **2 → 4**.
+- The BE-only control carries a live count in its **label** — `BE only (67)` — not only in a
+  tooltip the analyst has to hover to read.
+- Header caption, coverage strip, BE-only count, the Screener legend's count, **its observed range
+  ($20–$34, computed) and its no-production count** are all derived from that one predicate, so a
+  caption and the behaviour it describes cannot drift apart again.
+- `_orcaAdoptApiBe()` repaints the Explorer if the tab is on screen when a value lands. No-op at
+  cold load, where all three resolve while Home is active.
+
+## Result
+
+An analyst building a screening list can sort the Explorer by breakeven and get the right country
+at rank 1. The United Kingdom — ORCA's most resilient modelled regime — is no longer invisible to
+the breakeven column, the breakeven sort and the BE-only filter on the tab whose entire job is
+building a shortlist. **Every surface on the platform that reads a breakeven now reads the same
+one.** That debt, opened at v512 and carried through v895 and cycle 825, is closed.
+
+## Verification — all measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (run twice — after the fix, and again after the version bump) |
+| Graded runtime suite, local, v915 | **416 PASS / 0 FAIL / 0 WARN**, read from the suite's own report file |
+| JS errors captured by the suite | **0** |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768, 9 tabs each | overflow **0** at every width, max delta 0px |
+| Mobile 390×844 `hasTouch`, 9 tabs | `scrollWidth` 390 = `clientWidth`, overflow **0**, 0 page errors |
+| Controls under 24px under `pointer: coarse` | `#expl-be-check-wrap`, `#expl-be-th` — **none under 24px** |
+| Pre-change behaviour | walked against `HEAD` on the same local server before editing — the row-86 UK position and the 65/68 caption split are measured, not inferred from the diff |
+| Cross-surface breakeven agreement | Explorer caption 67, Screener legend 67, `cpBeFor` set 67 — all three agree |
+
+## Debt closed
+
+- **The Explorer was the last raw `be_75` read point.** Country Profile (v512), Fiscal Compare
+  (v895), Screener exports (825), Explorer column / filter / sort / XLSX (this cycle).
+
+## Debt still open, NOT fixed this cycle
+
+- **The Breakeven Map still reads raw `be_75`** — it shows 65 countries and states "every one of
+  them falls between $27 and $34/bbl". It remains internally consistent with itself, but it now
+  disagrees with the Explorer. Deliberately left: roughly fifteen further "65 of 185" literals sit
+  in Methodology and FAQ prose, and sweeping them is a text pass that would have buried this
+  one-line data fix. It is the next T6 cycle's work, and it is stated here so it is not rediscovered
+  cold.
+- The suite-copy divergence detector in `run_playwright()` still only warns and lets the cycle ship.
+- Cycle 822's 1800s subprocess timeout left a half-shipped feature on disk with nothing to roll it
+  back or flag it.
+- The `Score <= 20` IC rule on the Reform Risk intro strip and the FC column tooltip is unreachable
+  on this data (the UK, the most-reformed jurisdiction, scores 25). A decision for Zach about what
+  ORCA publishes as its IC rule, not a patch.
+- Home's Side-by-Side card says "Compare up to 4 countries in parallel" while `CMP_MAX` is 5.
+- The IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()` selects its band on
+  comparable take and ranks on the blend.
