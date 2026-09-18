@@ -59486,3 +59486,18 @@ path and does not produce the spurious 404 WARN noted in cycle 824.
 - Home's Side-by-Side card says "Compare up to 4 countries in parallel" while `CMP_MAX` is 5.
 - The IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()` selects its band
   on comparable take and ranks on the blend.
+
+---
+## Cycle 825 Log — 2026-09-18 04:20
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 825 shipped — v914, pushed, mirror copied.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Last ran at cycle 818; 824 was T4, 823 was T6.)
+
+## Friction
+Walked cold at 1440×900 with storage cleared, capturing every paste artifact off a stubbed clipboard and cross-checking all 185 Fiscal Compare rows against all 185 Screener rows, column by column. One column disagreed — about whether the number exists at all.
+
+`_scExportRows()` — the single choke point behind th
