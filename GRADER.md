@@ -59882,3 +59882,16 @@ downloaded the file and parsed it. **The suite has no coverage of the Breakeven 
 - Test before: 416 PASS / 0 FAIL
 - Test after: 416 PASS / 0 FAIL / 0 WARN, 0 JS errors — suite RAN this cycle, number read from `ORCA_REPORT_FILE`
 - Shipped: v918
+
+---
+## Cycle 829 Log — 2026-09-18 09:27
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Done — v918 shipped and pushed.
+
+## Cycle 829 — T6
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+
+**Friction.** Walked it cold in a real browser at 1440×900 with storage cleared. The Explorer ranks the **United Kingdom first at $20.3/bbl** — the lowest breakeven the platform carries. Open the **Breakeven Map**, the one tab whose entire subject is that number, and the UK is painted grey, counted inside "No data (120)", and its hover reads **"United Kingdom — no 
