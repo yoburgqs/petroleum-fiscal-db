@@ -59620,3 +59620,16 @@ one.** That debt, opened at v512 and carried through v895 and cycle 825, is clos
 - Home's Side-by-Side card says "Compare up to 4 countries in parallel" while `CMP_MAX` is 5.
 - The IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()` selects its band on
   comparable take and ranks on the blend.
+
+---
+## Cycle 826 Log — 2026-09-18 05:18
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 826 shipped as **v915**, pushed, mirror copied.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotation: 825 was T5, 824 T4, 823 T6, 821 T2, 820 T1, 819 T3.)
+
+## Friction
+Walked cold at 1440×900 with storage cleared: Home → Screener → Explorer. The Screener is in good shape. The Explorer was the last surface on the platform still reading the bundled `be_75` field directly instead of going through `cpBeFor()` — the single breakeven read point v895 established and 
