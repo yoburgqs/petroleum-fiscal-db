@@ -60135,3 +60135,98 @@ already bumped to, and v921 is the first build that actually contains the work.
 **Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 830 was T1, T4 last walked at 824.)
 
 **Friction.** Reform Risk tab, cold load at 1440×900, storage cleared, lookup set to **Iraq-Kurdistan**. `renderReformCountryVerdict()` takes the no-log branch and returns the emptiest card the tab can produce: *"no Reform Frequency Score"*, *"one of the 164 without one"*, **no statute 
+
+---
+## Cycle 835 — 2026-09-18 — shipped as v922
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest in
+rotation: 834 was T4, 830 T1, 829 T6, 828 T3, 826 T1, 825 T5, 824 T4, 823 T6, **821 T2**.
+
+**Friction.** Country Profile, cold load at 1440x900, sessionStorage and localStorage cleared.
+The tab auto-seeds Indonesia, so the first thing the analyst actually *operates* is
+`#dd-country-select`. Its options are built at `index.html:45330`:
+
+    opt.textContent = d.country + (REFORM_HISTORY[d.country] ? ' ★' : '')
+                                + (d.has_r_factor_tiers ? ' ◆' : '');
+
+Measured on the shipped build, not inferred: **91 of the 185 options carry a ★, a ◆ or both**
+(21 star, 70 diamond, 13 both). There was no legend anywhere in `#t7`, no `title` on the select
+(its `aria-label` reads only "Select a country to load its complete fiscal profile"), no `title`
+on any option, and the glyphs appear nowhere on the profile that renders after selection — so
+the analyst could not resolve them by reading on either.
+
+Both obvious guesses invert the meaning. **★ is not a recommendation:** it marks the 21
+jurisdictions whose fiscal terms ORCA can show were *rewritten* since 2010 — the cohort the
+Reform Risk tab scores. That is exposure that happens to be evidenced, and an unmarked country
+is not stable, it is un-logged. **◆ is a mechanic, not a data grade:** an R-factor profit-oil
+ladder, where take rises with project profitability and a single-price quote understates it.
+An analyst screening toward the starred rows as "the good ones" is screening toward the
+countries most likely to have changed the terms under them.
+
+**Change.** A legend sits directly under the selector, built from the data at populate time so
+its counts cannot drift from the list: `★ 21 with a sourced reform log · ◆ 70 with R-factor
+profit-oil tiers — coverage marks, not quality or attractiveness ranks`. Each mark is a toggle
+that narrows the list to its own cohort (★ → 21, ◆ → 70, both → 13) with a live
+`list narrowed to N of 185` readout. `loadCountryProfile()` — the single funnel every entry
+point routes through — now calls `_cpEnsureCountryVisible()`, so a peer row, a deep link or a
+cross-tab jump to an excluded country clears the filter and re-points the selector rather than
+leaving a blank picker sitting over a populated profile.
+
+**Result.** The analyst reads what the marks mean without leaving the control, cannot read ★ as
+an endorsement, and can narrow 185 countries down to the 21 whose fiscal-stability claim is
+actually evidenced before screening on it.
+
+### Verification — measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (re-run after the patch and after the version bump) |
+| Graded runtime suite, local tree, v922 | **415 PASS / 0 FAIL / 1 WARN**, read from `ORCA_REPORT_FILE=/tmp/orca922.txt` |
+| Score attribution | the pre-edit tree on the identical command also scores 415/0/1 — the change is score-neutral |
+| The 1 WARN / 1 JS error | service-worker `404` on the local server; present before any edit, carried from 830. Not chased. |
+| Pre-change state | the glyphs were read off the **shipped** build: `select.title` empty, every `option.title` empty, no `★` legend text anywhere in `#t7` |
+| Legend counts | ★ 21, ◆ 70 — computed from `REFORM_HISTORY` (21 keys) and `has_r_factor_tiers` (70 rows), not hardcoded |
+| Filter | ★ → 22 options (21 + placeholder), ◆ → 70, both → 13; `cp-mark-count` reads "list narrowed to 21 of 185" |
+| Funnel yield | with both filters on, `loadCountryProfile('Norway')` clears them, restores 186 options, **and sets `select.value` to `Norway`** so picker and profile agree |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768 / 390, all reachable tabs | **clean at every width** |
+| Mobile 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth`; both new chips measure **44px** under `pointer: coarse`; legend width 362px, **0** overflowing children |
+| Page errors | **0** `pageerror` across the desktop and mobile walks |
+| Mirror copy | sha-identical to `index.html` (`72417f480ec6`) |
+| Push | `73fe5fa..550b2a5  main -> main` |
+
+### Also walked this cycle and found clean — recorded so the next T2 does not re-walk it
+
+- All 185 profiles rendered in sequence: **0** occurrences of `undefined`, `NaN`, `null`,
+  `Infinity` or `[object` in the rendered text; **0** throws.
+- Peer-comparison tables: **0** non-monopoly countries are offered a 100%-take state monopoly as
+  a value peer. That contamination does not exist.
+- Verdict line: present on 182 of 185; the 3 absences (Bahrain, Kuwait, Saudi Arabia) are the
+  state monopolies, which render a dedicated no-contractor-position card instead.
+
+### Debt still open, NOT fixed this cycle
+
+- **The 1800s cycle timeout remains the top operational problem** (from 834). 31 `TimeoutExpired`
+  entries in `cycle_log.txt`; a slow cycle still loses all its work silently.
+- On a state monopoly the same NPV prints **`$0M`** in the Peer Comparison table and Key Metrics
+  but **`n/a — no contractor position`** in the 4-price table three inches below. `$0M` in a table
+  framed as "contractor NPV on the identical standardized project so the set can be read on value"
+  invites reading Saudi Arabia as the worst-value regime rather than as not-a-regime. Scope: 3
+  countries. **New this cycle.**
+- Angola's Country Profile prints `BE: < $50/bbl bounded` in four places above a paragraph that
+  opens "No breakeven on file for Angola." The paragraph does reconcile the two, but it leads with
+  the contradiction. **New this cycle.**
+- The service-worker 404 still makes the local suite read 415/0/1 against the harness's 416/0/0.
+- FAQ A381 still answers a "65 of 185" question with **117** and **120** (from 829).
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` unseparated (from 828).
+- Home's Side-by-Side card and the Reference panel still say "Compare up to 4 countries" while
+  `CMP_MAX` is 5 (from 828).
+- The Breakeven Map CSV still has no suite coverage (from 829).
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+
+## Cycle 835 Log — 2026-09-18
+- Test before: 416 PASS / 0 FAIL
+- Test after: 415 PASS / 0 FAIL / 1 WARN on the local tree (score-neutral vs the pre-edit tree on
+  the same command; the harness's 416/0/0 is the origin run, which does not hit the local
+  service-worker 404)
+- JS errors: 0 pageerrors; 1 console 404 (service worker, pre-existing)
+- Summary: Cycle 835 shipped as **v922**, pushed (`550b2a5`), mirror copied.
