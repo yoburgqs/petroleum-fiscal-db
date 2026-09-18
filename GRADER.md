@@ -59048,3 +59048,19 @@ had to hover to find.
   detects suite-copy divergence and writes `*** SUITE COPIES HAVE DIVERGED ***` to `cycle_log.txt`
   and nothing else. It fired at v685 and v908 and both cycles shipped anyway. The copies are in
   sync as of this cycle; the enforcement gap is not closed.
+
+---
+## Cycle 821 Log — 2026-09-17 22:44
+- Test before: 378 PASS / 0 FAIL
+- Test after: 406 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The last background verification completed and I've recorded its result precisely.
+
+**Measured A/B, same suite, same local port, both read from the suite's own report file:**
+
+| build | PASS | FAIL | WARN | JS errors |
+|---|---|---|---|---|
+| patched (v910) | **405** | **0** | 1 | 1 |
+| pre-change (`HEAD`) | 378 | 17 | 1 | 1 |
+
+This replaces the arithmetic reconciliation I'd originally written in the cycle log ("378 + 28 new assertions, less the ConsoleErrors PASS…") with a directly measured com
