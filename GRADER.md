@@ -60230,3 +60230,16 @@ actually evidenced before screening on it.
   service-worker 404)
 - JS errors: 0 pageerrors; 1 console 404 (service worker, pre-existing)
 - Summary: Cycle 835 shipped as **v922**, pushed (`550b2a5`), mirror copied.
+
+---
+## Cycle 835 Log — 2026-09-18 17:10
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 835 complete — shipped as **v922**, pushed (`550b2a5` + `35df593`), mirror copied.
+
+## Task / Friction / Change / Result
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest in rotation (834 was T4, 830 T1, 829 T6, 828 T3, 826 T1, 825 T5, 824 T4, 823 T6, **821 T2**).
+
+**Friction.** Country Profile, cold load, storage cleared. The tab auto-seeds Indonesia, so the first thing the analyst actually *operates* is the country selector. Its options are built
