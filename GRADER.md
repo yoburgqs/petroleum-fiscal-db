@@ -59895,3 +59895,105 @@ downloaded the file and parsed it. **The suite has no coverage of the Breakeven 
 **Task:** T6 — "Where did this number come from and how solid is the evidence?"
 
 **Friction.** Walked it cold in a real browser at 1440×900 with storage cleared. The Explorer ranks the **United Kingdom first at $20.3/bbl** — the lowest breakeven the platform carries. Open the **Breakeven Map**, the one tab whose entire subject is that number, and the UK is painted grey, counted inside "No data (120)", and its hover reads **"United Kingdom — no 
+
+---
+## Cycle 830 — 2026-09-18 — shipped as v919
+
+**Task:** T1 — "Which countries should even be on my screening list?" (stalest in rotation: 820
+was T1, 821 T2, 823 T6, 824 T4, 826 T5, 828 T3, 829 T6.)
+
+### Friction
+
+Walked cold at 1440x900 with `sessionStorage` and `localStorage` cleared. Home answers T1 well —
+*"15 countries pass the IOC capital screen … the other 163 carry regional-proxy economics —
+indicative, not a shortlist."* The Screener answers it well: presets carry their own hit counts,
+the empty state at the $125 deck names the binding leg and prints the per-deck counts, the
+round trip into a Country Profile and back preserves the screen. None of that was the problem.
+
+**Explorer Browse was.** It is the tab whose whole job is "show me everything so I can decide
+what to look at", and it is where a first-time analyst lands from the primary nav. It draws a
+labelled divider (v578) at the point the ranking stops being production-backed and says the
+block below is *"regional proxy estimates … usable for fiscal comparison; not defensible as a
+screening shortlist on their own."*
+
+The first row under that line, on **both** sorts T1 actually uses — the default **Govt Take**
+ascending and **NPV** descending — was:
+
+| # | country | take | contractor NPV | NPV @$50 | facts | grade |
+|---|---|---|---|---|---|---|
+| 23 | Vanuatu | 5.0% | **$5.10B** | $2.37B | 14 | D |
+| 24 | Bahamas | 10.0% | $4.67B | $2.08B | 8 | D |
+| 25 | Montenegro | 10.5% | $4.63B | $2.15B | 30 | C |
+| 26 | Greenland | 11.6% | $4.54B | $2.17B | 62 | B |
+| 27 | Faroe Islands | 11.9% | $4.51B | $2.16B | 98 | B |
+
+**$5.10B is the largest contractor NPV in the database** — larger than Canada's $3.91B, which
+leads the verified block. Two columns corroborated a list of jurisdictions nobody would screen.
+
+These 45 countries are not proxy estimates, which is what the divider had just called them. ORCA
+holds **no petroleum rent instrument for them at all** — no state participation, profit-oil or
+revenue share, resource-rent surtax, cost-recovery limit, first-tranche petroleum or service fee
+— on a record under 50 facts. Take is royalty and income tax alone: a **lower** bound, with the
+NPV beside it an **upper** bound. Since NPV falls as take rises, a thinner record yields a lower
+take, a higher NPV, and therefore a **higher row**. The divider's own promise — "ranked among
+themselves by the same metric" — was being satisfied by the absence of evidence.
+
+The product already knew this. The `sc-floor-keep` tooltip names Vanuatu by name: *"they sort to
+the TOP of an NPV ranking: Vanuatu leads the whole database at $5.1B on 14 facts."* **Fiscal
+Compare** partitions these rows (v563). The **Screener** partitions them with a second divider,
+bound glyphs and its own F block (v743). `renderExplorer()` was the last ranking surface that did
+not — and it is the one reached first.
+
+### Change
+
+| | before | after |
+|---|---|---|
+| `_explorerDqRank()` | 2 registers (verified / not) | **3** — verified `0`, modelled proxy `1`, floor `2`, matching the Screener's `_dqRank` |
+| dividers in Browse | 1 (+ the breakeven one) | **2** — second amber line reusing `_scFloorWhy()`, so the two tabs cannot drift |
+| floor row cells | `5.0%` · `$5.10B` · `$2.37B` | **`≥5.0%`** · **`≤$5.10B`** · **`≤$2.37B`**, each with the Screener's per-row tooltip |
+| count line | "22 verified … then **163** regional proxies" | "22 verified … then **118** regional proxies, then **45** whose take is a floor rather than a measurement" |
+| XLSX | `Data Basis` only | new **`Take Basis`** column; `Ranking basis` explains why the last 45 rank last |
+| `makeTakeCellWithEvidence()` | 2 args | optional 3rd, **opt-in** — the Explorer is its only caller |
+
+### Result
+
+Vanuatu moves from **rank 23 to rank 141**, under a line reading *"BELOW THIS LINE — 45 COUNTRIES
+WHOSE TAKE IS A FLOOR, NOT A MEASUREMENT"*. The head of the ranked proxy block is now Turkmenistan
+and Russia — countries with a modelled fiscal regime. An analyst who opens the Explorer to ask
+which countries belong on a screening list is no longer handed fourteen jurisdictions whose only
+qualification is that ORCA knows nothing about them, and the XLSX they carry into the memo says
+the same thing the screen did.
+
+### Verification — measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (re-run after every edit and after the version bump) |
+| Graded runtime suite, local, v919 | **415 PASS / 0 FAIL / 1 WARN**, read from `ORCA_REPORT_FILE` |
+| Score attribution | pristine build run on the **identical** command also scores **415/0/1**; the two report files are **byte-identical apart from the timestamp**. The change is exactly score-neutral. |
+| The 1 WARN | service-worker `404`, present on the shipped build **before** any edit, absent when the harness serves the tree. Environmental, not this change — which is why the cycle's own before-number read 416/0/0. Not chased this cycle. |
+| Pre-change behaviour | the grey-area ranking, the $5.10B at rank 23 and the 163-count were **observed on the shipped build before editing**, not inferred |
+| Sorts | take / npv / npv50 / stability all group three ways; **breakeven** draws the floor divider *inside* the ranked block only (@24, before the BE line @69); **A–Z** does not group at all |
+| Region filter | recomputes per result set — Europe: 2 verified / 20 modelled / 11 floor of 33 |
+| Evidence-first toggle OFF | still ungroups fully (Vanuatu returns to #1, the deliberate escape hatch) and the `≥` / `≤` glyphs **survive it** |
+| Prod Data Only | 22 rows, 0 floor rows, no divider drawn |
+| XLSX | downloaded and parsed with openpyxl — **185 rows**, `Take Basis` correct at ranks 1 / 23 / 141, assumptions sheet carries the floor paragraph |
+| Screener regression | unchanged — IOC preset still **15 of 185**, 170 filtered |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768, 8 tabs each | overflow **0** at every width |
+| Mobile 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth`, **0** page errors, divider renders (55px), min row height **50px** |
+| Mirror copy | sha-identical to `index.html` (`3ecdb4c0c296`) |
+
+### Debt still open, NOT fixed this cycle
+
+- The **service-worker 404** makes the local suite read 415/0/1 against the harness's 416/0/0.
+  Pre-existing and environmental, but it means the cycle's before- and after-numbers are measured
+  on two different footings. Worth reconciling so the gate compares like with like.
+- **FAQ A381** still answers a "65 of 185" question with **117** and **120** in one paragraph
+  (from 829; FAQs are frozen by directive).
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` with no thousands separator
+  (from 828).
+- Home's Side-by-Side card and the Reference panel's tab list both still say "Compare up to 4
+  countries" while `CMP_MAX` is 5 (from 828).
+- The suite-copy divergence detector in `run_playwright()` still only warns and lets a cycle ship.
+- The Breakeven Map CSV still has **no suite coverage** (from 829).
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
