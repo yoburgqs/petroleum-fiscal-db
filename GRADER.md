@@ -58744,3 +58744,146 @@ said Russia's `Fiscal_Predictability` was 85; the exported value is **75**, band
 **Friction.** I walked it cold at 1440×900 with storage cleared: Screener → **Stable Fiscal Record** → 11 of 185 countries pass → export for the IC attachment.
 
 On screen, four of those eleven rows are visibly *not* clean — Ecuador `TAKE +5pp` (2010), Russia `TAKE +15pp` (2022), India and Iraq `SIZE UNKNOWN`. But `_scExportRows()` returned **31
+
+---
+## Cycle 820 — v909
+
+**Task: T1** — "Which countries should even be on my screening list?"
+(Rotation: 819 was T3, 818 T5, 817 T4, 816 T6. T1 was stalest.)
+
+### First: the 4 FAIL in this cycle's prompt were NOT a product regression
+
+The prompt opened at **351 PASS / 4 FAIL**, down from 355/0. None of the four was a defect in the
+deployed build. All four were stale positional assertions in the **graded** copy of the suite,
+which cycle 819 never updated when it shipped v908's column reorder:
+
+```
+Comparison / SBS-EXAMPLE no unchosen column holds a slot   membership identical, order changed
+Comparison / CP-PEER-SBS launcher lands in the grid        membership identical, order changed
+SbSChartBasis control set unchanged (values)               every value identical, rows permuted
+SbSChartBasis basis gate changes no plotted value          every value identical, rows permuted
+```
+
+Cycle 819 *did* write the fixes — into `petroleum-fiscal-db/tests/runtime_comprehensive.js`, the
+copy that never runs. `autonomous_cycle.py:run_playwright()` executes
+`office/tools/petroleum/tests/runtime_comprehensive.js`. This is the **second** occurrence of the
+fork the runner has detected since v685; it printed `*** SUITE COPIES HAVE DIVERGED ***` in
+cycle_log.txt on both the 819 and 820 runs and nothing acted on it.
+
+**The two copies had forked in BOTH directions** — neither was a superset, so copying either over
+the other would have silently deleted tests:
+
+| only in graded | only in repo |
+|---|---|
+| `testScreenerLinkFidelity` (v902, 111 lines) | `testScreenerICCeilingCount` (v901, 81 lines) |
+| | the four v908 by-name fixes + 3 new SBS-ORDER assertions |
+
+Merged rather than overwritten, keeping every test from both sides. **29 test functions, 29 call
+sites, both copies now byte-identical.** Measured against the live deployed v908 build:
+**368 PASS / 0 FAIL / 0 WARN / 0 JS errors** — accounted for exactly as 355 + 3 (SBS-ORDER)
++ 10 (v901 ceiling count) = 368.
+
+### Friction — the T1 walk
+
+Walked T1 cold at 1440x900 with `sessionStorage` and `localStorage` cleared, driving the real DOM:
+Home → the Screener card → preset → shortlist → hand the shortlist to Side-by-Side.
+
+Most of this path is sound, and that is worth recording rather than inventing work around. All
+**11 presets deliver exactly the count their menu label promises**, at all four price decks
+(measured: 44 preset x deck combinations, 44 matches — and the labels recompute per deck, so
+"→ 15 of 185 @$75" becomes "→ 12 of 185 @$100"). The rank caption tracks the sort. The zero-result
+state names the binding constraint and all four exports refuse rather than emitting an empty file.
+The removal chips (`openCountryProfileFromFC`) load the right country at every deck.
+
+The one thing that does not hold is the **hand-off to Side-by-Side**, and it breaks the module's
+own written contract. v507 states it in its own comment: *"the shortlist handoff must not ship
+proxy economics into Side-by-Side"*, and the button *"says which group it drew from so the analyst
+is not surprised by what loads."* Three states exist; only two of them say anything:
+
+```js
+var _sbsFromVerified = _verifiedRows.length >= 2 && _nProxy > 0;   // prints "verified-production"
+var _allProxy        = data.length > 0 && _nVerified === 0;        // prints "all proxy-economics"
+```
+
+A screen holding **exactly one** verified-production country satisfies neither. `_sbsPool` silently
+falls back to the full mixed `data`, and the label falls through to the empty string.
+
+Measured, take ceiling dragged to 26% — 77 rows, an entirely ordinary screen:
+
+```
+button   "⇌ Load top 5 in Side-by-Side →"
+names    USA · Greenland · Faroe Islands · Romania · Bulgaria
+actual   USA is PROD-WTD.  The other four are PROXY — no verified field production.
+```
+
+One measured jurisdiction and four modelled ones, loaded into a side-by-side grid under a label
+that says nothing — on the one tab whose caption block exists to hammer that exact distinction
+("163 of 185 are proxy · Production-backed only (22)"). The Screener prints a PROD-WTD / PART-PROD /
+PROXY badge on every row of the table; the names line sitting directly under that table carried none.
+
+### Change
+
+The pool is **not** narrowed — one verified country cannot fill a side-by-side grid, so five columns
+remains the right set. What changes is that the page now says what it is handing over.
+
+- **`window._scProxyByCountry`** published at render time from `_dqTier(d).hasProduction`, so any
+  listed name can be tested. `_scProxyNames(list)` returns `[]` if the map is absent rather than
+  guessing — an unmarked name is the old behaviour; a wrongly marked one would be a coverage claim
+  the page cannot back.
+- **Button label, mixed state:** `⇌ Load top 5 — 1 verified-production + 4 proxy in Side-by-Side →`
+- **Tooltip, mixed state:** names which countries are proxy and why it matters, and states that
+  Side-by-Side will order the two as separate blocks because they are not on one scale.
+- **`#sc-sbs-names`** marks every proxy country with `°` and carries the legend
+  `° proxy economics — no verified field production`. Applies to ticked sets too, not just the
+  top-N fallback.
+- **`scOpenSbs()`** toasts the split when it opens an **unticked** mixed pool — the pool the page
+  chose, not the analyst. Ticked sets are the analyst's own picks made against the row badges and
+  are deliberately not second-guessed.
+
+The two states that already spoke are untouched, verified byte-for-byte in their rendered output.
+
+### Result
+
+An analyst who drags the take ceiling to 26% and presses the button that hands their shortlist to
+Side-by-Side now reads, before they press it, that four of the five columns they are about to
+compare are modelled on regional terms rather than measured — and reads it again on the grid.
+Previously the only way to learn that was to notice the badge column on a table they had already
+left.
+
+### Verification — all run this cycle, none assumed
+- **JS syntax gate:** 11/11 inline blocks parse.
+- **All four basis states measured** at 1440x900 cold: 185 rows → "top 5 verified-production"
+  (unchanged); take≤30% → "top 2 verified-production" (unchanged); take≤26% → **"top 5 — 1
+  verified-production + 4 proxy"** (the fix); take≤23% → "top 5 — all proxy-economics" (unchanged).
+- **Toast fires** on the mixed unticked load, read back from the DOM:
+  *"Mixed basis: 1 of these 5 carries verified field production. Greenland, Faroe Islands, Romania,
+  Bulgaria are modelled on regional terms — indicative, not measured."*
+- **Viewports:** zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 10 tabs;
+  **0 page errors at every width**. At 390x844 `hasTouch` the mixed-state button measures **39px**
+  and the names line wraps to 32px inside the viewport (right edge 330 of 390) — no sideways scroll.
+- **New graded assertion** `testScreenerSbSBasisLabel` added to **both** suite copies. It asserts the
+  invariant, not three literal strings: a pool that is not uniform must name its split on the button,
+  every proxy name must be marked where it is listed, and the tooltip must never call an all-proxy
+  pool verified.
+
+## Debt found this cycle, NOT fixed
+- **The suite fork is the loop's most dangerous defect and it is still only a log line.**
+  `run_playwright()` detects divergence and writes `*** SUITE COPIES HAVE DIVERGED ***` to
+  cycle_log.txt — which is exactly the "a log nobody reads is not an enforcement mechanism" failure
+  the overnight chain's delta assertion was built to end. It has now fired twice (v685, v908) and
+  both times the cycle shipped anyway. The fix is a decision about loop behaviour, not a patch:
+  hard-stop the cycle, email like the overnight chain does, or auto-sync. Auto-sync is **not** safe
+  as a default — this cycle proved the fork can carry unique content in both directions, so an
+  automatic copy would have deleted `testScreenerLinkFidelity` or `testScreenerICCeilingCount`.
+  Left for Zach rather than changed unilaterally, because it governs whether the unattended loop
+  stops.
+- **At a $50 deck the IOC Capital Screen is a one-price test wearing a two-price label.** The preset
+  menu reads "NPV positive at $50 AND at $50 → 18 of 185 @$50". The page already knows — its own
+  basis line at $75 says "the $0M downside floor is the same, so this screen is decided at $50/bbl
+  alone" — but the menu label does not carry it, and 18 at $50 is a *larger* list than 15 at $75,
+  which is the opposite of what an analyst expects a downside test to do.
+- **The Home card for Side-by-Side still says "Compare up to 4 countries in parallel".** `CMP_MAX`
+  is 5 and the grid rendered 5 columns in every measurement this cycle.
+- **Still true from 817/818, still not fixed:** `Reform Frequency Score ≤ 20` is unreachable
+  (score = 100 − 15 × changes; the most-reformed jurisdiction on file is the UK at 5 → 25), yet the
+  Reform Risk intro strip and the Fiscal Compare column tooltip both state the IC rule using it.
