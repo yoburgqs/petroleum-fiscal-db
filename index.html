@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v909</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v910</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1999,6 +1999,17 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      desktop rendering changes: nothing in that layer is removed, weakened or narrowed. */
   #screener-preset-label { white-space: normal !important; max-width: 100%; }
   #screener-preset-label-text { min-width: 0; overflow-wrap: anywhere; }
+
+  /* v910 (T2): the Country Profile contractor-NPV band pill is an inline-flex box with
+     `white-space: nowrap`, so it can only ever push the line wider. At 390 it already sat
+     flush against the edge; giving it the one word it needs to name its basis ("blend NPV
+     rank #20 of 20 ...") took the DOCUMENT's scrollWidth to 401 against a 390 clientWidth on
+     every Country Profile that carries the pill. Wrap the pill rather than scroll the page —
+     same remedy, same layer, same reasoning as #screener-preset-label four lines above. It
+     has no `min-width: max-content`, the marker the wrap rules key off, so wrapping is the
+     correct behaviour for it. Inside the v612 max-width:720px layer: nothing in that layer is
+     removed, weakened or narrowed, and no desktop rendering changes. */
+  .orca-npv-band-pill { display: inline-block !important; white-space: normal !important; max-width: 100%; }
 }
 
 @media (max-width: 390px) {
@@ -2568,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v909</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v910</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -42379,8 +42390,23 @@ function loadCountryProfile(country) {
   // v423: headline strip — add NPV @$75 and Swing (pp) for immediate analyst context
   // v516: headline strip metric 2 is the $50/bbl downside contractor NPV, not the bundled mean IRR.
   const _npv344Display = (!_isMonopoly && d.npv_75 != null) ? (function() {
-    var npvCol = d.npv_75 >= 0 ? 'var(--green)' : 'var(--red)';
-    var npvStr = fmtNpvShared ? fmtNpvShared(d.npv_75) : (d.npv_75 >= 0 ? '+' : '') + d.npv_75.toFixed(0) + 'M';
+    // v910 (T2): this chip printed d.npv_75 -- the all-contract blend -- with no basis marker, and
+    // sat one metric to the LEFT of a Downside chip that v786 had already moved onto the country's
+    // PSC/Concession contracts and labelled. Ten countries therefore printed a mixed pair, and on
+    // Iraq it inverted on screen: "NPV: $642M @$75" beside "Downside: $1.44B @$50 (survives $50)".
+    // A downside 2.2x the base case cannot happen on a monotonic price curve, and it is the pair an
+    // IC reviewer catches in one glance -- which is exactly the credibility the T2 analyst came here
+    // to borrow. The verdict sentence three lines above already quotes the PSC/Concession pair via
+    // cpPair75() ($3.04B / $1.44B), so the strip was also contradicting the prose directly above it.
+    // The chip now reads the same leg cpDownside50() switched, and carries the blend beside it in
+    // the same "· PSC/Conc n · blend x" form the Downside chip uses. The blend is NOT abandoned --
+    // the band pill, the XLSX export, the API and every other tab still carry it, and it is one
+    // hover away here -- but neither basis can now be read as the other's price case.
+    var _dn910 = (typeof cpDownside50 === 'function') ? cpDownside50(d) : { cmp: false };
+    var _reb910 = !!(_dn910 && _dn910.cmp && _dn910.v75 != null);
+    var _npv910 = _reb910 ? _dn910.v75 : d.npv_75;
+    var npvCol = _npv910 >= 0 ? 'var(--green)' : 'var(--red)';
+    var npvStr = fmtNpvShared ? fmtNpvShared(_npv910) : (_npv910 >= 0 ? '+' : '') + _npv910.toFixed(0) + 'M';
     // v734 (T2): the take three lines above this carries a rank AND a vs-median pill; the NPV
     // beside it carried neither, so the strip answered "how hard is the fiscal regime" and
     // left "am I getting paid" to be eyeballed off a table three screens down. The one NPV
@@ -42409,11 +42435,40 @@ function loadCountryProfile(country) {
         + 'HIGHEST FIRST (#1 = the most contractor value at this level of government take), against a band '
         + 'median of ' + cpNpvFmt(_bn734.median) + '. Read it with the take rank on the left: the take says '
         + 'how much the government takes across the life of the project, this says what the contractor is '
-        + 'left holding once the timing of that take is discounted.">NPV rank #'
+        + 'left holding once the timing of that take is discounted.'
+        + (_reb910
+            ? ' BLEND BASIS: every NPV in this band, including this country\u2019s ' + cpNpvFmt(d.npv_75)
+              + ', is the all-contract blend, so the ranking is like-for-like within itself \u2014 but it '
+              + 'is NOT the ' + cpNpvFmt(_npv910) + ' PSC/Concession figure printed to the left. Rank and '
+              + 'figure are on different bases here and the pill says which is which rather than '
+              + 'silently re-ranking a set ORCA does not hold a PSC/Concession NPV for.'
+            : '')
+        + '">' + (_reb910 ? 'blend ' : '') + 'NPV rank #'
         + _bn734.rank + ' of ' + _bn734.n + ' at this take \u00b7 ' + (_up734 ? '+' : '\u2212')
         + cpNpvFmt(Math.abs(_delta734)) + ' vs band median</span>';
     }
-    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile (' + _engineBasisLine(false) + '). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>' + _bandPill734;
+    var _feeClause910 = _reb910
+      ? (Number(_dn910.n2).toLocaleString() + ' fee-basis contracts (' + _dn910.names + ')')
+      : '';
+    var _basisTip910 = _reb910
+      ? ' BASIS: this is the figure for ' + Number(_dn910.n1).toLocaleString() + ' PSC/Concession contracts, '
+        + 'the same basis as the $50 downside beside it and as the verdict above — so the two prices read '
+        + 'as one pair. The all-contract blend is ' + cpNpvFmt(_dn910.blend75) + ', which averages in '
+        + _feeClause910 + '; contractor NPV on a fee-basis contract is a property of the remuneration '
+        + 'mechanic rather than of the fiscal terms, so it is not comparable with another country’s. '
+        + 'The blend is still what the XLSX export, the API and the other tabs carry, and it is printed '
+        + 'beside this figure. Quote the PSC/Concession pair or quote the blend pair — never one from each.'
+      : '';
+    var _basisSpan910 = _reb910
+      ? '<span class="cp-dn-basis" style="opacity:.8;font-size:10px;cursor:help;" title="'
+        + (d.country + ': ' + cpNpvFmt(_npv910) + ' is contractor NPV at $75/bbl on its '
+           + Number(_dn910.n1).toLocaleString() + ' PSC/Concession contracts. The all-contract blend is '
+           + cpNpvFmt(_dn910.blend75) + ', averaging in ' + _feeClause910
+           + '. ~/MECHANIC_COMPARABILITY: fee-basis take and NPV are a property of the remuneration '
+           + 'mechanic, not of the terms.').replace(/"/g, '&quot;')
+        + '"> · PSC/Conc ' + Number(_dn910.n1).toLocaleString() + ' · blend ' + cpNpvFmt(_dn910.blend75) + '</span>'
+      : '';
+    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile (' + _engineBasisLine(false) + '). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.' + _basisTip910 + '">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span>' + _basisSpan910 + '</span>' + _bandPill734;
   })() : '';
   const _dnside516Display = (!_isMonopoly && d.npv_50 != null) ? (function() {
     // v786 (T2): same $50 figure the verdict tests. Where it is the PSC/Concession figure, the blend

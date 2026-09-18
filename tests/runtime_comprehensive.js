@@ -2706,6 +2706,95 @@ async function testScreenerLinkFidelity(page) {
 // ONE verified-production country fell between them and printed a bare "Load top 5 in
 // Side-by-Side" over 1 measured jurisdiction and 4 modelled ones. Asserted as an invariant
 // rather than as three literal strings: whatever the pool holds, the label must account for it.
+// ─── v910 (T2): the Country Profile $75/$50 NPV pair must be on ONE basis ───────────────
+// The headline strip prints contractor NPV at $75 beside contractor NPV at the $50 downside.
+// v786 moved the $50 leg onto the country's PSC/Concession contracts where it blends fee-basis
+// (TSC/RSC/Buy-back) contracts, and labelled it; the $75 leg was left on the all-contract blend
+// and unlabelled. Ten countries therefore printed a mixed pair, and Iraq printed an IMPOSSIBLE
+// one -- $642M @$75 beside $1.44B @$50, a downside 2.2x the base case on a monotonic price curve.
+// This asserts the invariant rather than the literal figures: the two chips must carry the same
+// basis marker as each other, the $75 figure must not sit below the $50 figure, and where the
+// chips are rebased the band pill (which still ranks the blend) must say "blend".
+async function testCPNpvPairBasis(page) {
+  const S = 'CPNpvPair';
+  try {
+    await switchTab(page, 't7');
+    await page.waitForTimeout(1200);
+
+    // Ask the page which countries render a rebased pair, so the test cannot go stale against
+    // a data refresh the way a hard-coded country list would.
+    const plan = await page.evaluate(() => {
+      if (typeof COUNTRY_DATA === 'undefined' || typeof cpDownside50 !== 'function') return null;
+      const reb = [], flat = [];
+      COUNTRY_DATA.forEach(d => {
+        if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return;
+        if (d.npv_75 == null || d.npv_50 == null) return;
+        const dn = cpDownside50(d);
+        ((dn && dn.cmp && dn.v75 != null) ? reb : flat).push(d.country);
+      });
+      return { reb, flat: flat.slice(0, 2) };
+    });
+    if (!plan) { f(S, 'page exposes cpDownside50', 'helper or COUNTRY_DATA missing'); return; }
+    if (!plan.reb.length) { w(S, 'rebased countries exist', 'no country renders a PSC/Conc $75 figure'); }
+
+    const num = (t) => {
+      // "$3.04B" / "$642M" / "-$33M" -> millions
+      const m = /(-?)\$([\d.,]+)\s*([BM])/.exec(t || '');
+      if (!m) return null;
+      const v = parseFloat(m[2].replace(/,/g, '')) * (m[3] === 'B' ? 1000 : 1);
+      return m[1] === '-' ? -v : v;
+    };
+    const readStrip = async (country) => {
+      await page.evaluate(c => {
+        const s = document.getElementById('dd-country-select');
+        if (s) { s.value = c; s.dispatchEvent(new Event('change', { bubbles: true })); }
+      }, country);
+      await page.waitForTimeout(2600);
+      return page.evaluate(() => {
+        const spans = [...document.querySelectorAll('#dd-content span')];
+        const pick = (re) => spans.find(s => re.test(s.innerText) && s.innerText.length < 220);
+        const npv = pick(/^NPV: /), dn = pick(/^Downside: /);
+        const pill = document.querySelector('#dd-content .orca-npv-band-pill');
+        return {
+          npv: npv ? npv.innerText.replace(/\s+/g, ' ').trim() : null,
+          dn: dn ? dn.innerText.replace(/\s+/g, ' ').trim() : null,
+          pill: pill ? pill.innerText.replace(/\s+/g, ' ').trim() : null,
+        };
+      });
+    };
+
+    // Cap the rebased set so the suite stays inside its budget; the invariant is the same on all.
+    const sample = plan.reb.slice(0, 5).concat(plan.flat);
+    for (const c of sample) {
+      const r = await readStrip(c);
+      if (!r.npv || !r.dn) { w(S, `${c}: strip rendered`, `npv=${r.npv} downside=${r.dn}`); continue; }
+      const rebased = plan.reb.indexOf(c) >= 0;
+      const mN = /PSC\/Conc/.test(r.npv), mD = /PSC\/Conc/.test(r.dn);
+
+      // 1. One basis across the pair -- both marked, or neither.
+      if (mN === mD) p(S, `${c}: $75 and $50 carry one basis`, `${mN ? 'both PSC/Conc-marked' : 'both on the blend'}`);
+      else f(S, `${c}: $75 and $50 carry one basis`, `NPV chip "${r.npv}" vs Downside chip "${r.dn}"`);
+
+      // 2. The marker must be present exactly where the page says the bases diverge.
+      if (mN === rebased) p(S, `${c}: basis marker matches cpDownside50`, rebased ? 'rebased and marked' : 'not rebased, unmarked');
+      else f(S, `${c}: basis marker matches cpDownside50`, `cpDownside50 rebased=${rebased} but NPV chip reads "${r.npv}"`);
+
+      // 3. No impossible pair: the $75 base cannot sit below the $50 downside.
+      const v75 = num(r.npv), v50 = num(r.dn);
+      if (v75 == null || v50 == null) w(S, `${c}: pair parsed`, `${r.npv} | ${r.dn}`);
+      else if (v75 >= v50) p(S, `${c}: $75 base >= $50 downside`, `${r.npv.split(' · ')[0]} vs ${r.dn.split(' (')[0]}`);
+      else f(S, `${c}: $75 base >= $50 downside`, `downside exceeds base case on screen: "${r.npv}" / "${r.dn}"`);
+
+      // 4. The band pill still ranks the blend; where the chip no longer shows it, it must say so.
+      if (r.pill) {
+        const saysBlend = /blend/i.test(r.pill);
+        if (saysBlend === rebased) p(S, `${c}: band pill names its basis`, r.pill.slice(0, 70));
+        else f(S, `${c}: band pill names its basis`, `rebased=${rebased} but pill reads "${r.pill.slice(0, 80)}"`);
+      }
+    }
+  } catch (e) { f(S, 'suite', String(e).slice(0, 160)); }
+}
+
 async function testScreenerSbSBasisLabel(page) {
   const S = 'ScreenerSbSBasis';
   try {
@@ -3600,6 +3689,7 @@ async function testConsoleErrors() {
     await testScreener(page);
     await testScreenerICCeilingCount(page);
     await testScreenerSbSBasisLabel(page);
+    await testCPNpvPairBasis(page);
     await testHomeICScreenAgreement(page);
     await testICSourcingTier(page);
     await testIOC(page);
