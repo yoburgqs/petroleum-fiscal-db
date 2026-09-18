@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v915</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v917</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v915</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v917</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4009,7 +4009,7 @@ window.copyPlatformCitation = function(btn) {
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" id="cmp-npv-chart-png-btn" aria-label="Download the Contractor NPV vs Oil Price chart as a PNG image" title="Download THIS chart &mdash; Contractor NPV vs Oil Price &mdash; as a PNG. Saves as ORCA_contractor-npv_&lt;countries&gt;.png so it cannot be confused with the Govt Take chart above.">&#11015; PNG</button>
     </div>
-    <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points. Where the set mixes bases, a faded dashed bar is a statutory-basis column ORCA holds no verified production for; its bar runs taller because its take is lower, and it is not rankable against the solid bars." role="img"></canvas>
+    <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points. A column tagged (PSC/Conc) is drawn on its production-sharing and concession contracts only — the same comparable basis as the government take chart above and the Contractor NPV rows in the grid — with the blended published figure on its tooltip. Where the set mixes bases, a faded dashed bar is a statutory-basis column ORCA holds no verified production for; its bar runs taller because its take is lower, and it is not rankable against the solid bars." role="img"></canvas>
   </div>
 </div>
 
@@ -31402,7 +31402,7 @@ function renderCompare() {
           + Number(st.n2).toLocaleString() + ' fee-basis contracts (' + _cmpEsc(_cmpMechBare(st, 2)) + ')';
       }).join('; ')
     + '. A fee-basis contractor is paid a fixed $/bbl remuneration and keeps no price upside, so its take% climbs toward 97–99% because of the mechanic, not because the terms are hard — plotting it against a PSC line would rank the two on different questions. Both figures are in the <strong>Govt Take</strong> rows above. '
-    + '<strong style="color:var(--accent);">The Contractor NPV chart below is NOT re-based</strong> — ORCA holds no PSC/Conc-only NPV, so those bars are an unweighted mean across every contract, fee-basis included. Its legend marks the affected column <strong>(all contracts)</strong>. Do not read the two charts as one contract set.</div>');
+    + '<strong style="color:var(--green);">The Contractor NPV chart below is re-based the same way</strong> — v917: ORCA holds the Group-1 contractor split at all four published prices, so the bars are drawn on the same production-sharing &amp; concession contracts as this line, and its legend carries the same <strong>(PSC/Conc)</strong> key. The blended headline is on the tooltip of each re-based bar and in the <strong>Contractor NPV</strong> rows above. Both charts are now one contract set.</div>');
   if (_cmpChartStat.length) _cmpNotices.push(
     '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.28);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--text);"><span style="color:var(--accent);font-weight:700;">Mixed basis — the lowest line is not the winner.</span> '
     + _cmpChartStat.map(function(d){
@@ -31572,11 +31572,59 @@ function renderCompare() {
   // contracts the line above deliberately excluded. Two stacked charts, same three countries,
   // same four prices, same colour key, legends reading "Iraq (PSC/Conc)" and "Iraq": one plots
   // 195 contracts and the other 610, and only one of them said so.
-  //   Nothing is re-based here -- there is no PSC/Conc-only NPV in country_data.json to re-base
-  // onto. The fix is to stop the two legends from claiming to be the same basis.
+  //   v660's remedy was a LABEL: the legend said "(all contracts)" and a title line said "NOT the
+  // PSC/Conc basis of the take chart above", because the sentence directly above this one -- "there
+  // is no PSC/Conc-only NPV in country_data.json to re-base onto" -- was believed. It came from
+  // v666 and it is FALSE. v904 measured country_data.json and found g1.v50, v75, v100 AND v125 on
+  // all 11 fee-blended countries, then re-based all four Contractor NPV GRID rows onto them. The
+  // chart was not carried with it, so this cycle's walk found the last surface on the tab still
+  // drawing the blended figure.
+  //
+  // ── v917 (T3): the Contractor NPV chart is re-based, on the same rule as the grid ──
+  //
+  // Walked T3 cold at 1440x900, storage cleared, building Guyana / Nigeria / Iraq by hand. At $75
+  // the four surfaces on ONE screen said four different things about the same column:
+  //
+  //   verdict strip ....... Iraq $3.04B (PSC/Conc) > Nigeria $302M, "$2.74B apart"
+  //   grid NPV @$75 row ... $642M with "PSC/Conc $3.04B" in green beneath it
+  //   take chart .......... "Iraq (PSC/Conc)" -- re-based, 34.1%
+  //   NPV chart ........... Iraq bar = $642M, Nigeria $302M, Guyana $1.07B
+  //
+  // The chart is the only one of the four an analyst reads at a glance, and it was the only one on
+  // the blended basis. What it drew was not a smaller Iraq -- it was a different WINNER: Guyana's
+  // bar is the tallest at all four prices, and Guyana is the column the strip, the grid gate and
+  // two notices all refuse to rank at all. Iraq, first on the platform's own comparable ordering,
+  // drew the middle bar. Understatement measured across the 11 fee-blended countries at $75:
+  // Iraq 4.7x ($642M -> $3,043M), Oman 1.5x, South Sudan 1.2x, Iran 1.4x. Malaysia is the sharpest
+  // case -- at $50 the blended figure is -$33.2M and the comparable is +$46.2M, so the chart drew
+  // a bar BELOW the axis, a loss, for a column whose comparable basis is a positive position.
+  //
+  // Re-base test is _cmpNpvCell's verbatim, per price: fee-blended, g1['v'+price] present, and the
+  // two figures differ once fmtNpvShared has rounded them. So a column is marked on this chart if
+  // and only if the grid printed a green PSC/Conc sub-line for it, and Azerbaijan / India / Russia
+  // -- which agree with the blended figure at printed precision -- stay untouched, exactly as the
+  // take chart leaves Russia alone. The published headline is not thrown away: it is in the
+  // tooltip on every re-based bar, and it is still the figure the grid prints at full size.
+  const _npvG1At = (d, price) => {
+    const st = _cmpMixStat(d);
+    if (!st.blended || !st.g1) return null;
+    const g = st.g1['v' + price];
+    if (g == null) return null;
+    const v = d['npv_' + price];
+    if (v == null) return g;
+    return (fmtNpvShared(g) === fmtNpvShared(v)) ? null : g;
+  };
   const _npvRebased = {};
-  _cmpChartRebased.forEach(function(d){ _npvRebased[d.country] = true; });
+  npvCountries.forEach(function(d){
+    if (PRICES.some(p => _npvG1At(d, String(p)) != null)) _npvRebased[d.country] = true;
+  });
   const _npvAnyRebased = npvCountries.some(d => _npvRebased[d.country]);
+  // The plotted series. Per price, so a column re-based at $75 but agreeing at $50 keeps its
+  // published $50 bar rather than being switched wholesale onto a basis the grid did not print.
+  const _npvSeries = (d) => ['50','75','100','125'].map(function(p){
+    const g = _npvRebased[d.country] ? _npvG1At(d, p) : null;
+    return (g != null) ? g : d['npv_' + p];
+  });
   const _npvHasR = npvCountries.some(d => d.has_r_factor_tiers);
   // ── v691 (T3): the DATA-BASIS gate reaches the NPV chart ────────────────────────
   // v626 built the gate for the grid, v684 carried it to the take chart 8px above (hollow
@@ -31625,10 +31673,13 @@ function renderCompare() {
       data: {
         labels: ['$50/bbl','$75/bbl','$100/bbl','$125/bbl'],
         datasets: npvCountries.map((d, i) => ({
-          label: d.country + (_npvRebased[d.country] ? ' (all contracts)' : '')
+          // v917 (T3): same suffix string as the take chart's legend, because it is now the same
+          // basis. v606's reason for putting it in the LEGEND holds here: the legend is the only
+          // key that travels with the exported PNG.
+          label: d.country + (_npvRebased[d.country] ? ' (PSC/Conc)' : '')
                  + (_npvStatSet[d.country] ? ' (statutory basis)' : '')
                  + (d.has_r_factor_tiers ? ' ◆' : ''),
-          data: [d.npv_50, d.npv_75, d.npv_100, d.npv_125],
+          data: _npvSeries(d),
           // v691 (T3): fill alpha carries the data basis -- the bar analogue of the take chart's
           // hollow marker. Hue is untouched (v614 country key, shared between the two charts).
           backgroundColor: _cmpColorOf(d) + (_npvStatSet[d.country] ? '1F' : '88'),
@@ -31647,7 +31698,7 @@ function renderCompare() {
             // v691 (T3): title is built as a list so the basis keys stack, matching the take chart.
             text: (function(){
               const _t = ['Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : '')];
-              if (_npvAnyRebased) _t.push('(all contracts) = fee-basis contracts INCLUDED — NOT the PSC/Conc basis of the take chart above');
+              if (_npvAnyRebased) _t.push('(PSC/Conc) = drawn on production-sharing & concession contracts only, not the blended headline — same basis as the take chart above');
               if (_npvStatN) _t.push('faded dashed ' + (_npvStatN === 1 ? 'bar = statutory basis' : 'bars = statutory basis')
                 + ', no verified production — a taller bar there reports the basis, not a better project');
               return _t.length === 1 ? _t[0] : _t;
@@ -31656,13 +31707,21 @@ function renderCompare() {
           tooltip: { callbacks: { label: ctx => {
             const d2 = npvCountries[ctx.datasetIndex];
             let base = ' ' + d2.country + ': $' + Math.round(ctx.raw).toLocaleString() + 'M';
+            // v917 (T3): the bar IS the comparable figure now, so the tooltip carries the
+            // published headline it replaced rather than a warning that the two disagree.
             if (_npvRebased[d2.country]) {
               const st = _cmpMixStat(d2);
-              base += ' — unweighted mean across ALL ' + Number(st.tot).toLocaleString()
-                + ' contracts, including the ' + Number(st.n2).toLocaleString() + ' fee-basis ('
-                + _cmpMechBare(st, 2) + ') the take chart above excludes. The take line for '
-                + d2.country + ' is drawn on its ' + Number(st.n1).toLocaleString()
-                + ' PSC/Concession contracts only, so the two charts are not the same contract set.';
+              const _pr = ['50','75','100','125'][ctx.dataIndex];
+              const _pub = d2['npv_' + _pr];
+              base += ' — across its ' + Number(st.g1 && st.g1.n != null ? st.g1.n : st.n1).toLocaleString()
+                + ' production-sharing and concession contracts only, the same basis the take line'
+                + ' above and the Contractor NPV rows in the grid are on.'
+                + (_pub != null ? ' ORCA publishes ' + fmtNpvShared(_pub) + ' for ' + d2.country
+                    + ' at $' + _pr + '/bbl — an unweighted mean over all '
+                    + Number(st.tot).toLocaleString() + ' contracts, ' + Number(st.n2).toLocaleString()
+                    + ' of them fee-basis (' + _cmpMechBare(st, 2) + '), where the contractor is paid a'
+                    + ' fixed $/bbl remuneration and the DCF returns a far smaller position. Carry both'
+                    + ' into the memo; rank on this one.' : '');
             }
             // v691 (T3): the basis caveat, stated with its DIRECTION. Silence here was the defect.
             if (_npvStatSet[d2.country]) {
@@ -59376,31 +59435,10 @@ function fetchCountryContracts(country) {
       cpRecordObsSpread(country, contracts);
       try { _cpApplyObsSpread(country); } catch (e) {}
       const hasProd = contracts.some(c => c.prod_mmbbl != null);
-      let html = '<div class="tbl-wrap"><table style="font-size:12px;"><thead><tr>'
-        + '<th>#</th><th>Block / Contract</th><th>Operator</th><th>Type</th><th class="num">Take%</th>'
-        + (hasProd ? '<th class="num">Prod (MMbbl)</th>' : '')
-        + '<th class="num" title="Primary fiscal rate: royalty for Concessions, profit oil for PSCs">Key Rate</th>'
-        + '</tr></thead><tbody>';
-      contracts.slice(0, 30).forEach(function(c, i) {
-        const takeCol = c.take == null ? '' : c.take <= 40 ? 'color:var(--green)' : c.take <= 60 ? 'color:var(--yellow)' : c.take <= 75 ? 'color:var(--orange)' : 'color:var(--red)';
-        const keyRate = c.royalty != null ? c.royalty.toFixed(0) + '% R'
-                      : c.profit_oil != null ? c.profit_oil.toFixed(0) + '% PO'
-                      : c.ftp != null ? c.ftp.toFixed(0) + '% FTP'
-                      : '—';
-        html += '<tr>'
-          + '<td style="color:var(--muted)">' + (i+1) + '</td>'
-          + '<td style="font-weight:600;">' + (c.block || '—') + '</td>'
-          + '<td style="color:var(--muted);font-size:11px;">' + (c.operator || '—') + '</td>'
-          + '<td><span class="' + getMechTagClass(c.mechanic || c.type || '') + '" style="font-size:10px;">' + (c.mechanic || c.type || '—') + '</span></td>'
-          + '<td class="num" style="' + takeCol + ';font-weight:700;">' + (c.take != null ? c.take.toFixed(1) + '%' : '—') + '</td>'
-          + (hasProd ? '<td class="num" style="color:var(--accent);">' + (c.prod_mmbbl != null ? c.prod_mmbbl.toFixed(1) : '—') + '</td>' : '')
-          + '<td class="num" style="color:var(--muted);font-size:11px;">' + keyRate + '</td>'
-          + '</tr>';
-      });
-      html += '</tbody></table></div>';
-      if (contracts.length > 30) {
-        html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;">Showing top 30 of ' + contracts.length + ' contracts (ranked by production volume, then fiscal dispersion)</div>';
-      }
+      // v916 (T2): rows are grouped by their production figure before rendering, because the
+      // figure is field cumulative replicated onto every contract record mapped to that field.
+      // See cpGroupContractRecords() / cpRenderContractGroups() for the measurement.
+      let html = cpRenderContractGroups(country, contracts, hasProd);
       html += cpContractColNote(country, contracts);
       el.innerHTML = html;
     })
@@ -59781,6 +59819,199 @@ function _cpPanelIsNotThis() {
        + '<em>Live DCF Model</em> panel further down this page, which is also labelled \u201cDeepwater\u201d '
        + 'but runs a different project (' + pl + ') and returns a different NPV on the same country '
        + 'at the same price.';
+}
+// ── v916 (T2) — "Top Contracts ranked by production" was ranking ONE field N times ──────
+// Walked T2 cold at 1440x900, storage cleared: Country Profile -> United Kingdom -> scroll to
+// the only contract-level evidence table on the page, the one an analyst screenshots into the
+// memo. Rows 1-9 were nine different contract names, nine different operators, and the SAME
+// production figure: 2,826.3 MMbbl each. That is Forties Field's cumulative production, stamped
+// on every contract record ORCA maps to Forties. Read as the table presents it — "Top Contracts
+// ranked by production" — those nine rows assert 25,437 MMbbl, 69% of the UK's entire 36,755
+// MMbbl cumulative, from nine contracts on one block.
+//
+// Measured across all 239 published api/v1/country files, not asserted. 19 countries carry a
+// production column at all; of the 381 displayed rows that carry a figure, 231 (60.6%) carry a
+// figure that at least one other displayed row also carries:
+//
+//   Kazakhstan  30 rows shown, 2 distinct values — 26 rows are Tengiz at 1,365.5
+//   Azerbaijan  25 rows with prod, 2 distinct — 24 rows are ACG at 1,089.0
+//   Nigeria     21 rows are OML 118 Bonga at 154.6
+//   Angola      19 rows are Block 17 at 396.4
+//   Canada      15 rows are Christina Lake at 790.5
+//   Iraq        14 rows are Rumaila at 2,973.7
+//   UK           9 rows are Forties at 2,826.3
+//
+// The harm is not cosmetic and it lands exactly on T2's second half. The analyst asking "can I
+// defend this?" opens the section that names real blocks and real operators, and Kazakhstan's
+// reads as 26 independent giant assets spanning 64.5%-77.2% take. It is one field, and the take
+// range is two numbers, 25 rows of which say 77.2%. The page's own note four lines below already
+// refuses to print NPV and IRR per contract for precisely this reason — "they move with each
+// block's field size, so they rank how big a block is rather than how hard its terms are" — and
+// then ranks the table on a column with the same defect and a duplication problem on top.
+//
+// Grouping is on the production figure itself, at 2dp, and the group is described as what is
+// literally verifiable — "N contract records carry this same figure" — not as an inferred field
+// identity. Every group inspected across kz/az/ng/ao/ca/iq/no/uk resolves to one named field
+// (Tengiz, ACG, Bonga, Block 17, Christina Lake, Rumaila, Statfjord, Forties), but two adjacent
+// USA GoM lease blocks do share a rounded 0.28 MMbbl, so the wording claims the arithmetic and
+// not the geology. Nothing is hidden: every record is one click away in the expanded sub-row.
+// Ranking is unchanged — groups appear in the order their first record did, and the API already
+// sorts by production volume then fiscal dispersion.
+function cpGroupContractRecords(contracts) {
+  var groups = [], byKey = {};
+  for (var i = 0; i < contracts.length; i++) {
+    var c = contracts[i]; if (!c) continue;
+    var p = c.prod_mmbbl;
+    var grouped = (typeof p === 'number' && isFinite(p) && p > 0);
+    var key = grouped ? ('p' + p.toFixed(2)) : ('#' + i);
+    if (byKey[key] == null) { byKey[key] = groups.length; groups.push({ prod: grouped ? p : null, rows: [] }); }
+    groups[byKey[key]].rows.push(c);
+  }
+  return groups;
+}
+function _cpContractKeyRate(c) {
+  return c.royalty != null ? c.royalty.toFixed(0) + '% R'
+       : c.profit_oil != null ? c.profit_oil.toFixed(0) + '% PO'
+       : c.ftp != null ? c.ftp.toFixed(0) + '% FTP'
+       : '—';
+}
+function _cpTakeColour(v) {
+  return v == null ? '' : v <= 40 ? 'color:var(--green)' : v <= 60 ? 'color:var(--yellow)'
+       : v <= 75 ? 'color:var(--orange)' : 'color:var(--red)';
+}
+window._cpTogContractGroup = function (btn, id) {
+  var rows = document.querySelectorAll('tr[data-cpg="' + id + '"]');
+  if (!rows.length) return;
+  var open = rows[0].style.display !== 'none';
+  for (var i = 0; i < rows.length; i++) rows[i].style.display = open ? 'none' : '';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  var n = btn.getAttribute('data-n');
+  btn.innerHTML = (open ? '+' : '−') + n + ' record' + (n === '1' ? '' : 's') + ' on this figure';
+};
+function cpRenderContractGroups(country, contracts, hasProd) {
+  var groups = cpGroupContractRecords(contracts);
+  // The caption and the tail are gated on what is actually ON SCREEN, not on the whole file.
+  // Brazil publishes 50 records of which exactly one pair shares a figure, and that pair sits
+  // below row 30 -- an orange "rows sharing a figure are grouped below" banner over a table
+  // where nothing is grouped is a false alarm, and a false alarm on this page costs more than
+  // the note is worth.
+  var shown = groups.slice(0, 30), shownRecs = 0;
+  var dupGroups = 0, dupRecords = 0, biggest = 0;
+  for (var s2 = 0; s2 < shown.length; s2++) {
+    var nr = shown[s2].rows.length;
+    shownRecs += nr;
+    if (nr > 1) { dupGroups++; dupRecords += nr; }
+    if (nr > biggest) biggest = nr;
+  }
+  var slug = String(country || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  var html = '';
+  if (hasProd && dupGroups) {
+    html += '<div style="font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:8px;'
+      + 'border-left:2px solid var(--orange);padding:6px 0 6px 10px;">'
+      + '<strong style="color:var(--orange);">Prod (MMbbl) is field cumulative production, not this contract’s output — do not sum the column.</strong> '
+      + 'ORCA stamps a field’s cumulative on every contract record it maps to that field, so '
+      + dupRecords + ' of the ' + shownRecs + ' records shown here for ' + country
+      + ' carry a figure at least one other shown record also carries'
+      + (biggest > 1 ? ' — the largest such set is <strong>' + biggest + ' records on one figure</strong>' : '')
+      + '. Rows sharing a figure are grouped below and ranked once. '
+      + 'Open a row to see the individual records and the take each one carries.</div>';
+  }
+
+  html += '<div class="tbl-wrap"><table style="font-size:12px;"><thead><tr>'
+    + '<th>#</th><th>Block / Contract</th><th>Operator</th><th>Type</th><th class="num">Take%</th>'
+    + (hasProd ? '<th class="num" title="Field cumulative production, in million barrels, as ORCA holds it. It is a property of the FIELD, not of the contract on this row — every contract record mapped to the same field carries the same number, which is why rows sharing a figure are grouped. The column does not sum to the country total.">Prod (MMbbl)</th>' : '')
+    + '<th class="num" title="Primary fiscal rate: royalty for Concessions, profit oil for PSCs">Key Rate</th>'
+    + '</tr></thead><tbody>';
+
+  shown.forEach(function (grp, i) {
+    var rows = grp.rows, c = rows[0], n = rows.length;
+    var tk = [], ops = {}, mechs = {}, rates = {};
+    for (var k = 0; k < rows.length; k++) {
+      var r = rows[k];
+      if (typeof r.take === 'number' && isFinite(r.take)) tk.push(r.take);
+      if (r.operator) ops[r.operator] = 1;
+      mechs[r.mechanic || r.type || '—'] = 1;
+      rates[_cpContractKeyRate(r)] = 1;
+    }
+    var tmin = tk.length ? Math.min.apply(null, tk) : null;
+    var tmax = tk.length ? Math.max.apply(null, tk) : null;
+    var spread = (tmin != null && tmax - tmin >= 0.05);
+    var takeTxt = tmax == null ? '—' : spread ? (tmin.toFixed(1) + '–' + tmax.toFixed(1) + '%') : (tmax.toFixed(1) + '%');
+    var nOps = Object.keys(ops).length;
+    var mechKeys = Object.keys(mechs);
+    var rateKeys = Object.keys(rates);
+    var gid = 'cpg-' + slug + '-' + i;
+
+    var nameCell = '<div style="font-weight:600;">' + (c.block || '—') + '</div>';
+    if (n > 1) {
+      nameCell += '<button type="button" class="cp-grp-tog" id="' + gid + '-btn" aria-expanded="false"'
+        + ' aria-controls="' + gid + '" data-n="' + n + '"'
+        + ' onclick="_cpTogContractGroup(this,\'' + gid + '\')"'
+        + ' title="Show the ' + n + ' individual contract records ORCA holds against this production figure"'
+        + ' style="margin-top:3px;background:transparent;border:1px solid var(--border);border-radius:10px;'
+        + 'color:var(--accent);font-family:inherit;font-size:10px;font-weight:700;padding:2px 9px;'
+        + 'min-height:24px;cursor:pointer;">+' + n + ' records on this figure</button>';
+    }
+
+    var opCell = n > 1 && nOps > 1
+      ? (c.operator || '—') + '<div style="font-size:10px;opacity:.8;">+' + (nOps - 1) + ' other operator' + (nOps - 1 === 1 ? '' : 's') + '</div>'
+      : (c.operator || '—');
+
+    var mechCell = mechKeys.length > 1
+      ? '<span style="font-size:10px;color:var(--muted);">mixed (' + mechKeys.length + ')</span>'
+      : '<span class="' + getMechTagClass(mechKeys[0]) + '" style="font-size:10px;">' + mechKeys[0] + '</span>';
+
+    var rateCell = rateKeys.length > 1 ? 'mixed' : rateKeys[0];
+
+    html += '<tr>'
+      + '<td style="color:var(--muted)">' + (i + 1) + '</td>'
+      + '<td>' + nameCell + '</td>'
+      + '<td style="color:var(--muted);font-size:11px;">' + opCell + '</td>'
+      + '<td>' + mechCell + '</td>'
+      + '<td class="num" style="' + _cpTakeColour(tmax) + ';font-weight:700;">' + takeTxt
+      + (spread ? '<div style="font-size:9px;font-weight:400;color:var(--muted);">range over ' + n + '</div>' : '')
+      + '</td>'
+      + (hasProd ? '<td class="num" style="color:var(--accent);">' + (grp.prod != null ? grp.prod.toFixed(1) : '—') + '</td>' : '')
+      + '<td class="num" style="color:var(--muted);font-size:11px;">' + rateCell + '</td>'
+      + '</tr>';
+
+    if (n > 1) {
+      // The expanded records are real <tr> rows in the SAME seven columns, not a colspan panel.
+      // A colspan cell is sized on its own max-content by Chrome's auto table layout: measured at
+      // 1440 it took the table from 1048px (exactly its container) to 1367px the moment a group
+      // was opened, and the width:0/min-width:100% workaround for that left the scroller
+      // reporting 1299px of scrollWidth over content that fits. Ordinary rows have neither
+      // problem, and they put each record's take under the Take% header where it belongs.
+      for (var m = 0; m < rows.length; m++) {
+        var rr = rows[m];
+        html += '<tr data-cpg="' + gid + '"' + (m === 0 ? ' id="' + gid + '"' : '')
+          + ' style="display:none;background:var(--surface);">'
+          + '<td style="color:var(--muted);font-size:10px;text-align:right;">&#8627;</td>'
+          + '<td style="font-size:11px;color:var(--text);padding-left:14px;">' + (rr.block || '—') + '</td>'
+          + '<td style="color:var(--muted);font-size:10px;">' + (rr.operator || '—') + '</td>'
+          + '<td><span class="' + getMechTagClass(rr.mechanic || rr.type || '—') + '" style="font-size:10px;">' + (rr.mechanic || rr.type || '—') + '</span></td>'
+          + '<td class="num" style="' + _cpTakeColour(rr.take) + ';font-size:11px;">'
+          + (typeof rr.take === 'number' ? rr.take.toFixed(1) + '%' : '—') + '</td>'
+          + (hasProd ? '<td class="num" style="color:var(--muted);font-size:10px;" title="The same field figure as the grouped row above — it is not additional production.">same figure</td>' : '')
+          + '<td class="num" style="color:var(--muted);font-size:10px;">' + _cpContractKeyRate(rr) + '</td>'
+          + '</tr>';
+      }
+    }
+  });
+
+  html += '</tbody></table></div>';
+
+  var tail = '';
+  if (hasProd && dupGroups) {
+    tail = 'Showing ' + shown.length + ' of ' + groups.length + ' production groups — '
+         + shownRecs + ' of ' + contracts.length + ' contract records — ranked by production '
+         + 'volume, then fiscal dispersion.';
+  } else if (contracts.length > 30) {
+    tail = 'Showing top 30 of ' + contracts.length + ' contracts (ranked by production volume, then fiscal dispersion)';
+  }
+  if (tail) html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;">' + tail + '</div>';
+  return html;
 }
 function cpContractColNote(country, contracts) {
   if (!contracts || !contracts.length) return '';
