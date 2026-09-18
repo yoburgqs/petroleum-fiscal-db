@@ -1629,6 +1629,17 @@ async function testFCExportMethodology(page) {
         window.__cap = { name: name, meth: XLSX.utils.sheet_to_json(wb.Sheets['Methodology'], { header: 1 }) };
       };
     });
+    // v911: exportFCResults() needs one api/v1/country file per row for its Model_Terms_*
+    // columns, and the function is synchronous, so its first call warms that cache and
+    // re-enters rather than writing the workbook inline. A real click still produces the file
+    // (the re-entry is automatic); this probe reads window.__cap immediately, so it warms the
+    // cache itself first. The strict "one call must write a workbook" assertion below is kept
+    // exactly as it was -- it is now a statement about a warm cache, which is the state every
+    // call after the first is in.
+    await page.evaluate(() => new Promise(res => {
+      if (typeof _orcaTermsPrefetch !== 'function') { res(); return; }
+      _orcaTermsPrefetch((window.COUNTRY_DATA || []).map(d => d.country), res);
+    }));
     const keys = await page.evaluate(() =>
       Array.from(document.querySelectorAll('#fc-profile option')).map(o => o.value));
     if (!keys.length) { f(S, 'profile options', 'No options in #fc-profile'); return; }
@@ -1681,6 +1692,151 @@ async function testFCExportMethodology(page) {
     f(S, 'exception', e.message);
   }
 }
+
+// ── v911 (T6): the model-term evidence leg must LEAVE the tool ───────────────────────────────
+// Six cycles put "N of M model terms cited" on the six screens that print an evidence letter,
+// because the letter grades a country's whole fact base and says nothing about whether the 3-6
+// fiscal terms its DCF actually runs are cited. Measured pre-change: 59 of 185 countries grade
+// A or B while citing half or fewer of their model terms, 19 cite none, and none cites all.
+// Not one export carried the leg, so every IC attachment re-created the misreading the screens
+// had been corrected to prevent -- in the one artifact the reader cannot check against the page.
+// This asserts the leg is in all four multi-country export payloads, populated on EVERY row
+// (not just the rows that scrolled past and hydrated a chip), and consistent with the rule the
+// on-screen chip uses. A regression that silently drops a column would otherwise be invisible.
+async function testExportTermLeg(page) {
+  const S = 'ExportTermLeg';
+  try {
+    await switchTab(page, 't0');
+    await page.waitForTimeout(600);
+    const warm = await page.evaluate(() => new Promise(res => {
+      if (typeof _orcaTermsPrefetch !== 'function') { res(false); return; }
+      _orcaTermsPrefetch((window.COUNTRY_DATA || []).map(d => d.country), () => res(true));
+    }));
+    if (!warm) { f(S, 'prefetch', '_orcaTermsPrefetch is not defined — the leg cannot reach any export'); return; }
+
+    // 1. the helper itself: three cells, and an unresolved row must say n/c rather than blank
+    const cells = await page.evaluate(() => {
+      if (typeof _orcaTermLegCells !== 'function') return null;
+      return {
+        nl: _orcaTermLegCells('Netherlands'),
+        bogus: _orcaTermLegCells('Atlantis'),
+        note: typeof _ORCA_TERMLEG_NOTE === 'string' ? _ORCA_TERMLEG_NOTE.length : 0
+      };
+    });
+    if (!cells) { f(S, 'cells', '_orcaTermLegCells is not defined'); return; }
+    if (cells.nl[0] != null && cells.nl[1] > 0 && cells.nl[0] <= cells.nl[1]) {
+      p(S, 'cells populated', 'Netherlands ' + cells.nl[0] + ' of ' + cells.nl[1]);
+    } else {
+      f(S, 'cells populated', 'Netherlands leg came back ' + JSON.stringify(cells.nl));
+    }
+    if (cells.nl[0] < cells.nl[1] && /\S/.test(String(cells.nl[2])) && !/^none/.test(String(cells.nl[2]))) {
+      p(S, 'uncited terms named', String(cells.nl[2]).slice(0, 60));
+    } else {
+      f(S, 'uncited terms named', 'a partly-cited row did not name its uncited terms: ' + JSON.stringify(cells.nl[2]));
+    }
+    if (/^n\/c/.test(String(cells.bogus[2])) && cells.bogus[0] === null) {
+      p(S, 'unresolved says n/c', 'an unresolvable row is n/c, not a silent blank');
+    } else {
+      f(S, 'unresolved says n/c', 'an unresolvable row returned ' + JSON.stringify(cells.bogus));
+    }
+    if (cells.note > 400) p(S, 'basis note present', _ORCA_NOTE_LEN(cells.note));
+    else f(S, 'basis note present', '_ORCA_TERMLEG_NOTE is ' + cells.note + ' chars — the columns would travel uncaveated');
+
+    // 2. Fiscal Compare workbook: the three columns, and no row left blank
+    const fc = await page.evaluate(() => {
+      if (!window.__origWriteFile) window.__origWriteFile = XLSX.writeFile;
+      let cap = null;
+      XLSX.writeFile = function (wb) { cap = XLSX.utils.sheet_to_json(wb.Sheets['Fiscal Compare'], { header: 1 }); };
+      try { exportFCResults(); } catch (e) { XLSX.writeFile = window.__origWriteFile; return { err: e.message }; }
+      XLSX.writeFile = window.__origWriteFile;
+      if (!cap) return { err: 'no workbook' };
+      const h = cap[0];
+      const ci = h.indexOf('Model_Terms_Cited (n)'), ri = h.indexOf('Model_Terms_Run (n)'), ui = h.indexOf('Model_Terms_Uncited');
+      if (ci < 0 || ri < 0 || ui < 0) return { err: 'columns absent: ' + JSON.stringify([ci, ri, ui]) };
+      // The workbook honours the shortlist ticks (v632), and earlier probes in this suite leave
+      // rows selected, so the row COUNT here is whatever is on screen. What must hold is that
+      // no row in the file is blank; full 185-row completeness is asserted on the Screener and
+      // Explorer payloads below, neither of which takes a selection.
+      let n = 0, blank = 0;
+      cap.slice(1).forEach(r => {
+        if (!r[2]) return;
+        n++;
+        if (r[ci] == null && !/^n\/c/.test(String(r[ui] || ''))) blank++;
+      });
+      return { n: n, blank: blank, afterGrade: ci === h.indexOf('Facts On File') + 1 };
+    });
+    if (fc.err) {
+      f(S, 'fc workbook', fc.err);
+    } else {
+      if (fc.n >= 3 && fc.blank === 0) p(S, 'fc every row carries the leg', fc.n + ' rows in the file, 0 blank');
+      else f(S, 'fc every row carries the leg', fc.blank + ' of ' + fc.n + ' rows blank — a column populated by scroll position');
+      if (fc.afterGrade) p(S, 'fc leg sits beside the grade', 'immediately right of Facts On File');
+      else f(S, 'fc leg sits beside the grade', 'the leg is not adjacent to the grade block it qualifies');
+    }
+
+    // 3. Screener / Explorer / Breakeven payloads
+    await switchTab(page, 'tscreener');
+    await page.waitForTimeout(2000);
+    const sc = await page.evaluate(() => {
+      if (typeof _scExportRows !== 'function') return { err: '_scExportRows absent' };
+      const rows = _scExportRows();
+      if (!rows.length) return { err: 'no screener rows' };
+      const keys = Object.keys(rows[0]);
+      const have = ['Model_Terms_Cited', 'Model_Terms_Run', 'Model_Terms_Uncited'].every(k => keys.indexOf(k) >= 0);
+      let blank = 0, abHalf = 0;
+      rows.forEach(r => {
+        if (r.Model_Terms_Cited == null && !/^n\/c/.test(String(r.Model_Terms_Uncited || ''))) blank++;
+        if ((r.Evidence_Grade === 'A' || r.Evidence_Grade === 'B')
+            && r.Model_Terms_Run > 0 && r.Model_Terms_Cited / r.Model_Terms_Run <= 0.5) abHalf++;
+      });
+      // the pasted memo table must carry it in the Evidence cell, not lose it to column budget
+      let cell = null;
+      if (typeof _scCopyColumns === 'function') {
+        const cols = _scCopyColumns(rows, '75');
+        const ev = cols.find(c => c.h === 'Evidence');
+        const nl = rows.find(r => r.Country === 'Netherlands') || rows[0];
+        if (ev) cell = ev.f(nl);
+      }
+      return { have: have, blank: blank, n: rows.length, abHalf: abHalf, cell: cell };
+    });
+    if (sc.err) {
+      f(S, 'screener payload', sc.err);
+    } else {
+      if (sc.have && sc.blank === 0) p(S, 'screener every row carries the leg', sc.n + ' rows, 0 blank');
+      else f(S, 'screener every row carries the leg', 'have=' + sc.have + ' blank=' + sc.blank + ' of ' + sc.n);
+      // This is the whole reason the column exists. If it ever reads 0 the leg has stopped
+      // discriminating and something upstream is wrong, not fixed.
+      if (sc.abHalf >= 20) p(S, 'leg disagrees with the grade', sc.abHalf + ' rows grade A or B on half or fewer model terms');
+      else f(S, 'leg disagrees with the grade', 'only ' + sc.abHalf + ' A/B rows cite half or fewer — expected ~59; the leg is not being computed');
+      if (sc.cell && /model terms cited/.test(String(sc.cell))) p(S, 'memo paste carries the leg', String(sc.cell).slice(0, 62));
+      else f(S, 'memo paste carries the leg', 'pasted Evidence cell reads: ' + JSON.stringify(sc.cell));
+    }
+
+    await switchTab(page, 'texplorer');
+    await page.waitForTimeout(2000);
+    const ex = await page.evaluate(() => {
+      if (!window.__origWriteFile) window.__origWriteFile = XLSX.writeFile;
+      let cap = null;
+      XLSX.writeFile = function (wb) { cap = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 }); };
+      try { exportExplorer(); } catch (e) { XLSX.writeFile = window.__origWriteFile; return { err: e.message }; }
+      XLSX.writeFile = window.__origWriteFile;
+      if (!cap) return { err: 'no workbook' };
+      const h = cap[0];
+      const ci = h.indexOf('Model_Terms_Cited (n)'), ui = h.indexOf('Model_Terms_Uncited');
+      if (ci < 0 || ui < 0) return { err: 'columns absent' };
+      let n = 0, blank = 0;
+      cap.slice(1).forEach(r => { if (!r[0]) return; n++; if (r[ci] == null && !/^n\/c/.test(String(r[ui] || ''))) blank++; });
+      return { n: n, blank: blank };
+    });
+    if (ex.err) f(S, 'explorer payload', ex.err);
+    else if (ex.n > 100 && ex.blank === 0) p(S, 'explorer every row carries the leg', ex.n + ' rows, 0 blank');
+    else f(S, 'explorer every row carries the leg', ex.blank + ' of ' + ex.n + ' blank');
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+// Tiny helper kept out of the page: the note length is reported, not re-derived.
+function _ORCA_NOTE_LEN(n) { return n + ' chars of basis travelling with the columns'; }
 
 async function testDCF(page) {
   const S = 'DCF';
@@ -3680,6 +3836,7 @@ async function testConsoleErrors() {
     await testFiscalCompare(page);
     await testBreakevenOneReadPoint(page);
     await testFCExportMethodology(page);
+    await testExportTermLeg(page);   // v911 (T6)
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
     await testSBProvenance(page);

@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v910</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v912</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v910</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v912</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2895,7 +2895,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries<br>
           Take &gt;65% + IRR not shown &rarr; do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission<br>
           &ldquo;&mdash;&rdquo; in any cell = data not yet verified to Evidence A/B standard; do not cite in IC memo<br>
-          Export XLSX &rarr; carries the Evidence <strong>grade</strong> (A/B/C/D) with both legs that set it &mdash; primary-law share and fact count. It no longer exports a combined A/B%: that number reads 80%+ on 67 countries graded C or D here.
+          Export XLSX &rarr; carries the Evidence <strong>grade</strong> (A/B/C/D) with both legs that set it &mdash; primary-law share and fact count &mdash; <strong>and, since v912, the second leg the grade does not cover: how many of the fiscal terms each row&rsquo;s model actually ran carry a citation, and which ones do not.</strong> 59 of 185 countries grade A or B on half or fewer of their model terms and 19 cite none, so the workbook now carries both readings rather than the one that reads better. It does not export a combined A/B%: that number reads 80%+ on 67 countries graded C or D here.
         </div>
       </div>
     </div>
@@ -22679,7 +22679,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><strong>Step 2 (1 min) — Screener threshold filter.</strong> Switch to Screener mode (Explorer tab &rarr; Screener). Select preset &ldquo;Low Take · Positive NPV&rdquo; (Take &le;55%, BE &le;$65, NPV positive) as a starting point. Adjust: raise Max Govt Take to 65% if region is Africa (typical African PSC range 60&ndash;70%). Set Min Evidence A/B to 60% to exclude C-tier countries. Result count appears instantly. Aim for 8&ndash;12 countries. Click &ldquo;Load top N into Side-by-Side&rdquo; for your top 5.</p>
         <p><strong>Step 3 (2 min) — Side-by-Side parallel review.</strong> Side-by-Side loads your 5 shortlisted countries in parallel columns. Each column shows: take at 4 prices ($50/$75/$100/$125), NPV, IRR, Breakeven, mechanic, reform count, and stability. Scan columns for any country with Swing &gt;20pp (requires price table) or Stability Score &le;2 (requires reform disclosure). These become flagged items in your IC memo.</p>
         <p><strong>Step 4 (2 min) — Country Profile spot-checks.</strong> For any country where Side-by-Side shows a gap (missing IRR, n/a breakeven), open Country Profile and check the sourced fiscal parameters and evidence tier. If the key parameters show C-tier sourcing (&lt;60% A/B%), flag in memo as &ldquo;verify before IC submission.&rdquo;</p>
-        <p><strong>Export and cite:</strong> In Fiscal Compare, click &ldquo;Export XLSX.&rdquo; The XLSX includes an Evidence A/B% column and a Methodology sheet with ORCA version, profile assumptions, and citation template. This is your IC memo appendix. Total time: 7&ndash;10 minutes from blank screen to defensible shortlist with source documentation.</p>
+        <p><strong>Export and cite:</strong> In Fiscal Compare, click &ldquo;Export XLSX.&rdquo; The workbook carries the Evidence <strong>grade</strong> with the two legs that set it (primary-law share, fact count), the <strong>Model_Terms_Cited / Model_Terms_Run / Model_Terms_Uncited</strong> columns that say whether the terms behind that row&rsquo;s take and NPV are cited at all, and a Methodology sheet with the ORCA version, profile assumptions and a citation template. It does <em>not</em> carry a combined Evidence A/B% &mdash; that column was removed at v634 because it read 80%+ on 67 countries the platform grades C or D. This is your IC memo appendix. Total time: 7&ndash;10 minutes from blank screen to defensible shortlist with source documentation.</p>
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v426 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/. Cross-references: FAQ A384 (7-step IC analyst workflow), FAQ A956 (bid strategy), FAQ A383 (Vintage Analysis IC workflow).</em></p>
       </div>
     </div>
@@ -36198,6 +36198,9 @@ function _scExportBasisLines() {
   }
   L.push('ASSUMPTIONS: ' + _icEngineBasis()
     + ' Take and NPV are at the screened price; breakeven is always at $75/bbl.');
+  // v912 (T6): the three model-term columns are new in this file and they do NOT rank the same
+  // way as Evidence_Grade beside them. The sentence that says so travels with them.
+  if (typeof _ORCA_TERMLEG_NOTE === 'string') L.push(_ORCA_TERMLEG_NOTE);
   // v743 (T1): only stated when this shortlist actually contains such a row, and it names them,
   // because a caveat about countries that are not in the export is noise in an IC memo.
   (function(){
@@ -37021,6 +37024,12 @@ function _scExportRows() {
       Evidence_Grade: _scEvidExport(d).grade,
       Evidence_Primary_Law_pct: _scEvidExport(d).aPct,
       Evidence_Basis: _scEvidExport(d).basis,
+      // v912 (T6): _scEvidExport()'s own basis string ends "Grades the fact base, not the
+      // model." -- and then nothing in this file said what the model leg was. The screen has
+      // printed it on every Screener row since v846. These three are that chip, verbatim.
+      Model_Terms_Cited: _orcaTermLegCells(d.country)[0],
+      Model_Terms_Run: _orcaTermLegCells(d.country)[1],
+      Model_Terms_Uncited: _orcaTermLegCells(d.country)[2],
       // v743 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
       // direction of its own error, or the divider on screen stops at the browser window.
       Take_Is_Floor: _scTakeIsFloor(d) ? 'Yes' : 'No',
@@ -37162,7 +37171,22 @@ function _scEmptyMsg(verb) {
 }
 window._scEmptyMsg = _scEmptyMsg;
 
+// ── v912 (T6): the model-term evidence leg gate, shared by all three Screener export paths ──
+// _scExportRows() is the choke point for the clipboard, the CSV and the XLSX, and it is
+// synchronous, so the leg has to be in the cache before it runs. Returns true when it started a
+// fetch and re-entry is scheduled -- the caller must return immediately in that case.
+function _scTermGate(again) {
+  if (typeof _orcaTermsPending !== 'function') return false;
+  var names = (window._screenerData || []).map(function(d) { return d.country; });
+  if (!_orcaTermsPending(names).length) return false;
+  _orcaTermsPrefetch(names, again, ['screener-excel-btn', 'screener-csv-btn',
+    'screener-copy-ic-btn', 'sc-dock-xlsx', 'sc-dock-csv', 'sc-dock-copy']);
+  return true;
+}
+window._scTermGate = _scTermGate;
+
 function exportScreenerCSV() {
+  if (_scTermGate(exportScreenerCSV)) return;
   var rows = _scExportRows();
   if (!rows.length) { _icRefuse(_scEmptyMsg('export')); return; }
   var hdr = Object.keys(rows[0]);
@@ -37321,6 +37345,12 @@ function _scCopyColumns(rows, price) {
         ? Number(r.Evidence_Primary_Law_pct).toFixed(0) + '% primary law' : 'ungraded');
       if (r.Evidence_Grade === 'C') s += ' — screening only';
       if (r.Evidence_Grade === 'D') s += ' — not citable without the statute';
+      // v912 (T6): the leg the letter does not cover, in the cell rather than in a new column —
+      // this is a memo table and a column costs the reader more than nine characters do.
+      // 59 of 185 countries print an A or a B here over half or fewer of their model terms.
+      if (r.Model_Terms_Run != null && r.Model_Terms_Cited != null) {
+        s += ' · ' + r.Model_Terms_Cited + ' of ' + r.Model_Terms_Run + ' model terms cited';
+      }
       return s;
     } });
   cols.push({ h: 'Data basis', f: function(r){ return r.Verified_Production === 'Yes' ? 'verified field production' : 'proxy economics'; } });
@@ -37328,6 +37358,7 @@ function _scCopyColumns(rows, price) {
 }
 
 function copyScreenerTable() {
+  if (_scTermGate(copyScreenerTable)) return;
   var btn  = document.getElementById('screener-copy-ic-btn');
   var rows = _scExportRows();
   if (!rows.length) { _icRefuse(_scEmptyMsg('copy')); return; }
@@ -45370,6 +45401,15 @@ function exportExplorer() {
   if (!_explorerRendered) { if (typeof renderExplorer === 'function') renderExplorer(); }
   const R = _explorerRendered;
   if (!R || !R.rows.length) { _icRefuse('Nothing to export — no countries match the current filters.'); return; }
+  // v912 (T6): see _orcaTermLegCells(). Synchronous sheet, per-country fetch — warm the cache
+  // and re-enter, so the column is populated for every row rather than for the ones that
+  // happened to scroll past.
+  if (typeof _orcaTermsPending === 'function'
+      && _orcaTermsPending(R.rows.map(function(r) { return r.country; })).length) {
+    _orcaTermsPrefetch(R.rows.map(function(r) { return r.country; }), function() { exportExplorer(); },
+      ['explorer-excel-btn']);
+    return;
+  }
 
   const price   = R.price;                       // the price radio the table is rendered at
   const pk      = 'take_' + price;
@@ -45430,6 +45470,11 @@ function exportExplorer() {
     'Evidence Grade': _evidenceGrade(d).letter + ' — ' + _evidenceGrade(d).label,
     'Primary Law (tier A, %)': d.a_pct != null ? +d.a_pct.toFixed(1) : null,
     'Facts On File': d.n_facts != null ? d.n_facts : null,
+    // v912 (T6): the second evidence leg, the one the three columns above do not cover. The
+    // Explorer's own Evidence column has printed it on every row since v905.
+    'Model_Terms_Cited (n)': _orcaTermLegCells(d.country)[0],
+    'Model_Terms_Run (n)': _orcaTermLegCells(d.country)[1],
+    'Model_Terms_Uncited': _orcaTermLegCells(d.country)[2],
     'Prod Coverage (%)': d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null,
     'R-factor Tiers': d.has_r_factor_tiers ? 'Yes' : 'No',
   }));
@@ -45480,6 +45525,9 @@ function exportExplorer() {
 
   const ctx = [
     { Field: 'Export', Value: 'ORCA Global Explorer — screening list' },
+    // v912 (T6): the three model-term columns are new in this file and do NOT rank the same way
+    // as the Evidence Grade beside them. The sentence that says so travels with them.
+    { Field: 'Model terms cited', Value: (typeof _ORCA_TERMLEG_NOTE === 'string') ? _ORCA_TERMLEG_NOTE : '' },
     { Field: 'Countries in this file', Value: R.rows.length + ' of ' + COUNTRY_DATA.length },
     { Field: 'Filters applied', Value: applied.length ? applied.join('; ') : 'none — all ' + COUNTRY_DATA.length + ' countries' },
     { Field: 'Ranked by', Value: _rankedBy },
@@ -49474,6 +49522,7 @@ function ddAddCompare(country, btn) {
 
 function exportScreenerExcel() {
   if (typeof XLSX === 'undefined') { _icRefuse('Excel library not loaded — check internet connection.'); return; }
+  if (_scTermGate(exportScreenerExcel)) return;
   var rows = _scExportRows();
   if (!rows.length) { _icRefuse(_scEmptyMsg('export')); return; }
   var wb = XLSX.utils.book_new();
@@ -58355,6 +58404,170 @@ function _fcTermLeg(country) {
     .catch(function() { _fcTermLegCache[country] = null; return null; });
 }
 
+// ── v912 (T6): the model-term evidence leg, carried into the EXPORTS ────────────────────
+// The leg above is on every screen that prints an evidence letter: the Fiscal Compare Quality
+// column (v846), the Explorer Evidence column (v905), the Screener (v846), the Side-by-Side
+// grid (v716), the Country Profile Evidence Quality panel (v660) and its IC MEMO strip (v899).
+// Six surfaces, because six cycles each found the same misreading: the LETTER grades the
+// country's whole fact base -- primary-law share and fact depth, mostly contract metadata the
+// DCF never reads -- and says nothing about whether the 3-6 fiscal terms getDCFParams()
+// actually runs to produce the take, NPV and breakeven beside it are cited at all.
+//
+// Not one export carried it. Measured live against the shipped build over all 185 countries,
+// on _fcTermLeg()'s own rule:
+//   * 59 of 185 grade A or B while citing HALF OR FEWER of their model terms. All 59 are in the
+//     Screener workbook, which publishes a grade on every row; the Fiscal Compare workbook
+//     suppresses the grade on generic-default rows (v634), so 6 of ITS graded rows are affected
+//     -- USA, Australia, United Kingdom, Mongolia, Tanzania and Iran, all measured post-patch.
+//   * 19 cite ZERO. NO country on this platform cites all of them.
+//   * Netherlands grades A on 97.4% primary law over 278 facts and cites 1 of 4 Concession
+//     terms, its uncited terms including the royalty rate. Canada grades A on 1,758 facts and
+//     cites 2 of 4. Brazil, Albania: A over 2 of 4.
+// So the workbooks the Quick Start calls "Export XLSX for IC attachment" published exactly the
+// credential the six on-screen fixes exist to qualify, stripped of the qualification -- and an
+// export is the one artifact the analyst cannot check against the page, because the IC reviewer
+// reading it never saw the page.
+//
+// The leg needs api/v1/country/<slug>.json per country and both exports are synchronous, which
+// is why it was never there. It is prefetched on the click instead, 8 at a time, into the cache
+// the on-screen chips already share, then read synchronously while the sheet is built. No grade,
+// letter, percentage, fact count, take, NPV, rank, tier, order or filter changes.
+function _orcaTermsPending(countries) {
+  if (typeof _fcTermLegCache !== 'object' || !_fcTermLegCache) return [];
+  var seen = {}, out = [];
+  (countries || []).forEach(function(c) {
+    if (!c || seen[c]) return;
+    seen[c] = 1;
+    if (_fcTermLegCache[c] === undefined) out.push(c);
+  });
+  return out;
+}
+window._orcaTermsPending = _orcaTermsPending;
+// Resolves when every named country's leg is in the cache, or after 20s, whichever is first --
+// a hung network must delay the export, never cancel it. _fcTermLeg() caches null on failure,
+// and _orcaTermLegCells() reports that as "n/c", so a partial prefetch degrades to an honest
+// blank rather than to a wrong number.
+// The pressed control has to say it is working. The prefetch defers the download by one
+// round-trip per country -- ~150ms warm on a local server, but this is served from GitHub Pages
+// and 185 files over a bad connection is seconds. A button that looks idle while nothing
+// downloads is read as a dead button, which is the v460 failure this platform already had once.
+function _orcaTermsBusy(ids, on, n) {
+  (ids || []).forEach(function(id) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    if (on) {
+      if (b.dataset.orcaBusyLabel === undefined) b.dataset.orcaBusyLabel = b.innerHTML;
+      b.disabled = true;
+      b.setAttribute('aria-busy', 'true');
+      b.innerHTML = 'Reading sources… ' + (n || '');
+    } else {
+      if (b.dataset.orcaBusyLabel !== undefined) { b.innerHTML = b.dataset.orcaBusyLabel; delete b.dataset.orcaBusyLabel; }
+      b.disabled = false;
+      b.removeAttribute('aria-busy');
+    }
+  });
+}
+window._orcaTermsBusy = _orcaTermsBusy;
+function _orcaTermsPrefetch(countries, done, btnIds) {
+  var todo = _orcaTermsPending(countries);
+  if (!todo.length || typeof _fcTermLeg !== 'function') { done(); return; }
+  if (typeof showCopyToast === 'function') {
+    showCopyToast('Reading the source record for ' + todo.length + ' countr'
+      + (todo.length === 1 ? 'y' : 'ies') + '… the export carries WHICH model terms are cited, '
+      + 'not only the evidence grade.');
+  }
+  _orcaTermsBusy(btnIds, true, todo.length);
+  var i = 0, live = 0, settled = false;
+  var finish = function(timedOut) {
+    if (settled) return;
+    settled = true;
+    // v912 (T6): the 20s cap must not hand control back with the cache still COLD. done() is
+    // the export re-entering itself; it asks _orcaTermsPending() again, still gets the same
+    // unresolved countries, and calls straight back into this function for another 20s and
+    // another full set of duplicate fetches. On a connection that stalls rather than fails --
+    // the exact case this cap exists for -- that is an unbounded loop with a fetch storm
+    // behind it, and the analyst never gets the file at all. Bank every still-unresolved
+    // country as null, which is what _fcTermLeg() itself writes on a failed fetch, so
+    // _orcaTermLegCells() reports the "n/c — ORCA could not resolve..." cell it was written
+    // for and the workbook DOWNLOADS. A named gap in one column beats no export.
+    if (timedOut) {
+      todo.forEach(function(c) {
+        if (_fcTermLegCache[c] === undefined) _fcTermLegCache[c] = null;
+      });
+    }
+    _orcaTermsBusy(btnIds, false);
+    done();
+  };
+  var pump = function() {
+    if (settled) return;
+    if (i >= todo.length && live === 0) { finish(false); return; }
+    while (live < 8 && i < todo.length) {
+      live++;
+      _fcTermLeg(todo[i++]).then(function() { live--; pump(); }, function() { live--; pump(); });
+    }
+  };
+  setTimeout(function() { finish(true); }, 20000);
+  pump();
+}
+window._orcaTermsPrefetch = _orcaTermsPrefetch;
+// The three export cells, on the same rule and in the same words as the on-screen chip.
+function _orcaTermLegCells(country) {
+  var t = (typeof _fcTermLegCache === 'object' && _fcTermLegCache) ? _fcTermLegCache[country] : null;
+  if (!t) {
+    return [null, null, 'n/c — ORCA could not resolve which fiscal terms the model runs for '
+      + country + ', so this leg is not reported. It is NOT a clean record: open '
+      + country + ' in Country Profile and read the Key Fiscal Parameters evidence chain.'];
+  }
+  return [t.cited, t.total,
+    t.uncited && t.uncited.length
+      ? t.uncited.join('; ')
+      : 'none — every term this model runs carries a citation'];
+}
+window._orcaTermLegCells = _orcaTermLegCells;
+// The one sentence that has to travel with those three columns, because the whole point of the
+// leg is that it does NOT rank the same way as the letter beside it.
+// The same sentence as _ORCA_TERMLEG_NOTE, wrapped into AOA rows for the Methodology sheets,
+// which are one-cell-per-line and have no wrapping of their own.
+function _orcaTermLegMeth() {
+  return [
+    ['  These count only the fiscal terms that country\'s DCF actually RUNS to produce the take,'],
+    ['  NPV, IRR and breakeven in this file -- royalty, CIT, FTP, cost-recovery cap, profit-oil'],
+    ['  split, state equity, special tax, whichever its mechanic uses -- and ask of each one'],
+    ['  whether a citation stands behind it. The bulk harvest, an instrument shared across'],
+    ['  jurisdictions and an uncited contract average do not count: the same rule the Country'],
+    ['  Profile evidence chain uses.'],
+    ['  THIS IS NOT THE GRADE ABOVE, AND THE GRADE DOES NOT COVER IT. The grade, the primary-law'],
+    ['  share and the fact count describe a country\'s WHOLE fact base, most of which is contract'],
+    ['  metadata the DCF never reads. The two orderings INVERT: 59 of 185 countries grade A or B'],
+    ['  while citing half or fewer of their model terms. Netherlands grades A on 97% primary law'],
+    ['  and cites 1 of 4, its uncited terms including the royalty rate; Canada grades A on 1,758'],
+    ['  facts and cites 2 of 4. 19 countries cite NONE, and no country on this platform cites all'],
+    ['  of them -- so this is not a pass mark, it is which row is thinnest where it matters.'],
+    ['  Model_Terms_Uncited names the terms with nothing behind them. For any row you intend to'],
+    ['  cite, open that country in Country Profile and read the Key Fiscal Parameters evidence'],
+    ['  chain, which gives each term its ORCA value, the statutory value, the source, and'],
+    ['  whether that source can still be retrieved.'],
+    ['  "n/c" means ORCA could not resolve which terms the model runs for that row. It is not a'],
+    ['  clean record and must not be read as one.']
+  ];
+}
+window._orcaTermLegMeth = _orcaTermLegMeth;
+var _ORCA_TERMLEG_NOTE = 'Model_Terms_Cited / Model_Terms_Run / Model_Terms_Uncited '
+  + '— READ THESE WITH THE EVIDENCE GRADE, NOT INSTEAD OF IT, AND DO NOT TREAT THE GRADE AS '
+  + 'COVERING THEM. The grade, the primary-law share and the fact count describe a country’s '
+  + 'WHOLE fact base, most of which is contract metadata the DCF never reads. These three count '
+  + 'only the fiscal terms that country’s model actually runs to produce the take, NPV, IRR '
+  + 'and breakeven in this file, and ask of each one whether a citation stands behind it. The '
+  + 'bulk harvest, an instrument shared across jurisdictions and an uncited contract average do '
+  + 'not count — the same rule the Country Profile evidence chain uses. The two orderings '
+  + 'INVERT: 59 of 185 countries grade A or B while citing half or fewer of their model terms '
+  + '(Netherlands A / 97% primary law cites 1 of 4, its uncited terms including the royalty '
+  + 'rate; Canada A / 1,758 facts cites 2 of 4), 19 cite none, and no country on this platform '
+  + 'cites all of them. So this is not a pass mark — it is which row is thinnest where it '
+  + 'matters. For any row you intend to cite, open that country in Country Profile and read the '
+  + 'Key Fiscal Parameters evidence chain, which names each term, its ORCA value, the statutory '
+  + 'value, the source and whether that source can still be retrieved.';
+
 // Fills the placeholder left in the drawer header. Additive and late-binding: if the fetch
 // fails or the regime carries no model terms, the placeholder stays empty and the drawer is
 // exactly what it was.
@@ -60903,6 +61116,17 @@ function exportFCResults() {
   // v313: use filtered results if any filter is active, else fall back to full results
   let rows = (window._fcFilteredResults && window._fcFilteredResults.length) ? window._fcFilteredResults : window._fcResults;
   if (!rows || !rows.length) { _icRefuse('Run Fiscal Compare first to generate results.'); return; }
+  // v912 (T6): the model-term evidence leg needs one api/v1/country file per row and this
+  // function is synchronous. Fetch what is missing, then re-enter and build the sheet with the
+  // cache warm. The chips on screen hydrate only the rows that scrolled into view, so a cold
+  // export of 185 rows would otherwise write the column for a handful of countries and leave
+  // the rest blank -- a column that is populated by scroll position is worse than absent.
+  if (typeof _orcaTermsPending === 'function'
+      && _orcaTermsPending(rows.map(function(r) { return r.country; })).length) {
+    _orcaTermsPrefetch(rows.map(function(r) { return r.country; }), function() { exportFCResults(); },
+      ['fc-export-btn', 'fc-dock-xlsx']);
+    return;
+  }
   // v632 (T5): the shortlist ticks bind the workbook as well as the clipboard. Two export
   // affordances sit two inches apart on the same toolbar; if only one honoured the selection,
   // the analyst's shortlist would silently mean two different things depending which they pressed.
@@ -61135,6 +61359,10 @@ function exportFCResults() {
      // v634 (T6): 'Evidence A/B (%)' is GONE from every export, replaced by the grade the
      // screen shows. See the block above _fcXlEvidence().
      'Evidence Grade', 'Primary Law (tier A, %)', 'Facts On File',
+     // v912 (T6): the OTHER evidence leg -- see _orcaTermLegCells(). The three columns above
+     // grade the fact base; these three grade the terms this row's model ran. 59 of 185 rows
+     // carry an A or B in the column to the left over half or fewer of their model terms cited.
+     'Model_Terms_Cited (n)', 'Model_Terms_Run (n)', 'Model_Terms_Uncited',
      'Take% (model, selected price)', 'Model_vs_DB_pp', 'Govt NPV (model, $M est)', 'Contractor NPV (model, $M)'],
     ..._xlSorted.map(function(r, i) {
       const _mono = _xlMono(r);
@@ -61187,6 +61415,7 @@ function exportFCResults() {
         // Evidence describes the country's fiscal facts. On a generic-default row those
         // facts were not used, so publishing a grade here would be a false credential.
         ..._fcXlEvidence(r),
+        ..._orcaTermLegCells(r.country),
         take != null ? +take.toFixed(2) : null,
         (take != null && _dbTake != null && !isStateMonopoly(_dbTake)) ? +(take - _dbTake).toFixed(1) : null,
         govtNpv,
@@ -61365,6 +61594,11 @@ function exportFCResults() {
     ['  country-level bulk harvest, not an operator filing. That column read 80%+ on 67 countries'],
     ['  this platform grades C or D, and a flat 100.0 on 53 of them, including countries holding'],
     ['  two fiscal facts. Do not carry an A/B share into an IC memo as a sourcing credential.'],
+    [''],
+    // v912 (T6): the three columns that sit immediately right of the grade block, and the
+    // reason they are separate columns rather than folded into the letter.
+    ['Model_Terms_Cited (n) / Model_Terms_Run (n) / Model_Terms_Uncited (v912):'],
+    ..._orcaTermLegMeth(),
     [''],
     ['Citation: ORCA (2026), ' + _orcaVer + '. yoburgqs.github.io/petroleum-fiscal-db/']
   ]);
@@ -62666,6 +62900,14 @@ async function renderBreakevenMap() {
 }
 
 function exportBreakevenCSV() {
+  // v912 (T6): warm the model-term cache, then re-enter. See _orcaTermLegCells().
+  if (typeof _orcaTermsPending === 'function' && typeof COUNTRY_DATA !== 'undefined') {
+    var _beNames = COUNTRY_DATA.map(function(d) { return d.country; });
+    if (_orcaTermsPending(_beNames).length) {
+      _orcaTermsPrefetch(_beNames, function() { exportBreakevenCSV(); }, ['breakeven-csv-btn']);
+      return;
+    }
+  }
   if (!COUNTRY_DATA) { _icRefuse('Data not loaded yet.'); return; }
   // v608 (T5): this file is the Breakeven Map's only export, and it contradicted the tab it
   // came from. The screen states plainly that breakeven "does not rank them" -- 65 countries
@@ -62700,7 +62942,11 @@ function exportBreakevenCSV() {
   // been missing since it was built, and the one every other export carries: the evidence grade.
   var head = ['Country','Region','Mechanic','Breakeven ($/bbl)','Govt Take @$75 (%)',
               'Contractor NPV @$75 ($M)','Contractor NPV @$50 ($M)',
-              'NPV Retention $50 vs $75 (%)','Evidence Grade','Evidence Basis'];
+              'NPV Retention $50 vs $75 (%)','Evidence Grade','Evidence Basis',
+              // v912 (T6): the leg the grade does not cover — same three columns as the other
+              // three exports, so four files describing the same country cannot grade it four
+              // different ways.
+              'Model_Terms_Cited (n)','Model_Terms_Run (n)','Model_Terms_Uncited'];
   var rows = [head];
   // v591: the $1.0 state-monopoly floor artifact is not exported — in a spreadsheet it reads
   // as the cheapest barrel on earth with nothing on screen to contradict it.
@@ -62745,7 +62991,8 @@ function exportBreakevenCSV() {
       d.npv_50 != null ? d.npv_50.toFixed(0) : '',
       (ret === null || ret === undefined) ? '' : (ret * 100).toFixed(0),
       _ev ? _ev.grade : '',
-      _ev ? _ev.basis : ''
+      _ev ? _ev.basis : '',
+      ..._orcaTermLegCells(d.country).map(function(x) { return x == null ? '' : x; })
     ]);
   });
   if (rows.length <= 1) { _icRefuse('No breakeven data to export.'); return; }
@@ -62807,6 +63054,8 @@ function exportBreakevenCSV() {
             + (nCD > cdNames.length ? ' and ' + (nCD - cdNames.length) + ' more' : '') + '. '
           : 'No row in this file is C or D on evidence. ')
       + 'The "Evidence Basis" column states the sourcing mix behind each grade.',
+    // v912 (T6): and the leg that grade does not cover, in the file that explains the grade.
+    (typeof _ORCA_TERMLEG_NOTE === 'string') ? _ORCA_TERMLEG_NOTE : '',
     'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/'
   ];
 
