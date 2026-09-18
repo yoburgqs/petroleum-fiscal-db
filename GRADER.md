@@ -60243,3 +60243,97 @@ actually evidenced before screening on it.
 **Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest in rotation (834 was T4, 830 T1, 829 T6, 828 T3, 826 T1, 825 T5, 824 T4, 823 T6, **821 T2**).
 
 **Friction.** Country Profile, cold load, storage cleared. The tab auto-seeds Indonesia, so the first thing the analyst actually *operates* is the country selector. Its options are built
+
+---
+## Cycle 836 Log — 2026-09-18
+- Test before: 415 PASS / 0 FAIL / 1 WARN (local tree; harness origin run reads 416/0/0)
+- Test after: 415 PASS / 0 FAIL / 1 WARN — **identical to the pre-edit tree on the same command**,
+  confirmed by serving `index.before.html` on a second port and running the suite against it.
+  The WARN is the pre-existing local service-worker 404.
+- JS errors: 0 pageerrors. JS syntax gate PASS (11 blocks).
+- Summary: Cycle 836 shipped as **v923**, pushed (`78b94ab`), mirror copied (sha `ea36c9e08a47`).
+
+## Task / Friction / Change / Result
+
+**Task: T5** — "Give me something I can paste straight into an IC memo." Stalest in rotation
+(835 was T2, 834 T4, 830 T1, 829 T6, 828 T3, 826 T1, **825 T5**).
+
+**Friction.** Fiscal Compare and Screener, cold load, storage cleared, nothing ticked. Click
+**⎘ Copy for IC Memo** and `_icArmBulkCopy()` (`index.html:51679`) arms a confirm rather than
+copying: the button goes amber and reads `⚠ Copy all 185 rows — confirm`, the 186 tick cells
+light up, and `showCopyToast()` raises a 36-word instruction — *"Nothing ticked, so this would
+copy all 185 rows — about 7 pages in Word. Click again to copy all 185, or tick the rows you
+want in the highlighted left-hand column and copy just those."*
+
+Both clocks behind that state were shorter than the act it asks for:
+
+| | value | |
+|---|---|---|
+| Toast hold | **2500ms** | `showCopyToast()` default |
+| Arm window | **6000ms** | `setTimeout(_icDisarmBulk, 6000)` |
+| Time to read the instruction | **7.2s @300wpm · 8.6s @250wpm · 10.8s @200wpm** | 36 words |
+
+So an analyst who actually read the sentence came back to a button that had already reverted,
+and their confirming click **re-armed instead of copying**. Reading it a second time took longer
+than the window a second time, so it re-armed again — the confirm path was unreachable *in a
+loop*, and the clipboard was never written. Measured cold on Fiscal Compare before the change:
+
+| gap between the two clicks | copied? |
+|---|---|
+| 2s | yes |
+| 8s | **no** |
+| 12s | **no** |
+
+The failure was also success-shaped. Every failed attempt swapped the button label and raised a
+toast, so the analyst saw the tool respond, went to Word, and pasted whatever had been on the
+clipboard beforehand.
+
+**Change.** `IC_ARM_MS = 20000` replaces the bare `6000` and now drives both clocks.
+`showCopyToast(msg, holdMs)` gained an optional hold, so the instruction is pinned to the life of
+the state it describes instead of vanishing at 2.5s underneath it. New `hideCopyToastIf(msg)` is
+called from `_icDisarmBulk()`, so the instruction is retracted on confirm, on click-off cancel and
+on timeout alike — it never sits on screen over a button that has stopped listening.
+
+**Result.** The analyst can read the warning, decide, and click again — and the shortlist lands on
+the clipboard.
+
+| check | result |
+|---|---|
+| Gaps 2s / 8s / 12s / 18s, Fiscal Compare | **all copy** (8s and 12s previously did not) |
+| Gap 12s, Screener | **copies** (survives the `_scTermGate` "Reading sources… 168" prefetch first) |
+| Gap 24s | still expires — the guard against a surprise 7-page paste survives — **and the toast now goes down with it** |
+| Click-off cancel | disarms, clears all 186 `.ic-tick-cue` cells, restores the label |
+| Horizontal scroll, 1920/1440/1280/1024/768/390 x 10 tabs | **0 overflow findings** |
+| Mobile 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth`; toast 366px wide, in view; both copy buttons **44px** tall under `pointer: coarse`, armed and unarmed |
+| Page errors | **0** across the desktop and mobile walks |
+
+### Also walked this cycle and found clean — recorded so the next T5 does not re-walk it
+
+- **Every IC clipboard surface produces correct, assumption-carrying output**: FC drilldown
+  `⎘ IC Citation` and `Copy 4-price as IC table`, Country Profile `dd-cite-btn` and
+  `dd-ic-summary-btn` (assumption table + 7 keyed notes), Screener `Copy for IC Memo`,
+  Side-by-Side `cmp-copy-table-btn`, IOC `ioc-copy-ic-btn`. All carry the standardized Deepwater
+  basis, the model-vs-database distinction, and the fee-basis comparability correction.
+- **Four file exports download and parse**: FC XLSX, Screener CSV, Screener XLSX, Breakeven CSV.
+- The FC / Screener bulk-copy guard was the only reachable point in the whole T5 walk where a
+  click produced no artifact.
+
+### Debt still open, NOT fixed this cycle
+
+- **The 1800s cycle timeout remains the top operational problem** (from 834). A slow cycle still
+  loses all its work silently.
+- On a state monopoly the same NPV prints **`$0M`** in Peer Comparison and Key Metrics but
+  **`n/a — no contractor position`** in the 4-price table below. Scope: 3 countries (from 835).
+- Angola's Country Profile prints `BE: < $50/bbl bounded` in four places above a paragraph opening
+  "No breakeven on file for Angola." (from 835).
+- The service-worker 404 still makes the local suite read 415/0/1 against the harness's 416/0/0.
+- FAQ A381 still answers a "65 of 185" question with **117** and **120** (from 829).
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` unseparated (from 828).
+- Home's Side-by-Side card and the Reference panel still say "Compare up to 4 countries" while
+  `CMP_MAX` is 5 (from 828).
+- The Breakeven Map CSV still has no suite coverage (from 829).
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+- **New this cycle:** no runtime test covers `_icArmBulkCopy`. The arm/confirm guard sits directly
+  in front of two of the platform's IC clipboard paths and was broken for an unknown number of
+  cycles with 415 tests passing over it. A regression test should assert that a confirm click
+  inside `IC_ARM_MS` copies and one outside it does not.
