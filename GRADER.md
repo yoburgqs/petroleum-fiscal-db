@@ -59064,3 +59064,124 @@ had to hover to find.
 | pre-change (`HEAD`) | 378 | 17 | 1 | 1 |
 
 This replaces the arithmetic reconciliation I'd originally written in the cycle log ("378 + 28 new assertions, less the ConsoleErrors PASS…") with a directly measured com
+
+---
+## Cycle 823 Log — 2026-09-18 01:10 — v912
+
+- Test before: 406 PASS / **1 FAIL** / 0 WARN / 0 JS errors (against the DEPLOYED build)
+- Test after: **415 PASS / 0 FAIL** / 1 WARN / 1 JS error (local, v912, report `2026-09-18T06:04`)
+- The 1 WARN + 1 JS error are the service-worker 404 from serving on `127.0.0.1`. Same artefact
+  recorded in cycles 820/821. Not present on the deployed origin.
+
+### First — what the inbound FAIL actually was
+
+`✗ [FAIL] [ExportTermLeg] prefetch: _orcaTermsPrefetch is not defined — the leg cannot reach any
+export`. This was **not a defect in the deployed build**. Cycle 822 hit the 1800s subprocess
+timeout in `run_claude_cycle()` and died mid-flight, leaving **241 uncommitted lines in
+`index.html`** and **157 committed lines of assertions in the graded suite** that test them. The
+graded suite runs against `https://yoburgqs.github.io/` by default, so it was asserting a v911
+feature against a v910 origin that had never received it. The suite was right; the build was
+simply never pushed.
+
+This cycle finished 822's work rather than starting a sixth T-task and leaving the tree dirty and
+the gate permanently red. Cycle 821 was T2, so T6 is not a repeat.
+
+### Task — T6, "Where did this number come from and how solid is the evidence?"
+
+### Friction
+
+Six on-screen surfaces qualify the evidence letter with a second leg: FC Quality column (v846),
+Explorer Evidence column (v905), Screener (v846), SbS grid (v716), CP Evidence Quality panel
+(v660), CP IC MEMO strip (v899). Six, because six cycles each found the same misreading — the
+**letter grades the country's whole fact base** (primary-law share, fact depth, mostly contract
+metadata the DCF never reads) and says nothing about whether the 3–6 fiscal terms
+`getDCFParams()` actually **runs** to produce the take, NPV and breakeven beside it are cited.
+
+**Not one export carried it.** Measured live this cycle against the patched build, all 185
+countries resolved, 0 unresolved:
+
+| measure | value |
+|---|---|
+| grade A or B while citing **half or fewer** model terms | **59 of 185** |
+| cite **zero** model terms | **19** |
+| cite **all** their model terms | **0** |
+| Netherlands | **A**, 97.4% primary law, 278 facts — cites **1 of 4**, uncited include the royalty rate |
+| Canada / Brazil / Albania | **A** — 2 of 4 each |
+
+Every figure above is measured, not carried forward from 822's prose — the claims that prose
+prints to users were re-derived independently and match exactly.
+
+The workbook the Quick Start calls "Export XLSX for IC attachment" therefore published exactly
+the credential those six on-screen fixes exist to qualify, stripped of the qualification. An
+export is the **one artifact the analyst cannot check against the page**, because the IC reviewer
+opening it never saw the page.
+
+### Change
+
+`Model_Terms_Cited` / `Model_Terms_Run` / `Model_Terms_Uncited` now sit immediately right of the
+grade block in **all four exports** — Fiscal Compare XLSX, Screener XLSX/CSV/clipboard, Explorer
+XLSX, Breakeven CSV — with the uncited terms **named**, not counted. The clipboard folds it into
+the evidence cell (`A — 97% primary law · 1 of 4 model terms cited`) rather than adding a column,
+because that one is a memo table. Both Methodology sheets carry `_orcaTermLegMeth()`, 19 rows
+stating that the two orderings **invert**.
+
+The leg needs `api/v1/country/<slug>.json` per row and every export is synchronous, which is why
+it was never there. The click now prefetches 8 at a time into the cache the on-screen chips
+already share, and the pressed button reads `Reading sources… n` instead of sitting dead — the
+v460 dead-button failure this platform has had once already.
+
+**Defect found and fixed in that prefetch (this cycle's own contribution):** `finish()` on the
+20s cap called `done()` with the cache still cold. `done()` is the export re-entering itself; it
+asked `_orcaTermsPending()` again, got the same countries back, and called straight into
+`_orcaTermsPrefetch()` for another 20s with a full duplicate fetch set behind it. On a connection
+that **stalls rather than fails** — precisely the case the cap exists for — that is an unbounded
+loop and the analyst never receives the file. The cap now banks every unresolved country as
+`null`, which is what `_fcTermLeg()` itself writes on a failed fetch, so `_orcaTermLegCells()`
+emits the `n/c — ORCA could not resolve...` cell it was written for and **the workbook
+downloads**. Proven with `window.fetch` replaced by a promise that never settles: **1 re-entry,
+0 still pending, cell reads `n/c`.** Before the fix that probe ran to its 6-entry safety cap.
+
+### Result
+
+An analyst attaching the workbook to an IC memo can now see, per row, whether the terms behind
+that row's number are sourced at all and **which ones are not** — instead of reading an "A" that
+grades a fact base the DCF never touched. A stalled network now costs one named gap in one
+column instead of the whole export.
+
+No grade, letter, percentage, fact count, take, NPV, IRR, rank, tier, order or filter changed.
+
+### Verification — all measured, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | 0 failures (run twice — before and after the version bump) |
+| Graded suite, local, v912 | **415 PASS / 0 FAIL** |
+| Page errors, desktop | 0 |
+| Page errors, 390x844 `hasTouch` | 0 |
+| Mobile `scrollWidth` vs `clientWidth` | 390 = 390, **overflow 0** |
+| Controls touched by this change under 24px at `pointer: coarse` | **0** of 10 checked |
+| Screener export rows carrying a populated leg | **185 of 185** |
+| XLSX downloads, opens, parses (openpyxl) | yes — `ORCA_fiscal_compare_$75_deepwater_2026-09-18.xlsx`, all rows populated, Methodology carries the INVERT warning |
+
+### Debt closed this cycle
+
+- **Suite-copy divergence.** `run_playwright()` fired `*** SUITE COPIES HAVE DIVERGED ***` at the
+  top of this cycle (graded `730fe6af953b` vs repo `22e8a3c194b2`) — the third firing after v685
+  and v908. The repo copy has been resynced to the graded copy and both now read `730fe6af953b`.
+  **The enforcement gap itself is still open:** the detector still only writes a line to
+  `cycle_log.txt` and lets the cycle ship. That is a change to `autonomous_cycle.py`, not to the
+  product, and it is what decides whether the unattended loop can be trusted to stop itself.
+
+### Debt still open, NOT fixed
+
+- **Cycle 822 died on a 1800s subprocess timeout and left a half-shipped feature on disk.** No
+  mechanism noticed; the next cycle inherited a dirty tree and a red gate and had to reconstruct
+  intent from the diff. Nothing rolls back or flags a timed-out cycle.
+- Still true from 817/818/820: **`Reform Frequency Score <= 20` is unreachable** (score =
+  100 − 15 × changes; the most-reformed jurisdiction on file is the UK at 5 → 25), yet the Reform
+  Risk intro strip and the FC column tooltip both state the IC rule using it.
+- Still true from 820: the Home card for Side-by-Side says "Compare up to 4 countries in parallel"
+  while `CMP_MAX` is 5.
+- Still true from 821: the IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()`
+  selects its band on comparable take and ranks on the blend. Both are decisions for Zach about
+  what ORCA publishes, not patches.
