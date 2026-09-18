@@ -59185,3 +59185,14 @@ No grade, letter, percentage, fact count, take, NPV, IRR, rank, tier, order or f
 - Still true from 821: the IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()`
   selects its band on comparable take and ranks on the blend. Both are decisions for Zach about
   what ORCA publishes, not patches.
+
+---
+## Cycle 823 Log — 2026-09-18 01:27
+- Test before: 406 PASS / 1 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and verified against the deployed build.
+
+## Cycle 823 — v912
+
+**First, what the inbound "1 FAIL" actually was.** It was not a defect in the live site. Cycle 822 hit the 1800-second subprocess timeout and died mid-flight, leaving 241 uncommitted lines in `index.html` and 157 lines of assertions already committed to the graded suite. Since that suite runs against `yoburgqs.github.io` by default, it was testing a v911 feature against a v910 origin that had never received it. The sui
