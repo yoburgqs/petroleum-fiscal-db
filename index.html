@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v914</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v915</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v914</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v915</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3412,11 +3412,11 @@ window.copyPlatformCitation = function(btn) {
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off" inputmode="search" spellcheck="false">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.10);"></div>
     </div>
-    <label id="expl-evidence-first-wrap" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): the 22 countries with verified field production rank above the 163 whose economics are regional proxy estimates, sorted by the chosen metric within each group. Nothing is filtered out \u2014 a labelled divider marks the boundary. OFF: rank all 185 on the metric alone, which puts the lowest-take proxy regimes (Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%) at the top and the first production-backed country at rank 62. Does not apply to the A\u2013Z sort."><input type="checkbox" id="expl-evidence-first" checked style="accent-color:var(--accent);" onchange="_toggleExplorerEvidenceFirst(this);"> Verified production first</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 180 countries whose contractor NPV is still positive at the $50/bbl downside \u2014 the NPV @ $50 column. Mirrors the &#9678; Positive at $50 chip above; either control moves both."><input type="checkbox" id="expl-dn-check" style="accent-color:var(--accent);" onchange="setExplorerDownsidePositive(document.getElementById('chip-downside-positive'), this.checked);"> NPV+ @ $50</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven data"><input type="checkbox" id="expl-be-check" style="accent-color:var(--accent);" onchange="_explorerHasBreakeven=this.checked;renderExplorer();"> BE only</label><button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only the 22 countries where at least some contracts are matched to verified field production — the same set the badge on each row calls FACTS or EVIDENCE, and the same set the count line ranks first. The other 163 carry regional proxy economics. Coverage inside this set runs from 37.6% (United Kingdom) to 0.2% (USA); the row badge separates them." aria-label="Toggle production data filter — show only the 22 countries with verified field production" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="toggleExplorerMap()" title="Toggle world map view">Map View</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
+    <label id="expl-evidence-first-wrap" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): the 22 countries with verified field production rank above the 163 whose economics are regional proxy estimates, sorted by the chosen metric within each group. Nothing is filtered out \u2014 a labelled divider marks the boundary. OFF: rank all 185 on the metric alone, which puts the lowest-take proxy regimes (Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%) at the top and the first production-backed country at rank 62. Does not apply to the A\u2013Z sort."><input type="checkbox" id="expl-evidence-first" checked style="accent-color:var(--accent);" onchange="_toggleExplorerEvidenceFirst(this);"> Verified production first</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 180 countries whose contractor NPV is still positive at the $50/bbl downside \u2014 the NPV @ $50 column. Mirrors the &#9678; Positive at $50 chip above; either control moves both."><input type="checkbox" id="expl-dn-check" style="accent-color:var(--accent);" onchange="setExplorerDownsidePositive(document.getElementById('chip-downside-positive'), this.checked);"> NPV+ @ $50</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" id="expl-be-check-wrap" title="Show only the countries ORCA models a breakeven for — the count beside the label is live and is the same set the Breakeven column prints a figure for."><input type="checkbox" id="expl-be-check" style="accent-color:var(--accent);" onchange="_explorerHasBreakeven=this.checked;renderExplorer();"> BE only <span id="expl-be-check-n" style="font-weight:400;opacity:.8;">(65)</span></label><button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only the 22 countries where at least some contracts are matched to verified field production — the same set the badge on each row calls FACTS or EVIDENCE, and the same set the count line ranks first. The other 163 carry regional proxy economics. Coverage inside this set runs from 37.6% (United Kingdom) to 0.2% (USA); the row badge separates them." aria-label="Toggle production data filter — show only the 22 countries with verified field production" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="toggleExplorerMap()" title="Toggle world map view">Map View</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
-    Data coverage: <span style="color:var(--muted);">Govt Take</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV @$50</span> <strong style="color:var(--text);">185/185</strong> <span style="color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside is modelled for every country, on the same standardized Deepwater profile as the $75 NPV beside it. This line read &ldquo;IRR 124/185&rdquo; until v851; the 61 missing rows were not the problem with that figure \u2014 the 124 present ones were, at a median of 333%.">ⓘ</span> &nbsp;·&nbsp; <span style="color:var(--muted);">Breakeven</span> <strong style="color:var(--text);">65/185</strong> <span style="color:var(--muted);cursor:help;" title="Breakeven requires complete royalty and cost data — coverage expands as sourcing progresses">ⓘ</span>
+    Data coverage: <span style="color:var(--muted);">Govt Take</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV</span> <strong style="color:var(--text);">185/185</strong> &nbsp;·&nbsp; <span style="color:var(--muted);">NPV @$50</span> <strong style="color:var(--text);">185/185</strong> <span style="color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside is modelled for every country, on the same standardized Deepwater profile as the $75 NPV beside it. This line read &ldquo;IRR 124/185&rdquo; until v851; the 61 missing rows were not the problem with that figure \u2014 the 124 present ones were, at a median of 333%.">ⓘ</span> &nbsp;·&nbsp; <span style="color:var(--muted);">Breakeven</span> <strong style="color:var(--text);" id="expl-be-cov-n">65/185</strong> <span style="color:var(--muted);cursor:help;" title="Breakeven requires complete royalty and cost data — coverage expands as sourcing progresses">ⓘ</span>
   </div>
   <div class="tbl-wrap">
     <table id="tbl-explorer">
@@ -3436,7 +3436,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
           <th class="num expl-sm-off" data-sort-key="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside, same standardized Deepwater profile as the NPV column beside it (50k bbl/d peak, $1.0B all-in capex, 10% WACC, 100% WI). Modelled for all 185 countries and monotonic in price, so it ranks. Green = the entry still clears its cost of capital through a price break; red = it does not. THIS SLOT USED TO BE IRR @ $75. That figure is AVG(irr_pct) across every contract in the country — an arithmetic mean of a heavy-tailed distribution, median 333% across the 165 countries carrying one, and not monotonic in price because the 999-sentinel drops a different subset at each price point. It is not a project return. v516 withdrew it from the Country Profile, v517 from the Screener hurdle slider, v525 from Fiscal Compare, v787 from both IOC tables and v847 from the Breakeven CSV; this table was the last surface still printing it. For a real return, open a country and use Model in Scenario Builder at your own capex and profile. Sort: largest downside NPV first">NPV @ $50 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(downside · 185/185)</span></th>
-          <th class="num expl-sm-off" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 65 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(65/185 countries)</span></th>
+          <th class="num expl-sm-off" id="expl-be-th" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(<span id="expl-be-th-n">65</span>/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num" data-sort-key="stability" tabindex="0" role="columnheader" aria-sort="none" style="cursor:pointer;" title="Sort: measured spread first, least predictable first — see the order note under the table. —— Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = the bundled quartiles are identical, so the IQR component contributed nothing and the score reflects price swing and mechanic count only &mdash; but that basis is only as good as the quartiles, and for 41 of the 132 one-term rows ORCA's OWN contract file refutes it. Those rows resolve on scroll and re-print as a ceiling ('&le;52 &middot; LOW &#9650;', stored score struck through) with the observed spread in place of the basis chip ('&ge;29.6pp obs') &mdash; the same ceiling Country Profile, Side-by-Side and Reform Risk give for that country. It is a ceiling, not a recomputed score: the observed spread is a floor on the true spread. A row still reading 'one term' after you have scrolled past it is one the contract file agrees with; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
@@ -3853,7 +3853,7 @@ window.copyPlatformCitation = function(btn) {
 <!-- v568 (T1): this legend pointed the analyst at the "Max Breakeven" slider, which this cycle
      removed — the same defect v537 fixed here, a legend advertising a control that is gone. It now
      states what the Breakeven column can and cannot do, and names the axis that does the downside job. -->
-<strong>Downside is screened on Contractor NPV @$50</strong> — the column beside Contractor NPV, modelled for all 185 countries with no blanks, so a value there was always measured. Its second line is the share of the $75 NPV still standing at $50 (observed −14% to +75%, median 45%), which is the axis the <strong>Downside Resilience</strong> preset screens on. <strong>Breakeven is not a column on this table and not a filter.</strong> ORCA models one for <span id="be-legend-n">65</span> of 185 countries, every value between $27 and $34/bbl, so it could render only two states and could not rank any two rows — and 63 of those 65 countries hold no verified field production, so the column read as a low-price endorsement of Vanuatu and the Bahamas while the USA, Norway, Canada and Brazil showed a blank. The per-country figure is still on <strong>Country Profile</strong> and the <strong>Breakeven Map</strong>, and the export still carries <em>Breakeven_bbl</em> with a <em>Breakeven_Tested</em> flag beside it.</div>
+<strong>Downside is screened on Contractor NPV @$50</strong> — the column beside Contractor NPV, modelled for all 185 countries with no blanks, so a value there was always measured. Its second line is the share of the $75 NPV still standing at $50 (observed −14% to +75%, median 45%), which is the axis the <strong>Downside Resilience</strong> preset screens on. <strong>Breakeven is not a column on this table and not a filter.</strong> ORCA models one for <span id="be-legend-n">65</span> of 185 countries, every value between <span id="be-legend-range">$27 and $34</span>/bbl, so it could render only two states and could not rank any two rows — and <span id="be-legend-noprod">63</span> of them hold no verified field production, so the column read as a low-price endorsement of Vanuatu and the Bahamas while the USA, Norway, Canada and Brazil showed a blank. The per-country figure is still on <strong>Country Profile</strong> and the <strong>Breakeven Map</strong>, and the export still carries <em>Breakeven_bbl</em> with a <em>Breakeven_Tested</em> flag beside it.</div>
   </div>
 
   <!-- v781 (T1): the IC shortlist dock. Walked T1 cold: Home -> "open the screen" -> IOC Capital
@@ -26509,7 +26509,31 @@ function _explorerDqRank(d) { return _dqTier(d).hasProduction ? 0 : 1; }
 // the guard the BE-only filter and the breakeven cell renderer have each carried privately since
 // v563. Excludes null (120 countries, never modelled), the `<= 1` state-monopoly sentinel
 // (Bahrain, Kuwait, Saudi Arabia) and the `>= 999` no-solution marker.
-function _beTested(d) { const v = d && d.be_75; return v != null && v > 1 && v < 999; }
+// ── v915 (T1): this table reads the breakeven through cpBeFor() like every other surface ──
+// v895 made cpBeFor() the platform's single breakeven read point and joined Fiscal Compare to
+// it; cycle 825 joined the Screener's CSV / XLSX / clipboard. The Explorer was the last surface
+// still dereferencing the bundled `be_75` field directly, in four places — this predicate, the
+// `be` sort comparator, the BE-only filter and the cell renderer. COUNTRY_DATA carries no
+// be_75 for Norway or the United Kingdom, while ORCA's own api/v1/country files publish 28.7
+// and 20.3 for them, so on this tab alone both printed "—", the BE-only checkbox dropped them,
+// and — the reason this is a T1 defect and not a cosmetic one — sorting by Breakeven ranked
+// them 999. The UK's $20.3 is the LOWEST breakeven in the database; "sort by breakeven, low
+// first" buried it at row 86 in the unranked alphabetical tail and answered rank 1 with
+// Australia at $28.
+function _explBe(d) {
+  if (!d) return null;
+  if (typeof cpBeFor === 'function') return cpBeFor(d);
+  const v = d.be_75;
+  return (v != null && v > 1 && v < 999) ? v : null;
+}
+function _beTested(d) { return _explBe(d) != null; }
+// Live coverage count for every "N/185" this tab prints about breakeven. Computed off the same
+// predicate the filter and the sort use, so the caption cannot drift from the behaviour again:
+// the header said 65, the BE-only tooltip said 68, and the set was 67.
+function _explBeCovN() {
+  try { return COUNTRY_DATA.filter(_beTested).length; } catch (e) { return 0; }
+}
+window._explBeCovN = _explBeCovN;
 function _toggleExplorerEvidenceFirst(cb) {
   _explorerEvidenceFirst = !!cb.checked;
   renderExplorer();
@@ -26754,7 +26778,7 @@ function renderExplorer() {
     // still positive at $50/bbl. The state monopolies sit at exactly 0.0 and are excluded, because
     // an absent contractor position is not a surviving one.
     if (_explorerDownsidePositive) { if (!(d.npv_50 > 0)) return false; }
-    if (_explorerHasBreakeven) { if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return false; }
+    if (_explorerHasBreakeven) { if (!_beTested(d)) return false; }   // v915: cpBeFor(), not raw be_75
     if (search && !d.country.toLowerCase().includes(search)) return false;
     // v581 (T6): this was `prod_coverage_pct <= 5`. _dqTier() -- declared in v507 as the single
     // source of truth for the FACTS / EVIDENCE / PROXY data basis, and the test that drives the
@@ -26793,7 +26817,7 @@ function renderExplorer() {
       // prints an em dash), the leaderboards, the Fiscal Compare tie groups and the CSV all
       // guard on `> 1`. This comparator did not, so it ranked those three AHEAD of Belgium at
       // $27 -- the genuine lowest breakeven in the database. _beTested() is that same guard.
-      case 'be':      va = _beTested(a) ? a.be_75 : 999; vb = _beTested(b) ? b.be_75 : 999; break;
+      case 'be':      va = _explBe(a) != null ? _explBe(a) : 999; vb = _explBe(b) != null ? _explBe(b) : 999; break;
       case 'swing':    va = a.swing ?? 999; vb = b.swing ?? 999; break;
       case 'stability': va = _fpSortVal(a); vb = _fpSortVal(b); break;
       case 'evidence': va = _evidenceSortVal(a); vb = _evidenceSortVal(b); break;
@@ -26817,6 +26841,18 @@ function renderExplorer() {
   // grouping still applies WITHIN them, unchanged), then everything with no breakeven to rank,
   // below a labelled line. Every other sort is untouched -- take, NPV, IRR, swing, stability
   // and evidence are populated for all 185, so they have no unrankable block to separate.
+  // v915 (T1): the three breakeven coverage captions on this tab are set from the predicate that
+  // actually drives the column, the filter and the sort. They were three hand-typed numbers and
+  // two of them were wrong: the header "(65/185)", the coverage strip "65/185" and the BE-only
+  // tooltip "the 68 countries". The set is 67.
+  (function () {
+    try {
+      const _n = _explBeCovN();
+      const _th = document.getElementById('expl-be-th-n'); if (_th) _th.textContent = String(_n);
+      const _cv = document.getElementById('expl-be-cov-n'); if (_cv) _cv.textContent = _n + '/185';
+      const _cb = document.getElementById('expl-be-check-n'); if (_cb) _cb.textContent = '(' + _n + ')';
+    } catch (e) {}
+  })();
   const _explBeSplit  = sort === 'be';
   const _explBeRank   = d => (_beTested(d) ? 0 : 1);
   // v854 (T6): the two grouping terms stay in their natural direction; only the metric flips.
@@ -26959,12 +26995,20 @@ function renderExplorer() {
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
       <td class="num">${fmtNpvShared(npv)}</td>
       <td class="num expl-sm-off">${fmtDownsideNpv(d)}</td>
-      <td class="num expl-sm-off" style="${(function(){
-        if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return ''; // <=1 is state-monopoly sentinel
-        if (d.be_75 < 50) return 'border-left:3px solid #15803D;padding-left:5px;';
-        if (d.be_75 <= 75) return 'border-left:3px solid #A16207;padding-left:5px;';
+      <td class="num expl-sm-off" data-explbe="${String(d.country).replace(/"/g,'&quot;')}" title="${(function(){
+        // v915: an api-resolved value says where it came from, on the _fcAdoptBePaint pattern.
+        const _b = _explBe(d);
+        if (_b == null) return 'Breakeven not modelled for ' + d.country;
+        if (d.be_75 != null && d.be_75 > 1 && d.be_75 < 999) return 'Breakeven $' + _b.toFixed(1) + '/bbl — modelled on the standardized Deepwater profile.';
+        return 'Breakeven $' + _b.toFixed(1) + '/bbl — ORCA publishes this for ' + d.country
+             + ' in api/v1/country, averaged over the same contract set as the take on this row. The bundled table carries none, which is why this cell read — before v915. Same number the Country Profile prints, Fiscal Compare shows and the Screener exports.';
+      })().replace(/"/g,'&quot;')}" style="${(function(){
+        const _b = _explBe(d);
+        if (_b == null) return ''; // never modelled, or the <=1 state-monopoly sentinel
+        if (_b < 50) return 'border-left:3px solid #15803D;padding-left:5px;';
+        if (_b <= 75) return 'border-left:3px solid #A16207;padding-left:5px;';
         return 'border-left:3px solid #B91C1C;padding-left:5px;';
-      })()}">${formatBreakeven(d.be_75)}</td>
+      })()}">${formatBreakeven(_explBe(d))}</td>
       <td class="num">${(function(){
         if (d.swing === null) return '—';
         const s = d.swing;
@@ -33928,10 +33972,28 @@ function _scUpdateNeutralFlags() {
   // What survives is the one number the note under the table still states — how many of the 185
   // countries ORCA has ever modelled a breakeven for — read off COUNTRY_DATA, never hard-coded.
   if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
-    const _beVals = COUNTRY_DATA.filter(d => _beIsTested(d.be_75)).map(d => d.be_75);
+    // v915 (T1): read through cpBeFor(), the platform's single breakeven read point, not the raw
+    // bundled field. This legend and the Explorer's column caption sit in the SAME tab shell
+    // (#texplorer, Screener mode vs Browse mode), so while this counted 65 and the Explorer
+    // counted 67 the two halves of one tab disagreed about how many breakevens ORCA holds.
+    const _beVals = COUNTRY_DATA.map(d => (typeof _explBe === 'function') ? _explBe(d) : null)
+                                .filter(v => v != null);
     const _nBeMeas = _beVals.length;
     const _lg = document.getElementById('be-legend-n');
     if (_lg) _lg.textContent = _nBeMeas;
+    // The observed range was hand-typed as "$27 and $34". The United Kingdom's api-published
+    // $20.3 falsifies the low end, so the sentence states the range it measures.
+    const _lr = document.getElementById('be-legend-range');
+    if (_lr && _nBeMeas) {
+      _lr.textContent = '$' + Math.round(Math.min.apply(null, _beVals))
+                      + ' and $' + Math.round(Math.max.apply(null, _beVals));
+    }
+    const _lp = document.getElementById('be-legend-noprod');
+    if (_lp) {
+      _lp.textContent = COUNTRY_DATA.filter(d =>
+        (typeof _explBe === 'function' && _explBe(d) != null) &&
+        !(typeof _dqTier === 'function' && _dqTier(d).hasProduction)).length;
+    }
   }
 
   // v554: the take-comparability control only has meaning once a take ceiling is set, and it
@@ -45496,7 +45558,7 @@ function exportExplorer() {
     // which is modelled for all 185 rows. The 'Where IRR went' row on Filters & Assumptions says so
     // inside the workbook, because the analyst reading the file is not looking at the page.
     'Contractor NPV @$50 ($M)': (d.npv_50 !== null && d.npv_50 !== undefined) ? +d.npv_50.toFixed(1) : null,
-    'Breakeven @$75 ($/bbl)': (d.be_75 && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null,
+    'Breakeven @$75 ($/bbl)': _explBe(d),   // v915: same read point as the column it exports
     'Swing $50→$125 (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
     // ── v738 (T4): the workbook's one "stability" number was invented here ───────────
     // This column shipped as 'Stability Score' = 100 - swing*3, computed nowhere else and
@@ -59491,6 +59553,14 @@ function _orcaAdoptApiBe(country, j) {
     if (window._cpBeResolved[country] === be) return be;
     window._cpBeResolved[country] = be;
     if (typeof _fcAdoptBePaint === 'function') _fcAdoptBePaint(country, be);
+    // v915 (T1): the Explorer's Breakeven column, its BE-only filter, its `be` ranking and its
+    // three coverage captions all read cpBeFor() now, so a value that lands after the table was
+    // drawn has to reach it. Repaint only while the tab is actually on screen — at cold load the
+    // Home tab is active and this is a no-op, which is where all three of these resolve.
+    try {
+      var _ex = document.getElementById('texplorer');
+      if (_ex && _ex.classList.contains('active') && typeof renderExplorer === 'function') renderExplorer();
+    } catch (e) {}
     return be;
   } catch (e) { return null; }
 }
