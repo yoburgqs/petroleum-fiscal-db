@@ -60122,3 +60122,16 @@ already bumped to, and v921 is the first build that actually contains the work.
 - The suite-copy divergence detector in `run_playwright()` still only warns.
 - The Breakeven Map CSV still has no suite coverage (from 829).
 - The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+
+---
+## Cycle 834 Log — 2026-09-18 15:57
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Shipped as v921 and pushed.
+
+## Task / Friction / Change / Result
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 830 was T1, T4 last walked at 824.)
+
+**Friction.** Reform Risk tab, cold load at 1440×900, storage cleared, lookup set to **Iraq-Kurdistan**. `renderReformCountryVerdict()` takes the no-log branch and returns the emptiest card the tab can produce: *"no Reform Frequency Score"*, *"one of the 164 without one"*, **no statute 
