@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v913</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v914</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v913</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v914</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -36344,6 +36344,32 @@ function _scExportBasisLines() {
       + 'must not be sorted, ranked or cited as one. A blank on any OTHER row means the opposite — '
       + 'Breakeven_Tested "No", the breakeven is simply not modelled there yet.');
   })();
+  // ── v914 (T5) — where a breakeven came from, where the two sources differ ────────────
+  // The Breakeven column now reads through cpBeFor(), so a row can carry a value that is NOT in
+  // country_data.json. An IC reader cross-checking this workbook against the bundled table would
+  // find a blank there and have no way to tell a published figure from an invented one. Named,
+  // counted and scoped to THIS file, off the same rows the column was written from — so the line
+  // is absent entirely unless such a row is actually in the shortlist.
+  (function(){
+    try {
+      var _s5 = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+      var _inC = (window._screenerData || []);
+      if (_s5 && _s5.length) _inC = _inC.filter(function(x){ return _s5.indexOf(x.country) >= 0; });
+      var _api = _inC.filter(function(x){
+        return !(x.be_75 != null && x.be_75 > 1 && x.be_75 < 999)
+          && typeof cpBeFor === 'function' && cpBeFor(x) != null;
+      }).map(function(x){ return x.country + ' $' + cpBeFor(x).toFixed(1) + '/bbl'; });
+      if (!_api.length) return;
+      var _one = _api.length === 1;
+      L.push('BREAKEVEN SOURCE — ' + _api.join(', ') + ': ' + (_one ? 'this breakeven is' : 'these breakevens are')
+        + ' published by ORCA at api/v1/country/<country>.json and ' + (_one ? 'is' : 'are')
+        + ' NOT in the bundled country_data.json table, so a cross-check against that table alone '
+        + 'returns a blank. Averaged over the same contract set as the take on the same row, on the '
+        + 'same standardized Deepwater basis. It is the figure Fiscal Compare prints, the Country '
+        + 'Profile prints, and its IC citation pastes. Every other Breakeven_bbl cell in this file '
+        + 'is the bundled value and the two sources agree wherever both hold one.');
+    } catch (e) {}
+  })();
   // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
   L.push(_icIrrNote('IRR is not reported'));
   // v879 (T5): this line used to promise agreement with the Country Profile and Side-by-Side
@@ -37006,7 +37032,17 @@ function _scExportRows() {
     // v873 (T5): see the Breakeven_bbl note below. True for the three regimes whose stored
     // be_75 is the DCF floor artifact rather than a breakeven.
     var _beArtifact = (disp.state === 'monopoly') || (d.be_75 != null && d.be_75 > 0 && d.be_75 <= 1);
-    var _beReal = (!_beArtifact && d.be_75 != null && d.be_75 > 1 && d.be_75 < 999);
+    // ── v914 (T5) — the Screener's exports join the platform's single breakeven read point ──
+    // This line was `d.be_75 != null && d.be_75 > 1 && d.be_75 < 999` — the raw bundled field,
+    // which is null for Norway and the United Kingdom. cpBeFor() is the read point v512 built
+    // and v895 brought Fiscal Compare onto: bundled where country_data.json has a value,
+    // api/v1/country/<slug>.json's avg_breakeven_usd where ORCA publishes one it did not bundle,
+    // never the be_75 = 1.0 state-monopoly solver floor. It resolves within a second of load for
+    // every surface, off fetches the page already issues, so no value here waits on a request.
+    var _beRes = (typeof cpBeFor === 'function')
+      ? cpBeFor(d)
+      : ((d.be_75 != null && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null);
+    var _beReal = (!_beArtifact && _beRes != null);
     return {
       // v876 (T1): the label the # column printed on screen, which restarts inside each
       // data-basis block -- bare 1,2,3 for verified production, P1,P2 for the proxy block,
@@ -37073,7 +37109,27 @@ function _scExportRows() {
       // "100.0%" take and "$0M" NPV in the same row, with nothing reconciling the three.
       // Same defect, same three countries, same fix as v529 — on the tab whose whole job is
       // producing the IC shortlist.
-      Breakeven_bbl: _beReal ? d.be_75 : null,
+      // ── v914 (T5) ──────────────────────────────────────────────────────────────────
+      // Walked T5 cold at 1440x900, storage cleared. Screener -> "⎘ Copy for IC Memo" pasted
+      //     Norway          Europe  Concession  68.0%  ...  — not modelled
+      //     United Kingdom  Europe  Concession  49.2%  ...  — not modelled
+      // into the Breakeven column, and the CSV and XLSX wrote a blank cell beside
+      // Breakeven_Tested "No". One tab away, in the same session and the same build, Fiscal
+      // Compare printed $29 and $20 on those same two rows, the Country Profile printed
+      // "$29/bbl", and its ⎘ IC Citation pasted "BE $29/bbl". Both artifacts go into one memo.
+      //
+      // The Screener has NO breakeven column on screen, so nothing could warn the analyst
+      // before it was in the document — the first sight of "not modelled" is in the memo.
+      // Worse than a blank: this workbook's own BREAKEVEN basis note tells the reader that a
+      // blank on a non-monopoly row means "the breakeven is simply not modelled there yet",
+      // so the file asserted absence for two countries ORCA publishes a breakeven for. That
+      // assertion becomes true again by construction once these rows stop being blank.
+      //
+      // Norway and the United Kingdom are the only two of the 185 affected — measured, not
+      // assumed — and they are the two largest European producers, both in the default
+      // Side-by-Side set, with Norway the default Country Profile. A North Sea screen hits
+      // both. Same value, same contract set, same standardized basis as the take beside it.
+      Breakeven_bbl: _beReal ? _beRes : null,
       Breakeven_Tested: _beArtifact ? 'n/a — no contractor position' : _beReal ? 'Yes' : 'No',
       // ── v882 (T1): the same fix v529/v847 gave Breakeven_bbl, on the column beside it ──────
       // These are the SAME three countries. A bare `d.swing` wrote 0 into the Swing column for
