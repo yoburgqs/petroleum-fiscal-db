@@ -59997,3 +59997,16 @@ the same thing the screen did.
 - The suite-copy divergence detector in `run_playwright()` still only warns and lets a cycle ship.
 - The Breakeven Map CSV still has **no suite coverage** (from 829).
 - The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+
+---
+## Cycle 830 Log — 2026-09-18 10:40
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed and clean. Cycle 830 complete.
+
+## Cycle 830 — v919
+
+**Task: T1** — *"Which countries should even be on my screening list?"* (stalest in rotation; 829 was T6.)
+
+**Friction.** Explorer Browse, cold load at 1440×900, storage cleared. The tab draws a divider where the ranking stops being production-backed and tells the analyst everything below it is "regional proxy estimates." The first row under that line — on *both* sorts T1 actually uses, the default Govt Take and NPV — was **Vanuatu: 5.0
