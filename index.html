@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v919</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v921</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v919</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v921</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2906,7 +2906,44 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     var d = document.getElementById('fc-ic-ref');
     var arr = document.getElementById('fc-ic-ref-arrow');
     var hint = document.getElementById('fc-ic-ref-hint');
+    // ── v920 (T5) — the guide's DEFAULT on a phone, and only on a phone ────────────────
+    // Walked T5 cold at 390x844 with hasTouch, storage cleared: "give me something I can
+    // paste straight into an IC memo."  Measured on the shipped build, off the rendered
+    // boxes rather than from the markup:
+    //
+    //     #fc-ic-ref  (this guide)          y=184    height 2205
+    //     .fc-controls  — holds ⎘ Copy for IC Memo, ⬇ XLSX     y=2400
+    //     #fc-results   — the first row of the ranked table    y=3363
+    //     first <table> row                                     y=4018
+    //
+    // The guide is 2,205px of instructional prose at 390px wide: 2.6 full phone screens,
+    // and 66% of everything standing between a cold arrival and the results. The analyst
+    // who came here for a table to paste has to thumb past all of it to reach the export
+    // toolbar at 2,642 — three screens — before they have seen a single country. On a
+    // desktop the same block is a dense multi-column legend that costs about 600px and
+    // earns its place; the wall is a narrow-viewport artifact of it reflowing to one column.
+    //
+    // v430 is a locked item — "FC IC Analyst Guide starts OPEN with sessionStorage collapse
+    // memory. Keep the sessionStorage logic." Both halves are kept exactly:
+    //   · Desktop is untouched. The branch below is gated on `pointer: coarse` AND
+    //     max-width 720px, the same scope as the v612 mobile layer, so a mouse at any
+    //     width — including a narrow desktop window — still gets the guide open.
+    //   · The memory is not just kept, it is the mechanism. Collapsing the <details> here
+    //     fires its own `toggle`, which the listener below records as 'fc-ic-ref-collapsed'.
+    //     So a phone analyst who taps the summary open keeps it open for the rest of the
+    //     session, exactly like a desktop analyst who collapses it keeps it collapsed. No
+    //     second storage key, and no new state to reason about.
+    //   · The summary row stays visible and is a 44px tap target under the v612 rule, so
+    //     nothing is hidden — the legend is one tap away, in the place it already was.
+    // Zach, 2026-08-30: "finalization of oil gas expertise fiscal ux including mobile
+    // defaults." An `open` attribute that costs 2,205px on a phone is a mobile default.
+    var _fcIcPhone = !!(window.matchMedia &&
+      window.matchMedia('(pointer: coarse) and (max-width: 720px)').matches);
     if (sessionStorage.getItem('fc-ic-ref-collapsed')) {
+      d.removeAttribute('open');
+      if (arr) arr.innerHTML = '&#9656;';
+      if (hint) hint.textContent = 'expand — take tiers, Swing, Reform verdict, IC memo rules';
+    } else if (_fcIcPhone && d.open) {
       d.removeAttribute('open');
       if (arr) arr.innerHTML = '&#9656;';
       if (hint) hint.textContent = 'expand — take tiers, Swing, Reform verdict, IC memo rules';
@@ -24935,7 +24972,7 @@ function getDataQualityExplain(entry) {
 }
 
 // Wraps a take value cell with rich evidence tooltip (for Explorer rows)
-// v919 (T1): optional third argument `floorTip`. When non-null the take is a FLOOR -- royalty
+// v920 (T1): optional third argument `floorTip`. When non-null the take is a FLOOR -- royalty
 // and income tax alone on a thin record -- so the cell prints a ≥ before the number. Opt-in, so
 // nothing changes for a caller that does not pass it. The Explorer is the only caller.
 function makeTakeCellWithEvidence(take, entry, floorTip) {
@@ -26510,7 +26547,7 @@ let explorerSort = {col: 'take', dir: 1}; // dir: 1=asc, -1=desc
 // in the count line instead of silence.
 var _explorerEvidenceFirst = true;
 var _explorerRendered = null;   // v584 (T5): set by renderExplorer(), read by exportExplorer()
-// v919 (T1): the Explorer's data-basis rank now has THREE registers, not two, matching the
+// v920 (T1): the Explorer's data-basis rank now has THREE registers, not two, matching the
 // Screener's _dqRank (v743) and Fiscal Compare's v563 partition.
 //   0 = verified field production
 //   1 = proxy economics, but ORCA holds at least one petroleum rent instrument, so the take is
@@ -26895,7 +26932,7 @@ function renderExplorer() {
   // draw, and v543 established that those two states need a stated caveat, not a silent one.
   const _explGrouped  = _explGroupable && _explVerified > 0 && _explProxy > 0;
   const _explBeGrouped = _explBeSplit && _explBeScope.length > 0 && _explBeUnrank > 0;
-  // v919 (T1): the floor block, on the same scope and the same toggle as the production block.
+  // v920 (T1): the floor block, on the same scope and the same toggle as the production block.
   // _explProxy stays the count of rows with no verified production (163 unfiltered) because
   // that is what the first divider asserts and it is true of the floor rows too. _explModelled
   // is the part of it that is actually a modelled estimate (118), which is what the basis note
@@ -26924,7 +26961,7 @@ function renderExplorer() {
     grouped: _explGrouped,
     verified: _explVerified,
     proxy: _explProxy,
-    // v919 (T1): the split inside `proxy`, so the workbook can describe the same three blocks
+    // v920 (T1): the split inside `proxy`, so the workbook can describe the same three blocks
     // the table is now ranked in instead of calling all 163 "regional proxy estimates".
     modelled: _explModelled,
     floor: _explFloor,
@@ -26986,7 +27023,7 @@ function renderExplorer() {
       ? `<span style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--purple);font-weight:700;margin-left:4px;vertical-align:middle;" title="${d.prod_coverage_pct.toFixed(1)}% of contracts have verified production data — production chart available">Prod</span>`
       : '';
     const safeExpl = d.country.replace(/'/g,"\\'");
-    // v919 (T1): the bound marker. The divider and the ranking are the fix; this is what a row
+    // v920 (T1): the bound marker. The divider and the ranking are the fix; this is what a row
     // still carries when it has been lifted out of its block -- scrolled past the divider on a
     // phone, or read in isolation. Same glyphs, same tooltip sentence as the Screener's v743.
     const _explRowFloor = _explTakeIsFloor(d);
@@ -27012,7 +27049,7 @@ function renderExplorer() {
         + `Ranked among themselves by the same metric. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
-    // v919 (T1): second boundary, drawn where the ranking stops being a measurement at all.
+    // v920 (T1): second boundary, drawn where the ranking stops being a measurement at all.
     // The v578 divider above answers "has anyone drilled here". It does not answer "is this
     // number a number", and those two questions have OPPOSITE consequences on the two sorts
     // T1 actually uses: the thinner the fiscal record, the lower the modelled take, the higher
@@ -27175,7 +27212,7 @@ function renderExplorer() {
   // v735 (T1): when the breakeven split is on, the data-basis counts describe the RANKED block,
   // not the whole result set, so the sentence names the block it is counting.
   const _explBeScopeWord = _explBeGrouped ? ` of the ${_explBeScope.length} ranked` : '';
-  // v919 (T1): three blocks named, not two. The floor rows were being counted inside "regional
+  // v920 (T1): three blocks named, not two. The floor rows were being counted inside "regional
   // proxies" while ranking above them, so the sentence described an order the table was not in.
   const _explBasisNote = _explGrouped
     ? ` — ranked by data basis:${_explBeGrouped ? ` within the ${_explBeScope.length} that hold one,` : ''} ${_explVerified} with verified field production first, then ${_explModelled} whose economics are regional proxies${_explFloor > 0 ? `, then ${_explFloor} whose take is a floor rather than a measurement` : ''}`
@@ -44927,14 +44964,49 @@ function loadCountryProfile(country) {
       var clk = isSelf ? "" : ' onclick="var c=decodeURIComponent(\'' + enc + '\');document.getElementById(\'dd-country-select\').value=c;loadCountryProfile(c)"';
       var hov = isSelf ? "" : ' onmouseover="this.style.background=\'rgba(176,104,0,.08)\'" onmouseout="this.style.background=\'\'"';
       var addBtn = isSelf ? "" : '<button class="btn btn-sm btn-outline" style="font-size:10px;padding:2px 6px;margin-left:4px;" onclick="event.stopPropagation();addCompare(decodeURIComponent(\'' + enc + '\'))">+</button>';
+      // ── v920 (T2) ── contractor NPV joins the peer table ────────────────────────
+      // This table is matched ON take, so its take columns are near-identical by construction —
+      // the Δ column reads under 2pp on 8 of 185 profiles and under 6pp on most of the rest. Read
+      // alone it says "these regimes are interchangeable". They are not: across all 185 peer sets
+      // the contractor NPV inside one spans 2x or more on 32 of them, the profiled country is LAST
+      // of its own set on 16 and FIRST on 29. The headline strip on this same page already tells
+      // the analyst to "carry that NPV position separately" — this is the table where they would
+      // do it, and until now it carried no value column at all. Same basis and same formatter as
+      // the Similar Fiscal Profile table further down, so the two agree.
+      var _pn = r.npv_75;
+      var _selfN = d.npv_75;
+      var _nStr = (typeof cpNpvFmt === 'function') ? cpNpvFmt(_pn) : (_pn == null ? '\u2014' : '$' + Math.round(_pn) + 'M');
+      var _nCol, _nTip;
+      if (_pn == null) {
+        _nCol = 'var(--muted)';
+        _nTip = 'Contractor NPV not computed for ' + r.country + '.';
+      } else if (isSelf) {
+        _nCol = 'var(--text)';
+        _nTip = 'Contractor NPV ' + _nStr + ' at $75/bbl \u2014 the figure in this page\u2019s headline strip. '
+          + 'ORCA\u2019s standardized Deepwater project (50k bbl/d peak \u00b7 5yr plateau \u00b7 241.9 MMbbl \u00b7 $1.0B all-in capex \u00b7 '
+          + '$18/bbl opex escalating 2%/yr \u00b7 25yr life) run through every country\u2019s terms, 10% WACC, 100% WI. '
+          + 'One project for all 185 countries \u2014 which is what makes this column comparable down the table.';
+      } else {
+        _nCol = (_selfN == null) ? 'var(--text)'
+              : (_pn > _selfN ? 'var(--green)' : _pn < _selfN ? 'var(--negative)' : 'var(--muted)');
+        _nTip = 'Contractor NPV ' + _nStr + ' at $75/bbl on the same standardized Deepwater project as '
+          + d.country + '. '
+          + (_selfN == null || _selfN === 0 ? ''
+             : (_pn > _selfN ? 'Above ' : _pn < _selfN ? 'Below ' : 'Level with ')
+               + d.country + ' at ' + (typeof cpNpvFmt === 'function' ? cpNpvFmt(_selfN) : _selfN)
+               + (_selfN > 0 && _pn > 0 ? ' \u2014 ' + (_pn / _selfN).toFixed(2) + '\u00d7.' : '.'))
+          + ' Nearly the same government take, on the same project: the gap is the shape of the terms, not their level.';
+      }
+      var _nFw = isSelf ? 'font-weight:800;' : 'font-weight:700;';
       var tr = '<tr style="' + bg + 'cursor:' + (isSelf ? 'default' : 'pointer') + ';"' + clk + hov + '>';
       tr += '<td style="padding:6px 10px;' + fw + 'color:var(--text);white-space:nowrap;">' + r.country + (isSelf ? ' <span style="font-size:10px;color:var(--accent);">(this)</span>' : '') + feeMark + addBtn + '</td>';
       tr += _takeCell(r, '50', false);
       tr += _takeCell(r, '75', true);
       tr += _takeCell(r, '125', false);
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + dCol + ';">' + dStr + '</td>';
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;' + _nFw + 'color:' + _nCol + ';" title="' + _nTip.replace(/"/g, '&quot;') + '">' + _nStr + '</td>';
       tr += '<td style="padding:6px 10px;font-size:11px;color:var(--muted);">' + mech + '</td>';
       tr += '<td style="padding:6px 10px;font-size:11px;color:var(--muted);">' + (r.region || '\u2014') + '</td>';
-      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + dCol + ';">' + dStr + '</td>';
       tr += '</tr>';
       return tr;
     }
@@ -44949,13 +45021,65 @@ function loadCountryProfile(country) {
                       .map(function(p) { return p.country; });
     var selfRow = _bpr(d, true, false);
     var peerRows = peers.map(function(p) { return _bpr(p, false, !_laIn[p.country]); }).join("");
+
+    // ── v920 (T2) ── say it out loud when the take column and the NPV column disagree ────────
+    // Deliberately narrow. It fires only when the value gap is material in BOTH senses — a ratio
+    // of 1.5x or better AND at least $250M of absolute spread — and then only when the profiled
+    // country sits at one end of its own set or the set spans 2x. On a set like Netherlands, whose
+    // six peers all sit inside $260M of each other, it stays silent rather than narrating an
+    // unremarkable table into noise.
+    var _vsNote = '';
+    (function() {
+      var set = [d].concat(peers).filter(function(x) { return x.npv_75 != null; });
+      if (set.length < 3 || d.npv_75 == null) return;
+      var vals = set.map(function(x) { return x.npv_75; });
+      var hi = Math.max.apply(null, vals), lo = Math.min.apply(null, vals);
+      var abs = hi - lo;
+      var ratio = (lo > 0) ? hi / lo : null;
+      if (!ratio || ratio < 1.5 || abs < 250) return;
+      var nHi = vals.filter(function(v) { return v === hi; }).length;
+      var nLo = vals.filter(function(v) { return v === lo; }).length;
+      var isHi = (d.npv_75 === hi && nHi === 1);
+      var isLo = (d.npv_75 === lo && nLo === 1);
+      if (!isHi && !isLo && ratio < 2) return;
+      var ordered = set.slice().sort(function(a, b) { return b.npv_75 - a.npv_75; });
+      var rk = vals.filter(function(v) { return v > d.npv_75; }).length + 1;
+      var best = ordered[0], worst = ordered[ordered.length - 1];
+      var tks = set.map(function(x) { var v = cpPeerBasis(x, '75').v; return v == null ? x.take_75 : v; })
+                   .filter(function(v) { return v != null; });
+      var tSpread = tks.length ? (Math.max.apply(null, tks) - Math.min.apply(null, tks)) : null;
+      // "only" is a claim about the take column being tight. Do not make it when it is not.
+      var takeClause = (tSpread == null)
+        ? 'Across these ' + set.length + ', '
+        : 'Government take across these ' + set.length + (tSpread <= 3 ? ' spans only ' : ' spans ')
+          + tSpread.toFixed(1) + 'pp, but ';
+      var posTxt = isHi
+        ? '<strong style="color:var(--text);">' + d.country + ' is the highest of the ' + set.length + '</strong>, '
+          + worst.country + ' the lowest at ' + cpNpvFmt(lo) + '.'
+        : isLo
+          ? '<strong style="color:var(--text);">' + d.country + ' is the lowest of the ' + set.length + '</strong>, '
+            + best.country + ' the highest at ' + cpNpvFmt(hi) + '.'
+          : d.country + ' sits #' + rk + ' of ' + set.length + ' on it \u2014 ' + best.country + ' leads at '
+            + cpNpvFmt(hi) + ', ' + worst.country + ' trails at ' + cpNpvFmt(lo) + '.';
+      _vsNote = '<div style="font-size:11px;line-height:1.55;color:var(--accent-dim);background:rgba(176,104,0,.07);'
+        + 'border:1px solid rgba(176,104,0,.28);border-left:3px solid var(--accent);border-radius:6px;'
+        + 'padding:8px 12px;margin-bottom:10px;">'
+        + '<strong style="color:var(--text);">'
+        + ((tSpread != null && tSpread <= 3) ? 'Same take, different value.' : 'Take and value rank this set differently.')
+        + '</strong> '
+        + takeClause + 'contractor NPV runs ' + cpNpvFmt(lo) + ' to ' + cpNpvFmt(hi)
+        + ' \u2014 ' + ratio.toFixed(1) + '\u00d7, on the identical standardized project. ' + posTxt
+        + ' Matching on take does not match on what the contractor keeps \u2014 these are two findings, not one.'
+        + '</div>';
+    })();
     var laClick = "cpLoadPeersSbs(decodeURIComponent('" + encodeURIComponent(d.country) + "'),["
       + _laPeers.map(function(p) { return "decodeURIComponent('" + encodeURIComponent(p.country) + "')"; }).join(",")
       + "])";
 
     _peerSection = '<div class="dd-section" id="dd-peers-' + ddSlugPeer + '">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">Peer Comparison \u2014 Similar Fiscal Terms</div>'
-      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Countries with closest government take at $75/bbl'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Countries with closest government take at $75/bbl, '
+      + 'with contractor NPV on the identical standardized project so the set can be read on value as well as on terms'
       + (_anyFee ? '' : '.') + '</div>'
       + (_anyFee
           ? '<div style="font-size:11px;line-height:1.55;color:var(--accent-dim);background:rgba(176,104,0,.07);'
@@ -44976,6 +45100,7 @@ function loadCountryProfile(country) {
             + 'colours, tiers and exports elsewhere.'
             + '</div>'
           : '')
+      + _vsNote
       + '<div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border);">'
       + '<table style="width:100%;border-collapse:collapse;">'
       + '<thead><tr>'
@@ -44983,9 +45108,10 @@ function loadCountryProfile(country) {
       + '<th style="' + thSR + '">@$50</th>'
       + '<th style="' + thSR + '">@$75</th>'
       + '<th style="' + thSR + '">@$125</th>'
+      + '<th style="' + thSR + '" title="Government take at $75/bbl minus ' + d.country.replace(/"/g,'&quot;') + '\u2019s, in percentage points. This set is matched ON take, so this column is small by construction \u2014 it is not evidence that the regimes are equivalent.">\u0394 take</th>'
+      + '<th style="' + thSR + 'color:var(--text);" title="Contractor NPV at $75/bbl, 10% WACC. Every row is ORCA\u2019s one standardized Deepwater project (50k bbl/d peak \u00b7 5yr plateau \u00b7 241.9 MMbbl \u00b7 $1.0B all-in capex \u00b7 $18/bbl opex escalating 2%/yr \u00b7 25yr life, 100% WI, pre-financing) run through that country\u2019s terms, so the column is comparable down the table and against the NPV in this page\u2019s headline strip. Green is above ' + d.country.replace(/"/g,'&quot;') + ', red below.">NPV @$75</th>'
       + '<th style="' + thS + '">Mechanic</th>'
       + '<th style="' + thS + '">Region</th>'
-      + '<th style="' + thSR + '">\u0394 vs ' + d.country + '</th>'
       + '</tr></thead>'
       + '<tbody>' + selfRow + peerRows + '</tbody>'
       + '</table></div>'
@@ -45160,6 +45286,33 @@ function loadCountryProfile(country) {
   // row, deep link, FC drawer, Prev/Next — so this is the one place the FC nav bar and the price-
   // basis strip can be kept pointed at the country actually on screen.
   if (typeof _fcNavBarUpdate === 'function') _fcNavBarUpdate();
+
+  // v920 (T2): v769 reset the scroll offset when the TAB changed, because entering a profile
+  // 530px down hid the country name, the headline take and the NPV. That guard is _paneChanged,
+  // so it never fired on the far commoner move: the analyst is ALREADY on Country Profile and
+  // switches COUNTRY. The offset was kept, and because the new profile is a different height the
+  // browser also drifted it — measured, from the Indonesia contract table at y=6200, switching to
+  // Iraq landed at y=7254, inside "WHICH NUMBER GOES IN THE IC MEMO?". The analyst saw a green
+  // "✔ CITE THIS 84.8%" and none of the profile above it: not the verdict, not the evidence tier,
+  // and not Iraq's fee-basis correction (68% of its contracts are TSC; the comparable take is
+  // 34.1%, and 84.8% is a structural artefact that must not be ranked across countries). A
+  // country change now starts at the top of the profile, the same rule v769 applied to panes.
+  // Scoped deliberately: only when the country actually CHANGED (so re-renders of the same
+  // country do not yank the page), only when CP is the pane on screen (a cross-tab entry is
+  // already handled by switchTab, which runs its own reset), and never while seeding the
+  // auto-example or restoring a deep link.
+  try {
+    var _cpPrev = window._cpRenderedCountry;
+    window._cpRenderedCountry = country || null;
+    if (country && _cpPrev && _cpPrev !== country && !window._cpSeeding) {
+      var _cpPane = document.getElementById('t7');
+      if (_cpPane && _cpPane.classList.contains('active')) {
+        var _cpTop = document.getElementById('dd-select-wrap') || _cpPane;
+        var _cpY = Math.max(0, _cpTop.getBoundingClientRect().top + (window.pageYOffset || 0) - 12);
+        if ((window.pageYOffset || 0) > _cpY + 4) window.scrollTo(0, _cpY);
+      }
+    }
+  } catch (e) {}
 }
 
 // Populate country select
@@ -45664,7 +45817,7 @@ function exportExplorer() {
     Rank: i + 1,
     Country: d.country,
     'Data Basis': _dqTier(d).label,
-    // v919 (T1): the screen marks these rows ≥ / ≤ and ranks them in their own block. Without
+    // v920 (T1): the screen marks these rows ≥ / ≤ and ranks them in their own block. Without
     // this column the workbook lost both facts and printed the floor as a flat measurement.
     'Take Basis': _explTakeIsFloor(d)
       ? 'FLOOR — royalty + income tax only, no petroleum rent instrument on file: take is a LOWER bound, contractor NPV an UPPER bound'
@@ -45784,7 +45937,7 @@ function exportExplorer() {
     // workbook, a pasted rank list silently mixes production-backed and proxy countries.
     { Field: 'Ranking basis', Value: R.grouped
         ? 'Verified production first: ranks 1–' + R.boundaryRank + ' are backed by verified field production; ranks ' + (R.boundaryRank + 1) + '–' + R.rows.length + ' carry regional proxy estimates and are indicative only. See the Data Basis column.'
-          // v919 (T1): the third block. These rows rank LAST on screen, not first, and the
+          // v920 (T1): the third block. These rows rank LAST on screen, not first, and the
           // workbook has to say why or the order looks arbitrary in the file.
           + (R.floorGrouped ? ' The last ' + R.floor + ' rows are a separate block again: their take is royalty and income tax alone on a record with no petroleum rent instrument of any kind, so it is a LOWER bound and the contractor NPV beside it an UPPER bound. They rank last for that reason and are marked FLOOR in the Take Basis column. Do not carry them into a shortlist.' : '')
           // v855 (T5): the grouping is only half the order — say what the order is INSIDE each
@@ -48366,7 +48519,9 @@ function _rrVerdictPayload() {
   // #rr-ext-check on the 164 with no sourced log, where "there is no score" IS the finding and
   // must paste as prominently as a score would.
   var prose = [];
-  ['rr-ic-action', 'rr-verdict-lead', 'rr-ext-check'].forEach(function (id) {
+  // v921 (T4): rr-filed-under carries the parent-state cross-reference. It is prose, not an
+  // event table, precisely so the sweep below cannot stamp its rows as scoring here.
+  ['rr-ic-action', 'rr-verdict-lead', 'rr-filed-under', 'rr-ext-check'].forEach(function (id) {
     var e = document.getElementById(id);
     if (e && out.contains(e)) { var t = tx(e); if (t) prose.push(t); }
   });
@@ -48548,6 +48703,124 @@ function _rrLatestLine(events, latest) {
 }
 window._rrLatestLine = _rrLatestLine;
 
+// ── v921 (T4): the jurisdiction whose sourced reform events are filed under its parent ─────
+// Walking T4 cold on Iraq-Kurdistan -- the one jurisdiction in this database whose entire
+// investment case turns on Baghdad-Erbil legal risk -- the lookup returned the emptiest card
+// this tab can produce. Measured on the shipped build before this edit: the headline
+// "Iraq-Kurdistan — no Reform Frequency Score", the lead "one of the 164 without one", NO
+// statute block at all (v766's own comment names Iraq-Kurdistan as one of four jurisdictions
+// holding no citation to offer), and a closing instruction to go and run an external check.
+// 386 words, no event, no citation, no date.
+//
+// ORCA is not silent on it. TWO of Iraq's three sourced reform events are about the KRG, both
+// cited, both confidence B, and both sitting one click away under a different country name:
+//   2014  KRG oil exports direct — federal revenue crisis   (context: changed no fiscal terms)
+//   2023  KRG-Baghdad FSC ruling — revenue sharing dispute   (a fiscal law change, size never
+//         quantified; its own note reads "Disrupted payment flows for IOC TSC contractors in KRG")
+// Iraq-Kurdistan is its own row in COUNTRY_DATA -- 53 contracts, 63.0% take @$75 against Iraq's
+// 84.8% -- so an analyst screening the KRG has no reason to open Iraq, and those two events were
+// invisible on the path T4 actually walks.
+//
+// This is a CROSS-REFERENCE, NOT A SCORE. Iraq-Kurdistan stays n/c, its Reform Frequency Score
+// stays "not sourced", the 21-of-185 coverage count is unchanged, and the block says all three
+// in its own first line. The map is explicit and holds exactly one entry because exactly one
+// jurisdiction in this data has this shape: a name-splitting heuristic would have swept in
+// Guinea-Bissau and Timor-Leste, which are sovereign states and not sub-national entries of
+// anything. Add an entry here only with the same evidence -- a separate COUNTRY_DATA row whose
+// parent's sourced log names it.
+var _RR_FILED_UNDER = {
+  'Iraq-Kurdistan': {
+    parent: 'Iraq',
+    match: /kurdistan|\bKRG\b/i,
+    why: 'ORCA holds Iraq-Kurdistan as its own jurisdiction — 53 contracts on KRG Model PSA terms, '
+       + 'priced separately from the federal TSC regime — but it logs reform events against the '
+       + 'sovereign state. These are filed under Iraq and are counted in Iraq’s score, not here.'
+  }
+};
+function _rrFiledUnder(country) {
+  var m = _RR_FILED_UNDER[country];
+  if (!m) return null;
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  // If this jurisdiction ever gets a log of its own, that log is the answer and this is not.
+  if (Array.isArray(rh[country]) && rh[country].length) return null;
+  // Prefer _ALL_REFORMS: the same records, enriched asynchronously from the per-country API with
+  // source, source_url and confidence. Fall back to the inline literal before that fetch lands,
+  // so the block never waits on the network to say the events exist.
+  var pool = (window._ALL_REFORMS && window._ALL_REFORMS.length)
+    ? window._ALL_REFORMS.filter(function(e){ return e.country === m.parent; })
+    : (Array.isArray(rh[m.parent]) ? rh[m.parent] : []);
+  var hits = pool.filter(function(e){
+    return m.match.test(String(e.event || '') + ' ' + String(e.notes || '') + ' ' + String(e.context_kind || ''));
+  }).sort(function(a, b){ return (b.year || 0) - (a.year || 0); });
+  if (!hits.length) return null;
+  return { parent: m.parent, why: m.why, events: hits, parentTotal: pool.length };
+}
+window._rrFiledUnder = _rrFiledUnder;
+
+// Own classes, not .reform-timeline / .reform-event. _rrVerdictPayload() sweeps those to build
+// the clipboard's event table and stamps every row "Yes — in the 2010 scoring window", which
+// would be false here: these events score against Iraq. The block travels as prose instead,
+// via its id, with the scoring statement attached to it.
+function _rrFiledUnderBlock(country) {
+  var x = (typeof _rrFiledUnder === 'function') ? _rrFiledUnder(country) : null;
+  if (!x) return '';
+  var esc = _rrEsc(country);
+  var pEsc = _rrEsc(x.parent);
+  var jsP = String(x.parent).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  var n = x.events.length;
+  var nScored = x.events.filter(function(e){ return _rrScores(e); }).length;
+  var yrs = x.events.map(function(e){ return e.year; }).sort(function(a,b){ return (a||0)-(b||0); });
+  var col = 'var(--orange)';
+
+  var evHtml = x.events.map(function(e) {
+    var isCtx = !_rrIsFiscalChange(e);
+    var src = e.source
+      ? _rrEsc(e.source) + (e.confidence ? ' &middot; ' + _rrEsc(String(e.confidence).toUpperCase()) : '')
+      : 'NOT RECORDED — no citation held for this event';
+    var srcHtml = (e.source && e.source_url)
+      ? '<a href="' + _rrEsc(e.source_url) + '" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">' + src + ' &nearr;</a>'
+      : src;
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--border);min-width:0;">'
+      + '<div style="font-size:15px;font-weight:800;color:' + col + ';flex:0 0 auto;min-width:40px;">' + _rrEsc(e.year) + '</div>'
+      + '<div style="flex:1 1 auto;min-width:0;overflow-wrap:anywhere;">'
+      +   '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">' + _rrEsc(e.event || '') + '</div>'
+      +   '<div style="font-size:10px;font-weight:700;margin-bottom:4px;color:' + (isCtx ? 'var(--muted)' : col) + ';">'
+      +     (isCtx
+              ? 'CHANGED NO FISCAL TERMS — does not score, for ' + pEsc + ' or for anyone'
+              : 'FISCAL LAW CHANGE — scores against ' + pEsc + (e.take_change ? ', ' + _rrEsc(e.take_change) + ' take' : ', take move never quantified'))
+      +   '</div>'
+      +   (e.notes ? '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:4px;">' + _rrEsc(e.notes) + '</div>' : '')
+      +   '<div style="font-size:10px;color:var(--muted);">' + srcHtml + '</div>'
+      + '</div></div>';
+  }).join('');
+
+  return '<div id="rr-filed-under" style="border:1px solid ' + col + ';border-left:3px solid ' + col
+    + ';border-radius:6px;padding:10px 12px;margin-bottom:12px;background:rgba(194,65,12,.05);">'
+    + '<div style="font-size:10px;font-weight:800;color:' + col + ';text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">'
+    +   'ORCA holds ' + n + ' sourced event' + (n === 1 ? '' : 's') + ' about ' + esc + ' — filed under ' + pEsc
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px;">'
+    +   '<strong>This does not give ' + esc + ' a Reform Frequency Score, and this card does not award one.</strong> '
+    +   x.why + ' ' + (nScored
+          ? nScored + ' of the ' + n + ' ' + (nScored === 1 ? 'is a fiscal law change dated 2010 or later and is counted in ' + pEsc + '’s score'
+                                                            : 'are fiscal law changes dated 2010 or later and are counted in ' + pEsc + '’s score')
+            + '; the ' + pEsc + ' log holds ' + x.parentTotal + ' event' + (x.parentTotal === 1 ? '' : 's') + ' in total. '
+          : 'None of them is a fiscal law change, so none scores anywhere. ')
+    +   'Read ' + (n === 1 ? 'it' : 'them') + ' before carrying a reform premium of zero for ' + esc + ': '
+    +   'the external check this card sends you on does not start from nothing, it starts from '
+    +   (yrs.length === 1 ? yrs[0] : yrs.slice(0, -1).join(', ') + ' and ' + yrs[yrs.length - 1]) + '.'
+    + '</div>'
+    + evHtml
+    + '<div style="margin-top:10px;">'
+    +   '<button class="btn btn-sm btn-outline" onclick="openReformRiskFor(\'' + jsP + '\')" '
+    +   'title="Open the full reform verdict, Reform Frequency Score and complete sourced event log for ' + pEsc
+    +   ' — the jurisdiction these events are filed under. ' + esc + ' itself stays unscored.">'
+    +   'Open the full ' + pEsc + ' reform verdict ›</button>'
+    + '</div>'
+    + '</div>';
+}
+window._rrFiledUnderBlock = _rrFiledUnderBlock;
+
 function renderReformCountryVerdict() {
   var sel = document.getElementById('rr-country-lookup');
   var out = document.getElementById('rr-country-verdict');
@@ -48680,6 +48953,9 @@ function renderReformCountryVerdict() {
       + '<strong style="color:var(--text);">This is not a score of 100.</strong> No events on file means no coverage, not a clean record — '
       + 'do not read it as stability and do not carry a reform-frequency premium of zero into an IC memo on this basis.'
       + '</div>'
+      // v921 (T4): the cross-reference, directly under the lead that says there is no score,
+      // because for Iraq-Kurdistan there is no statute block below it to carry the next step.
+      + _rrFiledUnderBlock(c)
       // ── v766 (T4): the one instruction this card gives, directly under the "not a score" lead ──
       // v759 moved the IC action to the head of the covered-country card. This branch is the other
       // 164 of 185 jurisdictions -- 89% of what the lookup offers -- and it was left in the old
