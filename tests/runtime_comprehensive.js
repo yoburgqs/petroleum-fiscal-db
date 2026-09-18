@@ -916,8 +916,18 @@ async function testComparison(page) {
       w(S, 'SBS-EXAMPLE collapses to the named country', _sbsEx.skip);
     } else {
       const keepOk = _sbsEx.afterKeep.length === 1 && _sbsEx.afterKeep[0] === 'Norway';
-      const allOk = JSON.stringify(_sbsEx.afterAll) ===
-        JSON.stringify(['Norway', 'Indonesia', 'Nigeria', 'Angola', 'Brazil']);
+      // v908 (T3): MEMBERSHIP, not sequence. This assertion is named "no unchosen column holds a
+      // slot" and the bug it pins is an example column surviving the analyst's picks — which is a
+      // question about which countries are in compareList, not where they sit. It compared the
+      // array literally, so it also silently pinned the column ORDER, and went red when the default
+      // order control moved from "addition order" to the take order the verdict strip states. All
+      // five chosen countries were present and none refused; only their left-to-right position
+      // changed. Sorted-set compare, so the test keeps testing the thing it is named for. The
+      // ordering itself is asserted separately below, where switching the control back to
+      // "addition order" must reproduce the exact add sequence.
+      const _sorted = a => a.slice().sort().join('|');
+      const allOk = _sorted(_sbsEx.afterAll) ===
+        _sorted(['Norway', 'Indonesia', 'Nigeria', 'Angola', 'Brazil']);
       if (keepOk) p(S, 'SBS-EXAMPLE collapses to the named country',
         'keeping an example country left exactly ["Norway"], not the 3-country seed');
       else f(S, 'SBS-EXAMPLE collapses to the named country',
@@ -926,6 +936,36 @@ async function testComparison(page) {
         'all 5 analyst picks present, no example residue, nothing refused at CMP_MAX');
       else f(S, 'SBS-EXAMPLE no unchosen column holds a slot',
         'expected the 5 chosen countries, got ' + JSON.stringify(_sbsEx.afterAll));
+
+      // ── v908 (T3): the column order is a CHOICE, and both ends of it must hold. ──────────
+      // The default is now take_asc so the grid opens in the sequence #cmp-verdict states.
+      // Two things have to be true and neither was covered: the control must report the order
+      // actually in force (a select reading "Addition order" over a sorted grid would be the
+      // same defect one level down), and "Addition order" must still restore the exact sequence
+      // the analyst typed — _sbsApplyOrder() sorts compareList in place, so cmpAddSeq is the
+      // only remaining record of it, and a bug there makes the option dead rather than wrong.
+      const _ord = await page.evaluate(() => {
+        const sel = document.getElementById('cmp-order');
+        const dflt = { sel: sel ? sel.value : null, js: (typeof cmpOrder !== 'undefined') ? cmpOrder : null,
+                       list: compareList.slice() };
+        setCompareOrder('add');
+        const added = compareList.slice();
+        setCompareOrder(dflt.js);
+        return { dflt, added, restored: compareList.slice() };
+      });
+      await page.waitForTimeout(200);
+      if (_ord.dflt.sel === _ord.dflt.js) p(S, 'SBS-ORDER control matches the order in force',
+        `#cmp-order reads "${_ord.dflt.sel}" and cmpOrder is "${_ord.dflt.js}"`);
+      else f(S, 'SBS-ORDER control matches the order in force',
+        `#cmp-order reads "${_ord.dflt.sel}" but the grid is ordered by "${_ord.dflt.js}"`);
+      if (JSON.stringify(_ord.added) === JSON.stringify(['Norway', 'Indonesia', 'Nigeria', 'Angola', 'Brazil']))
+        p(S, 'SBS-ORDER addition order still restorable', 'switching to "add" reproduced the exact add sequence');
+      else f(S, 'SBS-ORDER addition order still restorable',
+        'expected the typed sequence, got ' + JSON.stringify(_ord.added));
+      if (JSON.stringify(_ord.restored) === JSON.stringify(_ord.dflt.list))
+        p(S, 'SBS-ORDER default order reapplies', 'returning to "' + _ord.dflt.js + '" reproduced ' + JSON.stringify(_ord.restored));
+      else f(S, 'SBS-ORDER default order reapplies',
+        'got ' + JSON.stringify(_ord.restored) + ' want ' + JSON.stringify(_ord.dflt.list));
     }
     await page.evaluate(() => { if (typeof clearCompare === 'function') clearCompare(); });
     await page.waitForTimeout(150);
@@ -969,7 +1009,13 @@ async function testComparison(page) {
           hash: location.hash
         }));
         const want = ['Norway'].concat(found.peers);
-        const listOk = JSON.stringify(got.cl) === JSON.stringify(want);
+        // v908 (T3): set compare — this pins WHICH countries the launcher lands in the grid, which
+        // is what the name says and what the bug was (the peers went into window.compareBasket and
+        // t2 re-seeded the canned example instead). The grid's left-to-right order is the column
+        // order control's business and is asserted in SBS-ORDER above; a literal array compare here
+        // meant the default order change read as the launcher having failed.
+        const _sortJ = a => (a || []).slice().sort().join('|');
+        const listOk = _sortJ(got.cl) === _sortJ(want);
         if (listOk) p(S, 'CP-PEER-SBS launcher lands in the grid',
           'clicking "' + found.label + '" rendered ' + JSON.stringify(got.cl) + ' -- the set the section advertises');
         else f(S, 'CP-PEER-SBS launcher lands in the grid',
@@ -1449,7 +1495,19 @@ async function testSbSChartBasis(page) {
       const d = COUNTRY_DATA.find(x => x.country === n);
       return [d.take_50, d.take_75, d.take_100, d.take_125];
     }));
-    const ctlOk = ctlExpect.every((row, i) => row.every((v, k) => Math.abs(v - ns.data[i][k]) < 0.001));
+    // v908 (T3): match the series BY LABEL, not by dataset index. This control is named
+    // "(values)" and asks whether each country still plots its published headline take; it read
+    // ns.data[i] positionally, which additionally pinned the dataset order and went red when the
+    // column order default became the take order (UK 49.2 before Norway 68.0). Every value was
+    // unchanged. Label lookup is the pattern the rest of this test already uses for the Iraq/USA
+    // and Netherlands cases, and it is strictly stronger here: a series landing under the wrong
+    // country's label now fails instead of passing on a coincidence of position.
+    const _cmpIdx = (r, n) => r.labels.findIndex(l => l.indexOf(n) === 0);
+    const _ctlNames = ['Norway', 'United Kingdom', 'Netherlands'];
+    const ctlOk = ctlExpect.every((row, i) => {
+      const j = _cmpIdx(ns, _ctlNames[i]);
+      return j >= 0 && row.every((v, k) => Math.abs(v - ns.data[j][k]) < 0.001);
+    });
     if (ctlOk) p(S, 'control set unchanged (values)', 'North Sea Trio still plots its published headline take');
     else f(S, 'control set unchanged (values)', 'got ' + JSON.stringify(ns.data) + ' want ' + JSON.stringify(ctlExpect));
     // v684: these two assertions used to read `title === 'Govt Take vs Oil Price'` and
@@ -1501,7 +1559,12 @@ async function testSbSChartBasis(page) {
       const d = COUNTRY_DATA.find(x => x.country === n);
       return [50, 75, 100, 125].map(p => cpCmpTakeOf(d, String(p)));
     }));
-    if (ctl6.every((row, i) => row.every((v, k) => Math.abs(v - mx6.data[i][k]) < 0.001)))
+    // v908 (T3): by label, for the same reason as the (5) control above — the assertion is about
+    // the twelve VALUES, not about which dataset index each country landed on.
+    if (ctl6.every((row, i) => {
+      const j = _cmpIdx(mx6, _ctlNames[i]);
+      return j >= 0 && row.every((v, k) => Math.abs(v - mx6.data[j][k]) < 0.001);
+    }))
       p(S, 'basis gate changes no plotted value', 'all 12 points still equal cpCmpTakeOf()');
     else f(S, 'basis gate changes no plotted value', 'got ' + JSON.stringify(mx6.data) + ' want ' + JSON.stringify(ctl6));
 

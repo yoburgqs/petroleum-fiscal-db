@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v907</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v908</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2568,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v907</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v908</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3962,7 +3962,10 @@ window.copyPlatformCitation = function(btn) {
                 title="Reorders the columns of the grid, both charts, the PDF, the share link and the IC-memo clipboard copy. The take orders sort on the COMPARABLE take — a country that blends fee-basis contracts (TSC / RSC / Buy-back) is placed on its PSC/Concession figure, not on its headline take, and a state monopoly or a cash-flow-basis (PRRT) column has no comparable take and is placed last. Where the set mixes production-weighted countries with countries ORCA holds no production for, the two are ordered as separate blocks — producers first — because they are not on one scale."
                 style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
           <option value="add">Addition order</option>
-          <option value="take_asc">Govt take $75 — low → high</option>
+          <!-- v908 (T3): selected — must match `let cmpOrder` in the script. The grid now opens in
+               the same order the verdict strip above it states, instead of in the order the
+               countries happened to be typed. -->
+          <option value="take_asc" selected>Govt take $75 — low → high</option>
           <option value="take_desc">Govt take $75 — high → low</option>
           <option value="name">Country A–Z</option>
         </select>
@@ -27964,7 +27967,24 @@ let cmpChart = null;
    Reordering `compareList` itself means the grid, both charts, the PDF, the share
    link and both clipboard flavours all follow with no extra plumbing.
 */
-let cmpOrder = 'add';
+// ── v908 (T3): the DEFAULT is the take order, not addition order. ────────────────────────────
+// v646 built the ordering above and then left it switched off, so the page contradicted itself
+// on first paint. Walked cold at 1440 with storage cleared: the t2 seed loads Norway / United
+// Kingdom / Netherlands, #cmp-verdict prints "GOVT TAKE @$75, LOWEST FIRST: United Kingdom 49.2%
+// > Norway 68.0%", and the grid 10px below it opens Norway | United Kingdom | Netherlands. The
+// strip names one sequence; the columns are laid out in another. Same on the analyst's own set —
+// typing Guyana, Brazil, Angola gives a verdict of "Angola 53.0% > Brazil 55.6%, Guyana set
+// aside" over a grid that leads with Guyana, the one column the strip just said is not a rank
+// position. Two of the four quickstart presets do the same (Atlantic Frontier opens on Guyana).
+// A side-by-side grid is read left to right; when the leftmost column is the excluded one, the
+// first figure the analyst's eye lands on is the one figure the page refuses to rank.
+// _sbsApplyOrder() already buckets exactly the way the verdict strip does — comparable take
+// first, statutory-terms columns as a separate block, no-comparable-take last — so switching the
+// default makes the two agree by construction rather than by a caption. "Addition order" stays in
+// the dropdown; it is now a choice instead of an unannounced default. The <option selected> in
+// the markup must stay in sync with this literal, or the control would report an order the grid
+// is not in — which is the same defect one level down.
+let cmpOrder = 'take_asc';
 const CMP_ORDER_LABEL = {
   add:       'addition order',
   take_asc:  'government take at $75/bbl, lowest first',
