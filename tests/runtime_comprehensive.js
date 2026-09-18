@@ -2587,6 +2587,196 @@ async function testRouting(page) {
   } catch(e) { f(S, 'exception', e.message); }
 }
 
+// ─── v902 (T1): a Screener link must open the screen it was copied from ─────────────────
+// Pre-v902 the Screener route carried only the preset NAME. An analyst on the IOC Capital
+// Screen at $100/bbl (12 countries) copied "#/screener/iochurdle"; the recipient opened 15
+// countries at $75, with Azerbaijan, India and Indonesia back on a shortlist the sender's own
+// NOT-ON-THIS-LIST panel had removed by name. A hand-built screen copied as bare "#/screener"
+// and opened on the unfiltered 185. Each case is asserted here against a genuinely COLD second
+// context, because a same-page hash set would not exercise the cold-load restore path.
+async function testScreenerLinkFidelity(page) {
+  const S = 'ScreenerLink';
+  try {
+    const browser = page.context().browser();
+    const rowsOf = pg => pg.evaluate(() => ({
+      n: document.querySelectorAll('#tbody-screener tr[data-country]').length,
+      deck: (typeof getPriceKey === 'function') ? getPriceKey() : '?',
+      take: (document.getElementById('sv-take') || {}).textContent,
+      names: [...document.querySelectorAll('#tbody-screener tr[data-country]')]
+               .map(r => r.getAttribute('data-country')).sort(),
+    }));
+
+    const cases = [
+      {
+        name: 'IOC Capital Screen at $100',
+        build: async pg => {
+          await pg.evaluate(() => { applyScreenerPreset('iochurdle'); _scRouteSetPreset('iochurdle'); });
+          await pg.waitForTimeout(700);
+          await pg.evaluate(() => _scSetDeck('100'));
+          await pg.waitForTimeout(1200);
+        },
+      },
+      {
+        name: 'hand-built take<=45 + Africa',
+        build: async pg => {
+          await pg.evaluate(() => { if (typeof _scClearPreset === 'function') _scClearPreset(); });
+          await pg.waitForTimeout(600);
+          await pg.evaluate(() => {
+            const s = document.getElementById('sl-take');
+            s.value = 45; s.dispatchEvent(new Event('input')); s.dispatchEvent(new Event('change'));
+          });
+          await pg.waitForTimeout(700);
+          await pg.evaluate(() => {
+            const r = document.getElementById('sc-region');
+            r.value = 'Africa'; r.dispatchEvent(new Event('change'));
+          });
+          await pg.waitForTimeout(900);
+        },
+      },
+    ];
+
+    for (const c of cases) {
+      // Sender
+      const sctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const sp = await sctx.newPage();
+      await sp.goto(URL, { waitUntil: 'networkidle' });
+      await sp.evaluate(() => { sessionStorage.clear(); localStorage.clear(); });
+      await sp.reload({ waitUntil: 'networkidle' });
+      await sp.waitForTimeout(1500);
+      await sp.evaluate(() => _scTabEnter(document.getElementById('tab-btn-tscreener')));
+      await sp.waitForTimeout(1200);
+      await c.build(sp);
+      const sender = await rowsOf(sp);
+      const hash = await sp.evaluate(() => window.location.hash);
+      await sctx.close();
+
+      if (sender.n === 0) { w(S, `${c.name} — sender built`, 'sender screen returned 0 rows'); continue; }
+      p(S, `${c.name} — sender`, `${sender.n} countries at $${sender.deck}, hash ${hash}`);
+
+      // The route must actually carry state, not just a preset name.
+      if (hash.indexOf('?') !== -1) p(S, `${c.name} — route carries state`, hash.slice(hash.indexOf('?')));
+      else f(S, `${c.name} — route carries state`, `hash "${hash}" carries no screen state`);
+
+      // Recipient — cold context, nothing shared with the sender.
+      const rctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const rp = await rctx.newPage();
+      await rp.goto(URL.split('#')[0] + hash, { waitUntil: 'networkidle' });
+      await rp.waitForTimeout(3000);
+      const rec = await rowsOf(rp);
+      await rctx.close();
+
+      if (rec.n === sender.n) p(S, `${c.name} — row count`, `${rec.n} countries, both ends`);
+      else f(S, `${c.name} — row count`, `sender ${sender.n}, recipient ${rec.n}`);
+
+      if (rec.deck === sender.deck) p(S, `${c.name} — price deck`, `$${rec.deck}, both ends`);
+      else f(S, `${c.name} — price deck`, `sender $${sender.deck}, recipient $${rec.deck}`);
+
+      if (JSON.stringify(rec.names) === JSON.stringify(sender.names)) {
+        p(S, `${c.name} — identical shortlist`, `${rec.n} countries match name for name`);
+      } else {
+        const extra = rec.names.filter(x => sender.names.indexOf(x) === -1);
+        const miss  = sender.names.filter(x => rec.names.indexOf(x) === -1);
+        f(S, `${c.name} — identical shortlist`,
+          `recipient gained [${extra.join(', ')}] and lost [${miss.join(', ')}]`);
+      }
+    }
+
+    // A malformed or truncated query must degrade to the cold Screener, not to a threshold the
+    // slider could never have produced. "t=zzz" previously assigned straight through.
+    const gctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const gp = await gctx.newPage();
+    await gp.goto(URL.split('#')[0] + '#/screener?d=999&t=zzz&rg=Nowhere&o=Bogus', { waitUntil: 'networkidle' });
+    await gp.waitForTimeout(2800);
+    const g = await rowsOf(gp);
+    await gctx.close();
+    if (g.n === 185 && g.take === '100' && g.deck === '75') {
+      p(S, 'malformed query degrades safely', `185 countries, take ceiling 100%, $75 deck`);
+    } else {
+      f(S, 'malformed query degrades safely', `${g.n} rows, take ${g.take}, deck $${g.deck}`);
+    }
+
+  } catch (e) { f(S, 'exception', e.message); }
+}
+
+// ── v909 (T1): the Side-by-Side handoff must name the basis of what it is about to load ──────
+// v507's contract, in its own words: "the shortlist handoff must not ship proxy economics into
+// Side-by-Side" and the button "says which group it drew from so the analyst is not surprised by
+// what loads". Two of the three states said it; the MIXED state did not, because
+// _sbsFromVerified needs >=2 verified rows and _allProxy needs 0, so a screen holding EXACTLY
+// ONE verified-production country fell between them and printed a bare "Load top 5 in
+// Side-by-Side" over 1 measured jurisdiction and 4 modelled ones. Asserted as an invariant
+// rather than as three literal strings: whatever the pool holds, the label must account for it.
+async function testScreenerSbSBasisLabel(page) {
+  const S = 'ScreenerSbSBasis';
+  try {
+    await switchTab(page, 'tscreener');
+    await page.waitForTimeout(2200);
+
+    const at = async (take) => {
+      await page.evaluate((v) => {
+        const s = document.getElementById('sl-take');
+        s.value = v; s.dispatchEvent(new Event('input', { bubbles: true }));
+        s.dispatchEvent(new Event('change', { bubbles: true }));
+      }, take);
+      await page.waitForTimeout(1700);
+      return page.evaluate(() => {
+        const btn = document.getElementById('sc-sbs-btn');
+        const nm = document.getElementById('sc-sbs-names');
+        const pool = window._scSbsTop5 || [];
+        const m = window._scProxyByCountry || {};
+        return {
+          rows: document.querySelectorAll('#tbody-screener tr[data-country]').length,
+          pool,
+          nProxy: pool.filter(c => m[c] === true).length,
+          label: btn ? btn.textContent.replace(/\s+/g, ' ').trim() : null,
+          title: btn ? btn.title : null,
+          names: nm ? nm.textContent.replace(/\s+/g, ' ').trim() : null,
+        };
+      });
+    };
+
+    // 100 = the cold universe (many verified), 26 = one verified + proxies, 23 = all proxy.
+    for (const take of [100, 30, 26, 23]) {
+      const r = await at(take);
+      if (!r.label) { w(S, `take<=${take}%: button present`, `${r.rows} rows, no handoff button`); continue; }
+      const nVer = r.pool.length - r.nProxy;
+
+      // The invariant: a pool that is not uniform must say so on the button.
+      const uniform = r.nProxy === 0 || r.nProxy === r.pool.length;
+      if (uniform) {
+        p(S, `take<=${take}%: uniform pool labelled`, `${r.pool.length} countries, ${r.nProxy} proxy — "${r.label}"`);
+      } else if (/proxy/i.test(r.label) && r.label.indexOf(String(r.nProxy)) >= 0) {
+        p(S, `take<=${take}%: MIXED pool names its split`,
+          `${nVer} verified + ${r.nProxy} proxy — "${r.label}"`);
+      } else {
+        f(S, `take<=${take}%: MIXED pool names its split`,
+          `pool is ${nVer} verified + ${r.nProxy} proxy but the button reads "${r.label}"`);
+      }
+
+      // Every proxy country in the listed names must be marked where it is listed.
+      if (r.nProxy > 0 && r.names !== null) {
+        const marks = (r.names.match(/°/g) || []).length;
+        // one ° per proxy name, plus one on the legend
+        if (marks >= r.nProxy) p(S, `take<=${take}%: proxy names marked`, `${marks} marks for ${r.nProxy} proxy countries`);
+        else f(S, `take<=${take}%: proxy names marked`, `${r.nProxy} proxy in ${JSON.stringify(r.pool)} but ${marks} marks in "${r.names}"`);
+      }
+
+      // The tooltip must never claim verified production for a pool that has none.
+      if (r.nProxy === r.pool.length && r.pool.length &&
+          /the top \d+ verified-production countries/.test(r.title || '')) {
+        f(S, `take<=${take}%: all-proxy pool not called verified`, r.title.slice(0, 120));
+      } else if (r.pool.length) {
+        p(S, `take<=${take}%: tooltip basis honest`, (r.title || '').slice(0, 90));
+      }
+    }
+
+    // restore the screen for anything downstream
+    await page.evaluate(() => { if (typeof resetScreenerAll === 'function') resetScreenerAll(); });
+    await page.waitForTimeout(1500);
+
+  } catch (e) { f(S, 'suite', String(e).slice(0, 160)); }
+}
+
 // ─── SECTION 16: Compare Basket ──────────────────────────────────────────
 async function testBasket(page) {
   const S = 'Basket';
@@ -3409,6 +3599,7 @@ async function testConsoleErrors() {
     await testExplorer(page);
     await testScreener(page);
     await testScreenerICCeilingCount(page);
+    await testScreenerSbSBasisLabel(page);
     await testHomeICScreenAgreement(page);
     await testICSourcingTier(page);
     await testIOC(page);
@@ -3420,6 +3611,7 @@ async function testConsoleErrors() {
     await testSampleAnalyses(page);
     await testSearch(page);
     await testRouting(page);
+    await testScreenerLinkFidelity(page);
     await testBasket(page);
     await testMechanics(page);
     await testMethodology(page);

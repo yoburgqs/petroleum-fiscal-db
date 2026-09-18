@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v908</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v909</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2568,7 +2568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v908</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v909</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -35751,6 +35751,24 @@ function runScreener() {
   window._scSbsTop5 = top4.map(function(d) { return d.country; });
   window._scSbsFromVerified = _sbsFromVerified;
   window._scSbsAllProxy = !!_allProxy;
+  // ── v909 (T1): the MIXED pool had no name. ─────────────────────────────────────────────────
+  // v507 set the contract in its own words: "the shortlist handoff must not ship proxy economics
+  // into Side-by-Side", and the button "says which group it drew from so the analyst is not
+  // surprised by what loads". Two of the three states say it — `_sbsFromVerified` prints
+  // "verified-production", `_allProxy` prints "all proxy-economics". The third says nothing,
+  // because `_sbsFromVerified` needs `_verifiedRows.length >= 2` and `_allProxy` needs
+  // `_nVerified === 0`. A screen holding EXACTLY ONE verified-production country falls between
+  // them: the pool silently becomes the full mixed `data`, and the button reads a bare
+  // "Load top 5 in Side-by-Side" over 1 measured jurisdiction and 4 modelled ones.
+  // Measured cold at 1440x900, take ceiling dragged to 26% (77 rows, an ordinary screen):
+  // "USA · Greenland · Faroe Islands · Romania · Bulgaria" — USA is PROD-WTD, the other four are
+  // PROXY — loaded into Side-by-Side with nothing on screen marking the split, on the one tab
+  // whose caption block exists to insist on that exact distinction ("163 of 185 are proxy").
+  // The pool is NOT narrowed: one verified country cannot fill a side-by-side grid, so five
+  // columns is the right set. What changes is that the page now says what it is handing over.
+  // Published per-country so both branches of _scSyncSbsBtn() can mark ticked sets too.
+  window._scProxyByCountry = {};
+  data.forEach(function (d) { window._scProxyByCountry[d.country] = !_dqTier(d).hasProduction; });
   if (top4.length >= 2) {
     screenerTop4Btn.innerHTML = '<button type="button" id="sc-sbs-btn" onclick="scOpenSbs()"'
       + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;min-height:24px;cursor:pointer;transition:.15s;margin-top:6px;font-family:inherit;"'
@@ -36724,12 +36742,34 @@ function scOpenSbs() {
   if (left.length && typeof showCopyToast === 'function') {
     showCopyToast('Side-by-Side holds ' + cap + ' countries \u2014 opened the first ' + cap
       + ' ticked. Not loaded: ' + left.join(', ') + '.');
+  } else if (!sel.length && typeof showCopyToast === 'function') {
+    // v909 (T1): the top-N fallback is the pool the PAGE chose, not the analyst. When that pool
+    // mixes measured and modelled jurisdictions, say so at the moment the grid replaces the
+    // screen \u2014 the button label is behind them by then. Ticked sets are the analyst's own picks,
+    // made against the badge on each row, so they are not second-guessed here.
+    var px = (typeof _scProxyNames === 'function') ? _scProxyNames(picks) : [];
+    if (px.length && px.length < picks.length) {
+      showCopyToast('Mixed basis: ' + (picks.length - px.length) + ' of these ' + picks.length
+        + (picks.length - px.length === 1 ? ' carries' : ' carry') + ' verified field production. ' + px.join(', ')
+        + (px.length === 1 ? ' is' : ' are') + ' modelled on regional terms \u2014 indicative, not measured.');
+    }
   }
 }
 
 // Both doors to Side-by-Side say which countries they will open, recomputed on every tick.
 // _scSelOrdered() carries only ticks the CURRENT screen still returns, which is the same set
 // Copy/CSV/Excel carry -- so the comparison and the export can never disagree about the list.
+// v909 (T1): which of these names has no verified field production. Reads the map published by
+// the render pass, so it always describes the screen currently on the table. Returns [] rather
+// than guessing if the map is not there yet — an unmarked name is the old behaviour, an
+// incorrectly marked one would be a coverage claim the page cannot back.
+function _scProxyNames(list) {
+  var m = window._scProxyByCountry;
+  if (!m) return [];
+  return (list || []).filter(function (c) { return m[c] === true; });
+}
+window._scProxyNames = _scProxyNames;
+
 function _scSyncSbsBtn() {
   var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
   var pool = window._scSbsTop5 || [];
@@ -36747,20 +36787,45 @@ function _scSyncSbsBtn() {
         + pool.length + ' of this screen instead.';
     } else {
       var fromVerified = !!window._scSbsFromVerified, allProxy = !!window._scSbsAllProxy;
+      // v909 (T1): the third state. Neither flag is set when the screen holds exactly one
+      // verified-production country, so the pool is mixed and used to print bare.
+      var poolProxy = _scProxyNames(pool), nPx = poolProxy.length;
+      var mixed = !fromVerified && !allProxy && nPx > 0 && nPx < pool.length;
       btn.innerHTML = '\u21cc Load top ' + pool.length
-        + (fromVerified ? ' verified-production' : (allProxy ? ' \u2014 all proxy-economics' : ''))
+        + (fromVerified ? ' verified-production'
+           : (allProxy ? ' \u2014 all proxy-economics'
+              : (mixed ? ' \u2014 ' + (pool.length - nPx) + ' verified-production + ' + nPx + ' proxy' : '')))
         + ' in Side-by-Side \u2192';
       btn.title = 'Load ' + (fromVerified
           ? 'the top ' + pool.length + ' verified-production countries'
           : (allProxy
               ? 'the top ' + pool.length + ' Screener results \u2014 ALL of them proxy-economics countries with no verified field production, indicative only'
-              : 'the top ' + pool.length + ' Screener results'))
+              : (mixed
+                  ? 'the top ' + pool.length + ' Screener results \u2014 a MIXED set. '
+                    + (pool.length - nPx) + ' carr' + (pool.length - nPx === 1 ? 'ies' : 'y')
+                    + ' verified field production; ' + poolProxy.join(', ')
+                    + ' ' + (nPx === 1 ? 'is a proxy-economics country' : 'are proxy-economics countries')
+                    + ' with none, so their figures are modelled on regional terms and are indicative only. '
+                    + 'Side-by-Side orders the two as separate blocks because they are not on one scale'
+                  : 'the top ' + pool.length + ' Screener results')))
         + ' into Side-by-Side for detailed comparison: ' + pool.join(', ')
         + '. Tick rows first to compare your own choice instead.';
     }
   }
   var names = document.getElementById('sc-sbs-names');
-  if (names) names.textContent = shown.join(' \u00b7 ');
+  // v909 (T1): every name that has no verified field production is marked where it is listed,
+  // for ticked sets as well as the top-N fallback. The Screener puts a PROD-WTD / PART-PROD /
+  // PROXY badge on every row of the table; this line sat directly under it carrying none.
+  if (names) {
+    var shownProxy = _scProxyNames(shown);
+    names.textContent = shown.map(function (c) {
+      return c + (window._scProxyByCountry && window._scProxyByCountry[c] ? ' \u00b0' : '');
+    }).join(' \u00b7 ') + (shownProxy.length ? '   \u00b0 proxy economics \u2014 no verified field production' : '');
+    names.title = shownProxy.length
+      ? shownProxy.join(', ') + (shownProxy.length === 1 ? ' is' : ' are')
+        + ' modelled on regional terms \u2014 indicative, not measured.'
+      : '';
+  }
   var dockSbs = document.getElementById('sc-dock-sbs');
   if (dockSbs) {
     dockSbs.disabled = !sel.length;
