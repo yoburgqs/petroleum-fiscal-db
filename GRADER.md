@@ -59321,3 +59321,168 @@ serving the repo at root. Re-served from `~` so the path resolves, and the suite
   while `CMP_MAX` is 5.
 - Still true from 821: the IC Citation and the CP strip lead with different bases;
   `cpTakeBandNpv()` selects its band on comparable take and ranks on the blend. Decisions for Zach.
+
+---
+
+# CYCLE 825 — v914 (T5) — the Screener's IC shortlist dropped the breakeven for the UK and Norway
+
+## Task
+
+**T5 — "Give me something I can paste straight into an IC memo."**
+Last used at cycle 818. Cycle 824 ran T4, 823 ran T6.
+
+## Friction
+
+Walked cold at 1440x900 with no sessionStorage and no localStorage, against the real DOM
+and the real handlers. The five paste surfaces were exercised end to end and their payloads
+captured off a stubbed `navigator.clipboard`, then cross-checked country by country. All 185
+rows of the Fiscal Compare paste were compared against all 185 of the Screener paste on every
+shared numeric column. One column disagreed, and it disagreed about whether the number exists
+at all.
+
+`_scExportRows()` — the single choke point for the Screener's clipboard, CSV and XLSX — read
+the raw bundled `COUNTRY_DATA.be_75`, which is `null` for Norway and the United Kingdom:
+
+```
+    var _beReal = (!_beArtifact && d.be_75 != null && d.be_75 > 1 && d.be_75 < 999);
+    ...
+    Breakeven_bbl:    _beReal ? d.be_75 : null,
+    Breakeven_Tested: _beArtifact ? 'n/a — no contractor position' : _beReal ? 'Yes' : 'No',
+```
+
+Measured on screen, before the change:
+
+| path | Norway | United Kingdom |
+|---|---|---|
+| Screener → ⎘ Copy for IC Memo, full 185 rows | `— not modelled` | `— not modelled` |
+| Screener → tick both → ⎘ Copy for IC Memo | **Breakeven column absent from the table** | — |
+| Screener → ⬇ CSV | blank, `Breakeven_Tested "No"` | blank, `"No"` |
+| Screener → ⬇ Excel | blank, `Breakeven_Tested "No"` | blank, `"No"` |
+| Fiscal Compare cell | **$29** | **$20** |
+| Country Profile strip | **$29/bbl** | — |
+| Country Profile ⎘ IC Citation | **"BE $29/bbl"** | — |
+
+The two-country case is the worse one and it is the natural T5 move. `anyBe` is
+`rows.some(r => r.Breakeven_bbl != null || …)`, so a hand-ticked North Sea shortlist of
+exactly these two countries produced a pasted IC table **with no Breakeven column at all** —
+verified by re-running the same walk against HEAD on an overlay server, not inferred from the
+code.
+
+Three things make this worse than a blank cell:
+
+1. **The Screener has no breakeven column on screen.** The analyst's first sight of
+   "not modelled" is inside the document they already pasted it into.
+2. **The workbook asserts the absence.** Its own BREAKEVEN basis note tells the reader that a
+   blank on a non-monopoly row means *"Breakeven_Tested 'No', the breakeven is simply not
+   modelled there yet."* ORCA publishes a breakeven for both countries at
+   `api/v1/country/<slug>.json` and prints it on three other surfaces.
+3. **These two countries in particular.** Norway and the UK are the two largest European
+   producers, both sit in the default Side-by-Side set, and Norway is the default Country
+   Profile. Any North Sea screen hits both. Measured across all 185 rows, they are the *only*
+   two affected — 0 numeric mismatches on breakeven anywhere else, and the three state
+   monopolies differ only in wording.
+
+This is the v895 scar repeating on the next tab. v512 resolved the API breakeven for the
+Country Profile alone; v895 brought Fiscal Compare onto the same read point; the Screener —
+the tab whose entire job is producing the IC shortlist — was still on the raw field.
+
+## Change
+
+The Screener's export row now reads through `cpBeFor()`, the platform's single breakeven read
+point, instead of the raw bundled field:
+
+```js
+    var _beRes = (typeof cpBeFor === 'function')
+      ? cpBeFor(d)
+      : ((d.be_75 != null && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null);
+    var _beReal = (!_beArtifact && _beRes != null);
+```
+
+Bundled where `country_data.json` holds a value, `avg_breakeven_usd` where ORCA publishes one
+it did not bundle, never the `be_75 = 1.0` state-monopoly solver floor — which `cpBeFor()`
+already rejects by name, so the three monopoly rows keep their `n/a — no contractor position`
+string unchanged. **No new rule, no new threshold, no new network request:** `_cpBeResolved`
+is populated within one second of a cold load off fetches the page already issues, measured at
+1s / 2s / 3s / 5s / 8s. One edit covers all three export paths because `_scExportRows()` is
+their common choke point.
+
+Alongside it, a **BREAKEVEN SOURCE** basis line, computed from the rows actually in the file
+and absent entirely when no such row is present:
+
+> BREAKEVEN SOURCE — United Kingdom $20.3/bbl, Norway $28.7/bbl: these breakevens are published
+> by ORCA at api/v1/country/&lt;country&gt;.json and are NOT in the bundled country_data.json
+> table, so a cross-check against that table alone returns a blank. Averaged over the same
+> contract set as the take on the same row, on the same standardized Deepwater basis. It is the
+> figure Fiscal Compare prints, the Country Profile prints, and its IC citation pastes. Every
+> other Breakeven_bbl cell in this file is the bundled value and the two sources agree wherever
+> both hold one.
+
+Nothing else moved. No take, NPV, retention, swing, predictability, reform verdict, rank,
+order, filter value or colour changed, and the existing BREAKEVEN note about the three state
+monopolies becomes true again by construction, because the two rows it mis-described are no
+longer blank.
+
+## Result
+
+An analyst screening 185 countries, ticking the UK and Norway, and pressing ⎘ Copy for IC Memo
+now pastes:
+
+```
+# in screen (of 185)  Country         ...  Breakeven ($/bbl)  ...
+13                    United Kingdom  ...  $20                ...
+16                    Norway          ...  $29                ...
+```
+
+— a Breakeven column that exists, reading the same numbers as Fiscal Compare, the Country
+Profile and the IC Citation. The XLSX carries `20.3` and `28.7` against `Breakeven_Tested "Yes"`,
+and the workbook says where they came from. The memo no longer states that ORCA has not
+modelled a breakeven for two countries whose breakeven it publishes.
+
+## Verification — all measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (run twice — after the fix, and again after the version bump) |
+| Graded runtime suite, local, v914 | **416 PASS / 0 FAIL / 0 WARN** |
+| JS errors captured by the suite | **0** |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768, 9 tabs each | overflow **0** at every width |
+| Mobile 390x844 `hasTouch`, 9 tabs | `scrollWidth` 390 = `clientWidth`, overflow **0**, 0 page errors |
+| Controls under 24px | none added, none touched — this cycle changed no DOM control |
+| Screener XLSX | opens and parses; UK **20.3**, Norway **28.7**, `Breakeven_Tested "Yes"`; source line on the Screen & Basis sheet |
+| Screener CSV | same two values, same flag |
+| Screener clipboard, 185 rows | `$20` / `$29`; every other row unchanged against the pre-change capture |
+| Screener clipboard, 2-row shortlist | Breakeven column **present** (it was absent before) |
+| Pre-change behaviour | re-walked against `HEAD` on an overlay server — not inferred from the diff |
+| CP IC Citation / FC cells after the change | `BE $29/bbl` / `$29` / `$20` — unchanged, no regression |
+| Breakeven cross-check, all 185 rows, FC vs Screener | 5 disagreements before → **0** after (3 of the 5 were the monopoly wording, which is intended) |
+
+The suite ran against a server rooted at `~`, so `sw.js` resolves at its absolute GitHub Pages
+path and does not produce the spurious 404 WARN noted in cycle 824.
+
+## Debt closed
+
+- **The breakeven read point is now single across every surface that exports or pastes one.**
+  Country Profile (v512), Fiscal Compare (v895), Screener clipboard / CSV / XLSX (this cycle).
+
+## Debt still open, NOT fixed this cycle
+
+- **The Explorer still reads raw `be_75`** — its BE column, its `be` sort comparator and its
+  "measured breakeven only" filter (`_explorerHasBreakeven`), so Norway and the UK show "—"
+  there and are dropped by that filter. Deliberately left: the Explorer labels itself
+  "(65/185)" and is internally consistent, and roughly fifteen further "65 of 185" literals
+  sit across the Methodology and FAQ text along with the Breakeven Map's claim that "every one
+  of them falls between $27 and $34/bbl" — a statement the UK's $20.3 falsifies. Admitting the
+  two countries there is a coverage-count change (65 → 67) that has to be computed rather than
+  retyped in fifteen places, and doing it inside this cycle would have buried a one-line data
+  fix under a text sweep. It is the next T1/T6 cycle's work, and it is a display path, not a
+  pasted artifact.
+- The suite-copy divergence detector in `run_playwright()` still only warns and lets the cycle
+  ship. Fired at v685, v908 and 823.
+- Cycle 822's 1800s subprocess timeout left a half-shipped feature on disk with nothing to roll
+  it back or flag it.
+- The `Score <= 20` IC rule stated on the Reform Risk intro strip and the FC column tooltip is
+  unreachable on this data (the most-reformed jurisdiction, the UK, scores 25). A decision for
+  Zach about what ORCA publishes as its IC rule, not a patch.
+- Home's Side-by-Side card says "Compare up to 4 countries in parallel" while `CMP_MAX` is 5.
+- The IC Citation and the CP strip lead with different bases; `cpTakeBandNpv()` selects its band
+  on comparable take and ranks on the blend.
