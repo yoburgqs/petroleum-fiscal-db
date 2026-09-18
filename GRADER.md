@@ -59756,3 +59756,16 @@ A local server rooted at the repo makes `index.html:49` — `navigator.serviceWo
   shares the file, and is named here and in the commit body so the attribution is not lost. This is
   the same "half-shipped feature left on disk with nothing to flag it" pattern recorded for cycle
   822 — it has now happened twice and nothing in the loop detects it.
+
+---
+## Cycle 828 Log — 2026-09-18 07:59
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Left the scratch server running (cleanup was denied — harmless, it's a temp `python3 -m http.server 8901` on a symlinked tmp dir).
+
+## Cycle 828 — shipped as v917
+
+**Task: T3** — "How do these three countries compare side by side?" (oldest in rotation; 826 was T1, 825 T5, 824 T4, 823 T6, 821 T2, 819 T3.)
+
+**Friction.** Walked Side-by-Side cold at 1440×900 with storage cleared, building Guyana / Nigeria / Iraq by hand. At $75/bbl, four surfaces on one screen said different things about the same c
