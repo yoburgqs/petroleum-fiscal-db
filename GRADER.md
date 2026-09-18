@@ -59633,3 +59633,126 @@ one.** That debt, opened at v512 and carried through v895 and cycle 825, is clos
 
 ## Friction
 Walked cold at 1440×900 with storage cleared: Home → Screener → Explorer. The Screener is in good shape. The Explorer was the last surface on the platform still reading the bundled `be_75` field directly instead of going through `cpBeFor()` — the single breakeven read point v895 established and 
+
+---
+## Cycle 828 Log — 2026-09-18 07:19
+- Test before: 416 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 416 PASS / 0 FAIL / 0 WARN / 0 JS errors — **suite RAN this cycle**, number read from `/tmp/orca828/report2.txt`, not assumed
+- JS errors: 0
+- Summary: Cycle 828 shipped as **v917**, pushed (`18f89d1`), mirror copied.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (rotation: 826 was T1, 825 T5, 824 T4, 823 T6, 821 T2, 819 T3 — T3 was the oldest.)
+
+## Friction
+
+Walked cold at 1440x900, `localStorage`/`sessionStorage` both empty, on the tab's own seeded
+default (UK / Norway / Netherlands) and then building **Guyana / Nigeria / Iraq** by hand through
+the search box — the path a first-time analyst takes.
+
+At $75/bbl, four surfaces on ONE screen said different things about the same column:
+
+| surface | Iraq @ $75 |
+|---|---|
+| verdict strip | **$3.04B** (PSC/Conc) › Nigeria $302M, "$2.74B apart" |
+| grid `Contractor NPV @$75` row | $642M, with **PSC/Conc $3.04B** in green beneath it |
+| Govt Take chart | legend **"Iraq (PSC/Conc)"** — re-based, 34.1% |
+| **Contractor NPV chart** | **$642M** — Nigeria $302M, Guyana $1.07B |
+
+The chart is the only one of the four an analyst reads at a glance, and it was the only one left
+on the blended basis. It did not merely understate Iraq — **it drew a different winner.** Guyana's
+bar was the tallest at all four prices, and Guyana is the column the verdict strip, the grid's
+basis gate and two separate ⚠ notices all refuse to rank at all. Iraq, first on the platform's own
+comparable ordering, drew the middle bar.
+
+**Root cause was a stale sentence, not a missing capability.** The comment above the chart
+(`index.html` ~31575) read *"Nothing is re-based here -- there is no PSC/Conc-only NPV in
+country_data.json to re-base onto."* That came from v666 and it is **false**. v660 therefore
+treated the problem as a labelling problem — legend `(all contracts)`, plus a title line reading
+*"NOT the PSC/Conc basis of the take chart above"*. That is precisely what the directive bans: a
+caption where the underlying confusion should have been fixed. v904 later measured
+`country_data.json`, found `g1.v50 / v75 / v100 / v125` on **all 11** fee-blended countries, and
+re-based all four Contractor NPV **grid** rows onto them. The chart was not carried with it.
+
+## Change — `#cmp-npv-chart`, in `index.html`
+
+- **The bars are the comparable figure.** New `_npvG1At(d, price)` / `_npvSeries(d)` replace the
+  raw `[d.npv_50, d.npv_75, d.npv_100, d.npv_125]` array. The re-base test is `_cmpNpvCell`'s
+  verbatim, **per price**: fee-blended, `g1['v'+price]` present, and the two figures differ once
+  `fmtNpvShared` has rounded them. So a column is marked on this chart **if and only if** the grid
+  printed its green `PSC/Conc` sub-line — the two cannot drift apart. Azerbaijan / India / Russia
+  keep their published bars at the prices where the two agree, exactly as the take chart leaves
+  Russia alone.
+- **Legend suffix is now `(PSC/Conc)`** — the take chart's exact string, replacing `(all
+  contracts)`. v606's reason applies here too and is recorded in the code: *the legend is the only
+  key that travels with the exported PNG.*
+- **Title line** replaced with the take chart's, stating the shared basis instead of denying it.
+- **Tooltip** now carries the published headline the bar replaced, with its contract counts and
+  fee-basis split — "carry both into the memo; rank on this one" — instead of a warning that the
+  two charts are different contract sets.
+- **The green notice above the take chart** said in bold *"The Contractor NPV chart below is NOT
+  re-based"*. Corrected; left as-is it would have contradicted the picture 8px below it.
+- **Canvas `aria-label`** states the `(PSC/Conc)` basis.
+- `_npvRebased` is now computed over `npvCountries` from NPV data rather than inherited from
+  `_cmpChartRebased` (a **take**-derived set), so the two charts' marks are each true of their own
+  chart.
+
+## Result
+
+An analyst comparing three countries reads the value chart — the artifact the IC recommendation is
+written on — and gets the ordering the rest of the tab gives them: **Iraq $3.04B at $75, roughly 3x
+Guyana and 10x Nigeria**, instead of a middle bar sitting under a Guyana column that nothing else
+on the page will rank.
+
+**Malaysia is the sharpest case.** At $50/bbl the blended figure is **-$33.2M** and the comparable
+is **+$46.2M** — the chart drew a bar *below the axis*, a loss, for a column whose comparable basis
+is a positive position. Both charts, and both PNG exports, are now one contract set.
+
+Understatement removed at $75, measured across the 11 fee-blended countries: Iraq **4.7x**
+($642M → $3,043M), Oman 1.5x, Iran 1.4x, South Sudan 1.2x.
+
+## Verification — all measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (run twice — after the fix, and again after the version bump) |
+| Graded runtime suite, local, v917 | **416 PASS / 0 FAIL / 0 WARN**, read from the suite's own report file |
+| JS errors captured by the suite | **0** |
+| Grid ↔ chart agreement, cell by cell | **84 cells over 7 sets — 0 mismatches.** Covers all 11 fee-blended countries plus PRRT (Australia), state-monopoly (Saudi Arabia, correctly dropped), statutory-basis and clean-producer columns |
+| Pre-change behaviour | measured on the shipped build before editing — the $642M bar and the Guyana-tallest ordering are observed, not inferred from the diff |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768, 9 tabs each | overflow **0** at every width |
+| Mobile 390x844 `hasTouch`, 9 tabs | `scrollWidth` 390 = `clientWidth`, overflow **0**, **0** page errors |
+| Controls under 24px under `pointer: coarse` | both chart PNG buttons **44px** |
+| Suite-copy divergence | graded and repo copies **sha-identical** (`730fe6af953b`) |
+
+## Harness note, recorded because it cost time and will recur
+
+A local server rooted at the repo makes `index.html:49` — `navigator.serviceWorker.register(
+'/petroleum-fiscal-db/sw.js')` — 404, which the suite scores as **1 WARN + 1 JS error** and turns
+416/0/0 into **415 PASS / 1 WARN**. It is a harness artefact, not a regression: reproduced on
+`HEAD` before this cycle's change. Serve the repo under a `/petroleum-fiscal-db/` path prefix
+(symlink a parent dir) and the run is clean.
+
+## Debt closed
+
+- **The NPV chart was the last surface on Side-by-Side reading the blended contractor NPV.** Grid
+  rows (v904), verdict strip (v666/v869), take chart (v606) and now the NPV chart are one basis.
+- The false claim *"there is no PSC/Conc-only NPV in country_data.json"* is removed from the code
+  and from the on-screen notice. It had propagated into four places.
+
+## Debt still open, NOT fixed this cycle
+
+- **The Breakeven Map still reads raw `be_75`** and shows 65 countries against the Explorer's 67
+  (carried from cycle 826). Roughly fifteen "65 of 185" literals sit in Methodology and FAQ prose.
+  Next T6 cycle.
+- **`# Contracts` grid row prints `4211` / `7643` / `610`** with no thousands separator, while every
+  other count on the same grid uses `toLocaleString()`. Cosmetic; noted so it is not rediscovered.
+- Home's Side-by-Side card still says "Compare up to 4 countries in parallel" while `CMP_MAX` is 5
+  and the tab's own empty state says 5.
+- The suite-copy divergence detector in `run_playwright()` still only warns and lets a cycle ship.
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+- **v916 (T2) — Country Profile contract grouping — was found UNCOMMITTED on disk at cycle start**,
+  left by the previous cycle. It is not cycle 828's work; it rode along in `18f89d1` because it
+  shares the file, and is named here and in the commit body so the attribution is not lost. This is
+  the same "half-shipped feature left on disk with nothing to flag it" pattern recorded for cycle
+  822 — it has now happened twice and nothing in the loop detects it.
