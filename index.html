@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v918</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v919</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v918</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v919</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -24935,16 +24935,22 @@ function getDataQualityExplain(entry) {
 }
 
 // Wraps a take value cell with rich evidence tooltip (for Explorer rows)
-function makeTakeCellWithEvidence(take, entry) {
+// v919 (T1): optional third argument `floorTip`. When non-null the take is a FLOOR -- royalty
+// and income tax alone on a thin record -- so the cell prints a ≥ before the number. Opt-in, so
+// nothing changes for a caller that does not pass it. The Explorer is the only caller.
+function makeTakeCellWithEvidence(take, entry, floorTip) {
   if (take == null) return '<td class="num">—</td>';
   if (isStateMonopoly(take)) return '<td class="num"><span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span></td>';
   const tt = buildEvidenceTooltip(entry);
+  const _ge = floorTip
+    ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${floorTip}">&ge;</span>`
+    : '';
   // v557 (T6): the dot beside every Explorer take% was green wherever a_pct + b_pct >= 80, which
   // is 171 of 185 countries including Russia at 3.8% primary law. It now carries the same grade
   // colour as the Evidence column two cells to its right.
   const color = _evidenceGrade(entry).color;
   return `<td class="num" style="position:relative;" title="${tt}">
-    <span style="font-weight:600">${fmtTake(take)}</span>
+    ${_ge}<span style="font-weight:600">${fmtTake(take)}</span>
     <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${color};margin-left:4px;vertical-align:middle;"></span>
   </td>`;
 }
@@ -26504,7 +26510,24 @@ let explorerSort = {col: 'take', dir: 1}; // dir: 1=asc, -1=desc
 // in the count line instead of silence.
 var _explorerEvidenceFirst = true;
 var _explorerRendered = null;   // v584 (T5): set by renderExplorer(), read by exportExplorer()
-function _explorerDqRank(d) { return _dqTier(d).hasProduction ? 0 : 1; }
+// v919 (T1): the Explorer's data-basis rank now has THREE registers, not two, matching the
+// Screener's _dqRank (v743) and Fiscal Compare's v563 partition.
+//   0 = verified field production
+//   1 = proxy economics, but ORCA holds at least one petroleum rent instrument, so the take is
+//       a modelled figure that can be ranked against other modelled figures
+//   2 = the take is a FLOOR -- royalty and income tax alone on a thin record, no rent
+//       instrument of any kind (see _scTakeIsFloor)
+// Two registers put register 2 at the TOP of register 1, because a missing rent instrument
+// lowers modelled take and therefore raises modelled NPV. On the shipped data that placed
+// Vanuatu (5.0%, $5.10B, 14 facts, grade D) immediately under the "no verified production"
+// divider on BOTH the default Govt Take sort and the NPV sort -- i.e. the first thing an
+// analyst reads after being told the block is "regional proxy estimates". It is not a proxy
+// estimate; it is an absence. Fiscal Compare and the Screener both already refused to rank
+// these rows alongside modelled ones. The Explorer was the last tab that still did.
+function _explTakeIsFloor(d) {
+  return (typeof _scTakeIsFloor === 'function') && !!_scTakeIsFloor(d);
+}
+function _explorerDqRank(d) { return _dqTier(d).hasProduction ? 0 : (_explTakeIsFloor(d) ? 2 : 1); }
 // v735 (T1): "does this country hold a breakeven that can be ranked" — one predicate, matching
 // the guard the BE-only filter and the breakeven cell renderer have each carried privately since
 // v563. Excludes null (120 countries, never modelled), the `<= 1` state-monopoly sentinel
@@ -26872,6 +26895,15 @@ function renderExplorer() {
   // draw, and v543 established that those two states need a stated caveat, not a silent one.
   const _explGrouped  = _explGroupable && _explVerified > 0 && _explProxy > 0;
   const _explBeGrouped = _explBeSplit && _explBeScope.length > 0 && _explBeUnrank > 0;
+  // v919 (T1): the floor block, on the same scope and the same toggle as the production block.
+  // _explProxy stays the count of rows with no verified production (163 unfiltered) because
+  // that is what the first divider asserts and it is true of the floor rows too. _explModelled
+  // is the part of it that is actually a modelled estimate (118), which is what the basis note
+  // in the count line has to say now that the two are ranked apart.
+  const _explFloor    = _explBeScope.filter(_explTakeIsFloor).length;
+  const _explModelled = _explProxy - _explFloor;
+  const _explFloorGrouped = _explGroupable && _explFloor > 0
+                            && (_explBeScope.length - _explFloor) > 0;
 
   // v584 (T5): the single source of truth for "what is on the Explorer screen right now".
   // exportExplorer() used to rebuild its own query from mechanic + region-dropdown + search and
@@ -26892,6 +26924,11 @@ function renderExplorer() {
     grouped: _explGrouped,
     verified: _explVerified,
     proxy: _explProxy,
+    // v919 (T1): the split inside `proxy`, so the workbook can describe the same three blocks
+    // the table is now ranked in instead of calling all 163 "regional proxy estimates".
+    modelled: _explModelled,
+    floor: _explFloor,
+    floorGrouped: _explFloorGrouped,
     boundaryRank: _explGrouped ? _explVerified : null,
     filters: {
       mechanic: _explorerRFactorOnly ? 'R-factor profit oil tiers' : (mech || null),
@@ -26949,6 +26986,17 @@ function renderExplorer() {
       ? `<span style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--purple);font-weight:700;margin-left:4px;vertical-align:middle;" title="${d.prod_coverage_pct.toFixed(1)}% of contracts have verified production data — production chart available">Prod</span>`
       : '';
     const safeExpl = d.country.replace(/'/g,"\\'");
+    // v919 (T1): the bound marker. The divider and the ranking are the fix; this is what a row
+    // still carries when it has been lifted out of its block -- scrolled past the divider on a
+    // phone, or read in isolation. Same glyphs, same tooltip sentence as the Screener's v743.
+    const _explRowFloor = _explTakeIsFloor(d);
+    const _explFloorTip = (d.country + ': ' + (typeof _scFloorWhy === 'function' ? _scFloorWhy() : '')
+                      + ' Record on file: ' + Number(d.n_facts || 0).toLocaleString()
+                      + ' fiscal facts across ' + Number(d.n || 0).toLocaleString()
+                      + ' contracts, royalty and income tax only.').replace(/"/g, '&quot;');
+    const _explFloorLe = _explRowFloor
+      ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_explFloorTip}">&le;</span>`
+      : '';
     // v578 (T1): labelled boundary at the point the ranking stops being production-backed. The
     // per-row PROXY badge cannot carry this on its own — v507 found that every row above the
     // fold carried it too, so it reads as decoration rather than as a caveat.
@@ -26964,6 +27012,21 @@ function renderExplorer() {
         + `Ranked among themselves by the same metric. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
+    // v919 (T1): second boundary, drawn where the ranking stops being a measurement at all.
+    // The v578 divider above answers "has anyone drilled here". It does not answer "is this
+    // number a number", and those two questions have OPPOSITE consequences on the two sorts
+    // T1 actually uses: the thinner the fiscal record, the lower the modelled take, the higher
+    // the modelled NPV, the higher the row. Ported from the Screener's v743 divider so the two
+    // tabs cannot disagree about which countries are rankable.
+    const _explFloorDivider = (_explFloorGrouped && i > 0
+                               && !_explTakeIsFloor(data[i-1]) && _explTakeIsFloor(d)
+                               && (!_explBeSplit || _beTested(d)))
+      ? `<tr class="explorer-basis-divider explorer-floor-divider"><td colspan="20" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+        + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_explFloor} ${_explFloor === 1 ? 'COUNTRY WHOSE TAKE IS A FLOOR' : 'COUNTRIES WHOSE TAKE IS A FLOOR'}, NOT A MEASUREMENT</strong><br>`
+        + (typeof _scFloorWhy === 'function' ? _scFloorWhy() : '')
+        + ` Their take cells read <strong style="color:var(--accent);">&ge;</strong> and their NPV cells <strong style="color:var(--accent);">&le;</strong> for that reason. A low take here is missing record, not favourable terms &mdash; do not carry this block into a shortlist.`
+        + `</td></tr>`
+      : '';
     // v735 (T1): the end of the breakeven ranking. Everything under it prints an em dash in the
     // Breakeven column, so it is listed rather than ranked, and the row numbers say so.
     const _explBeDivider = (_explBeGrouped && i > 0 && _beTested(data[i-1]) && !_beTested(d))
@@ -26974,7 +27037,7 @@ function renderExplorer() {
         + `Use <strong style="color:var(--text);">BE only</strong> above to drop them from the table entirely.`
         + `</td></tr>`
       : '';
-    return _explDivider + _explBeDivider + `<tr data-country="${d.country}" style="cursor:pointer;" onclick="openCountryProfileFromFC('${safeExpl}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to open ${d.country} profile">
+    return _explDivider + _explFloorDivider + _explBeDivider + `<tr data-country="${d.country}" style="cursor:pointer;" onclick="openCountryProfileFromFC('${safeExpl}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to open ${d.country} profile">
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${d.country.replace(/'/g,"\\'")}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;">+</button></td>
       <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''}${prodBadge} ${getDQBadge(d)}</td>
@@ -26987,14 +27050,14 @@ function renderExplorer() {
         return d.n;
       })()} ↗</td>
       <td>${mechs}</td>
-      ${makeTakeCellWithEvidence(take, d)}
+      ${makeTakeCellWithEvidence(take, d, _explRowFloor ? _explFloorTip : null)}
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="expl-terms-slot" data-tc-country="${String(d.country).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="margin-top:2px;"></div></td>
       <td class="num expl-sm-off">${makeTakeSparkline(d, price)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
-      <td class="num">${fmtNpvShared(npv)}</td>
-      <td class="num expl-sm-off">${fmtDownsideNpv(d)}</td>
+      <td class="num">${_explFloorLe}${fmtNpvShared(npv)}</td>
+      <td class="num expl-sm-off">${_explFloorLe}${fmtDownsideNpv(d)}</td>
       <td class="num expl-sm-off" data-explbe="${String(d.country).replace(/"/g,'&quot;')}" title="${(function(){
         // v915: an api-resolved value says where it came from, on the _fcAdoptBePaint pattern.
         const _b = _explBe(d);
@@ -27112,8 +27175,10 @@ function renderExplorer() {
   // v735 (T1): when the breakeven split is on, the data-basis counts describe the RANKED block,
   // not the whole result set, so the sentence names the block it is counting.
   const _explBeScopeWord = _explBeGrouped ? ` of the ${_explBeScope.length} ranked` : '';
+  // v919 (T1): three blocks named, not two. The floor rows were being counted inside "regional
+  // proxies" while ranking above them, so the sentence described an order the table was not in.
   const _explBasisNote = _explGrouped
-    ? ` — ranked by data basis:${_explBeGrouped ? ` within the ${_explBeScope.length} that hold one,` : ''} ${_explVerified} with verified field production first, then ${_explProxy} whose economics are regional proxies`
+    ? ` — ranked by data basis:${_explBeGrouped ? ` within the ${_explBeScope.length} that hold one,` : ''} ${_explVerified} with verified field production first, then ${_explModelled} whose economics are regional proxies${_explFloor > 0 ? `, then ${_explFloor} whose take is a floor rather than a measurement` : ''}`
     : (_explVerified === 0 && _explBeScope.length > 0
         ? ` — none of these ${_explBeScope.length}${_explBeScopeWord ? '' : ''} countries has verified field production; every figure below is a regional proxy estimate`
         : (_explProxy > 0 && _explVerified > 0
@@ -45599,6 +45664,11 @@ function exportExplorer() {
     Rank: i + 1,
     Country: d.country,
     'Data Basis': _dqTier(d).label,
+    // v919 (T1): the screen marks these rows ≥ / ≤ and ranks them in their own block. Without
+    // this column the workbook lost both facts and printed the floor as a flat measurement.
+    'Take Basis': _explTakeIsFloor(d)
+      ? 'FLOOR — royalty + income tax only, no petroleum rent instrument on file: take is a LOWER bound, contractor NPV an UPPER bound'
+      : (_dqTier(d).hasProduction ? 'Measured on verified field production' : 'Modelled on regional proxy terms'),
     Region: d.region,
     Contracts: d.n,
     Mechanics: d.mechanics,
@@ -45714,6 +45784,9 @@ function exportExplorer() {
     // workbook, a pasted rank list silently mixes production-backed and proxy countries.
     { Field: 'Ranking basis', Value: R.grouped
         ? 'Verified production first: ranks 1–' + R.boundaryRank + ' are backed by verified field production; ranks ' + (R.boundaryRank + 1) + '–' + R.rows.length + ' carry regional proxy estimates and are indicative only. See the Data Basis column.'
+          // v919 (T1): the third block. These rows rank LAST on screen, not first, and the
+          // workbook has to say why or the order looks arbitrary in the file.
+          + (R.floorGrouped ? ' The last ' + R.floor + ' rows are a separate block again: their take is royalty and income tax alone on a record with no petroleum rent instrument of any kind, so it is a LOWER bound and the contractor NPV beside it an UPPER bound. They rank last for that reason and are marked FLOOR in the Take Basis column. Do not carry them into a shortlist.' : '')
           // v855 (T5): the grouping is only half the order — say what the order is INSIDE each
           // block, or a reader ranks across the divider and mixes the two bases.
           + (_orderPhrase ? ' Within each block the rows run ' + _orderPhrase + '.' : '')
