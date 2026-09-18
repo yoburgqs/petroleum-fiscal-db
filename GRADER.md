@@ -58887,3 +58887,154 @@ left.
 - **Still true from 817/818, still not fixed:** `Reform Frequency Score ≤ 20` is unreachable
   (score = 100 − 15 × changes; the most-reformed jurisdiction on file is the UK at 5 → 25), yet the
   Reform Risk intro strip and the Fiscal Compare column tooltip both state the IC rule using it.
+
+---
+## Cycle 821 — v910
+
+**Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"*
+(Rotation: 820 was T1, 819 T3, 818 T5, 817 T4, 816 T6 — T2 had not been walked since 812.)
+
+### Friction
+
+Walked cold at 1440x900 with `sessionStorage` and `localStorage` cleared: Home → **Country
+Profile** → the tab auto-loads Indonesia → selector → **Iraq**. The headline metric strip is where
+a T2 analyst reads their two defence numbers, base case and downside, side by side.
+
+On Iraq it printed this, verbatim:
+
+```
+NPV: $642M @$75
+Downside: $1.44B @$50 (survives $50) · PSC/Conc 195 · blend $389M
+```
+
+**A downside 2.2x the base case.** That cannot happen on a monotonic price curve, and it is the
+single pair an IC reviewer catches in one glance — the reviewer does not need to know anything
+about fiscal regimes to know a number is wrong. Everything the analyst says afterwards is
+discounted.
+
+It was not a computation error. `_npv344Display()` (index.html ~42409) read `d.npv_75`, the
+**all-contract blend** over all 610 Iraq contracts, 415 of them fee-basis TSC where contractor NPV
+is a property of the remuneration mechanic rather than of the fiscal terms
+(`~/MECHANIC_COMPARABILITY.md`). `_dnside516Display()` two metrics to its right read
+`cpDownside50(d)`, which **v786 had already moved onto the 195 PSC/Concession contracts** — and
+labelled, `· PSC/Conc 195 · blend $389M`. So one chip was rebased and marked, the chip beside it
+was not rebased and carried no marker at all. The only way to know the two were on different bases
+was to notice that the labelled one was labelled.
+
+Three further consequences of the same root cause:
+
+- **The strip contradicted the prose three lines above it.** The verdict sentence at ~42104 already
+  quotes the PSC/Concession pair through `cpPair75()`: *"Clears the 10% WACC at $75 ($3.04B) and at
+  the $50/bbl downside ($1.44B; both figures read on its 195 PSC/Concession contracts)"*. v871
+  fixed the sentence and left the strip. $3.04B in the paragraph, $642M in the chip, same page,
+  same price, no explanation.
+- **Ten countries printed a mixed pair**, not one. Measured off `COUNTRY_DATA` in the live page:
+  Azerbaijan, Ecuador, India, Iran, **Iraq**, Malaysia, Mexico, Oman, Qatar, South Sudan. Iraq is
+  the only one where it inverts on screen, which is why it is the one that gets caught — the other
+  nine are wrong more quietly. Oman printed $566M @$75 (blend) against $364M @$50 (PSC/Conc), so
+  the downside cushion looked 3x larger than the basis the base case was read on.
+- **The band pill beside it ranks `d.npv_75`**, the blend, inside a band selected on comparable
+  take. That is defensible on its own and the verdict discloses it — but it had no marker either.
+
+### Change
+
+`_npv344Display()` now reads the same leg `cpDownside50()` switched, and carries the blend beside
+it in exactly the form the Downside chip has used since v786. On Iraq the strip now reads:
+
+```
+NPV: $3.04B @$75 · PSC/Conc 195 · blend $642M
+Downside: $1.44B @$50 (survives $50) · PSC/Conc 195 · blend $389M
+```
+
+Monotonic, one basis across the pair, both legs marked, and the *blend* pair — `$642M` / `$389M` —
+is printed on screen as a pair too. Those two are precisely the figures the IC Citation button puts
+on the clipboard, so the analyst can now see the clipboard's pair and the comparable pair at once
+instead of having one of each.
+
+Two supporting changes, both required by the first:
+
+- **The band pill now reads `blend NPV rank #20 of 20 at this take`** where the chip is rebased. It
+  still ranks the blend — every NPV in the band is a blend, so re-ranking it on a PSC/Concession
+  figure ORCA does not hold for most band members would be worse — but it can no longer be read as
+  ranking the figure printed to its left. Unrebased countries are unchanged: Indonesia and Norway
+  still read `NPV rank #32 of 33 at this take`, no prefix.
+- **`.orca-npv-band-pill` wraps at ≤720px.** The pill is `inline-flex` + `white-space: nowrap`, so
+  it can only push the line wider; at 390 it already sat flush to the edge and the one added word
+  took the *document's* `scrollWidth` to **401 against a 390 `clientWidth`** on every Country
+  Profile carrying the pill. Caught by this cycle's own mobile check, not shipped. Fixed inside the
+  v612 `max-width: 720px` layer with the same remedy as `#screener-preset-label` four lines above —
+  wrap the line rather than scroll the page. Nothing in the v612 layer is removed, weakened or
+  narrowed, and no desktop rendering changes.
+
+Nothing on the locked list is touched. The published blend is not abandoned: the XLSX export, the
+API, the IC Citation, the other tabs and the band pill all still carry it, and the chip's tooltip
+says so explicitly.
+
+### Result
+
+An analyst defending Iraq at $75/bbl can now read their base case and their downside off the
+headline strip as a pair that survives an IC reviewer's first glance, and can see on screen which
+of the two bases each figure is on. Before, the strip handed them a downside larger than the base
+case, and the only figure that agreed with the verdict paragraph directly above it was the one they
+had to hover to find.
+
+### Verification — all run this cycle, none assumed
+
+- **JS syntax gate:** 11/11 inline blocks parse.
+- **All ten rebased countries measured in the live page**; the five sampled by the new assertion
+  (Azerbaijan, Ecuador, India, Iran, Iraq) plus two unrebased controls all render one basis across
+  the pair, with `$75 >= $50` on every one.
+- **Viewports:** zero horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all ten
+  tabs *and* with Iraq, Oman and Indonesia loaded into Country Profile. At 390x844 `hasTouch` the
+  pill wraps to 39px tall, right edge 376 of 390.
+- **Page errors: 0** at every viewport. The one console line at 390 (`404 fetching the script`, the
+  service worker under the local port) reproduces byte-identically on the pre-change `HEAD` build
+  and is an artefact of serving from `127.0.0.1`, not of this change.
+- **New graded assertion `testCPNpvPairBasis`** added to **both** suite copies, which are
+  byte-identical (`22e8a3c1...`). It asserts the invariant, not the literal figures: it asks the
+  page itself which countries `cpDownside50()` rebases, then requires that the $75 and $50 chips
+  carry the same basis marker as each other, that the marker is present exactly where the page says
+  the bases diverge, that the $75 base never renders below the $50 downside, and that the band pill
+  says `blend` exactly when the chip no longer does.
+- **The assertion was self-tested against the pre-change build**, not just against the fix. The
+  same suite run against `HEAD` (served side by side on a second port) records **16 FAILs** on the
+  five sampled countries — including the exact line this cycle exists for:
+
+  ```
+  ✗ [FAIL] [CPNpvPair] Iraq: $75 base >= $50 downside: downside exceeds base case on screen:
+           "NPV: $642M @$75" / "Downside: $1.44B @$50 (survives $50) · PSC/Conc 195 · blend $389M"
+  ✗ [FAIL] [CPNpvPair] Azerbaijan: $75 and $50 carry one basis: NPV chip "NPV: $2.95B @$75" vs
+           Downside chip "Downside: $1.82B @$50 (survives $50) · PSC/Conc 167 · blend $1.78B"
+  ```
+
+  All 28 pass against the patched build. The assertion is load-bearing, not decorative.
+- **Graded suite:** **405 PASS / 0 FAIL** against the patched build, read from the suite's own
+  report file (`2026-09-18T03:31:09.910Z`), not assumed. The prompt's live-URL baseline was 378
+  PASS; 378 + 28 new assertions = 406, less the `ConsoleErrors` PASS that becomes a WARN under the
+  local port = 405. The 1 WARN and 1 JS error are that same service-worker 404 and reproduce
+  byte-identically on the pre-change build.
+- **Confirmed on the DEPLOYED build** after push, not only locally. `yoburgqs.github.io` serves
+  v910 and Country Profile → Iraq renders `NPV: $3.04B @$75 · PSC/Conc 195 · blend $642M` over
+  `Downside: $1.44B @$50 (survives $50) · PSC/Conc 195 · blend $389M`, 0 page errors.
+
+### Debt found this cycle, NOT fixed
+
+- **The IC Citation and the strip now lead with different bases.** The citation carries the blend
+  pair ($642M / $389M) — internally coherent, and both of its figures are now printed on the strip
+  — but it leads with the number the page no longer leads with. The same split already exists on
+  take (published 84.8% vs comparable 34.1%) and resolving it is a decision about what ORCA
+  *publishes*, not a patch. Left for Zach.
+- **`cpTakeBandNpv()` selects its band on comparable take and ranks on the blend.** Now labelled,
+  still mixed. A PSC/Concession NPV does not exist for most band members, so the honest fix is
+  either to restrict the band to countries that carry one (dropping n below the 8-member floor for
+  several) or to drop the pill on rebased countries. Both lose information; neither is obviously
+  right.
+- **Still true from 817/818/820, still not fixed:** `Reform Frequency Score <= 20` is unreachable
+  (score = 100 - 15 x changes; the most-reformed jurisdiction on file is the UK at 5 -> 25), yet
+  the Reform Risk intro strip and the Fiscal Compare column tooltip both state the IC rule using it.
+- **Still true from 820:** the Home card for Side-by-Side says "Compare up to 4 countries in
+  parallel" while `CMP_MAX` is 5.
+- **Still true from 820, and it governs whether the unattended loop stops:** `run_playwright()`
+  detects suite-copy divergence and writes `*** SUITE COPIES HAVE DIVERGED ***` to `cycle_log.txt`
+  and nothing else. It fired at v685 and v908 and both cycles shipped anyway. The copies are in
+  sync as of this cycle; the enforcement gap is not closed.
