@@ -60010,3 +60010,115 @@ the same thing the screen did.
 **Task: T1** — *"Which countries should even be on my screening list?"* (stalest in rotation; 829 was T6.)
 
 **Friction.** Explorer Browse, cold load at 1440×900, storage cleared. The tab draws a divider where the ranking stops being production-backed and tells the analyst everything below it is "regional proxy estimates." The first row under that line — on *both* sorts T1 actually uses, the default Govt Take and NPV — was **Vanuatu: 5.0
+
+## Cycle 834 Log — 2026-09-18 15:52
+- Test before: 415 PASS / 0 FAIL / 1 WARN (local, pre-edit tree, read from ORCA_REPORT_FILE)
+- Test after: 415 PASS / 0 FAIL / 1 WARN (local, v921, read from ORCA_REPORT_FILE)
+- JS errors: 1 — service-worker 404, present before any edit. Environmental (from 830).
+- Summary: v921 shipped and pushed (9df9fb2). Cycle 834 complete.
+
+## Cycle 834 — v921
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation:
+830 was T1, 829 T6, 828 T3, 827 T2, 825 T5, and T4 was last walked at 824.
+
+**Friction.** Reform Risk tab, cold load at 1440×900, `sessionStorage` and `localStorage`
+cleared, lookup set to **Iraq-Kurdistan**. `renderReformCountryVerdict()` took the no-log
+branch (index.html:48737, `if (!events.length)`) and returned the emptiest card this tab can
+produce: the headline *"Iraq-Kurdistan — no Reform Frequency Score"*, the lead *"one of the
+164 without one"*, **no statute block at all** — v766's own comment names Iraq-Kurdistan as
+one of four jurisdictions holding no citation to offer — and a closing instruction to go and
+run an external check. 386 words, no event, no citation, no date. For the one jurisdiction in
+this database whose entire investment case is Baghdad–Erbil legal risk.
+
+ORCA was not silent on it. **Two of Iraq's three sourced reform events are about the KRG**,
+both cited, both confidence B, both one click away under a different country name:
+
+| year | event | scores? | source |
+|---|---|---|---|
+| 2023 | KRG-Baghdad FSC ruling — revenue sharing dispute. Note: *"Disrupted payment flows for IOC TSC contractors in KRG."* | yes, against **Iraq** | Iraqi Federal Supreme Court Decision 2022; Reuters 2023 · B |
+| 2014 | KRG oil exports direct — federal revenue crisis | no — `fiscal_change:false`, context | KRG Ministry of Natural Resources; Reuters; IEA Iraq report 2015 · B |
+
+Iraq-Kurdistan is its own `COUNTRY_DATA` row — **53 contracts, 63.0% take @$75 against Iraq's
+84.8%** — so an analyst screening the KRG has no reason to open Iraq, and both events stayed
+invisible on the path T4 actually walks. Same shape as cycle 344's USA-under-region-"Other":
+the data was present and unreachable from the user's route.
+
+**Change.** `_RR_FILED_UNDER` / `_rrFiledUnder()` / `_rrFiledUnderBlock()`, rendered directly
+under the lead in the no-log branch. An orange block headed **"ORCA holds 2 sourced events
+about Iraq-Kurdistan — filed under Iraq"**, carrying for each event the year, the name, whether
+it is a fiscal law change or context, its notes and its citation with confidence and link — plus
+a 44px control onto Iraq's full verdict. The map is **explicit and holds exactly one entry**: a
+name-splitting heuristic would have swept in Guinea-Bissau and Timor-Leste, which are sovereign
+states and not sub-national entries of anything. Measured: the block renders on **1 of 185**
+lookups.
+
+**No new score and no new threshold.** Iraq-Kurdistan stays `n/c`, its Reform Frequency Score
+stays "not sourced", the 21-of-185 coverage count is unchanged, and the block says all three in
+its own first sentence. It deliberately uses its own classes rather than `.reform-timeline` /
+`.reform-event`, because `_rrVerdictPayload()` sweeps those into the clipboard's event table and
+stamps every row *"Yes — in the 2010 scoring window"*, which would be false here. It travels to
+the clipboard as prose via its id, with the scoring statement attached.
+
+**Result.** An analyst asking for KRG reform exposure now leaves with two sourced, dated, cited
+events — including the Federal Supreme Court ruling that disrupted IOC contractor payment flows
+— instead of a prohibition and a blank page. The external check the card still asks for starts
+from 2014 and 2023 rather than from a standing start, and the IC memo they paste carries the
+same two events the screen showed them.
+
+### ⚠ Also carried in this commit — NOT this cycle's work
+
+**Cycles 831, 832 and 833 each hit the 1800s `subprocess` timeout in `autonomous_cycle.py`
+and never committed.** Their work had been sitting uncommitted in the working tree since
+11:16 and rides in 9df9fb2:
+
+- **v920 (T1)** Explorer three-register data-basis ranking + floor block + export split
+- **v920 (T2)** contractor NPV in the Country Profile peer table; take/NPV disagreement notice
+- **v920 (T5)** FC IC Analyst Guide collapsed by default under `pointer: coarse` only
+
+Nothing had been pushed since **10:40**. The loop looked healthy the whole time — `launchctl`
+exit codes fine, 416 PASS emailed every cycle — while three consecutive cycles' work never
+shipped and nothing said so. This is the *"stable but wrong"* failure mode at the loop level.
+Their changes are verified clean as shipped (0 overflow at six widths across all 9 reachable
+tabs, suite 415/0/1 on the combined tree) but they were not authored, walked or logged by this
+cycle, and they are attributed here rather than absorbed.
+
+The build ships as **v921**, not v920: v920 was the badge those three unshipped cycles had
+already bumped to, and v921 is the first build that actually contains the work.
+
+### Verification — measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (re-run after every edit and after the version bump) |
+| Graded runtime suite, local, v921 | **415 PASS / 0 FAIL / 1 WARN**, read from `ORCA_REPORT_FILE` |
+| Score attribution | the **pre-edit tree** run on the identical command also scores **415/0/1**. The change is exactly score-neutral. |
+| The 1 WARN / 1 JS error | service-worker `404`, present on the tree **before** any edit. Environmental, carried from 830. Not chased. |
+| Pre-change behaviour | the empty Iraq-Kurdistan card was **rendered and read on the shipped build before editing**, not inferred |
+| Block scope | **1 of 185** lookups — every option in `#rr-country-lookup` was selected and tested for `#rr-filed-under` |
+| Helper scope | `window._rrFiledUnder()` returns non-null for **Iraq-Kurdistan only**; both its events carry `source` and `confidence` from `window._ALL_REFORMS` |
+| Sentence ordering | year list sorts ascending — "starts from 2014 and 2023" |
+| Clipboard | **Copy for IC Memo** carries the cross-reference as prose (`hasXref` true); the event table stays **0 rows**, so no row is falsely stamped as scoring here |
+| Button | opens Iraq's full verdict — lookup switches to Iraq, card repaints to `SIZE UNKNOWN` |
+| Coverage counts | unchanged — the tab still states 21 of 185 |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768 / 390, 9 tabs each | overflow **0** at every width |
+| New block at every width | **0** overflowing children; width 288px at 390 |
+| Mobile 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth`; the new button measures **44px** under `pointer: coarse` |
+| Page errors | **0** `pageerror` across the walk |
+| Mirror copy | sha-identical to `index.html` (`d4c0d85a6328`) |
+
+### Debt still open, NOT fixed this cycle
+
+- **The 1800s cycle timeout is now the top operational problem.** 3 of the last 4 cycles hit
+  it and shipped nothing. 31 `TimeoutExpired` entries in `cycle_log.txt` overall. Either the
+  budget rises or the cycle needs to commit incrementally — right now a slow cycle loses all
+  its work silently and the emailed PASS count hides it.
+- The **service-worker 404** still makes the local suite read 415/0/1 against the harness's
+  416/0/0 (from 830).
+- **FAQ A381** still answers a "65 of 185" question with **117** and **120** (from 829).
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` unseparated (from 828).
+- Home's Side-by-Side card and the Reference panel still say "Compare up to 4 countries" while
+  `CMP_MAX` is 5 (from 828).
+- The suite-copy divergence detector in `run_playwright()` still only warns.
+- The Breakeven Map CSV still has no suite coverage (from 829).
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
