@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v912</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v913</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v912</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v913</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -48499,8 +48499,57 @@ function renderReformCountryVerdict() {
   var icRule = _v.icRule, icColor = _v.icColor, icLabel = _v.icLabel, scoreNote = _v.scoreNote;
   var scoreColor = _v.scoreColor, tiltWord = _v.tiltWord, tiltColor = _v.tiltColor;
 
+  // ── v913 (T4): the tab this question is named for was the last surface still painting ──────
+  // every jurisdiction the same orange. Measured on the live file, cold, all 21 covered
+  // jurisdictions through _rrClassify(): icColor returns var(--orange) for TWENTY-ONE OF 21.
+  // Not a near-miss -- the two branches that emit any other colour are both unreachable on this
+  // data. The green `else` needs a jurisdiction with a measured in-window take move that did not
+  // raise take and no unmeasured change, which no country on file is; and the red needs
+  // `activelyReforming && score <= 20`, where score = 100 - 15 x changes since 2010, so it needs
+  // 6+ changes and the most-reformed jurisdiction ORCA holds is the UK at 5 -> 25.
+  //   United Kingdom  25/100  5 law changes since 2010, WACC +3-5pp   rgb(194,65,12)
+  //   Guyana         100/100  no post-2010 fiscal change at all       rgb(194,65,12)
+  //   Libya          100/100  100 is a pre-2010 window artefact       rgb(194,65,12)
+  // Card accent, IC-action rule, IC-action label and the headline score all read that one value,
+  // so a 25 that carries a real WACC premium and a 100 with no law change on file rendered
+  // pixel-identical on every colour channel the card has. An analyst checking three countries in
+  // a row saw no difference between them and had to read 200-900 characters of prose per country
+  // to triage. _rrClassify's own comment states the intent already -- "the card accent and the
+  // headline score follow the verdict, not the raw band. An 85 that is an artefact of where the
+  // window starts must not render in the same green as a real 85" -- the intent just collapsed
+  // when every branch returned one colour.
+  // NO NEW RULE AND NO NEW THRESHOLD. This is v843's _rrTokenTier(), the six-way partition built
+  // off _rrClassify()'s OWN token, which Fiscal Compare (42340), the Country Profile sidebar
+  // (56341), IOC Portfolio (38135) and the Screener chip (57617) have all rendered for 70 cycles.
+  // The Reform Risk tab -- where the classification originates -- never got it. A fifth surface
+  // reading the same helper cannot drift from the other four.
+  var _tier = (typeof _rrTokenTier === 'function')
+    ? _rrTokenTier(_v.icToken, _v.icColor)
+    : { col: _v.icColor, dotted: false, isAction: false };
+  var _tierCol = _tier.col;
+  // Same pill treatment as the Fiscal Compare cell, from the same tier: a WACC verdict is the
+  // only one that changes a model input, so it alone is filled; SIZE UNKNOWN keeps the dotted
+  // rule that means "ORCA has not measured this".
+  // padding is 3px rather than Fiscal Compare's 1px so the pill clears 24px tall under
+  // pointer: coarse (measured 21.6px at 1px, 25.6px at 3px). FC's copy lives in a table row
+  // whose cell sets the height; this one leads a prose block and sets its own.
+  var _pillBase = 'display:inline-block;font-size:11px;font-weight:800;letter-spacing:.02em;'
+    + 'line-height:1.6;padding:3px 7px;white-space:nowrap;border-radius:3px;margin-right:7px;'
+    + 'vertical-align:1px;';
+  var _tokenPill = _v.icToken
+    ? '<span style="' + (_tier.isAction
+        ? _pillBase + 'background:' + _tierCol + ';color:#fff;border:1px solid ' + _tierCol + ';'
+        : _pillBase + 'color:' + _tierCol + ';border:1px solid ' + _tierCol + ';'
+          + (_tier.dotted ? 'border-bottom-style:dotted;' : ''))
+      + '" title="' + (_tier.isAction
+          ? 'Percentage points to ADD TO THE DISCOUNT RATE. This is the only verdict family that changes a model input.'
+          : 'Not a WACC premium. Read the IC action beside it for what this verdict does and does not support.')
+      + ' Same verdict token, from the same _rrClassify() classifier, that Fiscal Compare&#39;s Reform column, the Country Profile sidebar, the IOC Portfolio row and the Screener chip print for this country.">'
+      + _rrEsc(_v.icToken) + '</span>'
+    : '';
+
   out.innerHTML =
-    '<div style="border:1px solid var(--border);border-left:3px solid ' + scoreColor + ';border-radius:8px;padding:14px 16px;background:var(--surface);">'
+    '<div style="border:1px solid var(--border);border-left:3px solid ' + _tierCol + ';border-radius:8px;padding:14px 16px;background:var(--surface);">'
     + _rrVerdictHead(esc + ' — reform exposure', 10)
     // ── v759 (T4): the IC action is the answer, so it sits first ──────────────────────────
     // The Home card sells this lookup as the control "that returns one IC action", and every
@@ -48514,12 +48563,16 @@ function renderReformCountryVerdict() {
     // An analyst who picked Nigeria read 70/100, "direction not measured", "73 MODERATE" and
     // "Carry <=46 LOW" before reaching the line telling them what premium to carry.
     // Nothing is recomputed or reworded; the block moves above the tiles and takes an id.
-    + '<div id="rr-ic-action" style="font-size:12px;color:var(--text);line-height:1.7;padding:8px 12px;background:var(--surface2);border-left:3px solid ' + icColor + ';border-radius:4px;margin-bottom:12px;">'
-    + '<strong style="color:' + icColor + ';">' + icLabel + ':</strong> ' + icRule
+    + '<div id="rr-ic-action" style="font-size:12px;color:var(--text);line-height:1.7;padding:8px 12px;background:var(--surface2);border-left:3px solid ' + _tierCol + ';border-radius:4px;margin-bottom:12px;">'
+    // The space between the pill and the label is load-bearing, not formatting: _rrCopyVerdict's
+    // tx() reads this block with innerText, so without a text node here the pasted IC memo runs
+    // the two together as "WACC +3-5ppIC action - Actively Reforming".
+    + _tokenPill + ' '
+    + '<strong style="color:' + _tierCol + ';">' + icLabel + ':</strong> ' + icRule
     + '</div>'
     + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
-    + '<div style="font-size:18px;font-weight:800;color:' + scoreColor + ';">' + score + '<span style="font-size:11px;color:var(--muted);font-weight:700;">/100</span></div>'
+    + '<div style="font-size:18px;font-weight:800;color:' + _tierCol + ';">' + score + '<span style="font-size:11px;color:var(--muted);font-weight:700;">/100</span></div>'
     + '<div style="font-size:10px;color:var(--muted);">' + scoreNote + '</div></div>'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reforms since 2010</div>'
     + '<div style="font-size:18px;font-weight:800;color:' + (since2010 > 2 ? 'var(--red)' : since2010 > 0 ? 'var(--orange)' : 'var(--green)') + ';">' + since2010 + '</div>'
