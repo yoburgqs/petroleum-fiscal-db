@@ -60337,3 +60337,14 @@ the clipboard.
   in front of two of the platform's IC clipboard paths and was broken for an unknown number of
   cycles with 415 tests passing over it. A regression test should assert that a confirm click
   inside `IC_ARM_MS` copies and one outside it does not.
+
+---
+## Cycle 836 Log — 2026-09-18 18:39
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 836 — shipped as v923** (`78b94ab` + `fe2ec82`, mirror `adef15b91`)
+
+**Task: T5** — "Give me something I can paste straight into an IC memo." Stalest in rotation (835 was T2; last T5 was 825).
+
+**Friction.** Fiscal Compare and Screener, cold load, nothing ticked. Clicking **⎘ Copy for IC Memo** doesn't copy — `_icArmBulkCopy()` (`index.html:51679`) arms a confirm first, turning the button amber ("⚠ Copy all 185 rows — confirm") and raising a 36-word toast telling the analyst to click aga
