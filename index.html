@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v922</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v923</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v922</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v923</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -51539,7 +51539,13 @@ function copyExplorerLink() {
   }).catch(function(){ _icRefuse('Clipboard unavailable — copy from address bar.'); });
 }
 
-function showCopyToast(msg) {
+/* v923 (T5) — a toast that tells the analyst to do something must outlive the reading of it.
+   The bulk-copy confirm instruction is 36 words: 7-11s to read at 200-300wpm. It was raised
+   with the default 2.5s hold, so it left the screen while the analyst was still in the middle
+   of the sentence. `holdMs` lets the caller pin a toast to the lifetime of the state it is
+   describing; `_toastMsg` lets that caller take it back down the moment the state ends, so an
+   instruction is never on screen after it has stopped being true. */
+function showCopyToast(msg, holdMs) {
   var toast = document.getElementById('copy-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -51553,8 +51559,21 @@ function showCopyToast(msg) {
   toast.textContent = msg || 'Link copied to clipboard';
   toast.style.opacity = '1';
   clearTimeout(toast._hideTimer);
-  toast._hideTimer = setTimeout(function(){ toast.style.opacity = '0'; }, 2500);
+  window._toastMsg = toast.textContent;
+  toast._hideTimer = setTimeout(function(){ toast.style.opacity = '0'; }, holdMs || 2500);
 }
+
+/* v923 (T5): take down a specific toast, and only if it is still the one on screen. Used by
+   _icDisarmBulk so the confirm instruction leaves with the confirm state rather than sitting
+   on screen over a button that has already reverted. */
+function hideCopyToastIf(msg) {
+  var toast = document.getElementById('copy-toast');
+  if (!toast || !msg || window._toastMsg !== msg) return;
+  clearTimeout(toast._hideTimer);
+  toast.style.opacity = '0';
+  window._toastMsg = null;
+}
+window.hideCopyToastIf = hideCopyToastIf;
 
 // ── v808 (T5) — "give me something I can paste straight into an IC memo." ──────
 // A REFUSED copy or export must say so ON THE BUTTON. Walked T5 cold at 1440x900 and
@@ -51650,10 +51669,19 @@ window.IC_BULK_ROWS = 25;   // above any hand-built IC shortlist, far below the 
 window._icArmedBtn = null;
 window._icArmTimer = null;
 
+/* v923 (T5): how long a bulk-copy confirm stays live. Must exceed the time it takes to read
+   the instruction that arms it — see the note at the showCopyToast call in _icArmBulkCopy. */
+var IC_ARM_MS = 20000;
+window.IC_ARM_MS = IC_ARM_MS;
+
 function _icDisarmBulk() {
   clearTimeout(window._icArmTimer);
   var b = window._icArmedBtn;
   window._icArmedBtn = null;
+  // v923 (T5): the instruction goes when the state it describes goes — on confirm, on cancel
+  // and on timeout alike. It never sits on screen over a button that has stopped listening.
+  if (window._icArmMsg && typeof hideCopyToastIf === 'function') hideCopyToastIf(window._icArmMsg);
+  window._icArmMsg = null;
   var cues = document.querySelectorAll('.ic-tick-cue');
   for (var i = 0; i < cues.length; i++) cues[i].classList.remove('ic-tick-cue');
   if (!b || !document.body.contains(b)) return;
@@ -51702,10 +51730,18 @@ function _icArmBulkCopy(btn, n, tickSel, restoreFn) {
     var cells = document.querySelectorAll(tickSel);
     for (var i = 0; i < cells.length; i++) cells[i].classList.add('ic-tick-cue');
   }
-  showCopyToast('Nothing ticked, so this would copy all ' + n + ' rows — about '
+  /* v923 (T5): the window has to outlast the reading of the sentence that opens it. At 6000ms
+     it did not: the instruction is 36 words (7-11s at 200-300wpm) and the toast carrying it
+     held for 2.5s, so an analyst who actually read it came back to a button that had already
+     reverted. Their confirming click then re-armed instead of copying — and since reading
+     always took longer than the window, it re-armed every time and the clipboard was never
+     written. Measured cold on Fiscal Compare: 2s gap copied, 8s and 12s gaps did not.
+     The toast is now pinned to the arm, and the arm outlasts the read. */
+  window._icArmMsg = 'Nothing ticked, so this would copy all ' + n + ' rows — about '
     + Math.round(n / 26) + ' pages in Word. Click again to copy all ' + n + ', or tick the rows '
-    + 'you want in the highlighted left-hand column and copy just those.');
-  window._icArmTimer = setTimeout(_icDisarmBulk, 6000);
+    + 'you want in the highlighted left-hand column and copy just those.';
+  showCopyToast(window._icArmMsg, IC_ARM_MS);
+  window._icArmTimer = setTimeout(_icDisarmBulk, IC_ARM_MS);
   return false;
 }
 window._icArmBulkCopy = _icArmBulkCopy;
