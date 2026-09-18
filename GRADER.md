@@ -59008,11 +59008,21 @@ had to hover to find.
   ```
 
   All 28 pass against the patched build. The assertion is load-bearing, not decorative.
-- **Graded suite:** **405 PASS / 0 FAIL** against the patched build, read from the suite's own
-  report file (`2026-09-18T03:31:09.910Z`), not assumed. The prompt's live-URL baseline was 378
-  PASS; 378 + 28 new assertions = 406, less the `ConsoleErrors` PASS that becomes a WARN under the
-  local port = 405. The 1 WARN and 1 JS error are that same service-worker 404 and reproduce
-  byte-identically on the pre-change build.
+- **Graded suite, measured A/B on the same port** — both numbers read from the suite's own report
+  file, neither assumed, neither reconstructed by arithmetic:
+
+  | build | PASS | FAIL | WARN | JS errors | report |
+  |---|---|---|---|---|---|
+  | patched (v910) | **405** | **0** | 1 | 1 | `2026-09-18T03:31:09.910Z` |
+  | pre-change (`HEAD`) | 378 | 17 | 1 | 1 | `2026-09-18T03:36:35.490Z` |
+
+  **The pre-change run's 17 FAILs are 16 `CPNpvPair` plus one artefact of this cycle, and the 17th
+  is mine, not the build's.** It reads
+  `✗ [FAIL] [ScreenerLink] exception: page.goto: net::ERR_CONNECTION_REFUSED` — I killed the two
+  local servers while that run was still in flight, so `testScreenerLinkFidelity` could not reach
+  the page. It is not a defect in `HEAD` and must not be read as one by anyone who opens that
+  report later. The 1 WARN and 1 JS error on both rows are the same service-worker 404 from serving
+  on `127.0.0.1`, present identically on both builds.
 - **Confirmed on the DEPLOYED build** after push, not only locally. `yoburgqs.github.io` serves
   v910 and Country Profile → Iraq renders `NPV: $3.04B @$75 · PSC/Conc 195 · blend $642M` over
   `Downside: $1.44B @$50 (survives $50) · PSC/Conc 195 · blend $389M`, 0 page errors.
