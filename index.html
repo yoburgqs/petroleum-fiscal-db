@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v921</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v922</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2579,7 +2579,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v921</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v922</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41957,6 +41957,8 @@ function _esc594(s) {
 }
 
 function loadCountryProfile(country) {
+  // v922 (T2): the ★/◆ list filter yields rather than blanking the selector over a live profile.
+  try { if (typeof _cpEnsureCountryVisible === 'function') _cpEnsureCountryVisible(country); } catch (e) {}
   // v615 (T2): the "Example loaded: Norway — a North Sea Concession benchmark" banner was
   // injected once and never removed, so it stayed above the headline while the page showed
   // whatever country the analyst had since loaded — dropdown, peer row, regional-peer row or
@@ -45316,16 +45318,122 @@ function loadCountryProfile(country) {
 }
 
 // Populate country select
+// v922 (T2): this list is the first control of the "is this country attractive at $75" walk, and
+// 91 of its 185 rows carried a ★ or a ◆ that was defined NOWHERE — not on the option, not on the
+// select, not anywhere in the Country Profile tab, and not on any page the profile then renders.
+// The glyphs never reappear after selection, so an analyst cannot resolve them by reading on.
+// Both of the obvious guesses invert the meaning: ★ is not a recommendation, it marks the 21
+// jurisdictions whose fiscal terms ORCA can show were REWRITTEN since 2010 — that is exposure, not
+// quality — and ◆ marks a profit-oil mechanic, not a data grade. The marks now carry their own
+// legend under the selector, state in words that they are coverage marks rather than rankings, and
+// each one narrows the list to its own cohort so the mark is usable instead of merely decoded.
+var _cpMarks = [];
+var _cpMarkOn = { star: false, dia: false };
+function _cpMarkMatch(m) {
+  if (_cpMarkOn.star && !m.star) return false;
+  if (_cpMarkOn.dia && !m.dia) return false;
+  return true;
+}
+function _cpRebuildSelect() {
+  var sel = document.getElementById('dd-country-select');
+  if (!sel) return;
+  var keep = sel.value;
+  var shown = _cpMarks.filter(_cpMarkMatch);
+  // The selected country never disappears out from under the profile that is on screen.
+  if (keep && !shown.some(function(m) { return m.v === keep; })) {
+    var cur = _cpMarks.filter(function(m) { return m.v === keep; });
+    shown = cur.concat(shown);
+  }
+  var html = '<option value="">— Select a country —</option>';
+  shown.forEach(function(m) {
+    html += '<option value="' + m.v.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '">'
+      + m.txt.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</option>';
+  });
+  sel.innerHTML = html;
+  sel.value = keep;
+  var cnt = document.getElementById('cp-mark-count');
+  if (cnt) {
+    var act = _cpMarkOn.star || _cpMarkOn.dia;
+    cnt.textContent = act ? ('list narrowed to ' + shown.length + ' of ' + _cpMarks.length) : '';
+    cnt.style.display = act ? 'inline' : 'none';
+  }
+}
+function _cpToggleMark(k) {
+  _cpMarkOn[k] = !_cpMarkOn[k];
+  var chip = document.getElementById('cp-mark-' + k);
+  if (chip) {
+    chip.setAttribute('aria-pressed', _cpMarkOn[k] ? 'true' : 'false');
+    chip.style.background = _cpMarkOn[k] ? 'rgba(176,104,0,.12)' : 'transparent';
+    chip.style.borderColor = _cpMarkOn[k] ? 'rgba(176,104,0,.55)' : 'var(--border)';
+    chip.style.color = _cpMarkOn[k] ? 'var(--accent)' : 'var(--muted)';
+  }
+  _cpRebuildSelect();
+}
+// Every entry point into a profile routes through loadCountryProfile(); if a peer row, a deep link
+// or another tab opens a country the active filter excludes, the filter yields rather than leaving
+// the selector blank above a populated profile.
+function _cpEnsureCountryVisible(c) {
+  if (!c) return;
+  if (!_cpMarkOn.star && !_cpMarkOn.dia) return;
+  var m = _cpMarks.filter(function(x) { return x.v === c; })[0];
+  if (m && _cpMarkMatch(m)) return;
+  if (_cpMarkOn.star) _cpToggleMark('star');
+  if (_cpMarkOn.dia) _cpToggleMark('dia');
+  // The caller may have set sel.value BEFORE the option existed, which silently blanks a native
+  // select. Re-point it now that the full list is back, so the picker never disagrees with the
+  // profile underneath it.
+  var sel = document.getElementById('dd-country-select');
+  if (sel && m && sel.value !== c) sel.value = c;
+}
+window._cpToggleMark = _cpToggleMark;
+window._cpEnsureCountryVisible = _cpEnsureCountryVisible;
+
 (function populateDDSelect() {
   const sel = document.getElementById('dd-country-select');
   if (!sel) return;
   const sorted = [...COUNTRY_DATA].sort((a, b) => a.country < b.country ? -1 : 1);
   sorted.forEach(d => {
+    const star = !!REFORM_HISTORY[d.country], dia = !!d.has_r_factor_tiers;
+    _cpMarks.push({ v: d.country, txt: d.country + (star ? ' ★' : '') + (dia ? ' ◆' : ''), star: star, dia: dia });
     const opt = document.createElement('option');
     opt.value = d.country;
-    opt.textContent = d.country + (REFORM_HISTORY[d.country] ? ' ★' : '') + (d.has_r_factor_tiers ? ' ◆' : '');
+    opt.textContent = d.country + (star ? ' ★' : '') + (dia ? ' ◆' : '');
     sel.appendChild(opt);
   });
+
+  var nStar = _cpMarks.filter(function(m) { return m.star; }).length;
+  var nDia  = _cpMarks.filter(function(m) { return m.dia;  }).length;
+  var wrap = document.getElementById('dd-select-wrap');
+  if (!wrap || !wrap.parentNode || document.getElementById('cp-select-legend')) return;
+  var chip = function(id, glyph, label, tip) {
+    return '<span id="cp-mark-' + id + '" role="button" tabindex="0" aria-pressed="false"'
+      + ' onclick="_cpToggleMark(\'' + id + '\')"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_cpToggleMark(\'' + id + '\');}"'
+      + ' title="' + tip.replace(/"/g, '&quot;') + '"'
+      + ' style="display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:2px 8px;'
+      + 'border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--muted);'
+      + 'cursor:pointer;font-size:11px;white-space:nowrap;">'
+      + '<span style="font-size:12px;">' + glyph + '</span>' + label + '</span>';
+  };
+  var leg = document.createElement('div');
+  leg.id = 'cp-select-legend';
+  leg.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:8px;'
+    + 'margin:-14px 0 18px;font-size:11px;color:var(--muted);line-height:1.5;';
+  leg.innerHTML = '<span style="color:var(--muted);">Marks in the list:</span>'
+    + chip('star', '★', nStar + ' with a sourced reform log',
+        'ORCA holds a sourced log of fiscal-law changes for these ' + nStar + ' of ' + _cpMarks.length
+        + ' jurisdictions, which is what the Reform Risk tab scores. A ★ means the terms have been '
+        + 'rewritten and the rewrite is on file — it is exposure that can be evidenced, NOT a '
+        + 'recommendation and NOT a better country. An unmarked country is not stable; it is '
+        + 'un-logged. Click to narrow the list to the logged cohort.')
+    + chip('dia', '◆', nDia + ' with R-factor profit-oil tiers',
+        'These ' + nDia + ' countries resolve the government profit-oil share off an R-factor ladder '
+        + '(R = cumulative revenue / cumulative cost) rather than a flat split, so their take rises '
+        + 'with project profitability and a single-price quote understates it. This is a mechanic, '
+        + 'not a data grade. Click to narrow the list to the R-factor cohort.')
+    + '<span style="color:var(--muted);opacity:.85;">— coverage marks, not quality or attractiveness ranks</span>'
+    + '<span id="cp-mark-count" style="display:none;color:var(--accent);font-weight:600;"></span>';
+  wrap.parentNode.insertBefore(leg, wrap.nextSibling);
 })();
 
 // ─── init ────────────────────────────────────────────────────────────────────
