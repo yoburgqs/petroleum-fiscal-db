@@ -59769,3 +59769,116 @@ A local server rooted at the repo makes `index.html:49` — `navigator.serviceWo
 **Task: T3** — "How do these three countries compare side by side?" (oldest in rotation; 826 was T1, 825 T5, 824 T4, 823 T6, 821 T2, 819 T3.)
 
 **Friction.** Walked Side-by-Side cold at 1440×900 with storage cleared, building Guyana / Nigeria / Iraq by hand. At $75/bbl, four surfaces on one screen said different things about the same c
+
+---
+## Cycle 829 — 2026-09-18 — shipped as v918
+
+**Task: T6** — "Where did this number come from and how solid is the evidence?"
+(Rotation: 828 T3, 826 T1, 825 T5, 824 T4, 823 T6, 821 T2, 819 T3. Not a repeat of 828.)
+
+### Friction
+
+Walked T6 cold at 1440x900 with storage cleared, in a real browser, from the Explorer's
+Breakeven column into the Breakeven Map.
+
+The Explorer ranks the **United Kingdom first at $20.3/bbl** — the lowest breakeven ORCA
+carries, moved there from row 86 by v915. Open the **Breakeven Map**, the one tab whose entire
+subject is that number, and the United Kingdom is:
+
+- painted `var(--border)` grey,
+- counted inside **"No data (120)"**,
+- and its hover reads **"United Kingdom — no modelled cost structure"**.
+
+Norway says the same thing, and Norway grades **A on 63,848 facts** — the best-evidenced record
+on the platform.
+
+Neither value was missing. Both were sitting in `window._cpBeResolved` at the moment the map
+painted — measured in the browser, not inferred from the diff: at cold load the reform-history
+fetch loop resolves them through `_orcaAdoptApiBe()` before this tab is ever opened.
+`renderBreakevenMap()` built `beLookup` from raw `be_75` (`index.html:62997`). `cpBeFor()` has
+been the platform's single breakeven read point since v512; Fiscal Compare joined it at v895
+and the Explorer at v915. **This tab was the last surface that had not.**
+
+That is worse than a blank. "No modelled cost structure" is an affirmative claim about ORCA's
+cost model and it is false for these two. The caption above the map compounded it — *"every one
+of them falls between $27 and $34/bbl"* is precisely the sentence UK $20.3 falsifies. An analyst
+who cited the Explorer's rank-1 UK breakeven in a memo and was challenged on it would come to
+this tab to defend the figure and find the platform contradicting itself about whether the
+figure exists at all.
+
+Walking outward from there, **five surfaces printed three different counts for one quantity**:
+the Breakeven Map header and the FC column legend/header tooltip said **65**; the FC "Has
+Breakeven" chip and BE-only checkbox said **68** while the filter behind them returns **67**;
+the Explorer said **67**. v915 recorded this exact drift ("the header said 65, the BE-only
+tooltip said 68, and the set was 67") and built `_explBeCovN()` — but joined only the Explorer.
+
+### Change
+
+- `beLookup`, the quintile bands, the legend counts, the per-band C/D tally, the distribution
+  card, the threshold counter, the no-D3 fallback table and the CSV export all read `_beRead()`
+  → `cpBeFor()`. **UK and Norway paint green**; the grey count falls 120 → **118**.
+- The four typed coverage literals on the tab are **counted, not typed** — "67 of 185",
+  "Remaining 118", "of 67 countries", "$20.3 and $34/bbl". The v687 `_icIrrStat()` treatment
+  applied to the other quantity two surfaces described with two different constants.
+- `_beCoverage()` is one read point for the same sentence elsewhere: the FC column-header
+  tooltip, the FC column legend, the FC chip + BE-only checkbox, and the two FC drilldown
+  "breakeven is not modelled here" tooltips.
+- `_beLbl()` keeps a decimal only where the value has one, so the UK is never rounded to a
+  "$20" that appears nowhere else on the platform.
+- `window._beMapInvalidate()` — `renderBreakevenMap()` is render-once, so a breakeven resolving
+  after first paint was frozen out for the whole session. **Reproduced**: delaying every
+  `api/v1/country/*.json` by 6s and opening the tab at 1.2s showed "Coverage: 65 of 185" and
+  "no modelled cost structure"; it now repaints to 67 / "$20.3/bbl (modelled)".
+- `computeBeBands()` — population quantiles collapse when 43 of 67 values sit on two integers:
+  two cut points deduped away and the legend rendered **3 colours where the data supports 5**.
+  Lost cuts are topped up from distinct values. The lowest band is now `<$27 (1)` — the United
+  Kingdom, alone, which is the correct picture of a genuine outlier.
+
+### Result
+
+The analyst can open the Breakeven Map and see the United Kingdom as the single greenest country
+on the map, alone in its own band, which is what the Explorer told them one tab earlier. Hover
+returns **"breakeven $20.3/bbl (modelled) — evidence B"**, not a denial. The CSV opens with 67
+rows ascending, UK first. Five surfaces that printed 65, 67 and 68 for one quantity now print one
+number, computed from the predicate that does the filtering.
+
+### Verification — all measured this cycle, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **0 failures** (run after every edit) |
+| Graded runtime suite, local, v918 | **416 PASS / 0 FAIL / 0 WARN**, read from the suite's own report file |
+| JS errors captured by the suite | **0** |
+| Pre-change behaviour | measured on the shipped build before editing — the grey UK, the "no modelled cost structure" hover and the 65/120 counts are observed, not inferred |
+| CSV export | **67 data rows**, ascending confirmed programmatically, UK $20.3 grade B at row 1, Norway $28.7 grade A present |
+| Late-resolution repaint | reproduced stale under a 6s API delay, confirmed it self-corrects |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768, 8 tabs each | overflow **0** at every width |
+| Mobile 390x844 `hasTouch`, 8 tabs | `scrollWidth` 390 = `clientWidth`, overflow **0**, **0** page errors |
+| Controls under 24px under `pointer: coarse` | CSV button **44px**, price slider **44px** |
+| Mirror copy | sha-identical to `index.html` (`94c93ccad92f`) |
+
+### A defect this cycle introduced and then fixed, recorded because it nearly shipped
+
+Joining the CSV export to `cpBeFor()` made `sorted[0]` the United Kingdom, whose `be_75` is
+**null** in the bundle. The caveat block below still read the raw field — `sorted[0].be_75` —
+and threw `TypeError: Cannot read properties of null`, killing the entire download. The graded
+suite did **not** catch it: no test clicks that button. It was caught only because this cycle
+downloaded the file and parsed it. **The suite has no coverage of the Breakeven Map CSV.**
+
+### Debt still open, NOT fixed this cycle
+
+- **FAQ A381** asks about "only 65 of 185 countries" and answers with **117** and **120** in the
+  same paragraph. It was internally inconsistent *before* this change, and the directive freezes
+  FAQs. Logged rather than edited.
+- Roughly a dozen `65 of 185` strings remain in **code comments** — historical record, left alone.
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` with no thousands separator
+  (carried from 828).
+- Home's Side-by-Side card still says "Compare up to 4 countries" while `CMP_MAX` is 5 (from 828).
+- The Reference panel's tab list also says "Compare up to 4 countries" — same literal, second site.
+- The suite-copy divergence detector in `run_playwright()` still only warns and lets a cycle ship.
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+
+## Cycle 829 Log — 2026-09-18
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL / 0 WARN, 0 JS errors — suite RAN this cycle, number read from `ORCA_REPORT_FILE`
+- Shipped: v918
