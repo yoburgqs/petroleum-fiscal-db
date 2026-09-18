@@ -59196,3 +59196,128 @@ No grade, letter, percentage, fact count, take, NPV, IRR, rank, tier, order or f
 ## Cycle 823 — v912
 
 **First, what the inbound "1 FAIL" actually was.** It was not a defect in the live site. Cycle 822 hit the 1800-second subprocess timeout and died mid-flight, leaving 241 uncommitted lines in `index.html` and 157 lines of assertions already committed to the graded suite. Since that suite runs against `yoburgqs.github.io` by default, it was testing a v911 feature against a v910 origin that had never received it. The sui
+
+---
+## Cycle 824 Log — 2026-09-18 02:51
+- Test before: 416 PASS / 0 FAIL
+- Test after: 416 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RAN this cycle, local v913)
+- JS errors: 0
+- Summary: Cycle 824 complete, shipped as **v913** and pushed.
+
+## Cycle 824 — v913
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"* (rotation: 823 was T6,
+821 T2, 820 T1, 819 T3, 818 T5 — T4 at 817 was stalest.)
+
+### Friction
+
+Walked T4 cold over HTTP at 1440x900 — no sessionStorage, no localStorage — Home → Reform Risk →
+`Check one country`. The picker and the verdict cards are in good shape: two optgroups make the
+21/164 coverage split visible before the analyst commits, and the uncovered card (Oman, Malaysia)
+names the statute ORCA read the terms from and tells them where the external check starts.
+
+The friction is the colour. `renderReformCountryVerdict()` (`index.html:48499`) read
+`_rrClassify()`'s raw `icColor` for **all four** of the card's colour channels — card accent,
+IC-action rule border, IC-action label, and the headline Reform Frequency Score. Measured cold
+against the live `reform_history.json`, every one of the 21 covered jurisdictions came back
+`var(--orange)`.
+
+Twenty-one of 21 is not a near-miss — **both other branches are unreachable on this data**:
+
+- the red needs `activelyReforming && score <= 20`, but `score = 100 − 15 × changes since 2010`,
+  so it needs 6+ changes and the most-reformed jurisdiction ORCA holds is the UK at 5 → **25**.
+  (This is the `Score <= 20` unreachability carried as open debt since cycle 817 — it is not only
+  a wrong sentence in the intro strip, it is a dead colour branch.)
+- the green `else` is reached only by elimination and no country on file survives it.
+
+Measured on screen, `getComputedStyle`, before the change:
+
+| country | score | verdict | card accent | headline score |
+|---|---|---|---|---|
+| United Kingdom | 25/100 | 5 law changes, WACC +3–5pp | `rgb(194,65,12)` | `rgb(194,65,12)` |
+| Guyana | 100/100 | no post-2010 fiscal change at all | `rgb(194,65,12)` | `rgb(194,65,12)` |
+| Libya | 100/100 | the 100 is a pre-2010 window artefact | `rgb(194,65,12)` | `rgb(194,65,12)` |
+| Russia | 85/100 | +15pp windfall tax inside the window | `rgb(194,65,12)` | `rgb(194,65,12)` |
+
+A 25 that carries a real WACC premium and a 100 with no law change on file rendered
+**pixel-identical on every colour channel the card has**. An analyst checking three countries in
+sequence saw no difference between them and had to read 200–900 characters of prose per country
+to triage. `_rrClassify()`'s own comment already states the intent — *"the card accent and the
+headline score follow the verdict, not the raw band. An 85 that is an artefact of where the window
+starts must not render in the same green as a real 85"* — the intent collapsed because every
+branch returns one colour.
+
+And the tab this question is **named for** was the last surface still doing it. Fiscal Compare
+(42340), the Country Profile sidebar (56341), IOC Portfolio (38135) and the Screener chip (57617)
+have all rendered `_rrTokenTier()`'s six-way partition since v843. The originating tab never got it.
+
+### Change
+
+The card's four colour channels now read `_rrTokenTier()`, and the verdict token renders as a pill
+ahead of the IC action — filled for the WACC verdicts (the only family that changes a model input),
+dotted for `SIZE UNKNOWN` — the same treatment the other four surfaces already give it.
+
+**No new rule and no new threshold.** This is `_rrClassify()`'s own `icToken`, read through the
+helper built for exactly this in v843. A fifth surface reading the same helper cannot drift from
+the other four.
+
+Distinct card colours across the 21: **1 → 3.**
+
+| tier | n | countries |
+|---|---|---|
+| green `#15803D` — NO LAW CHANGE | 2 | Ghana, Guyana |
+| amber `#A16207` — ↑ PRE-2010 window artefact | 7 | Kazakhstan, Libya, USA, Venezuela, Algeria, Colombia, Canada |
+| orange `#C2410C` — WACC / TAKE / SIZE UNKNOWN | 12 | UK, Brazil (filled pill — WACC action), + 10 |
+
+### Result
+
+An analyst checking three countries in a row can now tell them apart without reading a paragraph
+each. Guyana reads green at a glance. Libya's 100 reads **amber**, because it is a window artefact
+and not a clean record — which is the single most misreadable number on this tab. The UK and Brazil
+are the only two jurisdictions on file wearing a **filled** pill, which is the platform's existing
+signal for *add this to your discount rate*. The pasted IC memo now leads with the same token.
+
+No score, verdict, rank, premium, take, NPV, IRR, order or filter value changed.
+
+### Verification — all measured, none assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | 0 failures (run twice — before and after the version bump) |
+| Graded runtime suite, local, v913 | **416 PASS / 0 FAIL / 0 WARN** |
+| JS errors captured by the suite | **0** |
+| Horizontal scroll 1920 / 1440 / 1280 / 1024 / 768 | overflow 0 at every width |
+| Mobile 390x844 `hasTouch`, all 13 tabs swept | `scrollWidth` 390 = `clientWidth`, overflow **0** |
+| Pill height under `pointer: coarse` | **25.6px** — raised from 21.6 by padding 1px→3px to clear the 24px bar |
+| Page errors, desktop and mobile | 0 |
+| Copy for IC Memo | 5,146 chars, token leads the verdict, 0 errors |
+| Card colours re-measured, all 21 | 3 distinct values (was 1) |
+
+**On the suite's 1 WARN.** The first local run reported 415 PASS / 1 WARN — a 404 on the service
+worker. Not a product defect and proven so rather than waved off: `sw.js` registers at the absolute
+GitHub Pages path `/petroleum-fiscal-db/sw.js` (index.html:49), which cannot resolve on a harness
+serving the repo at root. Re-served from `~` so the path resolves, and the suite returned
+**416 PASS / 0 FAIL / 0 WARN / 0 JS errors**. The number above is from that run.
+
+### Debt closed this cycle
+
+- **The `Score <= 20` dead branch, in its colour half.** Carried open since 817/818/820. The
+  unreachable threshold no longer decides whether the card is legible — the tier does. The
+  *sentence* is still wrong: the Reform Risk intro strip and the FC column tooltip both still state
+  the IC rule as "5–8pp and a probability-weighted NPV at Score ≤ 20", a band no jurisdiction on
+  file can reach. That is a decision for Zach about what ORCA publishes as its IC rule, not a
+  patch — the honest options are to restate the rule on a reachable bound or to say plainly that
+  the severe band is unpopulated.
+
+### Debt still open, NOT fixed
+
+- **The suite-copy divergence detector still only warns.** `run_playwright()` writes
+  `*** SUITE COPIES HAVE DIVERGED ***` to `cycle_log.txt` and lets the cycle ship. Fired three
+  times (v685, v908, 823). That is a change to `autonomous_cycle.py`, not to the product, and it
+  is what decides whether the unattended loop can stop itself.
+- **Cycle 822's 1800s subprocess timeout left a half-shipped feature on disk** and nothing noticed.
+  Nothing rolls back or flags a timed-out cycle.
+- Still true from 820: the Home card for Side-by-Side says "Compare up to 4 countries in parallel"
+  while `CMP_MAX` is 5.
+- Still true from 821: the IC Citation and the CP strip lead with different bases;
+  `cpTakeBandNpv()` selects its band on comparable take and ranks on the blend. Decisions for Zach.
