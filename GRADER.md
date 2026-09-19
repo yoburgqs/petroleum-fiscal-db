@@ -60348,3 +60348,119 @@ the clipboard.
 **Task: T5** — "Give me something I can paste straight into an IC memo." Stalest in rotation (835 was T2; last T5 was 825).
 
 **Friction.** Fiscal Compare and Screener, cold load, nothing ticked. Clicking **⎘ Copy for IC Memo** doesn't copy — `_icArmBulkCopy()` (`index.html:51679`) arms a confirm first, turning the button amber ("⚠ Copy all 185 rows — confirm") and raising a 36-word toast telling the analyst to click aga
+
+---
+## Cycle 840 Log — 2026-09-18 23:xx
+- Test before: 427 PASS / 1 FAIL / 0 WARN / 0 JS errors (harness, against the live build)
+- Test after: see "Verification" below — suite RUN this cycle, number read from ORCA_REPORT_FILE
+- JS errors: 0. JS syntax gate 11/11 PASS.
+- Summary: **Cycle 840 — shipped as v927** (`ababe89`), pushed, mirror sha `4c5099725662`
+
+**Task: T1** — "Which countries should even be on my screening list?" Rotation: 836 was T5,
+the 837-839 window shipped T3 as v926 (its log never landed — the cycle timed out), 835 T2,
+834 T4, **830 T1**.
+
+### First: the 1 FAIL was chased and is NOT a code defect
+
+`✗ [Screener] exception: elementHandle.click: Timeout 30000ms exceeded`, hanging at
+"performing click action". testScreener makes exactly four `elementHandle.click()` calls
+(Shell check/uncheck, mechanic uncheck/re-check); everything else goes through `evaluate`.
+
+Reproduced three ways before concluding anything:
+
+| attempt | result |
+|---|---|
+| Isolated clicks, local build | 39 / 65 / 57 / 75 ms |
+| Isolated clicks, LIVE build, 4x repeat | 57 / 80 / 87 / 79 ms; sync handler 27-30 ms |
+| **Full suite prefix (testLoad → testScreener), LIVE build, instrumented** | **112 / 75 / 118 ms, all four PASS** |
+
+The third run is the harness's own environment and ordering, and it did not reproduce. The
+checkboxes are static markup with delegated listeners (`index.html:65399`), so there is no
+re-render/detach path, and the change handler measures 27-30 ms. Recorded as a **harness-side
+network stall against GitHub Pages**, not a defect. The arithmetic is consistent with it:
+v926 scored 429 and the flake scored 427, i.e. it died on the LAST of the four clicks, losing
+only 'reset button' and 'preset select'. **Not fixed, because there is nothing here to fix** —
+but it is now a known flake rather than an unexplained red.
+
+### Friction
+
+Screener and Explorer, cold load, storage cleared, no filters. The **Tier** column is the
+screening verdict — its own header says *"Used for portfolio-level screening across
+geographies"* — and it is the only cell on the row that is a WORD, which is what an eye
+scanning 185 rows actually reads. That is the point v890 made when it fixed the fee-basis
+divergence in this very cell.
+
+All 45 rows whose take is a FLOOR read a green **Inv-Friendly**. Every one of them:
+
+| row set | tiers |
+|---|---|
+| **45 floor rows** | **Inv-Friendly 45 — nothing else** |
+| 140 other rows | Inv-Friendly 63 · Moderate 50 · High Take 17 · NOC/Conc 7 · State Monopoly 3 |
+
+And monotonically, which is what makes it dangerous rather than merely wrong: the thinner the
+record, the lower the floor, the more attractive the verdict. Vanuatu — the thinnest record on
+the platform, take **≥5.0%** — drew the most attractive label the scale has. Bahamas ≥10.0%,
+Montenegro ≥10.5%, Moldova ≥12.4%, Sweden ≥13.7%, all "Inv-Friendly".
+
+The row already knew better and said so three times. Its take cell prints **≥** (`_floorGe`,
+`index.html:36103`), its NPV cell **≤**, and the v743 divider directly above the block reads
+*"A low take here is missing record, not favourable terms — do not carry this block into a
+shortlist."* Then the last cell on the same row contradicted all three in one green word.
+
+**One root cause, two consumers.** `tierLabel()` / `tierClass()` (`index.html:23996-24012`)
+take a NUMBER and cannot know the number is a bound. v743 gave the Screener its floor markers
+and v920 gave the Explorer its own; neither touched the tier both tables derive from the same
+two functions. Same shape as v926 — the detector was upgraded, its consumers were not.
+
+### Change
+
+New **`tierCellHtml(take, isFloor, floorTip, extraTitle)`** — one renderer, so the two tables
+cannot drift apart about what a floor row is called. Called from the Screener tier cell
+(`index.html:36183`) and the Explorer tier cell (`index.html:27211`).
+
+On a floor row the pill loses `tier-if` green for a new colourless, dashed-border
+**`.tier-floor`** and reads **"Inv-Friendly at best"**. A floor bounds the tier from one side
+only, so the pill now says which side. The tooltip adds that Moderate, High Take and
+NOC/Concession all stay open, and that it is a bound, not a screening verdict. Non-floor rows,
+the fee-basis divergence title and the PSC/Conc sub-line are untouched.
+
+### Result
+
+Scanning the Tier column for a shortlist, the analyst can no longer mistake 45 absent fiscal
+records for the platform's most attractive terms. The verdict column now stops short exactly
+where the evidence does — on **both** tables.
+
+| check | result |
+|---|---|
+| Screener floor pills re-labelled | **45 of 45** → "Inv-Friendly at best", **0 still green** |
+| Explorer floor pills re-labelled | **45 of 45**, **0 still green** |
+| Survives an explicit take-sort | yes — 45 still bounded after `setScreenerSort('take')` |
+| Non-floor buckets unchanged | 63 / 50 / 17 / 7 / 3, identical to pre-patch |
+| Horizontal scroll 1920/1440/1280/1024/768/390 | **0 overflow** (scrollWidth = clientWidth at all six) |
+| Mobile 390x844 `hasTouch` | floor pill **23px — exact parity** with all four existing tier pills (also 23px); no height regression, and these are labels, not controls |
+| Page errors | **0** |
+| JS syntax gate | **11/11 PASS** |
+
+### Debt still open, NOT fixed this cycle
+
+- **The 1800s cycle timeout is still the top operational problem.** It ate cycles 831-833 and
+  837-839 outright; v926's own message records finding v924 and v925 *uncommitted in the working
+  tree*, written by earlier cycles that died before committing. This cycle committed before
+  running the full suite for exactly that reason.
+- The `[Screener] elementHandle.click` flake above will recur. If it does, it is the network,
+  not the page — but no runtime test covers `_icArmBulkCopy` either (from 836), and that one IS
+  a real gap.
+- On a state monopoly the same NPV prints `$0M` in Peer Comparison and Key Metrics but
+  `n/a — no contractor position` in the 4-price table below. Scope: 3 countries (from 835).
+- Angola's Country Profile prints `BE: < $50/bbl bounded` in four places above a paragraph
+  opening "No breakeven on file for Angola." (from 835).
+- The service-worker 404 still makes the local suite read one WARN the harness does not.
+- FAQ A381 still answers a "65 of 185" question with 117 and 120 (from 829).
+- The `# Contracts` grid row still prints `4211` / `7643` / `610` unseparated (from 828).
+- Home's Side-by-Side card and the Reference panel still say "Compare up to 4 countries" while
+  `CMP_MAX` is 5 (from 828).
+- The Breakeven Map CSV still has no suite coverage (from 829).
+- The `Score <= 20` IC rule on Reform Risk is unreachable on this data — a decision for Zach.
+- **New this cycle:** the four **export** paths and the Country Profile headline were not
+  audited for the same floor-vs-verdict confusion. `tierCellHtml` exists now, so if a floor row
+  reaches a CSV/XLSX tier column it should route through the same bound. Next T1 should check.
