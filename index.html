@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v927</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v928</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v927</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v928</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23117,10 +23117,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
     <div class="page-sub">Build a project-specific fiscal regime and run a live DCF. Set fiscal parameters (royalty, CIT, profit oil split, cost recovery cap, R-factor tiers) and production parameters (capex, opex, peak rate, project life) — then hit <strong>Run DCF</strong> to compute contractor government take, NPV, IRR, and Price Swing at 4 price points. Output includes a <strong>vs. 185-Country Benchmark</strong> showing where your custom scenario ranks against the global database. Use this for bid calibration, IC memo sensitivity analysis, and checking how project-specific terms diverge from ORCA's statutory take for a given country. Pre-built presets load common IOC country archetypes (Norway, Angola, Iraq, Australia, UK, Saudi Arabia, Iran, Guyana, Indonesia, Malaysia, Kazakhstan) in one click.</div>
     <!-- v363: Pre-fill context banner — shown when Scenario Builder is opened from Country Profile via ddOpenScenarioBuilder() -->
-    <div id="sb-prefill-banner" style="display:none;background:rgba(176,104,0,0.07);border:1px solid rgba(176,104,0,0.25);border-radius:5px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--accent-dim);align-items:center;gap:8px;">
+    <!-- v928 (T6): flex-wrap + a swap control. A preset names a country, so the banner now has to
+         carry both the basis of what was loaded and a route to the country's own ORCA record. -->
+    <div id="sb-prefill-banner" style="display:none;flex-wrap:wrap;background:rgba(176,104,0,0.07);border:1px solid rgba(176,104,0,0.25);border-radius:5px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--accent-dim);align-items:center;gap:8px;">
       <span style="font-size:14px;"></span>
-      <span id="sb-prefill-text">Parameters pre-filled from Country Profile</span>
-      <button onclick="(function(){document.getElementById('sb-prefill-banner').style.display='none';})()" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px;" title="Dismiss" aria-label="Dismiss pre-fill notification">&times;</button>
+      <span id="sb-prefill-text" style="flex:1 1 220px;min-width:0;line-height:1.55;">Parameters pre-filled from Country Profile</span>
+      <button id="sb-preset-swap" style="display:none;flex:0 0 auto;margin-left:auto;background:transparent;border:1px solid currentColor;border-radius:4px;color:inherit;font-size:11px;font-weight:700;padding:4px 9px;min-height:28px;cursor:pointer;white-space:nowrap;">Use ORCA&rsquo;s record</button>
+      <button onclick="(function(){document.getElementById('sb-prefill-banner').style.display='none';})()" style="flex:0 0 auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px;min-height:24px;min-width:24px;" title="Dismiss" aria-label="Dismiss pre-fill notification">&times;</button>
     </div>
 
     <div class="scenario-builder-grid">
@@ -54614,40 +54617,49 @@ function toggleCFPanel(country) {
 
 const SB_PRESETS = {
   norway: {
+    _country: 'Norway', _doc: 'Norway Petroleum Taxation Act \u2014 22% CIT + 56% special petroleum tax, SDFI 33.4%',
     mechanic: 'Concession', profile: 'north_sea', price: 75,
     royalty: 0, cit: 22, spt: 56, state_eq: 33.4, windfall: 0, severance: 0
   },
   angola: {
+    _country: 'Angola', _doc: 'Angola EPSA IV model production-sharing agreement',
     mechanic: 'PSC', profile: 'deepwater', price: 75,
     cr_cap: 70, ftp: 10, po_govt: 50, psc_cit: 25, psc_royalty: 0
   },
   iraq: {
+    _country: 'Iraq', _doc: 'Iraq 2009\u201310 licensing-round technical service contracts',
     mechanic: 'TSC', profile: 'onshore_me', price: 75,
     fee: 6.0, tsc_cit: 35, ept: 0
   },
   uk: {
+    _country: 'United Kingdom', _doc: 'UK ring-fence corporation tax + supplementary charge + Energy Profits Levy (2022)',
     mechanic: 'Concession', profile: 'north_sea', price: 75,
     royalty: 0, cit: 40, spt: 0, state_eq: 0, windfall: 38, severance: 0
   },
   australia: {
+    _country: 'Australia', _doc: 'Petroleum Resource Rent Tax Assessment Act 1987 \u2014 40% PRRT, 11.5% uplift',
     mechanic: 'PRRT', profile: 'shallow', price: 75,
     prrt_rate: 40, prrt_cit: 30, prrt_royalty: 0, prrt_uplift: 11.5
   },
   saudi: {
+    _country: 'Saudi Arabia', _doc: 'Saudi Aramco concession \u2014 20% royalty, 85% income tax',
     mechanic: 'Concession', profile: 'onshore_me', price: 75,
     royalty: 20, cit: 85, spt: 0, state_eq: 0, windfall: 0, severance: 0
   },
   iran: {
+    _country: 'Iran', _doc: 'NIOC buy-back contract terms (2000\u20132010)',
     mechanic: 'Buy-back', profile: 'onshore_me', price: 75,
     bb_fee: 3.50, bb_cap: 50, bb_term: 10, bb_cit: 25
   },
   india: {
+    _country: 'India', _doc: 'India NELP / HELP risk service contract \u2014 representative $4/bbl fee',
     mechanic: 'RSC', profile: 'shallow', price: 75,
     fee: 4.0, tsc_cit: 34, ept: 5
   },
   nigeria_rs: {
     // Nigeria Revenue Share — pre-PIA legacy gross revenue contracts (pre-2021 Petroleum Industry Act)
     // 55% govt revenue share, 30% CIT, 0% royalty; representative of pre-PIA deepwater RSA structures
+    _country: 'Nigeria', _doc: 'Nigeria pre-PIA legacy gross-revenue contracts',
     mechanic: 'Revenue Share', profile: 'deepwater', price: 75,
     rs_govt: 55, rs_cit: 30, rs_royalty: 0
   },
@@ -54656,6 +54668,7 @@ const SB_PRESETS = {
     // Base contractor split: 43% onshore oil. Variable components (field stage, depth, location, infrastructure)
     // add 2–18pp to base split. 25% DMO at 25% ICP (years 1–5), escalating to 100% ICP thereafter.
     // Replaces traditional cost recovery PSC; contractor bears all cost risk within gross split.
+    _country: 'Indonesia', _doc: 'MoEMR Decree No. 8/2017 \u2014 Gross Split',
     mechanic: 'Gross Split', profile: 'onshore_me', price: 75,
     gs_cont: 43, gs_cit: 25, gs_dmo: 25, gs_dmo_price: 25
   },
@@ -54664,6 +54677,7 @@ const SB_PRESETS = {
     // 10% royalty, 50% cost recovery cap (oil), 50/50 profit oil split (flat — no R-factor tiers), 25% CIT.
     // One of the most-watched deepwater fiscal benchmarks since the 2015 Liza discovery (11+ billion boe).
     // Government take ~52–56% at $75/bbl — among the most contractor-friendly PSCs in Latin America.
+    _country: 'Guyana', _doc: 'Guyana Stabroek Block PSC, 2016 renegotiation',
     mechanic: 'PSC', profile: 'deepwater', price: 75,
     cr_cap: 50, ftp: 0, po_govt: 50, psc_cit: 25, psc_royalty: 10
   },
@@ -54672,6 +54686,7 @@ const SB_PRESETS = {
     // 75% cost recovery cap (oil), 10% FTP (First Tranche Petroleum, PETRONAS), 50% government profit oil,
     // 25% CIT. Governs Shell, ExxonMobil, TotalEnergies, and Murphy deepwater operations.
     // Government take ~59% at $75/bbl — mid-range Asia Pacific PSC benchmark.
+    _country: 'Malaysia', _doc: 'PETRONAS standard upstream model PSC',
     mechanic: 'PSC', profile: 'deepwater', price: 75,
     cr_cap: 75, ftp: 10, po_govt: 50, psc_cit: 25, psc_royalty: 0
   },
@@ -54682,11 +54697,102 @@ const SB_PRESETS = {
     // applies above cost-recovery threshold; modeled at representative mid-rate.
     // Government take ~70% at $75/bbl (KAZENERGY range 67–74%). One of the most complex
     // PSA structures globally — Kashagan required 6 production-sharing agreement renegotiations.
+    _country: 'Kazakhstan', _doc: 'Kazakhstan PSA \u2014 Kashagan / Tengiz model',
     mechanic: 'PSC', profile: 'onshore_me', price: 75,
     cr_cap: 80, ftp: 0, po_govt: 50, psc_cit: 20, psc_royalty: 5
   }
 };
 
+// ── v928 (T6) — A PRESET NAMES A COUNTRY. IT HAD NO BASIS AND NO RECONCILIATION. ──────────
+// The Scenario Builder's preset row is the only place on this platform where a fiscal parameter
+// is asserted about a named country — and, on eight of the thirteen, about a named signed
+// instrument — with nothing behind it. Every other number here was taught to state where it came
+// from: Fiscal Compare, Explorer, Screener and Side-by-Side all carry the "N of M terms cited"
+// chip into the Evidence Chain, the country pre-fill path (v607/v776/v883) prints which terms it
+// read from ORCA's record and which it defaulted, and the profile strip above says in full that
+// this modal is what-if only. loadPreset() did the opposite: it dropped _sbOrigin and HID the
+// banner, so the form went blank of provenance at exactly the moment it acquired a country name.
+//
+// That matters because the presets are hand-entered archetypes and they disagree with ORCA's own
+// record. Measured against the shipped country_data.json, 9 of the 13 differ on at least one term
+// the form loads, several of them far apart:
+//
+//     Guyana      royalty 10% (preset) vs 2% on record   · cost recovery cap 50% vs 75%
+//     Angola      profit oil govt 50% vs 75%  · CIT 25% vs 49.9%  · FTP 10% vs 20%  · cap 70/50
+//     Malaysia    profit oil govt 50% vs 70%  · CIT 25% vs 38%    · royalty 0% vs 10%
+//     Nigeria     CIT 30% vs 65.4%            · royalty 0% vs 10%
+//     Kazakhstan  profit oil govt 50% vs 80%  · cap 80% vs 89.4%  · royalty 5% vs 8%
+//     Iraq        service fee $6.00/bbl vs $2.00 · Saudi CIT 85% vs 50% · India CIT 34% vs 40%
+//
+// Guyana is the sharp one. The preset is labelled with the Stabroek PSA and loads a 10% royalty;
+// ORCA's Evidence Chain cites that same document, tier A, statutory-matched, at 2% — the figure
+// Guyana's own parliament has argued about. An analyst who has just been taught to read the
+// Evidence Chain clicks the button named after that contract and is handed a different number.
+// And it computes 54.2% take against the profile's published 54.1%, so the output looks like
+// corroboration rather than a contradiction.
+//
+// NOTHING HERE CHANGES A PRESET VALUE, and deliberately so. The divergence does not always run
+// one way: Iraq's $2.00/bbl on record is the D-confidence mass default applied to 406 of its 415
+// TSC contracts, so the preset's $6.00 may well be the better figure. Which one is right is a
+// judgement about the blocks being screened, not something this page can settle. So the page
+// states both, names the instrument the preset was typed in from, and hands over a one-click
+// route to ORCA's record — the existing ddOpenScenarioBuilder() path, with all its own basis
+// reporting — instead of picking a winner.
+//
+// Which loaded fields are comparable to a column ORCA holds, per mechanic. Anything not listed
+// (R-factor tiers, uplift, buy-back term, DMO) has no country-level counterpart to compare with.
+var _SB_PRESET_CMP = {
+  'Concession':    [['royalty','royalty','Royalty','%'], ['cit','cit','CIT','%'],
+                    ['spt','spt','Special tax','%'], ['state_eq','state_eq','State equity','%']],
+  'PSC':           [['psc_royalty','royalty','Royalty','%'], ['psc_cit','cit','CIT','%'],
+                    ['cr_cap','cr_cap','Cost recovery cap','%'], ['ftp','ftp','FTP','%'],
+                    ['po_govt','profit_oil_govt','Profit oil (govt)','%']],
+  'TSC':           [['fee','tsc_fee','Service fee','$/bbl'], ['tsc_cit','cit','CIT','%']],
+  'RSC':           [['fee','tsc_fee','Service fee','$/bbl'], ['tsc_cit','cit','CIT','%']],
+  'PRRT':          [['prrt_royalty','royalty','Royalty','%'], ['prrt_cit','cit','CIT','%']],
+  'Buy-back':      [['bb_cit','cit','CIT','%']],
+  'Revenue Share': [['rs_royalty','royalty','Royalty','%'], ['rs_cit','cit','CIT','%']],
+  'Gross Split':   [['gs_cit','cit','CIT','%']]
+};
+function _sbPresetNum(v, unit) {
+  var n = Number(v);
+  if (!isFinite(n)) return '';
+  return (unit === '$/bbl' ? '$' + n.toFixed(2) + '/bbl'
+                           : (Math.round(n * 10) / 10) + '%');
+}
+// Compares the values this preset is about to write into the form against the country-level
+// terms ORCA holds. Returns the lists rather than a verdict; the caller does the wording.
+function _sbPresetReconcile(p) {
+  var out = { n: 0, diff: [], held: [], none: [] };
+  if (!p || !p._country || typeof COUNTRY_DATA === 'undefined') return out;
+  var d = COUNTRY_DATA.find(function (x) { return x.country === p._country; });
+  if (!d) return out;
+  var fields = _SB_PRESET_CMP[p.mechanic] || [];
+  fields.forEach(function (f) {
+    var pv = p[f[0]];
+    if (pv == null) return;               // the preset does not set this field
+    out.n++;
+    var ov = d[f[1]];
+    if (ov == null) { out.none.push(f[2]); return; }
+    var tol = f[3] === '$/bbl' ? 0.05 : 0.5;   // rounding, not disagreement
+    if (Math.abs(Number(ov) - Number(pv)) > tol) {
+      out.diff.push(f[2] + ' <strong>' + _sbPresetNum(pv, f[3]) + '</strong> here vs <strong>'
+                  + _sbPresetNum(ov, f[3]) + '</strong> on record');
+    } else {
+      out.held.push(f[2]);
+    }
+  });
+  return out;
+}
+function _sbEscP(t) {
+  return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// Loads ORCA's own record for the country the preset names, through the fully-instrumented
+// country pre-fill path — so the swap arrives with its own basis line, its R-factor ladder and
+// its published-take reconciliation, none of which a preset can carry.
+function _sbUsePresetCountryRecord(country) {
+  if (typeof ddOpenScenarioBuilder === 'function') ddOpenScenarioBuilder(country);
+}
 function loadPreset(name) {
   const p = SB_PRESETS[name];
   if (!p) return;
@@ -54695,7 +54801,7 @@ function loadPreset(name) {
   // banner with it, so the results panel cannot claim terms came from a country it did not.
   window._sbOrigin = null;
   var _sbPfB = document.getElementById('sb-prefill-banner');
-  if (_sbPfB) _sbPfB.style.display = 'none';
+  if (_sbPfB) _sbPfB.style.display = 'none';   // v928 (T6): re-shown, with the preset's basis, at the end of this function
   // v883 (T2): drop any armed R-factor ladder with it, for the same reason.
   if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
   document.getElementById('sb-mechanic').value = p.mechanic;
@@ -54739,6 +54845,60 @@ function loadPreset(name) {
     document.getElementById('sb-gs-cit').value = p.gs_cit ?? 25;
     document.getElementById('sb-gs-dmo').value = p.gs_dmo ?? 25;
     document.getElementById('sb-gs-dmo-price').value = p.gs_dmo_price ?? 25;
+  }
+
+  // ── v928 (T6): say what was just loaded, and reconcile it with ORCA's own record. ──────
+  var _pb = document.getElementById('sb-prefill-banner');
+  var _pt = document.getElementById('sb-prefill-text');
+  var _ps = document.getElementById('sb-preset-swap');
+  if (_pb && _pt && p._country) {
+    var _r = _sbPresetReconcile(p);
+    var _c = _sbEscP(p._country);
+    var _h = '<strong>Preset \u2014 a hand-built archetype, not ORCA\u2019s record for ' + _c
+           + '.</strong> These figures were entered from ' + _sbEscP(p._doc)
+           + '. No fact in ORCA\u2019s database stands behind them, and the evidence letter you see '
+           + 'elsewhere grades ' + _c + '\u2019s record, not this form. ';
+    var _one = function (k) { return k === 1; };
+    if (_r.diff.length) {
+      _h += '<strong>' + (_r.diff.length === _r.n
+              ? (_one(_r.n) ? 'The one loaded term ORCA can be compared on disagrees'
+                            : 'All ' + _r.n + ' loaded terms disagree')
+              : _r.diff.length + ' of the ' + _r.n + ' loaded terms disagree')
+          + ' with what ORCA holds for ' + _c + ':</strong> ' + _r.diff.join(' \u00b7 ') + '. ';
+    } else if (_r.n) {
+      _h += (_one(_r.n) ? 'The one comparable term matches' : 'All ' + _r.n + ' comparable terms match')
+          + ' what ORCA holds for ' + _c + '. ';
+    }
+    if (_r.none.length) {
+      _h += 'ORCA holds no country-level ' + _r.none.join(', ') + ' for ' + _c + '. ';
+    }
+    if (_r.diff.length) {
+      _h += 'Neither figure is automatically the right one \u2014 ORCA\u2019s is averaged across the '
+          + 'contracts it holds, the preset is one published instrument \u2014 but the DCF below runs '
+          + 'the preset\u2019s.';
+    }
+    _pt.innerHTML = _h;
+    var _warn = _r.diff.length > 0;
+    _pb.style.borderColor = _warn ? 'var(--yellow)' : 'rgba(176,104,0,0.25)';
+    _pb.style.background  = _warn ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    _pb.style.color       = 'var(--accent-dim)';
+    _pb.style.display     = 'flex';
+    if (_ps) {
+      _ps.innerHTML = 'Use ' + _c + '\u2019s ORCA record';
+      _ps.title = 'Reload this form from the fiscal terms ORCA actually holds for ' + p._country
+                + ', through the country pre-fill path \u2014 which states which terms it read from the '
+                + 'record and which it defaulted, carries the filed R-factor ladder if there is one, and '
+                + 'reconciles the result against ' + p._country + '\u2019s published take.';
+      _ps.setAttribute('aria-label', 'Reload the Scenario Builder from ORCA\u2019s record for ' + p._country);
+      _ps.onclick = function () { _sbUsePresetCountryRecord(p._country); };
+      _ps.style.display = '';
+    }
+    // The preset buttons sit at the bottom of a scrolling panel; the fields they just rewrote,
+    // the Run DCF control and this note are all above the fold. Without this the click produced
+    // no visible feedback at all on a phone.
+    try { _pb.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { _pb.scrollIntoView(); }
+  } else if (_ps) {
+    _ps.style.display = 'none';
   }
 }
 
@@ -56092,6 +56252,9 @@ function ddOpenScenarioBuilder(country) {
     _sbBanner.style.background  = _sbMono ? 'rgba(185,28,28,0.07)' : _sbBasis === 'default' ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
     _sbBanner.style.color       = _sbMono ? 'var(--red)' : 'var(--accent-dim)';
     _sbBanner.style.display = 'flex';
+    // v928 (T6): this path IS the record, so the "use the record instead" control retires here.
+    var _sbSwapBtn = document.getElementById('sb-preset-swap');
+    if (_sbSwapBtn) _sbSwapBtn.style.display = 'none';
   }
 
   // Set mechanic
