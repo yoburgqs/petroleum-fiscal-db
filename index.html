@@ -43872,8 +43872,72 @@ function loadCountryProfile(country) {
       charLabel = 'Moderate take, price-dependent returns — contractor NPV clears the 10% WACC at $75/bbl but not at $50/bbl; needs a sustained price above the base case or a lower-cost profile';
       charColor = 'var(--yellow)';
     } else if (take <= 65 && (!hasDownC || downSolid)) {
-      charLabel = 'Moderate-take open access — typical IOC benchmark range with predictable fiscal structure';
-      charColor = 'var(--accent)';
+      // ── v931 (T2): "with predictable fiscal structure" was an adjective, not a reading ──────
+      // This branch is selected by `take <= 65 && (!hasDownC || downSolid)`. Neither test touches
+      // predictability, dispersion or the reform log — yet the clause asserted a fiscal-stability
+      // property, in the page's FIRST line, the one v760 promoted to sit directly under the country
+      // name precisely because it is this page's one direct answer to "is this attractive at $75?".
+      //
+      // Measured live against COUNTRY_DATA with the spread cache warmed, this branch fires for 10
+      // countries, and the SAME page refutes the word two blocks down on 6 of them:
+      //   Azerbaijan  ≤39 VERY LOW (130th of 132 one-term regimes)   Myanmar   ≤51 LOW
+      //   Brazil      ≤59 LOW — and a Stability row reading "WACC +3–5pp (3 fiscal law changes
+      //               since 2010)", i.e. the page called it predictable while telling the analyst
+      //               to add 3–5 points to the discount rate for reform exposure
+      //   Gabon        53 LOW      India  52 LOW      Tanzania  ≤54 LOW
+      // Kenya (62) and Sudan (73) print UNGRADED — a band this platform deliberately refuses to
+      // award on a spread nobody measured — and the remaining two (China 72, Sao Tome ≤65) top out
+      // at MODERATE, which is the highest grade rendered anywhere here: no regime on this platform
+      // has earned a HIGH on a measured spread. So the claim was unsupported on all 10 and
+      // contradicted outright on 6, in the half of the sentence an analyst pastes into an IC memo.
+      //
+      // This is the v648 defect on the branch v648 did not reach — "the page contradicted itself at
+      // the point of decision, and the half an analyst quotes into an IC memo was the half it had
+      // just disowned". The take half of this sentence IS earned by the branch condition and is
+      // kept. The predictability half now reads the SAME objects the badge and the Stability row
+      // paint from — _fpObsCeiling(), _fpDispersion(), _rrClassify() — so the top line and the
+      // badge below it can no longer print different findings. No new threshold is introduced:
+      // the bands are _fpBandLabel()'s, and "graded only where measured" is the v624 rule.
+      var _pdC931  = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+      var _pdSt931 = (typeof _fpDispersion === 'function') ? ((_fpDispersion(d) || {}).state || null) : null;
+      var _pdSc931 = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+      var _pdBand931 = null, _pdRead931 = '', _pdGraded931 = false;
+      // `material` is v720's rule and the badge obeys it: a correction that neither moves the band
+      // nor costs 5 points is stated in muted type, and the badge keeps PRINTING the stored score.
+      // Ignoring it here made this line read "\u226451 \u00b7 LOW, the same figure the badge below
+      // prints" for India while that badge printed "52 \u00b7 LOW" — a sentence whose own claim of
+      // agreement was the thing that was false. Where material is false, bandMoves is false too, so
+      // falling through to the measured branch prints the badge's number AND its band.
+      if (_pdC931 && _pdC931.bound != null && _pdC931.material) {
+        // The contract file refutes the stored basis — carry the ceiling, as every other surface does.
+        _pdBand931 = _pdC931.band; _pdGraded931 = true;
+        _pdRead931 = '\u2264' + _pdC931.bound + ' \u00b7 ' + _pdC931.band;
+      } else if (_pdSt931 === 'measured' && _pdSc931 != null) {
+        _pdBand931 = _fpBandLabel(_pdSc931); _pdGraded931 = true;
+        _pdRead931 = _pdSc931 + ' \u00b7 ' + _pdBand931;
+      } else if (_pdSt931 === 'single' && _pdSc931 != null) {
+        _pdRead931 = _pdSc931 + ' \u00b7 UNGRADED';
+      }
+      var _pdWeak931 = _pdGraded931 && (_pdBand931 === 'LOW' || _pdBand931 === 'VERY LOW');
+      // The reform log belongs in the sentence that used to claim stability, not three blocks below it.
+      var _pdRef931 = _rrCovered344
+        ? ' Reform log: ' + _reforms344 + ' fiscal law change' + (_reforms344 !== 1 ? 's' : '') + ' since 2010'
+          + ((_rrV843 && _rrV843.icToken) ? ' \u2014 ' + _rrTxt843(_rrV843.icToken) : '') + '.'
+        : '';
+      charLabel = 'Moderate-take open access \u2014 at ' + take.toFixed(1)
+        + '% the terms sit in the typical IOC benchmark range.'
+        + (_pdWeak931
+            ? ' Its fiscal structure is NOT predictable, and this page grades that separately: predictability reads '
+              + _pdRead931 + ', the same figure the badge below prints. Defend the entry on the take, not on stability.'
+            : _pdGraded931
+            ? ' Fiscal predictability reads ' + _pdRead931
+              + ' \u2014 the top of the range rather than a HIGH, because MODERATE is the highest band any measured regime on this platform reaches.'
+            : _pdRead931
+            ? ' Fiscal predictability is NOT established: ' + _pdRead931
+              + ' \u2014 the band was never earned, because ORCA measured no take spread across this country\u2019s own contracts. A one-term score is not the steadier regime, it is the one ORCA holds less contract evidence against.'
+            : ' Fiscal predictability is not scored here \u2014 ORCA holds no contract-level take distribution, so no stability reading may be carried into an IC memo.')
+        + _pdRef931;
+      charColor = _pdWeak931 ? 'var(--yellow)' : 'var(--accent)';
     } else if (take <= 75 && downFragile) {
       charLabel = 'High-moderate take with constrained returns — contractor NPV clears at $75/bbl but not at $50/bbl; viability depends on the price environment and specific block economics';
       charColor = 'var(--orange)';

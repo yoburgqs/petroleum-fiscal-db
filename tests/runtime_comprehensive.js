@@ -1183,6 +1183,104 @@ async function testComparison(page) {
             `_fpObsCeiling().bound = ${agree2.bound} but the badge reads "${agree2.badge}"`);
       } catch (e) { f(S, 'CP-FPCEIL predictability ceiling leads the badge', e.message); }
 
+      // ── v931 (T2): the Fiscal character verdict may not ASSERT a stability it did not read ──
+      // The branch selected by `take <= 65 && (!hasDownC || downSolid)` closed with the fixed
+      // words "with predictable fiscal structure". Neither half of that condition reads
+      // predictability, dispersion or the reform log. It fires for 10 countries and the SAME page
+      // refuted the word two blocks down on 6: Azerbaijan ≤39 VERY LOW, Brazil ≤59 LOW (whose
+      // Stability row simultaneously said "WACC +3–5pp, 3 fiscal law changes since 2010"),
+      // Myanmar ≤51, Tanzania ≤54, Gabon 53, India 52. Kenya and Sudan print UNGRADED — a band
+      // this platform refuses to award on a spread nobody measured — and the best of the ten is
+      // MODERATE, the highest grade rendered anywhere here.
+      // The verdict is the FIRST line on the page (v760 promoted it there) and the half an analyst
+      // pastes into an IC memo, so it is asserted on all four shapes, plus the cross-surface
+      // equality that is the actual fix: the figure the sentence quotes IS the figure the badge
+      // prints. India is in the set deliberately — its ceiling exists but is immaterial, so the
+      // badge keeps the stored 52 and the sentence must follow it rather than print ≤51.
+      try {
+        const VPRED = [
+          { c: 'Azerbaijan', shape: 'weak',        why: '≤39 · VERY LOW — 130th of 132 one-term regimes' },
+          { c: 'Brazil',     shape: 'weak',        why: '≤59 · LOW, and a reform log the sentence must carry' },
+          { c: 'India',      shape: 'weak',        why: 'immaterial ceiling — must print the badge’s 52, not ≤51' },
+          { c: 'China',      shape: 'graded',      why: '72 · MODERATE measured — stated as the top of the range, not a HIGH' },
+          { c: 'Sudan',      shape: 'unestablished', why: '73 · UNGRADED one term — a band never earned' }
+        ];
+        await switchTab(page, 't7');
+        await page.waitForTimeout(300);
+        for (const t of VPRED) {
+          await page.selectOption('#dd-country-select', t.c).catch(() => {});
+          await page.waitForFunction(
+            (c) => { try { return !!(window._cpObsSpread && window._cpObsSpread[c]); } catch (e) { return false; } },
+            t.c, { timeout: 8000 }).catch(() => {});
+          await page.waitForTimeout(1800);
+          const r = await page.evaluate(() => {
+            const el = [...document.querySelectorAll('#dd-content div')]
+              .find(e => /^Fiscal character:/.test(e.innerText || ''));
+            const txt = el ? (el.innerText || '').replace(/\s+/g, ' ').trim() : '';
+            const lbl = document.querySelector('#dd-profile-head .cp-fp-lbl');
+            const bdg = lbl && lbl.nextElementSibling;
+            const m = txt.match(/predictability reads ([^,—]+)|NOT established:\s*([^—]+)/);
+            return {
+              txt: txt,
+              quoted: ((m && (m[1] || m[2])) || '').trim(),
+              badge: bdg ? bdg.innerText.replace(/\s+/g, ' ').trim() : '',
+              oldWord: /predictable fiscal structure/.test(txt)
+            };
+          });
+          // (1) the unearned adjective is gone on every shape
+          if (!r.oldWord) p(S, `CP-VPRED ${t.c} asserts no unread stability`,
+            `verdict no longer closes with "predictable fiscal structure" — ${t.why}`);
+          else f(S, `CP-VPRED ${t.c} asserts no unread stability`,
+            `verdict still reads "predictable fiscal structure": "${r.txt.slice(0, 160)}"`);
+          // (2) the shape matches what the platform actually holds
+          let ok, expl = `quoted="${r.quoted}" badge="${r.badge}"`;
+          if (t.shape === 'weak')            ok = /NOT predictable/.test(r.txt) && /(LOW|VERY LOW)/.test(r.quoted);
+          else if (t.shape === 'graded')     ok = /MODERATE is the highest band/.test(r.txt) && /MODERATE/.test(r.quoted);
+          else                               ok = /NOT established/.test(r.txt) && /UNGRADED/.test(r.quoted);
+          if (ok) p(S, `CP-VPRED ${t.c} (${t.shape})`, `${expl} — ${t.why}`);
+          else    f(S, `CP-VPRED ${t.c} (${t.shape})`, `expected the ${t.shape} shape; got "${r.txt.slice(0, 200)}"`);
+          // (3) THE FIX: the sentence and the badge print one figure
+          // The badge element also carries its basis chip ("≥23.0pp obs" / "13.3pp" / "one term"),
+          // so this asserts the badge LEADS with the figure the sentence quotes rather than equals
+          // it outright. Strict equality would false-fail on a correct build — caught by reading
+          // the pre-build failure text, which printed badge="≤39 · VERY LOW ≥23.0pp obs".
+          if (r.quoted && r.badge && r.badge.replace(/\s/g, '').indexOf(r.quoted.replace(/\s/g, '')) === 0)
+            p(S, `CP-VPRED ${t.c} verdict figure == badge figure`,
+              `both read "${r.badge}" — the top line can no longer disagree with the metric below it`);
+          else
+            f(S, `CP-VPRED ${t.c} verdict figure == badge figure`,
+              `verdict quotes "${r.quoted}" while the badge prints "${r.badge}"`);
+        }
+        // Brazil is the sharpest case: the page priced reform exposure into the WACC while the
+        // line above called the regime predictable. The reform log now travels with the sentence.
+        await page.selectOption('#dd-country-select', 'Brazil').catch(() => {});
+        await page.waitForTimeout(2500);
+        const brz = await page.evaluate(() => {
+          const el = [...document.querySelectorAll('#dd-content div')]
+            .find(e => /^Fiscal character:/.test(e.innerText || ''));
+          return el ? (el.innerText || '').replace(/\s+/g, ' ').trim() : '';
+        });
+        if (/Reform log: 3 fiscal law changes since 2010/.test(brz) && /WACC/.test(brz))
+          p(S, 'CP-VPRED Brazil carries its reform log in the verdict',
+            'the sentence that used to say "predictable" now names 3 fiscal law changes since 2010 and the WACC verdict');
+        else
+          f(S, 'CP-VPRED Brazil carries its reform log in the verdict',
+            `reform log missing from the verdict: "${brz.slice(0, 220)}"`);
+        // Control: a country on an untouched branch must be unaffected by this change.
+        await page.selectOption('#dd-country-select', 'Angola').catch(() => {});
+        await page.waitForTimeout(2500);
+        const ang = await page.evaluate(() => {
+          const el = [...document.querySelectorAll('#dd-content div')]
+            .find(e => /^Fiscal character:/.test(e.innerText || ''));
+          return el ? (el.innerText || '').replace(/\s+/g, ' ').trim() : '';
+        });
+        if (/Commercially attractive/.test(ang))
+          p(S, 'CP-VPRED untouched branch control (Angola)',
+            'the take<=55 && downSolid branch still reads "Commercially attractive" — v931 changed one branch, not the chain');
+        else
+          f(S, 'CP-VPRED untouched branch control (Angola)', `Angola verdict changed: "${ang.slice(0, 200)}"`);
+      } catch (e) { f(S, 'CP-VPRED verdict states the predictability it read', e.message); }
+
       // Same badge, same defect, in the Fiscal Compare drilldown drawer, where it sat between
       // "19.9–26.1% range" and "BE: —" as a bare "91 · UNGRADED / one term".
       await page.evaluate(() => { if (typeof switchTab === 'function') switchTab('t0', null); });
