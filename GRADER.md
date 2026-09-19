@@ -60633,3 +60633,16 @@ below the harness. Pre-existing; recorded, not fixed here.
   the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable `Score <= 20` IC rule
   on Reform Risk.
 - Not audited this cycle: whether a floor row reaches a CSV/XLSX tier column (carried from 840).
+
+---
+## Cycle 841 Log — 2026-09-19 00:55
+- Test before: 430 PASS / 0 FAIL
+- Test after: 431 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Environment is clean — those two "failed" notifications are the self-matching wait loops I just killed, not the verification runs. All work is committed and pushed.
+
+## Cycle 841 — complete, shipped as v928
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+
+**Friction:** The Scenario Builder's preset row was the only place on the platform asserting a fiscal parameter about a named country — on eight of thirteen, a named signed contract — with nothing behind it. `lo
