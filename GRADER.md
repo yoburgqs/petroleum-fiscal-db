@@ -60646,3 +60646,127 @@ below the harness. Pre-existing; recorded, not fixed here.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?"
 
 **Friction:** The Scenario Builder's preset row was the only place on the platform asserting a fiscal parameter about a named country — on eight of thirteen, a named signed contract — with nothing behind it. `lo
+
+---
+## Cycle 842 — 2026-09-19 — shipped as v929
+
+**Task: T3** — "How do these three countries compare side by side?" Stalest in rotation
+(841 was T6, 840 T1, 836 T5, 835 T2, 834 T4, 830 T1, 829 T6 — **T3 last walked at 828**).
+
+## Friction
+
+Walked cold at 1440x900 with `sessionStorage` and `localStorage` cleared, and deliberately
+*typed* a set rather than clicking a quickstart — the search box is the only way an analyst
+puts their own three countries on this tab. Set: **Guyana / Brazil / Angola**, three of the
+four countries in this tab's own Atlantic Frontier preset.
+
+Every **ordering** surface on Side-by-Side is hard-coded to $75:
+
+| surface | where | was |
+|---|---|---|
+| verdict strip, take chain | `_vdTake` → `_cmpRankTake(d, 75)` | `renderCompare()` |
+| verdict strip, value chain | `_cmpRankNpv` → `_cmpRankNpvAt(d, 75)` | `renderCompare()` |
+| left→right column order | `_sbsCmpTake(d, 75)` ×3 | `_sbsApplyOrder()` |
+| Reading line | `CMP_ORDER_LABEL[cmpOrder]` | fixed string `$75/bbl` |
+| order dropdown labels | markup | `Govt take $75 — low → high` |
+
+Meanwhile the grid beneath prints **all four** published prices, and the tab's own
+`_cmpReorder` detector (v926) already knows the order changes between them. On this set the
+headline reads, in the largest text on the tab, with Angola in the leftmost column:
+
+```
+GOVT TAKE @$75, LOWEST FIRST:  Angola 53.0% › Brazil 55.6%     [2.6pp apart]
+```
+
+At $100 the truth is the reverse — **Brazil 58.7% against Angola 60.2%**. The page *knew*: it
+drew an amber `⚠ order changes in $75–$100` pill. But measured on the shipped build, the
+notice that expands it starts at **y=1654** and the take-vs-price chart that draws the crossing
+starts at **y=2310** — page three on a 900px viewport, behind 550px of caveat prose. And
+nothing anywhere let the analyst *act* on it. The two readings available were "trust the
+headline" and "discard the ranking"; there was no "re-rank it at my deck."
+
+This is the sharpest kind of wrong the tab can be: not missing, not caveated — **confidently
+inverted at the price half its users defend**, in its own headline, under its own column order.
+
+## Change
+
+A **`Rank at`** select ($50 / $75 / $100 / $125) in the Side-by-Side toolbar, immediately left
+of `Order columns`. It re-ranks together:
+
+- the verdict strip's take chain, its `Npp apart` pill and every tooltip on it
+- the contractor-value chain, its `agrees / disagrees with take order` chip and its reconciliation tooltips
+- the left→right column order, including the statutory-terms bucketing
+- the Reading line, via a new `_cmpOrderLabel()` (the `CMP_ORDER_LABEL` map stays a literal because `setCompareOrder()` uses it as a validity check)
+- both `Govt take $N` option labels in the order dropdown
+
+so **no surface is left naming a price the ordering is not using**. The grid keeps all four
+price rows unchanged — this chooses which row the set is *ranked* on, not what is displayed.
+
+The price rides the share link as an `@<price>` suffix, written by both `_updateCompareHash()`
+and `shareComparison()` and parsed back by the `#/compare/` route before anything splits on
+`+`. Without that, a link shared off a $100 deck reopens at $75 — on this very set, the
+**reverse order under the sender's own column headings**, which is the same defect one level
+down. Suffix is omitted at 75, so every previously issued link is byte-identical.
+
+**Default stays `cmpRankPrice = 75`.** A cold load renders exactly as before — the same
+invariant v908 recorded for `cmpOrder`, and the `<option selected>` must stay in sync with the
+literal for the same reason.
+
+## Result
+
+An analyst screening at a $100 deck sets `Rank at $100` and reads:
+
+```
+GOVT TAKE @$100, LOWEST FIRST:  Brazil 58.7% › Angola 60.2%    [1.5pp apart]
+CONTRACTOR VALUE @$100, LARGEST FIRST:  Brazil $2.65B › Angola $1.65B   [agrees with take order]
+```
+
+Columns reorder to **Brazil | Angola | Guyana**. The value line flips from *disagrees with take
+order* to *agrees* — at $100 the two blocks stop contradicting each other, which the $75 view
+could never show. The inversion the page previously only warned about is now something the
+analyst can read, defend, and share.
+
+## Verification — suite RAN this cycle, on a clean process, local build
+
+| check | result |
+|---|---|
+| JS syntax gate | **11/11 PASS** |
+| Runtime suite | **423 PASS / 0 FAIL / 1 WARN** — 416 last cycle **+ exactly the 7 new assertions**, no regressions |
+| WARN | the known local service-worker 404 the harness does not see |
+| New `[SBS-RANKPRICE]` vs **pre-change** build | **0 PASS / 2 FAIL** — control absent, `selectOption` times out |
+| New `[SBS-RANKPRICE]` vs this build | **7 PASS / 0 FAIL** |
+| Horizontal scroll | **0 overflow at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs, `scrollWidth == clientWidth` at every one |
+| Page errors | **0** at every viewport |
+| 390×844 `hasTouch` | `#cmp-rankprice` **30px** tall under `pointer: coarse`, visible, ≥24px |
+| Share-link roundtrip, cold context | `#/compare/brazil+angola+guyana@100` → `cmpRankPrice=100`, control `100`, columns `Brazil\|Angola\|Guyana`, strip `@$100` |
+| Return to $75 | strip `@$75`, columns back to `Angola\|Brazil\|Guyana`, hash drops the suffix |
+
+The test was written to **fail first**: it was run against the pre-change build before being
+run against this one, so it asserts the fix rather than the implementation.
+
+### One defect found in this cycle's own change, before it shipped
+
+The first pass left `CONTRACTOR VALUE @$75, LARGEST FIRST:` hard-coded while printing the
+$125 figures beneath it — exactly the "a control naming a price the ordering is not using"
+defect this cycle set out to remove, reintroduced one line down. Caught by reading the rendered
+strip at $125 rather than trusting the patch, fixed, and now asserted (`strip re-ranks at $100`
+checks the take chain, the value chain, the Reading line **and** the dropdown together).
+
+## Debt still open, NOT fixed this cycle
+
+- **Both suite copies were patched identically this cycle**, but they remain diverged by the
+  pre-existing ~151 lines (`office/…/runtime_comprehensive.js` carries `testSbSRouteMiss`,
+  the repo copy does not). A local number and a harness number are still not comparable.
+- The two charts still render **below** the five caveat blocks — the take-vs-price chart starts
+  at y=2310 on a 1440x900 screen. The `Rank at` control gives the analyst the ordering without
+  scrolling there, but the chart that *shows* the crossing is still last on the page. Worth a
+  T3 look at its placement.
+- `# Contracts` grid row still prints `1193` unseparated while the `NPV weighting` row three
+  rows below prints `all 1,193` from the same figure (carried from 828).
+- Carried forward, unchanged: the PSC pre-fill rounding Angola's 2.6% to `3` (841) · the
+  state-monopoly `$0M` vs `n/a` split (835) · Angola's `BE: < $50/bbl bounded` above "No
+  breakeven on file" (835) · the service-worker 404 WARN · FAQ A381's 117/120 against 65 (829)
+  · "Compare up to 4 countries" against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven
+  Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable `Score <= 20` IC rule on Reform Risk
+  · `ddOpenScenarioBuilder()` falling to its generic branch for Guyana (841).
+- Not audited this cycle: whether a floor row reaches a CSV/XLSX tier column (carried from 840).
