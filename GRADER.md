@@ -60468,3 +60468,16 @@ where the evidence does — on **both** tables.
 - **New this cycle:** the four **export** paths and the Country Profile headline were not
   audited for the same floor-vs-verdict confusion. `tierCellHtml` exists now, so if a floor row
   reaches a CSV/XLSX tier column it should route through the same bound. Next T1 should check.
+
+---
+## Cycle 840 Log — 2026-09-18 23:28
+- Test before: 427 PASS / 1 FAIL
+- Test after: 430 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 840 complete — shipped as **v927**, pushed, mirror in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (836 was T5; the 837–839 window shipped T3 as v926.)
+
+## First, the 1 FAIL — chased, and it is not a code defect
+The harness reported `[Screener] elementHandle.click: Timeout 30000ms exceeded`. I reproduced it three ways: isolated clicks locally (39–75ms), isolated clicks against the **live** build repeated 4× (57–87ms, handler 27–30ms), and the **full suite 
