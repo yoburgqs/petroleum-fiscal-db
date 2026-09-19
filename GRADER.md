@@ -60907,3 +60907,131 @@ the tell.
 **Task: T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation (842 T3, 841 T6, 840 T1, 836 T5, 835 T2; T4 last walked at 834).
 
 **Friction.** The Reform Risk tab itself was clean — the lookup covers all 185 countries, states the 21/164 coverage split honestly, deep-links resolve, the CSV carries its basis columns, and it holds zero horizontal scroll and zero sub-24px controls at 390×844. The friction 
+
+---
+## Cycle 844 Log — 2026-09-19
+
+## Task / Friction / Change / Result
+
+**Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"*
+Stalest in rotation (843 T4, 842 T3, 841 T6, 840 T1, 836 T5; T2 last walked at **835**).
+
+### Friction
+
+Walked T2 cold at 1440×900 with `sessionStorage` and `localStorage` cleared — Country Profile,
+default Indonesia, then typing my own country. Most of the page held up: the IRR slot correctly
+refuses a country-level IRR and routes to Scenario Builder, which pre-fills this country's record
+and its R-factor ladder (v607/v776/v883); the dead-citation chip is honest; the defend paragraph
+disowns the downside-NPV leg by name.
+
+The friction was in the page's **first line**. The `Fiscal character` verdict is the one direct
+answer this page gives to "is this attractive at $75?", and v760 deliberately promoted it to render
+directly under the country name for exactly that reason. Its branch for a moderate take with a
+solid downside closed with the fixed words **"with predictable fiscal structure"**.
+
+The branch is selected by `take <= 65 && (!hasDownC || downSolid)` (`index.html`, in
+`loadCountryProfile` → `_cpFiscalVerdict470`). **Neither half of that condition reads
+predictability, dispersion, or the reform log.** The adjective had no input — it was asserted.
+
+Measured live against `COUNTRY_DATA` with the spread cache warmed, not assumed: the branch fires
+for **10** countries, and the **same page refutes the word two blocks down on 6 of them**.
+
+| country | what the top line said | what the page's own badge said |
+|---|---|---|
+| Azerbaijan | "…predictable fiscal structure" | **≤39 · VERY LOW** — 130th of 132 one-term regimes |
+| Brazil | same | **≤59 · LOW**, + Stability row "WACC +3–5pp (3 fiscal law changes since 2010)" |
+| Myanmar | same | **≤51 · LOW** |
+| Tanzania | same | **≤54 · LOW** |
+| Gabon | same | **53 · LOW** |
+| India | same | **52 · LOW** |
+| Kenya | same | 62 · **UNGRADED** — a band never earned |
+| Sudan | same | 73 · **UNGRADED** |
+| Sao Tome | same | ≤65 · MODERATE |
+| China | same | 72 · MODERATE |
+
+Brazil is the sharpest: the top line called the regime predictable while the Stability row on the
+same screen told the analyst to **add 3–5 points to the discount rate for reform exposure**. Both
+figures go into an IC memo. And MODERATE is the ceiling of this platform — no regime here has
+earned a HIGH on a measured spread — so even the best two of the ten did not support the word.
+
+This is the **v648 defect on the branch v648 did not reach**: *"the page contradicted itself at the
+point of decision, and the half an analyst quotes into an IC memo was the half it had just
+disowned."* v648 rebuilt the take ≤55 branches onto counted evidence and left this one asserting.
+
+### Change
+
+The take half of the sentence **is** earned by the branch condition and is kept. The predictability
+half now reads the same objects the badge and the Stability row paint from — `_fpObsCeiling()`,
+`_fpDispersion()`, `_rrClassify()` — and resolves in four shapes:
+
+| shape | reads | verdict colour |
+|---|---|---|
+| withdrawn ceiling (material) | `≤N · BAND` | yellow if LOW/VERY LOW |
+| measured spread | `N · BAND` | yellow if LOW/VERY LOW |
+| one-term | `N · UNGRADED` — "the band was never earned" | accent |
+| no distribution | "not scored … no stability reading may be carried into an IC memo" | accent |
+
+The reform log now travels **inside** the sentence that used to claim stability, instead of three
+blocks below it. **No new threshold is introduced**: the bands are `_fpBandLabel()`'s, "graded only
+where measured" is the v624 rule, and the ceiling is taken only where `_fpObsCeiling().material` —
+the same gate the badge itself obeys.
+
+### Result
+
+The analyst reading the first line on Azerbaijan is now told the regime is **NOT predictable at
+≤39 · VERY LOW**, where the page previously told them the opposite; on Brazil they get the 3 fiscal
+law changes and the WACC verdict in the same sentence as the take. **Verdict figure == badge figure
+on 10 of 10** — the top line can no longer disagree with the metric below it.
+
+### Verification — the suite RAN this cycle, on a clean process, against the LOCAL build
+
+| check | result |
+|---|---|
+| JS syntax gate | **11/11 PASS** |
+| Runtime suite | **446 PASS / 0 FAIL / 1 WARN** — read from the suite's own report at `/tmp/rt_931.txt`, not assumed |
+| New assertions | **+17** `[CP-VPRED]` across all four shapes, the Brazil reform-log clause, and an untouched-branch control (Angola) |
+| Written to fail first | **16 FAIL** against a genuine `git show HEAD:index.html` build; **0 FAIL** against this one. The Angola control passed on both — it is a control, not a symptom |
+| Other branches | **12 of 12 unchanged** (Angola, Norway, Iraq, USA, UAE, Nigeria, Libya, Indonesia, Malaysia, Venezuela, Nauru, Australia) — one branch changed, not the chain |
+| Horizontal scroll | **0 overflow across 6 viewports × 8 tabs = 48 combinations**, `scrollWidth == clientWidth` at every one |
+| 390×844 `hasTouch` | `pointer: coarse` confirmed; touched block 163–211px, right edge 376 < 390, its one control **44px** |
+| Page errors | **0** on both builds, every viewport |
+| WARN | the known **local** service-worker 404. Checked this cycle rather than carried forward: `sw.js` is **200 on the deployed build** and 404 only under local serving |
+
+### Two defects found in this cycle's own work, before it shipped
+
+1. **In the change.** The first pass took the ceiling whenever `_fpObsCeiling().bound` existed,
+   ignoring the `material` gate. For **India** that printed `≤51 · LOW` in a sentence whose own
+   words were *"the same figure the badge below prints"* — while that badge printed `52 · LOW`.
+   The claim of agreement was itself the false part. Since `material === false` implies
+   `bandMoves === false`, falling through to the measured branch prints the badge's number *and*
+   its band. Caught by diffing line against badge across all 10, not by trusting the patch.
+
+2. **In the test.** The first `[CP-VPRED]` assertion compared the quoted figure to the badge with
+   strict equality. The badge element also carries its basis chip, so it reads
+   `"≤39 · VERY LOW ≥23.0pp obs"` — the assertion would have **false-failed on a correct build**.
+   Caught by reading the pre-build failure text rather than only its pass/fail count; changed to
+   assert the badge *leads with* the quoted figure.
+
+### Process note
+
+The pre-change build was served as a second file from the **same** server rather than on a second
+port. Cycle 930 lost a before/after run to a stale server holding port 8898 and reporting
+`EADDRINUSE` into a log nobody read; one server has no such failure mode, and the staged copy was
+byte-compared to `git show HEAD:index.html` before use.
+
+### Debt still open, NOT fixed this cycle
+
+- Both suite copies were patched identically this cycle, but remain diverged by the pre-existing
+  ~151 lines — a local number and a harness number are still not comparable.
+- The two charts still render below the five caveat blocks (carried from 842).
+- `# Contracts` grid row still prints `1193` unseparated against `all 1,193` three rows below (828).
+- Carried forward unchanged: PSC pre-fill rounding Angola's 2.6% to `3` (841) · state-monopoly
+  `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No breakeven on file" (835) ·
+  FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries" against `CMP_MAX` 5 (828) ·
+  no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable
+  `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch for Guyana (841).
+- Not audited this cycle: whether a floor row reaches a CSV/XLSX tier column (carried from 840).
+- **Surfaced but not acted on:** the remaining v470-era verdict branches (`take > 65`, the two
+  `downFragile` branches, `progressive`) are still fixed strings. None of them asserts a property
+  it did not read — they describe take and swing, which their conditions do test — so none is the
+  same defect. Worth a later T2 pass for counted evidence, not a correctness fix.
