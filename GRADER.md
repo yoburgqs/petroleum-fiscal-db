@@ -61137,3 +61137,20 @@ the NPV that sets the printed breakeven bracket.
   `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch for Guyana (841).
 - The remaining v470-era verdict branches (`take > 65`, the two `downFragile`, `progressive`) are
   still fixed strings. None asserts a property it did not read, so none is the v931 defect.
+
+### Cycle 846 — verified against the DEPLOYED build after push
+
+The local run above was on `localhost:8899`. Re-run after the push, in the graded
+configuration (default `TEST_URL` = `https://yoburgqs.github.io/petroleum-fiscal-db/`):
+
+**475 PASS / 0 FAIL / 0 WARN / 0 JS errors.**
+
+The arithmetic is the proof that the same assertions ran rather than silently dropping out:
+**452 PASS + 23 FAIL (before) = 475 PASS + 0 FAIL (after)** — identical assertion count, and all
+23 of the former failures are now green. The local run's 1 WARN was the service-worker 404, which
+is absent here, confirming `sw.js` is 200 on the deployed build and 404 only under local serving.
+
+All five of the directive's "finished" criteria now hold on the deployed build: suite green and
+read from the suite's own report; zero horizontal scroll at 1920/1440/1280/1024/768/390; the one
+control this cycle touched is 44px under `pointer: coarse`; zero console and page errors; and the
+IC memo export now carries the full four-price ladder plus the notes that qualify it.
