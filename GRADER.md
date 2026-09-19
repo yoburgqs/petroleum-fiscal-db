@@ -60352,7 +60352,11 @@ the clipboard.
 ---
 ## Cycle 840 Log — 2026-09-18 23:xx
 - Test before: 427 PASS / 1 FAIL / 0 WARN / 0 JS errors (harness, against the live build)
-- Test after: see "Verification" below — suite RUN this cycle, number read from ORCA_REPORT_FILE
+- Test after: **429 PASS / 0 FAIL / 1 WARN** — suite RUN this cycle against the patched tree,
+  number read from `ORCA_REPORT_FILE`, not assumed. Matches v926's 429 baseline with 0 FAIL;
+  the harness's 1 FAIL did not reproduce (see below). The 4 "JS errors" are the local-only
+  service-worker 404 — the harness runs against live, where `sw.js` exists.
+- Shipped in three commits: `ababe89` (the fix), `3911694` (this log), `55741c0` (dead locals).
 - JS errors: 0. JS syntax gate 11/11 PASS.
 - Summary: **Cycle 840 — shipped as v927** (`ababe89`), pushed, mirror sha `4c5099725662`
 
