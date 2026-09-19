@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v936</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v937</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -26458,12 +26458,34 @@ function _fpCohortLine(d) {
   var rank = _fpOrd(i + 1) + ' of ' + list.length;
   var top = k.measuredTop;
   var isTop = !!(top && top.c === d.country);
+  // ── v937 (T4): the ranking sentence must name THIS country's band, not a hard-coded one ──
+  // The measured branch closed on the literal string "MODERATE here outranks any UNGRADED
+  // score". That sentence was written for the cohort ceiling (Turkmenistan, 74 = MODERATE) and
+  // then printed for all 28 measured countries. The cohort ceiling is 74, so no measured country
+  // is HIGH and 17 of the 28 are not MODERATE either: 14 LOW (United Kingdom 58, Egypt 53,
+  // Ghana 52, India 52, Iraq 47 ...) and 3 VERY LOW (Guatemala 44, Somalia 41, Uruguay 37).
+  // Each of those cards printed the country's real band on the badge -- "53 LOW" -- and then,
+  // in the card's only emphasis colour, a rule naming a band the country does not have.
+  // This is the one sentence on the card that tells an analyst how to rank the number against
+  // other countries, and for those 17 it inverted: the plain reading of "MODERATE outranks
+  // UNGRADED, I am LOW" is that a measured LOW ranks BELOW an ungraded 100, which is the exact
+  // misreading v624 exists to stop. Name the country's own band and score, and put the highest
+  // ungraded score on screen by name, so the comparison is decidable on the card instead of
+  // being asserted as a rule about somebody else's band.
+  var ownScore = getFiscalPredictabilityScore(d);
+  var ownBand = (ownScore == null) ? '' : _fpBandLabel(ownScore);
+  var topSingle = (k.single && k.single.length) ? k.single[0] : null;
   var msg = (st === 'measured')
     ? '<strong style="color:var(--text);">' + (isTop ? 'Top of the ' + list.length : rank) + ' countries ORCA can measure</strong>'
       + (isTop ? '' : ' — not ' + _fpOrd(i + 1) + ' of 185') + '. '
       + 'The spread penalty is charged in this cohort and nowhere else, so it is the only one that carries a graded band at all'
       + (top ? ' — ' + (isTop ? 'this ' + top.s + ' is the cohort ceiling' : 'ceiling ' + top.s + ', ' + _rrEsc(top.c)) : '') + '. '
-      + '<strong style="color:var(--orange);">MODERATE here outranks any UNGRADED score, however high its number</strong> — since v624 the '
+      + '<strong style="color:var(--orange);">This ' + (ownBand ? ownBand + ' ' + ownScore : 'score') + ' was measured, so it '
+      + 'outranks any UNGRADED score, however high its number</strong>'
+      + (topSingle ? ' \u2014 including ' + _rrEsc(topSingle.c) + '\u2019s ' + topSingle.s
+           + ', the highest on the platform. That ' + topSingle.s + ' is not the steadier regime; it is the one '
+           + 'ORCA holds less contract evidence against.' : '.')
+      + ' Since v624 the '
       + k.single.length + ' one-term regimes are shown ungraded and uncoloured, because the band their number '
       + 'falls in was earned by a penalty that was never applied to them.'
     : '<strong style="color:var(--text);">' + rank + ' one-term regimes</strong> — a cohort the spread penalty never touches, which is why this '
