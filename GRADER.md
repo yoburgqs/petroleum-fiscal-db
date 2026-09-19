@@ -61325,3 +61325,99 @@ state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "N
 (835) · FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries" against `CMP_MAX` 5 (828)
 · no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · unreachable
 `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch for Guyana (841).
+
+---
+
+## Cycle 850 — v936 (T1): the Screener threw on a cold load, and shipping v935
+
+**Task — T1.** "Which countries should even be on my screening list?" (849 was also T1 but never
+shipped; its work was orphaned by the timeout, so T1 was re-walked from cold rather than assumed.)
+
+**Friction.** `let COUNTRY_DATA = null` (`index.html:23661`), filled by an async fetch of
+`country_data.json`. Every tab button is live from first paint. An analyst landing cold and going
+straight to Screener — the documented first move for T1 — hits `runScreener()`, which reaches
+`COUNTRY_DATA.filter(...)` at `:35181` and throws.
+
+Three exceptions fire in that window:
+
+| site | guard as written | why it failed |
+|---|---|---|
+| `runScreener` :35181 | none | `null.filter` |
+| `_scUpdateNeutralFlags` :34548 | `typeof X !== 'undefined' && X.length` | `typeof null` is `'object'` — the guard PASSES, then derefs |
+| `renderIRRScatter` :27704 | none | `null.filter` |
+
+Measured, not assumed: with `country_data.json` delayed 3.5s, a cold load + Screener click gave
+**3 page errors**. The identical walk at full speed gave **0**. That is why this was never seen —
+the runtime suite runs against the warm **deployed** host, where the fetch always wins the race.
+
+**Change.** Nine readiness guards now treat not-yet-loaded as not-ready instead of dereferencing
+null: an early return at the top of `runScreener()`, one in `renderIRRScatter()`, and seven
+`typeof X !== 'undefined'` guards corrected to also test the value (`_scUpdateNeutralFlags`,
+`_scNpvAxisMax`, `_scSyncNpvAxis`, the fee-basis counter, the take axis, the evidence-depth block,
+the count-line evidence phrase).
+
+**Result.** Clicking Screener during the load window is a **wait**, not a failure. The tab
+self-fills to "All 185 countries — no filters applied yet" the moment the fetch resolves, with the
+analyst taking no further action — verified by clicking Screener at 400ms and then touching
+nothing. Cold-load page errors **3 → 0**. This closes finalization criterion #4 on the one path
+that was still violating it.
+
+Behaviour on the loaded path is unchanged **by construction**: every edit only adds a null test to
+a guard whose intent was already "skip if no data". Verified identical — preset still returns 15
+rows, badge "Screener (15)", breakeven legend 67.
+
+### The inherited half-cycle — audited, not trusted
+
+Cycle 849 was killed by the 1800s timeout and left `index.html` dirty with an unshipped **v935**
+(`_sbsAdoptDeck`), plus 4 FAILs. Cycle 848 warned that orphaned work "has been survivable three
+times only because the orphaned edits happened to be correct — and that is not guaranteed." So it
+was tested rather than adopted:
+
+**The 4 FAILs were not a broken fix. They were a fix that was never pushed.** The runtime suite
+defaults to `https://yoburgqs.github.io/petroleum-fiscal-db/` (`runtime_comprehensive.js:13`) and
+`autonomous_cycle.py` sets `TEST_URL` only for the **pixel audit**, never for the runtime suite. So
+step 2 graded the *deployed* build against assertions written for a *local* edit. Run against the
+local tree, all four pass:
+
+    deck "100" · cmpRankPrice 100 · #cmp-rankprice "100"
+    hash #/compare/usa+mexico+argentina+canada+colombia@100
+    verdict strip contains "Govt take @$100" · 0 page errors
+
+v935 is therefore correct and is shipped here. **This is a structural note worth keeping: any fix a
+cycle makes will FAIL its own suite in the cycle that makes it, and pass in the next one.** That
+alone explains the 842→846 churn (2, 4, 16, 0 FAIL) without anything actually being broken.
+
+### Verification — run this cycle, against the patched local tree
+
+| Check | Result |
+|---|---|
+| JS syntax gate | **PASS** — 11/11 inline blocks |
+| Cold load (3.5s delay) + Screener click | **0 page errors** (was 3) |
+| Screener self-fill, no further action | 185 rows, badge "Screener (185)" |
+| Normal load, all 10 tabs + preset | **0 page errors**, 15 rows, be-legend 67 |
+| v935 handover | deck $100 → cmpRankPrice 100, hash `@100`, strip names $100 |
+| Horizontal scroll @390 `pointer: coarse` | **10/10 tabs** `scrollWidth` 390 == `clientWidth` 390 |
+| Touch targets | `screener-preset-select` / `sl-take` / `sl-npv` / tab btn all **44px**, right edges < 390 |
+| Runtime suite (deployed) | **not re-run against the deploy this cycle** — the push lands after this log; expect 500 PASS / 0 FAIL next cycle as v935's 4 assertions go green |
+
+Header badge `v934 → v936` (single line; every other version string is derived from it).
+
+### Debt still open, carried forward unchanged
+
+**The 1800s timeout — now orphaned work four cycles running, and this time it cost the suite 4
+FAILs and a full cycle of re-verification.** `autonomous_cycle.py:28 INTERVAL = 1800`,
+`:233 timeout=1800`, plist `StartInterval 1800`. The Claude step is budgeted the entire interval,
+leaving nothing for test re-run (~6 min), pixel audit (~1.5 min), push and email. Still not changed
+unilaterally — `CLAUDE.md` reserves the loop's control surface to Zach. **Recommendation, one line:
+`timeout=1500` at `autonomous_cycle.py:233`.**
+
+Second, smaller, same family: consider setting `TEST_URL` to the local tree for the runtime suite
+as well as the pixel audit, so a cycle can grade its own work instead of the previous deploy.
+
+Carried forward unchanged: two charts render below the five caveat blocks (842) · `# Contracts`
+grid row prints `1193` unseparated against `all 1,193` (828) · PSC pre-fill rounds Angola's 2.6% to
+`3` (841) · state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No
+breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries"
+against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy`
+(836) · unreachable `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch
+for Guyana (841).
