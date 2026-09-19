@@ -2603,7 +2603,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v938</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v939</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -62423,16 +62423,56 @@ function _cpApplyObsSpread(country) {
 // is bracketed by the two prices it changes sign between. That is arithmetic on
 // displayed figures, not a new model output.
 function _cpBeSettle(safe, state, country, fpt) {
+  // ── v939 (T2) — the BREAKEVEN column printed an em-dash on the one figure the
+  //    page's own export already carries. ────────────────────────────────────
+  //
+  // Walked T2 cold on 20 countries. On 17 of them (116 of 185 by this file's own
+  // count) the Country Profile makes the breakeven claim THREE times above this
+  // table — headline strip "BE: < $50/bbl bounded", summary chip "Breakeven:
+  // < $50/bbl bounded", Data Completeness "◖ Breakeven (< $50/bbl, bounded)" —
+  // all three resolved through cpBeBound(). Then the 4-Price Sensitivity table,
+  // which is the table the analyst actually reads at the decision point, printed
+  // "—" in all four BREAKEVEN cells, and the footnote under it opened with a bold
+  // "No breakeven on file for Indonesia." followed by three sentences of absence
+  // before the agreeing bound finally arrived in sentence four.
+  //
+  // Worse, "Copy as IC table" 200px below does NOT print the dash: _cpIcBe()
+  // pastes "< $50/bbl (bounded)" into the memo. So the figure the analyst hands
+  // their IC was not visible anywhere in the table they took it from, and the
+  // page's most prominent sentence about breakeven appeared to deny it.
+  //
+  // The bound is resolved through cpBeBound() — the same resolver the headline
+  // uses — so the table cannot print a different bound from the strip above it.
+  // The local fpt arithmetic below stays as the fallback for the case where
+  // COUNTRY_DATA has no NPV row but the API payload does.
+  var _b939 = null;
+  if (state === 'none' && typeof cpBeBound === 'function') {
+    var _d939 = (window.COUNTRY_DATA || []).filter(function(x){ return x.country === country; })[0];
+    if (_d939) _b939 = cpBeBound(_d939);
+  }
   var CELL = {
     none:  ['—', 'No breakeven solved for this country. The lookup completed — this is an absence in the data, not a pending fetch.'],
     fail:  ['?',      'Breakeven lookup did not return. This is unknown, not zero and not absent.']
   }[state];
   if (CELL) {
+    var _bColor939 = _b939 ? (_b939.hi === 50 ? 'var(--green)' : _b939.lo === 125 ? 'var(--red)' : 'var(--yellow)') : null;
+    var _dashTip939 = _b939
+      ? 'Breakeven is one claim for this country, not four — it is carried on the $75 row as ' + _b939.txt
+        + ' (bounded). ORCA carries no solved value, so there is no per-price figure to print here.'
+      : CELL[1];
     ['50','75','100','125'].forEach(function(pk) {
       var el = document.getElementById('dd-be-' + safe + '-' + pk);
       if (!el) return;
       if (!/^\s*(…|)\s*$/.test(el.textContent)) return;   // never overwrite a solved value
-      el.innerHTML = '<span style="color:var(--muted);" title="' + CELL[1] + '">' + CELL[0] + '</span>';
+      if (_b939 && pk === '75') {
+        el.innerHTML = '<span style="color:' + _bColor939 + ';font-weight:700;" title="' + _esc594(_b939.tip) + '">'
+          + _b939.txt + '</span> <span style="font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 3px;white-space:nowrap;" title="'
+          + _esc594(_b939.tip) + '">bounded</span>';
+        el.style.color = '';
+        el.title = '';
+        return;
+      }
+      el.innerHTML = '<span style="color:var(--muted);" title="' + _esc594(_dashTip939) + '">' + CELL[0] + '</span>';
       el.style.color = 'var(--muted)';
     });
   }
@@ -62478,8 +62518,20 @@ function _cpBeSettle(safe, state, country, fpt) {
     }
   }
 
-  fn.innerHTML = '<strong style="color:var(--text);">No breakeven on file for ' + cty + '.</strong> '
-    + 'ORCA carries a solved breakeven for 67 of 185 countries and this is not one of them. The lookup finished — '
+  // v939 (T2): lead with the claim the rest of this page already makes, not with a denial of it.
+  // The old order opened "No breakeven on file for Indonesia." in bold, directly under a headline
+  // strip reading "BE: < $50/bbl bounded" — the analyst had to read four sentences to discover the
+  // two agree. The absence is still stated, in full, as the qualification it is.
+  var _lead939 = _b939
+    ? '<strong style="color:var(--text);">Breakeven ' + _esc594(_b939.txt) + ' for ' + cty
+      + ' — bounded, not solved.</strong> This is the same bound the headline strip, the summary chip and '
+      + 'the Data Completeness row above report; it is one claim, stated in four places.'
+    : '<strong style="color:var(--text);">No breakeven on file for ' + cty + '.</strong>';
+  fn.innerHTML = _lead939 + ' '
+    + (_b939 ? 'ORCA carries a <em>solved</em> breakeven for 67 of 185 countries and ' + cty + ' is not one of them, '
+             + 'so cite the bound as a bound and never as a price. '
+             : 'ORCA carries a solved breakeven for 67 of 185 countries and this is not one of them. ')
+    + 'The lookup finished — '
     + 'nothing further is loading, and the blank is an absence in the data, not $0 and not an uneconomic regime. '
     + 'The reason is not recorded, so do not repeat the "no production data" explanation given elsewhere on this page: '
     + 'breakeven is on file for fewer producers than non-producers.'
