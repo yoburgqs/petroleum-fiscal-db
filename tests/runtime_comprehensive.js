@@ -3425,6 +3425,10 @@ async function testSBProvenance(page) {
       out.presetOrigin = window._sbOrigin;
       out.presetStrip  = !!document.getElementById('sb-origin-note');
       out.presetBanner = document.getElementById('sb-prefill-banner').style.display;
+      // v928 (T6): the banner is no longer hidden here — it is re-filled with the PRESET's own
+      // basis. What must not survive is a claim that these terms came from a country's record.
+      out.presetBannerText = document.getElementById('sb-prefill-text').innerText;
+      out.presetSwap = (document.getElementById('sb-preset-swap') || {}).innerText || '';
       // editing a field is reported rather than silently re-attributed
       ddOpenScenarioBuilder('Norway'); await new Promise(r => setTimeout(r, 400));
       var _cs = document.getElementById('sb-origin-note');
@@ -3442,9 +3446,26 @@ async function testSBProvenance(page) {
     if (!/HYPOTHETICAL|default, not /.test(String(drops.headerIc))) p(S, 'Header IC line', 'header-opened IC line carries no basis clause');
     else f(S, 'Header IC line', 'header-opened IC line wrongly qualified');
 
-    if (drops.armed === true && drops.presetOrigin === null && drops.presetStrip === false && drops.presetBanner === 'none')
-      p(S, 'Preset overwrite', 'loading a preset drops the prior country provenance and its banner');
-    else f(S, 'Preset overwrite', 'stale provenance survived a preset: ' + JSON.stringify(drops));
+    // v928 (T6): was `presetBanner === 'none'`. Hiding the banner WAS the defect — a preset names
+    // a country and 10 of the 13 disagree with ORCA's record for it, so the form went blank of
+    // provenance exactly where it acquired a country name. The invariant this test exists to
+    // protect is unchanged (no _sbOrigin, no origin strip, no claim of a country's record); what
+    // is asserted now is that the banner states the PRESET's basis instead of disappearing.
+    if (drops.armed === true && drops.presetOrigin === null && drops.presetStrip === false
+        && drops.presetBanner === 'flex'
+        && /hand-built archetype/.test(String(drops.presetBannerText))
+        && /not ORCA\u2019s record for Angola|not ORCA's record for Angola/.test(String(drops.presetBannerText))
+        && !/pre-filled from|pre-filled for/.test(String(drops.presetBannerText)))
+      p(S, 'Preset overwrite', 'a preset drops the country provenance and declares its own basis instead');
+    else f(S, 'Preset overwrite', 'preset provenance wrong: ' + JSON.stringify(drops).slice(0, 700));
+
+    // v928 (T6): the preset banner must name the terms that disagree with ORCA's record, with
+    // both values, and offer the route to that record. Angola disagrees on all five.
+    if (/5 loaded terms disagree/.test(String(drops.presetBannerText))
+        && /Profit oil \(govt\) 50% here vs 75% on record/.test(String(drops.presetBannerText))
+        && /Use Angola\u2019s ORCA record|Use Angola's ORCA record/.test(String(drops.presetSwap)))
+      p(S, 'Preset reconciliation', 'Angola preset names all 5 divergences with both values and offers ORCA\u2019s record');
+    else f(S, 'Preset reconciliation', 'preset divergence not reported: ' + JSON.stringify({t: String(drops.presetBannerText).slice(0, 400), s: drops.presetSwap}));
 
     if (!/edited since load/.test(drops.cleanStrip) && /edited since load/.test(drops.editedStrip))
       p(S, 'Edit detection', 'an edited form is reported as edited, an untouched one is not');
