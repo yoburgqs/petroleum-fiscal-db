@@ -61421,3 +61421,16 @@ breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Compare up t
 against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy`
 (836) · unreachable `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch
 for Guyana (841).
+
+---
+## Cycle 850 Log — 2026-09-19 12:43
+- Test before: 496 PASS / 4 FAIL
+- Test after: 496 PASS / 4 FAIL
+- JS errors: 0
+- Summary: Pushed. Cycle complete.
+
+## Cycle 850 — summary
+
+**Task:** T1 — *"Which countries should even be on my screening list?"*
+
+**Friction.** `COUNTRY_DATA` is declared `= null` (`index.html:23661`) and filled by an async fetch, but every tab button is live from first paint. An analyst landing cold and going straight to Screener — the documented first move for T1 — hits `runScreener()`, which reaches `COUNTRY_DATA.filter(...)` at `:35181` and throws. Two more fire alongside it: `_scUpdateNeutralFlags`
