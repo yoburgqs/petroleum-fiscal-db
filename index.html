@@ -2603,7 +2603,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v939</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v940</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -37911,6 +37911,24 @@ window._scEmptyMsg = _scEmptyMsg;
 function _scTermGate(again) {
   if (typeof _orcaTermsPending !== 'function') return false;
   var names = (window._screenerData || []).map(function(d) { return d.country; });
+  // ── v940 (T5): hydrate the rows the export will CONTAIN, not every row the screen returned ──
+  // This gate read the whole screened set while _scExportRows() -- the choke point it exists to
+  // serve -- narrows to the ticked shortlist one line before it returns:
+  //     var _out = _sel ? _all.filter(function(r){ return _sel.indexOf(r.Country) >= 0; }) : _all;
+  // So ticking 4 countries and pressing "Copy 4 selected" fetched 168 api/v1/country files to
+  // write 4 rows. Measured cold on the Screener: 4 ticked, 4 rows pasted, 168 requests fired.
+  // Fiscal Compare's "Export XLSX (4)" was the same, at 169. That is the single moment the tab
+  // asks for -- the button tooltip and the bulk-copy confirm toast BOTH instruct the analyst to
+  // tick the rows they want and export just those -- so the worst stall in the flow sat on the
+  // path the product recommends. It also made the only feedback on screen contradict the button
+  // beside it: "Reading sources... 168" over a control reading "Copy 4 selected". todo.length
+  // drives both the label and the toast, so narrowing the set corrects the message as well.
+  // Same source array, same _scSelOrdered() filter, same predicate as _out, and deliberately no
+  // .length guard: where a ticked country is not returned by the current screen the filtered set
+  // is empty, _orcaTermsPending([]) is empty, the gate opens and _scExportRows() refuses through
+  // _scEmptyMsg() -- which is the correct outcome, reached now without 168 fetches in front of it.
+  var _selT = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+  if (_selT) names = names.filter(function(c) { return _selT.indexOf(c) >= 0; });
   if (!_orcaTermsPending(names).length) return false;
   _orcaTermsPrefetch(names, again, ['screener-excel-btn', 'screener-csv-btn',
     'screener-copy-ic-btn', 'sc-dock-xlsx', 'sc-dock-csv', 'sc-dock-copy']);
@@ -63116,9 +63134,24 @@ function exportFCResults() {
   // cache warm. The chips on screen hydrate only the rows that scrolled into view, so a cold
   // export of 185 rows would otherwise write the column for a handful of countries and leave
   // the rest blank -- a column that is populated by scroll position is worse than absent.
+  // v940 (T5): and the rows it will contain, which is the shortlist when one is ticked. The
+  // narrowing below runs AFTER this gate, so the gate was hydrating all 185 to write 4 --
+  // measured cold, "Export XLSX (4)" fired 169 country requests and held the button on
+  // "Reading sources... 169" for 8s. Mirrors _xlPicked exactly, including its source array
+  // (window._fcResults, not `rows`, so a ticked country hidden by the region filter is still
+  // hydrated) and its .length guard, so the set fetched and the set written cannot diverge.
+  var _fcTermSel = (typeof _fcSelOrdered === 'function') ? _fcSelOrdered() : null;
+  var _fcTermRows = rows;
+  if (_fcTermSel && _fcTermSel.length) {
+    var _fcTermPick = (window._fcResults || rows).filter(function(r) {
+      return _fcTermSel.indexOf(r.country) >= 0;
+    });
+    if (_fcTermPick.length) _fcTermRows = _fcTermPick;
+  }
+  var _fcTermNames = _fcTermRows.map(function(r) { return r.country; });
   if (typeof _orcaTermsPending === 'function'
-      && _orcaTermsPending(rows.map(function(r) { return r.country; })).length) {
-    _orcaTermsPrefetch(rows.map(function(r) { return r.country; }), function() { exportFCResults(); },
+      && _orcaTermsPending(_fcTermNames).length) {
+    _orcaTermsPrefetch(_fcTermNames, function() { exportFCResults(); },
       ['fc-export-btn', 'fc-dock-xlsx']);
     return;
   }
