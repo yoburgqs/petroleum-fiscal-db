@@ -61551,3 +61551,16 @@ breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Compare up t
 against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy`
 (836) · unreachable `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch
 for Guyana (841).
+
+---
+## Cycle 851 Log — 2026-09-19 13:53
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v937).
+
+## Cycle 851 summary
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (850 was T1; T4 was stalest, last walked at cycle 806.)
+
+**Friction.** `_fpCohortLine()` (`index.html:26449`) ended its measured-cohort paragraph on a hard-coded band name — *"**MODERATE** here outranks any UNGRADED score, however high its number"* — in the card's only emphasis colour. That sentence was written for the cohort ceiling (Turkmenistan, 74, which is MODERA
