@@ -61686,3 +61686,16 @@ above "No breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Co
 countries" against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or
 `_icArmBulkCopy` (836) · unreachable `Score <= 20` IC rule on Reform Risk ·
 `ddOpenScenarioBuilder()` generic branch for Guyana (841).
+
+---
+## Cycle 852 Log — 2026-09-19 15:19
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v938). Remaining `CYCLE_STATE.json` / `cycle_log.txt` modifications are the loop's own bookkeeping, untouched by me.
+
+## Cycle 852 summary
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (851 was T4; T6 was stalest, last walked at cycle 843.)
+
+**Friction.** Five country surfaces on this platform answer the evidence question with *two* numbers: the whole-fact-base grade (A/B/C/D), and how many of the fiscal terms the DCF actually runs 
