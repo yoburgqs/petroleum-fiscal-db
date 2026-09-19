@@ -60481,3 +60481,155 @@ where the evidence does — on **both** tables.
 
 ## First, the 1 FAIL — chased, and it is not a code defect
 The harness reported `[Screener] elementHandle.click: Timeout 30000ms exceeded`. I reproduced it three ways: isolated clicks locally (39–75ms), isolated clicks against the **live** build repeated 4× (57–87ms, handler 27–30ms), and the **full suite 
+
+---
+## Cycle 841 Log — 2026-09-19
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+(840 was T1; the 837–839 window shipped T3 as v926; 836 T5, 835 T2, 834 T4.)
+
+## Friction
+
+Walked T6 cold — storage cleared, no sessionStorage — and the established provenance
+surfaces are in good shape. Fiscal Compare's Quality cell carries the `N of M terms cited`
+chip and `_fcOpenTermChain()` lands correctly on Country Profile with the right country
+selected and the Evidence Chain scrolled into view (measured: USA, tab switched, selector
+`USA`, chain header at y=119, in view). The Explorer and Screener carry the same chip. The
+Evidence Chain itself distinguishes cited from uncited, dead-link from index-only, and
+model-read from on-record-but-unused. The exports carry the grade, both its legs, the
+model-terms count and the uncited term names. The Breakeven CSV's 67 rows reconcile exactly
+with the histogram on screen and carry four footer paragraphs of basis.
+
+The gap is one tab over. **The Scenario Builder's preset row is the only place on this
+platform where a fiscal parameter is asserted about a named country — and on eight of the
+thirteen about a named signed instrument — with nothing at all behind it.**
+
+`loadPreset()` (`index.html`) did the exact opposite of everything else here: it set
+`window._sbOrigin = null` and **hid** `#sb-prefill-banner`, so the form went blank of
+provenance at precisely the moment it acquired a country name. Correct as far as v607's
+reasoning went — a preset is not a country record, so it must not claim to be one — but the
+conclusion drawn was silence, and silence on a button labelled "Guyana PSC" is not neutral.
+
+The presets are hand-entered archetypes and they disagree with ORCA's own record. Measured
+against the shipped `country_data.json`, **10 of the 13** differ on at least one term the
+form loads:
+
+| preset | terms compared | disagreements |
+|---|---|---|
+| Angola | 5 | **all 5** — profit oil govt 50% vs 75% · CIT 25% vs 49.9% · cap 70% vs 50% · FTP 10% vs 20% · royalty 0% vs 2.6% |
+| Malaysia | 5 | 4 — profit oil govt 50% vs 70% · CIT 25% vs 38% · royalty 0% vs 10% · cap 75% vs 65.1% |
+| Saudi Arabia | 4 | 3 — CIT 85% vs 50% · special tax 0% vs 50% · state equity 0% vs 100% |
+| Kazakhstan | 5 | 3 — profit oil govt 50% vs 80% · cap 80% vs 89.4% · royalty 5% vs 8% |
+| **Guyana** | 5 | **2 — royalty 10% vs 2% · cost recovery cap 50% vs 75%** |
+| Iraq | 2 | both — service fee $6.00/bbl vs $2.00 · CIT 35% vs 29.4% |
+| Nigeria | 2 | both — royalty 0% vs 10% · CIT 30% vs 65.4% |
+| Indonesia, India, UK | 1, 2, 4 | 1 each |
+| Norway, Australia, Iran | 4, 2, 1 | **none** |
+
+Guyana is the sharp case. The button is labelled with the Stabroek PSA; ORCA's Evidence
+Chain cites *that same document*, tier A, statutory-matched, at **2%** — the number Guyana's
+own parliament has argued about — and the preset loads **10%**. The run then returns 54.2%
+government take against the Country Profile's published 54.1%, so the output reads as
+corroboration rather than contradiction.
+
+Secondary, same click: the preset buttons sit 337–594px below the fields they rewrite
+(measured at 390 and 1440), so on a phone clicking a preset produced **no visible feedback
+whatsoever** — the form changed off-screen and the page looked inert.
+
+## Change
+
+**No preset value is altered, deliberately.** The divergence does not always run ORCA's way:
+Iraq's $2.00/bbl on record is the D-confidence mass default applied to 406 of its 415 TSC
+contracts, so the preset's $6.00 is arguably the better figure. Which one is right is a
+judgement about the blocks being screened, and this page cannot settle it.
+
+So it states both. `loadPreset()` now **shows** the banner instead of hiding it, carrying:
+
+1. **Basis.** "Preset — a hand-built archetype, not ORCA's record for *Guyana*", plus the
+   instrument it was entered from (new `_country` / `_doc` fields on all 13 presets), plus
+   the fact that the evidence letter elsewhere grades the country's record, not this form.
+2. **Reconciliation.** New `_sbPresetReconcile()` compares every loaded field that has a
+   country-level counterpart (`_SB_PRESET_CMP`, per mechanic; 0.5pp tolerance, $0.05/bbl on
+   fees) and names each disagreement with **both values side by side**. Terms ORCA holds
+   nothing for are listed separately rather than counted as agreement.
+3. **A route out.** New `#sb-preset-swap` — *"Use Guyana's ORCA record"* — reloads the form
+   through the existing `ddOpenScenarioBuilder()` path, which brings its own basis line, the
+   filed R-factor ladder and the published-take reconciliation. It retires itself on that
+   path, because that path *is* the record.
+
+Border goes amber when anything disagrees, accent when nothing does. The banner is scrolled
+into view on the click, which also fixes the no-feedback problem above. `_sbOrigin` stays
+null — a preset still makes no country claim in the results panel.
+
+## Result
+
+An analyst who clicks "Guyana PSC" is told, before running anything, that the 10% royalty
+now sitting in the form is not the 2% ORCA cites from the same contract — and can load the
+sourced terms in one click instead of discovering the gap in an IC meeting.
+
+## Verification
+
+| check | result |
+|---|---|
+| JS syntax gate | **11/11 PASS** |
+| All 13 presets render a basis note | yes — 10 name divergences, 3 report full agreement (Norway, Australia, Iran) |
+| Swap tested end to end (Guyana) | royalty **10 → 2**, cost recovery cap **50 → 75**, `_sbOrigin` set to Guyana, R-factor ladder armed (4 tiers, govt 40–85%), swap control retires |
+| Country pre-fill path unaffected | swap control hidden on `ddOpenScenarioBuilder()`; its own banner wording unchanged |
+| `_sbOrigin` after a preset | still `null` — no country claim reaches the results panel or the IC line |
+| Page errors | **0** |
+| Horizontal scroll, all 10 tabs | **0 overflow at 1920 / 1440 / 1280 / 1024 / 768 / 390** — scrollWidth = clientWidth at every one, 0 page errors at every one |
+| Mobile 390×844 `hasTouch` | modal inner 369/369, banner 337px wide inside a 369px column, **swap button 28px**, dismiss 24px, banner **in view** after the preset click |
+
+## A suite test asserted the defect — fixed, not suppressed
+
+`[SB-PROVENANCE] Preset overwrite` required `#sb-prefill-banner` to end at `display:none`
+after `loadPreset()`. That is the behaviour this cycle removed. The invariant the test exists
+to protect is unchanged and still asserted — no `_sbOrigin`, no `#sb-origin-note`, and no text
+claiming the terms were pre-filled from a country's record — but the banner must now *declare
+the preset's basis* rather than vanish. A second assertion, `Preset reconciliation`, requires
+the Angola preset to name all five divergences with both values and to offer the route to
+ORCA's record.
+
+**Suite RAN this cycle, after the test change, on a clean process: 416 PASS / 0 FAIL / 1 WARN.**
+The WARN is the known local service-worker 404 the harness does not see. Both new assertions
+are green:
+
+```
+PASS [SB-PROVENANCE] Preset overwrite: a preset drops the country provenance and
+                     declares its own basis instead
+PASS [SB-PROVENANCE] Preset reconciliation: Angola preset names all 5 divergences
+                     with both values and offers ORCA's record
+```
+
+The other 30 SB-PROVENANCE assertions — the Saudi monopoly branch, the Brazil record basis,
+the Norway single-project fork, the IRR reconciliation row, and the 185-country sweep — all
+still pass unchanged, so the preset work did not disturb the country pre-fill path it borrows.
+
+Applied identically to both copies of the suite. **The two copies have diverged by 151 lines** —
+`office/tools/petroleum/tests/runtime_comprehensive.js` carries `testSbSRouteMiss` (v925) and
+`petroleum-fiscal-db/tests/runtime_comprehensive.js` does not, which is why a local run scores
+below the harness. Pre-existing; recorded, not fixed here.
+
+## Debt still open, NOT fixed this cycle
+
+- **The 1800s cycle timeout remains the top operational problem.** This run committed and pushed
+  the fix before the suite finished, deliberately. Two Playwright processes contending on one
+  machine roughly tripled the suite's wall time; run them sequentially, not in parallel.
+- **416 here is not comparable to the harness's 430** — see the suite divergence above. The
+  difference is missing tests in the repo copy, not regressions.
+- The two suite copies have diverged (above). Until they are reconciled, a local number and a
+  harness number are not comparable.
+- After the swap, `ddOpenScenarioBuilder()` falls to its generic branch for Guyana — *"Parameters
+  pre-filled for Guyana — edit any field"* — rather than the v607 `record` or `default` wording.
+  Worth a look on the next T2.
+- The PSC pre-fill rounds to whole percent (`Math.round(params.royalty_rate*100)`), so Angola's
+  2.6% on record loads as **3**. The Concession path already keeps one decimal (v776); the PSC
+  path was never given the same treatment.
+- Carried forward, unchanged: the state-monopoly `$0M` vs `n/a` split (835) · Angola's
+  `BE: < $50/bbl bounded` above "No breakeven on file" (835) · the service-worker 404 WARN ·
+  FAQ A381's 117/120 against 65 (829) · unseparated `4211`/`7643`/`610` in the `# Contracts`
+  grid row (828) · "Compare up to 4 countries" against `CMP_MAX` 5 (828) · no suite coverage for
+  the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable `Score <= 20` IC rule
+  on Reform Risk.
+- Not audited this cycle: whether a floor row reaches a CSV/XLSX tier column (carried from 840).
