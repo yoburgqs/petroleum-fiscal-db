@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v923</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v926</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -432,6 +432,9 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 
 /* ── comparison ── */
 .compare-grid { display: grid; grid-template-columns: 160px repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+/* v924 (T3): axis labels in the Side-by-Side verdict strip. nowrap lives here, not inline,
+   so the max-width:720px rule can override it — an inline style outranks any selector. */
+.cmp-vd-label { white-space: nowrap; }
 .cmp-hdr { background: var(--surface); font-size: 12px; font-weight: 700; padding: 10px 14px; text-align: center; color: var(--text); border-bottom: 1px solid var(--border); }
 .cmp-hdr.row-label { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; }
 .cmp-row { display: contents; }
@@ -1684,6 +1687,17 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     text-align: left;
   }
 
+  /* v924 (T3): the two Side-by-Side verdict-strip axis labels. They are `white-space: nowrap`
+     so a desktop strip never breaks its axis name away from the order it introduces. The label
+     added this cycle — "TERM CONSISTENCY ACROSS CONTRACTS, MOST UNIFORM FIRST:" — is 53
+     characters and measures 394px, wider than a 390px phone, and because #cmp-verdict is a
+     column flex container that widened every sibling row in the strip with it and made the
+     whole document scroll sideways. Measured: scrollWidth 423 against clientWidth 390, from
+     this one span. Allowed to wrap here only; the desktop strip is unchanged. Like
+     .cp-spread-badge above, these carry no `min-width: max-content` — the marker the wrap
+     rules key off — precisely because wrapping, not scrolling, is what they should do. */
+  .cmp-vd-label { white-space: normal; max-width: 100%; }
+
   /* v761 (T6): the Evidence Chain on a phone. Parameter / ORCA / Statutory filled the 336px
      wrapper and the Source column sat at x=422-778 -- off screen on 26 of 26 rows walked, behind a
      sideways swipe nothing signals (this wrapper has no .tbl-wrap fade). The analyst read the
@@ -2579,7 +2593,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v923</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v926</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -28667,6 +28681,7 @@ function removeCompare(country) {
   if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
 }
 function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash();
+  if (typeof _sbsClearRouteMiss925 === 'function') _sbsClearRouteMiss925();   // v925: a deliberate reset ends the link's claim on this page
   if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
 }
 
@@ -29555,7 +29570,19 @@ function renderCompare() {
                 : ''))
         + 'Read the same marker on the other three Govt Take rows before ranking: the order is not '
         + 'the same at every price, and on this set it '
-        + (r.flips ? 'does change between $50 and $125.' : 'does not change between $50 and $125.'))
+        // v926 (T3): `r.flips` was set only by _cmpFlip — the lowest-column-moves test — so on a set
+        // whose order changes deeper in the ordering this sentence read "does not change between $50
+        // and $125" while the strip directly above the grid read "⚠ order changes in $75–$100". Both
+        // now read _cmpReorder. r.flipAt is the interval, and is set only where the low end holds —
+        // where it moves, the full-reversal notice under the grid already states the interval.
+        + (r.flips
+            ? (r.flipAt
+                ? 'does change: the ordering at ' + r.flipAt + '/bbl is not the ordering below it, '
+                  + 'though the lowest-take column is the same at all four prices. The two columns '
+                  + 'that trade places, and the gap between them, are named in the price-ordering '
+                  + 'notice under the grid.'
+                : 'does change between $50 and $125.')
+            : 'does not change between $50 and $125.'))
       + '">' + word + ' of ' + r.n + tag + '</span>';
   };
   // v750 (T3): the four Govt Take figures were the last thing on this tab still presenting a
@@ -30351,7 +30378,59 @@ function renderCompare() {
   // The reversal itself: does the lowest-take column at $50 stay the lowest-take column at $125?
   const _r50 = _cmpPriceRank[50], _r125 = _cmpPriceRank[125];
   const _cmpFlip = (_r50 && _r125 && _r50.lo && _r125.lo && _r50.lo !== _r125.lo) ? { a: _r50.lo, b: _r125.lo } : null;
-  if (_cmpFlip) _CMP_PRICES.forEach(p => { if (_cmpPriceRank[p]) _cmpPriceRank[p].flips = true; });
+
+  // ── v926 (T3): the order can change WITHOUT the lowest-take column moving, and when it did,
+  //    three surfaces on this screen gave the analyst three different answers. ──────────────────
+  //
+  // Walked T3 cold at 1440x900, storage cleared, on the trio an Atlantic-margin screen actually
+  // builds — Namibia / Guyana / Suriname. Measured on the shipped build:
+  //
+  //   verdict strip pill        "⚠ order changes in $75–$100"          (from _vdBreak, v756)
+  //   that pill's tooltip       "The full reversal ... is set out in the price-ordering
+  //                              notice under the grid."
+  //   the notice under the grid  DOES NOT EXIST — it is gated on _cmpFlip
+  //   every Govt Take cell       "the order is not the same at every price, and on this set it
+  //   marker tooltip              DOES NOT CHANGE between $50 and $125."   ← flatly false here
+  //
+  // One root cause. _cmpFlip above asks one narrow question — is the LOWEST column at $50 still
+  // the lowest at $125 — and it drives both the under-grid notice and the `flips` flag the cell
+  // tooltips read. v756 gave the strip a full-sequence detector instead, and v829's own comment
+  // on it says so in as many words: an ordering "can change in the middle of the set without the
+  // lowest column moving, which _cmpFlip alone would not catch." The strip was upgraded; its two
+  // downstream consumers were not, and nothing reconciled them.
+  //
+  // Measured over 44 rendered sets (4 real screening sets + 40 seeded random trios): the strip
+  // raised the warning on 5, and on 2 of those 5 there was no notice under the grid to read and
+  // the cell tooltips asserted the opposite. On Namibia / Guyana / Suriname the swap is Guyana
+  // and Suriname — 0.1pp apart at $75, 0.2pp at $100 — while Namibia holds the low end at every
+  // price 17.2pp clear. So the warning is real and immaterial, and the page gave the analyst no
+  // way to find that out: the two readings available were "discard the ranking" and "there is
+  // nothing to discard."
+  //
+  // Detected on the INTERSECTION of the columns ranked at both prices, so a column that is
+  // rankable at one price and not at another is a membership change and is not reported as a
+  // reordering. _vdHold/_vdBreak below now read this same object, so the strip, the notice and
+  // the cell tooltips cannot give three answers again.
+  const _cmpSeqAt = (p) => selected.map(d => ({ c: d.country, v: _cmpRankTake(d, p) }))
+    .filter(x => x.v != null).sort((a, b) => a.v - b.v).map(x => x.c);
+  const _cmpReorder = (function () {
+    for (let i = 1; i < _CMP_PRICES.length; i++) {
+      const a = _cmpSeqAt(_CMP_PRICES[i - 1]), b = _cmpSeqAt(_CMP_PRICES[i]);
+      const both = a.filter(c => b.indexOf(c) >= 0);
+      if (both.length < 2) continue;
+      const ao = both.slice().sort((x, y) => a.indexOf(x) - a.indexOf(y));
+      const bo = both.slice().sort((x, y) => b.indexOf(x) - b.indexOf(y));
+      let k = 0; while (k < ao.length && ao[k] === bo[k]) k++;
+      if (k >= ao.length) continue;
+      return { loP: _CMP_PRICES[i - 1], hiP: _CMP_PRICES[i], a: ao[k], b: bo[k],
+               label: '$' + _CMP_PRICES[i - 1] + '–$' + _CMP_PRICES[i] };
+    }
+    return null;
+  })();
+  if (_cmpFlip || _cmpReorder) _CMP_PRICES.forEach(p => {
+    if (_cmpPriceRank[p]) { _cmpPriceRank[p].flips = true;
+      _cmpPriceRank[p].flipAt = _cmpFlip ? '' : (_cmpReorder ? _cmpReorder.label : ''); }
+  });
 
   // v501: --cmp-n drives the responsive overrides too — the ≤768px and ≤600px rules
   // used to force repeat(4)/repeat(2) with !important regardless of how many countries
@@ -30423,20 +30502,16 @@ function renderCompare() {
   const _vdOut = selected.filter(d => d && _vdTake(d) == null).map(d => ({ c: d.country, why: _vdWhy(d) }));
   // The full ordering at each published price, not just its low end -- an ordering can change in
   // the middle of the set without the lowest column moving, which _cmpFlip alone would not catch.
-  const _vdSeq = (p) => selected.filter(d => d && _cmpRankTake(d, p) != null)
-    .map(d => ({ c: d.country, v: _cmpRankTake(d, p) })).sort((a, b) => a.v - b.v)
-    .map(x => x.c).join('›');
+  // v926 (T3): was its own joined-string sequence walk, computed here and nowhere else. It is now
+  // _cmpReorder, computed once beside _cmpFlip — see the block there. The pill, the notice under
+  // the grid and the per-cell markers are three readings of ONE detector, which is the only way
+  // they can be kept from contradicting each other. The intersection basis also removes a false
+  // positive the joined-string form had: a column rankable at one price and not at another moved
+  // the string and was reported as a change of ORDER.
   let _vdHold = null, _vdBreak = '';
   if (_vdRanked.length >= 2) {
-    const _s75 = _vdSeq(75);
-    _vdHold = _CMP_PRICES.every(p => _vdSeq(p) === _s75);
-    if (!_vdHold) {
-      for (let _q = 1; _q < _CMP_PRICES.length; _q++) {
-        if (_vdSeq(_CMP_PRICES[_q]) !== _vdSeq(_CMP_PRICES[_q - 1])) {
-          _vdBreak = '$' + _CMP_PRICES[_q - 1] + '–$' + _CMP_PRICES[_q]; break;
-        }
-      }
-    }
+    _vdHold = !_cmpReorder;
+    _vdBreak = _cmpReorder ? _cmpReorder.label : '';
   }
   // ── v829 (T3): the CONTRACTOR-VALUE ordering. ────────────────────────────────────────────
   //
@@ -30595,7 +30670,12 @@ function renderCompare() {
                     'These columns rank in this same order at all four published prices ($50 / $75 / $100 / $125), so the $75 ordering is the ordering at every price ORCA publishes.')
             : _pill('⚠ order changes in ' + _vdBreak, 'var(--orange)', 'rgba(194,65,12,.12)',
                     'The columns do NOT rank in this order at every price. The ordering first changes in the ' + _vdBreak
-                    + '/bbl interval, so a ranking taken off the $75 row is not the ranking at the deck you may actually defend. The full reversal, with the figures at each end, is set out in the price-ordering notice under the grid.'));
+                    // v926 (T3): this said "The full reversal ... is set out in the price-ordering
+                    // notice under the grid" for every break, including the ones where the lowest
+                    // column never moves and there is no reversal — and until v926 that notice did
+                    // not render at all on those sets. It always renders now; the wording no longer
+                    // promises a reversal the set may not contain.
+                    + '/bbl interval, so a ranking taken off the $75 row is not the ranking at the deck you may actually defend. The columns that trade places, the figures at each end of that interval and the gap between them are set out in the price-ordering notice under the grid.'));
     } else if (_vdRanked.length === 1) {
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
         + '<span style="font-size:12px;">Only <strong style="color:var(--text);">' + _cmpEsc(_vdRanked[0].c)
@@ -30870,6 +30950,9 @@ function renderCompare() {
       + _dsLine
       // v772 (T3): filled by _sbsPaintVerdictFp() once the per-country spread fetches land.
       + '<div id="cmp-verdict-fp" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
+      // v924 (T3): filled by _sbsPaintVerdictRr(). See the block above that function for why
+      // the strip may not leave the Predictability row as its only stability statement.
+      + '<div id="cmp-verdict-rr" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
       + '</div>';
   }
   let html = `<div id="cmp-scroll-hint" role="status"></div>`;
@@ -31000,6 +31083,59 @@ function renderCompare() {
       + _flipAside
       + ' The <em>Price Swing</em> row below gives each column\u2019s progressivity, which is what drives this. '
       + '<strong style="color:var(--text);">Screen this set at the price deck you will actually defend</strong> \u2014 a ranking taken off one price row is not the ranking at another.'
+      + '</div>';
+  } else if (_cmpReorder) {
+    // \u2500\u2500 v926 (T3): the notice the strip has always promised and never had. \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    // The pill above the grid says "\u26a0 order changes in $75\u2013$100" and its tooltip sends the analyst
+    // down here. Until now this whole block was gated on _cmpFlip, so on a set whose lowest-take
+    // column holds while two columns behind it trade places, the analyst arrived at nothing. The
+    // decision-relevant fact is the one the strip cannot fit in a pill: WHICH two moved, and by
+    // how much. On Namibia / Guyana / Suriname it is 0.1pp at $75 \u2014 a warning worth dismissing,
+    // which the analyst could not do without the number.
+    const _roAt = (nm, pr) => { const d = selected.find(x => x.country === nm);
+      const v = d ? _cmpRankTake(d, pr) : null; return v == null ? '\u2014' : v.toFixed(1) + '%'; };
+    const _roV = (nm, pr) => { const d = selected.find(x => x.country === nm);
+      return d ? _cmpRankTake(d, pr) : null; };
+    const _roA = _cmpReorder.a, _roB = _cmpReorder.b;
+    const _roG75 = (function () { const x = _roV(_roA, 75), y = _roV(_roB, 75);
+      return (x != null && y != null) ? Math.abs(x - y) : null; })();
+    // Only claim the low end holds if it is the same non-null column at all four published prices.
+    const _roLows = _CMP_PRICES.map(p => _cmpPriceRank[p] && _cmpPriceRank[p].lo);
+    const _roLow = (_roLows[0] && _roLows.every(x => x === _roLows[0])) ? _roLows[0] : null;
+    // The margin that survives the reordering: low column to the next one up, at $75.
+    const _roMargin = (function () {
+      if (!_roLow) return null;
+      const vs = selected.map(d => _cmpRankTake(d, 75)).filter(v => v != null).sort((a, b) => a - b);
+      return vs.length >= 2 ? (vs[1] - vs[0]) : null;
+    })();
+    html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.30);border-left:3px solid var(--accent);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+      + '<strong style="color:var(--text);">\u26a0 Two columns trade places between $'
+      + _cmpReorder.loP + ' and $' + _cmpReorder.hiP + '/bbl'
+      + (_roLow ? ' \u2014 the lowest-take column does not move' : '') + '.</strong> '
+      + 'In the lowest-take-first ordering, <strong style="color:var(--text);">' + _cmpEsc(_roB)
+      + '</strong> ranks <em>behind</em> <strong style="color:var(--text);">' + _cmpEsc(_roA)
+      + '</strong> at $' + _cmpReorder.loP + '/bbl (' + _roAt(_roB, _cmpReorder.loP)
+      + ' take against ' + _roAt(_roA, _cmpReorder.loP)
+      + ') and <em>ahead</em> of it at $' + _cmpReorder.hiP + '/bbl ('
+      + _roAt(_roB, _cmpReorder.hiP) + ' against ' + _roAt(_roA, _cmpReorder.hiP)
+      + ') — the higher take is the worse position, so the lower figure is the one in front.'
+      + (_roG75 == null ? ''
+          : ' At <strong style="color:var(--text);">$75/bbl</strong> the two are '
+            + '<strong style="color:var(--text);">' + _roG75.toFixed(1) + 'pp</strong> apart'
+            + (_roG75 < 5
+                ? ' \u2014 inside the spread ORCA observes across contracts within a single one of '
+                  + 'these countries, so the base-case row does not separate them either way, and '
+                  + 'this reordering is not a finding to carry into the memo.'
+                : ', which is a separation the base-case row does establish \u2014 carry the price '
+                  + 'at which you are ranking them.'))
+      + (_roLow
+          ? ' <strong style="color:var(--text);">' + _cmpEsc(_roLow) + '</strong> holds the lowest '
+            + 'government take at all four published prices'
+            + (_roMargin != null ? ', ' + _roMargin.toFixed(1)
+                + 'pp clear of the next column at $75/bbl (not the full-set span in the strip above)' : '')
+            + ', so the headline ordering of this set is not what moved.'
+          : '')
+      + ' The <em>Price Swing</em> row below gives each column\u2019s progressivity, which is what drives this.'
       + '</div>';
   }
   // v511: the Data Basis rows tell the analyst what each column is. This says what it means for
@@ -31851,6 +31987,10 @@ function renderCompare() {
   }
 
   _sbsApplyObsSpread();   // v672 (T3)
+  // v924 (T3): unconditional — unlike the Predictability row, which only exists when a score in
+  // the set was withdrawn, the reform order is available for every set and is the row the
+  // stability question is actually answered on.
+  try { _sbsPaintVerdictRr(); } catch (e) { /* non-critical */ }
   _sbsApplyTermsCited();  // v716 (T6) — must follow, it reads the token _sbsApplyObsSpread bumps
   _sbsScrollHint();       // v712 (T3)
   try { _sbsColBar(); } catch (e) {}   // v791 (T3)
@@ -32405,7 +32545,7 @@ function _sbsBoundOrder(hits, measured, sink) {
       + ' \u2014 its true score may sit on either side';
   });
   var body = hasOrder
-    ? ' The predictability order this supports is on the strip above the grid, under the take order.'
+    ? ' The predictability order this supports is on the term-consistency row of the strip above the grid.'
       + (looseTxt.length ? ' ' + looseTxt.join('; ') + '.' : '')
     : ' No predictability order is established in this set: ' + looseTxt.join('; ') + '.';
   return head + body + offClause + ' Carry ' + (hasOrder ? 'that order, and ' : '')
@@ -32480,6 +32620,129 @@ function _sbsRevealEvidence() {
 // The notice under the grid keeps its derivation and its "cannot be placed" clauses but no longer
 // prints an order of its own. The strip row is filled here, as each fetch lands, because that is
 // when the ceilings exist; before then, and on sets with nothing withdrawn, it stays hidden.
+// ── v924 (T3): the strip made a stability claim out of the one score that cannot make one ──
+// Walked T3 cold, storage cleared. The tab seeds its own example — Norway / United Kingdom /
+// Netherlands — so the first ordering a first-time analyst reads on this platform's comparison
+// tab, in the strip above the grid, was:
+//
+//     PREDICTABILITY, MOST STABLE FIRST:  United Kingdom 58 › Norway ≤52
+//
+// The United Kingdom is placed ahead of Norway as the more stable fiscal regime. ORCA's own
+// sourced reform log, one tab away, holds the refutation and was never consulted by this strip:
+//
+//     United Kingdom   _rrClassify → WACC +3–5pp   5 fiscal law changes since 2010,
+//                      net-tightening, latest 2024 "EPL raised to 38% and extended to March 2030"
+//                      (2011 SC→32%, 2016 SC→10%, 2022 EPL 25%, 2023 EPL 35%, 2024 EPL 38%)
+//     Norway           _rrClassify → TAKE NET 0pp  2 changes, the 2022 expiry undoing the 2020
+//                      relief, latest 2022
+//     Netherlands      no reform log at all
+//
+// WACC +3–5pp is the only verdict class this platform says changes a model input. So the strip
+// put the single column in the set carrying a discount-rate premium at the head of a "most
+// stable" order, above the column at net zero — on the set it loads for you, in the largest type
+// on the tab, above a grid whose Predictability row then reads LOW for all three.
+//
+// The cause is a label, not a computation. The Fiscal Predictability Score is an IQR penalty +
+// a price-swing penalty + a mechanic-count penalty. Every other tooltip on this platform is
+// careful to say it is "distinct from the Reform Frequency Score on the Reform Risk tab" — the
+// Explorer header, the badge, the grid row and the Country Profile all carry that sentence. The
+// strip dropped it, called the score "most stable", and ranked on it. A jurisdiction that
+// rewrites its fiscal law every eighteen months but writes uniform contracts scores well; that
+// is what happened here.
+//
+// The order below is NOT a new rule. It is _fcReformRank()/_fcReformCmp(), which read
+// _rrClassify()'s own icToken — the same ordering the Fiscal Compare Reform sort runs — so this
+// row, that table's cells and the Reform Risk tab cannot disagree with each other. n/c sorts
+// last and is stated as an absence of coverage, never as a clean record.
+function _sbsPaintVerdictRr() {
+  var row = document.getElementById('cmp-verdict-rr');
+  if (!row) return;
+  var hide = function () { row.style.display = 'none'; row.innerHTML = ''; };
+  if (typeof _fcReformRank !== 'function' || typeof _rrClassify !== 'function'
+      || typeof REFORM_HISTORY === 'undefined' || !REFORM_HISTORY) return hide();
+  var names = (compareList || []).slice();
+  if (names.length < 2) return hide();
+  // _cmpEsc lives in the renderCompare script block and is not in scope here.
+  var esc = function (t) {
+    return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+
+  var scored = [], nolog = [];
+  names.forEach(function (c) {
+    var rk = _fcReformRank(c);
+    if (rk && rk.scored) scored.push({ country: c, rk: rk, v: _rrClassify(c) });
+    else nolog.push(c);
+  });
+  // The log has not loaded yet — say nothing rather than report an absence of data as coverage.
+  if (!scored.length && !Object.keys(REFORM_HISTORY).length) return hide();
+
+  scored.sort(function (a, b) { return _fcReformCmp({ country: a.country }, { country: b.country }); });
+
+  // Each column states its own verdict token and the count/date behind it, because the token is
+  // the finding and the count is blind to magnitude — the distinction the Reform Risk tab spends
+  // four paragraphs on. No column is reduced to a bare number here.
+  var seg = function (e) {
+    var v = e.v || {};
+    // `latest` is the most recent event of ANY kind, so on a jurisdiction whose newest entry is a
+    // discovery or a terms review it is not a change at all — the same trap _icReformLine() names.
+    // Printing "0 changes since 2010, last 2022" for Guyana asserts a change that did not happen.
+    var last = '';
+    if (v.latest && v.latest.year) {
+      var isChg = (typeof _rrIsFiscalChange !== 'function') || _rrIsFiscalChange(v.latest);
+      last = isChg ? ', last change ' + v.latest.year
+                   : ', last event ' + v.latest.year + ' — not a fiscal change';
+    }
+    return '<strong style="color:var(--text);">' + esc(e.country) + '</strong> '
+      + '<span style="color:' + (e.rk.band === 0 ? 'var(--orange)' : 'var(--muted)') + ';font-weight:700;">'
+      + esc(String(v.icToken || 'n/c')) + '</span>'
+      + '<span style="color:var(--muted);"> (' + v.since2010 + ' change'
+      + (v.since2010 === 1 ? '' : 's') + ' since 2010' + esc(last) + ')</span>';
+  };
+
+  var body;
+  if (scored.length >= 2) {
+    body = '<span style="font-size:12px;">'
+      + scored.map(seg).join(' <span style="color:var(--muted);">›</span> ') + '</span>';
+  } else if (scored.length === 1) {
+    body = '<span style="font-size:12px;">' + seg(scored[0])
+      + '<span style="color:var(--muted);font-size:11px;"> — the only column in this set with a '
+      + 'sourced log, so there is no order to read</span></span>';
+  } else {
+    body = '<span style="font-size:12px;color:var(--muted);">no order established — ORCA holds no '
+      + 'sourced reform log for any column in this set</span>';
+  }
+  if (nolog.length) {
+    body += '<span style="font-size:11px;color:var(--muted);">no sourced log: '
+      + esc(nolog.join(', ')) + ' — an absence of coverage, not a clean record</span>';
+  }
+
+  // The WACC band is the only one that changes a model input, so it is the only one promoted to
+  // a pill. Silent when the set contains none.
+  var wacc = scored.filter(function (e) { return e.rk.band === 0; });
+  var pill = wacc.length
+    ? '<span title="' + _sbsAttr(wacc.map(function (e) { return e.country; }).join(', ')
+          + ' carr' + (wacc.length === 1 ? 'ies' : 'y') + ' a reform-frequency premium — the only '
+          + 'verdict class on this platform that changes a model input. Add it to the discount rate '
+          + 'before comparing this column’s contractor NPV with the others in the grid below; '
+          + 'those NPVs are all computed at the same 10% WACC. Click through to the Reform Risk tab '
+          + 'for the sourced event log behind it.')
+      + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;'
+      + 'color:var(--orange);background:rgba(194,65,12,.10);border-radius:3px;padding:2px 8px;'
+      + 'line-height:1.5;white-space:nowrap;cursor:help;">WACC premium applies to ' + wacc.length
+      + ' of ' + names.length + '</span>'
+    : '';
+
+  row.innerHTML = '<span class="cmp-vd-label" style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;'
+      + 'text-transform:uppercase;" title="'
+      + _sbsAttr('Orders the columns on ORCA’s sourced fiscal-reform event log, worst exposure '
+          + 'first — the same ranking the Reform verdict sort runs in Fiscal Compare, read from the '
+          + 'same classifier, so the two can never disagree. This is the fiscal-stability reading. '
+          + 'The term-consistency row above is not: it never opens the reform log.')
+      + '">Reform exposure, highest first:</span>'
+    + body + pill;
+  row.style.display = 'flex';
+}
 function _sbsPaintVerdictFp(s) {
   var row = document.getElementById('cmp-verdict-fp');
   if (!row) return;
@@ -32501,8 +32764,23 @@ function _sbsPaintVerdictFp(s) {
       + (s.offOneTerm ? ' — a one-term score skips the take-spread penalty, so it is not on this scale' : '')
       + '</span>';
   }
-  row.innerHTML = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;'
-      + 'text-transform:uppercase;white-space:nowrap;">Predictability, most stable first:</span>'
+  // v924 (T3): this label read "PREDICTABILITY, MOST STABLE FIRST". See the block above
+  // _sbsPaintVerdictRr() for the measurement: on the tab's own cold default it put the United
+  // Kingdom at the head of a "most stable" order. The Fiscal Predictability Score is take
+  // dispersion + price swing + mechanic count -- every other tooltip on this platform says so and
+  // says it is "distinct from the Reform Frequency Score on the Reform Risk tab". The strip was
+  // the one surface that dropped the distinction and then ranked on it. It now names the axis it
+  // actually orders, and the reform order it was being mistaken for sits on the row below.
+  row.innerHTML = '<span class="cmp-vd-label" style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;'
+      + 'text-transform:uppercase;" title="'
+      + _sbsAttr('Orders the columns on the Fiscal Predictability Score, which measures how far this '
+          + 'country’s OWN contracts disagree with each other on government take, plus its price '
+          + 'swing and mechanic count. It is a uniformity-of-terms reading. It is NOT reform risk and '
+          + 'it is NOT fiscal stability: it never reads the reform log, so a jurisdiction that has '
+          + 'rewritten its fiscal law five times since 2010 can head this order. For the stability '
+          + 'question, read the Reform exposure row directly below — that one is the sourced '
+          + 'event log.')
+      + '">Term consistency across contracts, most uniform first:</span>'
     + body
     + '<span title="' + _sbsAttr('A ≤ figure is a CEILING, not a score. ORCA’s contract file shows '
         + 'a wider take spread for that country than its printed Predictability Score was charged for, so '
@@ -32591,7 +32869,7 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
             + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
             + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on the '
             + 'printed scores \u2014 use the \u2264 ceilings now shown on the Predictability '
-            + 'Score row above, and the predictability order on the strip above the grid.'
+            + 'Score row above, and the term-consistency row on the strip above the grid.'
           : 'are shown on a measured basis and are directly readable.');
   }
   var fpSink = {};
@@ -50620,6 +50898,125 @@ function _cpShowNotFound846(slug) {
   }
 }
 
+// ── v925 (T3): a shared #/compare/ link that names a country ORCA cannot resolve. ───────────
+// The compare branch of handleRoute() read `if (c) addCompare(c)` and dropped every unresolved
+// token on the floor — no notice, no toast, no console warning. Two outcomes, both silent, both
+// reached by the ONE action an analyst takes to receive somebody else's three-country screen:
+//
+//   #/compare/trinidad+suriname+guyana   -> "Trinidad" resolves to nothing (the country is on
+//       file as Trinidad and Tobago, and the tab's own search box accepts the short form), so a
+//       three-country link renders TWO columns — and the verdict strip above them then asserts
+//       "All 2 columns are on one basis — nothing is set aside, the ordering above is the whole
+//       set." A column WAS set aside, and the page states in words that none was.
+//   #/compare/zzzland+qqqstan            -> nothing resolves, compareList is emptied, and the
+//       t2 activation seed is guarded only by `compareList.length > 0`. So the analyst who
+//       opened a link to two named countries is shown a confident, fully-rendered comparison of
+//       Norway / United Kingdom / Netherlands with a headline verdict, four price rows, two
+//       charts and a Copy-for-IC-Memo button. Nothing on screen says the link produced none of it.
+//
+// This is the same defect v846 fixed for #/profile/<slug> — that branch was given a not-found
+// notice naming the failed slug with live near-matches, and the compare branch beside it was
+// left as it was. The recovery machinery (_slugNear846) already exists; it is reused here.
+var _sbsRouteMiss925 = [];
+// Counted at route-parse time, NOT re-derived at render time: when nothing resolves, the t2
+// activation seed loads three example countries 400ms later, and a render that reads
+// compareList.length then would report them as “the 3 that did load” from the link.
+var _sbsRouteAsked925 = 0;
+var _sbsRouteLoaded925 = 0;
+function _sbsEsc925(x) {
+  return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _sbsClearRouteMiss925() {
+  _sbsRouteMiss925 = [];
+  _sbsRouteAsked925 = 0;
+  _sbsRouteLoaded925 = 0;
+  var n = document.getElementById('sbs-route-miss');
+  if (n && n.parentNode) n.parentNode.removeChild(n);
+}
+// Recover one named-but-unloaded country. Drops just that row; the notice goes when the last
+// row does, so a 2-miss link does not hide its second miss the moment the first is fixed.
+function _sbsPick925(country) {
+  if (typeof addCompare === 'function' && !addCompare(country)) return;
+  _sbsRouteLoaded925 += 1;
+  _sbsRouteMiss925 = _sbsRouteMiss925.filter(function (m) {
+    return m.pick !== country && (m.near || []).indexOf(country) < 0;
+  });
+  if (!_sbsRouteMiss925.length) { _sbsClearRouteMiss925(); return; }
+  _sbsRenderRouteMiss925();
+}
+function _sbsRenderRouteMiss925() {
+  var host = document.getElementById('t2');
+  var before = document.getElementById('cmp-output');
+  if (!host || !before || !_sbsRouteMiss925.length) return;
+  var old = document.getElementById('sbs-route-miss');
+  if (old && old.parentNode) old.parentNode.removeChild(old);
+
+  var loaded = _sbsRouteLoaded925;
+  var asked  = _sbsRouteAsked925;
+  var none   = loaded === 0;
+
+  var btn = 'display:inline-block;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.45);'
+    + 'border-radius:4px;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;'
+    + 'padding:6px 10px;min-height:28px;line-height:1.2;';
+
+  var html = '<div id="sbs-route-miss" role="status" style="background:var(--surface2);'
+    + 'border:1px solid rgba(185,28,28,.35);border-left:4px solid var(--red);border-radius:8px;'
+    + 'padding:12px 14px;margin:10px 0 14px;">'
+    + '<div style="display:flex;align-items:flex-start;gap:10px;">'
+    + '<div style="flex:1;min-width:0;">'
+    + '<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;">⚠ '
+    + (none
+        ? 'None of the ' + asked + ' names in this link produced a column'
+        : _sbsRouteMiss925.length + ' of the ' + asked + ' names in this link did not produce a column')
+    + '</div>'
+    + '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:9px;">'
+    + (none
+        ? 'Nothing in the comparison below came from the link you opened — it is ORCA’s own '
+          + 'default example set. Do not read a take, an NPV or a ranking off this page as an '
+          + 'answer about the countries the link named.'
+        : 'The comparison below is built on the ' + loaded + ' column' + (loaded === 1 ? '' : 's')
+          + ' that did load, and every ranking, spread and “whole set” statement on this page '
+          + 'is about those ' + loaded + ' only. Resolve the name(s) below before citing the ordering.')
+    + '</div>';
+
+  _sbsRouteMiss925.forEach(function (m) {
+    html += '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:7px;">'
+      + '<code style="background:var(--surface);border:1px solid var(--border);border-radius:3px;'
+      + 'padding:2px 6px;font-size:12px;color:var(--text);">' + _sbsEsc925(m.shown) + '</code>'
+      + '<span style="font-size:11px;color:var(--muted);">' + m.why + '</span>';
+    if (m.near && m.near.length) {
+      html += '<span style="font-size:10px;color:var(--muted);text-transform:uppercase;'
+        + 'letter-spacing:.06em;font-weight:700;">did you mean</span>';
+      m.near.forEach(function (c) {
+        html += '<button type="button" onclick="_sbsPick925(' + _sbsEsc925(JSON.stringify(c)) + ')" '
+          + 'title="Add ' + _sbsEsc925(c) + ' to this comparison" style="' + btn + '">'
+          + _sbsEsc925(c) + '</button>';
+      });
+    }
+    html += '</div>';
+  });
+
+  html += '</div>'
+    + '<button type="button" onclick="_sbsClearRouteMiss925()" aria-label="Dismiss the missing-country notice" '
+    + 'title="Dismiss" style="background:transparent;border:none;color:var(--muted);cursor:pointer;'
+    + 'font-size:18px;line-height:1;padding:4px 6px;min-height:28px;min-width:28px;">×</button>'
+    + '</div></div>';
+
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  before.parentNode.insertBefore(wrap.firstChild, before);
+}
+// Called by the compare route once it knows what resolved and what did not.
+function _sbsReportRouteMiss925(missed, asked, loaded) {
+  _sbsClearRouteMiss925();
+  if (!missed || !missed.length) return;
+  _sbsRouteMiss925 = missed;
+  _sbsRouteAsked925 = asked;
+  _sbsRouteLoaded925 = loaded;
+  _sbsRenderRouteMiss925();
+}
+
 function _tabBtnFor(tabId) {
   // Returns the .tab-btn element that switches to tabId
   // Use id-based lookup — primary tab buttons use id="tab-btn-{tabId}" (v97+: no onclick attr)
@@ -50709,12 +51106,42 @@ function parseAndNavigate(hash) {
       // shared link from being spliced with the example trio — the v509 guard, relied on in
       // the order it was written for.
       compareList = [];
+      // v925 (T3): every token is accounted for. `if (c) addCompare(c)` threw the failures away.
+      var _miss925 = [];
       param.split('+').forEach(function(s){
+        if (!s) return;
+        var raw = s; try { raw = decodeURIComponent(s); } catch (e) {}
+        var shown = String(raw).replace(/[<>&"]/g, '').slice(0, 48);
         var c = fromSlug(s);
-        if (c) addCompare(c);
+        if (!c) {
+          _miss925.push({ shown: shown, pick: null, reason: 'unresolved',
+            why: 'no country on file resolves to this name',
+            near: (typeof _slugNear846 === 'function' ? _slugNear846(s, 3) : []) });
+          return;
+        }
+        if (compareList.indexOf(c) !== -1) {
+          _miss925.push({ shown: shown, pick: null, reason: 'duplicate',
+            why: c + ' is named twice in this link — it is in the comparison once', near: [] });
+          return;
+        }
+        if (compareList.length >= CMP_MAX) {
+          _miss925.push({ shown: shown, pick: c, reason: 'full',
+            why: 'the link names more than ' + CMP_MAX + ' countries — this one exceeded the cap',
+            near: [c] });
+          return;
+        }
+        if (!addCompare(c)) {
+          _miss925.push({ shown: shown, pick: c, reason: 'refused',
+            why: 'ORCA refused this column', near: [c] });
+        }
       });
       var sbsBtn = _tabBtnFor('t2');
       if (sbsBtn) switchTab('t2', sbsBtn);
+      // After the tab is up, so the notice sits above a rendered grid rather than a hidden pane.
+      // The seed inside switchTab('t2') runs on a timer and only fires when nothing resolved —
+      // which is exactly the case the notice has to survive, so re-assert behind it.
+      _sbsReportRouteMiss925(_miss925, param.split('+').filter(Boolean).length, compareList.length);
+      if (_miss925.length) setTimeout(function(){ _sbsRenderRouteMiss925(); }, 400);
     } else {
       var cmpBtn = _tabBtnFor('t0');
       if (cmpBtn) switchTab('t0', cmpBtn);
