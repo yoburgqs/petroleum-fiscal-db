@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v928</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v929</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v928</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v929</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4022,6 +4022,25 @@ window.copyPlatformCitation = function(btn) {
       <!-- v646 (T3): the grid told the analyst to "rank these countries on Govt Take" and then
            left the columns in whatever order they happened to be typed in, with "To change order:
            remove and re-add" as the only remedy. This reorders them. -->
+      <!-- v929 (T3): the price the comparison is RANKED at. Every ordering surface on this tab
+           was hard-coded to $75 — the verdict strip, the column order, the "lowest of N" chain —
+           while the grid itself prints all four prices and the tab's own _cmpReorder detector
+           already knew the order inverts between them. On the standard screening set
+           (Guyana / Brazil / Angola) the headline read "Angola 53.0% > Brazil 55.6%" at $75 and
+           the truth at $100 is the reverse (Brazil 58.7% < Angola 60.2%). The page warned in an
+           amber pill whose expansion sat 1,400px below the fold and offered no way to act on it.
+           An analyst defending a $100 deck now ranks at $100. Default stays 75. -->
+      <label id="cmp-rankprice-wrap" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);white-space:nowrap;">
+        <span>Rank at</span>
+        <select id="cmp-rankprice" aria-label="Oil price the comparison is ranked at"
+                title="The price deck the ORDERINGS are computed at — the verdict strip above the grid, the contractor-value ordering, and the left-to-right column order when a Govt take order is selected. The grid itself always prints all four published prices ($50 / $75 / $100 / $125); this chooses which of them the set is RANKED on. Countries do not rank the same way at every price: a progressive regime that looks cheapest at $50 can be the most expensive at $125. Set this to the deck you will actually defend in the memo."
+                style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;min-height:26px;">
+          <option value="50">$50/bbl</option>
+          <option value="75" selected>$75/bbl</option>
+          <option value="100">$100/bbl</option>
+          <option value="125">$125/bbl</option>
+        </select>
+      </label>
       <label id="cmp-order-wrap" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);white-space:nowrap;">
         <span>Order columns</span>
         <select id="cmp-order" aria-label="Order the comparison columns left to right"
@@ -28194,12 +28213,24 @@ let cmpChart = null;
 // the markup must stay in sync with this literal, or the control would report an order the grid
 // is not in — which is the same defect one level down.
 let cmpOrder = 'take_asc';
+// v929 (T3): the price every ORDERING on this tab is computed at. 75 is the default, so a cold
+// load renders exactly as before. The <option selected> in the markup must stay in sync with this
+// literal — same invariant v908 recorded for cmpOrder, and for the same reason: a control that
+// reports a state the grid is not in is the defect one level down.
+let cmpRankPrice = 75;
+const CMP_RANK_PRICES = [50, 75, 100, 125];
 const CMP_ORDER_LABEL = {
   add:       'addition order',
   take_asc:  'government take at $75/bbl, lowest first',
   take_desc: 'government take at $75/bbl, highest first',
   name:      'country name, A–Z'
 };
+// Read this, never CMP_ORDER_LABEL directly, anywhere the label is shown to the analyst — the
+// map above stays a plain literal because setCompareOrder() uses it as a validity check.
+function _cmpOrderLabel(mode) {
+  const base = CMP_ORDER_LABEL[mode] || CMP_ORDER_LABEL.add;
+  return base.replace('$75/bbl', '$' + cmpRankPrice + '/bbl');
+}
 function _sbsMechGroups(d) {
   const mx  = Array.isArray(d && d.mech_mix) ? d.mech_mix : [];
   const tot = mx.reduce((s, x) => s + (x.n || 0), 0);
@@ -28255,21 +28286,37 @@ function _sbsApplyOrder() {
   const nProd  = rec.filter(_sbsHasProd).length;
   const mixed  = nProd > 0 && nProd < rec.length;
   const bucket = (d) => {
-    if (_sbsCmpTake(d, 75) == null) return 2;                 // no comparable take — last
+    if (_sbsCmpTake(d, cmpRankPrice) == null) return 2;       // no comparable take — last
     return (mixed && !_sbsHasProd(d)) ? 1 : 0;                // statutory-terms block
   };
   compareList = rec.slice().sort((a, b) => {
     const ba = bucket(a), bb = bucket(b);
     if (ba !== bb) return ba - bb;
     if (ba === 2) return idx[a.country] - idx[b.country];
-    const va = _sbsCmpTake(a, 75), vb = _sbsCmpTake(b, 75);
+    const va = _sbsCmpTake(a, cmpRankPrice), vb = _sbsCmpTake(b, cmpRankPrice);
     if (va !== vb) return (va - vb) * dir;
     return idx[a.country] - idx[b.country];
   }).map(d => d.country);
-  _sbsOrderSplit = mixed || rec.some(d => _sbsCmpTake(d, 75) == null);
+  _sbsOrderSplit = mixed || rec.some(d => _sbsCmpTake(d, cmpRankPrice) == null);
 }
 function setCompareOrder(mode) {
   cmpOrder = CMP_ORDER_LABEL[mode] ? mode : 'add';
+  _sbsApplyOrder();
+  renderCompare();
+  _updateCompareHash();
+}
+// v929 (T3): re-rank the set at another published price. Re-labels the two Govt-take options in
+// the order dropdown at the same time, so the two controls can never name different prices.
+function setCompareRankPrice(price) {
+  const p = Number(price);
+  cmpRankPrice = (CMP_RANK_PRICES.indexOf(p) >= 0) ? p : 75;
+  const sel = document.getElementById('cmp-order');
+  if (sel) {
+    const a = sel.querySelector('option[value="take_asc"]');
+    const b = sel.querySelector('option[value="take_desc"]');
+    if (a) a.textContent = 'Govt take $' + cmpRankPrice + ' — low \u2192 high';
+    if (b) b.textContent = 'Govt take $' + cmpRankPrice + ' — high \u2192 low';
+  }
   _sbsApplyOrder();
   renderCompare();
   _updateCompareHash();
@@ -28749,7 +28796,12 @@ function _updateCompareHash() {
   if (_cmpHashHold) return;
   if (window._activeTab === 't0' || window._activeTab === 't2') {
     if (compareList.length > 0) {
-      updateHash('compare', compareList.map(toSlug).join('+'));
+      // v929 (T3): the rank price rides the hash. Without it a link shared from a $100 deck
+      // reopens ranked at $75 — and on the set that motivated this control that is the REVERSE
+      // order, under the sender's own column headings. Omitted at 75 so every previously issued
+      // link, and every link to a default comparison, is unchanged.
+      updateHash('compare', compareList.map(toSlug).join('+')
+        + (cmpRankPrice !== 75 ? '@' + cmpRankPrice : ''));
     } else {
       updateHash('compare', '');
     }
@@ -30489,7 +30541,7 @@ function renderCompare() {
   // same `_cmpRankTake` gate every notice below already uses -- so it cannot disagree with them.
   // It adds no new analysis: the ordering, the exclusions and the price-deck reversal were all
   // already derived, they were just never assembled into an answer.
-  const _vdTake = (d) => (d ? _cmpRankTake(d, 75) : null);
+  const _vdTake = (d) => (d ? _cmpRankTake(d, cmpRankPrice) : null);
   // v823 (T3): the ordering above the grid is computed on _cmpRankTake, which SUBSTITUTES the
   // Group-1-only take on a fee-blended column (v549). It printed that substituted figure bare.
   // On Iraq — which ships on this tab's own "USA vs Iraq" quickstart — the strip read
@@ -30500,7 +30552,7 @@ function renderCompare() {
   // the same pairing v549 established for the Govt Take cells.
   const _vdRanked = selected.filter(d => _vdTake(d) != null)
     .map(d => {
-      const _pub = d['take_75'];
+      const _pub = d['take_' + cmpRankPrice];
       const _v = _vdTake(d);
       return { c: d.country, v: _v, d: d, pub: _pub,
                reb: (_pub != null && _v != null && Math.abs(_pub - _v) >= 0.05) };
@@ -30511,7 +30563,7 @@ function renderCompare() {
   const _vdRebTitle = (x) => {
     const st = _cmpMixStat(x.d);
     const _g1n = (st.g1 && st.g1.n != null) ? Number(st.g1.n).toLocaleString() : null;
-    return x.c + ': ORCA publishes a government take of ' + x.pub.toFixed(1) + '% at $75/bbl — that is the '
+    return x.c + ': ORCA publishes a government take of ' + x.pub.toFixed(1) + '% at $' + cmpRankPrice + '/bbl — that is the '
       + 'figure on the Country Profile, in Fiscal Compare, in the Screener, in the Regime Explorer and in '
       + 'the JSON API. It is NOT the figure this ordering uses. '
       + (st.n2 ? Math.round(st.feePct) + '% of its ' + Number(st.tot).toLocaleString() + ' contracts are '
@@ -30528,8 +30580,8 @@ function renderCompare() {
   // Reasons mirror _cmpRankTake's null branches in the same order, so every set-aside column can
   // say WHY in its own clause rather than being silently absent from the ordering.
   const _vdWhy = (d) => {
-    const v = d['take_75'];
-    if (v == null) return 'no take at $75/bbl on file';
+    const v = d['take_' + cmpRankPrice];
+    if (v == null) return 'no take at $' + cmpRankPrice + '/bbl on file';
     if (isStateMonopoly(v)) return 'state monopoly — no contractor position to rank';
     if (_cmpBasisGate && !_cmpHasProd(d)) return 'statutory terms — ORCA holds no verified production behind it';
     const st = _cmpMixStat(d);
@@ -30610,12 +30662,13 @@ function renderCompare() {
     }
     return v;
   };
-  const _cmpRankNpv = (d) => _cmpRankNpvAt(d, 75);
+  const _cmpRankNpv = (d) => _cmpRankNpvAt(d, cmpRankPrice);
   const _vdVal = selected.filter(d => _cmpRankNpv(d) != null)
     .map(d => {
       const _v = _cmpRankNpv(d);
-      return { c: d.country, v: _v, d: d, pub: d.npv_75,
-               reb: (d.npv_75 != null && fmtNpvShared(d.npv_75) !== fmtNpvShared(_v)) };
+      const _pubN = d['npv_' + cmpRankPrice];
+      return { c: d.country, v: _v, d: d, pub: _pubN,
+               reb: (_pubN != null && fmtNpvShared(_pubN) !== fmtNpvShared(_v)) };
     }).sort((a, b) => b.v - a.v);   // highest contractor NPV first — best-for-contractor first,
                                     // the same "best first" direction the take chain reads in
   const _vdValReb = _vdVal.filter(x => x.reb);
@@ -30694,18 +30747,18 @@ function renderCompare() {
               + 'PSC/Conc basis · ORCA publishes ' + x.pub.toFixed(1) + '%</span>'
             : '')
       ).join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
-      _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Govt take @$75, lowest first:</span>'
+      _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Govt take @$' + cmpRankPrice + ', lowest first:</span>'
         + '<span style="font-size:12px;">' + _chain + '</span>'
         + _pill(_span.toFixed(1) + 'pp apart',
                 _span < 5 ? 'var(--orange)' : 'var(--text)',
                 _span < 5 ? 'rgba(194,65,12,.10)' : 'var(--surface2)',
                 _span < 5
-                  ? 'Lowest to highest government take across the ranked columns at $75/bbl is only ' + _span.toFixed(1)
+                  ? 'Lowest to highest government take across the ranked columns at $' + cmpRankPrice + '/bbl is only ' + _span.toFixed(1)
                     + ' percentage points. That is inside the spread ORCA itself observes across contracts within a single one of these countries, so the base-case row does not separate them on its own.'
-                  : 'Lowest to highest government take across the ranked columns at $75/bbl, in percentage points.')
+                  : 'Lowest to highest government take across the ranked columns at $' + cmpRankPrice + '/bbl, in percentage points.')
         + (_vdHold
             ? _pill('order holds $50–$125', 'var(--green)', 'rgba(21,128,61,.10)',
-                    'These columns rank in this same order at all four published prices ($50 / $75 / $100 / $125), so the $75 ordering is the ordering at every price ORCA publishes.')
+                    'These columns rank in this same order at all four published prices ($50 / $75 / $100 / $125), so the $' + cmpRankPrice + ' ordering is the ordering at every price ORCA publishes.')
             : _pill('⚠ order changes in ' + _vdBreak, 'var(--orange)', 'rgba(194,65,12,.12)',
                     'The columns do NOT rank in this order at every price. The ordering first changes in the ' + _vdBreak
                     // v926 (T3): this said "The full reversal ... is set out in the price-ordering
@@ -30713,11 +30766,11 @@ function renderCompare() {
                     // column never moves and there is no reversal — and until v926 that notice did
                     // not render at all on those sets. It always renders now; the wording no longer
                     // promises a reversal the set may not contain.
-                    + '/bbl interval, so a ranking taken off the $75 row is not the ranking at the deck you may actually defend. The columns that trade places, the figures at each end of that interval and the gap between them are set out in the price-ordering notice under the grid.'));
+                    + '/bbl interval, so a ranking taken off the $' + cmpRankPrice + ' row is not the ranking at the deck you may actually defend. Re-rank the set with the \u201cRank at\u201d control above the grid to read it at the deck you will defend. The columns that trade places, the figures at each end of that interval and the gap between them are set out in the price-ordering notice under the grid.'));
     } else if (_vdRanked.length === 1) {
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
         + '<span style="font-size:12px;">Only <strong style="color:var(--text);">' + _cmpEsc(_vdRanked[0].c)
-        + '</strong> carries a comparable take (' + _vdRanked[0].v.toFixed(1) + '% at $75/bbl). A single column is not a comparison.</span>';
+        + '</strong> carries a comparable take (' + _vdRanked[0].v.toFixed(1) + '% at $' + cmpRankPrice + '/bbl). A single column is not a comparison.</span>';
     } else {
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
         + '<span style="font-size:12px;">No column in this set carries a take that is comparable with any other. The take rows are readable one at a time; the set does not order.</span>';
@@ -30764,7 +30817,7 @@ function renderCompare() {
           + '<strong style="color:var(--orange);">Contractor value does not order here:</strong> '
           + (_vdVal.length === 1
               ? 'only <strong style="color:var(--text);">' + _cmpEsc(_vdVal[0].c) + '</strong> ('
-                + fmtNpvShared(_vdVal[0].v) + ' at $75/bbl) carries a comparable contractor NPV'
+                + fmtNpvShared(_vdVal[0].v) + ' at $' + cmpRankPrice + '/bbl) carries a comparable contractor NPV'
               : 'no column in this set carries a contractor NPV comparable with any other')
           + (_vdValOut.length
               ? '. ' + _vdValOut.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c)
@@ -30776,8 +30829,8 @@ function renderCompare() {
         + fmtNpvShared(x.v)
         + (x.reb
             ? ' <span class="cmp-vd-reb" title="' + _cmpEsc(x.c
-                + ': ORCA publishes a contractor NPV of ' + fmtNpvShared(x.pub) + ' at $75/bbl — that is the '
-                + 'figure printed in full size on the Contractor NPV @$75 row below, and it is NOT the figure '
+                + ': ORCA publishes a contractor NPV of ' + fmtNpvShared(x.pub) + ' at $' + cmpRankPrice + '/bbl — that is the '
+                + 'figure printed in full size on the Contractor NPV @$' + cmpRankPrice + ' row below, and it is NOT the figure '
                 + 'this ordering uses. It is an unweighted mean over all of this country’s contracts, '
                 + 'fee-basis ones included, where the contractor is paid a fixed $/bbl remuneration and the '
                 + 'DCF therefore returns a far smaller position. This ordering places ' + x.c + ' on '
@@ -30794,7 +30847,7 @@ function renderCompare() {
       ).join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
       const _gap = _vdVal[0].v - _vdVal[_vdVal.length - 1].v;
       let _h = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">'
-        + '<span title="' + _cmpEsc('Contractor NPV at $75/bbl, largest first — every column run on the same '
+        + '<span title="' + _cmpEsc('Contractor NPV at $' + cmpRankPrice + '/bbl, largest first — every column run on the same '
           + '' + _cmpEngBasisAttr() + ', so the '
           + 'ordering isolates the fiscal regime. A column is ranked here only where ORCA holds a contractor value '
           + 'comparable with the rest of the set: state monopolies carry no contractor position, statutory-terms '
@@ -30804,7 +30857,7 @@ function renderCompare() {
           + 'order because its take% is comparable at a single price and not across the deck, but it IS ranked here, '
           + 'because a contractor NPV on the shared profile is a cash result and is comparable. So the two lines can '
           + 'legitimately hold different sets of columns.')
-          + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;cursor:help;">Contractor value @$75, largest first:</span>'
+          + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;cursor:help;">Contractor value @$' + cmpRankPrice + ', largest first:</span>'
         + '<span style="font-size:12px;">' + _chain + '</span>'
         + _pill(fmtNpvShared(_gap) + ' apart', 'var(--text)', 'var(--surface2)',
                 'Largest to smallest comparable contractor NPV across the ranked columns at $75/bbl, on the '
@@ -31528,7 +31581,7 @@ function renderCompare() {
     if (cmpOrder === 'add') {
       _ordTxt = 'Sorted left→right by <strong style="color:var(--text);">addition order</strong> — change it with <strong style="color:var(--text);">Order columns</strong> above.';
     } else {
-      _ordTxt = 'Sorted left→right by <strong style="color:var(--text);">' + CMP_ORDER_LABEL[cmpOrder] + '</strong>';
+      _ordTxt = 'Sorted left→right by <strong style="color:var(--text);">' + _cmpOrderLabel(cmpOrder) + '</strong>';
       if (cmpOrder !== 'name' && _sbsOrderSplit) {
         const _statCols = selected.filter(d => _cmpBasisGate && !_cmpHasProd(d) && _sbsCmpTake(d, 75) != null).map(d => d.country);
         const _noneCols = selected.filter(d => _sbsCmpTake(d, 75) == null).map(d => d.country);
@@ -50543,7 +50596,10 @@ function exportScreenerExcel() {
 function shareComparison() {
   if (!compareList.length) return;
   // Use new slug-based route format for cleaner URLs
-  var hash = '#/compare/' + compareList.map(toSlug).join('+');
+  // v929 (T3): same '@<price>' suffix _updateCompareHash() writes, so the button and the address
+  // bar cannot hand out two different links for one screen. Omitted at the 75 default.
+  var hash = '#/compare/' + compareList.map(toSlug).join('+')
+    + ((typeof cmpRankPrice === 'number' && cmpRankPrice !== 75) ? '@' + cmpRankPrice : '');
   var url = window.location.href.split('#')[0] + hash;
   navigator.clipboard.writeText(url).then(function(){
     var btn = document.querySelector('[onclick="shareComparison()"]');
@@ -51139,6 +51195,27 @@ function parseAndNavigate(hash) {
     // A shared comparison link did the same thing to the recipient, on a cold load.
     // Route on the param: a country list goes where country lists are rendered.
     if (param) {
+      // v929 (T3): read the rank price off the tail before anything splits on '+'. A link made at
+      // a $100 deck must reopen ranked at $100 — on the set this control was built for, reopening
+      // at the 75 default is the REVERSE order under the sender's own column headings. An absent,
+      // malformed or unpublished price falls back to 75 rather than refusing the link.
+      var _rpM = /@(\d+)$/.exec(param);
+      if (_rpM) {
+        param = param.slice(0, _rpM.index);
+        var _rpV = Number(_rpM[1]);
+        cmpRankPrice = (CMP_RANK_PRICES.indexOf(_rpV) >= 0) ? _rpV : 75;
+      } else {
+        cmpRankPrice = 75;
+      }
+      var _rpSel = document.getElementById('cmp-rankprice');
+      if (_rpSel) _rpSel.value = String(cmpRankPrice);
+      var _rpOrd = document.getElementById('cmp-order');
+      if (_rpOrd) {
+        var _oa = _rpOrd.querySelector('option[value="take_asc"]');
+        var _ob = _rpOrd.querySelector('option[value="take_desc"]');
+        if (_oa) _oa.textContent = 'Govt take $' + cmpRankPrice + ' \u2014 low \u2192 high';
+        if (_ob) _ob.textContent = 'Govt take $' + cmpRankPrice + ' \u2014 high \u2192 low';
+      }
       // Populate BEFORE switching. The t2 activation seed (Norway/UK/Netherlands) is guarded
       // by `if (compareList.length > 0) return;`, so filling the list first is what stops a
       // shared link from being spliced with the example trio — the v509 guard, relied on in
@@ -65719,6 +65796,11 @@ document.addEventListener('DOMContentLoaded', function() {
   var cmpOrderSel = document.getElementById('cmp-order');
   if (cmpOrderSel) cmpOrderSel.addEventListener('change', function() {
     if (typeof setCompareOrder === 'function') setCompareOrder(cmpOrderSel.value);
+  });
+  // v929 (T3): rank-at-price control
+  var cmpRankSel = document.getElementById('cmp-rankprice');
+  if (cmpRankSel) cmpRankSel.addEventListener('change', function() {
+    if (typeof setCompareRankPrice === 'function') setCompareRankPrice(cmpRankSel.value);
   });
   var cmpPrint = document.getElementById('cmp-print-btn');
   if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });

@@ -3529,6 +3529,111 @@ async function testSBProvenance(page) {
 // A correct ranking that reads as a broken sort is what this pins. Both directions, both
 // columns, and — just as important — the three adjacent states that must NOT change.
 // ─────────────────────────────────────────────────────────────────────────────
+// ── v929 (T3): the comparison is ranked at a price the analyst chooses. ──────────────────────
+// Every ordering surface on Side-by-Side was hard-coded to $75 — the verdict strip, the
+// left-to-right column order, the contractor-value chain — while the grid printed all four
+// published prices and the tab's own _cmpReorder detector already knew the order inverts.
+// On Guyana / Brazil / Angola the headline read "Angola 53.0% > Brazil 55.6%" at $75 and the
+// truth at $100 is the reverse. These assertions fail against any build where the control is
+// absent or where changing it does not move the columns and the strip together.
+async function testSbSRankPrice(page) {
+  const S = 'SBS-RANKPRICE';
+  try {
+    await switchTab(page, 't2');
+    await page.waitForTimeout(1200);
+    // The analyst's own set, typed — not a quickstart preset.
+    for (const c of ['Guyana', 'Brazil', 'Angola']) {
+      await page.fill('#cmp-search', c);
+      await page.press('#cmp-search', 'Enter');
+      await page.waitForTimeout(500);
+    }
+    await page.waitForTimeout(900);
+
+    const read = () => page.evaluate(() => {
+      const vd = document.getElementById('cmp-verdict');
+      const txt = vd ? vd.innerText : '';
+      return {
+        price: (typeof cmpRankPrice !== 'undefined') ? cmpRankPrice : null,
+        sel: (document.getElementById('cmp-rankprice') || {}).value || null,
+        cols: Array.from(document.querySelectorAll('.compare-grid .cmp-hdr[data-cmp-country]'))
+                .map(e => e.dataset.cmpCountry),
+        take: (txt.match(/GOVT TAKE @\$(\d+), LOWEST FIRST:\s*\n?([^\n]*)/) || []).slice(1),
+        val:  (txt.match(/CONTRACTOR VALUE @\$(\d+), LARGEST FIRST:/) || [])[1] || null,
+        reading: (document.getElementById('cmp-output').innerText
+                   .match(/Sorted left→right by ([^.]*)/) || [])[1] || '',
+        optAsc: (document.querySelector('#cmp-order option[value="take_asc"]') || {}).textContent || ''
+      };
+    });
+
+    // 1. the control exists, and the default is unchanged at $75
+    const d0 = await read();
+    if (d0.sel === '75' && d0.price === 75 && d0.take[0] === '75') {
+      p(S, 'default is $75', `control present, selected 75, strip reads GOVT TAKE @$75 — cold load unchanged`);
+    } else {
+      f(S, 'default is $75', `expected a #cmp-rankprice defaulting to 75 with a $75 strip; got sel=${d0.sel} cmpRankPrice=${d0.price} strip=@$${d0.take[0]}`);
+    }
+    const cols75 = d0.cols.join('|');
+
+    // 2. re-ranking at $100 moves the STRIP and the COLUMNS together
+    await page.selectOption('#cmp-rankprice', '100');
+    await page.waitForTimeout(1400);
+    const d1 = await read();
+    const cols100 = d1.cols.join('|');
+    if (d1.take[0] === '100' && d1.val === '100' && /\$100\/bbl/.test(d1.reading) && /\$100/.test(d1.optAsc)) {
+      p(S, 'strip re-ranks at $100', `take chain, value chain, Reading line and the order dropdown all name $100 — no surface left on the old price`);
+    } else {
+      f(S, 'strip re-ranks at $100', `take=@$${d1.take[0]} value=@$${d1.val} reading="${d1.reading.slice(0,60)}" opt="${d1.optAsc}"`);
+    }
+    if (cols100 !== cols75 && cols100 === 'Brazil|Angola|Guyana') {
+      p(S, 'columns follow the price', `$75 ordered ${cols75}; $100 reorders to ${cols100} — the inversion the $75 strip could only warn about is now on screen`);
+    } else {
+      f(S, 'columns follow the price', `expected Brazil|Angola|Guyana at $100, got ${cols100} (was ${cols75} at $75)`);
+    }
+    // the take figures themselves must be the $100 figures, not relabelled $75 ones
+    if (/Brazil 58\.7%/.test(d1.take[1] || '') && /Angola 60\.2%/.test(d1.take[1] || '')) {
+      p(S, '$100 figures are the $100 figures', `strip reads "${(d1.take[1]||'').trim()}" — the numbers moved with the label`);
+    } else {
+      f(S, '$100 figures are the $100 figures', `strip chain reads "${(d1.take[1]||'').trim()}", expected Brazil 58.7% then Angola 60.2%`);
+    }
+
+    // 3. the price rides the share link, and restores on a COLD load
+    const hash = await page.evaluate(() => location.hash);
+    if (/@100$/.test(hash)) {
+      p(S, 'rank price rides the hash', `${hash} — a link shared off a $100 deck carries the deck`);
+    } else {
+      f(S, 'rank price rides the hash', `expected a trailing @100, got ${hash}`);
+    }
+    const rp = await page.context().newPage();
+    await rp.goto(URL.split('#')[0] + hash, { waitUntil: 'networkidle' });
+    await rp.waitForTimeout(2600);
+    const rest = await rp.evaluate(() => ({
+      price: (typeof cmpRankPrice !== 'undefined') ? cmpRankPrice : null,
+      sel: (document.getElementById('cmp-rankprice') || {}).value || null,
+      cols: Array.from(document.querySelectorAll('.compare-grid .cmp-hdr[data-cmp-country]')).map(e => e.dataset.cmpCountry).join('|'),
+      strip: ((document.getElementById('cmp-verdict') || {}).innerText || '').match(/GOVT TAKE @\$(\d+)/)
+    }));
+    if (rest.price === 100 && rest.sel === '100' && rest.cols === 'Brazil|Angola|Guyana' && rest.strip && rest.strip[1] === '100') {
+      p(S, 'shared link reopens at the sender\'s price', `cold restore: cmpRankPrice=100, control=100, columns ${rest.cols}, strip @$100 — recipient reads the sender's order`);
+    } else {
+      f(S, 'shared link reopens at the sender\'s price', `got price=${rest.price} sel=${rest.sel} cols=${rest.cols} strip=@$${rest.strip ? rest.strip[1] : '?'}`);
+    }
+    await rp.close();
+
+    // 4. back to the default leaves no residue
+    await page.selectOption('#cmp-rankprice', '75');
+    await page.waitForTimeout(1400);
+    const d2 = await read();
+    const h2 = await page.evaluate(() => location.hash);
+    if (d2.take[0] === '75' && d2.cols.join('|') === cols75 && !/@\d+$/.test(h2)) {
+      p(S, 'returning to $75 is lossless', `strip @$75, columns back to ${cols75}, hash drops the suffix (${h2}) — previously issued links stay byte-identical`);
+    } else {
+      f(S, 'returning to $75 is lossless', `strip=@$${d2.take[0]} cols=${d2.cols.join('|')} hash=${h2}`);
+    }
+  } catch (e) {
+    f(S, 'suite', e.message);
+  }
+}
+
 async function testScreenerTakeSortRender(page) {
   const S = 'ScreenerSortRender';
   try {
@@ -3861,6 +3966,7 @@ async function testConsoleErrors() {
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
     await testSBProvenance(page);
+    await testSbSRankPrice(page);   // v929 (T3)
     await testScreenerTakeSortRender(page);
     await testCountryProfile(page);
     await testExplorer(page);
