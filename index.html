@@ -27065,8 +27065,8 @@ function renderExplorer() {
     const take = d[takeKey];
     const npv  = d[npvKey];
     const irr  = d[irrKey];
-    const tc   = tierClass(take);
-    const tl   = tierLabel(take);
+    // v927 (T1): tc/tl removed — the tier cell now routes through tierCellHtml(), which is
+    // floor-aware. Computing them here again would be a second, bound-blind source of truth.
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
     const prodBadge = d.prod_coverage_pct > 5
       ? `<span style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--purple);font-weight:700;margin-left:4px;vertical-align:middle;" title="${d.prod_coverage_pct.toFixed(1)}% of contracts have verified production data — production chart available">Prod</span>`
@@ -36138,7 +36138,7 @@ function runScreener() {
     const _floorGe = _rowFloor ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_floorTip}">&ge;</span>` : '';
     const _floorLe = _rowFloor ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_floorTip}">&le;</span>` : '';
     const _tierOn = (_takeLeadCmp && _rowFc.diverges) ? _rowFc.cmp : d[takeKey];
-    const tc = tierClass(_tierOn);
+    // v927 (T1): tc removed for the same reason — tierCellHtml() derives the class itself.
     // v890 (T1): the TIER cell is the only column on this row that is a WORD, so it is what an eye
     // scanning 185 rows for a shortlist actually reads. Where the take cell now prints a comparable
     // figure that lands in a DIFFERENT bucket, the pill above it was contradicting that figure in
