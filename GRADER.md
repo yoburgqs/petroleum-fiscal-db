@@ -61564,3 +61564,125 @@ for Guyana (841).
 **Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (850 was T1; T4 was stalest, last walked at cycle 806.)
 
 **Friction.** `_fpCohortLine()` (`index.html:26449`) ended its measured-cohort paragraph on a hard-coded band name — *"**MODERATE** here outranks any UNGRADED score, however high its number"* — in the card's only emphasis colour. That sentence was written for the cohort ceiling (Turkmenistan, 74, which is MODERA
+
+---
+## Cycle 852 Log — 2026-09-19
+- Test before: 494 PASS / 0 FAIL / 1 WARN (local tree, pre-change)
+- Test after: 494 PASS / 0 FAIL / 1 WARN (local tree, patched) — RUN this cycle, both sides
+- JS errors: 0 page errors across all tabs at 1440 and 390
+- Summary: v938 shipped and pushed.
+
+## Cycle 852 summary
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (851 was T4, 850
+T1, 847 T3, 846 T5, 844 T2 — T6 was stalest, last walked at cycle 843.)
+
+**Friction.** Five country surfaces on this platform answer the evidence question with two numbers,
+not one: the whole-fact-base grade, AND how many of the fiscal terms the DCF actually runs have a
+citation behind them — clickable through to that country's term-by-term Evidence Chain. Country
+Profile badge (v660), Fiscal Compare drawer (v728), Screener (v730), Fiscal Compare table (v884),
+Explorer (v905); Side-by-Side carries it as its own row.
+
+**The IOC Portfolio did not — the only one.** Measured on the shipped build, the whole `#t5`
+container held **zero** `_fcOpenTermChain` references and **zero** terms-chips. `_iocEvCell()`
+(`index.html:38638`) rendered `getEvidenceBar()` into a `cursor:help` cell whose only affordance was
+a hover tooltip, so under a thumb it answered nothing at all. Its own column header
+(`_IOC_EV_TH`, `:38627`) meanwhile claimed the cell was *"Identical to the Explorer and Screener
+Evidence columns, the Fiscal Compare Quality column, the Country Profile badge and the Side-by-Side
+Evidence tier row"* — true of the letter, false of the column.
+
+This is the worst of the six to be missing, because this is the tab the directive's analyst is named
+after and the only one framed as **their** portfolio. Measured on the tab's own cold seeded example,
+Shell:
+
+| | |
+|---|---|
+| rows rendered | 37 |
+| graded A or B | 28 |
+| **of those 28, citing HALF OR FEWER model terms** | **18** |
+
+| country | position | grade / facts | terms cited |
+|---|---|---|---|
+| USA | 474 contracts — largest | B · 125,336 facts | **2 of 5** |
+| United Kingdom | 89 contracts | B · 15,899 facts | **2 of 5** |
+| Netherlands | — | **A** · 278 facts | **1 of 4** |
+| Namibia | — | B · 125 facts | **1 of 4** |
+| Canada | — | **A** · 1,758 facts | 2 of 4 |
+| New Zealand | — | **A** · 381 facts | 2 of 4 |
+| Norway | 140 contracts | A · 63,848 facts | 3 of 4 |
+
+An analyst reading "A — 63,848 facts" against a position takes the A rows as the auditable ones and
+stops. On the axis that produces the number they will put in the memo, they are not.
+
+**Change.** The Evidence cell now carries the model-terms chip under the letter —
+`2 of 5 terms cited →`, red at half or fewer, orange below full, green at full. Click or Enter opens
+that country's Evidence Chain, which names each term, its ORCA value, the statutory value and the
+source. It reuses `_scFillTermChip()` **verbatim** via `data-tc-class`, so the six surfaces cannot
+give six answers. Hydrated lazily per row against `api/v1/country/<slug>.json`, root the `.tbl-wrap`
+scroller and target the `<tr>`, for the two-axis reason v730 and v905 each give. Wired into **both**
+render paths — the group roll-up (`:39248`) and the single-entity table (`:39342`). The header
+tooltip now states the second leg instead of only claiming parity with surfaces that have it.
+
+**Result.** An analyst on the IOC Portfolio tab can now see, on the row itself, that an A-graded
+63,848-fact country cites 1 of 4 of the terms producing its take — and reach the document behind each
+term without leaving the tab. Before this, the tab had no route to the Evidence Chain at all.
+
+### Verification — run this cycle, against the patched local tree
+
+| Check | Result |
+|---|---|
+| JS syntax gate | **PASS** — 11/11 inline blocks |
+| Runtime suite, pre-change local tree | **494 PASS / 0 FAIL / 1 WARN** |
+| Runtime suite, patched local tree | **494 PASS / 0 FAIL / 1 WARN** — identical, no regression |
+| IOC chips hydrated, group roll-up (Shell) | **37 / 37** slots |
+| IOC chips hydrated, single-entity path | 1 / 1 (Murphy Exploration — USA) |
+| All chips carry `_fcOpenTermChain` + `role=button` + `tabindex=0` | **37 / 37** |
+| Click landing | `#/profile/usa`, Country Profile, Evidence Chain rendered |
+| Keyboard (Enter) landing | `#/profile/usa` — same destination |
+| Page errors, all 10 tabs, 1440 | **0** |
+| Page errors, all 10 tabs, 390 `hasTouch` | **0** |
+| Horizontal scroll, all tabs, 1440 and 390 | **NONE** |
+| Mobile `documentElement.scrollWidth` vs `clientWidth` | 390 == 390 — unchanged from baseline |
+| Mobile chip height | min **24px**, 0 controls under 24px |
+
+The single WARN is the known local-only service-worker 404 — `index.html:49` registers
+`/petroleum-fiscal-db/sw.js`, a hard-coded Pages path that 404s when the tree is served from a local
+root. It is present on the pre-change baseline run too, which is why both runs read 494/0/1 and the
+comparison is clean. The cycle-prompt figure of 500 PASS was measured against the **deployed** build;
+six assertions do not reach that path locally. Grading its own work against the local tree is the
+practice cycle 849 recommended.
+
+Cost on screen: the IOC table's own horizontal scroller grew 1131px → 1185px and its mobile row
+height 60px → 70px — the same cost v730 / v884 / v905 accepted on the Screener, Fiscal Compare and
+Explorer. Page-level horizontal scroll is unchanged at every viewport.
+
+Header badge `v937 → v938`, done silently at the end, not as the reason the cycle happened.
+
+### Debt still open, carried forward
+
+Unchanged and still not adopted unilaterally — `CLAUDE.md` reserves the loop's control surface to
+Zach: **`autonomous_cycle.py:28 INTERVAL = 1800` / `:233 timeout=1800`** budgets the Claude step the
+entire interval, leaving nothing for test re-run, pixel audit, push and email. One-line
+recommendation stands: `timeout=1500`. Second, same family: set `TEST_URL` to the local tree for the
+runtime suite as well as the pixel audit — this cycle had to set it by hand on both runs.
+
+New this cycle, not fixed, recorded because it is written nowhere else. **`_modelParam()`
+(`index.html:~40282`) resolves the profit-oil ladder only where `getDCFParams()` carries
+`tier_schedule`.** Measured live: 98 of 185 countries hold a `tier_schedule` in `COUNTRY_DATA`, but
+only **51** of those reach the engine's params. On the 47-country gap the Country Profile still
+prints a Profit Oil Tier Schedule card while the DCF runs a flat figure — Libya and Algeria are the
+clearest cases (PSC, `_basis: 'country'`, a filed 4-tier ladder on screen, no ladder in params). The
+Evidence Chain is correct on both today, because v700's ladder machinery sits in the *unsourced*
+branch and Libya's profit-oil row is unsourced — but the v767 *sourced* branch skips
+`origin === 'tiers'` with the comment "left to v700's machinery", and v700 never sees a sourced row.
+A country that is both laddered and sourced on profit oil would fall through both. None was found in
+this walk; the hole is structural, not yet live.
+
+Carried forward unchanged: FC Stability tooltip (`:3496`) and XLSX `Fiscal Predictability` note
+generalise from the best case (851) · two charts render below the five caveat blocks (842) ·
+`# Contracts` grid row prints `1193` unseparated against `all 1,193` (828) · PSC pre-fill rounds
+Angola's 2.6% to `3` (841) · state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded`
+above "No breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Compare up to 4
+countries" against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or
+`_icArmBulkCopy` (836) · unreachable `Score <= 20` IC rule on Reform Risk ·
+`ddOpenScenarioBuilder()` generic branch for Guyana (841).
