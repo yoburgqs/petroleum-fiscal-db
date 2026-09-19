@@ -3962,6 +3962,183 @@ async function testScreenerTakeSortRender(page) {
 // The assertions are invariants, not figures: the two ladders must be the same width, the NPV
 // rows must run in ascending price order, the quoted $100 value must equal what the page
 // computes for that country, and every price the breakeven note names must be in the table.
+// ─── v933 (T3): THE SHARED COMPARISON OPENS IN THE ORDER IT WAS SENT ────────────────
+// Regression guard for the defect this cycle fixed. The Side-by-Side hash already spelled
+// the columns out in order — `#/compare/nigeria+angola+guyana` — and the restore path then
+// re-sorted them under the RECIPIENT's default `take_asc`. A link sent from a "high → low"
+// screen reopened "low → high": the same three columns, the same headings, reversed, with
+// nothing on screen saying so. v929 fixed exactly this for the rank PRICE and left the
+// order control out.
+//
+// These assertions do NOT hardcode a column order. They assert the sender and the receiver
+// AGREE, and separately that the ORDER CONTROL agrees with the grid — so the guard cannot
+// be satisfied by making both ends wrong in the same direction, or by restoring the columns
+// while leaving the dropdown reading something else.
+async function testSbsShareOrder(page) {
+  const S = 'SBS-ShareOrder';
+  const TRIO = ['Nigeria', 'Angola', 'Guyana'];
+  try {
+    // ---- sender: load the trio, set an order, read what the page hands out -------------
+    // The two deck controls are driven with selectOption, i.e. through their real 'change'
+    // handlers, NOT by calling setCompareOrder()/setCompareRankPrice() directly. Driving the
+    // API leaves the <select> elements untouched at their defaults, which made the "order
+    // control agrees with the grid" assertion below compare two stale values and pass no
+    // matter what the product did.
+    const send = async (order, price) => {
+      await page.goto(URL, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(1800);
+      await switchTab(page, 't2');
+      await page.waitForTimeout(600);
+      await page.evaluate(async (trio) => {
+        if (typeof clearCompare === 'function') clearCompare();
+        for (const c of trio) { addCompare(c); await new Promise(r => setTimeout(r, 60)); }
+      }, TRIO);
+      await page.selectOption('#cmp-rankprice', String(price));
+      await page.waitForTimeout(200);
+      await page.selectOption('#cmp-order', order);
+      await page.waitForTimeout(350);
+      return await page.evaluate(() => ({
+        list: compareList.slice(), hash: location.hash,
+        sel: (document.getElementById('cmp-order') || {}).value,
+        rp: String((document.getElementById('cmp-rankprice') || {}).value)
+      }));
+    };
+    // ---- receiver: COLD load of that hash, read the rendered column order --------------
+    // about:blank first, deliberately. A page.goto() to a URL that differs from the current
+    // one only by its fragment — or not at all — is a same-document navigation: no reload, no
+    // DOMContentLoaded, and on an identical URL not even a hashchange. The receiver was then
+    // just the sender's own live page, so compareList still held the sender's columns and every
+    // column assertion passed without the restore path running at all. Forcing a real document
+    // load is what makes this a test of the link rather than a test of the sender's memory.
+    const recv = async (hash) => {
+      await page.goto('about:blank');
+      await page.goto(URL.split('#')[0] + hash, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2600);
+      return await page.evaluate(() => {
+        const hdr = document.querySelector('#cmp-output table tr');
+        return {
+          list: typeof compareList !== 'undefined' ? compareList.slice() : null,
+          sel: (document.getElementById('cmp-order') || {}).value,
+          rp: (document.getElementById('cmp-rankprice') || {}).value,
+          // what the analyst actually reads left→right, straight off the header row
+          cols: hdr ? [...hdr.children].slice(1).map(td => (td.innerText || '').trim().split('\n')[0]) : null
+        };
+      });
+    };
+
+    for (const [order, price] of [['add', 100], ['take_desc', 75], ['name', 50]]) {
+      const s = await send(order, price);
+      const r = await recv(s.hash);
+      const sameCols = JSON.stringify(s.list) === JSON.stringify(r.list);
+      const sameCtl  = s.sel === r.sel;
+      const headerMatches = r.cols && JSON.stringify(r.cols) === JSON.stringify(r.list);
+
+      if (sameCols) p(S, `${order}: recipient's columns are the sender's`, `${r.list.join(' | ')}`);
+      else f(S, `${order}: recipient's columns are the sender's`, `sent ${JSON.stringify(s.list)} got ${JSON.stringify(r.list)}`);
+
+      if (sameCtl) p(S, `${order}: the order control agrees with the grid`, `dropdown reads "${r.sel}" on both ends`);
+      else f(S, `${order}: the order control agrees with the grid`, `sender "${s.sel}" recipient "${r.sel}"`);
+
+      if (headerMatches) p(S, `${order}: rendered header row matches the restored order`, `${r.cols.join(' | ')}`);
+      else f(S, `${order}: rendered header row matches the restored order`, `header ${JSON.stringify(r.cols)} vs list ${JSON.stringify(r.list)}`);
+
+      if (String(r.rp) === String(price)) p(S, `${order}: v929 rank price still rides alongside`, `$${r.rp}/bbl preserved`);
+      else f(S, `${order}: v929 rank price still rides alongside`, `sent $${price} got $${r.rp}`);
+    }
+
+    // ---- the default must not change the link at all ----------------------------------
+    // Every link issued before this cycle was built at take_asc. If the suffix were written
+    // unconditionally, all of them would still resolve but none would be byte-identical, and
+    // the "unchanged for existing links" claim in the commit would be false.
+    const d = await send('take_asc', 75);
+    if (!/[~@]/.test(d.hash))
+      p(S, 'default order writes the legacy hash unchanged', d.hash);
+    else
+      f(S, 'default order writes the legacy hash unchanged', `expected no suffix, got ${d.hash}`);
+
+    // ---- a pre-v933 link still opens, at the default --------------------------------------
+    const legacy = await recv('#/compare/nigeria+angola+guyana@100');
+    if (legacy.list && legacy.list.length === 3 && legacy.sel === 'take_asc' && String(legacy.rp) === '100')
+      p(S, 'a pre-v933 link still opens at the default order', `3 columns, take_asc, $100/bbl`);
+    else
+      f(S, 'a pre-v933 link still opens at the default order', JSON.stringify(legacy));
+
+    // ---- a malformed order token degrades, never refuses the link ----------------------
+    const bad = await recv('#/compare/nigeria+angola+guyana~bogus_mode');
+    if (bad.list && bad.list.length === 3 && bad.sel === 'take_asc')
+      p(S, 'an unknown order token falls back instead of dropping the countries', '3 columns survive, order defaults');
+    else
+      f(S, 'an unknown order token falls back instead of dropping the countries', JSON.stringify(bad));
+
+    // ---- v934: the BASKET button is the third producer of this hash ---------------------
+    // launchCompare() wrote a bare "#/compare/<a>+<b>+<c>" and then handed it to the parser.
+    // Once v929 taught the parser to DEFAULT a bare tail to $75/take_asc, that bare hash became
+    // an instruction to RESET: swapping the country set silently reverted the analyst's ranking
+    // price and column order, both dropdowns snapping back. Asserted on the deck, the controls
+    // and the hash together, so the guard cannot be met by fixing the state and leaving the
+    // dropdowns — or the link the analyst then shares — reading something else.
+    await page.goto('about:blank');
+    await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1800);
+    await switchTab(page, 't2');
+    await page.waitForTimeout(600);
+    const hand = await page.evaluate(async () => {
+      if (typeof clearCompare === 'function') clearCompare();
+      for (const c of ['Nigeria', 'Angola', 'Guyana']) { addCompare(c); await new Promise(r => setTimeout(r, 60)); }
+      setCompareRankPrice(100); await new Promise(r => setTimeout(r, 150));
+      setCompareOrder('take_desc'); await new Promise(r => setTimeout(r, 300));
+      window.compareBasket = new Set(['Brazil', 'Norway', 'Oman']);
+      launchCompare();
+      await new Promise(r => setTimeout(r, 1400));
+      return { order: cmpOrder, price: cmpRankPrice, hash: location.hash,
+               cols: compareList.slice(),
+               ctl: (document.getElementById('cmp-order') || {}).value,
+               pctl: String((document.getElementById('cmp-rankprice') || {}).value) };
+    });
+    const swapped = hand.cols && hand.cols.length === 3 && hand.cols.indexOf('Nigeria') === -1;
+    if (swapped) p(S, 'basket handover: the new set replaced the old one', hand.cols.join(' | '));
+    else f(S, 'basket handover: the new set replaced the old one', JSON.stringify(hand.cols));
+
+    if (hand.order === 'take_desc' && String(hand.price) === '100')
+      p(S, 'basket handover keeps the deck the analyst built', `$${hand.price}/bbl, ${hand.order}`);
+    else
+      f(S, 'basket handover keeps the deck the analyst built', `expected $100/take_desc, got $${hand.price}/${hand.order}`);
+
+    if (hand.ctl === 'take_desc' && hand.pctl === '100')
+      p(S, 'basket handover: both dropdowns still read the deck', `order "${hand.ctl}", price "${hand.pctl}"`);
+    else
+      f(S, 'basket handover: both dropdowns still read the deck', `order "${hand.ctl}", price "${hand.pctl}"`);
+
+    if (/@100~take_desc$/.test(hand.hash))
+      p(S, 'basket handover writes a shareable hash, not a bare one', hand.hash);
+    else
+      f(S, 'basket handover writes a shareable hash, not a bare one', hand.hash);
+
+    // A DEFAULT deck must still write the byte-identical bare hash it always did — _basketLive
+    // and _basketSameAs() match on that shape, and every basket link ever issued has it.
+    // Cold load, so the deck is genuinely at its defaults rather than carrying the block above.
+    await page.goto('about:blank');
+    await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1800);
+    await switchTab(page, 't2');
+    await page.waitForTimeout(600);
+    const bare = await page.evaluate(async () => {
+      if (typeof clearCompare === 'function') clearCompare();
+      window.compareBasket = new Set(['Brazil', 'Norway', 'Oman']);
+      launchCompare();
+      await new Promise(r => setTimeout(r, 1200));
+      return location.hash;
+    });
+    if (bare === '#/compare/brazil+norway+oman')
+      p(S, 'a default basket deck writes the legacy bare hash unchanged', bare);
+    else
+      f(S, 'a default basket deck writes the legacy bare hash unchanged', `expected bare, got ${bare}`);
+
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testCpIcNpvLadder(page) {
   const S = 'CP-NPV100';
   try {
@@ -4286,6 +4463,7 @@ async function testConsoleErrors() {
     await testMethodology(page);
     await testMethGlanceEvidence(page);
     await testCpIcNpvLadder(page);
+    await testSbsShareOrder(page);
     await testConsoleErrors();
 
   } finally {

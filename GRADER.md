@@ -61167,3 +61167,161 @@ IC memo export now carries the full four-price ladder plus the notes that qualif
 **Task:** T5 — *"Give me something I can paste straight into an IC memo."* (Cycle 844 was T2, so not a repeat.)
 
 **First, what the 23 failures actually were.** Not 23 defects — one family. Every failure was `[CP-NPV100]`. Cycle 845 **timed out at 1800s** (`subprocess.TimeoutExpired`, visible in `cycle_log.txt`), having written its regression tests into the graded suite copy and its fix into `index
+
+---
+
+## Cycle 848 — T3
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (Cycle 846 was T5, so not a repeat.)
+
+### First: cycle 847 timed out, and that is now three cycles running
+
+`cycle_log.txt` records `subprocess.TimeoutExpired ... timed out after 1800 seconds`. Cycle 847 had
+already written its fix into `index.html` and 101 lines of regression tests into both suite copies,
+then died before committing. The **487 PASS / 3 FAIL** this cycle opened on is that state, and the
+arithmetic is the whole explanation:
+
+    475 PASS (cycle 846's green baseline) + 15 new assertions = 490 = 487 PASS + 3 FAIL
+
+Not a product regression — cycle 847's own new tests, failing against the *deployed* build that
+does not carry its fix. That orphaned work (**v933** — column order rides the Side-by-Side share
+hash, as v929 did for the rank price) was audited, found sound, and is shipped here.
+
+### Friction
+
+Auditing v933 before shipping it surfaced a defect of its own, in the same "one of N producers was
+left behind" family cycle 846 caught in the IC-memo button.
+
+`parseAndNavigate()`'s own comment (`index.html:51261`) names **three** producers of
+`#/compare/<a>+<b>+<c>`: `_updateCompareHash()`, `shareComparison()`, and **`launchCompare()`** —
+the floating basket's `Compare →` button. v933 updated the first two. So had v929.
+`launchCompare()` (`index.html:64027`) wrote a **bare** hash and handed it straight to the parser.
+
+That was harmless until v929 taught the parser to *default* a bare tail to `$75 / take_asc`. From
+that point a bare hash was not "no opinion" — it was **an instruction to reset**:
+
+> The analyst has Nigeria / Angola / Guyana ranked at **$100/bbl, high → low**. They go to
+> Explorer, tick three different countries into the basket, press **Compare →**. The new columns
+> arrive at **$75/bbl, low → high**, both dropdowns snapping back to defaults, nothing saying why.
+
+Swapping *which* countries are compared is not a request to change *how* they are ranked. Measured
+on the live DOM before the fix:
+
+    before  order=take_desc price=100  #/compare/nigeria+angola+guyana@100~take_desc
+    after   order=take_asc  price=75   #/compare/brazil+norway+oman            <-- reset
+
+The price half of this was live in the **shipped** build, reachable since v929. v933 would have
+stacked the order reset on top of it.
+
+### Change
+
+`launchCompare()` now builds the same `@<price>~<order>` tail the other two producers build, so all
+three hand out one link for one screen. Both suffixes are still omitted at their defaults, so a
+default deck writes the byte-identical bare hash it always did — which is what `_basketLive` and
+`_basketSameAs()` match on, and what every basket link ever issued looks like.
+
+Measured on the live DOM after the fix — the set swaps **and** the deck survives:
+
+    after   order=take_desc price=100  cols = Oman | Norway | Brazil
+            dropdowns read take_desc / 100
+            #/compare/oman+norway+brazil@100~take_desc
+
+The new trio arrives *ranked* (Oman / Norway / Brazil at $100 high→low), not in basket insertion
+order (Brazil / Norway / Oman).
+
+### Result
+
+The analyst sets up their comparison once. Swapping the country set through the basket keeps the
+ranking price and column order they chose, and the resulting screen is now shareable — pressing
+`Compare →` then `Share Link` sends the deck they are actually looking at, instead of a link that
+reopens at someone else's defaults.
+
+### The more important find: cycle 847's regression test was passing vacuously
+
+Running the suite against the patched build left **2 FAIL**, both in cycle 847's own
+`[SBS-ShareOrder]` block, on the `v929 rank price still rides alongside` assertion. The product was
+not at fault. **The test was.**
+
+Two flaws, and the second one is the dangerous kind:
+
+1. **`recv()` was not a cold load.** It did `page.goto(URL.split('#')[0] + hash)` from a page that
+   was already at that URL. A `goto` differing only by fragment — or not at all — is a
+   *same-document* navigation: no reload, no `DOMContentLoaded`, and on an identical URL not even a
+   `hashchange`. The "receiver" was simply the sender's own live page. `compareList` still held the
+   sender's columns, so **every column assertion passed without the restore path ever running.**
+2. **`send()` drove the JS API, not the controls** — `setCompareOrder()` / `setCompareRankPrice()`
+   directly, which never touch the `<select>` elements. So the assertion *"the order control agrees
+   with the grid"* was comparing two identically **stale** values and read
+   `dropdown reads "take_asc" on both ends` in all three cases. It could not have failed.
+
+The 2 FAIL were the one assertion whose expected value was a literal (`sent $100 got $75`) rather
+than a comparison of two stale reads — the only one the vacuity could not hide.
+
+Verified independently before touching anything: a genuine cold load of
+`#/compare/nigeria+angola+guyana@100~add` restores `rp="100"`, `sel="add"`, stable across 14
+samples over 4s. **The restore path was correct the whole time.**
+
+Fixed: `recv()` now goes through `about:blank` to force a real document load, and `send()` drives
+both controls with `page.selectOption` through their real `change` handlers. The same assertions now
+read real values — `dropdown reads "add" on both ends`, `$100/bbl preserved` — and the block went
+**2 FAIL → 0 FAIL** on evidence rather than on a rewritten expectation.
+
+**One thing checked and deliberately NOT "fixed".** A first probe appeared to show the dropdowns
+disagreeing with the grid on the forward path too. That was the same artifact — the probe driving
+the API. The only callers of those two setters are the selects' own change handlers
+(`index.html:65975, 65980`) and `parseAndNavigate()`, so on every real user path the control is in
+sync. Recorded because it is exactly the sort of false positive that otherwise gets "repaired".
+
+### Verification — run this cycle, against the patched build, read from the suite's own output
+
+| Check | Result |
+|---|---|
+| Runtime suite | **494 PASS / 0 FAIL / 1 WARN** (was 487/3) |
+| WARN | the known **local** service-worker 404; `sw.js` is 200 on the deployed build |
+| JS syntax gate | **PASS** — 11 inline blocks |
+| Horizontal scroll @390 | **0 overflow across all 8 tabs**; `scrollWidth` 390 == `clientWidth` 390 |
+| 390x844 `hasTouch` | `pointer: coarse` confirmed; touched controls `#cmp-order` **44px**, `#cmp-share-btn` **44px**, `#cmp-copy-table-btn` **44px**, basket button **44px**; all right edges < 390 |
+| Mobile behaviour | the changed flow works on a phone — `#/compare/oman+norway+brazil@100~take_desc` |
+| Page errors | 0 |
+| Suite copies | byte-identical (repo + graded), before and after |
+| `let` scope | `cmpOrder` (28215), `cmpRankPrice` (28220) and `launchCompare` (64027) are all in inline block 8, declarations before the call site — no TDZ, the v452 failure mode |
+
+Assertion arithmetic: 490 (487+3) → 494 with the 4 new basket-handover assertions added. No
+assertion silently dropped out.
+
+### Debt closed this cycle
+
+- Cycle 847's orphaned v933 adopted, audited and shipped rather than discarded.
+- Two vacuous assertions in the graded suite converted into real ones.
+- v929's `launchCompare()` price-reset — live since it shipped — closed by the same change.
+- `index_ab933.html` removed: 9.3 MB staged A/B copy, byte-compared to `git show HEAD:index.html`
+  first. Same cleanup cycle 846 did for `index_before_932.html`.
+- Header badge `v930 → v934`. Not a sweep: every other version string is **derived** from this one
+  badge by design (see the note at `index.html:3067`), so it is a single line.
+
+### ⚠ Debt NOT fixed — this one is now Zach's call
+
+**The 1800s timeout has orphaned work three cycles running.** The numbers are exact:
+
+    autonomous_cycle.py:28    INTERVAL = 1800          # 30 minutes
+    autonomous_cycle.py:233   timeout=1800             # the `claude -p` budget
+    com.yoburg.petroleum_cycle.plist   StartInterval   1800
+
+The Claude step alone is budgeted the **entire** cycle interval, leaving nothing for the post-steps
+that follow it — test re-run (~6 min), pixel audit (~1.5 min), push, email. Any cycle needing more
+than ~20 minutes of Claude time is killed mid-edit and the next cycle inherits a half-applied tree.
+It has been survivable three times only because the orphaned edits happened to be correct — and
+this cycle showed that is not guaranteed, since 847's orphaned *tests* were not.
+
+Not changed unilaterally: this is the loop's own control surface, which `CLAUDE.md` reserves to
+Zach. **Recommendation — one line:** `timeout=1500` at `autonomous_cycle.py:233`, leaving a
+5-minute margin for the post-steps inside the 30-minute interval.
+
+### Debt still open, carried forward unchanged
+
+Two charts render below the five caveat blocks (842) · `# Contracts` grid row prints `1193`
+unseparated against `all 1,193` (828) · PSC pre-fill rounds Angola's 2.6% to `3` (841) ·
+state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No breakeven on file"
+(835) · FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries" against `CMP_MAX` 5 (828)
+· no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · unreachable
+`Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch for Guyana (841).

@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v930</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v934</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -28800,8 +28800,15 @@ function _updateCompareHash() {
       // reopens ranked at $75 — and on the set that motivated this control that is the REVERSE
       // order, under the sender's own column headings. Omitted at 75 so every previously issued
       // link, and every link to a default comparison, is unchanged.
+      // v933 (T3): the column ORDER rides the hash too, for the reason v929 gave about the
+      // price. The hash already spells the columns out in order — `nigeria+angola+guyana` — and
+      // the restore path then re-sorted them under the RECIPIENT's default, so a link sent from
+      // a "high → low" screen reopened "low → high": the same three columns, the same headings,
+      // reversed, with nothing on screen saying so. Omitted at the take_asc default, so every
+      // previously issued link and every link to a default comparison is byte-identical.
       updateHash('compare', compareList.map(toSlug).join('+')
-        + (cmpRankPrice !== 75 ? '@' + cmpRankPrice : ''));
+        + (cmpRankPrice !== 75 ? '@' + cmpRankPrice : '')
+        + (cmpOrder !== 'take_asc' ? '~' + cmpOrder : ''));
     } else {
       updateHash('compare', '');
     }
@@ -50662,8 +50669,11 @@ function shareComparison() {
   // Use new slug-based route format for cleaner URLs
   // v929 (T3): same '@<price>' suffix _updateCompareHash() writes, so the button and the address
   // bar cannot hand out two different links for one screen. Omitted at the 75 default.
+  // v933 (T3): and the same '~<order>' suffix, for the same reason — this button and the
+  // address bar must not hand out two different links for one screen.
   var hash = '#/compare/' + compareList.map(toSlug).join('+')
-    + ((typeof cmpRankPrice === 'number' && cmpRankPrice !== 75) ? '@' + cmpRankPrice : '');
+    + ((typeof cmpRankPrice === 'number' && cmpRankPrice !== 75) ? '@' + cmpRankPrice : '')
+    + ((typeof cmpOrder === 'string' && cmpOrder !== 'take_asc') ? '~' + cmpOrder : '');
   var url = window.location.href.split('#')[0] + hash;
   navigator.clipboard.writeText(url).then(function(){
     var btn = document.querySelector('[onclick="shareComparison()"]');
@@ -51263,6 +51273,17 @@ function parseAndNavigate(hash) {
       // a $100 deck must reopen ranked at $100 — on the set this control was built for, reopening
       // at the 75 default is the REVERSE order under the sender's own column headings. An absent,
       // malformed or unpublished price falls back to 75 rather than refusing the link.
+      // v933 (T3): the column order rides ahead of the price on the tail, so strip it FIRST —
+      // '@75' is omitted at the default, which means '~add' can be the whole tail and the price
+      // regex must not see it. An absent, malformed or retired order falls back to the take_asc
+      // default rather than refusing the link, exactly as the price does.
+      var _ordM = /~([a-z_]+)$/.exec(param);
+      if (_ordM) {
+        param = param.slice(0, _ordM.index);
+        cmpOrder = CMP_ORDER_LABEL[_ordM[1]] ? _ordM[1] : 'take_asc';
+      } else {
+        cmpOrder = 'take_asc';
+      }
       var _rpM = /@(\d+)$/.exec(param);
       if (_rpM) {
         param = param.slice(0, _rpM.index);
@@ -51279,6 +51300,10 @@ function parseAndNavigate(hash) {
         var _ob = _rpOrd.querySelector('option[value="take_desc"]');
         if (_oa) _oa.textContent = 'Govt take $' + cmpRankPrice + ' \u2014 low \u2192 high';
         if (_ob) _ob.textContent = 'Govt take $' + cmpRankPrice + ' \u2014 high \u2192 low';
+        // v933 (T3): the CONTROL has to agree with the grid. Restoring the order without this
+        // line leaves the dropdown reading "low \u2192 high" over columns sorted high \u2192 low \u2014 a
+        // sharper lie than the one this cycle is fixing, because the analyst can see it.
+        _rpOrd.value = cmpOrder;
       }
       // Populate BEFORE switching. The t2 activation seed (Norway/UK/Netherlands) is guarded
       // by `if (compareList.length > 0) return;`, so filling the list first is what stops a
@@ -64004,7 +64029,19 @@ function launchCompare() {
   if (items.length === 0) return;
   _basketLive = true;   // v857: from here on the bar mirrors the comparison it handed over
   const slugs = items.map(toSlug).join('+');
-  window.location.hash = '#/compare/' + slugs;
+  // v934 (T3): carry the deck's own '@<price>~<order>' tail, because this is the THIRD producer
+  // of "#/compare/<a>+<b>+<c>" and it was the one left behind. The comment in parseAndNavigate
+  // names all three — _updateCompareHash(), shareComparison() and this — and v929 taught the
+  // parser to DEFAULT a bare tail to $75/take_asc. That made a bare hash an instruction to
+  // reset, so the basket button silently reverted the analyst's ranking price and column order
+  // every time they swapped the set: a deck built at "$100, high -> low" came back "$75,
+  // low -> high", both dropdowns snapping back, with nothing said. Swapping which countries are
+  // compared is not a request to change how they are ranked.
+  // Both suffixes are omitted at their defaults, so a default deck writes the identical bare
+  // hash it always did and _basketSameAs()/_basketLive keep matching on it.
+  const tail = ((typeof cmpRankPrice === 'number' && cmpRankPrice !== 75) ? '@' + cmpRankPrice : '')
+             + ((typeof cmpOrder === 'string' && cmpOrder !== 'take_asc') ? '~' + cmpOrder : '');
+  window.location.hash = '#/compare/' + slugs + tail;
   parseAndNavigate(window.location.hash);
 }
 
