@@ -61434,3 +61434,120 @@ for Guyana (841).
 **Task:** T1 — *"Which countries should even be on my screening list?"*
 
 **Friction.** `COUNTRY_DATA` is declared `= null` (`index.html:23661`) and filled by an async fetch, but every tab button is live from first paint. An analyst landing cold and going straight to Screener — the documented first move for T1 — hits `runScreener()`, which reaches `COUNTRY_DATA.filter(...)` at `:35181` and throws. Two more fire alongside it: `_scUpdateNeutralFlags`
+
+---
+
+## Cycle 851 — 2026-09-19 · v937
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (Cycle 850 was T1;
+T4 was the stalest in rotation — last walked at cycle 806.)
+
+**Walk.** Cold load, no sessionStorage, no localStorage. `file://` is not usable for this walk —
+the `#loading-overlay` never clears because the data fetches fail, and it intercepts every tab
+click — so the walk ran over `python3 -m http.server` against the local tree. Route in three ways:
+tab click → `#rr-country-lookup`; cold deep link `#/reform/<country>`; and the Country Profile
+Predictability row. All three land correctly and the earlier v805 population race does not
+reproduce (`#/reform/nigeria` and `#/reform/chad` both resolve with the right verdict, 0 errors).
+Mobile 390 was clean before the change as well as after, so the worst moment was not a layout one.
+
+### Friction
+
+`_fpCohortLine()` (`index.html:26449`) closed its measured-cohort branch on a **hard-coded band
+name**:
+
+    '<strong style="color:var(--orange);">MODERATE here outranks any UNGRADED score,
+     however high its number</strong>'
+
+That sentence was written for the cohort ceiling — Turkmenistan, 74, which *is* MODERATE — and then
+printed unchanged for all 28 countries in the measured cohort. Because the ceiling is 74, **no**
+measured country reaches HIGH, and **17 of the 28 are not MODERATE either**:
+
+| band | n | examples |
+|---|---|---|
+| MODERATE | 11 | Turkmenistan 74, Kazakhstan 73, Nigeria 73, Brazil 61 |
+| LOW | 14 | United Kingdom 58, Chad 57, Egypt 53, Ghana 52, India 52, Iraq 47 |
+| VERY LOW | 3 | Guatemala 44, Somalia 41, Uruguay 37 |
+
+So Egypt's card printed the badge `53 LOW`, and then directly beneath it, in the card's **only**
+emphasis colour, a ranking rule naming a band Egypt does not have.
+
+This is not a wording blemish. It is the one sentence on the card that tells the analyst how to
+rank this number against another country, and for those 17 it **inverts**. The plain reading of
+"MODERATE outranks UNGRADED, and I am LOW" is that a measured LOW ranks *below* an ungraded 100 —
+which is precisely the misreading v624 was built to stop. It rendered on two surfaces, not one:
+the Reform Risk verdict card (`#rr-fp-cohort`, `index.html:49586`/`:49719`) and the Country Profile
+Predictability row (`#cp-fp-cohort`, `index.html:44482`).
+
+The two countries where `bandMoves` already withdraws the whole paragraph (Mexico, Morocco) were
+covered; the other 15 non-MODERATE countries printed the stale claim.
+
+### Change
+
+The sentence now names **this country's** band and score, read from
+`_fpBandLabel(getFiscalPredictabilityScore(d))` — the same single source of the band word that
+`renderStabilityBadge()` and the pasted IC paragraph use, so badge, card and clipboard cannot drift
+apart. It then puts the highest ungraded score on screen **by name and number**, read from
+`_fpCohortStats().single[0]` rather than typed, so the comparison is decidable on the card instead
+of being asserted as a rule about somebody else's band.
+
+Egypt, before → after:
+
+    before   ... ceiling 74, Turkmenistan. MODERATE here outranks any UNGRADED score,
+             however high its number — since v624 the 132 one-term regimes ...
+
+    after    ... ceiling 74, Turkmenistan. This LOW 53 was measured, so it outranks any
+             UNGRADED score, however high its number — including Bahamas's 100, the highest
+             on the platform. That 100 is not the steadier regime; it is the one ORCA holds
+             less contract evidence against. Since v624 the 132 one-term regimes ...
+
+### Result
+
+An analyst on any of the 28 measured countries can now decide whether their graded score beats a
+higher ungraded one **from the card**, without inferring the answer from a band that belongs to a
+different country. 28 of 28 name their own band; 0 still print the stale string.
+
+### Verification — run this cycle, against the patched local tree
+
+| Check | Result |
+|---|---|
+| JS syntax gate | **PASS** — 11/11 inline blocks |
+| Cohort line names own band | **28/28** measured countries; 0 still emit `MODERATE here outranks` |
+| Reform Risk surface (`#rr-fp-cohort`) | correct for Egypt / UK / Uruguay / Turkmenistan / Chad |
+| Country Profile surface (`#cp-fp-cohort`) | correct via `#/profile/egypt` cold deep link |
+| One-term branch untouched | Oman 83 / Bolivia 86 still read `UNGRADED`, wording unchanged |
+| All 10 tabs, desktop | **0 page errors** |
+| Runtime suite | **RUN this cycle** against the local tree — 499 PASS / 0 FAIL / 1 WARN |
+| Mobile 390x844 `hasTouch` | **10/10 tabs** `scrollWidth` 390 == `clientWidth` 390 |
+| Mobile verdict card | 0 overflowing elements, 0 controls under 24px |
+
+The single WARN is not a regression: `index.html:49` registers the service worker at the hard-coded
+Pages path `/petroleum-fiscal-db/sw.js`, which 404s when the tree is served from a local server
+root. Deployed baseline this cycle opened at 500 PASS / 0 FAIL / 0 errors; the 500th assertion is
+the ConsoleErrors check itself, which moved to WARN on that one local-only 404. Running the suite
+against the local tree is the fix recommended by cycle 849 for exactly this reason — a cycle should
+grade its own work, not the previous deploy.
+
+Header badge `v936 → v937`, done silently at the end, not as the reason the cycle happened.
+
+### Debt still open, carried forward
+
+Unchanged and still not adopted unilaterally — `CLAUDE.md` reserves the loop's control surface to
+Zach: **`autonomous_cycle.py:28 INTERVAL = 1800` / `:233 timeout=1800`** budgets the Claude step the
+entire interval, leaving nothing for test re-run, pixel audit, push and email. One-line
+recommendation stands: `timeout=1500`. Second, same family: set `TEST_URL` to the local tree for
+the runtime suite as well as the pixel audit.
+
+New this cycle, small: the Fiscal Compare Stability column tooltip (`index.html:3496`) and the XLSX
+`Fiscal Predictability` field note (`:46569`) both still generalise from the best case — "A graded
+MODERATE therefore outranks any UNGRADED score". In their context (immediately after "none of the
+28 reaches HIGH — ceiling 74, Turkmenistan") that reads as an illustration rather than a rule, and
+both are static column-level text rather than a per-country verdict, so they were left alone rather
+than spend this cycle on a text edit.
+
+Carried forward unchanged: two charts render below the five caveat blocks (842) · `# Contracts`
+grid row prints `1193` unseparated against `all 1,193` (828) · PSC pre-fill rounds Angola's 2.6% to
+`3` (841) · state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No
+breakeven on file" (835) · FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries"
+against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy`
+(836) · unreachable `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch
+for Guyana (841).
