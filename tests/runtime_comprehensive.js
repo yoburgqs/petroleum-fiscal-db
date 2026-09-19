@@ -1043,15 +1043,39 @@ async function testComparison(page) {
     try {
       await switchTab(page, 't7');
       await page.waitForTimeout(400);
+      // v930 (T4): Indonesia's badge no longer READS "62 · UNGRADED" — on the material one-term
+      // refuted path the badge now leads with the ceiling ("≤32 · VERY LOW") and the withdrawn
+      // stored score moves to the struck-through .cp-fp-carry sub-line. The UNGRADED branch is
+      // still covered, by Oman, which is one-term and NOT refuted, so both shapes stay asserted.
       const FPL = [
-        { c: 'Indonesia',        want: /UNGRADED/,                 why: 'one-term, refuted — carries the ceiling chip too' },
+        { c: 'Indonesia',        want: /≤\d+ · (HIGH|MODERATE|LOW|VERY LOW)/, why: 'one-term, refuted, material — badge leads with the ceiling' },
+        { c: 'Oman',             want: /\d+ · UNGRADED/,          why: 'one-term, not refuted — ungraded, uncoloured, score intact' },
         { c: 'Ghana',            want: /\d+ · (HIGH|MODERATE|LOW|VERY LOW)/, why: 'measured spread — graded band' },
         { c: 'Ascension Island', want: /not scored/,               why: 'no distribution held' },
         { c: 'Saudi Arabia',     want: /no contractor position/,   why: 'state monopoly' }
       ];
       for (const t of FPL) {
         await page.selectOption('#dd-country-select', t.c).catch(() => {});
-        await page.waitForTimeout(1600);
+        // v930 (T4): the ceiling that the refuted branches now print is painted by
+        // _cpApplyObsSpread() once api/v1/country/<slug>.json lands, so a fixed sleep raced it.
+        // Wait for the sample the paint keys off, then for the badge text to stop changing —
+        // reading it mid-paint is what would make this assertion flaky rather than false.
+        await page.waitForFunction(
+          (c) => { try { return !!(window._cpObsSpread && window._cpObsSpread[c]); } catch (e) { return false; } },
+          t.c, { timeout: 8000 }).catch(() => {});
+        {
+          let prev = null;
+          for (let i = 0; i < 16; i++) {
+            const now = await page.evaluate(() => {
+              const l = document.querySelector('#dd-profile-head .cp-fp-lbl');
+              const b = l && l.nextElementSibling;
+              return b ? b.innerText.replace(/\s+/g, ' ').trim() : null;
+            });
+            if (now !== null && now === prev) break;
+            prev = now;
+            await page.waitForTimeout(400);
+          }
+        }
         const r = await page.evaluate(() => {
           const lbl = document.querySelector('#dd-profile-head .cp-fp-lbl');
           if (!lbl) return { missing: true, hasBadge: !!document.querySelector('#dd-profile-head .orca-fp-badge') };
@@ -1084,6 +1108,80 @@ async function testComparison(page) {
             `named=${named} visible=${r.visible} adjacent=${r.adjacent} branch=${branchOk} ` +
             `label="${r.text}" badge="${r.badge}"`);
       }
+
+      // ── v930 (T4): the badge must lead with the CEILING, not the withdrawn score ──────────
+      // Country Profile was the last of four surfaces still printing the stored Fiscal
+      // Predictability Score as its headline on the one-term-refuted path. Reform Risk (v784),
+      // Side-by-Side (v875) and the Copy for IC Memo paste (v758) all lead with the ceiling; this
+      // page led with the number they all say not to carry, and put the ceiling in a 10px sibling.
+      // 41 countries are on this path, 36 material, 34 crossing a band, 19 corrected by 20+ points.
+      // Asserted on all three shapes so neither the flip nor the materiality gate can be lost:
+      //   material refuted   badge = "≤N · BAND", sub-line = "stored: N ▲ withdrawn"
+      //   immaterial refuted badge = stored score, sub-line = "→ carry ≤N · BAND"
+      //   unrefuted one-term badge = stored score, no sub-line at all
+      try {
+        const CEIL = [
+          { c: 'Uzbekistan',  shape: 'material',   why: '89 · UNGRADED stored, ≤49 · LOW ceiling — 40 points and two bands' },
+          { c: 'Norway',      shape: 'material',   why: '76 stored, ≤52 · LOW ceiling — 29.6pp observed across its contracts' },
+          { c: 'Philippines', shape: 'immaterial', why: '70 stored, ≤69 ceiling — 1 point, same band; stays muted by design' },
+          { c: 'Oman',        shape: 'clean',      why: 'one term and NOT refuted — nothing to withdraw' }
+        ];
+        await switchTab(page, 't7');
+        await page.waitForTimeout(300);
+        for (const t of CEIL) {
+          await page.selectOption('#dd-country-select', t.c).catch(() => {});
+          await page.waitForFunction(
+            (c) => { try { return !!(window._cpObsSpread && window._cpObsSpread[c]); } catch (e) { return false; } },
+            t.c, { timeout: 8000 }).catch(() => {});
+          let prev = null, r = null;
+          for (let i = 0; i < 16; i++) {
+            r = await page.evaluate(() => {
+              const l = document.querySelector('#dd-profile-head .cp-fp-lbl');
+              const b = l && l.nextElementSibling;
+              const s = document.querySelector('#dd-profile-head .cp-fp-carry');
+              return {
+                badge: b ? b.innerText.replace(/\s+/g, ' ').trim() : '(no badge)',
+                sub: s ? s.innerText.replace(/\s+/g, ' ').trim() : '',
+                struck: !!(s && s.querySelector('span[style*="line-through"]'))
+              };
+            });
+            if (r.badge === prev) break;
+            prev = r.badge;
+            await page.waitForTimeout(400);
+          }
+          const leadsCeiling = /^≤\d+ · (HIGH|MODERATE|LOW|VERY LOW)/.test(r.badge);
+          let ok, expl;
+          if (t.shape === 'material') {
+            ok = leadsCeiling && r.struck && /^stored:/.test(r.sub);
+            expl = `badge="${r.badge}" sub="${r.sub}" struck=${r.struck}`;
+          } else if (t.shape === 'immaterial') {
+            ok = !leadsCeiling && /^→ carry ≤\d+/.test(r.sub);
+            expl = `badge="${r.badge}" sub="${r.sub}"`;
+          } else {
+            ok = !leadsCeiling && r.sub === '' && /UNGRADED/.test(r.badge);
+            expl = `badge="${r.badge}" sub="${r.sub || '(none)'}"`;
+          }
+          if (ok) p(S, `CP-FPCEIL ${t.c} (${t.shape})`, `${expl} — ${t.why}`);
+          else    f(S, `CP-FPCEIL ${t.c} (${t.shape})`, `expected the ${t.shape} shape; got ${expl}`);
+        }
+        // The ceiling on screen must be the SAME number the IC paste carries. Three surfaces
+        // disagreeing about one country is the defect this whole family of fixes exists for.
+        await page.selectOption('#dd-country-select', 'Norway').catch(() => {});
+        await page.waitForTimeout(2500);
+        const agree2 = await page.evaluate(() => {
+          const d = (window.COUNTRY_DATA || []).find(x => x.country === 'Norway');
+          const cl = (typeof _fpObsCeiling === 'function' && d) ? _fpObsCeiling(d) : null;
+          const l = document.querySelector('#dd-profile-head .cp-fp-lbl');
+          const b = l && l.nextElementSibling;
+          return { bound: cl ? cl.bound : null, badge: b ? b.innerText.replace(/\s+/g, ' ').trim() : '' };
+        });
+        if (agree2.bound != null && agree2.badge.indexOf('≤' + agree2.bound) === 0)
+          p(S, 'CP-FPCEIL badge number == _fpObsCeiling() bound',
+            `badge "${agree2.badge}" leads with the same ≤${agree2.bound} the IC paste and the XLSX read`);
+        else
+          f(S, 'CP-FPCEIL badge number == _fpObsCeiling() bound',
+            `_fpObsCeiling().bound = ${agree2.bound} but the badge reads "${agree2.badge}"`);
+      } catch (e) { f(S, 'CP-FPCEIL predictability ceiling leads the badge', e.message); }
 
       // Same badge, same defect, in the Fiscal Compare drilldown drawer, where it sat between
       // "19.9–26.1% range" and "BE: —" as a bare "91 · UNGRADED / one term".

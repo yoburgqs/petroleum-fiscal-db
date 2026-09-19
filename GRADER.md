@@ -60783,3 +60783,112 @@ checks the take chain, the value chain, the Reading line **and** the dropdown to
 
 ## Friction
 Walked Side-by-Side cold at 1440×900 with storage cleared, typing my own set (Guyana / Brazil / Angola) rather than clicking a preset. Every *ordering* surface on the tab was hard-coded to $75 — the verdict strip's take chain (`_vdTake`), its contractor-value chain (`_cmpRankNpv`), the left-to-right colum
+
+---
+## Cycle 843 Log — 2026-09-19
+
+## Task / Friction / Change / Result
+
+**Task: T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation
+(842 T3, 841 T6, 840 T1, 836 T5, 835 T2, T4 last walked at **834**).
+
+### Friction
+
+Walked T4 cold at 1440×900, storage cleared — Home → Reform Risk → lookup, then Country Profile,
+then Side-by-Side, reading the **same country's Fiscal Predictability Score on every surface that
+prints it**. The Reform Risk tab itself was clean: the lookup covers all 185, the 21/164 split is
+stated on the card, the CSV carries `Counts In Reform Frequency Score`, Copy-for-IC-Memo pastes a
+real table, `#/reform/<slug>` deep-links resolve for scored and unscored countries alike, the
+Iraq-Kurdistan "filed under Iraq" block (v921) renders, and the tab holds **0 horizontal scroll and
+0 controls under 24px at 390×844**. The friction was one tab over.
+
+For **Norway**, four surfaces printed four different leading numbers for one metric:
+
+| surface | headline | correction |
+|---|---|---|
+| Reform Risk lookup card (v784) | **≤52 · LOW** ceiling | printed 76 · UNGRADED ▲ best case |
+| Side-by-Side cell (v875) | **≤52 · LOW** | stored: ~~76~~ ▲ withdrawn |
+| Copy for IC Memo paste (v758) | **≤52 · LOW** | — |
+| **Country Profile badge** | **76 · UNGRADED** | `→ carry ≤52 · LOW`, 10px, to its right |
+
+Country Profile is the single-country page — the one a T4 analyst actually lands on — and it was the
+only one of the four whose most prominent number was the number this platform has **withdrawn**.
+`_cpApplyObsSpread()` has two paint paths and they disagreed with each other on the same page: the
+**measured** cohort's badge IS flipped to the ceiling (v721, Nigeria → `≤46 · LOW`), while the
+**one-term refuted** cohort grew a `→ carry` sibling (v758) and left the badge alone. Same strip,
+two refuted countries, opposite treatments.
+
+Measured live against `COUNTRY_DATA` + the 239 shipped `api/v1/country` files, not assumed:
+
+- **41** countries are on the one-term-refuted path with a computable ceiling; **36 are material**
+- **34** cross a band between the printed score and the ceiling
+- **19** are corrected by **20 points or more**
+
+  `Uzbekistan 89 → ≤49` · `Angola 62 → ≤26` · `Albania 81 → ≤49` · `Thailand 80 → ≤51`
+  `Netherlands 84 → ≤59` · `Indonesia 62 → ≤32` · `Colombia 72 → ≤40` · `Norway 76 → ≤52`
+
+In the header strip that badge sits beside the **take** tier word ("Moderate") and under the
+**reform** Stability line — two neighbouring band words whose subjects are different metrics — so the
+analyst scanning for a stability reading takes the largest, boldest, band-coloured figure in the row.
+On these 36 it was the one the page's own tooltip, its own IC paste and three other tabs all say not
+to carry.
+
+### Change
+
+`_cpApplyObsSpread()`, one-term branch (`index.html`, v930). On the **material** correction the
+ceiling moves INTO the badge, the badge takes the ceiling's orange (v624: a graded band and its
+colour are earned by a charged IQR penalty; a ceiling is a bound, not a score), and the stored score
+moves to the sub-line **struck through and named as withdrawn** — the identical idiom v875 already
+uses on Side-by-Side, so the two surfaces now render the same shape as well as the same number.
+
+Gated on `_fpObsCeilingFrom()`'s own `material` flag, the same gate v784 uses. The 5 immaterial
+corrections (Philippines 70 → ≤69, Mozambique 63 → ≤61, Algeria, Niger, Venezuela) keep the stored
+score in the badge and the existing muted `→ carry` line — a 1-point correction dressed like
+Uzbekistan's 40-point one is what trains an analyst to skip the line.
+
+Nothing is recomputed and nothing is hidden. `obs.spread` is a floor on the true spread, so the
+penalty is a floor and the printed figure is a CEILING — which is why it renders with a `≤`.
+
+### Result
+
+The analyst reading Country Profile for any of these 36 countries now takes the figure the platform
+stands behind as the page's headline, and can see what was withdrawn rather than having to notice a
+10px correction beside a bolder wrong number. Norway reads `≤52 · LOW` on Country Profile, Reform
+Risk, Side-by-Side and the IC paste — four surfaces, one number. It is no longer possible to paste
+`76` out of this page into an IC memo without having first read that it was withdrawn.
+
+## Verification — suite RAN this cycle, on a clean process, against the LOCAL build
+
+| check | result |
+|---|---|
+| JS syntax gate | **11/11 PASS** |
+| Runtime suite | **443 PASS / 0 FAIL / 1 WARN** — ran to completion on a clean process against the local build, number read from the suite's own report at `/tmp/rt_930.txt`, not assumed |
+| New assertions | **+6** — five `[CP-FPCEIL]` (material flip · a second material country · the immaterial gate · an unrefuted control · badge number `==` `_fpObsCeiling().bound`) and one added `FPL` branch (Oman), so the UNGRADED shape stays covered now that Indonesia's has moved to the ceiling |
+| WARN | the known **local** service-worker 404: the page registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages path, which a server rooted at the repo cannot serve. Checked this cycle rather than carried forward — `sw.js` is **200 on the deployed build** and 404 only under local serving. The suite's "JS errors: 4" are the same four registration attempts. |
+| `[CP-FPCEIL]` vs the **pre-change** build | the assertions describe a shape that build does not render — its badge reads `76 · UNGRADED` with `→ carry ≤52 · LOW` beside it, which is exactly the `material` branch's failure case |
+| Before/after, same probe, genuine `git HEAD` build on its own port | pre: `76 · UNGRADED` + `→ carry ≤52 · LOW` — post: `≤52 · LOW` + `stored: 7̶6̶ ▲ withdrawn` |
+| Unchanged branches | Nigeria (measured, v721) `≤46 · LOW` · Oman (one-term, unrefuted) `83 · UNGRADED` · Ghana (measured, clean) `52 · LOW` · Philippines (immaterial) `70 · UNGRADED` + muted `→ carry ≤69` |
+| Horizontal scroll | **0 overflow at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs, `scrollWidth == clientWidth` at every one |
+| 390×844 `hasTouch` | `.cp-fp-carry` **24px** under `pointer: coarse` — the v758 rule still applies because the class is kept; 14px on a mouse, so no desktop row grows |
+| Page errors | **0** at every viewport |
+
+### A second defect found in this cycle's own change, before it shipped
+
+The first pass built the ceiling tooltip once, HTML-escaped, and then assigned it to `wrap.title` —
+a DOM **property**, which does not decode entities — so any `&` in a country name would have printed
+as `&amp;` in the one tooltip that explains why the headline number changed. Latent rather than
+visible: none of the 41 countries in this cohort has an escapable character in its name, checked
+against the list rather than assumed. Split into `_carryRaw930` (plain, for `.title =`) and
+`_carryTip930` (escaped, for the two `insertAdjacentHTML` attributes) anyway, because the next
+country added to the cohort should not have to rediscover it.
+
+### One process error caught in this cycle's own verification, before it was reported
+
+The first before/after run reported the pre-change build printing `sub="(none)"` for every country —
+i.e. the `→ carry` line did not exist before this cycle. It did. Port 8898 was already held by a
+**stale server from an earlier cycle serving `/tmp/pristine`**; `python3 -m http.server` had exited
+with `EADDRINUSE` into a log nobody read, and the "pre-change" numbers came from an unrelated tree.
+Re-run on a free port against `git show HEAD:index.html`, which is the table above. The same shape as
+the defects `OUTAGE_2026-08-29.md` records: the failure was silent and the healthy-looking output was
+the tell.
+

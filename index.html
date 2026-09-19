@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v929</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v930</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v929</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v930</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61922,18 +61922,85 @@ function _cpApplyObsSpread(country) {
       // pastes. Before, this page said "≥29.6pp obs" and withheld the bound in a title, while
       // Side-by-Side printed "→ carry ≤52 · LOW" for the same country. Same object as the paste.
       var _c3 = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+      // ── v930 (T4): Country Profile was the last surface still LEADING with the withdrawn score ──
+      //
+      // Walked T4 cold this cycle — "what is my fiscal-stability and reform exposure here" — reading
+      // the same country on every surface that prints its Fiscal Predictability. Norway:
+      //
+      //   Reform Risk lookup card   ≤52 · LOW ceiling      (printed 76 · UNGRADED ▲ best case)
+      //   Side-by-Side grid cell    ≤52 · LOW              (stored: 76̶ ▲ withdrawn)
+      //   Copy for IC Memo paste    ≤52 · LOW
+      //   Country Profile badge     76 · UNGRADED          → carry ≤52 · LOW   (10px, to its right)
+      //
+      // Country Profile is the single-country page — the one a T4 analyst actually lands on — and
+      // it was the only one of the four whose most prominent number was the number this platform
+      // has WITHDRAWN. v784 flipped the Reform Risk slot for exactly this reason and v875 flipped
+      // the Side-by-Side cell for exactly this reason; the same repair was never made here, because
+      // this branch grew the "→ carry" sibling (v758) instead of touching the badge. Meanwhile the
+      // MEASURED cohort's badge fifty lines below IS flipped (v721), so this one page printed the
+      // ceiling as the headline for Nigeria (≤46 · LOW) and the withdrawn score as the headline for
+      // Norway (76 · UNGRADED) — two refuted countries, two opposite treatments, one strip.
+      //
+      // Measured live against COUNTRY_DATA + the shipped api/v1/country files, not assumed:
+      // 41 countries are on this path, 36 of them material. 34 cross a band between the printed
+      // score and the ceiling, and 19 are corrected by 20 points or more —
+      //   Uzbekistan 89 → ≤49   Angola 62 → ≤26   Albania 81 → ≤49   Thailand 80 → ≤51
+      //   Netherlands 84 → ≤59  Indonesia 62 → ≤32  Colombia 72 → ≤40  Norway 76 → ≤52
+      // In the header strip that badge sits beside the TAKE tier word ("Moderate") and under the
+      // reform Stability line, so the analyst scanning for a stability reading takes the largest,
+      // boldest, band-coloured figure in the row — and on these 36 it is the one the page's own
+      // tooltip, its IC paste and three other tabs all say not to carry.
+      //
+      // Nothing is recomputed and nothing is hidden. The ceiling moves INTO the badge and the
+      // stored score moves to the sub-line, struck through and named as withdrawn — the identical
+      // idiom v875 uses on Side-by-Side, so the two surfaces now render the same shape as well as
+      // the same number. The badge takes the ceiling's orange rather than a band colour, because
+      // v624's rule is that a graded band and its colour are earned by a charged IQR penalty and a
+      // ceiling is a bound, not a score. Gated on _fpObsCeilingFrom()'s own `material` flag, the
+      // same gate v784 uses: the 5 immaterial corrections (Philippines 70 → ≤69, Mozambique 63 →
+      // ≤61, Algeria, Niger, Venezuela) keep the stored score in the badge and the existing muted
+      // "→ carry" line, because a 1-point correction dressed like Uzbekistan's 40-point one is what
+      // trains an analyst to skip the line.
       if (_c3 && _c3.oneTerm && !wrap._obsBoundShown) {
         wrap._obsBoundShown = true;
-        wrap.insertAdjacentHTML('afterend',
-          '<span class="cp-fp-carry" style="display:inline-block;margin-left:6px;font-size:10px;'
-          + 'font-weight:800;color:var(--orange);line-height:1.35;white-space:normal;" title="'
-          + _sbsAttr('Carry ≤' + _c3.bound + ' · ' + _c3.band + ' for ' + country + ', not the printed '
-            + _c3.printed + '. The bundled p25 and p75 take are identical, so the interquartile-range term '
-            + '— worth up to −40 points — was charged nothing; the ' + obs.n + ' largest producing contracts '
-            + 'run ' + obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '% (' + obs.spread.toFixed(1) + 'pp), '
-            + 'which costs ' + _c3.cost.toFixed(0) + ' points. A ceiling, not a recomputed score: the true '
-            + 'figure is at or below it. Copy for IC Memo carries this bound.')
-          + '">→ carry ≤' + _c3.bound + ' · ' + _c3.band + '</span>');
+        // Built once as PLAIN text and escaped only where it lands in markup. `.title = x` is a DOM
+        // property and does not decode entities, so feeding it an already-escaped string is how a
+        // tooltip ends up reading "&amp;" — the reason the two forms are kept apart here.
+        var _carryRaw930 = 'Carry ≤' + _c3.bound + ' · ' + _c3.band + ' for ' + country
+          + ', not the printed ' + _c3.printed + '. The bundled p25 and p75 take are identical, so the '
+          + 'interquartile-range term — worth up to −40 points — was charged nothing; the ' + obs.n
+          + ' largest producing contracts run ' + obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '% ('
+          + obs.spread.toFixed(1) + 'pp), which costs ' + _c3.cost.toFixed(0) + ' points. A ceiling, not a '
+          + 'recomputed score: the true figure is at or below it. Copy for IC Memo carries this bound.';
+        var _carryTip930 = _sbsAttr(_carryRaw930);
+        if (_c3.material) {
+          // The badge becomes the ceiling. Leading text node only — the basis chip beside it has
+          // already been rewritten to "≥Npp obs" above and is left alone.
+          var _tn930 = wrap.firstChild;
+          if (_tn930 && _tn930.nodeType === 3) _tn930.nodeValue = '≤' + _c3.bound + ' · ' + _c3.band;
+          wrap.style.color = 'var(--orange)';
+          wrap.style.borderColor = 'var(--orange)';
+          wrap.style.background = 'rgba(194,65,12,.10)';
+          if (chip) { chip.style.borderLeftColor = 'var(--orange)'; }
+          wrap.title = 'CEILING, NOT THE PRINTED SCORE. ' + _carryRaw930 + ' —— ' + wrap.title;
+          wrap.insertAdjacentHTML('afterend',
+            '<span class="cp-fp-carry" style="display:inline-block;margin-left:6px;font-size:10px;'
+            + 'font-weight:600;color:var(--muted);line-height:1.35;white-space:normal;" title="'
+            + _sbsAttr('The stored Fiscal Predictability Score for ' + country + ' is ' + _c3.printed
+              + '. It is struck through because the one-term take-spread basis it was computed on has '
+              + 'been withdrawn by this page’s own contract table, and it is kept on screen so the '
+              + 'correction is visible rather than silent. Read the badge instead: ≤' + _c3.bound + ' · '
+              + _c3.band + '.') + '  ' + _carryTip930
+            + '">stored: <span style="text-decoration:line-through;">' + _c3.printed
+            + '</span> <span style="font-weight:800;color:var(--orange);">▲ withdrawn</span></span>');
+        } else {
+          // Immaterial correction: the stored score keeps the badge, and the ceiling stays a
+          // muted sibling. Unchanged from v758 apart from taking the shared tooltip.
+          wrap.insertAdjacentHTML('afterend',
+            '<span class="cp-fp-carry" style="display:inline-block;margin-left:6px;font-size:10px;'
+            + 'font-weight:800;color:var(--orange);line-height:1.35;white-space:normal;" title="'
+            + _carryTip930 + '">→ carry ≤' + _c3.bound + ' · ' + _c3.band + '</span>');
+        }
       }
     }
   }
