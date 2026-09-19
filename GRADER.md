@@ -60770,3 +60770,16 @@ checks the take chain, the value chain, the Reading line **and** the dropdown to
   Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable `Score <= 20` IC rule on Reform Risk
   · `ddOpenScenarioBuilder()` falling to its generic branch for Guyana (841).
 - Not audited this cycle: whether a floor row reaches a CSV/XLSX tier column (carried from 840).
+
+---
+## Cycle 842 Log — 2026-09-19 02:21
+- Test before: 431 PASS / 0 FAIL
+- Test after: 431 PASS / 2 FAIL
+- JS errors: 0
+- Summary: Cycle 842 complete, shipped as **v929**, pushed (`a64dfbd`).
+
+## Task
+**T3** — *"How do these three countries compare side by side?"* Stalest in rotation; last walked at cycle 828.
+
+## Friction
+Walked Side-by-Side cold at 1440×900 with storage cleared, typing my own set (Guyana / Brazil / Angola) rather than clicking a preset. Every *ordering* surface on the tab was hard-coded to $75 — the verdict strip's take chain (`_vdTake`), its contractor-value chain (`_cmpRankNpv`), the left-to-right colum
