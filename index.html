@@ -2597,7 +2597,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v934</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v936</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -27698,6 +27698,10 @@ function openContractDrilldown(country) {
 function renderIRRScatter() {
   const canvas = document.getElementById('irr-scatter-canvas');
   if (!canvas) return;
+  // v936 (T1): COUNTRY_DATA is declared `= null` and filled by an async fetch, so on a cold load
+  // this ran against null and threw before the chart could ever draw. Not-yet-loaded is the same
+  // case as no-data: return, and let the post-load render call this again.
+  if (!COUNTRY_DATA || !COUNTRY_DATA.length) return;
   const price = getPriceKey();
   const takeKey = 'take_' + price;
   const irrKey = 'irr_' + price;
@@ -28321,6 +28325,43 @@ function setCompareRankPrice(price) {
   renderCompare();
   _updateCompareHash();
 }
+
+// ── v935 (T1) — a set handed over from a screen ranks at the price that screen was RUN at ───
+// Walked T1 cold: Screener -> price deck $100 -> "IOC Capital Screen" -> 12 countries ranked at
+// $100 -> "Load top 5 in Side-by-Side ->". The grid opens with the verdict strip reading
+// "Govt take @$75, lowest first: 23.4% USA > Mexico > ..." and the "Rank at" select on 75. The
+// analyst never chose $75. They chose $100, on the Screener's own deck control, which v651 put
+// there precisely because the price is the assumption that moves every number on that tab — and
+// the first line of the page they land on quotes USA at 23.4% when their deck says 25.1%. The
+// grid's own price rows are all four prices, so nothing else on screen is wrong; it is the one
+// line the analyst reads first, and the one they paste, that is on a price they did not pick.
+//
+// This is NOT the v934 case inverted. launchCompare() PRESERVES cmpRankPrice because the basket
+// edits the membership of a comparison that already exists — swapping who is in it is not a
+// request to re-rank it. scOpenSbs() and fcOpenSbs() are the opposite motion: they REPLACE the
+// whole set (clearCompare + adds) with the output of a run the analyst just priced. The deck is
+// the freshest thing they said. Adopt it.
+//
+// Set before the adds, because addCompare() ends in _sbsApplyOrder() + renderCompare() — so the
+// ordering and the strip are built once, at the new price, with no second render.
+// A $75 deck adopts to 75, which is already the value, so the default path is byte-identical:
+// same bare '#/compare/a+b+c' hash, and _basketSameAs()/_basketLive keep matching on it.
+function _sbsAdoptDeck(price) {
+  const p = Number(price);
+  if (CMP_RANK_PRICES.indexOf(p) < 0 || p === cmpRankPrice) return false;
+  cmpRankPrice = p;
+  const rp = document.getElementById('cmp-rankprice');
+  if (rp) rp.value = String(p);
+  const sel = document.getElementById('cmp-order');
+  if (sel) {
+    const a = sel.querySelector('option[value="take_asc"]');
+    const b = sel.querySelector('option[value="take_desc"]');
+    if (a) a.textContent = 'Govt take $' + p + ' \u2014 low \u2192 high';
+    if (b) b.textContent = 'Govt take $' + p + ' \u2014 high \u2192 low';
+  }
+  return true;
+}
+window._sbsAdoptDeck = _sbsAdoptDeck;
 
 const cmpSearch = document.getElementById('cmp-search');
 const cmpDrop   = document.getElementById('cmp-dropdown');
@@ -34508,7 +34549,7 @@ function _scUpdateNeutralFlags() {
   // v623: the Breakeven Coverage radios and their live size captions are gone with the control.
   // What survives is the one number the note under the table still states — how many of the 185
   // countries ORCA has ever modelled a breakeven for — read off COUNTRY_DATA, never hard-coded.
-  if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+  if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) {
     // v915 (T1): read through cpBeFor(), the platform's single breakeven read point, not the raw
     // bundled field. This legend and the Explorer's column caption sit in the SAME tab shell
     // (#texplorer, Screener mode vs Browse mode), so while this counted 65 and the Explorer
@@ -34541,7 +34582,7 @@ function _scUpdateNeutralFlags() {
   if (_tkSl && _tkWrap) {
     _tkWrap.style.display = (+_tkSl.value < 100) ? 'inline-flex' : 'none';
     const _tkN = document.getElementById('sc-fee-cmp-n');
-    if (_tkN && typeof COUNTRY_DATA !== 'undefined') {
+    if (_tkN && typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) {
       _tkN.textContent = _scFeeCmpCount(typeof getPriceKey === 'function' ? getPriceKey() : '75');
     }
   }
@@ -34566,7 +34607,7 @@ function _scUpdateNeutralFlags() {
   // across this axis the headline separates 95 -> 185 while verified production separates 2 -> 22,
   // and below 24% take there is no verified country left at all.
   const _tkAxis = document.getElementById('sc-take-n');
-  if (_tkSl && _tkAxis && typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+  if (_tkSl && _tkAxis && typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) {
     const _tkV = +_tkSl.value;
     if (_tkV >= 100) { _tkAxis.textContent = ''; _tkAxis.className = 'sc-axis-n'; }
     else {
@@ -34606,7 +34647,7 @@ function _scUpdateNeutralFlags() {
     const _evV = +_evSl.value;
     if (_evWrap) _evWrap.style.display = _evV > 0 ? 'inline-flex' : 'none';
     if (_evFlag) _evFlag.style.display = _evV > 0 ? 'none' : 'inline';
-    if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+    if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) {
       const _evDepthOn = !!(document.getElementById('sc-evid-depth') || {}).checked;
       const _evFloor = Math.max(_evDepthOn ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
       const _nDep = document.getElementById('sc-evid-depth-n');
@@ -34665,7 +34706,7 @@ function _scUpdateNeutralFlags() {
 // #sl-npv50 is genuinely fixed to npv_50 regardless of deck and its range already spans that
 // distribution (max 2371, bound 2000 ~ p96), so its range is left alone — it gets the count only.
 function _scNpvAxisMax(key) {
-  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA.length) return 2000;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return 2000;
   var v = COUNTRY_DATA.map(function(d){ return d[key]; })
                       .filter(function(x){ return x !== null && x !== undefined && isFinite(x); })
                       .sort(function(a,b){ return b - a; });
@@ -34675,7 +34716,7 @@ function _scNpvAxisMax(key) {
 }
 
 function _scSyncNpvAxis() {
-  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA.length) return;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
   var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   var key = 'npv_' + price;
   var sl = document.getElementById('sl-npv');
@@ -34932,6 +34973,12 @@ function _scReformRollup(rows) {
 }
 
 function runScreener() {
+  // v936 (T1): COUNTRY_DATA is `= null` until an async fetch fills it, and every tab button is
+  // live from first paint. Clicking Screener during that window reached `COUNTRY_DATA.filter()`
+  // below and threw, so the screen the analyst had just asked for died on a console error they
+  // could not see. Not-yet-loaded is a wait, not a result: leave the table alone and return —
+  // the post-load render calls this again, and the analyst sees the full screen with no action.
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
   // v743 (T1): the floor-take population is read off the live data, not written into the label.
   (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
   _scUpdateNeutralFlags();
@@ -35505,7 +35552,7 @@ function runScreener() {
   if (minEvid > 0) {
     if (_evidFloorEff > 0) {
       _evidDepthPhrase = ` on \u2265${_evidFloorEff} fiscal facts on file`;
-    } else if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+    } else if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) {
       const _thinIn = data.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length;
       _evidDepthPhrase = _thinIn > 0
         ? ` on a record of ANY depth \u2014 fact-depth floor off, so ${_thinIn} of these ${data.length} are graded on fewer than ${SC_EVID_MIN_FACTS} facts and the Evidence column marks them C or D`
@@ -37372,6 +37419,9 @@ function scOpenSbs() {
   var picks = (sel.length ? sel : (window._scSbsTop5 || [])).slice();
   var left = picks.length > cap ? picks.splice(cap) : [];
   if (!picks.length) return;
+  // v935 (T1): the Screener deck buttons drive the same input[name="price"] radios getPriceKey()
+  // reads, so this is literally the price the rows below were filtered and ranked at.
+  _sbsAdoptDeck(typeof getPriceKey === 'function' ? getPriceKey() : 75);
   // One history entry for the whole set, not one per addCompare() -- same guard as fcOpenSbs().
   _cmpHashHold = true;
   try { clearCompare(); picks.forEach(function (c) { addCompare(c); }); }
@@ -57162,6 +57212,11 @@ function fcOpenSbs() {
   var picks = (sel || window._fcTop5 || []).slice();
   var left = picks.length > CMP_MAX ? picks.splice(CMP_MAX) : [];
   if (!picks.length) return;
+  // v935 (T1): same omission, same handoff family. Fiscal Compare keeps its price on its own
+  // #fc-price select rather than the global radios, and window._fcLastPrice is the price of the
+  // RUN that produced these rows — not the current state of a select that can be moved without
+  // re-running. That distinction is already load-bearing at _cpFcRunPrice887().
+  _sbsAdoptDeck(window._fcLastPrice);
   _cmpHashHold = true;   // clearCompare + N adds on this tab would push N+1 partial #/compare entries
   try { clearCompare(); picks.forEach(function(c) { addCompare(c); }); }
   finally { _cmpHashHold = false; }
