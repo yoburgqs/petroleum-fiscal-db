@@ -4299,7 +4299,7 @@ window.copyPlatformCitation = function(btn) {
     </button>
     <!-- v425: Copy IC Summary button — one-click copy of full IC memo paragraph for analyst use -->
     <!-- v474: renamed from "IC Summary" to "Copy for IC Memo" — clearer action label for first-time analysts -->
-    <button id="dd-ic-summary-btn" title="Copy this country to the clipboard as a real IC assumption table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted Metric/Value table, and into Excel as two columns. Rows: government take at $50/$75/$100/$125, the comparable take where the published figure blends fee-basis contracts, price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability, reform exposure, mechanic, contract count, evidence tier and the production-weighting basis. Every caveat follows as a numbered note keyed to the row it qualifies." aria-label="Copy IC memo assumption table to clipboard"
+    <button id="dd-ic-summary-btn" title="Copy this country to the clipboard as a real IC assumption table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted Metric/Value table, and into Excel as two columns. Rows: government take at $50/$75/$100/$125, the comparable take where the published figure blends fee-basis contracts, price swing, contractor NPV at $50/$75/$100/$125, breakeven, fiscal predictability, reform exposure, mechanic, contract count, evidence tier and the production-weighting basis. Every caveat follows as a numbered note keyed to the row it qualifies." aria-label="Copy IC memo assumption table to clipboard"
             style="display:none;margin-left:6px;background:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:600;">
       Copy for IC Memo
     </button>
@@ -51782,6 +51782,12 @@ function copyICSummary() {
   var npvStr    = _npvRefused ? CP_MONO_NPV : (d.npv_75 != null) ? cpNpvFmt(d.npv_75) : '—';
   var npv50Str  = _npvRefused ? CP_MONO_NPV : (d.npv_50 != null) ? cpNpvFmt(d.npv_50) : '—';
   var npv125Str = _npvRefused ? CP_MONO_NPV : (d.npv_125 != null) ? cpNpvFmt(d.npv_125) : '—';
+  /* v932 (T5): the $100 contractor NPV. It is on this page's own price ladder, in this tab's
+     XLSX ("Contractor NPV @$100 ($M)"), in the Side-by-Side grid and in COUNTRY_DATA for 185 of
+     185 countries. This paste — the flagship single-country IC artifact — was the only one of
+     the five that dropped it, pasting a FOUR-price government-take ladder against a THREE-price
+     contractor-value ladder. See the row list below. */
+  var npv100Str = _npvRefused ? CP_MONO_NPV : (d.npv_100 != null) ? cpNpvFmt(d.npv_100) : '—';
   var _beRes = cpBeFor(d);   // v512: resolved value, not the bundled-table null
   var _beBnd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;   // v642 (T2)
   var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl'
@@ -51855,6 +51861,11 @@ function copyICSummary() {
     ['Price swing ($50 → $125)', swingStr],
     ['Contractor NPV @ $50/bbl (downside)',  npv50Str],
     ['Contractor NPV @ $75/bbl (base case)', npvStr],
+    // v932 (T5): $100 carries no downside/base/upside parenthetical because the four Government
+    // take rows above carry none either, and a second row labelled "upside" beside $125 would
+    // read as a duplicate. Placed between $75 and $125 so the contractor ladder runs in price
+    // order and sits price-for-price against the take ladder four rows above it.
+    ['Contractor NPV @ $100/bbl',            npv100Str],
     ['Contractor NPV @ $125/bbl (upside)',   npv125Str],
     ['Breakeven', _beHT.head],
     ['Fiscal predictability', _stabHT.head],

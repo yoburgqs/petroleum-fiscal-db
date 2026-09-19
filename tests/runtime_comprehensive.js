@@ -3946,6 +3946,105 @@ async function testScreenerTakeSortRender(page) {
   }
 }
 
+// ── v932 (T5) — the CP IC memo's contractor ladder must be as wide as its take ladder ──
+// Country Profile -> "Copy for IC Memo" pasted a FOUR-price government-take ladder
+// ($50/$75/$100/$125) against a THREE-price contractor-value ladder ($50/$75/$125). The $100
+// contractor NPV is on this tab's own price ruler, in this tab's XLSX ("Contractor NPV @$100
+// ($M)"), in the Side-by-Side grid, and in COUNTRY_DATA for 185 of 185 countries — this paste
+// was the only one of the five IC artifacts that dropped it.
+//
+// It is load-bearing, not decorative: cpBeBound() brackets the printed breakeven off all FOUR
+// NPVs, and the note in this same paste says so in words — "read off contractor NPV at
+// $50/$75/$100/$125". 115 of 185 countries print a bounded breakeven, so on every one of them
+// the artifact cited a figure it did not carry, and on Malaysia and Yemen ($50–$75/bbl) one of
+// the two NPVs that SET the bracket was the missing one.
+//
+// The assertions are invariants, not figures: the two ladders must be the same width, the NPV
+// rows must run in ascending price order, the quoted $100 value must equal what the page
+// computes for that country, and every price the breakeven note names must be in the table.
+async function testCpIcNpvLadder(page) {
+  const S = 'CP-NPV100';
+  try {
+    await switchTab(page, 't7');
+    await page.waitForTimeout(1200);
+    for (const C of ['Indonesia', 'Malaysia', 'Norway', 'Saudi Arabia', 'Angola']) {
+      const g = await page.evaluate(async (country) => {
+        const sel = document.getElementById('dd-country-select');
+        if (!sel) return { err: 'no country select' };
+        sel.value = country; sel.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(r => setTimeout(r, 700));
+        // The whole navigator.clipboard object is replaced, not just its methods. Patching
+        // methods in place is not enough here: this context is not clipboard-granted, so
+        // ClipboardItem/clipboard.write may be absent, and cpCopyICTable() then takes its
+        // writeText fallback and never builds the HTML flavour at all. Under a method patch
+        // the HTML assertion below read htmlLen=0 on a CORRECT build — it would have measured
+        // the harness, not the artifact. Defining both methods forces the rich path.
+        let plain = '', html = '';
+        const realClip = navigator.clipboard;
+        Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
+          writeText: t => { plain += String(t); return Promise.resolve(); },
+          write: async items => {
+            for (const it of items) {
+              try { plain += await (await it.getType('text/plain')).text(); } catch (e) {}
+              try { html  += await (await it.getType('text/html')).text(); } catch (e) {}
+            }
+            return Promise.resolve();
+          }
+        }});
+        const b = document.getElementById('dd-ic-summary-btn'); if (b) b.click();
+        await new Promise(r => setTimeout(r, 700));
+        Object.defineProperty(navigator, 'clipboard', { configurable: true, value: realClip });
+        const d = (window.COUNTRY_DATA || []).find(x => x.country === country) || {};
+        const refused = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
+        const expect = refused ? CP_MONO_NPV
+          : (d.npv_100 != null && typeof cpNpvFmt === 'function' ? cpNpvFmt(d.npv_100) : '—');
+        return { plain, html, expect };
+      }, C);
+      if (g.err || !g.plain) { f(S, `${C} pasted something`, g.err || 'clipboard empty'); continue; }
+      const takes = (g.plain.match(/^Government take @ \$(\d+)\/bbl\t/gm) || []).map(x => +x.match(/\$(\d+)/)[1]);
+      const npvs  = (g.plain.match(/^Contractor NPV @ \$(\d+)\/bbl/gm)   || []).map(x => +x.match(/\$(\d+)/)[1]);
+      const row   = g.plain.match(/^Contractor NPV @ \$100\/bbl\t(.+)$/m);
+
+      if (npvs.length === takes.length)
+        p(S, `${C} ladders are the same width`, `${takes.length} take rows, ${npvs.length} contractor NPV rows`);
+      else
+        f(S, `${C} ladders are the same width`, `take=[${takes}] npv=[${npvs}]`);
+
+      if (JSON.stringify(npvs) === JSON.stringify([50, 75, 100, 125]))
+        p(S, `${C} NPV rows run $50/$75/$100/$125 in order`, `[${npvs}]`);
+      else
+        f(S, `${C} NPV rows run $50/$75/$100/$125 in order`, `[${npvs}]`);
+
+      if (row && row[1].trim() === String(g.expect))
+        p(S, `${C} quoted $100 NPV equals the page's own figure`, `"${row[1].trim()}"`);
+      else
+        f(S, `${C} quoted $100 NPV equals the page's own figure`, `paste=${row ? JSON.stringify(row[1].trim()) : 'ROW MISSING'} page=${JSON.stringify(g.expect)}`);
+
+      if (/Contractor NPV @ \$100\/bbl/.test(g.html))
+        p(S, `${C} HTML flavour carries the row`, 'Word/Docs paste has all four contractor rows');
+      else
+        f(S, `${C} HTML flavour carries the row`, `htmlLen=${g.html.length}`);
+
+      // The breakeven note names four prices. Every price it names must be in the table above it.
+      if (/read off contractor NPV at \$50\/\$75\/\$100\/\$125/.test(g.plain)) {
+        if (npvs.includes(100))
+          p(S, `${C} breakeven note's cited NPVs are all in the table`, 'note cites 4 prices, table carries 4');
+        else
+          f(S, `${C} breakeven note's cited NPVs are all in the table`, `note cites $50/$75/$100/$125, table carries [${npvs}]`);
+      }
+
+      // Control: the three pre-existing rows and their parentheticals are untouched.
+      const keptLabels = /Contractor NPV @ \$50\/bbl \(downside\)/.test(g.plain)
+        && /Contractor NPV @ \$75\/bbl \(base case\)/.test(g.plain)
+        && /Contractor NPV @ \$125\/bbl \(upside\)/.test(g.plain);
+      if (keptLabels) p(S, `${C} the three pre-existing NPV labels are unchanged`, 'downside / base case / upside intact');
+      else f(S, `${C} the three pre-existing NPV labels are unchanged`, 'a pre-existing label was rewritten');
+    }
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 // ─── v895 (T5): ONE BREAKEVEN, ONE READ POINT ───────────────────────────────────────
 // Regression guard for the defect this cycle fixed: the Country Profile IC citation for
 // Norway pasted "BE $29/bbl" while Fiscal Compare's row-drilldown IC citation for the same
@@ -4186,6 +4285,7 @@ async function testConsoleErrors() {
     await testMechanics(page);
     await testMethodology(page);
     await testMethGlanceEvidence(page);
+    await testCpIcNpvLadder(page);
     await testConsoleErrors();
 
   } finally {
