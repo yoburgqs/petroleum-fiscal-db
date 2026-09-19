@@ -61154,3 +61154,16 @@ All five of the directive's "finished" criteria now hold on the deployed build: 
 read from the suite's own report; zero horizontal scroll at 1920/1440/1280/1024/768/390; the one
 control this cycle touched is 44px under `pointer: coarse`; zero console and page errors; and the
 IC memo export now carries the full four-price ladder plus the notes that qualify it.
+
+---
+## Cycle 846 Log — 2026-09-19 07:51
+- Test before: 452 PASS / 23 FAIL
+- Test after: 475 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Only the loop's own runtime files remain modified, as expected.
+
+## Cycle 846 — T5
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (Cycle 844 was T2, so not a repeat.)
+
+**First, what the 23 failures actually were.** Not 23 defects — one family. Every failure was `[CP-NPV100]`. Cycle 845 **timed out at 1800s** (`subprocess.TimeoutExpired`, visible in `cycle_log.txt`), having written its regression tests into the graded suite copy and its fix into `index
