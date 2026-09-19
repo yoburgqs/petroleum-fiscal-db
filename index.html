@@ -277,6 +277,8 @@ table { width: 100%; border-collapse: collapse; }
   #tbl-fc .fc-terms-chip { min-height: 24px; }
   /* v905 (T6): the same chip, same call, on the Explorer's Evidence column. */
   #tbl-explorer .expl-terms-chip { min-height: 24px; }
+  /* v938 (T6): the same chip, same call, on the IOC Portfolio's Evidence column. */
+  #ioc-output .ioc-terms-chip { min-height: 24px; }
 }
 /* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
    title, so under a thumb — where there is no hover — it is treated as a control and takes the
@@ -2403,6 +2405,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      reason -- it is in a table cell 185 times, and 44px would turn the ranked table into a
      scroll. Scoped to that one chip on that one table; nothing else is narrowed. */
   #tbl-fc .fc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
+  /* v938 (T6): identical exemption for the IOC Portfolio chip. Same reason -- it is in a table
+     cell once per row, and 44px would inflate a 37-row portfolio table into a scroll. Scoped to
+     that one chip on that one table; nothing else is narrowed. */
+  #ioc-output .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
 }
 /* v801 (T3): the ✕ on each Side-by-Side country chip. Same exemption shape as v730 directly
    above, for the same reason, with a second symptom on top of the lost height.
@@ -2597,7 +2603,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v937</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v938</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -38632,7 +38638,12 @@ var _IOC_EV_TH = '<th class="num" title="' + _iocEvEsc(
   + 'The bar is the A/B/C/D source mix and the figure beside it is the number of fiscal facts '
   + 'held. Identical to the Explorer and Screener Evidence columns, the Fiscal Compare Quality '
   + 'column, the Country Profile badge and the Side-by-Side Evidence tier row. C or D means '
-  + 'verify against the country’s own petroleum act before an IC memo.')
+  + 'verify against the country’s own petroleum act before an IC memo. '
+  + 'The chip under each letter counts something different and is the one to read before '
+  + 'quoting a figure: of the fiscal terms the DCF runs to produce the take and NPV on this '
+  + 'row, how many have a citation standing behind them. The two do not track — a country '
+  + 'can grade A on 60,000 facts and cite 1 of 4. Click any chip for that country’s '
+  + 'Evidence Chain, which names each term, its ORCA value, the statutory value and the source.')
   + '">Evidence</th>';
 // The cell. Falls back to an explicit dash where ORCA holds no country entry at all.
 function _iocEvCell(country) {
@@ -38641,8 +38652,86 @@ function _iocEvCell(country) {
   if (!e) return '<td class="num"><span style="font-size:10px;color:var(--muted);" title="'
     + _iocEvEsc('ORCA holds no country fiscal record for ' + country + ', so there is no evidence grade to show for this row.')
     + '">no record</span></td>';
-  return '<td class="num">' + getEvidenceBar(e) + '</td>';
+  // v938 (T6): the model-terms slot. Same slot, same filler, same destination as the other five
+  // surfaces -- see _iocHydrateTermChips below for why this table was the one still missing it.
+  return '<td class="num">' + getEvidenceBar(e)
+    + '<div class="ioc-terms-slot" data-tc-country="' + _iocEvEsc(country) + '" style="margin-top:2px;"></div>'
+    + '</td>';
 }
+
+// ── v938 (T6): THE IOC PORTFOLIO EVIDENCE COLUMN HAD NO ROUTE TO THE EVIDENCE CHAIN ──────────
+//
+// T6 is "where did this number come from and how solid is the evidence?". Five country surfaces
+// on this platform answer the second half with two numbers, not one: the whole-fact-base grade,
+// AND how many of the fiscal terms the DCF actually runs have a citation behind them, clickable
+// through to that country's term-by-term Evidence Chain. Country Profile badge (v660), Fiscal
+// Compare drawer (v728), Screener (v730), Fiscal Compare table (v884), Explorer (v905), and
+// Side-by-Side carries it as its own row.
+//
+// The IOC Portfolio did not -- the only one. Measured on the shipped build, this tab's whole
+// container held zero `_fcOpenTermChain` references and zero terms-chips; the Evidence cell was
+// `cursor:help` and a hover tooltip, so on a phone it answered nothing at all. Its own column
+// header meanwhile claimed the cell was "Identical to the Explorer and Screener Evidence
+// columns, the Fiscal Compare Quality column, the Country Profile badge and the Side-by-Side
+// Evidence tier row" -- which was true of the letter and false of the column.
+//
+// This is the worst of the six to be missing, because this is the tab the directive's analyst is
+// named after and it is the only one framed as THEIR portfolio. Measured on the tab's own cold
+// seeded example, Shell: 37 rows, 28 graded A or B, and 18 of those 28 cite HALF OR FEWER of the
+// model terms behind the take printed in the same row.
+//   * USA      -- 474 contracts, the largest position: B, 125,336 facts, cites 2 of 5.
+//   * UK       -- 89 contracts:                        B,  15,899 facts, cites 2 of 5.
+//   * Netherlands -- A, 278 facts, cites 1 of 4.  Namibia -- B, 125 facts, cites 1 of 4.
+//   * Canada and New Zealand both read A and both cite 2 of 4.
+// An analyst reading "A - 63,848 facts" against a position takes the A rows as the auditable
+// ones and stops. On the axis that produces the number they will put in the memo, they are not.
+//
+// Reuses _scFillTermChip() verbatim -- identical rule, identical wording, identical destination,
+// so the five surfaces cannot give six answers. Hydrated lazily per row against
+// api/v1/country/<slug>.json, root the .tbl-wrap scroller and target the <tr>, for the two-axis
+// reason v730 and v905 each give. _fcTermLegCache dedupes with every other surface.
+//
+// No take, NPV, swing, downside, contract count, roll-up, grade, letter, bar or fact count on
+// this tab changes.
+var _iocTermObs = null;
+function _iocHydrateTermChips() {
+  var slots = document.querySelectorAll('#ioc-output .ioc-terms-slot:not([data-tc-done])');
+  if (!slots.length || typeof _scFillTermChip !== 'function') return;
+  function fill(slot) {
+    if (!slot || slot.getAttribute('data-tc-done')) return;
+    slot.setAttribute('data-tc-done', '1');
+    slot.setAttribute('data-tc-class', 'ioc-terms-chip');
+    _scFillTermChip(slot);
+  }
+  if (typeof IntersectionObserver !== 'function') {
+    Array.prototype.slice.call(slots, 0, 25).forEach(fill);
+    return;
+  }
+  var root = null;
+  for (var a = slots[0].parentElement; a; a = a.parentElement) {
+    var ov = getComputedStyle(a).overflowY;
+    if (ov === 'auto' || ov === 'scroll') { root = a; break; }
+  }
+  if (_iocTermObs) { try { _iocTermObs.disconnect(); } catch (e) {} }
+  _iocTermObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(en) {
+      if (!en.isIntersecting) return;
+      _iocTermObs.unobserve(en.target);
+      fill(en.target.querySelector('.ioc-terms-slot'));
+    });
+  }, { root: root, rootMargin: '200px 0px' });
+  Array.prototype.forEach.call(slots, function(el) {
+    var tr = el.closest ? el.closest('tr') : null;
+    if (tr) _iocTermObs.observe(tr); else fill(el);
+  });
+}
+var _iocTermHydT = null;
+function _iocHydrateTermChipsSoon() {
+  if (_iocTermHydT) clearTimeout(_iocTermHydT);
+  _iocTermHydT = setTimeout(function() { _iocTermHydT = null; _iocHydrateTermChips(); }, 300);
+}
+window._iocHydrateTermChips = _iocHydrateTermChips;
+window._iocHydrateTermChipsSoon = _iocHydrateTermChipsSoon;
 
 // ── v820 (T6) — GOVT TAKE ON THIS TAB IS THE OPERATOR'S FIGURE, RENDERED AS IF IT WERE THE COUNTRY'S ──
 // T6 is "where did this number come from?". IOC_DATA.take_75 is AVG(dcf_results.govt_take_pct)
@@ -39246,6 +39335,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
 
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="margin-bottom:10px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${brandName} Portfolio</h3><span style="font-size:11px;color:var(--muted);">group roll-up — ${_entNames.length} legal entit${_entNames.length === 1 ? 'y' : 'ies'} across ${countries.length} countr${countries.length === 1 ? 'y' : 'ies'}</span></div>${_provenance}${tbl}`;
+  if (typeof _iocHydrateTermChipsSoon === 'function') _iocHydrateTermChipsSoon();   // v938 (T6)
   document.getElementById('ioc-suggestions').innerHTML='';
 };
 
@@ -39340,6 +39430,7 @@ window.loadIOC = function(operator) {
     : '';
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="display:flex;align-items:center;margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${operator}</h3>${compareBtnHtml}</div>${tbl}${nocFootnote}`;
+  if (typeof _iocHydrateTermChipsSoon === 'function') _iocHydrateTermChipsSoon();   // v938 (T6)
   document.getElementById('ioc-suggestions').innerHTML='';
 };
 
