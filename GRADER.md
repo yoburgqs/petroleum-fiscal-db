@@ -61048,3 +61048,92 @@ byte-compared to `git show HEAD:index.html` before use.
 **Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest in rotation (T2 last walked at cycle 835).
 
 **Friction.** Country Profile's `Fiscal character` verdict is the first line on the page — v760 put it directly under the country name because it is the page's one direct answer to that question, and it's the sentence an analyst pastes into an IC memo. Its branch for a moderate take with 
+
+---
+## Cycle 846 Log — 2026-09-19
+
+- Test before: **452 PASS / 23 FAIL** / 0 WARN / 0 JS errors (graded copy, deployed build)
+- Test after: **474 PASS / 0 FAIL** / 1 WARN (known local `sw.js` 404) / 0 page errors
+- JS syntax gate: PASS (11 inline blocks, `node --check`)
+- Playwright: RAN this cycle. Not carried forward.
+
+## Cycle 846 — T5
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (844 was T2, so not a repeat.)
+
+**First, what the 23 FAIL actually were.** Every one of them was `[CP-NPV100]` — a single
+family, not 23 defects. Cycle 845 **timed out at 1800s** (`subprocess.TimeoutExpired` in
+`autonomous_cycle.py:231`, visible in `cycle_log.txt`). It had written its regression block into
+the **graded** suite copy and its fix into `index.html`, then died before committing either. The
+suite runs against `https://yoburgqs.github.io/petroleum-fiscal-db/` — the **deployed** build — so
+the new assertions were being measured against a build that did not have the fix. The fix was
+sitting uncommitted in the working tree the whole time.
+
+This is worth recording because the count was misleading in both directions: cycle 844 reported
+431/16, cycle 845 reported 447/0, cycle 846 reported 452/23 — on essentially the same page. The
+swing was the graded suite *growing assertions*, not the product regressing.
+
+**Friction.** `copyICSummary()` (~line 51861) built a Government take ladder at
+**$50/$75/$100/$125** and a Contractor NPV ladder at only **$50/$75/$125**. The analyst pastes one
+table into an IC memo in which the government side has four price points and the contractor side
+has three, so the two ladders cannot be read across at $100 — the interval in which take orderings
+most often reverse.
+
+It was load-bearing, not cosmetic. The paste's **own** breakeven note reads *"read off contractor
+NPV at $50/$75/$100/$125"*. 115 of 185 countries print a bounded breakeven, so on every one of
+them the memo cited a price its table did not carry. On **Malaysia** ($50–$75/bbl) one of the two
+NPVs that *set* the bracket was the missing one. `npv_100` is in `COUNTRY_DATA` for **185 of 185**
+countries and was already carried by this tab's XLSX (`Contractor NPV @$100 ($M)`), the
+Side-by-Side grid and the NPV bar chart. This paste was the only one of the five IC artifacts
+that dropped it.
+
+**Change.** A `Contractor NPV @ $100/bbl` row now sits between $75 and $125 in **both** clipboard
+flavours — the TSV that Excel splits into columns and the rich HTML that Word/Docs/Outlook render
+as a table. The contractor ladder runs in price order and sits price-for-price against the take
+ladder four rows above it.
+
+**Defect found in the orphaned work, before shipping it.** Cycle 845 changed the rows but not the
+button. `#dd-ic-summary-btn`'s own `title` (line 4302) still advertised *"contractor NPV at
+$50/$75/$125"* — the control would have described a three-price artifact while producing a
+four-price one. Corrected in the same commit. This is the failure mode the handover docs call
+"stable but wrong": the tests cycle 845 wrote would all have gone green while the button lied.
+
+**Result.** The analyst pastes one table whose two ladders line up at every published price, and
+every price named in the breakeven note is present in the table above it — including, on Malaysia,
+the NPV that sets the printed breakeven bracket.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| Runtime suite | **474 PASS / 0 FAIL**, local patched build (was 452/23) |
+| JS syntax gate | PASS — 11 inline blocks |
+| Horizontal scroll | **0 overflow across 6 viewports x 8 tabs = 48 combinations** |
+| 390x844 `hasTouch` | `pointer: coarse` confirmed; touched control `#dd-ic-summary-btn` **44px** tall, right edge **221 < 390** |
+| Page errors | 0 |
+| WARN | the known **local** service-worker 404; `sw.js` is 200 on the deployed build |
+
+### Debt closed this cycle
+
+- **The two suite copies are now byte-identical.** They had diverged by exactly the 100 lines of
+  this cycle's regression block (the older ~151-line divergence had already been closed). A local
+  number and a harness number are comparable again. The runner printed
+  `*** SUITE COPIES HAVE DIVERGED ***` at 07:02 this cycle — that warning should not fire next cycle.
+- Removed `index_before_932.html`, a 9.3 MB staged A/B copy the timed-out cycle left untracked in
+  the repo root. Byte-compared to `git show HEAD:index.html` before deleting.
+
+### Debt still open, NOT fixed this cycle
+
+- **Cycle 845's 1800s timeout is unfixed and will recur.** The 30-minute `claude -p` budget in
+  `autonomous_cycle.py:231` is the same length as the cycle interval, so a slow cycle leaves
+  half-applied work in the tree for the next one to find. This cycle only recovered cleanly
+  because the orphaned edit happened to be correct.
+- The two charts still render below the five caveat blocks (carried from 842).
+- `# Contracts` grid row still prints `1193` unseparated against `all 1,193` (828).
+- Carried forward unchanged: PSC pre-fill rounding Angola's 2.6% to `3` (841) · state-monopoly
+  `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No breakeven on file" (835) ·
+  FAQ A381's 117/120 against 65 (829) · "Compare up to 4 countries" against `CMP_MAX` 5 (828) ·
+  no suite coverage for the Breakeven Map CSV (829) or `_icArmBulkCopy` (836) · the unreachable
+  `Score <= 20` IC rule on Reform Risk · `ddOpenScenarioBuilder()` generic branch for Guyana (841).
+- The remaining v470-era verdict branches (`take > 65`, the two `downFragile`, `progressive`) are
+  still fixed strings. None asserts a property it did not read, so none is the v931 defect.
