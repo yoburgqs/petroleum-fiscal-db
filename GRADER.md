@@ -61699,3 +61699,120 @@ countries" against `CMP_MAX` 5 (828) · no suite coverage for the Breakeven Map 
 **Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (851 was T4; T6 was stalest, last walked at cycle 843.)
 
 **Friction.** Five country surfaces on this platform answer the evidence question with *two* numbers: the whole-fact-base grade (A/B/C/D), and how many of the fiscal terms the DCF actually runs 
+
+---
+## Cycle 855 — 2026-09-19 · v941
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Last three cycles ran
+T6 (852, v938), T2 (853, v939) and T5 (854, v940); T3 was stalest, last walked at cycle 848
+(v934). Cycles 853 and 854 both **timed out** at `autonomous_cycle.py:233 timeout=1800` after
+committing — v939 and v940 were left unpushed and unlogged. Both were pushed with this cycle.
+
+**Friction — what the analyst hit, and where.** Walked the tab cold in a fresh Playwright
+context (no sessionStorage, no localStorage) at 1440x900 and at 390x844 `hasTouch`, on the
+standard screening set Guyana / Brazil / Angola.
+
+`#cmp-chart-wrap` (`index.html:4080`) and `#cmp-npv-chart-wrap` (`:4086`) are **siblings of
+`#cmp-output`**, not children of it. `renderCompare()` writes the whole tab into `#cmp-output`
+— verdict strip, grid, set-specific notices, Reading legend, action row — and the two canvases
+render after all of it because that is where the markup puts them. Measured positions:
+
+| | grid ends | notices | legend | **action row** | take chart | NPV chart | page |
+|---|---|---|---|---|---|---|---|
+| 1440x900 | 1654 | 1653–2099 | 2107 | **2175** | 2310 | 2678 | 3086 |
+| 390x844 touch | 3274 | 3273–4771 | 4779 | **4912** | 5423 | 5681 | 5931 |
+
+The action row is `⎘ Copy Table for IC Memo · ⬇ Save as PDF · ⬇ Chart PNGs (take + NPV) ·
+⎘ Share Link · ▦ Rank all 185 countries`. That row is where the task ends — it is the set of
+things the analyst does once they have their answer. **Both exhibits rendered below it.** On a
+phone the take chart opened 5,423px down, behind 1,498px of caveat prose *and* behind the
+finish buttons.
+
+The consequence is specific, not cosmetic. This set's own verdict strip prints
+`⚠ order changes in $75–$100` (Angola 53.0% / Brazil 55.6% at \$75 inverts to Brazil 58.7% /
+Angola 60.2% at \$100). The take-vs-price chart is the only place on the platform that *draws*
+that crossing. And the button the analyst does reach offers `⬇ Chart PNGs (take + NPV)` — an
+export of an exhibit they have not seen.
+
+**Change — what is different on screen.** `renderCompare()` now emits `#cmp-charts-slot`
+immediately after the `.compare-grid` close and docks both wraps into it after
+`out.innerHTML = html`. Three supporting edits were required, not optional:
+
+1. **Park before write.** Every `out.innerHTML` assignment would destroy docked children on the
+   next render. The `compareList.length < 2` (Clear) path is worse than that — `:29133` calls
+   `document.getElementById('cmp-chart-wrap').style.display='none'` **unguarded** and would have
+   thrown on null. Both wraps are moved back onto `#t2` at the top of `renderCompare()` first.
+   A canvas keeps its 2D context across a reparent, and the charts are drawn after the dock.
+2. **`_sbsObsNotice()` re-anchored.** It inserts the async predictability-withdrawal notice at
+   `grid.nextSibling`, which after this change is the chart dock — it would have landed *between*
+   the grid and the exhibits and split the notice block. It now anchors on the slot, falling back
+   to the grid.
+3. `#cmp-monopoly-notice` uses `chartWrap.parentNode.insertBefore(el, chartWrap)`, so it rides
+   into the slot with the chart it qualifies — correct without edit. Take-chart `aria-label`
+   corrected: *"see the notices above the chart"* → *"below the chart"*. The three grid-row
+   tooltips saying "the NPV bar chart below" (`:29705`, `:29810`, `:30386`) and the take chart's
+   own "The Contractor NPV chart below" (`:31851`) all remain true — both charts are still below
+   the grid, and NPV is still below take.
+
+Order on screen is now **verdict → grid → take chart → NPV chart → notices → legend → actions**:
+
+| | take chart | NPV chart | action row | page height |
+|---|---|---|---|---|
+| 1440 | 2310 → **1759** | 2678 → **2127** | 2175 → **3009** | 3086 → 3086 |
+| 390 touch | 5423 → **3613** | 5681 → **3871** | 4912 → **5760** | 5931 → 6009 |
+
+**Result — what the analyst can now do.** They pass through both exhibits on the way to the
+export buttons rather than after them: 551px earlier at 1440, **1,810px earlier at 390**. The
+price-crossing the verdict strip names in words is now visible as a picture before the memo is
+copied, and `⬇ Chart PNGs` sits below the charts it saves instead of above them.
+
+### Verification — the suite RAN this cycle, twice
+
+| Check | Result |
+|---|---|
+| JS syntax gate | 11 script blocks, **0 failures** |
+| Runtime suite, local tree, **pre-change** (`git show HEAD:index.html`) | **499 PASS / 0 FAIL / 1 WARN**, 15 JS errors |
+| Runtime suite, local tree, **post-change** | **499 PASS / 0 FAIL / 1 WARN**, 15 JS errors |
+| Horizontal scroll, 8 tabs @ 1920/1440/1280/1024/768/390 | **NONE** |
+| Controls under 24px, Side-by-Side @ 390 `hasTouch` | **0** |
+| Page errors, cold load + Clear + 3-country rebuild, both viewports | **0** |
+| `#cmp-chart-wrap` / `#cmp-npv-chart-wrap` survive a Clear + rebuild | **yes** — both present, no null throw |
+| Share-link round trip `#/compare/brazil+angola+guyana@100` | tab, rank price, order, verdict all restored |
+| `⎘ Copy Table for IC Memo` | 10,232 chars, 6 notices — unchanged |
+
+The single WARN and the 15 JS errors are the known **local-only** service-worker 404:
+`index.html:49` registers `/petroleum-fiscal-db/sw.js`, a hard-coded Pages path that 404s when
+the tree is served from a local root. Both runs carry them identically, which is what makes the
+comparison clean. The cycle prompt's 500 PASS was measured against the **deployed** build; one
+assertion does not reach that path locally.
+
+Header badge `v940 → v941`, done silently at the end, not as the reason the cycle happened.
+
+### Debt still open, carried forward
+
+**New and load-bearing this cycle: `autonomous_cycle.py` is killing its own cycles.** Cycles 853
+and 854 both hit `TimeoutExpired` at `:233 timeout=1800` against `:28 INTERVAL = 1800` — the
+Claude step is budgeted the entire interval, leaving nothing for the test re-run, pixel audit,
+push and email. Both cycles had already committed when they were killed, so **v939 and v940 sat
+unpushed and unlogged** until this cycle pushed them. This is no longer a theoretical
+recommendation: it has now cost two cycles their push and their grader entry. One-line fix
+stands — `timeout=1500`. Still not adopted unilaterally; `CLAUDE.md` reserves the loop's control
+surface to Zach. Same family: set `TEST_URL` to the local tree for the runtime suite as well as
+the pixel audit — this cycle set it by hand on both runs. And `cycle_log.txt` still reports
+*** SUITE COPIES HAVE DIVERGED *** between the graded copy
+(`office/tools/petroleum/tests/runtime_comprehensive.js`, sha 045f00a6dddc) and the idle repo
+copy (`petroleum-fiscal-db/tests/runtime_comprehensive.js`, sha e87e483cb5dd).
+
+Carried forward unchanged: `_modelParam()` (`:~40282`) resolves the profit-oil ladder only where
+`getDCFParams()` carries `tier_schedule` — 98 countries hold one in `COUNTRY_DATA`, 51 reach the
+engine; a country both laddered and sourced on profit oil falls through both the v700 and v767
+branches (852) · FC Stability tooltip (`:3496`) and XLSX `Fiscal Predictability` note generalise
+from the best case (851) · `# Contracts` grid row prints `4211` / `7643` unseparated against
+`Concession (4,211)` one row below (828) · PSC pre-fill rounds Angola's 2.6% to `3` (841) ·
+state-monopoly `$0M` vs `n/a` (835) · Angola's `BE: < $50/bbl bounded` above "No breakeven on
+file" (835) · FAQ A381's 117/120 against 65 (829) · no suite coverage for the Breakeven Map CSV
+(829) or `_icArmBulkCopy` (836) · unreachable `Score <= 20` IC rule on Reform Risk ·
+`ddOpenScenarioBuilder()` generic branch for Guyana (841).
+
+Resolved this cycle from the carried list: **"two charts render below the five caveat blocks"
+(842)** — that was this cycle's fix.
