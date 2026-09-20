@@ -62586,3 +62586,132 @@ Side-by-Side's take-vs-NPV **inversion notice** was the last ordering claim on t
 | **v953 (T4)** | Recovered from two cycles of limbo, re-verified, committed `0930a19`, **pushed** |
 | **v954 (T1)** | Implemented, verified across all 4 decks and 6 viewports, mirror updated — commit pending the suite number |
 | Baseline sui
+
+---
+## Cycle 874 — v955 (T5): the two columns marked "db · citable" stood on two different contract populations
+
+### Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation
+(873 was T1, 872 T4, 870 T3, 868/869 T2, 867 T6; T5 last ran at 865). Walked cold at
+1440x900 and 390x844 `hasTouch`, no sessionStorage and no localStorage, with
+`navigator.clipboard.write` shimmed so every artifact was actually produced and read back
+rather than inferred from source: Fiscal Compare → Side-by-Side → IOC Portfolio → Reform
+Risk → Country Profile → Screener.
+
+Five of the six paste surfaces held up. Reform Risk correctly refused with "No country
+verdict on screen" and the Screener correctly armed rather than pasting at screening scale
+(v828) — both were logged as "NOTHING CAPTURED" on the first pass and **re-measured before
+being acted on**; neither is a defect.
+
+### Friction
+
+**The flagship shortlist paste, on the tab the platform opens ranked.** Ticked USA / Iraq /
+Somalia at $75 on a cold load and pressed ⌘ Copy for IC Memo. The memo received:
+
+```
+1  USA       Concession   23.4   3308
+2  Iraq      TSC          34.1    642
+3  Somalia   PSC          36.9   2478
+```
+
+Iraq, on a **lower** government take than Somalia, at **a quarter** of Somalia's contractor
+value — same standardized project, same price, no explanation anywhere in a 3,700-character
+preamble that calls both columns "the ORCA contract-database figures … and the ones to cite."
+An IC reviewer cannot reconcile those two cells. They either bin the row as broken or they
+quote it and their own model will not reproduce it.
+
+The cause is a half-applied correction. v675 moved the on-screen take cell, the # rank and
+the tier dividers onto the **comparable** PSC/Concession-only take; v777 carried that into
+this paste's ranked column. The contractor NPV column beside it — carrying the same green
+`db · citable` label — kept publishing `npv_75`, the unweighted mean across **all** 610 Iraqi
+contracts, 415 of them TSCs whose contractor is paid a fixed $/bbl fee. So the take was
+rescued on one population and the value was left on another, inside one row, under one
+"CITABLE" banner.
+
+ORCA holds the figure that belongs there. `country_data.json` carries the Group-1 split at
+**all four published prices** (`g1.v50 / v75 / v100 / v125`). Measured on the shipped build:
+
+| country | $50 blend → G1 | $75 blend → G1 | $100 | $125 |
+|---|---|---|---|---|
+| **Iraq** | 389 → **1,438** | 642 → **3,043** | 840 → **4,508** | 1,046 → **6,038** |
+| Oman | 118 → 364 | 566 → 866 | 1,013 → 1,368 | 1,460 → 1,870 |
+| Ecuador | 1,166 → 871 | 2,127 → 2,184 | 3,067 → 3,475 | 4,005 → 4,764 |
+| South Sudan | 448 → 833 | 1,534 → 1,868 | 2,244 → 2,674 | 3,025 → 3,591 |
+| Iran | 629 → 659 | 899 → 1,248 | 1,168 → 1,837 | 1,437 → 2,425 |
+
+At $75 Iraq is not the weakest contractor position on that shortlist — it is the **strongest**,
+by 4.7x on the figure that was printed. This is the single point in the walk where the artifact
+does not merely under-inform the analyst; it inverts the answer.
+
+**Side-by-Side already fixed exactly this at v666/v705** (`_cmpNpvCell`, green `PSC/Conc $3.0B`
+sub-line) and the FC row drilldown labels its own figure `· all contracts`. This table and the
+paste it feeds were the last two surfaces publishing the blend unmarked.
+
+### Change
+
+**On screen** — `_fcDbNpvCell()` now renders the fee-blended rows the way the take cell two
+columns to its left has rendered since v675: the comparable figure leads, marked ⚖, and the
+published blend sits beneath it, labelled.
+
+```
+   Take% db · citable        NPV ($M) db · citable
+   ⚖ 34.1%                   ⚖ $3.04B            ← was $642M alone
+   blended 84.8%             blended $642M
+```
+
+New tooltip states the contract count, names the fee mechanics, gives the blend, and says in
+words that the two cells can now be read in one sentence. Suppressed where the two agree at
+printed precision — same rule the take cell and `_cmpNpvCell` both use, which correctly
+leaves **Russia at $125** (48.9 vs 49.0 take, $1.57B either way) uncorrected on NPV.
+The other 175 rows are byte-identical: `_fcFeeState()` returns null for them.
+
+**In the paste** — `copyFCForIC()` mirrors v777's treatment of the take exactly. The
+`Contractor NPV … (CITABLE)` column becomes the like-for-like figure and a greyed
+`Published all-contract contractor NPV` reference column is spliced beside it, populated
+only on the rows it differs on. Both stay plain numbers so Excel still sorts them. The
+comparability paragraph gains the contractor-side half of the rule with the correction
+printed (`Iraq 642 → 3043 ($M)`), and the preamble stops claiming Country Profile carries
+these NPVs — on the corrected rows it does not, and the paste now says which columns hold
+the published blends instead. A guard emits a named sentence if ORCA ever lacks the split
+for a diverging row; measured, it fires on none of the ten.
+
+The memo now receives:
+
+```
+1  USA       23.4          3308
+2  Iraq      34.1   84.8   3043    642
+3  Somalia   36.9          2478
+```
+
+### Result
+
+An analyst can paste a shortlist containing Iraq, Oman, Iran, Ecuador, Qatar, Malaysia,
+Mexico, South Sudan or Azerbaijan into an IC memo and hand it to someone who never saw the
+screen, and the take and the contractor value in each row are on the same contracts — so the
+row can be read as one sentence, ranked against the others, and rebuilt. Before this, the
+one row in the walk that most needed the correction received the half of it that made the
+country look worst.
+
+### Deliberately left, named for the next T5
+
+`exportFCResults()` — the XLSX from the button beside this one — still writes the blended NPV.
+It is now **disclosed** rather than silent (the new cell tooltip and the paste preamble both say
+the XLSX and JSON API publish the blend), but it is the same defect in the attachment rather
+than the paste, and it deserves its own walk: the workbook has a Basis & Assumptions sheet that
+would have to carry the correction too, which is more than a column swap.
+
+### Cycle 874 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** |
+| Runtime suite, baseline control (`v954` tree), local server | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors** |
+| Runtime suite, **ran** this cycle against the modified tree | ****499 PASS / 0 FAIL / 1 WARN / 15 JS errors — IDENTICAL to the control. The change introduces no delta. The 15 JS errors and the gap vs the deployed 500/0/0 are the `sw.js` 404 under `python -m http.server`, present in both arms.**** |
+| Horizontal scroll, 8 tabs x 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Page errors across the whole walk | **0** |
+| Controls under 24px, `#tbl-fc` @390 `hasTouch` | 941 interactive controls, **0 under 24px — identical before and after** |
+| Row height @390, Iraq (fee row) / USA (plain row) | **56.5 / 49.0 before, 56.5 / 49.0 after — the sub-line adds no height**, it sits under the take cell's existing one |
+| Cell render, all four price decks | ⚖ + blended on Iraq / Oman / Ecuador / Azerbaijan at $50, $75, $100, $125; correctly suppressed on Russia @$125; USA / Norway / Somalia / Saudi Arabia (monopoly) unchanged |
+| Clipboard HTML flavour parsed back | 14 `<th>`, 14 `<td>` per row, reference columns 5 and 7 both muted |
+
+Header badge `v954 → v955`, done silently at the end.
