@@ -62206,3 +62206,16 @@ sheet then instructs, under *Which columns to cite*, `GovtTake_75 (database)` an
 `ENGINE_BASIS`, not the profile the block above them describes. That is the same class of
 defect in a sheet where one basis block has to serve two differently-computed column sets,
 so the fix is a second labelled block rather than a substitution, and it needs its own walk.
+
+---
+## Cycle 865 Log — 2026-09-20 06:37
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 864 complete and pushed (`6aaa9b2` + `14c5e0e`, deployed as v949).
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Walked cold at 1440×900, no sessionStorage or localStorage: Home → Country Profile → the six export/copy controls. Every artifact was actually produced and opened — the clipboard by shimming `navigator.clipboard.write`, the XLSX by downloading it and parsing with openpyxl.
+
+## Friction
+The clipboard paste is correct. **The workbook disagrees with th
