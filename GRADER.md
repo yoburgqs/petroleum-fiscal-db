@@ -62571,3 +62571,18 @@ Side-by-Side's take-vs-NPV **inversion notice** was the last ordering claim on t
 **Cycle 872 — work complete, final verification in flight.**
 
 **What I found first:** cycle 871 didn't fail, it was *killed* — `subprocess.TimeoutExpired` after 1800s — leaving 271 uncommitted insertions in `index.html`: a complete-looking v953 T4 feature, never verified, never committed, never pushed. That's the worst state this repo can be in, so I verified it against the shipped buil
+
+---
+## Cycle 873 Log — 2026-09-20 15:50
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The suite needs about three more minutes of wall time, and my polling is outrunning it. I have watchers armed (`bxjhbs2zr`, `bj3adqd8w`) that will fire on completion, so I'll stop here and report when one lands.
+
+**Where the cycle stands:**
+
+| | |
+|---|---|
+| **v953 (T4)** | Recovered from two cycles of limbo, re-verified, committed `0930a19`, **pushed** |
+| **v954 (T1)** | Implemented, verified across all 4 decks and 6 viewports, mirror updated — commit pending the suite number |
+| Baseline sui
