@@ -2641,7 +2641,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v942</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v943</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23517,6 +23517,25 @@ window._rrCountScored = _rrCountScored;
 // arithmetic of the claim itself. Where the margin does not survive that test the direction
 // word is withheld and the count is printed instead, so the analyst reads the evidence
 // rather than a verdict built on a minority of it.
+// ── v943 (T4): the Below-the-line divider test, extracted so it can be reused ──────
+// renderReformCountryVerdict() has computed this inline since v526 as `windowArtefact`, and the
+// ranked-cards block computes the same thing again for its `quietArtefact` bucket. The Regional
+// Reform Tilt panel's Avg Stability column needed it too and had no access to it. One definition,
+// so a country cannot be Below-the-line on one panel and count as clean stability on another.
+// TRUE means: this jurisdiction's most recent take-RAISING event on record falls before 2010, and
+// it clears the frequency bar — so its near-100 Reform Frequency Score is an artefact of where the
+// scoring window starts, not a finding that the terms held.
+function _rrLastRise(events) {
+  var h = (events || []).filter(function(e){ return e && e.take_change && String(e.take_change).charAt(0) === '+'; })
+    .sort(function(a, b){ return (b.year || 0) - (a.year || 0); });
+  return h.length ? h[0] : null;
+}
+function _rrArtefact(events, since2010) {
+  var lr = _rrLastRise(events);
+  return !!(lr && (lr.year || 0) < 2010 && (since2010 || 0) <= 1);
+}
+window._rrArtefact = _rrArtefact;
+
 function _rrEventDir(e) {
   var tc = (e && e.take_change) ? String(e.take_change) : '';
   if (tc.charAt(0) === '+') return 'hostile';
@@ -50598,6 +50617,36 @@ function renderReformRisk() {
     var _rAll    = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
     var _rSilent = [];   // members with a sourced log but no event inside the window
     var _rAllLo  = null;
+    // ── v943 (T4): the one column on this panel that was never made to withhold ──
+    // Every other cell in this row earned its discipline across v585/v668/v773: Tilt names a
+    // direction only where the unmeasured changes could not overturn it, the counts were pulled
+    // back to the window the heading claims, and the full record is printed beneath rather than
+    // in place of it. Avg Stability was a bare mean painted green above 70, yellow above 40, red
+    // below — with no denominator and no qualifier of any kind.
+    //   It is a mean of the Reform Frequency Score, which is 100 − 15 × fiscal law changes since
+    // 2010. A jurisdiction whose last take rise predates the window therefore scores near 100 for
+    // the sole reason that the window opens after its rupture. This tab already knows that and
+    // already says so — the card headed "Below the line — quiet only because the window starts in
+    // 2010 ... do not read the score as a stable-regime finding" sits ~600px lower on this very
+    // page and lists seven of the 21 scored jurisdictions.
+    //   Those same seven were being averaged into this column at face value, and on the live data
+    // that made the GREENEST CELL ON THE PANEL the least supported one:
+    //     North America  93, green, the best row here — USA 100 (last take rise 2007) and
+    //                    Canada 85 (2009). 2 of 2 window artefacts. Nothing else is in the row.
+    //     CIS/FSU        85, green — Kazakhstan 85 (last rise 2007). 1 of 2.
+    //     Africa         88, green — Libya 100 (last rise 1971, the nationalization wave) and
+    //                    Algeria 100 (2005 windfall tax). 2 of 5.
+    // An analyst screening T4 by region read "North America 93 / Africa 88" in green and carried
+    // "regionally stable" into an IC memo, off two countries and a 1971 nationalization.
+    //   The test below is NOT a new threshold. `_rrArtefact` is this tab's own Below-the-line
+    // divider test, unchanged, applied per member; and the band is named only where the supported
+    // members OUTNUMBER the artefact ones — the same arithmetic-of-the-claim form `_rrTilt()` uses
+    // for `determined`. Where it does not survive, the number still prints, uncoloured, with the
+    // reason. Withholding a colour is the change; no figure is hidden.
+    var _rArte = [];
+    members.forEach(function(m){ if (_rrArtefact(m.events, m.since2010)) _rArte.push(m.country); });
+    var _rSupported = members.length - _rArte.length;
+    var _rBandOK = _rSupported > _rArte.length;
     members.forEach(function(m){
       var si = m.splitIn || { hostile:0, friendly:0, unmeasured:0, context:0, total:0 };
       _rSplit.hostile += si.hostile; _rSplit.friendly += si.friendly;
@@ -50658,6 +50707,24 @@ function renderReformRisk() {
       // region's sourced set had gone quiet, when part of it was never in the window at all.
       + (_rSilent.length ? '<div style="color:var(--muted);opacity:.85;">' + _rSilent.map(_rrEsc).join(', ')
           + ': no post-2010 event</div>' : '');
+    // v943 (T4): the Avg Stability cell. Three lines, and the first is coloured only when the
+    // scored set that produced it is not mostly window artefacts. n is always named because this
+    // is a mean and two of the eight rows are a mean of one country.
+    var _avgTxt = avgScore.toFixed(0);
+    var _artLine = '';
+    if (_rArte.length) {
+      _artLine = '<div style="font-size:9.5px;font-weight:600;color:var(--orange);line-height:1.35;margin-top:2px;white-space:normal;">'
+        + (_rArte.length === members.length
+             ? (members.length === 1 ? 'its only' : members.length === 2 ? 'both' : 'all ' + members.length)
+               + ' score' + (members.length === 1 ? 's' : '') + ' clean only because the window starts in 2010'
+             : _rArte.length + ' of ' + members.length + ' score clean only because the window starts in 2010')
+        + '<div style="font-weight:400;opacity:.9;">' + _rArte.map(_rrEsc).join(', ') + '</div></div>';
+    }
+    var _avgCell = _rBandOK
+      ? '<span style="font-weight:700;color:' + (avgScore>70?'var(--green)':avgScore>40?'var(--yellow)':'var(--red)') + ';">' + _avgTxt + '</span>'
+      : '<span style="font-weight:700;color:var(--muted);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;" title="Band withheld: ' + _rArte.length + ' of this row&#39;s ' + members.length + ' scored jurisdiction' + (members.length === 1 ? '' : 's') + ' score clean only because their last take-raising event falls before 2010. A green band here would assert regional stability on scores this tab tells you not to read that way.">' + _avgTxt + '</span>'
+        + '<div style="font-size:9.5px;font-weight:700;color:var(--orange);line-height:1.35;">not a stability reading</div>';
+    _avgCell += '<div style="font-size:9.5px;font-weight:400;color:var(--muted);line-height:1.35;">n=' + members.length + '</div>' + _artLine;
     return '<tr>'
       + '<td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--text);">' + _rrEsc(region)
       + '<div style="font-size:10px;font-weight:400;color:var(--muted);">' + basis + '</div></td>'
@@ -50667,13 +50734,13 @@ function renderReformRisk() {
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalC + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + _allLine + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (avgScore>70?'var(--green)':avgScore>40?'var(--yellow)':'var(--red)') + ';">' + avgScore.toFixed(0) + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;">' + _avgCell + '</td>'
       + '</tr>';
   }).filter(Boolean).join('');
 
   var regionalTilt = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Regional Reform Tilt Since 2010</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? <strong>Every count, bar and tilt in this table is events dated 2010 or later</strong> \u2014 the same window as the Avg Stability column and as the Reform Frequency Score. The full sourced record, which runs back to 1938, is printed as a second line under each Tilt so the two are never read as one number. They are not the same: over the whole record Latin America is +8 and Africa +1, while inside the window they are +1 and \u22121. Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. Avg Stability = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010).</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? <strong>Every count, bar and tilt in this table is events dated 2010 or later</strong> \u2014 the same window as the Avg Stability column and as the Reform Frequency Score. The full sourced record, which runs back to 1938, is printed as a second line under each Tilt so the two are never read as one number. They are not the same: over the whole record Latin America is +8 and Africa +1, while inside the window they are +1 and \u22121. Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. <strong>Avg Stability</strong> = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010), and it is <strong>banded in colour only where that mean is supported</strong>. A jurisdiction whose last take-raising event predates 2010 scores near 100 for the sole reason that the window opens after its rupture \u2014 the card headed <em>Below the line</em> further down names all seven. Where those outnumber the rest of the row the figure prints grey and reads <em>not a stability reading</em>, with the countries responsible beneath it: on the live data that is <strong>North America</strong>, whose 93 is USA 100 (last take rise 2007) and Canada 85 (2009) and nothing else, and <strong>CIS/FSU</strong>. n is printed under every figure \u2014 two of these rows are a mean of one country.</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>'
@@ -50683,7 +50750,7 @@ function renderReformRisk() {
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced events that changed no fiscal terms — discoveries, first oil, conflict, a review that concluded without renegotiation. Excluded from every score and from the tilt."><span>No fiscal change</span><div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mix</th>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Tightened minus Liberalized inside the 2010 window, named only where the unmeasured changes could not overturn it. The muted second line is the same arithmetic over every sourced event on record for these jurisdictions.">Tilt<div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
-    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Avg Stability</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Mean Reform Frequency Score (100 − 15 × fiscal law changes since 2010) of the jurisdictions in this row that carry a sourced reform log — never of the region. n is printed under every figure because two of these rows are a mean of one country. The green/yellow/red band is awarded only where the jurisdictions whose score is supported OUTNUMBER those that score clean solely because their last take-raising event predates 2010; where it does not, the figure prints grey and dotted and the row names the countries responsible. That is the same Below-the-line test the ranked cards lower down use, and the same arithmetic-of-the-claim form the Tilt column uses — not a new threshold.">Avg Stability<div style="font-weight:400;text-transform:none;opacity:.75;">of sourced, 2010+</div></th>'
     + '</tr></thead>'
     + '<tbody>' + regionTiltRows + '</tbody></table>'
     + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Rows cover all <strong>' + _rrShown + '</strong> of the ' + withScore.length + ' jurisdictions with a sourced reform log, across ' + Object.keys(regionDefs).length + ' regions. A row is an average over those jurisdictions only, never over the region — read the <em>n of N sourced</em> line before treating a row as a regional finding. Unmeasured and no-fiscal-change events are excluded from the tilt margin, and the Unmeasured column is what decides whether a tilt may be named at all. A jurisdiction whose entire sourced record predates 2010 \u2014 Algeria, Colombia and the USA \u2014 contributes to the full-record line only, and its row says so. Use the country lookup above for a single-jurisdiction read.</div>'
