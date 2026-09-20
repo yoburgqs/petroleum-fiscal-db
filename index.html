@@ -2603,7 +2603,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v940</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v941</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4081,7 +4081,7 @@ window.copyPlatformCitation = function(btn) {
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" id="cmp-chart-png-btn" aria-label="Download Side-by-Side comparison chart as PNG image" title="Download chart as PNG">⬇ PNG</button>
     </div>
-    <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Where the set mixes bases, a dashed line with hollow markers is a statutory-basis column ORCA holds no verified production for, and it is not rankable against the solid filled lines — the same meaning the dashed bar carries in the Contractor NPV chart below. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
+    <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Where the set mixes bases, a dashed line with hollow markers is a statutory-basis column ORCA holds no verified production for, and it is not rankable against the solid filled lines — the same meaning the dashed bar carries in the Contractor NPV chart below. Fee-basis and cash-flow columns are re-based or excluded; see the notices below the chart." role="img"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;position:relative;">
     <!-- v708 (T5): the returns chart had no export control of any kind. Mirrors the take chart's
@@ -29085,6 +29085,23 @@ function renderCompare() {
   }
 
   const out = document.getElementById('cmp-output');
+
+  // ── v941 (T3): park the two chart wraps on the pane before anything writes out.innerHTML ──
+  // The two canvases are the only exhibits on this tab and they are now DOCKED inside
+  // #cmp-output (see the dock block after `out.innerHTML = html`). Every innerHTML write below
+  // would otherwise destroy them on the second render — including the Clear path at
+  // compareList.length < 2, which then reads .style on a null and throws. Moving them out to
+  // #t2 first is what makes docking survivable; a canvas keeps its 2D context across a reparent,
+  // and the charts are drawn after the dock in any case.
+  (function _sbsParkCharts941() {
+    var pane = document.getElementById('t2');
+    if (!pane) return;
+    var tw = document.getElementById('cmp-chart-wrap');
+    var nw = document.getElementById('cmp-npv-chart-wrap');
+    if (tw && tw.parentNode !== pane) pane.appendChild(tw);
+    if (nw && nw.parentNode !== pane) pane.appendChild(nw);
+  })();
+
   if (compareList.length < 2) {
     out.className = 'empty-state';
     if (compareList.length === 1) {
@@ -31193,6 +31210,18 @@ function renderCompare() {
     html += `</div>`;
   });
   html += `</div>`;
+  // ── v941 (T3): the landing slot for the Govt Take and Contractor NPV charts ──────────────
+  // Measured on Guyana / Brazil / Angola before this change: the grid ended at y=1654 and the
+  // four set-specific notices ran to y=2099, the Reading legend to y=2163 and the action row
+  // (Copy Table for IC Memo / Save as PDF / Chart PNGs / Share Link) to y=2204 — and the two
+  // charts opened at y=2310 and y=2678, BELOW the row that reads as the end of the task. At
+  // 390x844 it was worse: 1,498px of notice prose, then the action row at y=4912, then the take
+  // chart at y=5423. The analyst screening three countries reads the grid, hits Copy Table, and
+  // never reaches the one exhibit that draws the crossing its own verdict strip warns about
+  // ("order changes in $75-$100"). The ⬇ Chart PNGs button was offering to export a picture the
+  // analyst had not seen. The charts now sit against the grid they plot; the notices, the legend
+  // and the actions follow both exhibits, which is the order they were written for.
+  html += `<div id="cmp-charts-slot"></div>`;
   // v593 (T3): when the take ordering is not the same at $50 as it is at $125, say so in words
   // immediately under the grid. The per-row 'lowest of N' / 'highest of N' markers make the flip
   // visible; this names it, gives the interval it happens in, and gives the $75 spread -- because
@@ -31691,6 +31720,18 @@ function renderCompare() {
   html += `<table style="display:none;" aria-hidden="true" id="cmp-data-table"><thead><tr><th>Metric</th>${selected.map(d=>`<th>${d.country}</th>`).join('')}</tr></thead><tbody>${rows.filter(r=>!r.divider).map(r=>`<tr><td>${r.label}</td>${selected.map(d=>`<td${r.id ? ` data-sbs-row="${r.id}" data-sbs-c="${_cmpEsc(d.country)}"` : ''}>${typeof r.key==='function'?r.key(d):r.key}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   out.className = '';
   out.innerHTML = html;
+
+  // v941 (T3): dock the parked chart wraps into the slot directly under the grid. Runs before
+  // the charts are drawn, so Chart.js measures the canvas at its final position and the two
+  // exhibits land above the notices, the legend and the action row instead of below them.
+  (function _sbsDockCharts941() {
+    var slot = document.getElementById('cmp-charts-slot');
+    if (!slot) return;
+    var tw = document.getElementById('cmp-chart-wrap');
+    var nw = document.getElementById('cmp-npv-chart-wrap');
+    if (tw) slot.appendChild(tw);
+    if (nw) slot.appendChild(nw);
+  })();
 
   // Chart
   const chartWrap = document.getElementById('cmp-chart-wrap');
@@ -32976,8 +33017,12 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
     el = document.createElement('div');
     el.id = 'cmp-obs-notice';
     el.className = 'cmp-notice';
-    var grid = out.querySelector('.compare-grid');
-    if (grid && grid.nextSibling) out.insertBefore(el, grid.nextSibling);
+    // v941 (T3): anchor on the chart slot, falling back to the grid. This notice arrives
+    // asynchronously and used to insert itself at grid.nextSibling — which after v941 is the
+    // chart dock, so it would have landed BETWEEN the grid and the two exhibits and split the
+    // notice block in two. It stays first among the notices, under both charts.
+    var anchor = document.getElementById('cmp-charts-slot') || out.querySelector('.compare-grid');
+    if (anchor && anchor.nextSibling) out.insertBefore(el, anchor.nextSibling);
     else out.appendChild(el);
   }
   // v864: each refuted column states the basis that was withdrawn beside what the contracts
