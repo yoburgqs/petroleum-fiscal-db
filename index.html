@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v948</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v949</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46494,7 +46494,35 @@ function _cpBasisSheet(d, country, region, prof, npvBasis, cmpNote) {
     + 'and in the Regional Peers table — is ONE standardized project run through each country\u2019s '
     + 'fiscal terms. It is a fiscal comparison basis. It is not a valuation of any asset in '
     + country + ', and it does not use ' + country + '\u2019s own field costs or production.'));
-  if (prof) {
+  // v949 (T5): this table named the wrong project. `prof` was FC_PROFILES.deepwater — the
+  // in-page Live DCF / Scenario Builder what-if profile, byte-identical to DCF_PROFILES.deepwater
+  // — while every Contractor NPV in this workbook is the stored COUNTRY_DATA figure, produced by
+  // tools/petroleum/petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater. v833 corrected the two
+  // places on the Country Profile SCREEN and v834 corrected the seven clipboard/CSV artifacts that
+  // leave the tool; this workbook — the one sheet whose title is literally "Basis & Assumptions" —
+  // was missed, and it is the worst place for the substitution to survive, because it prints the
+  // parameters as a keyed table an IC reviewer retypes into their own model. Measured on the live
+  // build: Indonesia exports $744.6M at $75/bbl over a block declaring $1,200M capex and $15/bbl
+  // opex; the project it declared recovers 294.0 MMbbl for $1,668M all-in and does not return
+  // $744.6M for any country. Every figure below is now read from ENGINE_BASIS, the single constant
+  // the screen and the clipboard already derive from, so there is no second copy left to drift.
+  var _EB949 = (typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS : null;
+  if (_EB949) {
+    R.push(['  Profile', _EB949.name + ' — ORCA engine profile (' + _EB949.source + ')']);
+    R.push(['  Peak rate (bopd)', _EB949.peakBblDay]);
+    R.push(['  Ramp-up (yr)', _EB949.rampYears]);
+    R.push(['  Plateau (yr)', _EB949.plateauYears]);
+    R.push(['  Decline rate (%/yr, post-plateau)', +(_EB949.declineRate * 100).toFixed(1)]);
+    R.push(['  Total production recovered (MMbbl)', _EB949.totalProdMM]);
+    R.push(['  Capex — all-in ($M)', _EB949.capexAllInMM]);
+    R.push(['    of which development ($M)', _EB949.capexDevMM]);
+    R.push(['    of which sustaining ($M)', _EB949.sustainingMM]);
+    R.push(['    of which abandonment ($M)', _EB949.abandonmentMM]);
+    R.push(['  Opex ($/bbl)', _EB949.opexBbl]);
+    R.push(['  Opex escalation (%/yr real)', +(_EB949.opexEscal * 100).toFixed(0)]);
+    R.push(['  Discount rate / WACC (%)', +(_EB949.discountRate * 100).toFixed(0)]);
+    R.push(['  Modelled horizon (yr)', _EB949.years]);
+  } else if (prof) {
     R.push(['  Profile', prof.name]);
     R.push(['  Peak rate (bopd)', prof.peakBblDay]);
     R.push(['  Capex ($M)', prof.capexMM]);
@@ -46503,13 +46531,36 @@ function _cpBasisSheet(d, country, region, prof, npvBasis, cmpNote) {
     R.push(['  Plateau (yr)', prof.plateauYears]);
     R.push(['  Decline rate (%/yr, post-plateau)', +(prof.declineRate * 100).toFixed(1)]);
     R.push(['  Discount rate / WACC (%)', +(prof.discountRate * 100).toFixed(0)]);
+    R.push(['  Modelled horizon (yr)', 25]);
   }
-  R.push(['  Modelled horizon (yr)', 25]);
   R.push(['  Working interest', '100% — scale every contractor NPV in this workbook by your actual WI']);
   R = R.concat(_cpWrap('The horizon is fixed at 25 years for all ORCA profiles; profiles differ by ramp, '
     + 'plateau and decline inside that window, not by its length. A profile still producing in year 25 '
     + 'is truncated at the horizon, not depleted. For an NPV on YOUR capex, opex and production '
     + 'profile, use the Scenario Builder tab — that is the only figure that is a project NPV.'));
+
+  // The reconciliation the screen carries in two places and the clipboard paste carries in one.
+  // Without it the reader has no way to discover that the platform holds two different projects
+  // under the name "Deepwater", and the Scenario Builder is the tool this sheet just sent them to.
+  var _pnl949 = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES.deepwater) ? DCF_PROFILES.deepwater : null;
+  var _bd949 = null;
+  try { if (typeof _basisDelta833 === 'function') _bd949 = _basisDelta833('deepwater'); } catch (e) { _bd949 = null; }
+  if (_EB949 && _pnl949) {
+    R.push(['']);
+    R.push(['  DO NOT REBUILD THESE NPVs ON THE LIVE DCF / SCENARIO BUILDER "DEEPWATER" PROFILE']);
+    R = R.concat(_cpWrap('The platform holds two different projects under the name "' + _EB949.name
+      + '". The one above produced every figure in this workbook. The Live DCF panel on the Country '
+      + 'Profile screen and the Scenario Builder tab run the other: $'
+      + (_pnl949.capexMM / 1000).toFixed(1) + 'B headline development capex'
+      + (_bd949 && _bd949.jsCapexMM ? ' ($' + Number(_bd949.jsCapexMM).toLocaleString() + 'M all-in once sustaining is added)' : '')
+      + ', ' + _pnl949.plateauYears + 'yr plateau, ' + (_pnl949.declineRate * 100).toFixed(0)
+      + '% decline, $' + _pnl949.opexBbl + '/bbl flat opex'
+      + (_bd949 && _bd949.jsProdMM ? ', ' + _bd949.jsProdMM.toFixed(1) + ' MMbbl recovered against the engine’s '
+          + _EB949.totalProdMM.toFixed(1) : '')
+      + '. It returns a materially different contractor NPV at the same price on the same country, '
+      + 'so a figure in this workbook rebuilt on those assumptions will not reconcile. Quote the '
+      + 'parameters above with the numbers above.', 94, '  '));
+  }
   R.push(['']);
 
   R.push(['DATA BASIS OF THE GOVERNMENT TAKE FIGURES']);
@@ -46606,13 +46657,25 @@ function exportCountryProfile() {
           + 'contractor position; not comparable with contractor-participation regimes.'
         : 'Comparable — this country\u2019s contracts are profit-split mechanics (PSC / Concession / '
           + 'Gross Split / Revenue Share), which share one take definition.';
-  const _cpNpvBasis = 'Standardized ORCA '
-      + (_cpProf ? _cpProf.name : 'Deepwater') + ' project'
-      + (_cpProf ? ' — $' + (_cpProf.capexMM / 1000).toFixed(1) + 'B capex, '
-          + (_cpProf.peakBblDay / 1000).toFixed(0) + 'k bbl/d peak, $' + _cpProf.opexBbl + '/bbl opex, '
-          + (_cpProf.discountRate * 100).toFixed(0) + '% discount rate' : '')
-      + ', 25-yr modelled horizon, 100% working interest. A fiscal comparison basis, NOT the field '
-      + 'economics of any asset in ' + country + ' — see the Basis & Assumptions sheet.';
+  // v949 (T5): this row sits immediately above the four Contractor NPV rows and named the
+  // in-page Live DCF project ($1.2B capex, $15/bbl opex) over stored figures produced on the
+  // engine profile ($1.0B all-in, $18/bbl escalating 2%/yr). Derived from ENGINE_BASIS now,
+  // the same constant the on-screen footnote and the "Copy for IC Memo" paste already use.
+  const _cpEB949 = (typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS : null;
+  const _cpNpvBasis = _cpEB949
+    ? ('Standardized ORCA ' + _cpEB949.name + ' engine project — the basis these stored figures '
+        + 'were computed on: ' + (_cpEB949.peakBblDay / 1000).toFixed(0) + 'k bbl/d peak, '
+        + _cpEB949.plateauYears + 'yr plateau, ' + (_cpEB949.declineRate * 100).toFixed(0)
+        + '%/yr decline, ' + _cpEB949.totalProdMM.toFixed(1) + ' MMbbl recovered, $'
+        + (_cpEB949.capexAllInMM / 1000).toFixed(1) + 'B all-in capex, $' + _cpEB949.opexBbl
+        + '/bbl opex escalating ' + (_cpEB949.opexEscal * 100).toFixed(0) + '%/yr real, '
+        + _cpEB949.years + '-yr modelled horizon, ' + (_cpEB949.discountRate * 100).toFixed(0)
+        + '% WACC, 100% working interest. NOT the Live DCF / Scenario Builder profile also named "'
+        + _cpEB949.name + '". A fiscal comparison basis, NOT the field economics of any asset in '
+        + country + ' — see the Basis & Assumptions sheet.')
+    : ('Standardized ORCA ' + (_cpProf ? _cpProf.name : 'Deepwater') + ' project, 25-yr modelled '
+        + 'horizon, 100% working interest. A fiscal comparison basis, NOT the field economics of '
+        + 'any asset in ' + country + ' — see the Basis & Assumptions sheet.');
 
   // Sheet 1: 4-Price Summary
   const summaryRows = [
