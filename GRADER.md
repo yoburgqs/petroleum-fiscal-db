@@ -62219,3 +62219,93 @@ so the fix is a second labelled block rather than a substitution, and it needs i
 
 ## Friction
 The clipboard paste is correct. **The workbook disagrees with th
+
+---
+## Cycle 867 Log — 2026-09-20
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Walked cold at
+1440x900 and at 390x844 `hasTouch`, no sessionStorage and no localStorage: Home → Reform Risk
+(Nigeria) → IOC Portfolio. Two candidate findings were measured and **discarded before the fix**,
+recorded here because both looked right on inspection and were wrong on measurement:
+
+1. `reform_history.json` carries no `source` key on any of its 83 events, while the UI says
+   "sourced" 20+ times. **Not a defect** — the citations arrive from `reform_history` inside
+   `api/v1/country/{slug}.json` and are merged by year. Measured across all 21 logged
+   jurisdictions: **83 of 83 events carry a source name, 29 carry a URL.** v945 already built
+   that column properly, dead-link marking included.
+2. The Evidence Chain itself. Walked; it is the most thoroughly worked surface on the platform
+   (v538→v850) and nothing in it was worse than what follows.
+
+## Friction
+**The IOC Portfolio headline take never said what it was weighted by.**
+
+`Wtd Avg Take @$75` is the number an analyst quotes verbatim — *"Chevron's portfolio government
+take is 30%."* At both render sites it was computed inline as
+`SUM(take_75 * n) / SUM(n)` (`index.html:39657` and `:39801`), where **`n` is the number of
+contract documents ORCA holds** for that country|mechanic row. Not production, not reserves, not
+working interest, not value — and ORCA models none of those for an operator.
+
+It was also **the only tile in that strip with no `title=""` at all.** Mechanic Mix, C/D-graded
+exposure, Reform exposure, Instrument-type rows and R-factor PSC each carry one. Its sole
+qualifier read *"this operator's own contracts"*, which answers **whose** contracts and not **how
+they were weighted**. No surface anywhere on the platform named the weight.
+
+That matters because the weight is heavily concentrated. Measured on the shipped build over the
+16 quick-pick brands, after the same country|mechanic dedupe both callers apply:
+
+| brand | headline (contract-wtd) | top country's share of weight | unweighted country mean | gap |
+|---|---|---|---|---|
+| Chevron | **30.2%** | USA **74%** @ 23.8% | 52.7% | **22.5pp** |
+| BP | **30.4%** | USA **74%** @ 23.8% | 52.4% | **22.0pp** |
+| Equinor | **61.3%** | Norway **87%** @ 65.4% | 40.9% | **−20.4pp** |
+| Woodside | 34.5% | Australia 47% | 48.9% | 14.5pp |
+| Shell | **39.1%** | USA **54%** @ 23.8% | 51.8% | 12.7pp |
+
+467 individual Gulf of Mexico and onshore US lease documents outvote 140 Norwegian concessions
+three-to-one in Chevron's headline, and each of those US leases is a *tract*, not a position. An
+analyst reading 30.2% concludes Chevron sits in an unusually contractor-friendly set of regimes.
+What they are actually reading is ORCA's document count per country.
+
+## Change
+A shared `_iocTakeStat()` / `_iocTakeBasis()` builder now renders the tile at **both** call sites,
+so the group roll-up and the single-entity table can never state the headline on different terms.
+On screen, under the percentage, where there was one line there are now three:
+
+- **`weighted by contract count`** — the basis, named.
+- **`⚠ USA is 74% of the weight, at 23.8%`** — which country is carrying the number, in orange.
+- **`unweighted country mean 52.7% · 16 countries`** — the contrast figure.
+
+The ⚠ fires only when **both** legs hold: top country ≥ 40% of the weight **and** |gap| ≥ 5pp. A
+concentrated portfolio of similar regimes is concentrated without being misleading — measured,
+ExxonMobil (25% top share, 0.0pp gap), Petronas (43%, 1.0pp) and Harbour Energy (94%, 4.7pp) are
+correctly left unflagged. A single-country entity reads `one country — Norway, so this is its
+take` instead, because there the weighting does nothing.
+
+The tile also gains the tooltip it never had, stating the formula, naming what it is *not*
+weighted by, and — where the ⚠ fires — telling the analyst to quote the per-country rows or state
+the weighting beside the number in the memo.
+
+The inline `wtAvgTake` const is **deleted at both sites**: the formula now exists once, in
+`_iocTakeBasis()`. A second copy of a basis is exactly the drift cycle 864 spent itself on.
+
+## Result
+An analyst who opens Chevron on IOC Portfolio can no longer read 30.2% as a portfolio take
+without also reading that three-quarters of it is US lease-document count at 23.8%, and that
+giving each country equal weight puts the same portfolio at 52.7%. Before this, the number, its
+label and the entire tab were silent on the question — and the figure most likely to be pasted
+into an IC memo was the one number on the tab with no provenance affordance of any kind.
+
+## Cycle 867 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** (0 failures) |
+| Runtime suite, **ran** this cycle against the modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Runtime suite, baseline control (`git show HEAD:index.html`), same server, same run | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors — IDENTICAL.** The change introduces no delta. The gap vs the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server`, present in both arms. |
+| Horizontal scroll, 10 tabs x 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Controls under 24px, IOC Portfolio @390 `hasTouch` | **31 baseline → 31 after; 0 inside the new tile** (pre-existing country-link spans, untouched) |
+| Page errors across the walk | **0** |
+| Tile verified rendering | Shell / Chevron / BP / Equinor / ExxonMobil / Harbour Energy / Petronas + single-entity `A/S Norske Shell` |
+
+Header badge `v949 → v950`, done silently at the end.
