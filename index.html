@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v946</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v947</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -47953,30 +47953,58 @@ function renderSampleAnalyses() {
   const deltaColor = v => v == null ? '' : v > 20 ? '#96570A' : v > 10 ? '#A16207' : 'var(--muted)';
 
   // ── Card 1: Regional Benchmarks ──────────────────────────────────────────
-  const regionOrder = ['Middle East','Africa','Asia Pacific','Americas','Europe','Other'];
-  const regionGroups = {};
-  cd.forEach(d => {
-    const r = d.region || 'Other';
-    if (!regionGroups[r]) regionGroups[r] = [];
-    regionGroups[r].push(d);
-  });
-  const regionRows = regionOrder
-    .filter(r => regionGroups[r] && regionGroups[r].length >= 3)
-    .map(r => {
-      const g = regionGroups[r];
+  // v947 (T6) — this card grouped on a RAW `d.region ===` match against a hand-typed list
+  // ['Middle East','Africa','Asia Pacific','Americas','Europe','Other']. Three of those six
+  // strings are not values that exist in COUNTRY_DATA. The database (after v661's M49
+  // normalisation) files every country under exactly one of eight names: Asia, Oceania,
+  // Latin America, North America, CIS/FSU, Africa, Europe, Middle East. "Asia Pacific" and
+  // "Americas" are ROLL-UPS that only _regionMatch() knows how to expand, and "Other" no
+  // longer has members at all.
+  //
+  // So the card matched 3 of its 6 rows and printed Middle East (17), Africa (54) and
+  // Europe (33) = 104 countries, under a caption reading "across ALL jurisdictions with DCF
+  // coverage". Asia (26), Latin America (31), Oceania (16), CIS/FSU (5) and North America (3)
+  // -- 81 of 185, including the USA and Canada -- were silently absent, and the analyst reading
+  // "where does state capture differ most by geography" got a geographic spread with two whole
+  // continents missing and nothing on screen saying so. Same class of defect as cycle 344.
+  //
+  // Routed through _regionMatch(), the platform's own resolver, which every other region
+  // control on this file has used since v429. The eight granular names now sum to 185 of 185,
+  // verified in the coverage line under the table rather than asserted.
+  const _saRegionNames = ['Middle East','Africa','Asia','Oceania','Latin America',
+                          'North America','CIS/FSU','Europe','Other'];
+  const _saRegions = _saRegionNames
+    .map(r => ({ r: r, g: cd.filter(d => (typeof _regionMatch === 'function')
+                                          ? _regionMatch(d.region, r)
+                                          : (d.region || 'Other') === r) }))
+    .filter(x => x.g.length >= 3)
+    .map(x => {
+      const g = x.g;
       const avg = g.reduce((s,d) => s + d.take_75, 0) / g.length;
-      const mn = Math.min(...g.map(d => d.take_75));
-      const mx = Math.max(...g.map(d => d.take_75));
-      return [`<span style="color:var(--text)">${r}</span>`, g.length,
-              `<span style="color:${takeColor(avg)};font-weight:600">${avg.toFixed(1)}%</span>`,
-              `${mn.toFixed(1)}% – ${mx.toFixed(1)}%`];
-    });
+      // v947: the count that qualifies the average. Every other ranking surface on this
+      // platform separates the 22 verified-production countries from the 163 proxy-terms ones;
+      // a regional mean that is 1-of-16 production-backed is a statutory-terms average, and
+      // Oceania (1 of 16) and Europe (2 of 33) are only visible on this card because of the
+      // fix above, so they must not arrive unmarked.
+      const prod = g.filter(d => (typeof _dqTier === 'function') ? _dqTier(d).hasProduction : false).length;
+      return { r: x.r, n: g.length, prod: prod, avg: avg,
+               mn: Math.min(...g.map(d => d.take_75)), mx: Math.max(...g.map(d => d.take_75)) };
+    })
+    .sort((a,b) => b.avg - a.avg);
+  const _saRegionN = _saRegions.reduce((s,x) => s + x.n, 0);
+  const regionRows = _saRegions.map(x => [
+    `<span style="color:var(--text)">${x.r}</span>`,
+    `${x.n}<span style="color:var(--muted);font-size:10px;" title="Of the ${x.n} countries in this row, ${x.prod} have verified field production. The other ${x.n - x.prod} carry regional-proxy economics: their take is a simple average of statutory terms, so this row's average is a legal-terms benchmark, not observed state capture.">&nbsp;· ${x.prod} prod</span>`,
+    `<span style="color:${takeColor(x.avg)};font-weight:600">${x.avg.toFixed(1)}%</span>`,
+    `${x.mn.toFixed(1)}% – ${x.mx.toFixed(1)}%`
+  ]);
   const card1 = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--accent);">
       <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Regional Benchmarks</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where does state capture differ most by geography?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Average government take at $75/bbl across all jurisdictions with DCF coverage.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Mean government take at $75/bbl, ranked highest first. Every country with DCF coverage is in exactly one row &mdash; <strong style="color:var(--text);">${_saRegionN} of ${cd.length}</strong>.</div>
       ${tbl([{label:'Region'},{label:'Countries',align:'right'},{label:'Avg @$75',align:'right'},{label:'Range',align:'right'}], regionRows)}
+      <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;"><strong style="color:var(--text);">Read the second number in the Countries column.</strong> ${_saRegions.reduce((s,x)=>s+x.prod,0)} of the ${_saRegionN} have verified field production; the rest carry regional-proxy economics, so each row&rsquo;s average is a statutory-terms benchmark rather than observed state capture. ${(function(){var t=_saRegions.filter(function(x){return x.prod<=2;}).map(function(x){return x.r+' ('+x.prod+' of '+x.n+')';});return t.length? t.join(', ')+' rest almost entirely on proxy terms.':'';})()}</div>
       <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);switchExplorerMode('browse');}})()">Open in Explorer</button>
     </div>`;
 
@@ -48179,24 +48207,56 @@ function renderSampleAnalyses() {
     </div>`;
 
   // Card C: Asia Pacific in Global Context
-  const asiaCountries = cd.filter(d => d.region === 'Asia Pacific');
+  // v947 (T6) — the worst single moment on the T6 walk. `d.region === 'Asia Pacific'` matched
+  // ZERO rows: "Asia Pacific" is a _regionMatch() roll-up over the filed names Asia and
+  // Oceania, never a stored value. So asiaCountries was empty, asiaAvg was null, and both the
+  // four-lowest and three-highest blocks rendered nothing. The card shipped as:
+  //
+  //     Indonesia           Asia Pacific   59.5%   PSC-dominant
+  //     Asia Pacific avg    —              —       0 countries
+  //     Global avg          —              38.2%   185 countries
+  //
+  // — an em-dash and a literal "0 countries" sitting under a heading that asks "Is Southeast
+  // Asia cheap or expensive for IOCs vs global norms?" and a paragraph that answers it. The
+  // prose asserted a finding the card's own table could not produce, and the one cell that
+  // said so read "0 countries" in 10px muted grey. Asked "where did this number come from",
+  // the honest answer was: nowhere.
+  //
+  // Routed through _regionMatch() like every other region control since v429. 42 countries
+  // resolve; the average computes to 36.1% against a 38.2% global mean, so the paragraph's
+  // claim is now BACKED rather than merely asserted. Region cells print each country's own
+  // filed region instead of the hard-coded roll-up label, so the table cannot claim a country
+  // is filed somewhere it is not.
+  const asiaCountries = cd.filter(d => (typeof _regionMatch === 'function')
+                                        ? _regionMatch(d.region, 'Asia Pacific')
+                                        : (d.region === 'Asia' || d.region === 'Oceania'));
   const asiaAvg = asiaCountries.length ? asiaCountries.reduce((s,d)=>s+d.take_75,0)/asiaCountries.length : null;
   const globalAvg = cd.reduce((s,d)=>s+d.take_75,0)/cd.length;
+  // v947: the extremes this card now prints are proxy-terms regimes, not observed take. Before
+  // the fix it printed no extremes at all, so surfacing them unmarked would have shipped the
+  // defect v942 removed from the bubble chart. _dqTier() is the platform's own classifier.
+  const _apBasis = d => { try { return _dqTier(d).label; } catch (e) { return ''; } };
+  const _apProd  = asiaCountries.filter(d => { try { return _dqTier(d).hasProduction; } catch (e) { return false; } }).length;
   const asiaRanked = [...asiaCountries].sort((a,b)=>a.take_75-b.take_75);
   const asiaTopN = asiaRanked.slice(0,4);
+  const _apNote = (d, word) => word + ' &mdash; <span style="font-size:10px;'
+    + (_apBasis(d) === 'PROXY' ? 'color:var(--muted);' : 'color:var(--green);') + '">'
+    + (_apBasis(d) === 'PROXY' ? 'proxy terms' : 'production-backed') + '</span>';
+  const _indoD = cd.find(x=>x.country==='Indonesia');
   const asiaRows = [
-    ...asiaTopN.map(d=>[`<span style="color:var(--green)">${d.country}</span>`,d.region,`<span style="color:var(--green);font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Lowest in region']),
-    [`<span style="color:var(--accent);font-weight:700">Indonesia</span>`,'Asia Pacific',`<span style="color:var(--yellow);font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
-    [`<span style="color:var(--muted)">Asia Pacific avg</span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg?asiaAvg.toFixed(1)+'%':'—'}</span>`,asiaCountries.length + ' countries'],
-    [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,cd.length + ' countries'],
-    ...asiaRanked.slice(-3).map(d=>[`<span style="color:var(--red)">${d.country}</span>`,d.region,`<span style="color:var(--red);font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Highest in region']),
+    ...asiaTopN.map(d=>[`<span style="color:var(--green)">${d.country}</span>`,d.region,`<span style="color:var(--green);font-weight:600">${d.take_75.toFixed(1)}%</span>`,_apNote(d,'Lowest in region')]),
+    [`<span style="color:var(--accent);font-weight:700">Indonesia</span>`,(_indoD&&_indoD.region)||'Asia',`<span style="color:var(--yellow);font-weight:600">${(_indoD?_indoD.take_75:58).toFixed(1)}%</span>`,_apNote(_indoD||{},'PSC-dominant')],
+    [`<span style="color:var(--muted)">Asia Pacific avg <span style="font-size:10px;" title="Asia Pacific is a roll-up, not a filed region. _regionMatch() expands it to the database&rsquo;s Asia and Oceania. Before v947 this row compared d.region against the literal string &quot;Asia Pacific&quot;, matched nothing, and printed an em-dash beside &quot;0 countries&quot;.">(Asia + Oceania)</span></span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg!=null?asiaAvg.toFixed(1)+'%':'—'}</span>`,asiaCountries.length + ' countries · ' + _apProd + ' production-backed'],
+    [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,cd.length + ' countries · ' + cd.filter(function(x){ try { return _dqTier(x).hasProduction; } catch (e) { return false; } }).length + ' production-backed'],
+    ...asiaRanked.slice(-3).map(d=>[`<span style="color:var(--red)">${d.country}</span>`,d.region,`<span style="color:var(--red);font-weight:600">${d.take_75.toFixed(1)}%</span>`,_apNote(d,'Highest in region')]),
   ];
   const cardC = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--purple);">
       <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Asia Pacific in Global Context</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Is Southeast Asia cheap or expensive for IOCs vs global norms?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Asia Pacific average sits close to the global average. Indonesia's 58% is typical for a mid-tier PSC regime. The region's extremes are wider than they appear — Philippines TSC contracts near 100% vs some frontier Oceania regimes below 30%.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">${asiaAvg!=null ? `Asia Pacific averages <strong style="color:var(--text);">${asiaAvg.toFixed(1)}%</strong> against a <strong style="color:var(--text);">${globalAvg.toFixed(1)}%</strong> global mean &mdash; ${Math.abs(asiaAvg-globalAvg).toFixed(1)}pp ${asiaAvg<globalAvg?'below':'above'}, i.e. close to it. Indonesia&rsquo;s ${(_indoD?_indoD.take_75:59.5).toFixed(1)}% is mid-range for the roll-up. The spread inside it is the story: ${asiaRanked.length?asiaRanked[0].country+' at '+asiaRanked[0].take_75.toFixed(1)+'%':''} to ${asiaRanked.length?asiaRanked[asiaRanked.length-1].country+' at '+asiaRanked[asiaRanked.length-1].take_75.toFixed(1)+'%':''}, ${(function(){var w=asiaRanked.length?(asiaRanked[asiaRanked.length-1].take_75-asiaRanked[0].take_75).toFixed(1):'';return (/^(8|11|18)/.test(w)?'an ':'a ')+w;})()}pp band that the single average conceals.` : 'Asia Pacific average sits close to the global average.'}</div>
       ${tbl([{label:'Country / Benchmark'},{label:'Region'},{label:'Govt Take @$75',align:'right'},{label:'Notes'}], asiaRows)}
+      <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;">${_apProd} of these ${asiaCountries.length} have verified field production. ${(function(){ var ends = asiaRanked.slice(0,4).concat(asiaRanked.slice(-3)); var px = ends.filter(function(d){ return _apBasis(d) === 'PROXY'; }); if (!px.length) return ''; return px.length + ' of the ' + ends.length + ' countries at the two ends above (' + px.map(function(d){ return d.country; }).join(', ') + ') carry proxy terms &mdash; a statutory average over contracts ORCA holds no field output for. Read those as legal terms, not as observed state capture, and open the profile before either end goes in a memo.'; })()}</div>
       <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);const chip=[...document.querySelectorAll('.chip[data-filter=region]')].find(c=>c.dataset.value==='Asia Pacific');if(chip)setExplorerChip('region','Asia Pacific',chip);}})()">Filter Asia Pacific in Explorer</button>
     </div>`;
 
