@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v950</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v951</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -43283,7 +43283,7 @@ function loadCountryProfile(country) {
   const _hdrBeCallout = (_cpBeR != null && _cpBeR < 500)
     ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${_cpBeR.toFixed(0)} $/bbl</strong></span>`
     : _cpBeB
-    ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="${_esc594(_cpBeB.tip)}">Breakeven: <strong style="color:var(--text);">${_cpBeB.txt}</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span></span>`
+    ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="${_esc594(_cpBeB.tip)}">Breakeven: <strong style="color:var(--text);">${_cpBeB.txt}</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span>${_cpBeSplitTag(_cpBeB)}</span>`
     : `<span id="cp-be-meta" style="font-size:10px;color:var(--muted);margin-left:10px;opacity:.7;" title="${(typeof isStateMonopoly==='function'&&isStateMonopoly(d.take_75))?'State monopoly — government take is at or above 99.5%, so no contractor cash flow is modelled and no breakeven exists. The stored $1/bbl is the DCF solver floor, not a price.':'No solved breakeven on file for this country, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either. Use Scenario Builder with project capex and opex.'}">Breakeven: $/bbl n/a</span>`;
   // v277 Issue 8: Prominent country name header above profile content
   const _countryPageHeader = `<h2 id="cp-country-name" class="country-profile-header" style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 8px 0;letter-spacing:-0.01em;font-family:'Georgia',serif;">${d.country}${ddSpecBadge ? ' ' + ddSpecBadge : ''}</h2>`;
@@ -43890,7 +43890,8 @@ function loadCountryProfile(country) {
     return '<span id="cp-be-head" style="font-size:11px;color:var(--muted);" title="Breakeven oil price = minimum price for Contractor NPV ≥ 0 under this regime. &lt;$50/bbl = viable in low-price environment; $50–80 = viable at base case; &gt;$80 = requires elevated price to return positive NPV. Requires complete royalty and cost data.">BE: <strong style="color:' + beCol + ';">$' + _cpBeR.toFixed(0) + '/bbl</strong></span>';
   })() : _cpBeB ? ('<span id="cp-be-head" style="font-size:11px;color:var(--muted);" title="'
       + _esc594(_cpBeB.tip) + '">BE: <strong style="color:var(--text);">' + _cpBeB.txt
-      + '</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span></span>')
+      + '</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span>'
+      + _cpBeSplitTag(_cpBeB) + '</span>')
     : '<span id="cp-be-head" style="font-size:11px;color:var(--muted);opacity:.65;" title="No solved breakeven on file for this country, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either. Use Scenario Builder with field-specific capex and opex for a project-level estimate.">BE: n/a</span>';
   // v452: compute global rank + vs-median BEFORE _headlineStrip344 uses them
   const _grank452 = getGlobalTakeRank(country);
@@ -46923,7 +46924,11 @@ function exportCountryProfile() {
         var _r = (typeof cpBeFor === 'function') ? cpBeFor(d) : (d.be_75 != null && d.be_75 > 1 && d.be_75 < 999 ? d.be_75 : null);
         if (_r != null) return +_r.toFixed(0);
         var _bd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;
-        return _bd ? (_bd.txt + '  (bounded from contractor NPV at $50/$75/$100/$125 — not a solved breakeven)') : null;
+        // v951 (T2): name both bases in the workbook where they bound differently.
+        return _bd ? (_bd.txt + '  (bounded from contractor NPV at $50/$75/$100/$125 — not a solved breakeven'
+          + (_bd.split ? '; on ' + Number(_bd.n1).toLocaleString() + ' PSC/Concession contracts — '
+              + _bd.blendTxt + ' on the all-contract blend used by the NPV rows in this workbook' : '')
+          + ')') : null;
       })() },
     { Metric: '', Value: '' },
     { Metric: 'Royalty Rate (%)', Value: d.royalty != null ? +d.royalty.toFixed(1) : null },
@@ -52050,15 +52055,33 @@ function downloadTornadoPng(country) {
   }
   // v948 (T5): the third bare-bitmap export. A tornado is read as "these are the levers that
   // move MY project", so the profile it was actually run on has to travel with it.
-  var P = (typeof getPriceKey === 'function') ? (getPriceKey() || '75') : '75';
+  //
+  // v951 (T2): it was travelling with the WRONG one. Both legs of the caption came from
+  // elsewhere on the page rather than from this chart: the price from getPriceKey(), the
+  // Fiscal Compare price key, and the basis from _sbsBasisTerms(), which returns ENGINE_BASIS
+  // — the stored engine project ($1.0B all-in, 5yr plateau, $18/bbl escalating). This chart
+  // runs DCF_PROFILES[profileKey] at the Live DCF panel's price. Pick "LNG Project" and export
+  // and the PNG described a $1.0B 50k bbl/d deepwater project over bars computed on a $5.0B
+  // 200k bbl/d one; drag the slider to $110 and the caption and the filename both still said
+  // $75. It is now read from the state the chart itself recorded when it was built.
+  var st = (window._TORN951 || {})[slug] || null;
+  var P = st ? String(st.price) : ((typeof getPriceKey === 'function') ? (getPriceKey() || '75') : '75');
   var lines = [
     { bold: true, text: 'Fiscal sensitivity — ' + (country || '') + ' @$' + P + '/bbl. Each bar is the swing in '
-      + 'contractor NPV from moving ONE fiscal parameter with every other held at this country’s modelled terms.' },
-    { bold: true, text: 'Basis — one standardized project run through this country’s fiscal terms: '
-      + ((typeof _sbsBasisTerms === 'function') ? _sbsBasisTerms() : 'ORCA standardized reference project')
-      + '. The ranking of the bars is a property of THIS project, not of the country: a different capex/opex '
-      + 'profile reorders them. Re-run it on your own assumptions in Scenario Builder before carrying the '
-      + 'ordering into a recommendation.' },
+      + 'contractor NPV from moving ONE parameter with every other held at this country’s modelled terms'
+      + (st ? ', around a base case of ' + _tornAbs951(st.base) : '') + '.' },
+    { bold: true, text: st
+      ? 'Basis — one ' + st.profileName + (/project$/i.test(st.profileName) ? '' : ' project')
+        + ' run through this country’s fiscal terms: ' + st.terms
+        + '. This is the Live DCF panel’s project, NOT the stored engine project behind the NPV this '
+        + 'platform cites, ranks and exports ('
+        + ((typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS.short : 'a different project')
+        + '). The ranking of the bars is a property of THIS project, not of the country: a different '
+        + 'capex/opex profile reorders them. Re-run it on your own assumptions in Scenario Builder '
+        + 'before carrying the ordering into a recommendation.'
+      : 'Basis — one standardized project run through this country’s fiscal terms: '
+        + ((typeof _sbsBasisTerms === 'function') ? _sbsBasisTerms() : 'ORCA standardized reference project')
+        + '. The ranking of the bars is a property of THIS project, not of the country.' },
     _orcaPngSourceLine()
   ];
   var n = _orcaSaveCaptionedPng(canvas,
@@ -52629,7 +52652,11 @@ function copyICCitation() {
   // solved price and cannot be silently missing the one metric the page leads with.
   var _beBnd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;
   var beStr = (_beRes != null) ? 'BE $' + _beRes.toFixed(0) + '/bbl'
-    : _beBnd ? ('BE ' + _beBnd.txt.replace('/bbl', '/bbl (bounded from NPV at 4 modelled prices, not solved)')) : '';
+    // v951 (T2): where the two bases bound differently the cite carries both, or it states a
+    // survival claim the published blend in every other ORCA surface contradicts.
+    : _beBnd ? ('BE ' + _beBnd.txt.replace('/bbl', '/bbl (bounded from NPV at 4 modelled prices, not solved'
+        + (_beBnd.split ? '; on its ' + Number(_beBnd.n1).toLocaleString() + ' PSC/Concession contracts \u2014 '
+            + _beBnd.blendTxt + ' on the all-contract blend ORCA publishes' : '') + ')')) : '';
   var metricsStr = [npvStr, downStr, beStr].filter(Boolean).join(', ');
   var cite = country + ': Govt Take ' + takeStr + ' @$75/bbl' + _icFeeBasisClause(d)
     + _icProdBasisClause(d)   // v596 (T5)
@@ -52710,7 +52737,11 @@ function _cpIcBe(d, country) {
   var bound  = (solved == null && typeof cpBeBound === 'function') ? cpBeBound(d) : null;
   return {
     cell: solved != null ? '$' + solved.toFixed(0) + '/bbl'
+        // v951 (T2): both bounds in the pasted cell where they differ — the memo must not be able
+        // to carry "survives $50" while the export it cites carries a negative $50 NPV.
         : bound  != null ? bound.txt + ' (bounded)'
+            + (bound.split ? ' on ' + Number(bound.n1).toLocaleString() + ' PSC/Conc contracts \u00b7 '
+                + bound.blendTxt + ' on the published blend' : '')
         : '—',
     note: solved != null
         ? ''
@@ -52718,6 +52749,11 @@ function _cpIcBe(d, country) {
           ? 'Breakeven ' + bound.txt + ' is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
             + country + '. The range is arithmetic on the four contractor NPVs in this table, on the same '
             + 'standardized Deepwater profile. Cite it as a bound, not as a price.'
+            + (bound.split ? ' Two bases disagree here: on ' + country + '\u2019s '
+                + Number(bound.n1).toLocaleString() + ' PSC/Concession contracts the bound is ' + bound.txt
+                + ' and the entry survives a $50/bbl price break; on the all-contract blend that Fiscal '
+                + 'Compare, this workbook\u2019s NPV rows and the API publish it is ' + bound.blendTxt
+                + ' and it does not. State which basis this memo is on.' : '')
           : ((typeof _cpNpvRefused === 'function') && _cpNpvRefused(d))
             // v879 (T5): this branch told the analyst the four contractor NPVs "do not bracket one"
             // — reasoning from four $0M values that are now withheld as not being a contractor
@@ -52956,7 +52992,10 @@ function copyICSummary() {
   var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl'
     : _beBnd ? (_beBnd.txt + ' — bounded, not solved: ORCA carries no solved breakeven for this country, '
         + 'and this range is read off contractor NPV at $50/$75/$100/$125 on the same standardized '
-        + 'Deepwater profile. Cite it as a bound, not as a price.')
+        + 'Deepwater profile. Cite it as a bound, not as a price.'
+        // v951 (T2): the split basis travels with this chip too.
+        + (_beBnd.split ? ' Read on ' + Number(_beBnd.n1).toLocaleString() + ' PSC/Concession contracts; '
+            + 'the all-contract blend ORCA publishes bounds it ' + _beBnd.blendTxt + ' instead.' : ''))
     : '—';
   var stabScore = getFiscalPredictabilityScore(d);
   // v536 (T3): null means no contract-level take distribution is held, so no predictability claim
@@ -55709,10 +55748,117 @@ function renderTornadoPanel(country, containerId, profileKey, price) {
     <h3 style="margin:0;">&#8679; Sensitivity Analysis — NPV at ±25%</h3>
     <button onclick="downloadTornadoPng('${country.replace(/'/g,"\\'")}')" style="padding:4px 10px;background:var(--surface2);color:var(--accent);border:1px solid var(--accent);border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download sensitivity chart as PNG">&#8595; PNG</button>
   </div>
+  <div id="tornado-basis-${country.replace(/[^a-z0-9]/gi,'_')}" style="margin:-4px 0 10px;"></div>
   <div class="tornado-chart-wrap"><canvas id="tornado-canvas-${country.replace(/[^a-z0-9]/gi,'_')}"></canvas></div>
 </div>`;
   _buildTornadoChart(country, profileKey || 'deepwater', price || 75);
 }
+
+// ── v951 (T2) — helpers for the tornado's base-case strip ────────────────────────────
+// Kept beside the chart that uses them, and derived from the same DCF_PROFILES /
+// ENGINE_BASIS objects every other basis line on this page is derived from, so there is no
+// hand-typed copy of a project to fall out of step (the v833/v834 treatment).
+function _tornAbs951(v) {
+  if (v == null || !isFinite(v)) return 'n/a';
+  var a = Math.abs(v);
+  return (v < 0 ? '−' : '') + '$' + (a >= 1000 ? (a / 1000).toFixed(2) + 'B' : Math.round(a) + 'M');
+}
+
+// Base case, project, price -- and, when this chart's base is not the number the page cites,
+// the reconciliation. Repainted on every rebuild, because the chart is rebuilt silently
+// whenever the Live DCF panel's profile selector or price slider moves.
+function _tornPaintBasis951(country, slug, profile, profileKey, basePrice, base, d, vars) {
+  var el = document.getElementById('tornado-basis-' + slug);
+  if (!el) return;
+
+  var bd = (typeof _basisDelta833 === 'function') ? _basisDelta833(profileKey) : null;
+  var terms = bd
+    ? (bd.jsProfile.peakBblDay / 1000) + 'k bbl/d peak · ' + bd.jsProfile.plateauYears
+      + 'yr plateau · ' + bd.jsProdMM.toFixed(1) + ' MMbbl · $'
+      + (bd.jsCapexMM / 1000).toFixed(2) + 'B all-in capex · $' + bd.jsProfile.opexBbl
+      + '/bbl flat opex · 25yr life · ' + (bd.jsProfile.discountRate * 100).toFixed(0) + '% WACC'
+    : '';
+  var pName = (bd && bd.profileName) || profile.name || 'Deepwater';
+  var pWord = /project$/i.test(pName) ? '' : ' project';
+
+  var html =
+    '<div style="font-size:11px;color:var(--text);line-height:1.5;">'
+      + '<strong style="color:var(--text);">Base case ' + _tornAbs951(base) + '</strong>'
+      + ' — one <strong style="color:var(--text);">' + pName + '</strong>' + pWord + ' on '
+      + country + '’s fiscal terms at <strong style="color:var(--text);">$' + basePrice
+      + '/bbl</strong>, the two settings in the Live DCF panel above. Move either and every bar '
+      + 'below moves with it.'
+    + '</div>'
+    + (terms ? '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:2px;">Chart basis: '
+        + terms + '.</div>' : '');
+
+  // ── Reconciliation to the figure this page cites. ──────────────────────────────────
+  // This is NOT an exception: the panel project and the stored engine project differ on
+  // 169 of 185 countries, so an alarm on the gap alone would fire almost every time and
+  // teach the analyst to skip it. The gap is therefore stated plainly, every time, in the
+  // muted line -- and the orange warning is reserved for the one case where the two bases
+  // give OPPOSITE ANSWERS to the question this chart is opened to settle: does the project
+  // survive a $25/bbl price break. Measured on the shipped data, that flip is rare.
+  var cited = d ? Number(d.npv_75) : NaN;
+  var cited50 = d ? Number(d.npv_50) : NaN;
+  var oilRow = (vars || []).filter(function (v) { return /Oil Price/.test(v.label); })[0];
+
+  if (isFinite(cited) && basePrice === 75) {
+    var gap = base - cited;
+    var ratio = (Math.abs(cited) > 1) ? (base / cited) : null;
+    // Only state a multiple when it is one: 713 against 745 rounds to "1.0x smaller", which
+    // reads as a difference while saying there is none.
+    var _rx = '';
+    if (ratio && ratio > 0) {
+      var m = ratio >= 1 ? ratio : 1 / ratio;
+      if (m >= 1.15) _rx = m.toFixed(1) + '\u00d7 ' + (ratio >= 1 ? 'that' : 'smaller');
+      else _rx = 'within 15% of it';
+    } else if (ratio && ratio < 0) {
+      _rx = 'the opposite sign';
+    }
+    var gapLine = 'The NPV this page cites is ' + _tornAbs951(cited)
+      + ', on ORCA’s stored engine project ('
+      + ((typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS.short : 'a different project')
+      + ')'
+      + (_rx ? ' — this chart’s base is ' + _rx : '')
+      + '. The two are different projects, so read the bars as the swing on this one.';
+
+    // The verdict test: $50/bbl on this chart vs the $50/bbl figure the page publishes.
+    var flip = (oilRow && isFinite(cited50)) && ((oilRow.low >= 0) !== (cited50 >= 0));
+    if (flip) {
+      html += '<div style="margin-top:6px;padding:7px 10px;border:1px solid rgba(194,65,12,.3);'
+        + 'background:rgba(194,65,12,.06);border-radius:5px;font-size:11px;color:var(--text);line-height:1.5;">'
+        + '<strong style="color:var(--orange);">⚠ This chart and this page disagree about the $50/bbl downside.</strong> '
+        + 'The Oil Price bar below bottoms out at <strong style="color:var(--text);">' + _tornAbs951(oilRow.low)
+        + '</strong>, so on this project a $25 break '
+        + (oilRow.low >= 0 ? 'is survived' : 'wipes the value out') + '. '
+        + 'The figure this page publishes for ' + country + ' at $50/bbl is <strong style="color:var(--text);">'
+        + _tornAbs951(cited50) + '</strong>, which says the opposite. ' + gapLine
+        + '</div>';
+    } else {
+      html += '<div style="margin-top:5px;font-size:10px;color:var(--muted);line-height:1.45;">'
+        + gapLine
+        + (oilRow && isFinite(cited50)
+            ? ' At $50/bbl both land on the same side of zero — ' + _tornAbs951(oilRow.low)
+              + ' on this chart against the ' + _tornAbs951(cited50)
+              + ' this page publishes — so the downside verdict holds on either project, though not the value.'
+            : '')
+        + '</div>';
+    }
+  } else if (isFinite(cited)) {
+    html += '<div style="margin-top:5px;font-size:10px;color:var(--muted);line-height:1.45;">'
+      + 'The ' + _tornAbs951(cited) + ' this page cites exists only at $75/bbl, so it is not '
+      + 'comparable to a base run at $' + basePrice + '. Reset the panel to $75 to reconcile the two.'
+      + '</div>';
+  }
+
+  el.innerHTML = html;
+
+  // The PNG that leaves the tool has to carry the project it was actually run on.
+  window._TORN951 = window._TORN951 || {};
+  window._TORN951[slug] = { base: base, price: basePrice, profileName: pName, terms: terms, country: country };
+}
+
 
 function _buildTornadoChart(country, profileKey, basePrice) {
   const slug = country.replace(/[^a-z0-9]/gi,'_');
@@ -55754,9 +55900,36 @@ function _buildTornadoChart(country, profileKey, basePrice) {
   // Sort by range (largest impact first)
   vars.sort((a, b) => Math.abs(b.high - b.low) - Math.abs(a.high - a.low));
 
-  const labels = vars.map(v => v.label);
+  // ── v951 (T2) — the tornado never said what it was a sensitivity OF. ────────────────
+  // It plots "NPV Impact vs. Base Case ($M)" and printed the base case nowhere: not on the
+  // axis, not in the heading, not in a hover. The base is runNPV({}) above -- the LIVE DCF
+  // PANEL's project (DCF_PROFILES[profileKey]) at the PANEL's price -- and it is rebuilt
+  // silently every time the profile selector or the price slider moves. The figure the
+  // analyst has in their eye three inches up the page is the stored engine NPV, and the two
+  // are not the same project. Measured on the shipped build at the cold-load default:
+  //
+  //     country      cited NPV (headline)   this chart's unstated base
+  //     Nigeria             $302M                     $1,592M     5.3x
+  //     Brazil            $1,727M                     $4,257M     2.5x
+  //     Norway              $826M                     $1,211M     1.5x
+  //     Guyana            $1,068M                     $1,540M     1.4x
+  //
+  // So the bars were being read against the wrong number. On Nigeria a -$646M oil-price bar
+  // against the cited $302M says the project is wiped out twice over by a $25 break; against
+  // this chart's own base it leaves $946M. Opposite conclusions, same pixels. Indonesia runs
+  // the other way: the bar implies -$2M at $50 while the 4-price table on the same page says
+  // $334M and "survives $50".
+  //
+  // Two changes, both on screen: the strip below states the base case, the project and the
+  // price it was run at, and reconciles to the cited figure when they diverge; and each axis
+  // label now carries the ABSOLUTE NPV at both ends of its bar, so "does it survive" is read
+  // off the chart instead of computed against a base the analyst could not see.
+  const lowAbs  = vars.map(v => v.low);
+  const highAbs = vars.map(v => v.high);
+  const labels = vars.map((v, i) => [v.label, _tornAbs951(v.low) + '  \u2192  ' + _tornAbs951(v.high)]);
   const lowDeltas  = vars.map(v => v.low - base);
   const highDeltas = vars.map(v => v.high - base);
+  _tornPaintBasis951(country, slug, profile, profileKey, basePrice, base, d, vars);
 
   const existingChart = Chart.getChart(canvas);
   if (existingChart) existingChart.destroy();
@@ -55791,8 +55964,10 @@ function _buildTornadoChart(country, profileKey, basePrice) {
         tooltip: {
           callbacks: {
             label: (ctx) => {
+              // v951 (T2): a delta on its own was unreadable without the base. Both now.
               const v = ctx.raw;
-              return ` ${v >= 0 ? '+' : ''}$${Math.round(v)}M NPV vs. base`;
+              const abs = (ctx.datasetIndex === 0 ? lowAbs : highAbs)[ctx.dataIndex];
+              return ` ${_tornAbs951(abs)} NPV  (${v >= 0 ? '+' : '\u2212'}${_tornAbs951(Math.abs(v))} vs base ${_tornAbs951(base)})`;
             }
           }
         }
@@ -55801,7 +55976,7 @@ function _buildTornadoChart(country, profileKey, basePrice) {
         x: {
           ticks: { color: 'var(--muted)', font: { size: 10 }, callback: v => (v>=0?'+':'') + '$' + Math.round(v) + 'M' },
           grid: { color: 'var(--border)' },
-          title: { display: true, text: 'NPV Impact vs. Base Case ($M)', color: '#6B6560', font: { size: 10 } }
+          title: { display: true, text: 'NPV impact vs. this panel\u2019s base case of ' + _tornAbs951(base) + ' \u2014 absolute NPV at each end is on the row label', color: '#6B6560', font: { size: 10 } }
         },
         y: {
           ticks: { color: 'var(--text)', font: { size: 10 } },
@@ -62342,15 +62517,26 @@ window._fcAdoptBePaint = _fcAdoptBePaint;
 // text with a "bounded" marker rather than in the green/amber/red tier colour a solved breakeven
 // gets, and a solved value always wins: cpBeFor() is checked first here, and the async
 // _cpApplyBe() overwrites every slot when api/v1 returns a real one.
-function cpBeBound(d) {
-  if (!d) return null;
-  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
-  if (cpBeFor(d) != null) return null;                       // a solved breakeven wins
-  var P = [50, 75, 100, 125];
-  var v = [d.npv_50, d.npv_75, d.npv_100, d.npv_125];
+// ── v951 (T2): the bound must read the SAME basis as the $50 price-break verdict ──────────────
+// Walked cold: Country Profile -> Malaysia. Two statements, 5px apart on one 40px strip:
+//     Downside: $46M @$50 (survives $50) · PSC/Conc 354 · blend -$33M
+//     BE: $50–$75/bbl bounded
+// "survives $50" and "breakeven is between $50 and $75" cannot both be true of one project.
+// v786/v871 moved the $50 and $75 legs of the price-break test onto the 354 PSC/Concession
+// contracts, because the 11 RSCs dcf_results prices at -$2,516M each at $50 were manufacturing
+// the failure. This bound was never moved with them: it still reads d.npv_50, so the strip
+// reached the opposite verdict on the opposite basis with nothing on screen naming either.
+// Measured over all 185 countries: 10 switch basis, and Malaysia is the ONLY one whose bound
+// changes as a result (blend $50–$75 -> PSC/Conc < $50). It is also 1 of only 2 countries whose
+// published NPV goes negative at $50 at all — so this is the single country where an analyst
+// asking "is it attractive at $75, and can I defend that?" gets a conditional answer, and it was
+// the one country whose page answered it twice, in opposite directions.
+// The blend is NOT dropped: it is what Fiscal Compare, the XLSX and the API publish, so where
+// the two bases bound differently BOTH are named, in the same "· PSC/Conc n · blend x" form the
+// Downside chip beside it already uses.
+function _cpBeBracket(v, P) {
   for (var i = 0; i < 4; i++) if (typeof v[i] !== 'number' || !isFinite(v[i])) return null;
-
-  var txt, lo = null, hi = null, sense;
+  var lo = null, hi = null, txt, sense;
   var allPos = v.every(function(x) { return x > 0; });
   var allNeg = v.every(function(x) { return x <= 0; });
   if (allPos)      { hi = 50;  txt = '< $50/bbl';   sense = 'below the lowest price ORCA models on this page'; }
@@ -62365,22 +62551,81 @@ function cpBeBound(d) {
     txt = '$' + lo + '–$' + hi + '/bbl';
     sense = 'between $' + lo + ' and $' + hi + ', the two modelled prices contractor NPV changes sign between';
   }
+  return { txt: txt, lo: lo, hi: hi, sense: sense, v: v, survives50: v[0] > 0 };
+}
+function cpBeBound(d) {
+  if (!d) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
+  if (cpBeFor(d) != null) return null;                       // a solved breakeven wins
+  var P = [50, 75, 100, 125];
+  var blend = _cpBeBracket([d.npv_50, d.npv_75, d.npv_100, d.npv_125], P);
+
+  // The comparable arm: only where cpDownside50() already switched this country's $50 figure.
+  var dn = (typeof cpDownside50 === 'function') ? cpDownside50(d) : null;
+  var cmp = (dn && dn.cmp && d.g1)
+    ? _cpBeBracket([d.g1.v50, d.g1.v75, d.g1.v100, d.g1.v125], P)
+    : null;
+
+  var b = cmp || blend;
+  if (!b) return null;
+  var split = !!(cmp && blend && cmp.txt !== blend.txt);
 
   var fmtN = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(x) { return '$' + Math.round(x) + 'M'; };
+  var n1Str = (dn && dn.n1 != null) ? Number(dn.n1).toLocaleString() : '';
+  var feeStr = (dn && dn.n2 != null)
+    ? Number(dn.n2).toLocaleString() + ' fee-basis contracts (' + dn.names + ')' : 'its fee-basis contracts';
+
+  var basisNote = '';
+  if (cmp) {
+    basisNote = ' Read on this country’s ' + n1Str + ' PSC/Concession contracts — the same basis the '
+      + '$50 price-break verdict beside it reads, and for the same reason: take% and NPV on ' + feeStr
+      + ' are a property of the remuneration mechanic, not of the terms.';
+    if (split && blend) {
+      basisNote += ' ON THE ALL-CONTRACT BLEND — the figure Fiscal Compare, the XLSX export and the API '
+        + 'publish — the same arithmetic bounds it ' + blend.txt + ' instead (' + fmtN(blend.v[0])
+        + ' @ $50 · ' + fmtN(blend.v[1]) + ' @ $75), because averaging in ' + feeStr
+        + ' alone flips the sign of the $50 figure. Both bounds are on screen. In an IC memo, state which '
+        + 'basis you are on: the entry survives a $50 price break on its PSC/Concession terms and does not '
+        + 'on the published blend.';
+    } else if (blend) {
+      basisNote += ' The all-contract blend bounds it to the same range.';
+    }
+  }
+
   var tip = 'BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
     + (d.country || 'this country') + ' — 117 of 185 countries have none on file. This range is '
-    + 'arithmetic on the four contractor NPVs printed on this page (' + fmtN(v[0]) + ' @ $50 · '
-    + fmtN(v[1]) + ' @ $75 · ' + fmtN(v[2]) + ' @ $100 · ' + fmtN(v[3]) + ' @ $125), on the '
+    + 'arithmetic on four contractor NPVs (' + fmtN(b.v[0]) + ' @ $50 · '
+    + fmtN(b.v[1]) + ' @ $75 · ' + fmtN(b.v[2]) + ' @ $100 · ' + fmtN(b.v[3]) + ' @ $125), on the '
     + 'standardized Deepwater profile (' + _engineBasisLine() + '). NPV = 0 therefore sits '
-    + sense + '. It is a bound, not a price: the exact figure '
+    + b.sense + '.' + basisNote + ' It is a bound, not a price: the exact figure '
     + 'is not on file, and the bound is only as good as that one standardized profile. '
     + 'Do not repeat the "no production data" reason given elsewhere on this page — it is not the '
     + 'driver: breakeven is on file for more non-producers than producers. For a breakeven on your '
     + 'own capex, opex and production profile, use Scenario Builder.';
 
-  return { txt: txt, lo: lo, hi: hi, tip: tip, survives50: v[0] > 0 };
+  return {
+    txt: b.txt, lo: b.lo, hi: b.hi, tip: tip, survives50: b.survives50,
+    // v951: present only where the two bases genuinely bound differently.
+    split: split,
+    cmp: !!cmp,
+    n1: (dn && dn.n1 != null) ? dn.n1 : null,
+    blendTxt: split && blend ? blend.txt : null,
+    blendSurvives50: blend ? blend.survives50 : null
+  };
 }
 window.cpBeBound = cpBeBound;
+// v951 (T2): the marker that keeps both bounds on screen at once. Returns '' unless the
+// PSC/Concession basis and the published blend genuinely bound differently — measured across all
+// 185 countries that is Malaysia alone, so no other profile gains a character. Same
+// "· PSC/Conc n · blend x" form the Downside chip 5px to its left already uses, in accent so the
+// disagreement is seen rather than discovered in a tooltip.
+function _cpBeSplitTag(b) {
+  if (!b || !b.split || !b.blendTxt) return '';
+  return '<span class="cp-be-basis" style="font-size:10px;color:var(--accent);cursor:help;white-space:nowrap;"'
+    + ' title="' + _esc594(b.tip) + '"> \u00b7 PSC/Conc ' + Number(b.n1).toLocaleString()
+    + ' \u00b7 blend ' + b.blendTxt + '</span>';
+}
+window._cpBeSplitTag = _cpBeSplitTag;
 function _cpApplyBe(country, be75) {
   if (be75 == null || be75 <= 1 || be75 >= 999) return;   // v564 (T2): floor artifact is not a breakeven
   window._cpBeResolved[country] = be75;
@@ -63666,7 +63911,10 @@ function _cpBeSettle(safe, state, country, fpt) {
       if (_b939 && pk === '75') {
         el.innerHTML = '<span style="color:' + _bColor939 + ';font-weight:700;" title="' + _esc594(_b939.tip) + '">'
           + _b939.txt + '</span> <span style="font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 3px;white-space:nowrap;" title="'
-          + _esc594(_b939.tip) + '">bounded</span>';
+          + _esc594(_b939.tip) + '">bounded</span>'
+          // v951 (T2): this cell sits in a row whose NPV column is the all-contract blend. Where the
+          // bound is read on the PSC/Concession basis instead, say so here or the row contradicts itself.
+          + (typeof _cpBeSplitTag === 'function' ? '<br>' + _cpBeSplitTag(_b939) : '');
         el.style.color = '';
         el.title = '';
         return;
@@ -63721,10 +63969,25 @@ function _cpBeSettle(safe, state, country, fpt) {
   // The old order opened "No breakeven on file for Indonesia." in bold, directly under a headline
   // strip reading "BE: < $50/bbl bounded" — the analyst had to read four sentences to discover the
   // two agree. The absence is still stated, in full, as the qualification it is.
+  // v951 (T2): the "one claim, stated in four places" assurance is only true while every slot
+  // reads one basis. Where cpBeBound() reads the PSC/Concession contracts and the blend brackets
+  // elsewhere, this footnote sits under a table whose NPV column IS the blend — so it must name
+  // both bounds and say which one the slots above are showing, or it flatly contradicts them.
   var _lead939 = _b939
-    ? '<strong style="color:var(--text);">Breakeven ' + _esc594(_b939.txt) + ' for ' + cty
-      + ' — bounded, not solved.</strong> This is the same bound the headline strip, the summary chip and '
-      + 'the Data Completeness row above report; it is one claim, stated in four places.'
+    ? (_b939.split
+      ? '<strong style="color:var(--text);">Breakeven ' + _esc594(_b939.txt) + ' for ' + cty
+        + ' on its ' + Number(_b939.n1).toLocaleString() + ' PSC/Concession contracts — '
+        + _esc594(_b939.blendTxt) + ' on the all-contract blend. Bounded, not solved, on either basis.</strong> '
+        + 'The headline strip, the summary chip and the Data Completeness row above show the PSC/Concession '
+        + 'bound, because that is the basis the $50 price-break verdict beside them reads. The NPV column in '
+        + 'the table above is the blend — which is also what Fiscal Compare, the XLSX export and the API '
+        + 'publish — so the bracket sentence below is read off the blend and the two do not agree. '
+        + 'That disagreement is the finding: ' + cty + ' survives a $50/bbl price break on its '
+        + 'PSC/Concession terms and does not on the published blend. Carry whichever basis your memo is on, '
+        + 'and say which.'
+      : '<strong style="color:var(--text);">Breakeven ' + _esc594(_b939.txt) + ' for ' + cty
+        + ' — bounded, not solved.</strong> This is the same bound the headline strip, the summary chip and '
+        + 'the Data Completeness row above report; it is one claim, stated in four places.')
     : '<strong style="color:var(--text);">No breakeven on file for ' + cty + '.</strong>';
   fn.innerHTML = _lead939 + ' '
     + (_b939 ? 'ORCA carries a <em>solved</em> breakeven for 67 of 185 countries and ' + cty + ' is not one of them, '
