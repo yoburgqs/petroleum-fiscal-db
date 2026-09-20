@@ -61871,3 +61871,37 @@ The Screener already knows this. `_scTakeIsFloor()` drives its `TAKE IS A FLOOR,
 **Mobile:** inert by construction — at 390 the chart truncates to the top 30 by contract count, which excludes every floor-take country (10 of 30 proxy, 0 floor). No horizontal scroll at 1920/1440/1280/1024/768/390 across 8 tabs; 0 page errors; touched controls all ≥24px under `pointer: coarse`.
 
 **Also committed, not authored by this cycle:** the working tree already carried an uncommitted `v942 (T1)` fix for the Home `.home-ic-cta` tap target (a `[role="button"]` guard that never bound because the element computes `display:inline`). That is a previous cycle's work, killed before it could commit — the `TimeoutExpired` debt described in the cycle 855 log. It is carried in this commit rather than stranded.
+
+### Cycle 856 verification — measured this cycle, not carried forward
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 script blocks | **PASS** |
+| Runtime suite, local tree, post-change (`ORCA_REPORT_FILE=/tmp/rtA2.txt`, report stamped 2026-09-20T02:25:27Z) | **499 PASS / 0 FAIL / 1 WARN**, 15 JS errors |
+| Horizontal scroll, 8 tabs @ 1920/1440/1280/1024/768/390 | **NONE** |
+| Bubble Chart horizontal scroll, all six widths | **NONE** |
+| Controls under 24px, touched controls @ 390 `hasTouch` | **0** |
+| Page errors, Bubble Chart cold load + verified-only toggle, both viewports | **0** |
+| `bubble-verified-only` round trip | 22 points ticked / 185 unticked — unchanged |
+| Frontier labelled | Vanuatu ↘ · Montenegro ↘ · Bahamas ↘ · Greenland · Romania, grey against ink for Canada/USA/Mexico |
+
+The 1 WARN and 15 JS errors are the known **local-only** service-worker 404: `index.html:49`
+registers `/petroleum-fiscal-db/sw.js`, a hard-coded Pages path that 404s when the tree is served
+from a local root. Cycle 855 recorded the identical figure (499 PASS / 0 FAIL / 1 WARN, 15 JS
+errors) for its own local runs, so this cycle's number matches the established local baseline.
+
+**Honest note on the comparison.** I intended a pre/post pair. The pre-change run was served from
+a hand-built `/tmp/baseline` copy that carried only the repo-root `*.json` / `*.js` assets, and it
+reported a `SBS-RANKPRICE` failure that the real tree passes — an artefact of the incomplete copy,
+not a baseline defect. Three suite runs were also competing for the machine at that point, which is
+why both early runs stalled. I killed the stale runs and re-ran the post-change suite alone against
+the real repo directory; that uncontended run is the 499/0 above. **The pre-change half of the pair
+was not obtained this cycle**; the no-regression claim rests on the post-change run being clean and
+matching cycle 855's recorded local baseline exactly, not on a paired measurement.
+
+Also: two report files at `/tmp/rt_before.txt` / `/tmp/rt_after.txt` were already on disk dated
+2026-09-16 and were briefly mistaken for this cycle's output. They were not — `ORCA_REPORT_FILE`
+was never written by the killed runs. Fresh paths (`/tmp/rtA2.txt`) were used for the figure above.
+This is the same "report file never cleared" trap `CLAUDE.md` records for cycles 404/405.
+
+Header badge `v941 → v942`, done silently at the end, not as the reason the cycle happened.
