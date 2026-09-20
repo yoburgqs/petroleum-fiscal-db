@@ -761,6 +761,51 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   min-width: 40px;
   text-align: right;
 }
+
+/* ── v944 (T6): the Scenario Builder's citation leg ────────────────────────────────────
+   The marker is a CAPTION inside the 130px label column, deliberately display:block rather
+   than an inline chip, so it wraps inside a column that already exists and cannot widen the
+   row or push the bar -- the modal is 390px wide on a phone and the bar has to stay readable.
+   The Evidence Chain control beside it IS a control and takes the 24px floor. */
+.sb-wf-nocite {
+  display: block;
+  margin-top: 1px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--red);
+  cursor: help;
+}
+.sb-cite-line {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.sb-cite-chain {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: normal;
+  text-align: left;
+}
+.sb-cite-chain:hover { border-color: var(--accent); }
 .dcf-vs-db {
   font-size: 11px;
   color: var(--muted);
@@ -1206,6 +1251,17 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
    v500/v576's single-line clamp. The name wraps inside the cell; the column is ~500px at 1440,
    so the longest instrument names on record take two lines rather than losing their year. */
 .facts-table.ec-chain .source-badge { white-space: normal; max-width: 100%; overflow: visible; line-height: 1.45; overflow-wrap: anywhere; }
+/* v945 (T6): the reform log's source pill, on all three surfaces that print one. v500's
+   single-line clamp (nowrap + overflow:hidden + a 320px cap) would swallow the ⌕ find document
+   control whole on any citation longer than the cap -- and that control only exists on the rows
+   whose address is dead or absent, i.e. exactly the rows where it is the analyst's last step.
+   Same remedy as v761 for the Evidence Chain: wrap inside the cell instead of clipping, so the
+   instrument's name renders in full and the chip stays reachable. max-width is 100%, never a
+   fixed px, so the ~250px reform sidebar v576 was protecting cannot be overrun -- the pill can
+   no longer be wider than whatever contains it. Chips inside it stay on one line. */
+.source-badge.rr-src { white-space: normal; max-width: 100%; overflow: visible; text-overflow: clip; line-height: 1.5; overflow-wrap: anywhere; }
+.source-badge.rr-src > span { white-space: nowrap; }
+#tbl-reforms td:nth-child(6) { white-space: normal; }
 .facts-table.ec-chain .ec-src-name { white-space: normal; }
 /* The global `thead th` / `tbody td` nowrap (lines ~276/289) let the "Not read by the model"
    divider — one ~650px line in a colspan=4 cell — set the min-content of every column, which is
@@ -2641,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v943</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v946</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4217,7 +4273,7 @@ window.copyPlatformCitation = function(btn) {
             <th>Event</th>
             <th class="num" title="Estimated change in government take (percentage points) as a result of this fiscal reform. Positive = government take increased (hostile to IOC/contractor); negative = take decreased (friendly). Directional estimate where precise quantification is unavailable — see Source for primary reference.">Take Change (pp)</th>
             <th title="Reform direction relative to IOC/contractor economics. Hostile = higher government take or tighter fiscal terms; Friendly = lower take or improved contractor terms; Neutral = structural change without material economics shift (e.g. mechanic conversion at equivalent fiscal terms).">Direction</th>
-            <th title="Primary source for this reform event. A/B-tier = verified via legislation, company disclosure, or regulator filing. C-tier = directional estimate from secondary sources (academic, press). D-tier = unverified directional.">Source</th>
+            <th title="Where this reform event came from, and whether you can open it. The tier letter prints on EVERY row that names a source &mdash; until v945 it appeared only on the rows that also carried a working URL, so the 54 events with no link showed no letter at all, though 31 of them are tier A. A = primary official source (the legislation, decree, gazette or concession agreement itself). B = secondary or institutional record (regulator filing, NOC corporate history, operator disclosure, industry reference) &mdash; corroborating, not primary. C = directional estimate from academic or press sources; D = unverified directional. ORCA&rsquo;s reform log currently holds only A and B. THE TIER AND THE LINK ARE DIFFERENT QUESTIONS: LINK DEAD means the address on record returned a 404 or an unresolvable hostname when all reform citations were fetched on 20 Sep 2026, and &lsquo;no address on record&rsquo; means ORCA never held one. Neither downgrades the instrument; both mean the check is yours to run, and the &#8981; find document control searches for it by name.">Source</th>
           </tr>
         </thead>
         <tbody id="tbody-reforms"></tbody>
@@ -38489,6 +38545,173 @@ function initPlatform() {
   });
 })();
 
+// ══════════════════════════════════════════════════════════════════════════════════════════
+// v945 (T6) — THE REFORM EVENT LOG'S SOURCE COLUMN
+//
+// This column is the terminal surface for "where did this reform number come from". Fiscal
+// Compare's Reform verdict tooltip ends with "Click any cell for the full event log", the
+// Country Profile headline routes here from "Stability: ... · Reform Risk →", and the verdict
+// it backs is an IC instruction — a WACC premium of 3–8pp, or a take rise in pp. Every fiscal
+// TERM on this platform has had a citation apparatus since v500 and a measured link-reachability
+// apparatus since v641. The reform log, which drives a whole tab and three columns, had neither.
+//
+// Measured 2026-09-20 over all 239 shipped api/v1/country/*.json — 83 events, 21 countries:
+//
+//   22 rows  live address, tier letter shown ...................... correct, unchanged
+//    7 rows  tier letter + a live-looking ↗ that returns nothing ... 404 or dead hostname
+//   54 rows  NO TIER LETTER AT ALL ............................... though every one is in the data
+//
+// The 54 are the defect. `confidence` is populated for all 83 events in the API (56 A, 27 B),
+// but the render only reached the letter inside the `r.source && r.source_url` branch — so the
+// tier was shown exactly where the analyst could click through and judge the document for
+// themselves, and WITHHELD on the 54 rows where the letter is the only evidence signal that
+// exists. 31 of those 54 are tier A and 23 are tier B, and they rendered identically: the same
+// 10px var(--muted) grey. 20 of them are 2010-or-later events, i.e. inside the window that
+// actually scores. The column header meanwhile promised "A/B-tier = verified via legislation
+// ... C-tier = directional estimate ... D-tier = unverified directional" — a four-point scale,
+// on a column that showed no letter on two rows in three (and holds no C or D at all).
+//
+// Second defect on the same rows: `r.source.slice(0,60)` with no ellipsis and no title="".
+// 30 of the 54 exceed 60 characters, so they were cut mid-word with nothing marking the cut and
+// no way to recover the rest — "Alberta Department of Energy Generic Royalty Framework 1988;",
+// "UK Finance Act 1983; HMRC PRT guidance history; Wood Mackenz". The linked branch got BOTH an
+// ellipsis and a full-string tooltip. The rows with less evidence behind them were given the
+// worse treatment of the two, on the one string that is the analyst's only remaining lead.
+// This is v761's lesson ("the name is the only lead left") on a surface that never got it.
+//
+// Third: link reachability. Every citation URL on this platform was fetched on 4 Sep 2026
+// (_CITE_DEAD) — reform source_urls were not in that sweep. Measured here twice independently
+// today, urllib and curl, browser UA, three retries, full GET following redirects, over all 27
+// distinct reform addresses. Both runs returned the same 7:
+//
+//     404  https://www.nuprc.gov.ng/petroleum-industry-act/        Nigeria 2021 PIA          A
+//     404  https://open.alberta.ca/publications/royaltyreview      Canada 2016 Royalty Fwk   A
+//     404  https://treasury.gov.au/.../final_report_0.pdf          Australia 2023 PRRT       A
+//     404  https://www.gov.uk/guidance/ring-fence-...-supplement   UK 2002 RFES              A
+//     404  https://www.boem.gov/oil-gas-energy/leasing/royalties   USA 2007 deepwater        A
+//     404  https://www.stortinget.no/.../prop113l20192020.pdf      Norway 2020 COVID relief  A
+//   NXDOM  https://www.anpg.ao/                                    Angola 2004 PSC framework B
+//
+// Six of the seven wear tier A, "primary official source", and four sit inside the 2010+ window.
+// The BOEM address is already in _CITE_DEAD from v641, which this reconfirms independently
+// today. 403s (ato.gov.au, regjeringen.no) are a live host refusing a script and are left
+// completely alone, exactly as v641 ruled. Nothing here changes a value, a tier letter, a
+// take_change, a verdict or a score. What changes is whether the analyst can see the tier, read
+// the name, and act when the address fails.
+//
+// Search target is the segment before the first ";" — these strings are semicolon-joined
+// reference lists ("Finance Act 1993, Part II; HMRC ...") and the first segment is the
+// instrument. Same reasoning as v850: search for the document, not for ORCA's whole note.
+const _RR_CITE_CHECKED = '20 Sep 2026';
+const _RR_CITE_DEAD = (function () {
+  var s = new Set();
+  ['https://open.alberta.ca/publications/royaltyreview',
+   'https://treasury.gov.au/sites/default/files/2022-09/final_report_0.pdf',
+   'https://www.anpg.ao/',
+   'https://www.boem.gov/oil-gas-energy/leasing/royalties',
+   'https://www.gov.uk/guidance/ring-fence-expenditure-supplement',
+   'https://www.nuprc.gov.ng/petroleum-industry-act/',
+   'https://www.stortinget.no/globalassets/pdf/proposisjoner/2019-2020/prop113l20192020.pdf'
+  ].forEach(function (u) { s.add(u); });
+  return s;
+})();
+function _rrEsc(x) {
+  return String(x == null ? '' : x)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+// The instrument to go and look for when the address does not work.
+function _rrSrcTitle(src) {
+  var first = String(src || '').split(';')[0].trim().replace(/[\s,;:]+$/, '');
+  return first.length >= 6 ? first : String(src || '').trim();
+}
+var _RR_TIER_NOTE = {
+  A: 'Tier A — primary official source: the legislation, decree, gazette or concession agreement '
+   + 'itself. It is a statement about the DOCUMENT, not about whether ORCA can currently hand you a '
+   + 'copy of it; those are different questions and the link state beside it answers the second.',
+  B: 'Tier B — secondary or institutional record: regulator filing, NOC corporate history, operator '
+   + 'disclosure or an industry reference, rather than the instrument itself. Corroborating, not '
+   + 'primary. Verify against the national petroleum law before an IC memo carries a reform premium.',
+  C: 'Tier C — directional estimate from secondary sources (academic or press). Treat the take '
+   + 'change as indicative only.',
+  D: 'Tier D — unverified directional. No source located; the entry records that something changed, '
+   + 'not what it changed by.'
+};
+// Every event carries a tier. The letter renders on all of them, whatever the link state.
+// ONE builder for all three reform-source surfaces, so they cannot drift apart again: the event
+// table on Vintage Analysis, the Reform Risk country card (_rrInjectSources) and the Country
+// Profile reform timeline. Before v945 the table withheld the tier on 54 of 83 rows while the
+// other two showed it, and all three linked a dead address straight through to its 404.
+function _rrSrcBadge(source, source_url, confidence, extraStyle, maxLen) {
+  var full = String(source == null ? '' : source);
+  if (!full) return '';
+  var conf = String(confidence || '').toUpperCase();
+  if (!/^[ABCD]$/.test(conf)) conf = '';
+  var confClass = conf ? 'conf-' + conf.toLowerCase() : 'conf-db';
+  var tierNote = conf ? _RR_TIER_NOTE[conf] : 'No confidence tier recorded for this event.';
+  var lim = maxLen || 60;
+  var label = _rrEsc(full.length > lim ? full.slice(0, lim).replace(/[\s,;:]+$/, '') + '…' : full);
+  var suffix = conf ? ' · ' + conf : '';
+  var st = 'font-size:10px;' + (extraStyle || '');
+  var url = source_url || '';
+  var dead = !!(url && _RR_CITE_DEAD.has(url));
+
+  // 1. A working address — unchanged behaviour, plus escaping and an always-present tooltip.
+  if (url && !dead) {
+    return '<a href="' + _rrEsc(url) + '" target="_blank" rel="noopener" class="source-badge rr-src '
+      + confClass + '" style="' + st + '" title="' + _rrEsc(full) + ' — ' + _rrEsc(tierNote)
+      + '">' + label + suffix + ' ↗</a>';
+  }
+
+  var title = _rrSrcTitle(full);
+  var findTip = dead
+    ? full + ' — ' + tierNote + '  ⚠ THE ADDRESS ON RECORD RETURNS NOTHING. ORCA holds a URL for '
+      + 'this event and it answered with a 404, or named a hostname that does not resolve, when every '
+      + 'reform citation on the platform was fetched on ' + _RR_CITE_CHECKED + '. That is not a '
+      + 'judgement on the instrument — the tier letter is unchanged and the record may be perfectly '
+      + 'good. What is broken is the one step that would let you check it yourself. This control '
+      + 'searches for “' + title + '” instead of opening the dead address.'
+    : full + ' — ' + tierNote + '  ORCA records this source by name and holds no address for it, so '
+      + 'there is nothing to open. This control searches for “' + title + '”. Locate the instrument '
+      + 'before this event backs a reform premium in an IC memo.';
+  var a = '<a href="' + _rrEsc(_citeFindHref(title)) + '" target="_blank" rel="noopener" '
+    + 'class="source-badge rr-src ' + confClass + '" style="' + st + 'opacity:.85;" title="'
+    + _rrEsc(findTip) + '">' + label + suffix
+    + ' <span class="ec-find-chip">⌕ find document ↗</span></a>';
+
+  // 2. An address was recorded and it is dead. Say so — that is a fact about ORCA's record, and
+  //    it is different from never having had one.
+  if (dead) {
+    a += ' <span class="cite-dead-chip" style="background:rgba(185,28,28,.12);'
+      + 'border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;'
+      + 'padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" '
+      + 'title="' + _rrEsc(findTip) + '">LINK DEAD</span>';
+  }
+  // 3. No address was ever recorded. Muted, and not red: nothing is broken, the record is thinner.
+  else {
+    a += ' <span class="ec-nopage-chip" title="' + _rrEsc(findTip) + '">no address on record</span>';
+  }
+  return a;
+}
+// renderReformTable and everything beside it live INSIDE initPlatform(), so a bare function
+// declaration here is not global. The two surfaces that must share this builder — the Reform Risk
+// country card and the Country Profile reform timeline — are declared outside it. Exported the
+// same way _fcOpenTermChain is. (Found by the badge silently rendering empty: both call sites sit
+// inside a .then() with a .catch(){} after it, so the ReferenceError was swallowed and the source
+// slots simply stayed blank, with no page error. The v945 walk caught it only because the
+// before/after comparison measured the slots' content length rather than trusting a clean console.)
+window._rrSrcBadge = _rrSrcBadge;
+
+function _rrSrcCell(r) {
+  if (!r.source) {
+    return '<span style="color:var(--border);font-size:10px;" title="No source recorded for this '
+      + 'event at all — not an instrument, not a secondary record. It is not a tier-D reading; it '
+      + 'is an absence. Establish this event from the national petroleum law before citing it.">'
+      + '— no source on record</span>';
+  }
+  return _rrSrcBadge(r.source, r.source_url, r.confidence, '', 60);
+}
+
 function renderReformTable() {
   const filterCountry = (document.getElementById('reform-filter-country') || {}).value || '';
   const filterDir     = (document.getElementById('reform-filter-dir')     || {}).value || '';
@@ -38508,10 +38731,38 @@ function renderReformTable() {
   const countEl = document.getElementById('reform-count');
   if (countEl) {
     const _ctxN = data.filter(function(r){ return r.fiscal_change === false; }).length;
+    // v945 (T6): the same line now states what stands behind those events. The split is
+    // computed from the rows actually on screen, so it tracks the filters rather than quoting a
+    // constant. "opens" counts only an address measured live — a dead one is not a citation you
+    // can follow, which is the whole point of printing the number.
+    var _opens = 0, _deadL = 0, _noAddr = 0, _noSrc = 0;
+    data.forEach(function (r) {
+      if (!r.source) { _noSrc++; return; }
+      if (!r.source_url) { _noAddr++; return; }
+      if (_RR_CITE_DEAD.has(r.source_url)) { _deadL++; return; }
+      _opens++;
+    });
+    var _cited = data.length - _noSrc;
     countEl.innerHTML = data.length + ' events'
       + (_ctxN
           ? ' \u2014 <strong>' + (data.length - _ctxN) + '</strong> fiscal law changes, <span style="color:var(--orange);font-weight:700;">'
             + _ctxN + '</span> context ' + (_ctxN === 1 ? 'event' : 'events') + ' that changed no terms and do not score'
+          : '')
+      + (_cited
+          ? ' \u00b7 <span title="Every event above names a source and carries a confidence tier, '
+            + 'and the tier now prints on all of them. This counts something different: how many of '
+            + 'those citations you can actually open from here. All ' + _cited + ' reform addresses on '
+            + 'the platform were fetched on ' + _RR_CITE_CHECKED + ' \u2014 full GET, browser UA, '
+            + 'retries, redirects followed \u2014 and the ones marked LINK DEAD returned a 404 or named '
+            + 'a hostname that does not resolve. Rows marked \u2018no address on record\u2019 never had '
+            + 'a URL to begin with. Neither is a judgement on the instrument and neither changes a tier '
+            + 'letter or a score; both mean the verification step is yours to do. The \u2315 find '
+            + 'document control on each such row searches for the instrument by name." '
+            + 'style="cursor:help;border-bottom:1px dotted var(--muted);">'
+            + '<strong>' + _opens + '</strong> of ' + _cited + ' cited sources open'
+            + (_deadL ? ' \u00b7 <span style="color:var(--red);font-weight:700;">' + _deadL + ' link dead</span>' : '')
+            + (_noAddr ? ' \u00b7 ' + _noAddr + ' name only' : '')
+            + '</span>'
           : '');
   }
 
@@ -38540,18 +38791,7 @@ function renderReformTable() {
     const tcCell = r.take_change
       ? `<span style="color:${dirCol};font-weight:700;font-family:'IBM Plex Mono',monospace;">${r.take_change}</span>`
       : '—';
-    let srcCell;
-    if (r.source && r.source_url) {
-      const conf = (r.confidence || 'B').toUpperCase();
-      const confClass = conf === 'A' ? 'conf-a' : 'conf-b';
-      const label = r.source.length > 60 ? r.source.slice(0,60)+'…' : r.source;
-      const confTierNote = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = country-level secondary guide (EY / KPMG / IHS bulk harvest). Assigned to the whole country, never read off an individual contract \u2014 it is NOT an operator filing.';
-      srcCell = `<a href="${r.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;" title="${r.source} · ${confTierNote}">${label} · ${conf} ↗</a>`;
-    } else if (r.source) {
-      srcCell = `<span style="font-size:10px;color:var(--muted);">${r.source.slice(0,60)}</span>`;
-    } else {
-      srcCell = '<span style="color:var(--border);font-size:10px;">—</span>';
-    }
+    const srcCell = _rrSrcCell(r);
     const notesTooltip = r.notes ? r.notes.replace(/"/g,"'") : '';
     return `<tr title="${notesTooltip}" style="cursor:default;">
       <td style="font-family:'IBM Plex Mono',monospace;font-weight:700;">${r.year}</td>
@@ -41895,15 +42135,10 @@ function renderReformTimeline(country) {
         if (!el) return;
         const src = srcMap[r.year];
         if (!src || !src.source) return;
-        const conf = (src.confidence || 'B').toUpperCase();
-        const confClass = conf === 'A' ? 'conf-a' : 'conf-b';
-        const srcLabel = src.source.length > 80 ? src.source.slice(0,80) + '…' : src.source;
-        const confTierNote2 = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)';
-        if (src.source_url) {
-          el.innerHTML = `<a href="${src.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source} · ${confTierNote2}">${srcLabel} · ${conf} ↗</a>`;
-        } else {
-          el.innerHTML = `<span class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source} · ${confTierNote2}">${srcLabel} · ${conf}</span>`;
-        }
+        // v945 (T6): same builder as the Reform Risk card and the event table. Also the only one
+        // of the three that interpolated src.source into title="" unescaped.
+        el.innerHTML = _rrSrcBadge(src.source, src.source_url, src.confidence,
+          'display:inline-block;margin-top:4px;', 80);
       });
     })
     .catch(() => {});
@@ -44157,8 +44392,48 @@ function loadCountryProfile(country) {
       charLabel = 'High fiscal burden — government captures the majority of project economics; NOC/state-dominant structure';
       charColor = 'var(--orange)';
     } else if (swing != null && swing > 20) {
-      charLabel = 'Progressive regime — mid-range base take but significant price sensitivity; returns compress at high prices';
-      charColor = 'var(--yellow)';
+      // ── v946 (T2): "mid-range base take" was a level this branch never measured ───────
+      // This branch is selected by `swing != null && swing > 20` and is reached only once the
+      // chain has ruled out take <= 55 and take > 75, so its condition tests PRICE SENSITIVITY
+      // and nothing else. It then opened by characterising the LEVEL — "mid-range base take" —
+      // in the page's first line, the one v760 promoted to sit directly under the country name
+      // precisely because it is this page's one direct answer to "is this attractive at $75?".
+      //
+      // Measured live against COUNTRY_DATA, this branch fires for 14 countries, and on 3 of them
+      // the headline paragraph rendered DIRECTLY BENEATH it prints "high-take tier (61–75%)"
+      // off the same `take`: Iraq-Kurdistan 63.0%, Niger 61.2%, Republic of the Congo 60.2%.
+      // Iraq-Kurdistan is called "mid-range" on a figure 15 of the 21 production-weighted
+      // producers sit below. Two adjacent lines, one number, opposite readings of it.
+      //
+      // It was also the only populous branch left in this chain carrying NO measured content at
+      // all: no take, no swing figure, no producer position, and — on 12 of the 14, which hold
+      // prod_coverage_pct = 0 — no statement that the take is a statutory model. The take <= 40
+      // branches say exactly that for the identical evidence state ("No verified block-level
+      // production is held here, so the take is a statutory model over N contracts — directional,
+      // not realised"); this one went silent purely because the take landed one band higher.
+      //
+      // Same defect and same fix as v648 / v663 / v931, on the branch those three did not reach.
+      // The price-sensitivity half IS earned by the branch condition and is kept — now with the
+      // pp figure the Swing chip and the Price Swing row already print. The level half now reads
+      // the platform's own tier scale, the one v589's headline paragraph prints two lines below,
+      // so the two cannot state different bands. No new threshold: the bands, the producer
+      // position (_posClause648) and the no-production clause are all objects already on screen.
+      _posInLabel648 = _hasPos648;
+      var _lvl946 = take <= 60 ? 'moderate tier (41–60%)'
+                  : take <= 75 ? 'high-take tier (61–75%)'
+                  : 'NOC-dominated tier (>75%)';
+      charLabel = 'Progressive regime — at ' + take.toFixed(1) + '% the $75 base sits in the '
+        + _lvl946 + ', the same band the headline below prints'
+        + (_hasPos648 ? ', and ' + _posClause648 : '') + '. Government take then rises '
+        + swing.toFixed(1) + 'pp from $50 to $125/bbl — the Price Swing figure on this page — '
+        + 'so the contractor keeps a smaller share of the barrel as price climbs.'
+        + (_noProd663
+            ? ' No verified block-level production is held here, so both figures are a statutory '
+              + 'model over ' + _nStr663 + ' — directional, not realised.'
+            : '');
+      // Tier colours are v589's, so the line and the paragraph beneath it are not painted on
+      // two different scales.
+      charColor = take <= 60 ? 'var(--yellow)' : 'var(--orange)';
     } else if (take <= 65 && downFragile) {
       charLabel = 'Moderate take, price-dependent returns — contractor NPV clears the 10% WACC at $75/bbl but not at $50/bbl; needs a sustained price above the base case or a lower-cost profile';
       charColor = 'var(--yellow)';
@@ -48919,16 +49194,11 @@ function _rrInjectSources(c) {
         if (!ev.year || !ev.source) return;
         var el = document.getElementById('rr-src-' + slug + '-' + ev.year);
         if (!el) return;
-        var conf = String(ev.confidence || 'B').toUpperCase();
-        var cls = conf === 'A' ? 'conf-a' : 'conf-b';
-        var label = ev.source.length > 80 ? ev.source.slice(0, 80) + '…' : ev.source;
-        var note = conf === 'A'
-          ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)'
-          : 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)';
-        var st = 'font-size:10px;display:inline-block;margin-top:4px;';
-        el.innerHTML = ev.source_url
-          ? '<a href="' + _rrEsc(ev.source_url) + '" target="_blank" rel="noopener" class="source-badge ' + cls + '" style="' + st + '" title="' + _rrEsc(ev.source) + ' · ' + note + '">' + _rrEsc(label) + ' · ' + conf + ' ↗</a>'
-          : '<span class="source-badge ' + cls + '" style="' + st + '" title="' + _rrEsc(ev.source) + ' · ' + note + '">' + _rrEsc(label) + ' · ' + conf + '</span>';
+        // v945 (T6): one builder with the event table. This card linked source_url raw, so the
+        // seven addresses measured dead on 20 Sep 2026 — Nigeria's 2021 PIA among them — opened a
+        // 404 from the surface an analyst actually reaches, with nothing having warned them.
+        el.innerHTML = _rrSrcBadge(ev.source, ev.source_url, ev.confidence,
+          'display:inline-block;margin-top:4px;', 80);
       });
     })
     .catch(function() {});
@@ -54464,15 +54734,26 @@ function _execLiveDCF(country, profileKey, price) {
   const wfEl = document.getElementById('ldcf-wf-' + slug);
   if (wfEl) {
     const wf = result.waterfall;
+    // v944 (T6): prrt / cost_reimb / windfall / severance were missing from all three maps in
+    // this copy of the block. dcfPRRT() returns a waterfall keyed `prrt` and dcfTSC() /
+    // dcfBuyback() return `cost_reimb`, so the loop below fell through to `wfLabels[key]||key`
+    // and printed the raw variable name. On Australia that is the LARGEST line on the panel --
+    // 28.9% of revenue -- rendering as "prrt" in lowercase with no definition and no hover,
+    // directly beside "Corp. Income Tax" at 13.2% which had both. The Fiscal Compare drilldown's
+    // copy of this same block has carried prrt and cost_reimb since it was written; these two
+    // copies never did. Strings are taken verbatim from that one so the three cannot drift.
     const wfColors = {
       royalty: '#96570A', ftp: '#7C3AED', profit_oil: '#C2410C',
       cit: '#B91C1C', special: '#A16207', state_eq: '#6B6560',
-      base_govt: 'rgba(21,128,61,0.68)', ept: '#B91C1C'
+      base_govt: 'rgba(21,128,61,0.68)', ept: '#B91C1C',
+      prrt: '#15803D', cost_reimb: '#6B6560', windfall: '#B91C1C', severance: '#C2410C'
     };
     const wfLabels = {
       royalty: 'Royalty', ftp: 'FTP / Cost Recovery', profit_oil: 'Profit Oil (Govt)',
       cit: 'Corp. Income Tax', special: 'Special/Windfall Tax', state_eq: 'State Equity',
-      base_govt: 'Fixed Fee Remainder', ept: 'Excess Profits Tax'
+      base_govt: 'Fixed Fee Remainder', ept: 'Excess Profits Tax',
+      prrt: 'PRRT', cost_reimb: 'Cost Reimbursement', windfall: 'Windfall Tax',
+      severance: 'Severance Tax'
     };
     const wfTitles = {
       royalty: 'Royalty — percentage of gross production revenue paid to government before any cost deduction. Government\u2019s unconditional first claim; cannot be recovered by contractor.',
@@ -54482,7 +54763,11 @@ function _execLiveDCF(country, profileKey, price) {
       special: 'Special/Windfall Tax — supplemental resource rent levy above standard CIT. Captures excess returns at high prices or profitability (e.g. Norway SPT 22%, UK SCT 35%).',
       state_eq: 'State Equity (NOC carry) — NOC participation interest diluting contractor\u2019s working interest. NOC may be carried through exploration or fully participating from day one.',
       base_govt: 'Government Direct Take — in TSC/RSC/Buy-back regimes, the portion of gross revenue retained by the state after paying the contractor\u2019s fixed fee per barrel.',
-      ept: 'EPT (Excess Profits Tax) — supplemental tax on contractor income above a defined profit threshold. Compresses contractor returns at high oil prices or high R-factors.'
+      ept: 'EPT (Excess Profits Tax) — supplemental tax on contractor income above a defined profit threshold. Compresses contractor returns at high oil prices or high R-factors.',
+      prrt: 'PRRT (Petroleum Resource Rent Tax) \u2014 Australia\u2019s profit-based upstream tax. Triggered only when project cash flows exceed a threshold (LTBR + uplift %). Back-loaded: no PRRT in early project life, rising steeply once the uplift hurdle is cleared. Makes Australian effective take highly sensitive to oil price.',
+      cost_reimb: 'Cost Reimbursement \u2014 in buy-back or RSC regimes, the government\u2019s obligation to reimburse contractor capital and operating costs from field production.',
+      windfall: 'Windfall Tax \u2014 additional government levy triggered when oil prices exceed a defined threshold, capturing extraordinary profits above normal returns.',
+      severance: 'Severance Tax \u2014 production-based tax assessed per barrel produced, typically a percentage of wellhead value. Common in US state-level regimes.'
     };
     let html = '<div class="dcf-waterfall-title" title="Each bar segment shows that component\'s share of gross revenue. Hover any row label for a full definition.">Fiscal Breakdown (% of Revenue)</div>';
     for (const [key, pct] of Object.entries(wf)) {
@@ -55734,6 +56019,202 @@ function _sbPriceDeckHtml(deck, basePrice) {
   return h + '</div>';
 }
 
+// ══ v944 (T6): THE ONE DCF THE PLATFORM CALLS IC-GRADE SAID NOTHING ABOUT ITS SOURCES ══════
+// Walked T6 cold: Country Profile -> "IRR: -> Model in Scenario Builder". That button is not an
+// aside. It is the platform's ONLY route to an IRR -- the country-level figure was withdrawn
+// surface by surface (v516/517/525/787/847/851) and every replacement string, every FAQ and the
+// Country Profile headline all end in the same instruction, and the FAQ that retired the
+// country-level IRR calls the output of this modal "a project return and the number to put in
+// front of an IC".
+//
+// The model-term evidence leg is on SIX screens -- Fiscal Compare's Quality column (v846), its
+// row drawer (v?), the Explorer (v905), the Screener (v846), Side-by-Side (v716) and the Country
+// Profile's own Evidence Quality panel (v660) -- and in FOUR exports (v912). All of them say the
+// same thing: the A/B/C/D letter grades the country's WHOLE fact base, and the 3-6 fiscal terms
+// getDCFParams() actually runs are a different question.
+//
+// This modal runs those exact terms, pre-filled from that exact record, and carried none of it.
+// Measured live against the shipped build over all 185 countries on _fcTermLeg()'s own rule:
+//   * 185 of 185 have AT LEAST ONE model term with no citation behind it.
+//   * 128 of 185 cite half or fewer. 19 cite none.
+//   * The uncited term is most often the one that moves the answer: State Participation on 117
+//     countries, Special Tax on 125, Profit Oil (Govt) -- the primary lever in a PSC -- on 58.
+//   * It hits the country presets in this very modal hardest: Australia's PRRT RATE is uncited,
+//     and it is 28.9% of revenue in the run; Iraq TSC's SERVICE FEE is uncited, and a TSC is
+//     nothing but a service fee; Angola / Indonesia / Guyana / Malaysia are all uncited on
+//     Profit Oil (Govt).
+//
+// So the analyst ran Australia, read a Fiscal Breakdown whose largest line was 28.9% of revenue,
+// pasted the take and the IRR into an IC memo, and nothing on the screen said that line rests on
+// a rate no source on this platform states. The Evidence Chain two tabs away says exactly that.
+//
+// Below: the same leg, on the same rule, with the same click destination as the other six
+// surfaces -- but placed on the BREAKDOWN ROW that the uncited term produces, not in a caption,
+// because the row is what the analyst is reading when the number matters. A term the analyst has
+// overtyped is dropped from the verdict and named separately: once the field is edited the value
+// is their own assumption, and ORCA's record no longer describes it.
+//
+// Nothing about the take, NPV, IRR, price deck, hurdle verdict or ranking changes. This is what
+// the run was built from, stated where it was built.
+
+// Model term -> the waterfall key(s) it produces across the eight engines. Terms with no line of
+// their own (cost_recovery_cap, return_on_capex) map to nothing and appear in the summary only.
+var _SB_TERM_WF = {
+  royalty_rate: ['royalty'], cit_rate: ['cit'], spt_rate: ['special'],
+  windfall_rate: ['windfall', 'special'], severance_rate: ['severance'],
+  state_equity_pct: ['state_eq'], ftp_rate: ['ftp'], profit_oil_govt_pct: ['profit_oil'],
+  ept_rate: ['ept'], prrt_rate: ['prrt'], fee_per_bbl: ['base_govt'],
+  cost_recovery_cap: [], return_on_capex: []
+};
+// Model term -> every form field the pre-fill could have written it into, across all mechanics.
+var _SB_TERM_INPUTS = {
+  royalty_rate: ['sb-royalty', 'sb-psc-royalty', 'sb-prrt-royalty', 'sb-rs-royalty'],
+  cit_rate: ['sb-cit', 'sb-psc-cit', 'sb-tsc-cit', 'sb-prrt-cit', 'sb-bb-cit', 'sb-rs-cit', 'sb-gs-cit'],
+  spt_rate: ['sb-spt'], windfall_rate: ['sb-windfall'], severance_rate: ['sb-severance'],
+  state_equity_pct: ['sb-state-eq'], cost_recovery_cap: ['sb-cr-cap'], ftp_rate: ['sb-ftp'],
+  profit_oil_govt_pct: ['sb-po-govt'], ept_rate: ['sb-ept'], prrt_rate: ['sb-prrt-rate'],
+  fee_per_bbl: ['sb-fee', 'sb-bb-fee']
+};
+
+// Snapshot of what the country pre-fill actually wrote, taken in ddOpenScenarioBuilder() right
+// after it writes. Per-field, because the existing whole-form fingerprint cannot tell WHICH
+// field moved, and a verdict on a term the analyst has replaced would be wrong.
+function _sbSnapLoaded944() {
+  var out = {};
+  Object.keys(_SB_TERM_INPUTS).forEach(function(k) {
+    _SB_TERM_INPUTS[k].forEach(function(id) {
+      var e = document.getElementById(id);
+      if (e) out[id] = String(e.value);
+    });
+  });
+  return out;
+}
+
+function _sbTermEdited944(termKey) {
+  var o = window._sbOrigin;
+  if (!o || !o.loadedVals) return false;
+  var ids = _SB_TERM_INPUTS[termKey] || [];
+  for (var i = 0; i < ids.length; i++) {
+    var e = document.getElementById(ids[i]);
+    if (!e) continue;
+    if (o.loadedVals[ids[i]] !== undefined && String(e.value) !== o.loadedVals[ids[i]]) return true;
+  }
+  return false;
+}
+
+// Late-binding and additive: one cached fetch behind _fcTermLeg(). If it fails, or the modal was
+// opened from the header rather than from a country, the panel is exactly what it was.
+// The row label as printed, with the "no citation" caption this function may already have
+// appended stripped back off, so the summary quotes the line's own name and nothing else.
+function _sbWfRowLabel944(row) {
+  var lab = row.querySelector('.dcf-wf-label');
+  if (!lab) return null;
+  var txt = '';
+  Array.prototype.forEach.call(lab.childNodes, function(n) {
+    if (n.nodeType === 3) txt += n.nodeValue;
+    else if (n.nodeType === 1 && n.className !== 'sb-wf-nocite') txt += n.textContent;
+  });
+  return txt.trim() || null;
+}
+
+function _sbRenderCiteLeg944() {
+  var line = document.getElementById('sb-cite-line');
+  var o = window._sbOrigin;
+  if (!line || !o || !o.country || o.monopoly || typeof _fcTermLeg !== 'function') return;
+  if (o.basis === 'default') return;   // generic mechanic fallback: the banner already says no
+                                       // country terms are loaded, so there is nothing to source
+  var country = o.country;
+  _fcTermLeg(country).then(function(t) {
+    if (!t || !t.total) return;
+    if (!window._sbOrigin || window._sbOrigin.country !== country) return;  // analyst moved on
+    if (!line.isConnected) return;
+    var lbl2key = {};
+    Object.keys(_FC_TERM_LABEL).forEach(function(k) { lbl2key[_FC_TERM_LABEL[k]] = k; });
+    var rows = {};
+    Array.prototype.forEach.call(document.querySelectorAll('#sb-output .dcf-wf-row[data-wf-key]'),
+      function(r) { rows[r.getAttribute('data-wf-key')] = r; });
+
+    var flagged = [], edited = [];
+    t.uncited.forEach(function(labelTxt) {
+      var key = lbl2key[labelTxt];
+      if (!key) return;
+      if (_sbTermEdited944(key)) { edited.push(labelTxt); return; }
+      var wfKeys = _SB_TERM_WF[key] || [], row = null, pct = null, rowLbl = null;
+      for (var i = 0; i < wfKeys.length && !row; i++) {
+        if (rows[wfKeys[i]]) {
+          row = rows[wfKeys[i]];
+          var pEl = row.querySelector('.dcf-wf-pct');
+          pct = pEl ? pEl.textContent.trim() : null;
+          // The row's own printed name, not the term's. They are not always the same word --
+          // the term is "State Participation" and the line is "State Equity" -- and on a TSC
+          // the term is the Service Fee while the line is what the state keeps AFTER it. So the
+          // summary says the term PRODUCES that line; it never claims the term IS that number.
+          rowLbl = _sbWfRowLabel944(row);
+        }
+      }
+      flagged.push({ label: labelTxt, pct: pct, rowLbl: rowLbl });
+      if (row && !row.querySelector('.sb-wf-nocite')) {
+        var lab = row.querySelector('.dcf-wf-label');
+        if (lab) lab.insertAdjacentHTML('beforeend',
+          '<span class="sb-wf-nocite" title="' + _esc594(labelTxt) + ' is one of the '
+          + t.total + ' fiscal terms this DCF ran, and ORCA holds no citation behind the rate it '
+          + 'used — no statute, no secondary guide, no contract-level source. The bulk '
+          + 'harvest, an instrument shared across jurisdictions and a D-confidence value do not '
+          + 'count, the same rule the Country Profile Evidence Chain uses.">no citation</span>');
+      }
+    });
+
+    var safe = String(country).replace(/'/g, "\\'");
+    var chain = '<button type="button" class="sb-cite-chain" onclick="closeScenarioModal();'
+      + '_fcOpenTermChain(\'' + safe + '\');">Open ' + _esc594(country)
+      + '’s Evidence Chain →</button>';
+
+    var editedTxt = edited.length
+      ? ' <span style="color:var(--muted);">' + _esc594(edited.join(', ')) + ' '
+        + (edited.length === 1 ? 'is' : 'are') + ' uncited in ORCA’s record, but you have '
+        + 'overtyped ' + (edited.length === 1 ? 'that field' : 'those fields') + ' — '
+        + (edited.length === 1 ? 'it is' : 'they are') + ' your own assumption now, not ORCA’s.</span>'
+      : '';
+
+    var html;
+    if (!flagged.length) {
+      // Two different clean states, and they are not the same claim. With nothing edited,
+      // every term really is cited. With an edit, the uncited terms did not become sourced —
+      // they became the analyst's own input, which is a thing they are entitled to quote as
+      // theirs and not as ORCA's. Saying "every term carries a citation" in that case would be
+      // false, so the headline says what is actually true of the run.
+      html = '<strong style="color:var(--green);">Evidence — '
+        + (edited.length
+            ? 'no term in this run rests on an uncited ORCA value.</strong> ' + t.cited + ' of '
+              + t.total + ' carry a citation on ORCA’s record for ' + _esc594(country) + ';'
+            : 'every fiscal term this run used carries a citation.</strong> ' + t.cited + ' of '
+              + t.total + ' on ORCA’s record for ' + _esc594(country) + '.')
+        + editedTxt + ' ' + chain;
+      line.style.borderLeftColor = 'var(--green)';
+    } else {
+      var named = flagged.map(function(f) {
+        return '<strong style="color:var(--text);">' + _esc594(f.label) + '</strong>'
+             + (f.pct ? ' <span style="color:var(--muted);">(produces the ' + _esc594(f.pct)
+                        + ' ' + _esc594(f.rowLbl || '') + ' line above)</span>' : '');
+      }).join(flagged.length === 2 ? ' and ' : ', ');
+      html = '<strong style="color:var(--red);">Evidence — ' + t.cited + ' of the '
+        + t.total + ' fiscal terms this run used '
+        + (t.cited === 1 ? 'carries' : 'carry') + ' a citation.</strong> ' + named + ' '
+        + (flagged.length === 1 ? 'does' : 'do') + ' not: ORCA holds no statute, no secondary '
+        + 'guide and no contract-level source behind the rate the DCF just applied — the '
+        + 'same rule the Country Profile Evidence Chain uses. The take, NPV and IRR above are '
+        + 'arithmetic on '
+        + (flagged.length === 1 ? 'that number' : 'those numbers') + ', so state '
+        + (flagged.length === 1 ? 'it' : 'them') + ' as an assumption in an IC memo rather than '
+        + 'as ' + _esc594(country) + '’s terms.' + editedTxt + ' ' + chain;
+      line.style.borderLeftColor = 'var(--red)';
+    }
+    line.className = 'sb-cite-line';
+    line.innerHTML = html;
+  });
+}
+window._sbRenderCiteLeg944 = _sbRenderCiteLeg944;
+
 function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
   let result;
@@ -55750,8 +56231,12 @@ function runCustomScenario() {
   window._sbRunParams = params;
 
   const wf = result.waterfall;
-  const wfColors = { royalty:'#96570A', ftp:'#7C3AED', profit_oil:'#C2410C', cit:'#B91C1C', special:'#A16207', state_eq:'#6B6560', base_govt:'rgba(21,128,61,0.68)', ept:'#B91C1C', cost_reimb:'#6B6560', windfall:'#B91C1C', severance:'#C2410C' };
-  const wfLabels = { royalty:'Royalty', ftp:'FTP/Cost Recovery', profit_oil:'Profit Oil (Govt)', cit:'Corp. Income Tax', special:'Special/Windfall Tax', state_eq:'State Equity', base_govt:'Fixed Fee Remainder', ept:'Excess Profits Tax', cost_reimb:'Cost Reimbursement', windfall:'Windfall Tax', severance:'Severance Tax' };
+  // v944 (T6): `prrt` added. dcfPRRT() is one of the eight engines this function dispatches to
+  // and the only one whose waterfall key had no entry here, so every PRRT run -- including the
+  // Australia PRRT preset in this very modal -- printed its single largest line as the lowercase
+  // variable name "prrt", undefined and unhoverable.
+  const wfColors = { royalty:'#96570A', ftp:'#7C3AED', profit_oil:'#C2410C', cit:'#B91C1C', special:'#A16207', state_eq:'#6B6560', base_govt:'rgba(21,128,61,0.68)', ept:'#B91C1C', cost_reimb:'#6B6560', windfall:'#B91C1C', severance:'#C2410C', prrt:'#15803D' };
+  const wfLabels = { royalty:'Royalty', ftp:'FTP/Cost Recovery', profit_oil:'Profit Oil (Govt)', cit:'Corp. Income Tax', special:'Special/Windfall Tax', state_eq:'State Equity', base_govt:'Fixed Fee Remainder', ept:'Excess Profits Tax', cost_reimb:'Cost Reimbursement', windfall:'Windfall Tax', severance:'Severance Tax', prrt:'PRRT' };
   const wfTitles = {
     royalty: 'Royalty — percentage of gross production revenue paid to government before any cost deduction. Government\u2019s unconditional first claim; cannot be recovered by contractor.',
     ftp: 'FTP (First Tranche Petroleum) — government or NOC takes the first slice of gross production off the top in PSC regimes, before cost recovery begins. Compresses contractor returns in early field life.',
@@ -55763,14 +56248,15 @@ function runCustomScenario() {
     ept: 'EPT (Excess Profits Tax) — supplemental tax on contractor income above a defined profit threshold. Compresses contractor returns at high oil prices or high R-factors.',
     cost_reimb: 'Cost Reimbursement — in buy-back or RSC regimes, the government\u2019s obligation to reimburse contractor capital and operating costs from field production.',
     windfall: 'Windfall Tax — additional government levy triggered when oil prices exceed a defined threshold, capturing extraordinary profits above normal returns.',
-    severance: 'Severance Tax — production-based tax assessed per barrel produced, typically a percentage of wellhead value. Common in US state-level regimes.'
+    severance: 'Severance Tax — production-based tax assessed per barrel produced, typically a percentage of wellhead value. Common in US state-level regimes.',
+    prrt: 'PRRT (Petroleum Resource Rent Tax) \u2014 Australia\u2019s profit-based upstream tax. Triggered only when project cash flows exceed a threshold (LTBR + uplift %). Back-loaded: no PRRT in early project life, rising steeply once the uplift hurdle is cleared. Makes Australian effective take highly sensitive to oil price.'
   };
 
   let wfHtml = '';
   for (const [key, pct] of Object.entries(wf)) {
     if (pct < 0.1) continue;
     const _wft = wfTitles[key] ? ` title="${wfTitles[key].replace(/"/g,'&quot;')}"` : '';
-    wfHtml += `<div class="dcf-wf-row">
+    wfHtml += `<div class="dcf-wf-row" data-wf-key="${key}">
       <div class="dcf-wf-label"${_wft} style="cursor:${wfTitles[key]?'help':'default'};">${wfLabels[key]||key}</div>
       <div class="dcf-wf-bar-wrap"><div class="dcf-wf-bar" style="width:${Math.min(100,pct)}%;background:${wfColors[key]||'#6B6560'}"></div></div>
       <div class="dcf-wf-pct">${pct.toFixed(1)}%</div>
@@ -55819,6 +56305,7 @@ ${_sbPriceDeckHtml(window._sbPriceDeck, price)}
 ${_sbHurdleLine(result, DCF_PROFILES[profileKey], price, mech)}
 <div class="dcf-waterfall-title">Fiscal Breakdown (% of Revenue)</div>
 ${wfHtml}
+<div id="sb-cite-line"></div>
 ${(function() {
   // Database context: show where custom take sits vs 185-country distribution
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || COUNTRY_DATA.length < 5) return '';
@@ -55903,6 +56390,9 @@ ${(function() {
     + '</div></div>';
 })()}
 `;
+
+  // v944 (T6): the model-term citation leg, hydrated onto the breakdown rows it belongs to.
+  if (typeof _sbRenderCiteLeg944 === 'function') _sbRenderCiteLeg944();
 
   // Store last result for saving
   window._lastScenario = { mech, profileKey, price, params, result, reading };
@@ -56843,6 +57333,10 @@ function ddOpenScenarioBuilder(country) {
     cpNpvs:       _sbMono ? null : { 50: _num740(d.npv_50),  75: _num740(d.npv_75),  100: _num740(d.npv_100),  125: _num740(d.npv_125) },
     n:            (d.n != null ? d.n : null),
     profileName:  (DCF_PROFILES[profile] && DCF_PROFILES[profile].name) || profile,
+    // v944 (T6): per-field snapshot of what the pre-fill just wrote. The whole-form fingerprint
+    // above answers "edited at all"; the citation leg needs "edited WHICH term", because a
+    // verdict on a rate the analyst has replaced with their own would be wrong.
+    loadedVals:   (typeof _sbSnapLoaded944 === 'function') ? _sbSnapLoaded944() : null,
     fingerprint:  _sbFormFingerprint()
   };
 
