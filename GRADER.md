@@ -62323,3 +62323,100 @@ Header badge `v949 → v950`, done silently at the end.
 Two candidate findings were **measured and discarded** before I fixed anything, which is worth recording because both looked right on inspection:
 
 1. `reform_history.json` carries no `source` key on any of its
+
+---
+
+## Cycle 868 — v951 (T2): Malaysia's profile answered "does it survive $50?" twice, in opposite directions
+
+**Task: T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest in
+rotation: 867 was T6, 865/864 T5, 863 T1, 858 T4, 855 T3, and T2 last ran at 853. Walked cold at
+1440×900 and 390×844 `hasTouch`, no sessionStorage, no localStorage.
+
+## Friction
+
+The T2 walk does not break on the countries the loop keeps re-walking. Indonesia, Namibia and
+Suriname all answer the question cleanly — the take is tiered, the proxy flag fires, the Live DCF
+reconciliation holds both bases apart at every slider position, and all six Scenario Builder
+hand-offs on the page pre-fill the country correctly (checked: all six call
+`ddOpenScenarioBuilder('<country>')`, none the bare `openScenarioBuilder()`).
+
+So I swept the data instead of the page. Across all 185 countries, contractor NPV at the $50/bbl
+downside is negative for exactly **two**: Malaysia (−$33M) and Yemen (−$139M). Those are the only
+two countries where T2 has a *conditional* answer — attractive at $75, not at $50 — and therefore
+the only two where the question is load-bearing at all.
+
+Malaysia's headline strip answered it twice, 5px apart, in opposite directions:
+
+    Downside: $46M @$50 (survives $50) · PSC/Conc 354 · blend -$33M
+    BE: $50–$75/bbl bounded
+
+"Survives $50" and "breakeven is between $50 and $75" cannot both be true of one project.
+
+The cause is a half-finished migration, not a bad number. **v786/v871** deliberately moved the $50
+and the $75 legs of the price-break test onto Malaysia's 354 PSC/Concession contracts, because the
+11 RSCs `dcf_results` prices at −$2,516M each at $50 were manufacturing the failure — the exact
+thing `~/MECHANIC_COMPARABILITY.md` says may not be compared. **`cpBeBound()` (v642) was never moved
+with them.** It still read `d.npv_50`, so the strip reached the opposite verdict on the opposite
+basis with nothing on screen naming either. The sign flip was disclosed only inside a collapsed
+`Blend basis ›` body, under the *other* chip.
+
+Measured, not assumed: 10 of 185 countries switch basis in `cpDownside50()`; **Malaysia is the only
+one whose breakeven bound changes as a result** (blend `$50–$75/bbl` → PSC/Conc `< $50/bbl`). Iraq,
+Azerbaijan, Ecuador, India, Iran and Mexico all switch the downside *figure* but bound `< $50/bbl`
+on both bases, so none of them gains a character.
+
+## Change
+
+`cpBeBound()` now reads the same basis the $50 verdict reads, through a shared `_cpBeBracket()` so
+one bracket rule serves both arms rather than two copies drifting — the drift that caused this
+defect in the first place. The blend is **not** dropped: it is what Fiscal Compare, the XLSX export
+and the API publish. Where the two bases bound differently, **both** are carried, in the same
+`· PSC/Conc n · blend x` form the Downside chip beside it already uses:
+
+    BE: < $50/bbl bounded · PSC/Conc 354 · blend $50–$75/bbl
+
+in accent, so the disagreement is seen rather than discovered in a tooltip. It propagates to every
+slot that reads this resolver — headline chip, header callout, Data Completeness row, the 4-price
+`BREAKEVEN` cell (which sits in a row whose NPV column *is* the blend, so it now says so), the IC
+citation, the IC memo table and the XLSX Basis sheet.
+
+The footnote's assurance — *"This is the same bound the headline strip, the summary chip and the
+Data Completeness row above report; it is one claim, stated in four places"* — would have become
+**false** for Malaysia. It is now conditional: where the bases split it names both bounds, says
+which slots show which, and states the disagreement as the finding.
+
+## Result
+
+An analyst screening Malaysia can no longer read **"survives $50"**, put it on the shortlist, and
+carry it into an IC memo while every ORCA surface they would be checked against — Fiscal Compare's
+NPV @$50 column, the XLSX, the API — publishes **−$33M**. The page now states the actual finding:
+*Malaysia survives a $50/bbl price break on its PSC/Concession terms and does not on the published
+blend*, and the memo has to say which basis it is on. 114 of the 115 bounded countries are
+unchanged.
+
+### Cycle 868 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** (0 failures) |
+| Runtime suite, **ran** this cycle against the modified tree | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors** |
+| Runtime suite, baseline control (`git show HEAD:index.html`), same harness | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors — IDENTICAL.** No delta from this change. The gap vs the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server`, present in both arms. |
+| Horizontal scroll, 8 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Controls under 24px, Country Profile @390 `hasTouch` | **0** |
+| Page errors across the walk | **0** |
+| Split marker fires | **Malaysia only — 1 of 185.** 11px non-interactive `<span>`, same convention as the `cp-dn-basis` span beside it, so it is not a control and the 24px rule does not apply |
+| Verified unchanged | Yemen, Indonesia, Iraq, Azerbaijan, Ecuador, India, Iran, Mexico |
+| Bound distribution after the change | `< $50/bbl` 114 · `$50–$75/bbl` 1 (Yemen) |
+
+**Discarded before fixing, recorded so the next T2 walk does not re-find them as new:**
+
+1. All six Scenario Builder hand-offs on Country Profile pre-fill correctly — measured, not assumed.
+   The v576 defect is genuinely closed.
+2. The Live DCF reconciliation holds at $50, $75 and $125 — it re-states both sides at $75 and
+   refuses to charge the analyst's price move to the regime. Correct.
+3. The Live DCF production tile prints `CAPEX $1.2B` while the reconciliation two inches below says
+   `$1.67B all-in capex`. These are development vs all-in and both are defensible, but the tile does
+   not say which it is. **Minor, left deliberately** — it is a labelling gap, not a contradiction,
+   and it deserves its own walk rather than riding along with this one. Named here for the next T2.
+
+---
