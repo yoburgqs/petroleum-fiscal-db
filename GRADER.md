@@ -62055,3 +62055,62 @@ Header badge `v946 → v947`, done silently at the end, not as the reason the cy
 **Task: T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (946 was T2, 943 T4, 942 T1, 941 T3, 940 T5; T6 last ran at 938). Walked cold at 1440 and at 390 hasTouch.
 
 **Friction.** The Country Profile Evidence Chain turned out to be saturated — I walked it on seven countries and clicked the terms-cited chip through from Fiscal Compare, and it holds up. The gap was on **Sample Analyses*
+
+---
+
+## Cycle 863 — v948
+
+**Task: T1** — *"Which countries should even be on my screening list?"* Last cycle ran T6; T1 last ran at v942. Walked cold at 1440 and at 390 `hasTouch`, no sessionStorage, no localStorage.
+
+### Friction
+
+Home → the platform offers three screening entries: Fiscal Compare, Screener, and the Sample Analyses tab, which sells itself as *"Pre-built fiscal comparisons… useful for first-pass screening across basins."* The worst moment on the walk was on that third one: **Sample Analyses, Card 5 — "IOC Low Take · Positive NPVs"**, built in `renderSampleAnalyses()` (`index.html` ~48097).
+
+The card ranked `take_75 < 40 && d.n >= 3` ascending and printed the top 8. On this database **that sort is not a screen for low-take jurisdictions — it is a screen for absence of production data.** A PROXY country's take is a simple average of statutory terms with no field output weighting it, and unweighted statutory terms sit below every producing fiscal regime, so the lowest-take end of any raw ranking fills with micro-jurisdictions by construction.
+
+Measured on the shipped `country_data.json`: **90 countries clear take < 40%**, and the eight on the card were
+
+| | | |
+|---|---|---|
+| Vanuatu 5.0% (7 contracts) | Bahamas 10.0% | Montenegro 10.5% |
+| Greenland 11.6% | Faroe Islands 11.9% | Moldova 12.4% |
+| Romania 13.6% | Sweden 13.7% | |
+
+**8 of 8 PROXY** — not one verified producing barrel anywhere on the card. The green **Compare Top 5** button then loaded the five lowest of those straight into Side-by-Side as a ready-made IC shortlist.
+
+Meanwhile the six countries an IOC actually screens in that take band — **USA 23.4%, Argentina 31.0%, Mexico 32.2%, Canada 32.7%, Colombia 33.5%, Australia 38.5%**, all production-backed, all contractor-NPV-positive at $75 *and* at the $50 downside — **were not on the card at all.** Not demoted, not footnoted: absent.
+
+This is the same defect the Screener has had removed from it three separate times — **v517** (IOC Capital Screen returned 105 rows, 91 of them proxy), **v660** (Offshore & Deepwater, 11 rows, 0 production-backed), **v724** (Two-Price Return Screen: *"a return hurdle read off regional proxy terms is not a return"*). Sample Analyses was the last surface still doing it, and the only one that converts the result into a prebuilt five-country comparison on one click.
+
+### Change
+
+The card now applies the same production rule the IOC Capital Screen enforces, and answers the question in two parts.
+
+- **The table is the production-backed set** — 6 rows, columns `Country / Production basis / Take @$75 / NPV @$50`. Production basis prints the `_dqTier()` label with its coverage (`PROD-WTD · 20.0%`, `PART-PROD · 0.2%`), so the qualifier travels with the row instead of sitting in a caption.
+- **The headline is computed, not asserted:** *"90 countries clear 40% on published take — but only 6 of them have any verified field production… 6 of 6 are also contractor-NPV-positive at the $50 downside, so this set clears the same production and two-price NPV rule as the Screener's IOC Capital Screen — at a 40% ceiling instead of 65%."*
+- **Compare Top 5 now loads USA, Argentina, Mexico, Canada, Colombia.**
+- **The 84 proxy rows stay on screen**, below a dashed divider, counted, with the four lowest named at their take, under a line that states plainly they are not a shortlist and *why they sort where they do*: "on an unweighted ranking the number reads absence of production data, not investor-friendly terms." They carry **no button**.
+- **New outline button → `_saOpenLowTakeScreen()`** opens the Screener at the same 40% ceiling (reset first, so an earlier preset cannot silently narrow it). Its title states why the Screener returns *more* than 90 — it applies no 3-contract minimum, and it tests comparable take rather than the published blend. Measured: the Screener returns 110 = 108 (no contract minimum) + Ecuador and Iraq admitted on comparable take, and its own count line already names those two.
+
+### Result
+
+An analyst who clicks the green "IOC Low Take" card walks into IC with **USA / Argentina / Mexico / Canada / Colombia** instead of **Vanuatu / Bahamas / Montenegro / Greenland / Faroe Islands** — and can read, in the same card, how many jurisdictions the production rule removed and why the ones it removed rank where they do.
+
+### Cycle 863 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** |
+| Runtime suite, **ran** this cycle against the modified tree (`ORCA_REPORT_FILE=/tmp/t1walk/rt948.txt`) | **494 PASS / 0 FAIL / 1 WARN** |
+| Same suite against an **exact pre-change control** — this tree with only the v948 card, helper and version bump reverted | **494 PASS / 0 FAIL / 1 WARN**, identical. This edit regresses nothing; the delta from the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server` |
+| Horizontal scroll, 10 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Controls under 24px in the touched card @390 `hasTouch` | **0** (Compare Top 5 = 24px, Open Screener = 24px under coarse pointer) |
+| Page + console errors across the walk | **0** |
+| `Compare Top 5` clicked live | lands on Side-by-Side, basket reads USA · Mexico · Argentina · Canada · Colombia |
+| `Open Screener at ≤40% take` clicked live | lands on Screener in screen mode, `sl-take` = 40, label = 40, 110 rows counted |
+
+Header badge `v947 → v948`, done silently at the end.
+
+**Also committed, found uncommitted in the working tree and predating this cycle:** PNG caption / chart download edits around `_cmpPngCaptionLines()` and `downloadCmpChart()`. Run against `git show HEAD:index.html`, the suite fails 10 assertions (9 × CP-NPV100 — the $100 NPV row missing from the Country Profile copy ladder — plus an SBS-ShareOrder timeout) that the working tree passes. They were carried forward rather than left to drift, and are named here because a cycle should not silently absorb another cycle's work.
+
+**Not fixed this cycle, named for the next T1 walk:** Card 4 *"Price Sensitivity Leaders"* is still **8 of 8 PROXY** (Guyana, Sierra Leone, Liberia, Suriname, Sri Lanka, Chad, Ireland, Mongolia). Its ranking axis is take *swing*, not take level, so it is not the same construction defect as Card 5 and the same fix does not transplant — a swing computed off statutory terms is a statement about the terms' progressivity and is arguably legitimate. It needs its own walk to decide, rather than riding along with this one.
