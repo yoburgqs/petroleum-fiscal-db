@@ -61958,3 +61958,18 @@ On screen: **North America 93 and CIS/FSU 85 lose their green** (verified `rgb(1
 
 Header badge `v942 → v943`, done silently at the end, not as the reason the cycle happened.
 
+
+---
+## Cycle 858 Log — 2026-09-19 22:38
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 858 complete and pushed (`56e9eba`, `d4c47aa`).
+
+## Task
+**T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation (last walked at cycle 851; 852–856 ran T6/T2/T5/T3/T1). Walked cold at 1440 and at 390 hasTouch — no sessionStorage, no localStorage.
+
+## Friction
+Reform Risk → **Regional Reform Tilt** panel → the **Avg Stability** column.
+
+Every other cell in that row had been taught to withhold: Tilt names a direction only where the unmeasured changes can't over
