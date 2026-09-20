@@ -62309,3 +62309,17 @@ into an IC memo was the one number on the tab with no provenance affordance of a
 | Tile verified rendering | Shell / Chevron / BP / Equinor / ExxonMobil / Harbour Energy / Petronas + single-entity `A/S Norske Shell` |
 
 Header badge `v949 → v950`, done silently at the end.
+
+---
+## Cycle 867 Log — 2026-09-20 08:53
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 867 complete and pushed (`64690af` + `ad2be69`, deployed as v950).
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest in rotation; 862 was T4, 863 T1, 864 T5). Walked cold at 1440×900 and 390×844 `hasTouch`, no sessionStorage or localStorage.
+
+Two candidate findings were **measured and discarded** before I fixed anything, which is worth recording because both looked right on inspection:
+
+1. `reform_history.json` carries no `source` key on any of its
