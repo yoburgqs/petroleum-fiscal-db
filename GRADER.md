@@ -61816,3 +61816,16 @@ file" (835) · FAQ A381's 117/120 against 65 (829) · no suite coverage for the 
 
 Resolved this cycle from the carried list: **"two charts render below the five caveat blocks"
 (842)** — that was this cycle's fix.
+
+---
+## Cycle 855 Log — 2026-09-19 19:12
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: ## Cycle 855 summary — v941
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (852 was T6, 853 T2, 854 T5; T3 was stalest, last walked at cycle 848.)
+
+**Friction.** I walked Side-by-Side from a cold Playwright context — no sessionStorage, no localStorage — at 1440×900 and at 390×844 with `hasTouch`, on Guyana / Brazil / Angola.
+
+The two chart wraps (`index.html:4080`, `:4086`) are **siblings of `#cmp-output`**, not children of it. `renderCompare()` writes the verdict strip, 
