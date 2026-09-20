@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v930</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v955</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v953</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v955</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -25344,6 +25344,40 @@ function _scRetRefDeck() {
 function _scDeckIsDownside() { return _scDeckKey() === '50'; }
 window._scRetRefDeck = _scRetRefDeck;
 
+// ── v954 (T1): a caption resolves its deck token on the basis its own leg is measured on ──
+// v811 tokenised ${DECK} so a caption could not claim $75 while the screen ran at $100, and it
+// resolved every token from the RAW price deck. That is right for iochurdle's first NPV leg,
+// which screens npv_<deck>. It is wrong for downsideresilience, whose denominator is
+// _scRetRefDeck() — re-referenced to $75 at the $50 deck since v699, because a row cannot
+// retain less than 100% of itself. The filter (_scRetentionPasses), the count line (_retNote)
+// and the export criteria all read _scRetRefDeck(). The caption was the only consumer still
+// reading the raw deck, so at the $50 deck the chip read "retains ≥50% of $50 contractor NPV
+// at $50/bbl" — a test every row passes by construction — directly above a count line that
+// said, correctly, "measured against $75 because the screen deck is already $50". 24 rows under
+// a caption describing a screen that cannot exclude anything.
+function _scCaptionDeck(key) {
+  if (key === 'downsideresilience' && typeof _scRetRefDeck === 'function') return _scRetRefDeck();
+  return (typeof getPriceKey === 'function') ? String(getPriceKey()) : '75';
+}
+window._scCaptionDeck = _scCaptionDeck;
+
+// v954 (T1): at the $50 deck a two-price caption can name the same price twice — iochurdle
+// renders "NPV ≥0 @$50 AND @$50". Both legs genuinely run; they have converged, which is a
+// real property of the screen at this deck and is already stated in the count line by v706.
+// Say it in the caption too, rather than printing a conjunction that reads as a typo and
+// invites the analyst to distrust a row set that is correct.
+function _scCollapseDupLegs(t) {
+  var SAME = ' only \u2014 the deck and the downside are the same price here';
+  return String(t)
+    .replace(/@\$(\d+) AND @\$(\d+)/g, function (m, a, b) {
+      return a === b ? '@$' + a + SAME : m;
+    })
+    .replace(/at \$(\d+) AND at \$(\d+)/g, function (m, a, b) {
+      return a === b ? 'at $' + a + SAME : m;
+    });
+}
+window._scCollapseDupLegs = _scCollapseDupLegs;
+
 // v573 — the retention figure rendered under the NPV @$50 value in the Screener row, so the
 // axis the Downside Resilience preset screens on is legible on every row rather than being a
 // hidden ratio between two columns the analyst would have to divide by hand across 185 rows.
@@ -34412,13 +34446,14 @@ function applyScreenerPreset(preset) {
     // resolves from the price deck, so the badge cannot state a floor the filter does not apply.
     var _HB = (typeof _scReturnHurdles === 'function') ? _scReturnHurdles(_deckNow) : null;
     Object.keys(presetCriteria).forEach(function (k) {
-      var t = presetCriteria[k].split('${DECK}').join('$' + _deckNow);
+      // v954 (T1): per-caption deck basis, not the raw deck. See _scCaptionDeck().
+      var t = presetCriteria[k].split('${DECK}').join('$' + _scCaptionDeck(k));
       if (_HB) t = t.split('${DECKFLOOR}').join(_HB.deckTxt)
                    .split('${DNFLOOR}').join(_HB.dnTxt)
                    .split('${DECKMULT}').join(_HB.deckMultTxt)
                    .split('${DNMULT}').join(_HB.dnMultTxt)
                    .split('${CAPEXANCHOR}').join(_HB.capexTxt);
-      presetCriteria[k] = t;
+      presetCriteria[k] = _scCollapseDupLegs(t);   // v954 (T1)
     });
     var lblText = document.getElementById('screener-preset-label-text');
     if (preset && presetCriteria[preset]) {
@@ -34754,13 +34789,15 @@ function _labelScreenerPresets() {
       // deck token is resolved here — this line is read BEFORE the click, so it must name the
       // floors actually applied at THIS deck, not the ones applied at $75.
       var _cap = (typeof _scReturnHurdles === 'function') ? _scReturnHurdles(deck) : null;
-      var _base = o.dataset.baseText.split('${DECK}').join('$' + deck);
+      // v954 (T1): same per-caption basis as the chip, so the line read BEFORE the click and
+      // the chip read after it cannot name different denominators for one criterion.
+      var _base = o.dataset.baseText.split('${DECK}').join('$' + _scCaptionDeck(o.value));
       if (_cap) _base = _base.split('${DECKFLOOR}').join(_cap.deckTxt)
                              .split('${DNFLOOR}').join(_cap.dnTxt)
                              .split('${DECKMULT}').join(_cap.deckMultTxt)
                              .split('${DNMULT}').join(_cap.dnMultTxt)
                              .split('${CAPEXANCHOR}').join(_cap.capexTxt);
-      o.textContent = _base
+      o.textContent = _scCollapseDupLegs(_base)   // v954 (T1): collapse before the suffix is appended
                     + '   \u2192 ' + n + ' of ' + total + ' @$' + deck + (share >= 0.75 ? ' (barely narrows)' : '');
     });
   } catch (e) { /* non-critical: leave the menu unlabelled rather than half-labelled */ }
@@ -60072,6 +60109,16 @@ function renderFCResults(results, price) {
     var v = meta['npv_' + _fcSelPrice];
     return (v == null || isNaN(v)) ? null : Number(v);
   };
+  // ── v955 (T5) — the COMPARABLE (PSC/Concession-only) contractor NPV, same source the
+  // Take% db cell has been ranked on since v675. country_data.json carries the Group-1 split
+  // at all four published prices (g1.v50 / v75 / v100 / v125), so this resolves wherever the
+  // table can be set. Returns null on the 175 rows that hold no fee-basis contracts.
+  var _fcG1Npv = function(r) {
+    var meta = _fcDbNpvMap[r.country];
+    if (!meta || !meta.g1) return null;
+    var v = meta.g1['v' + _fcSelPrice];
+    return (v == null || isNaN(v)) ? null : Number(v);
+  };
   var _fcDbNpvCell = function(r) {
     var v = _fcDbNpv(r);
     if (v == null) {
@@ -60091,6 +60138,41 @@ function renderFCResults(results, price) {
          + (((r.liveNPV > 0) !== (v > 0)) ? ' THE TWO DISAGREE ON THE SIGN \u2014 cite this column, not the model.' : ' Cite this column.');
     }
     var col = v > 0 ? 'var(--green)' : v < 0 ? 'var(--red)' : 'var(--muted)';
+    // ── v955 (T5) — the citable NPV cell on a fee-blended row ───────────────────
+    // v675 moved the Take% db · citable cell onto the COMPARABLE PSC/Concession-only figure and
+    // kept the published blend beneath it, because a fee-basis blend measures contract structure
+    // rather than fiscal terms. The NPV cell immediately to its RIGHT — carrying the same green
+    // "db · citable" label — went on publishing the all-contract mean alone. So on 10 rows the
+    // two citable columns stood on two different contract populations with nothing on screen
+    // saying so. Iraq at $75 read ⚖ 34.1% beside $642M: a take LOWER than Somalia's 36.9% beside
+    // a quarter of Somalia's $2.48B, which reads as a broken row. On the very contracts the take
+    // figure is built from, g1.v75 puts Iraq at $3.04B — first on contractor value, not last.
+    // Side-by-Side fixed exactly this at v666/v705 (_cmpNpvCell) and the row drilldown labels its
+    // figure "· all contracts"; this table, and the ⌘ Copy for IC Memo artifact it feeds, were
+    // the last two surfaces publishing the blend unmarked. Rendered only where the two differ at
+    // printed precision — same suppression rule the take cell and _cmpNpvCell both use.
+    var _nst = _fcFeeState(r);
+    var _g1v = _nst ? _fcG1Npv(r) : null;
+    if (_g1v != null && fmtNpvShared(_g1v) !== fmtNpvShared(v)) {
+      var _g1col = _g1v > 0 ? 'var(--green)' : _g1v < 0 ? 'var(--red)' : 'var(--muted)';
+      var _g1n = (_nst.n1 != null) ? Number(_nst.n1).toLocaleString() : null;
+      var _g1names = _fcFeeMechNames(r);
+      var _g1t = 'COMPARABLE — ' + r.country + ' contractor NPV ' + fmtNpvShared(_g1v) + ' at $' + _fcSelPrice
+        + '/bbl across its ' + (_g1n ? _g1n + ' ' : '') + 'PSC/Concession contracts alone, on ' + _fcEngShort + '. '
+        + 'This is the contractor-side match to the ⚖ ' + _nst.cmp.toFixed(1) + '% take in the column to the left — '
+        + 'the same contract population, so the two numbers on this row can be read together and quoted in one sentence. '
+        + 'The published all-contract figure is ' + fmtNpvShared(v) + ', printed beneath: it is an unweighted mean over all '
+        + (r.n != null ? Number(r.n).toLocaleString() : (_nst.tot != null ? Number(_nst.tot).toLocaleString() : 'this country\u2019s'))
+        + ' contracts, ' + (_nst.n2 != null ? Number(_nst.n2).toLocaleString() + ' of them ' : '') + 'fee-basis'
+        + (_g1names ? ' (' + _g1names + ')' : '') + ', where the contractor is paid a fixed $/bbl remuneration and the DCF '
+        + 'returns a far smaller position. Ranking the blended figure against the other rows can invert the order the '
+        + '⚖ take column gives you. The blend remains what the JSON API and the XLSX NPV column publish.';
+      return '<td class="num">'
+        + '<span style="color:' + _g1col + ';font-weight:700;cursor:help;" title="' + _g1t.replace(/"/g, '&quot;') + '">⚖ ' + fmtNpvShared(_g1v) + '</span>'
+        + '<div style="font-size:10px;color:var(--muted);line-height:1.35;margin-top:2px;white-space:nowrap;cursor:help;" title="'
+        + t.replace(/"/g, '&quot;') + '">blended ' + fmtNpvShared(v) + '</div>'
+        + '</td>';
+    }
     return '<td class="num"><span style="color:' + col + ';font-weight:700;cursor:help;" title="' + t.replace(/"/g, '&quot;') + '">' + fmtNpvShared(v) + '</span></td>';
   };
   // ── v505: tie detection ──────────────────────────────────────────────────────
@@ -64661,12 +64743,17 @@ function copyFCForIC(btn) {
   // headline is correct as an all-contract average and is kept, exactly as v553 kept it; what
   // was missing is the figure to rank on, which now travels in its own column beside it.
   var _feeAt = {}, nFee = 0, feeNames = [];
+  var _g1At = {}, _g1Missing = [];   // v955 (T5)
   for (var _fi = 0; _fi < _entries.length; _fi++) {
     var _fcC = _entries[_fi].c;
     if (!byC[_fcC]) continue;
     var _fSt = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(cd[_fcC] || {}, P) : null;
     if (_fSt && _fSt.diverges && _fSt.cmp != null) {
       _feeAt[_fcC] = _fSt; nFee++; if (feeNames.length < 8) feeNames.push(_fcC);
+      // v955 (T5): the contractor-side half of the same correction. See the NPV column block below.
+      var _g1o = (cd[_fcC] || {}).g1;
+      var _g1v = (_g1o && _g1o['v' + P] != null && !isNaN(_g1o['v' + P])) ? Number(_g1o['v' + P]) : null;
+      if (_g1v != null) _g1At[_fcC] = _g1v; else if (_g1Missing.indexOf(_fcC) < 0) _g1Missing.push(_fcC);
     }
   }
   // Carried only when a row on THIS view actually blends fee-basis contracts. Where none does,
@@ -64679,14 +64766,38 @@ function copyFCForIC(btn) {
   // visible inversions in the 65 ranked rows, and a note disowning Iraq's (correct) placing. The
   // take column is now the like-for-like figure as a plain number, so the column reads in the order
   // it claims and Excel can sort it; the blend moves beside it, populated only where it differs.
+  // ── v955 (T5) ─ the NPV column travels on the SAME contract population as the take ─────
+  // v777 put the like-for-like take in the ranked column and moved the published blend beside
+  // it for reference. The contractor NPV column two cells over kept the all-contract mean, so
+  // this artifact left the tool with its two CITABLE columns on two different populations and a
+  // preamble calling them "the same values ... and the ones to cite." Walked cold at $75 with
+  // USA / Iraq / Somalia ticked, the memo received:
+  //     1 USA     23.4   3308
+  //     2 Iraq    34.1    642
+  //     3 Somalia 36.9   2478
+  // Iraq, on a LOWER government take than Somalia, at a quarter of Somalia's contractor value —
+  // on the same standardized project at the same price. An IC reader cannot reconcile those two
+  // cells, and the correct like-for-like figure, which ORCA holds, is $3,043M: Iraq is the
+  // strongest contractor position on that shortlist, not the weakest. Measured across the 10
+  // fee-blended countries at all four prices, the split exists at every one of them
+  // (g1.v50/v75/v100/v125) and moves Iraq 3.7x at $50 and 4.7x at $75.
+  var _anyG1 = false;
   if (_anyFee) {
     head[4] = 'Govt Take % @$' + P + ' — ORCA database, like-for-like (CITABLE)';
     head.splice(5, 0, 'Published all-contract take % @$' + P
       + ' — blends TSC / RSC / Buy-back fee contracts, NOT comparable across rows (reference only)');
+    for (var _gk in _g1At) { if (Object.prototype.hasOwnProperty.call(_g1At, _gk)) { _anyG1 = true; break; } }
+    if (_anyG1) {
+      head[6] = 'Contractor NPV $M @$' + P
+        + ' — ORCA database, standardized Deepwater, like-for-like (CITABLE) — same contract population as the take column';
+      head.splice(7, 0, 'Published all-contract contractor NPV $M @$' + P
+        + ' — blends the fee-basis contracts, NOT comparable across rows (reference only)');
+    }
   }
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
   var nProxy = 0, proxyNames = [];   // v596 (T5)
+  var nNpvFix = 0, npvFixNames = [];   // v955 (T5)
   var nSignFlip = 0, flipNames = [];   // v568 (T5)
   for (var i = 0; i < _entries.length; i++) {
     var c = _entries[i].c;
@@ -64730,6 +64841,23 @@ function copyFCForIC(btn) {
     // them. The marker is the Screener's, so the two shortlist pastes read the same way.
     // v777 (T5): the blend now sits beside the ranked figure rather than being the ranked figure.
     if (_anyFee) _row.splice(5, 0, _feeAt[c] ? num(_feeAt[c].head, 1) : '');
+    // v955 (T5): the ranked NPV cell becomes the like-for-like figure where ORCA holds the
+    // split; the published blend moves to the reference column beside it, populated only on the
+    // rows it actually differs on — same rule the take pair uses.
+    if (_anyFee && _anyG1) {
+      var _blendTxt = mono ? '' : num(meta['npv_' + P], 0);
+      var _g1Txt = (!mono && _g1At[c] != null) ? num(_g1At[c], 0) : '';
+      if (_g1Txt !== '' && _g1Txt !== _blendTxt) {
+        _row[6] = _g1Txt;
+        _row.splice(7, 0, _blendTxt);
+        nNpvFix++;
+        if (npvFixNames.length < 8) npvFixNames.push(c + ' ' + _blendTxt + ' \u2192 ' + _g1Txt);
+      } else {
+        // identical at printed precision, or no split held — leave the published figure in place
+        // and the reference column blank, so the column reads as "these are the corrected rows".
+        _row.splice(7, 0, '');
+      }
+    }
     matrix.push(_row);
   }
   if (matrix.length < 2) { _icRefuse('No rows on screen to copy.'); return; }
@@ -64760,7 +64888,7 @@ function copyFCForIC(btn) {
         + (_selOffscreen ? _selOffscreen + ' of them ' + (_selOffscreen === 1 ? 'is' : 'are') + ' outside the region filter that was active on screen, so ' + (_selOffscreen === 1 ? 'its # cell reads' : 'their # cells read') + ' \u201c\u2014\u201d. ' : '')
       : 'Rows in the order shown on screen, ranked on ' + sortName + '. ')
     + (_anyFee
-        ? 'Government take in the first numeric column and the ORCA database contractor NPV column are the ORCA contract-database figures — the same values Fiscal Compare ranks on, Country Profile and the row drilldown citation carry, and the ones to cite. '
+        ? 'Government take in the first numeric column and the ORCA database contractor NPV column are the ORCA contract-database figures and the ones to cite \u2014 the same values Fiscal Compare ranks on. On the fee-blended rows named below, BOTH of those columns are the like-for-like PSC/Concession-only figures; the published all-contract blends Country Profile and the JSON API carry sit in the two greyed reference columns beside them. '
         : 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. ')
     + 'That contractor NPV is on the ' + _icEngineBasis() + ' It is a fixed basis and does not move with the profile selector. '
     + 'The last numeric column is this screen’s model NPV on the ' + profName + ' profile you had selected — the figure that was on screen when you copied. Cite the database column; the model column is for profile sensitivity only.'
@@ -64805,7 +64933,23 @@ function copyFCForIC(btn) {
     + (((window._fcSortState || 'take') === 'take') ? ', and the one the # column is built on, so their placing is like-for-like' : '')
     + '. The published all-contract blend sits in the next column for reference only: it is the correct '
     + 'all-contract average and what the ORCA database and JSON API publish, but it is not comparable '
-    + 'across rows and must not be ranked or cited against them. '
+    + 'across rows and must not be ranked or cited against them. ';
+  // v955 (T5): the contractor-side half of the same rule. Stated separately from the take
+  // sentence because it is the one an IC reader is most likely to trip over: a corrected take
+  // beside an uncorrected NPV reads as a broken row, not as a caveat.
+  if (nNpvFix) warn += 'The contractor NPV on th' + (nNpvFix === 1 ? 'at row is' : 'ose rows is')
+    + ' corrected on the same basis: it is the NPV across the country\u2019s PSC/Concession contracts '
+    + 'alone, so it can be read in one sentence with the take beside it and ranked against the other '
+    + 'rows. The published all-contract NPV \u2014 an unweighted mean that includes the fee-basis '
+    + 'contracts, where the contractor is paid a fixed $/bbl remuneration and the DCF returns a far '
+    + 'smaller position \u2014 is in the next column for reference. The correction is material: '
+    + npvFixNames.join(', ') + (nNpvFix > npvFixNames.length ? ' and ' + (nNpvFix - npvFixNames.length) + ' more' : '')
+    + ' ($M). Quoting the blended NPV beside the like-for-like take states a low government take '
+    + 'against a value the country does not have. ';
+  if (_g1Missing.length) warn += 'ORCA holds no PSC/Concession-only contractor NPV at $' + P + '/bbl for '
+    + _g1Missing.join(', ') + ', so th' + (_g1Missing.length === 1 ? 'at row keeps its' : 'ose rows keep their')
+    + ' published all-contract NPV in the like-for-like column and the reference column is blank. '
+    + 'Do not rank th' + (_g1Missing.length === 1 ? 'at figure' : 'ose figures') + ' against the corrected rows. ';
   if (nSignFlip) warn += 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
     + flipNames.join(', ') + (nSignFlip > flipNames.length ? ' and ' + (nSignFlip - flipNames.length) + ' more' : '')
     + '. Cite the database column and do not quote the model figure for these rows without saying which basis it is on. ';
@@ -64827,7 +64971,7 @@ function copyFCForIC(btn) {
     + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + thS + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
     + '<tbody>' + matrix.slice(1).map(function(row){
         // v777 (T5): the reference-only blend column is muted so it does not read as a second ranked take.
-        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + (_anyFee && ci === 5 ? 'color:#777;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + (_anyFee && (ci === 5 || (_anyG1 && ci === 7)) ? 'color:#777;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>'
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
