@@ -61915,3 +61915,46 @@ Header badge `v941 → v942`, done silently at the end, not as the reason the cy
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 858 Log — 2026-09-19 (v943)
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (856 was T1, 855 T3, 854 T5, 853 T2, 852 T6; T4 was stalest, last walked at cycle 851.)
+
+**Friction.** Reform Risk → Regional Reform Tilt panel → **Avg Stability column** (`renderReformRisk`, the `regionTiltRows` map, ~index.html:50700). Walked cold at 1440 and at 390 hasTouch, no sessionStorage or localStorage.
+
+Every other cell in that row earned its discipline over successive cycles: v585 split the "neutral" bucket into *unmeasured* vs *context* and stopped Tilt naming a direction the unmeasured changes could overturn; v668 pulled the counts, bar and tilt back to the 2010 window the heading claims and printed the full record beneath rather than in place of it; v773 fixed the tie wording. **Avg Stability was the exception** — a bare mean, painted green >70 / yellow >40 / red below, with no denominator and no qualifier of any kind.
+
+It is a mean of the Reform Frequency Score, which is `100 − 15 × fiscal law changes since 2010`. A jurisdiction whose last take-**raising** event predates the window therefore scores near 100 for the sole reason that the window opens after its rupture. **This tab already knows that** — the card headed *"Below the line — quiet only because the window starts in 2010 … do not read the score as a stable-regime finding"* sits ~600px lower on the same page and names seven of the 21 scored jurisdictions. Those seven were being averaged into this column at face value, which made the **greenest cell on the panel the least supported one**:
+
+| region | printed | n | artefacts | what the number actually is |
+|---|---|---|---|---|
+| **North America** | **93 green — best row on the panel** | 2 | **2 of 2** | USA 100 (last take rise **2007**), Canada 85 (**2009**). Nothing else is in the row. |
+| **CIS/FSU** | 85 green | 2 | 1 of 2 | Kazakhstan 85 (last rise 2007) |
+| **Africa** | 88 green | 5 | 2 of 5 | Libya 100 (**1971** nationalization wave), Algeria 100 (2005 windfall tax) |
+| Latin America | 83 green | 6 | 2 of 6 | Venezuela 85 (2007), Colombia 100 (2007) |
+| Middle East / Oceania | 85 / 70 | **1** | 0 | a column headed *Avg* printing one country |
+
+An analyst answering T4 with a regional screen read "North America 93 / Africa 88" in green and carried *regionally stable* into an IC memo — off two countries and a 1971 nationalization.
+
+**Change.** `_rrArtefact()` extracts this tab's own Below-the-line divider test — computed inline as `windowArtefact` since v526 in `renderReformCountryVerdict()`, and recomputed a second time for the ranked cards' `quietArtefact` bucket — into one definition, so a country cannot be Below-the-line on one panel and count as clean stability on another. The colour band is now awarded **only where supported members outnumber artefact members**: the same arithmetic-of-the-claim form `_rrTilt()` uses for `determined`. **Not a new threshold** — both halves are the tab's own existing tests.
+
+Where the band does not survive, the figure still prints — grey, dotted-underlined, with **"not a stability reading"** beneath it and the responsible countries named. Every row now carries `n=` under the figure. Header gains `of sourced, 2010+` and a title; the panel note names North America explicitly. **No figure is hidden; the colour is what is withheld.**
+
+On screen: **North America 93 and CIS/FSU 85 lose their green** (verified `rgb(107,101,96)` muted, vs `rgb(21,128,61)` green before). Africa and Latin America keep theirs and gain *"2 of 5 / 2 of 6 score clean only because the window starts in 2010 — Libya, Algeria / Venezuela, Colombia"*. Middle East and Oceania read `n=1`.
+
+**Result.** The analyst can no longer read a green regional stability ranking off scores this same tab tells them not to read that way. Each row now states which countries produced its number, how many there are, and whether the number may be banded at all — the standard the Tilt column beside it has met since v585, finally applied to the one column that renders a colour-coded judgement.
+
+### Cycle 858 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 script blocks | **PASS** |
+| Runtime suite, **ran** this cycle against the repo tree (`ORCA_REPORT_FILE=/tmp/t4walk/rt943.txt`) | **500 PASS / 0 FAIL / 0 WARN**, **0 JS errors** — matches the pre-change baseline |
+| Horizontal scroll, 10 tabs × 1920/1440/1280/1024/768/390 | **NONE** (0 overflow screens) |
+| Page errors, all six widths | **0** |
+| Controls under 24px, Reform Risk @ 390 `hasTouch` | **0** |
+| Band withheld correctly | North America (2/2 artefact) ✓ · CIS/FSU (1/2) ✓ · Africa, Latin America, Asia, Europe, Middle East, Oceania keep band ✓ |
+
+Header badge `v942 → v943`, done silently at the end, not as the reason the cycle happened.
+
