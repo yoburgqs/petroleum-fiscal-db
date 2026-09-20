@@ -62114,3 +62114,95 @@ Header badge `v947 → v948`, done silently at the end.
 **Also committed, found uncommitted in the working tree and predating this cycle:** PNG caption / chart download edits around `_cmpPngCaptionLines()` and `downloadCmpChart()`. Run against `git show HEAD:index.html`, the suite fails 10 assertions (9 × CP-NPV100 — the $100 NPV row missing from the Country Profile copy ladder — plus an SBS-ShareOrder timeout) that the working tree passes. They were carried forward rather than left to drift, and are named here because a cycle should not silently absorb another cycle's work.
 
 **Not fixed this cycle, named for the next T1 walk:** Card 4 *"Price Sensitivity Leaders"* is still **8 of 8 PROXY** (Guyana, Sierra Leone, Liberia, Suriname, Sri Lanka, Chad, Ireland, Mongolia). Its ranking axis is take *swing*, not take level, so it is not the same construction defect as Card 5 and the same fix does not transplant — a swing computed off statutory terms is a statement about the terms' progressivity and is arguably legitimate. It needs its own walk to decide, rather than riding along with this one.
+
+---
+
+## Cycle 864 — v949 (T5): the workbook's "Basis & Assumptions" sheet named a project that produced none of its numbers
+
+### Task
+**T5 — "Give me something I can paste straight into an IC memo."** Walked cold at
+1440x900, no sessionStorage, no localStorage: Home → Country Profile (Indonesia
+auto-loads) → the six export/copy controls in the drop-down dock. Each artifact was
+actually produced and parsed, not read from source: the clipboard paste was captured
+by shimming `navigator.clipboard.write`/`writeText`, and the XLSX was downloaded and
+opened with openpyxl.
+
+### Friction
+
+The clipboard paste (`copyICSummary`) is exhaustive and correct — it opens with
+`_icEngineBasis()`, which derives the basis from `ENGINE_BASIS` and warns in the same
+paragraph that the in-page Live DCF / Scenario Builder profile is a *different* project.
+
+The **workbook does not agree with the button two inches away.** `exportCountryProfile()`
+reads `FC_PROFILES.deepwater` (`index.html:46590`) — byte-identical to
+`DCF_PROFILES.deepwater`, the in-page what-if profile — while every Contractor NPV in
+the file is the stored `COUNTRY_DATA` figure produced by `petroleum_dcf.py` on
+`dcf_profiles.py PROFILES.deepwater`. Two places stated it:
+
+| where | printed | engine basis |
+|---|---|---|
+| Sheet 3 `Basis & Assumptions`, under the heading **WHAT THE CONTRACTOR NPV FIGURES ARE ON** | `Capex ($M) 1200` · `Opex ($/bbl) 15` · `Plateau (yr) 8` · `Decline 12` | $1,000M all-in ($800M dev + $150M sustaining + $50M abandonment) · $18/bbl escalating 2%/yr real · 5yr plateau · 15% decline · 241.9 MMbbl |
+| Sheet 1 row 23 `Contractor NPV basis`, **immediately above rows 24–27** | "Standardized ORCA Deepwater project — $1.2B capex, 50k bbl/d peak, $15/bbl opex" | same |
+
+Measured on the live build: Indonesia exports **333.6 / 744.6 / 1087.8 / 1477** under a
+block declaring the $1.2B/$15 project. `_basisDelta833('deepwater')` returns that project
+at **294.0 MMbbl for $1,668M all-in** — it returns nothing near those figures. v833
+measured 179 of 182 non-monopoly countries more than $250M apart under the same profile
+name (Malaysia 627 vs 3,372, Sierra Leone 1,098 vs 3,618).
+
+**v833 fixed the two places on the Country Profile SCREEN. v834 fixed the seven
+clipboard / CSV artifacts that leave the tool. This workbook was missed** — and it is the
+worst place for the substitution to survive. The clipboard states the basis in prose a
+reader may skim; the workbook states it as a **keyed parameter table an IC reviewer
+retypes into their own model**, in the one artifact that is read weeks later by people who
+never saw the screen and have no route back to it.
+
+### Change
+
+Both strings are now **derived from `ENGINE_BASIS`** — the single constant the screen
+footnote and the IC paste already use — so there is no second copy left to drift.
+
+- Sheet 3 now prints peak rate, ramp, **5yr plateau, 15% decline, 241.9 MMbbl recovered**,
+  **all-in capex split three ways** (1000 / 800 / 150 / 50), **$18/bbl opex with its 2%/yr
+  real escalation**, WACC, horizon, WI — and names the engine file it comes from
+  (`tools/petroleum/dcf_profiles.py — PROFILES.deepwater`).
+- A new block below it: **DO NOT REBUILD THESE NPVs ON THE LIVE DCF / SCENARIO BUILDER
+  "DEEPWATER" PROFILE** — naming the other project with its own measured figures
+  ($1.2B headline, $1,668M all-in once sustaining is added, 8yr plateau, 12% decline,
+  $15/bbl flat, 294.0 MMbbl against the engine's 241.9) and stating that a figure rebuilt
+  on those assumptions will not reconcile. This matters because the paragraph directly
+  above it sends the reader to Scenario Builder.
+- Sheet 1 row 23 carries the same basis in one line and says outright it is **NOT** the
+  Live DCF / Scenario Builder profile of the same name.
+
+Both paths keep a fallback to the old `prof` table if `ENGINE_BASIS` is ever absent, so
+the export cannot lose its basis block entirely.
+
+### Result
+
+An analyst who exports Indonesia and hands the workbook to an IC reviewer hands over
+assumptions that **reproduce the $744.6M inside it**. Before this, a reviewer rebuilding on
+the stated $1.2B / $15/bbl / 8yr project got a materially different number, and the
+workbook was the one ORCA artifact with no route back to the screen that produced it.
+
+### Cycle 864 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** |
+| Runtime suite, **ran** this cycle against the modified tree (`ORCA_REPORT_FILE=/tmp/t5walk/rt949.txt`) | **494 PASS / 0 FAIL / 1 WARN** — identical to the v948 control; the delta from the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server` |
+| Workbook re-exported and re-parsed with openpyxl | 4 sheets, all parse; basis table reads the engine profile; sheet 1 row 23 corrected |
+| Horizontal scroll, 10 tabs x 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Controls under 24px, Country Profile @390 `hasTouch` | **0** |
+| Page + console errors across the walk | **0** |
+
+Header badge `v948 → v949`, done silently at the end.
+
+**Not fixed this cycle, named for the next T5 walk.** The Fiscal Compare workbook
+(`exportFCResults`, ~`index.html:64455`) prints its `Profile assumptions` block from the
+*selected* `FC_PROFILES` profile, which is correct for its live-run columns — but the same
+sheet then instructs, under *Which columns to cite*, `GovtTake_75 (database)` and
+`Contractor NPV_75 (database, $M)`. Those two columns are `COUNTRY_DATA`, i.e.
+`ENGINE_BASIS`, not the profile the block above them describes. That is the same class of
+defect in a sheet where one basis block has to serve two differently-computed column sets,
+so the fix is a second labelled block rather than a substitution, and it needs its own walk.
