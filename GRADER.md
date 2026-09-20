@@ -62547,3 +62547,16 @@ selected $100. Unlike the box fixed here it makes no false claim — it is an ex
 and every figure in it is correctly attributed to its own price — but the phrase "base case" is
 anchored to a deck the analyst may not have chosen. It is a wording anchor, not a contradiction, and it
 deserves its own walk rather than riding along with this one.
+
+---
+## Cycle 870 Log — 2026-09-20 12:24
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 870 complete, shipped as **v952** (`5ffec78` + `deee29c`), pushed, mirror updated.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest in rotation (868/869 were T2; T3 last ran at 855). Walked cold at 1440×900 and 390×844 touch, fresh context, no storage.
+
+## Friction
+Side-by-Side's take-vs-NPV **inversion notice** was the last ordering claim on the tab still hard-wired to $75. Everything else — the verdict strip, the column order, the ordering chain — moved onto
