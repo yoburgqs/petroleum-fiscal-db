@@ -62420,3 +62420,16 @@ unchanged.
    and it deserves its own walk rather than riding along with this one. Named here for the next T2.
 
 ---
+
+---
+## Cycle 869 Log — 2026-09-20 11:16
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 868 complete and pushed (`632b6b8` + `5b311d0`, deployed as v951). Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest in rotation; 867 was T6, 864/865 T5, 863 T1, 858 T4, 855 T3, T2 last at 853). Walked cold at 1440×900 and 390×844 `hasTouch`.
+
+## Friction
+The countries the loop keeps re-walking answer T2 cleanly, so I swept the data instead. Across all 185 countries, 
