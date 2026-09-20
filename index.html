@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v951</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v952</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -31732,16 +31732,48 @@ function renderCompare() {
   // Oman's 75.6% / $866M -- no inversion. This box then said, in orange, "Iraq takes more of the
   // barrel than Oman (84.8% vs 77.6%) and still shows more contractor NPV ($642M vs $566M)" and
   // "Rank these countries on Govt Take" -- the ranking it had just contradicted -- and the IC-memo
-  // clipboard carries it out. On a fee-blended column the pair test now reads the same Group-1
-  // figures the $75 rows print (g1.t75 / g1.v75; ORCA holds the NPV split at $75 only, which is the
-  // only price this notice tests). PRRT columns keep their headline: at one equal price that take is
+  // clipboard carries it out. On a fee-blended column the pair test reads the same Group-1
+  // figures the ranked rows print. PRRT columns keep their headline: at one equal price that take is
   // comparable. Columns without a blend are unchanged.
-  const _invT = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1.t75 != null) ? st.g1.t75 : null) : d.take_75; };
-  const _invV = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1.v75 != null) ? st.g1.v75 : null) : d.npv_75; };
+  //
+  // v952 (T3): THIS NOTICE NOW TESTS THE PRICE THE SET IS RANKED AT. v929 gave the tab a "Rank at"
+  // control and moved the verdict strip, the column order and the whole ordering chain onto
+  // cmpRankPrice. This box was the last ordering claim left hard-wired to 75, and it is the
+  // strongest one on the tab -- it is headed as a paradox, it instructs "do not present the NPV
+  // ordering as the fiscal ranking", and it leaves the platform as a numbered note in the
+  // Copy-for-IC-Memo clipboard.
+  //
+  // The two then contradicted each other on one screen. Angola / Brazil with Rank at $100:
+  //     verdict strip   CONTRACTOR VALUE @$100, LARGEST FIRST: Brazil $2.65B > Angola $1.65B
+  //                     "agrees with take order"
+  //     this box        "Govt Take and Contractor NPV rank these columns in opposite orders.
+  //                      Brazil takes more of the barrel than Angola (55.6% vs 53.0%) and still
+  //                      shows more contractor NPV ($1.73B vs $1.14B)"   <- all four $75 figures
+  // Both were carried into the same IC-memo paste, as notes 1 and 5.
+  //
+  // Measured over the shipped country_data.json, across the 420 ordered same-basis producer pairs
+  // (45 of which invert at $75):
+  //     Rank at $50    2 pairs shown a paradox untrue at $50,  14 real $50 inversions not shown
+  //     Rank at $100  13 pairs shown a paradox untrue at $100,  1 real $100 inversion not shown
+  //     Rank at $125  16 pairs shown a paradox untrue at $125,  1 real $125 inversion not shown
+  // The $50 column is the worse half: an analyst running the downside deck was shown nothing for
+  // 14 pairs that genuinely do invert there.
+  //
+  // v768's parenthesis -- "ORCA holds the NPV split at $75 only" -- is no longer true of the data
+  // and was the stated reason for the hard-coding. Every g1 block now carries t50/t75/t100/t125 and
+  // v50/v75/v100/v125, all 11 blended countries complete, and every top-level take_/npv_ is
+  // populated 185/185 at all four prices. The null-guards stay anyway.
+  //
+  // The box now also NAMES the price it tested, because without it the analyst cannot tell which
+  // deck the paradox belongs to -- which is what let the staleness sit here unseen.
+  const _invP  = (typeof cmpRankPrice === 'number' && CMP_RANK_PRICES.indexOf(cmpRankPrice) >= 0)
+                   ? cmpRankPrice : 75;
+  const _invT = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1['t' + _invP] != null) ? st.g1['t' + _invP] : null) : d['take_' + _invP]; };
+  const _invV = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1['v' + _invP] != null) ? st.g1['v' + _invP] : null) : d['npv_' + _invP]; };
   const _invG1 = (d) => _cmpMixStat(d).blended;
   const _invTs = (d) => _invT(d).toFixed(1) + '%' + (_invG1(d) ? ' on PSC/Conc' : '');
   const _invVs = (d) => fmtNpvShared(_invV(d)) + (_invG1(d) ? ' on PSC/Conc' : '');
-  const _cmpEcon = selected.filter(d => d.take_75 != null && d.npv_75 != null && _invT(d) != null && _invV(d) != null);
+  const _cmpEcon = selected.filter(d => d['take_' + _invP] != null && d['npv_' + _invP] != null && _invT(d) != null && _invV(d) != null);
   // v737 (T3): THE BASIS GATE REACHES THE INVERSION NOTICE — the last block on this tab that
   // still compared a production-weighted column against a statutory-terms column at face value.
   //
@@ -31793,7 +31825,7 @@ function renderCompare() {
     _xHtml = '<strong style="color:var(--text);">⚠ '
       + _cmpEsc(_stat.country) + ' and ' + _cmpEsc(_pw.country)
       + ' cannot be ranked against each other on either row.</strong> '
-      + 'Their take and NPV figures do invert (' + _cmpEsc(_x[0].country) + ' ' + _invTs(_x[0]) + ' / '
+      + 'Their take and NPV figures do invert at $' + _invP + '/bbl (' + _cmpEsc(_x[0].country) + ' ' + _invTs(_x[0]) + ' / '
       + _invVs(_x[0]) + ' against ' + _cmpEsc(_x[1].country) + ' ' + _invTs(_x[1]) + ' / '
       + _invVs(_x[1]) + ')'
       + (_cmpInvX.length > 1 ? ', as ' + (_cmpInvX.length === 2 ? 'does 1 further cross-basis pair'
@@ -31819,9 +31851,10 @@ function renderCompare() {
     const _shown = _cmpInv.slice(0, 2).map(_pair).join(' ');
     const _more = _cmpInv.length > 2 ? ' (' + (_cmpInv.length - 2) + ' further inverted pair' + (_cmpInv.length - 2 > 1 ? 's' : '') + ' in this set.)' : '';
     html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
-      + '<strong style="color:var(--text);">⚠ Govt Take and Contractor NPV rank these columns in opposite orders.</strong> '
+      + '<strong style="color:var(--text);">⚠ At $' + _invP + '/bbl, Govt Take and Contractor NPV rank these columns in opposite orders.</strong> '
       + _shown + _more
-      + ' Both rows are on the same standardized Deepwater profile at the same price, so this is not a profile difference — <strong style="color:var(--text);">the two blocks are not averaged the same way.</strong> '
+      + ' This is the price the set is ranked at (the <em>Rank at</em> control above the grid); the pairs that invert are not the same at every price, so change it and this box changes with it. '
+      + 'Both rows are on the same standardized Deepwater profile at that price, so this is not a profile difference — <strong style="color:var(--text);">the two blocks are not averaged the same way.</strong> '
       + 'The four <strong style="color:var(--text);">Govt Take</strong> rows are production-weighted on every column ORCA holds verified production for, and a simple average of statutory terms on the columns marked <em>statutory terms</em> on those rows. The three <strong style="color:var(--text);">Contractor NPV</strong> rows are an unweighted mean of every contract’s result, with production ignored — the <em>NPV weighting</em> row marks every column where the two differ. '
       + 'Across all 185 countries the pre-take project value these two rows jointly imply ranges from <strong style="color:var(--text);">$1.3B to $9.6B</strong> on a profile that is identical for every column, so they are not two views of one cash flow and cannot be ranked against each other. '
       + '<strong style="color:var(--text);">Rank these countries on Govt Take</strong>, which is the production-weighted figure this platform publishes, and read the NPV rows as each country’s contract-set average. If this table goes into an IC memo, do not present the NPV ordering as the fiscal ranking.'
