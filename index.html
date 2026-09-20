@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v955</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v956</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v955</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v956</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -24648,6 +24648,68 @@ function _citeFindHref(title) {
 }
 
 
+// ── v956 (T6) — DOES THE CITED INSTRUMENT PREDATE A REFORM THIS PLATFORM LOGS? ───────────────
+// Every provenance test under the Evidence Chain asks WHICH DOCUMENT and WHETHER IT AGREES:
+// the tier letter (v551), the bulk harvest (v569), the shared regional instrument (v588), the
+// absent citation (v601), the unretrievable address (v641), the one-document-behind-four-rows
+// count (v755). Not one of them asks WHETHER THE DOCUMENT IS STILL THE LAW -- and v755's own
+// note already names "a superseded amendment" as one of the three ways its tick sentence can
+// fail, then does not test for it.
+//
+// ORCA holds the data that tests it. REFORM_HISTORY is a sourced fiscal-law-change log for 21
+// jurisdictions, rendered two sections down this same page and on its own tab. Measured over
+// the shipped reform_history.json and the 21 matching api/v1/country files: those countries
+// carry 82 sourced rows between them, and on 27 of them -- across 13 of the 21 -- the newest
+// year in the cited instrument's own title is EARLIER than a fiscal reform ORCA itself records
+// for that country.
+//
+//   Canada     both cited rows -- Income Tax Act RSC 1985, Alberta Mines and Minerals Act
+//              RSA 2000 -- against logged changes in 1988, 2009 and 2016. Canada is the top
+//              row of the Screener's IOC Capital Screen, graded A on 1,758 facts.
+//   UK         Finance Act 2011 backs both the 40% CIT and the 0% royalty, tier A, statutory
+//              column matching. ORCA's log for the UK then lists 2016, 2022, 2023 and 2024.
+//   Australia  Income Tax Assessment Act 1997 and the Offshore Petroleum Act 2006, against
+//              logged PRRT changes in 2012, 2019 and 2023.
+//
+// This is NOT a claim that the rate is wrong, and the marker says so on its face. A stabilised
+// licence is legitimately unaffected by a later statute -- that is the whole point of a freeze
+// clause -- and ORCA does not model which contracts a reform reached. What is wrong is that an
+// A-tier citation to an instrument the platform's own log has superseded renders identically to
+// an A-tier citation to current law, on the one surface built to answer "how solid is this".
+//
+// Conservative by construction, in four ways: the year is read from the instrument's TITLE only
+// (ORCA's harvest annotation is stripped by _srcTitleSplit, so a rate list cannot supply a
+// year); the MAX year is taken, so "Act 1993 (amended 2019)" is a 2019 document and the bar for
+// firing is raised, not lowered; events with fiscal_change:false are excluded via the same
+// _rrEventDir() the Reform Risk tab uses, so Libya's 2011 civil war and Guyana's 2020 first oil
+// -- context, not law -- do not supersede anything; and a country with no reform log returns
+// null rather than a clean bill, because missing coverage is not a finding.
+function _citeDocYear(srcName) {
+  var t = (typeof _srcTitleSplit === 'function') ? _srcTitleSplit(srcName).title : String(srcName || '');
+  var m = String(t).match(/\b(19[5-9]\d|20[0-2]\d)\b/g);
+  if (!m || !m.length) return null;
+  return Math.max.apply(null, m.map(Number));
+}
+function _citeSuperseded(country, srcName) {
+  var y = _citeDocYear(srcName);
+  if (!y) return null;
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
+  var evs = (rh && Array.isArray(rh[country])) ? rh[country] : null;
+  if (!evs || !evs.length) return null;
+  var later = evs.filter(function(e) {
+    if (!e || typeof e.year !== 'number' || e.year <= y) return false;
+    // Same fiscal/context split the Reform Risk tab draws. A context event changed no fiscal
+    // terms, so it cannot have superseded a fiscal citation.
+    return (typeof _rrEventDir === 'function') ? _rrEventDir(e) !== 'context'
+                                               : e.fiscal_change !== false;
+  }).sort(function(a, b) { return a.year - b.year; });
+  if (!later.length) return null;
+  return { docYear: y, later: later,
+           title: (typeof _srcTitleSplit === 'function') ? _srcTitleSplit(srcName).title : String(srcName || '') };
+}
+window._citeSuperseded = _citeSuperseded;
+
+
 // ── v860 (T6) — THE BULK CITATION'S DEAD ADDRESS NOW OPENS THE COUNTRY'S OWN PAGE ────────────
 // v850 stopped a dead citation from opening a 404 — but only for non-bulk rows. Its stated
 // reason was sound: "EY / KPMG corporate income tax guides (2025)" is ORCA's label for its own
@@ -40891,6 +40953,12 @@ function renderReformTimeline(country) {
     // a row can be A-tier, independently sourced, matching the statute, and still unverifiable.
     let deadLinkCount = 0;
     let deadLinkLabels = [];
+    // v956 (T6): rows whose cited instrument predates a fiscal reform ORCA's own log records
+    // for this country. Orthogonal to every other bucket, exactly as v641's was: a row can be
+    // A-tier, independently sourced, retrievable, matching the statute — and cited to a document
+    // this platform separately reports was overtaken.
+    let supersedeRows = [];
+    let srcNamedCount = 0;    // v956: rows carrying a named citation at all — the denominator
     let citedLinkCount = 0;   // rows that render a clickable citation at all -- the denominator
     // v601 (T2): rows that carry NO source of any kind. Until now they rendered a bare numeric
     // value, an em-dash in the Statutory column, and a badge reading "Contract DB average" -- a
@@ -41132,6 +41200,7 @@ function renderReformTimeline(country) {
           sS: sourcedSrcs.length,   // v755: rolled back with the rest when a row is off-model
           uL: unsourcedLabels.length, uZ: unsourcedZeroLabels.length, bL: bulkLabels.length,
           sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
+          spR: supersedeRows.length, sNC: srcNamedCount,   // v956
           tC: Array.from(_termsCited)
         };
         const val = (typeof rawVal === 'number') ? _fmtPct(rawVal) : String(rawVal);
@@ -41350,6 +41419,38 @@ function renderReformTimeline(country) {
           } else {
             badgeHtml = `<span class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
           }
+          // ── v956 (T6): the currency of the instrument, on the badge that cites it ──────────
+          // Appended AFTER the badge rather than inside it, so it survives all three branches
+          // (live link, dead link, no URL) and cannot be clipped by the name. Non-interactive
+          // span, same 11px convention as LINK DEAD beside it.
+          if (conf !== 'd') {
+            srcNamedCount++;
+            const _sup956 = _citeSuperseded(country, srcLabel);
+            if (_sup956) {
+              supersedeRows.push({ label: label, docYear: _sup956.docYear,
+                                   title: _sup956.title, later: _sup956.later });
+              const _tip956 = _esc(label + ': the document cited above is dated ' + _sup956.docYear
+                + ', and ORCA\u2019s own sourced reform log for ' + country + ' records '
+                + _sup956.later.length + ' fiscal law change'
+                + (_sup956.later.length === 1 ? '' : 's') + ' after that date \u2014 '
+                + _sup956.later.map(function(e) {
+                    return e.year + ': ' + String(e.event || e.description || 'fiscal change')
+                      + (e.take_change ? ' (' + e.take_change + ')' : '');
+                  }).join('; ')
+                + '. This is not a finding that the rate is wrong. ORCA does not model which '
+                + 'contracts a reform reached, and a stabilised licence can be legitimately '
+                + 'unaffected by a later statute. It is that nothing else on this table asks the '
+                + 'question: the tier letter grades the document, not its currency, so a citation '
+                + 'to a superseded instrument still reads ' + String(confLabel || '').trim()
+                + '. Read the reform log for ' + country + ' before this figure goes in an IC memo.');
+              badgeHtml += '<span class="cite-super-chip" style="display:inline-block;margin-top:3px;'
+                + 'background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);'
+                + 'font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.04em;'
+                + 'white-space:nowrap;cursor:help;" title="' + _tip956 + '">\u27f3 ' + _sup956.docYear
+                + ' \u00b7 ' + _sup956.later.length + ' REFORM'
+                + (_sup956.later.length === 1 ? '' : 'S') + ' SINCE</span>';
+            }
+          }
           // v767 (T6): same test v601 applies to unsourced rows, now applied to cited ones. A ladder
           // is left to v700's machinery; a rate already printed on a sibling row is not a conflict.
           if (conf !== 'd' && numVal != null) {
@@ -41499,6 +41600,8 @@ function renderReformTimeline(country) {
           sharedLabels.length        = _snap742.sL;
           deadLinkLabels.length      = _snap742.dL;
           modelConflicts.length      = _snap742.mC;
+          supersedeRows.length       = _snap742.spR;   // v956
+          srcNamedCount              = _snap742.sNC;   // v956
           _termsCited.clear(); _snap742.tC.forEach(function(k) { _termsCited.add(k); });
         }
       });
@@ -41930,6 +42033,16 @@ function renderReformTimeline(country) {
     // Scopes the tick sentence itself, in the same place and the same voice as v625's _scope625.
     // "All 3 independently sourced parameters match the rate stated in the cited source" is the
     // string that misleads when the cited source is a dead address.
+    // v956 (T6): the tick sentence claims the cited source and the ORCA value agree. It cannot
+    // also be read as "and the cited source is current" — on these rows the platform's own log
+    // says otherwise, so the claim is scoped where it is made rather than only under the table.
+    const _supScope956 = supersedeRows.length
+      ? ' <strong style="color:var(--orange);">'
+        + (supersedeRows.length === 1
+            ? 'That citation predates'
+            : supersedeRows.length + ' of those citations predate')
+        + ' a fiscal reform ORCA logs for ' + _esc(country) + '.</strong>'
+      : '';
     const _citeScope641 = deadLinkCount > 0
       ? ' <strong style="color:var(--red);">'
         + (_allDead
@@ -42008,6 +42121,7 @@ function renderReformTimeline(country) {
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
         + _concScope755
         + _citeScope641
+        + _supScope956
         + _scope625
         + '</div>'
       : (sourcedCount > 0
@@ -42017,7 +42131,7 @@ function renderReformTimeline(country) {
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
                 + (offRows.length ? ' the model reads' : '') + ' match')
-          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _supScope956 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
@@ -42058,7 +42172,62 @@ function renderReformTimeline(country) {
         + 'contracts — they are simply provenance for something other than the figure on this page.'
         + '</div>'
       : '';
-    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _sharedNote;
+    // ── v956 (T6): the currency note ────────────────────────────────────────────────────
+    // Same shape and same voice as v641's retrievability note, and placed beside it, because it
+    // is the same class of statement: a measurable property of the citation that the tier letter
+    // does not carry. Rows are grouped by instrument, because one document usually backs several
+    // of them (v755) and four repetitions of the same sentence would read as four findings.
+    const _supNote956 = supersedeRows.length
+      ? (function() {
+          const groups = [];
+          supersedeRows.forEach(function(r) {
+            const key = r.title + '|' + r.docYear;
+            let g = groups.filter(function(x) { return x.key === key; })[0];
+            if (!g) { g = { key: key, title: r.title, docYear: r.docYear, later: r.later, labels: [] };
+                      groups.push(g); }
+            g.labels.push(_stripTag742(r.label));
+          });
+          const allYears = [];
+          supersedeRows.forEach(function(r) {
+            r.later.forEach(function(e) { if (allYears.indexOf(e.year) === -1) allYears.push(e.year); });
+          });
+          allYears.sort(function(a, b) { return a - b; });
+          const one = supersedeRows.length === 1;
+          let h = '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);'
+            + 'border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;'
+            + 'color:var(--muted);line-height:1.5;">'
+            + '<strong style="color:var(--text);">⟳ '
+            + (one ? 'The cited source for ' + _esc(_stripTag742(supersedeRows[0].label))
+                   : supersedeRows.length + ' of the ' + srcNamedCount + ' cited sources above')
+            + ' predate' + (one ? 's' : '') + ' a fiscal reform this platform itself records for '
+            + _esc(country) + '.</strong> ';
+          h += groups.map(function(g) {
+            return '<strong style="color:var(--text);">' + _esc(g.labels.join(', ')) + '</strong> cite'
+              + (g.labels.length === 1 ? 's' : '') + ' ' + _esc(g.title) + ' — a ' + g.docYear
+              + ' instrument — against ' + g.later.length + ' later change'
+              + (g.later.length === 1 ? '' : 's') + ' on the log: '
+              + _esc(g.later.map(function(e) {
+                  return e.year + ' ' + String(e.event || e.description || 'fiscal change')
+                    + (e.take_change ? ' (' + e.take_change + ')' : '');
+                }).join('; ')) + '.';
+          }).join(' ');
+          h += ' <strong style="color:var(--text);">This is not a judgement on the rate.</strong> '
+            + 'ORCA does not model which contracts a reform reached, and a licence under a freeze '
+            + 'clause is legitimately unaffected by a later statute — but nothing above tests '
+            + 'it either. The tier letter grades the document, not whether it is still the law, so '
+            + 'a citation to a superseded instrument renders exactly like a citation to current '
+            + 'law. <strong style="color:var(--text);">Check what changed in '
+            + _esc(allYears.join(', ')) + ' before ' + (one ? 'this figure goes' : 'these figures go')
+            + ' in an IC memo.</strong>'
+            + '<div style="margin-top:7px;"><button class="btn btn-sm btn-outline" '
+            + 'onclick="_cpToReformLog(\'' + String(country).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\')" '
+            + 'title="Jump to the Fiscal Reform History section on this page — the sourced event '
+            + 'log these years come from">Reform log for ' + _esc(country) + ' ›</button></div>'
+            + '</div>';
+          return h;
+        })()
+      : '';
+    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
@@ -42298,7 +42467,7 @@ function renderReformTimeline(country) {
     const _fpBadge = (_cdRow && typeof renderStabilityBadge === 'function') ? renderStabilityBadge(_fp, _cdRow) : '';
     const _esc0 = _rrEsc(country);
     const _jsC0 = String(country).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return '<h3>Fiscal Reform History</h3>'
+    return '<h3 id="cp-reform-history">Fiscal Reform History</h3>'
       + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">No sourced reform log</div>'
       + '<div style="font-size:12px;color:var(--muted);line-height:1.65;">'
       + 'ORCA holds a sourced fiscal-law change log for <strong style="color:var(--text);">' + _cov + ' of ' + _tot + '</strong> jurisdictions. '
@@ -42382,7 +42551,7 @@ function renderReformTimeline(country) {
       + 'Full reform detail for ' + _escC + ' &rsaquo;</button></div>'
       + '</div>';
   }
-  let html = '<h3>Fiscal Reform History</h3>' + _cpVerdict + '<div class="reform-timeline">';
+  let html = '<h3 id="cp-reform-history">Fiscal Reform History</h3>' + _cpVerdict + '<div class="reform-timeline">';
   const visibleReforms = reformsSorted.slice(0, REFORM_SHOW_LIMIT);
   const olderReforms = reformsSorted.slice(REFORM_SHOW_LIMIT);
   visibleReforms.forEach(r => { html += buildReformEventHtml(r, rfSlug); });
@@ -49381,6 +49550,24 @@ function _methPaintCoverage() {
   }
 }
 window._methPaintCoverage = _methPaintCoverage;
+
+// v956 (T6): the currency note's one control. The reform log it names is already ON this page,
+// two sections down, so it scrolls there rather than throwing the analyst onto another tab and
+// losing the profile they were reading. Falls back to the Reform Risk tab only if the section is
+// not rendered — which happens for the 164 jurisdictions with no log, and those never reach this
+// note in the first place (_citeSuperseded returns null without one).
+function _cpToReformLog(country) {
+  var h = document.getElementById('cp-reform-history');
+  if (h && h.offsetParent !== null) {
+    h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    h.style.transition = 'background .4s';
+    h.style.background = 'rgba(194,65,12,.18)';
+    setTimeout(function() { h.style.background = ''; }, 1600);
+    return;
+  }
+  if (typeof openReformRiskFor === 'function') openReformRiskFor(country);
+}
+window._cpToReformLog = _cpToReformLog;
 
 function openReformRiskFor(country) {
   var btn = document.getElementById('tab-btn-treformrisk');
