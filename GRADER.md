@@ -62715,3 +62715,13 @@ would have to carry the correction too, which is more than a column swap.
 | Clipboard HTML flavour parsed back | 14 `<th>`, 14 `<td>` per row, reference columns 5 and 7 both muted |
 
 Header badge `v954 → v955`, done silently at the end.
+
+---
+## Cycle 874 Log — 2026-09-20 16:54
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 874 complete. Shipped as **v955** (`e731831` + `c920432`), pushed, mirror updated.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation (873 was T1, 872 T4, 870 T3, 868/869 T2, 867 T6; T5 last ran at 865). Walked cold at 1440×900 and 390×844 `hasTouch`, no storage, with `navigator.clipboard.write` shimmed so every artifact was actually produced and read back — Fiscal Compare → Side-by-Side → IOC Portfolio → Reform Risk → Country Profile → Screener
