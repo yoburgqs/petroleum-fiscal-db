@@ -169,6 +169,9 @@ button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible 
 .sc-deck-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer; font-size: 12px; font-weight: 700; padding: 4px 10px; transition: .15s; }
 .sc-deck-btn:hover { border-color: var(--accent); color: var(--accent); }
 .sc-deck-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* v942 (T1): inline-block so the coarse-pointer sizing in the v612 layer can bind. Renders
+   identically to `inline` for the one-line phrase it wraps, so desktop is unchanged. */
+.home-ic-cta { display: inline-block; }
 .search-input { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 14px; width: 240px; }
 .search-input:focus { border-color: var(--accent); outline: none; }
 .btn { background: var(--accent); border: none; border-radius: var(--radius); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 14px; transition: .15s; touch-action: manipulation; }
@@ -2410,6 +2413,41 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      that one chip on that one table; nothing else is narrowed. */
   #ioc-output .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
 }
+
+@media (pointer: coarse), (max-width: 768px) {
+  /* v942 (T1): the Home headline's "open the screen" control -- the one route the page
+     offers to the IOC capital screen, and the first thing a T1 analyst taps.
+
+     A guard for it already existed and had never fired. The Fix 6 block above carries
+     `[role="button"] { min-height: 44px !important; min-width: 44px !important; }`, and this
+     element matches that selector -- but it is a <span> in running prose, so its computed
+     display is `inline`, and min-height / min-width do not apply to a non-replaced inline box.
+     The rule resolved to 44px in getComputedStyle and the element still measured 112 x 14.
+     It is the only element in the app where that guard binds to nothing: a sweep of all nine
+     tabs at 390 x 844 with hasTouch found one sub-24px target on the whole T1 route, and this
+     was it.
+
+     Sizing alone would not fix the tap: a 44px box drawn around a phrase mid-sentence still
+     overlaps the lines above and below it. So under a thumb the control leaves the sentence and
+     becomes its own centred button on the next line, and the em-dash that joined it to the
+     sentence goes with it. Above 768px on a mouse nothing moves -- .home-ic-cta is inline-block
+     there, which renders identically to inline for a one-line phrase, and the em-dash stays. */
+  .home-ic-cta-sep { display: none; }
+  .home-ic-cta {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    margin: 10px auto 2px;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.45;
+  }
+}
 /* v801 (T3): the ✕ on each Side-by-Side country chip. Same exemption shape as v730 directly
    above, for the same reason, with a second symptom on top of the lost height.
      At 44x44 !important the ✕ is a BLOCK two and a half times the height of the 12px country
@@ -2603,7 +2641,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v941</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v942</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3946,7 +3984,7 @@ window.copyPlatformCitation = function(btn) {
   <div id="explorer-bubble-mode" style="display:none;padding-top:16px;">
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
       Scatter plot: Government Take (X) vs Contractor NPV (Y, standardized $1.2B deepwater project). Bubble size = number of contracts.
-      Click any bubble to open the Country Profile. The <strong>left frontier</strong> (low take) with <strong>high NPV</strong> (upper position) represents the most IOC-favorable regimes — low government capture and strong contractor returns.
+      Click any bubble to open the Country Profile. The <strong>left frontier</strong> (low take) with <strong>high NPV</strong> (upper position) is where the most IOC-favorable regimes sit &mdash; but read it on the <strong>filled</strong> bubbles only. A <strong>dotted</strong> bubble is a country ORCA holds no petroleum rent instrument for: its take is a <strong>floor</strong> and its NPV a <strong>ceiling</strong>, so its true position is somewhere <strong>right of and below</strong> where it is drawn. Those are plotted at their bound, which is why they crowd the top-left corner &mdash; a low take there is missing record, not favourable terms.
       <strong>Right side</strong> (high take) with <strong>positive NPV</strong> = large-reserve countries where project scale delivers value even under high fiscal burden. Countries with negative NPV (below the X-axis) are uneconomic at the standardized project size and selected price.
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
@@ -3976,6 +4014,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="bubble-basis-key" style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;">
         <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:#96570A;border:1px solid #96570A;display:inline-block;flex:none;"></span>verified field production &mdash; <strong style="font-weight:700;color:var(--text);">named on the chart</strong></span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:transparent;border:1.5px dashed #96570A;display:inline-block;flex:none;"></span>regional proxy estimate &mdash; indicative only</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;" title="ORCA holds no petroleum rent instrument for these &mdash; no state participation, profit-oil or production-sharing lever on file. Take is therefore a lower bound and NPV an upper bound, so the bubble is plotted at its bound and the country's true position is right of and below it. A low take here is missing record, not favourable terms."><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;background:transparent;border:1px dotted #96570A;opacity:.6;display:inline-block;flex:none;"></span>take is a <strong style="font-weight:700;color:var(--text);">floor</strong>, NPV a ceiling &mdash; plotted at the bound <span aria-hidden="true">&#8600;</span></span>
       </span>
       <span id="bubble-basis-note" style="font-size:11px;color:var(--muted);" aria-live="polite"></span>
     </div>
@@ -3990,7 +4029,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="bubble-scope-note" style="font-size:11px;color:var(--muted);"></span>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Countries with verified field production are labelled by name; the unlabelled bubbles are regional proxy estimates. Click a bubble to open its Country Profile." role="img"></canvas></div>
+      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Countries with verified field production are filled and labelled by name, and the highest-NPV proxy-estimate countries on the upper-left frontier are labelled too. A name ending in a down-right arrow is a country whose take is a floor and NPV a ceiling, so its true position is right of and below the point drawn. Click a bubble to open its Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
         <button id="download-bubble-png"
           style="padding:6px 14px;background:var(--surface2);color:var(--accent);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.8rem;"
@@ -63777,6 +63816,13 @@ function renderBubbleChart() {
   };
 
   // Alpha applied properly, so a non-hex entry can never poison the fill again.
+  // v942 (T1): the 45 countries ORCA holds no petroleum rent instrument for. _scTakeIsFloor()
+  // is the Screener's own predicate -- the one that drives its "TAKE IS A FLOOR, NOT A
+  // MEASUREMENT" divider -- so the chart and the table cannot drift about who is in the set.
+  function _bubFloor(d) {
+    return (typeof _scTakeIsFloor === 'function') && !!_scTakeIsFloor(d);
+  }
+
   function _bubAlpha(col, a) {
     var m = /^#([0-9a-f]{6})$/i.exec(col || '');
     if (m) {
@@ -63840,10 +63886,12 @@ function renderBubbleChart() {
       // Per-point, not per-dataset: the legend stays 8 regions rather than doubling to 16,
       // but a filled disc and a hollow ring are separable at a glance without a hover.
       backgroundColor: countries.map(function (d) {
-        return _tierOf(d).hasProduction ? _bubAlpha(base, 0.62) : _bubAlpha(base, 0.07);
+        if (_tierOf(d).hasProduction) return _bubAlpha(base, 0.62);
+        return _bubFloor(d) ? 'rgba(0,0,0,0)' : _bubAlpha(base, 0.07);
       }),
-      borderColor: countries.map(function () { return base; }),
-      borderWidth: countries.map(function (d) { return _tierOf(d).hasProduction ? 1 : 1.6; }),
+      borderColor: countries.map(function (d) { return _bubFloor(d) ? _bubAlpha(base, 0.45) : base; }),
+      borderWidth: countries.map(function (d) { return _tierOf(d).hasProduction ? 1 : (_bubFloor(d) ? 1 : 1.6); }),
+
       data: countries.map(function(d) {
         // On mobile, increase bubble radius slightly for easier tapping
         var baseR = Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5));
@@ -63856,6 +63904,7 @@ function renderBubbleChart() {
           mechanic: d.mechanics || d.mechanic || '\u2014',
           basis: _t.label,
           verified: !!_t.hasProduction,
+          floor: (typeof _scTakeIsFloor === 'function') && !!_scTakeIsFloor(d),
           n: d.n || 0
         };
       })
@@ -63887,17 +63936,37 @@ function renderBubbleChart() {
     var all = [];
     datasets.forEach(function (ds, di) {
       ds.data.forEach(function (pt, pi) {
-        all.push({ di: di, pi: pi, country: pt.country, verified: !!pt.verified, y: pt.y });
+        all.push({ di: di, pi: pi, country: pt.country, verified: !!pt.verified,
+                   floor: !!pt.floor, y: pt.y, x: pt.x });
       });
     });
     var pool;
     if (_verifiedOnly) pool = all.slice();
     else if (_useScreen && all.length <= 30) pool = all.slice();
-    else pool = all.filter(function (q) { return q.verified; });
+    else {
+      // ── v942 (T1) — the frontier the caption points at is now named ──────────────────────
+      // v870 put labels on the 22 production-backed bubbles and reasoned that "the named set IS
+      // the investible universe, so the unnamed hollow cloud in the top-left reads as what it
+      // is." Walked cold at 1440x900 it does not. Measured off COUNTRY_DATA: the TOP TWENTY
+      // bubbles by NPV on this chart all carry prod_coverage_pct = 0, and the 45 floor-take
+      // countries span take 5.0-36.5% and NPV $2,419M-$5,102M -- which is precisely the
+      // upper-left quadrant the caption calls "the most IOC-favorable regimes". The single
+      // highest point on the plot is Vanuatu at 5.0% take and $5.1B.
+      //
+      // Anonymity was doing the damage. A named Vanuatu at the top of an oil-fiscal
+      // attractiveness chart corrects itself in one second; an unnamed ring at the same spot
+      // reads as a find. So the extreme frontier is labelled whatever its basis, and the
+      // label plugin already paints an unverified name in muted grey rather than ink.
+      var _verified = all.filter(function (q) { return q.verified; });
+      var _front = all.filter(function (q) { return !q.verified; })
+                      .sort(function (a, b) { return b.y - a.y; })
+                      .slice(0, isMobile ? 3 : 8);
+      pool = _verified.concat(_front);
+    }
     // Verified first, then highest NPV -- if the collision pass has to drop one, it drops the
     // least interesting one, never the frontier.
     pool.sort(function (a, b) { return (b.verified - a.verified) || (b.y - a.y); });
-    return pool.slice(0, isMobile ? 6 : 28);
+    return pool.slice(0, isMobile ? 6 : 30);
   })();
 
   var _bubbleLabelPlugin = {
@@ -63917,7 +63986,10 @@ function renderBubbleChart() {
         var el = meta.data && meta.data[q.pi];
         if (!el || el.skip || !isFinite(el.x) || !isFinite(el.y)) return;
         var r = (el.options && el.options.radius) || el.radius || 4;
-        var name = q.country, w = c.measureText(name).width, h = fs + 4;
+        // v942 (T1): a floor-take name is suffixed with the bound arrow. The point is drawn at
+        // take-floor / NPV-ceiling, so the country's real position is right of and below it --
+        // the same thing the Screener says with its >= take cell and <= NPV cell.
+        var name = q.country + (q.floor ? ' \u2198' : ''), w = c.measureText(name).width, h = fs + 4;
         var cands = [
           { x: el.x + r + 4, y: el.y,         a: 'left'   },
           { x: el.x - r - 4, y: el.y,         a: 'right'  },
@@ -65559,7 +65631,7 @@ async function loadPlatformData() {
             _hStat.innerHTML =
               '&#x2713; ' + _hPass.length + ' countries pass the IOC capital screen '
               + '<span style="font-weight:400;color:var(--muted);">&mdash; verified field production &middot; take &le;65% &middot; contractor NPV positive at $75 <em>and</em> at the $50/bbl downside</span> '
-              + '&mdash; <span role="button" tabindex="0" style="cursor:pointer;text-decoration:underline;" '
+              + '<span class="home-ic-cta-sep">&mdash; </span><span class="home-ic-cta" role="button" tabindex="0" style="cursor:pointer;text-decoration:underline;" '
               + 'onclick="_homeOpenICScreen()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_homeOpenICScreen();}">'
               + 'open the screen \u2192</span>'
               + '<div style="margin-top:3px;font-size:11px;font-weight:400;color:var(--muted);">'
