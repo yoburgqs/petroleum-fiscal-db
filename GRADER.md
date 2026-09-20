@@ -61973,3 +61973,72 @@ Header badge `v942 → v943`, done silently at the end, not as the reason the cy
 Reform Risk → **Regional Reform Tilt** panel → the **Avg Stability** column.
 
 Every other cell in that row had been taught to withhold: Tilt names a direction only where the unmeasured changes can't over
+
+---
+## Cycle 862 Log — 2026-09-20 (v947)
+
+**Task:** **T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation: 946 was T2, 943 T4, 942 T1, 941 T3, 940 T5, and T6 last ran at 938. Walked cold at 1440 and at 390 `hasTouch` — no sessionStorage, no localStorage.
+
+### Where the walk went
+
+The Country Profile Evidence Chain is saturated. Walked it on Indonesia, Vanuatu, Montenegro, Bahamas, Norway, Iraq and Guyana: it partitions rows above and below the model divider, names which citations are dead as of 4 Sep 2026, splits ORCA's harvest annotation off the instrument title, routes `⌕ find document` to an exact-phrase search, and states in full sentences when a term carries no source at all. The `N of M model terms cited` chip reaches it from all four ranking tables — Fiscal Compare, Screener, Explorer, IOC Portfolio — and the FC chip was clicked and verified to land on `Country Profile → Evidence Chain` for the right country. Breakeven Map carries the evidence letter on its ranked cards. No friction there worth a cycle.
+
+**Sample Analyses is the exception.** It is the tab that looks most like finished analysis — pre-written question headings, prose answers, tables, and a button under each card that loads the result into the platform. Asking "where did these numbers come from" of that tab produced the find.
+
+## Friction
+
+`renderSampleAnalyses()` (~index.html:47954 and :48209) is **the only surface left on this file that compares `d.region` with `===`** instead of routing through `_regionMatch()`, the resolver every other region control has used since v429. `"Asia Pacific"` and `"Americas"` are **roll-ups** `_regionMatch()` expands to `Asia`+`Oceania` and `Latin America`+`North America`. They are not values that exist in `COUNTRY_DATA` — after v661's M49 normalisation the database files every country under exactly one of eight names. Both cards asked for the roll-ups by literal string.
+
+**Card C — "Asia Pacific in Global Context" — matched zero rows.** `cd.filter(d => d.region === 'Asia Pacific')` returned `[]`, so `asiaAvg` was `null` and both the four-lowest and three-highest blocks rendered nothing. Measured on the shipped build, the whole card was:
+
+| Country / Benchmark | Region | Govt Take @$75 | Notes |
+|---|---|---|---|
+| Indonesia | Asia Pacific | 59.5% | PSC-dominant |
+| **Asia Pacific avg** | — | **—** | **0 countries** |
+| Global avg | — | 38.2% | 185 countries |
+
+An em-dash and the literal string *0 countries*, sitting under a heading that asks **"Is Southeast Asia cheap or expensive for IOCs vs global norms?"** and a paragraph that answers it — *"Asia Pacific average sits close to the global average… the region's extremes are wider than they appear."* The prose asserted a finding the card's own table could not produce, and the one cell that said so read `0 countries` in 10px muted grey. The Region cell also printed a hard-coded `Asia Pacific` against Indonesia, which is filed `Asia`. For a T6 walk this is the strongest possible failure: asked where the number came from, the honest answer was *nowhere*.
+
+**Card 1 — "Regional Benchmarks" — matched 3 of its 6 hand-typed names.** `regionOrder = ['Middle East','Africa','Asia Pacific','Americas','Europe','Other']`; three of those six are not stored values and `Other` no longer has members. The card printed Middle East (17), Africa (54) and Europe (33) = **104 countries**, under a caption reading *"Average government take at $75/bbl across **all** jurisdictions with DCF coverage."* Absent, with nothing on screen saying so: **Asia 26, Latin America 31, Oceania 16, CIS/FSU 5, North America 3 — 81 of 185, the USA and Canada among them.** An analyst reading *"where does state capture differ most by geography"* got a geographic spread missing two continents. Same class of defect as cycle 344 (USA filed under region `Other`, invisible to every region filter).
+
+## Change
+
+Both cards routed through `_regionMatch()`, with a direct-comparison fallback if it is ever absent.
+
+**Card 1** now iterates the eight filed region names, keeps any with ≥3 members, and **ranks by mean take descending**. Eight rows render where three did, and the caption states the coverage rather than claiming it: **185 of 185**, computed and printed, not asserted.
+
+| region | n | prod | avg @$75 | range |
+|---|---|---|---|---|
+| Middle East | 17 | 3 | 61.2% | 18.8–100.0% |
+| CIS/FSU | 5 | 2 | 48.1% | 16.1–69.9% |
+| **Asia** | **26** | 4 | **45.5%** | 13.8–87.2% |
+| Africa | 54 | 3 | 44.4% | 18.9–81.1% |
+| **Latin America** | **31** | 5 | **33.8%** | 10.0–74.9% |
+| Europe | 33 | 2 | 23.0% | 10.5–68.0% |
+| **North America** | **3** | 2 | **22.6%** | 11.6–32.7% |
+| **Oceania** | **16** | 1 | **20.9%** | 5.0–38.5% |
+
+**Card C** resolves 42 countries. The average computes to **36.1% against a 38.2% global mean**, so the paragraph's claim is now *backed* rather than merely asserted — and the paragraph is built from those computed values, so it cannot drift from the table again. It names the real spread, **Vanuatu 5.0% to Turkmenistan 87.2%, an 82.2pp band**, replacing a Philippines/Oceania sentence the restored table refutes. Region cells print each country's own filed region. The avg row is labelled `Asia Pacific avg (Asia + Oceania)` with the roll-up explained on hover.
+
+**Both cards now surface rankings that were previously blank or truncated, so neither may arrive unmarked.** Each Card 1 row carries `_dqTier()`'s production-backed count beside its country count — the newly-visible rows are the thinnest (**Oceania 1 of 16, Europe 2 of 33**) and would have been the most misleading arriving bare. Card C labels every extreme row proxy-terms or production-backed and states that **6 of the 7 countries at its two ends** (Vanuatu, Kyrgyzstan, Tajikistan, Taiwan, Uzbekistan, Turkmenistan) carry proxy terms. Surfacing them unlabelled would have shipped fresh the defect v942 removed from the bubble chart.
+
+## Result
+
+The analyst asking where the Asia Pacific benchmark came from gets 42 countries, a computed mean, a named 82.2pp spread and a production-backed count — instead of an em-dash and *0 countries* under a paragraph asserting the answer. And the tab's opening geographic benchmark no longer omits Asia, Latin America, Oceania, CIS/FSU and North America while its caption claims to cover all jurisdictions.
+
+### Cycle 862 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** |
+| Runtime suite, **ran** this cycle against the modified tree (graded copy, `ORCA_REPORT_FILE=/tmp/t6walk/rt947.txt`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Same suite, same harness, against `git show HEAD:index.html` (pre-change control) | **499 PASS / 0 FAIL / 1 WARN** — byte-identical, so the delta from the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server`, not this edit |
+| Horizontal scroll, 10 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| Page + console errors, all six widths | **0** |
+| Controls under 24px, touched cards @ 390 `hasTouch` | **0** |
+| Card 1 row counts sum to the full set | **185 of 185**, verified live |
+| Card C `Filter Asia Pacific in Explorer` button | clicked — lands on Explorer, chip `Asia Pacific` pressed, 42 countries returned |
+
+Header badge `v946 → v947`, done silently at the end, not as the reason the cycle happened.
+
+**Not fixed this cycle, named for the next T6 or T1 walk:** Sample Analyses Card 5 (*"IOC Low Take · Positive NPVs"*) ranks **8 of 8 PROXY** countries — Vanuatu, Bahamas, Montenegro, Greenland, Faroe Islands, Moldova, Romania, Sweden, three of them evidence grade D — under a green heading, ending in a **"Compare Top 5"** button that builds an IC shortlist out of five of them. Card 4 (*"Price Sensitivity Leaders"*) is also 8 of 8 PROXY. Left alone deliberately: it is a separate defect from the region resolver and deserves its own cycle rather than riding along with this one.
