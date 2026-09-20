@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v952</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v953</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23291,6 +23291,17 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <input type="number" id="sb-price" value="75" min="20" max="200" step="5">
         </div>
 
+        <!-- v953 (T4): the discount rate the Reform Risk verdict has been telling analysts to change
+             since v744, on a form that had no field for it. See _sbDiscount() below. -->
+        <div class="sb-control-group">
+          <label for="sb-discount">Discount Rate / WACC (%)</label>
+          <input type="number" id="sb-discount" value="10" min="1" max="40" step="0.5"
+                 oninput="_sbRenderBasis()" onchange="_sbRenderBasis()"
+                 aria-describedby="sb-discount-note"
+                 title="The rate this DCF discounts contractor cash flows at. ORCA&#39;s standardized figures everywhere else on the platform are computed at 10% with no country risk premium, so 10% is the default here and reproduces them exactly. Change it to run the same fiscal terms at your own hurdle rate. This is the field the Reform Risk verdict means: a jurisdiction classified Actively Reforming carries an IC action of WACC +3&ndash;5pp or +5&ndash;8pp &mdash; percentage points ADDED to this number, not to government take. Every figure in the results below (NPV, the four-price deck, the hurdle line and the IC citation) is recomputed at the rate you set and states it. IRR is unaffected by construction: it is the rate at which NPV = 0, solved by bisection, so no assumed discount rate enters it.">
+          <div id="sb-discount-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;"></div>
+        </div>
+
         <div id="sb-concession-params">
           <div class="sb-section-hdr">Concession Parameters</div>
           <div class="sb-row2">
@@ -40359,6 +40370,18 @@ function _rrOrdinal(n) {
   return n + (['th','st','nd','rd'][n % 10] || 'th');
 }
 window._rrOrdinal = _rrOrdinal;
+// v953 (T4): verdict -> field. Opens the builder on this country and applies the premium.
+function _rrModelPremium(country, pct) {
+  if (typeof ddOpenScenarioBuilder !== 'function') return;
+  ddOpenScenarioBuilder(country);
+  // ddOpenScenarioBuilder() auto-runs the DCF on a 100ms timer, so the rate is set after it,
+  // and _sbApplyReformPremium() re-runs once a result exists.
+  setTimeout(function () {
+    if (typeof _sbApplyReformPremium === 'function') _sbApplyReformPremium(pct);
+  }, 260);
+}
+window._rrModelPremium = _rrModelPremium;
+
 function _rrClassify(c) {
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
   var events = Array.isArray(rh[c]) ? rh[c] : [];
@@ -50026,7 +50049,18 @@ function _rrVerdictPayload() {
   // event table, precisely so the sweep below cannot stamp its rows as scoring here.
   ['rr-ic-action', 'rr-verdict-lead', 'rr-filed-under', 'rr-ext-check'].forEach(function (id) {
     var e = document.getElementById(id);
-    if (e && out.contains(e)) { var t = tx(e); if (t) prose.push(t); }
+    if (!e || !out.contains(e)) return;
+    // v953 (T4): this block reads with innerText, so the "Model this premium in Scenario Builder"
+    // control added to the WACC branch landed inside the pasted IC memo as
+    // "...explicitly in the memo. ⚙ Model this premium in Scenario Builder →loads United Kingdom's
+    // terms at 13%". A button is an affordance, not a finding. Clone and strip rather than hide,
+    // so nothing on screen changes and the verdict prose itself is untouched.
+    var src = e;
+    if (e.querySelector('.rr-noclip')) {
+      src = e.cloneNode(true);
+      [].slice.call(src.querySelectorAll('.rr-noclip')).forEach(function (n) { n.parentNode.removeChild(n); });
+    }
+    var t = tx(src); if (t) prose.push(t);
   });
 
   // The stat strip is the card's only flex row. Anchoring on the computed display rather than
@@ -50598,6 +50632,32 @@ function renderReformCountryVerdict() {
     // the two together as "WACC +3-5ppIC action - Actively Reforming".
     + _tokenPill + ' '
     + '<strong style="color:' + _tierCol + ';">' + icLabel + ':</strong> ' + icRule
+    // ── v953 (T4): the verdict now has somewhere to go ────────────────────────────────────
+    // This block has prescribed "add a 3-5pp WACC premium" since v526 and printed it as the
+    // WACC token since v744, and until v953 the platform had no discount-rate input anywhere
+    // for the analyst to add it to. The Scenario Builder now does. This button loads THIS
+    // country's terms into it and applies the low end of its own band, so the verdict turns
+    // into an NPV cost in one click instead of a sentence the analyst has to model elsewhere.
+    // Only the two WACC branches get it — the other five verdicts emit no rate to apply, and a
+    // button offering to apply one would assert a premium _rrClassify() deliberately withheld.
+    + (String(_v.icToken || '').indexOf('WACC') === 0
+        ? (function () {
+            var m = /([0-9]+)–([0-9]+)pp/.exec(String(_v.icToken));
+            if (!m || typeof ddOpenScenarioBuilder !== 'function') return '';
+            var lo = 10 + parseInt(m[1], 10), hi = 10 + parseInt(m[2], 10);
+            var cj = String(c).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            return '<div class="rr-noclip" style="margin-top:9px;">'
+              + '<button type="button" class="btn btn-sm btn-outline" style="font-size:11px;min-height:26px;" '
+              + 'onclick="_rrModelPremium(\'' + cj + '\', ' + lo + ')" '
+              + 'title="Open the Scenario Builder on ' + _rrEsc(c) + '\u2019s own terms and set the Discount Rate field to '
+              + lo + '% \u2014 ORCA\u2019s standardized 10% plus the low end of this jurisdiction\u2019s reform premium. The '
+              + 'builder shows the run at 10% and at ' + lo + '\u2013' + hi + '% side by side once you save both, so the premium '
+              + 'reads as a contractor-NPV cost rather than as an instruction. Government take does not move \u2014 a WACC premium '
+              + 'is a discount-rate add, not a take add.">&#9881; Model this premium in Scenario Builder \u2192</button>'
+              + '<span style="font-size:10px;color:var(--muted);margin-left:8px;">loads ' + _rrEsc(c)
+              + '\u2019s terms at ' + lo + '% \u00b7 the band runs to ' + hi + '%</span></div>';
+          })()
+        : '')
     + '</div>'
     + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
@@ -53988,6 +54048,150 @@ function _sbBuildProfileOptions() {
   if (keep && DCF_PROFILES[keep]) sel.value = keep;
   _sbRenderBasis();
 }
+// ── v953 (T4): the discount rate, as a live input ───────────────────────────────────────────
+// Walked T4 cold: Home -> Reform Risk -> "Check one country" -> United Kingdom. The card returns
+// icToken 'WACC +3-5pp' (or '+5-8pp' at score <= 20), and the platform describes that token, in
+// four separate places, as "percentage points to add to the discount rate -- the only verdicts
+// that change a model input". FAQ A160 and A137 and the Methodology then route the analyst here:
+// "Re-run ORCA Scenario Builder at your adjusted WACC. The Scenario Builder allows custom
+// discount rates. Enter your project WACC."
+//
+// It did not. The modal carried 33 labelled inputs and no discount rate among them. sbGetParams()
+// cloned DCF_PROFILES[key], whose discountRate is 0.10 on all six profiles, and the results card
+// printed the string "10% disc. rate" as a literal. So the one action the whole Reform Risk tab
+// exists to produce could not be performed anywhere in the product, and an analyst who followed
+// the instruction, failed to find the field and carried the number on screen forward was carrying
+// an UNADJUSTED NPV into an IC memo under the belief that it was risk-adjusted.
+//
+// The engines already took the rate: dcfConcession/dcfPSC/dcfTSC all read profile.discountRate,
+// and _sbHurdleLine() has been re-discounting the same cash flows at 15% since v594 to print its
+// hurdle test. Nothing needed rebuilding — only a control, and every downstream string that had
+// the 10 typed into it rather than read from the run.
+function _sbDiscount() {
+  var el = document.getElementById('sb-discount');
+  var v = el ? parseFloat(el.value) : 10;
+  if (!isFinite(v) || v <= 0) v = 10;
+  return Math.min(40, Math.max(1, v)) / 100;
+}
+window._sbDiscount = _sbDiscount;
+// Printed form, so "12.5%" does not become "13%" in one string and "12.5%" in another.
+function _sbDiscTxt(r) {
+  var pct = (r == null ? _sbDiscount() : r) * 100;
+  return (Math.abs(pct - Math.round(pct)) < 0.05 ? Math.round(pct) : pct.toFixed(1)) + '%';
+}
+window._sbDiscTxt = _sbDiscTxt;
+
+// The note under the field. Two jobs, and it only ever asserts what _rrClassify() already said:
+//   1. Say when the rate has been moved off 10, because every OTHER figure on this platform is a
+//      10% figure and a run at 14% is no longer comparable with them.
+//   2. Where the builder was opened FROM a country (window._sbOrigin) and that country's reform
+//      record classifies as Actively Reforming, name its premium band and offer to apply it.
+//      This is the only surface where that token can be turned into a number, so it is offered
+//      here rather than left as an instruction the analyst has to arithmetic by hand.
+function _sbReformPremium(country) {
+  if (!country || typeof _rrClassify !== 'function') return null;
+  var v = null;
+  try { v = _rrClassify(country); } catch (e) { return null; }
+  if (!v || !v.icToken || String(v.icToken).indexOf('WACC') !== 0) return null;
+  // icToken is 'WACC +3–5pp' or 'WACC +5–8pp'. Read the band off the token itself rather
+  // than re-deriving it from the score, so this cannot disagree with the cell that printed it.
+  var m = /([0-9]+)–([0-9]+)pp/.exec(String(v.icToken));
+  if (!m) return null;
+  return { lo: parseInt(m[1], 10), hi: parseInt(m[2], 10), token: v.icToken,
+           since2010: v.since2010, score: v.score };
+}
+window._sbReformPremium = _sbReformPremium;
+
+function _sbRenderDiscountNote() {
+  var out = document.getElementById('sb-discount-note');
+  if (!out) return;
+  var r = _sbDiscount(), pct = r * 100, html = '';
+  var o = window._sbOrigin;
+  var country = o && o.country ? o.country : null;
+  var prem = _sbReformPremium(country);
+
+  if (Math.abs(pct - 10) < 0.05) {
+    html += 'Matches ORCA’s standardized 10% — this run is comparable with the NPV on Country '
+          + 'Profile, Fiscal Compare and every export.';
+  } else {
+    html += '<strong style="color:var(--accent);">Not 10% — this run is no longer comparable with '
+          + 'ORCA’s published NPVs,</strong> which are all computed at 10% with no country risk '
+          + 'premium. Take percentage is unchanged (it is a share of revenue, not a discounted '
+          + 'figure); NPV and breakeven move, IRR does not.';
+  }
+
+  // ── v953 (T4): the form has moved but the results below have not ──────────────────────────
+  // This field is the only input in the builder with a live handler, so typing in it repaints
+  // the profile-basis line ("18% WACC") while the results card underneath is still the 13% run
+  // that produced the NPV on screen. The card self-labels its own rate, so no figure is
+  // mis-attributable — but a rate in the form disagreeing with the rate under the NPV is the
+  // exact confusion this whole change exists to remove, and before v953 that line was a
+  // constant and could not disagree. Say so at the point of typing, where the eye already is.
+  var _ran = window._lastScenario ? window._lastScenario.disc : null;
+  if (_ran != null && Math.abs(_ran - r) > 0.0001) {
+    html += '<div style="margin-top:6px;color:var(--orange);font-weight:700;">'
+          + '\u26A0 The results below were run at ' + _sbDiscTxt(_ran) + ', not ' + _sbDiscTxt(r)
+          + '. Re-run the DCF to apply the new rate.</div>';
+  }
+
+  if (prem) {
+    var loR = 10 + prem.lo, hiR = 10 + prem.hi;
+    var applied = (Math.abs(pct - loR) < 0.05) ? 'lo' : (Math.abs(pct - hiR) < 0.05) ? 'hi' : null;
+    html += '<div style="margin-top:6px;padding:6px 8px;border:1px solid rgba(176,104,0,.30);'
+          + 'background:rgba(176,104,0,.06);border-radius:4px;">'
+          + '<strong style="color:var(--accent);">Reform Risk — ' + _sbEscP(country) + ': '
+          + _sbEscP(prem.token) + '.</strong> '
+          + prem.since2010 + ' fiscal law change' + (prem.since2010 === 1 ? '' : 's')
+          + ' since 2010 puts it in the Actively Reforming band, whose IC action is to add those '
+          + 'percentage points <em>to this field</em> — not to government take. On ORCA’s 10% '
+          + 'base that is ' + loR + '–' + hiR + '%. '
+          + (applied
+              ? '<span style="color:var(--green);font-weight:700;">Applied: ' + _sbDiscTxt(r)
+                + ' = 10% + ' + (applied === 'lo' ? prem.lo : prem.hi) + 'pp.</span>'
+              : 'The premium is a judgement, not a computed rate — these two buttons are the band’s '
+                + 'endpoints, and any rate between them is defensible.')
+          + '<div style="margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;">'
+          + '<button type="button" class="btn btn-sm btn-outline" style="font-size:11px;min-height:26px;" '
+          + 'onclick="_sbApplyReformPremium(' + loR + ')" title="Set the discount rate to '
+          + loR + '% — ORCA’s 10% base plus the ' + prem.lo + 'pp low end of this jurisdiction’s '
+          + 'reform premium. Re-run the DCF to see the effect.">Run at ' + loR + '% (+' + prem.lo + 'pp)</button>'
+          + '<button type="button" class="btn btn-sm btn-outline" style="font-size:11px;min-height:26px;" '
+          + 'onclick="_sbApplyReformPremium(' + hiR + ')" title="Set the discount rate to '
+          + hiR + '% — ORCA’s 10% base plus the ' + prem.hi + 'pp high end of this jurisdiction’s '
+          + 'reform premium. Re-run the DCF to see the effect.">Run at ' + hiR + '% (+' + prem.hi + 'pp)</button>'
+          + '<button type="button" class="btn btn-sm btn-outline" style="font-size:11px;min-height:26px;" '
+          + 'onclick="_sbApplyReformPremium(10)" title="Return to ORCA’s standardized 10%, which is '
+          + 'the basis of every published figure on the platform.">Back to 10%</button>'
+          + '</div></div>';
+  } else if (country && typeof _rrClassify === 'function') {
+    var vv = null; try { vv = _rrClassify(country); } catch (e) {}
+    html += '<div style="margin-top:5px;">'
+          + (vv
+              ? 'Reform Risk returns <strong>' + _sbEscP(vv.icToken || '—') + '</strong> for '
+                + _sbEscP(country) + ' — not a WACC premium, so nothing is added to this field '
+                + 'on that basis.'
+              : 'ORCA holds no sourced reform log for ' + _sbEscP(country) + ', so it supplies no '
+                + 'reform premium for this field — and a premium of zero is not what that absence '
+                + 'means. Set your own rate.')
+          + '</div>';
+  }
+  out.innerHTML = html;
+}
+window._sbRenderDiscountNote = _sbRenderDiscountNote;
+
+function _sbApplyReformPremium(pct) {
+  var el = document.getElementById('sb-discount');
+  if (!el) return;
+  el.value = pct;
+  if (typeof _sbRenderBasis === 'function') _sbRenderBasis(); else _sbRenderDiscountNote();
+  // Re-run only if the analyst has already produced a result; otherwise leave the form alone.
+  var out = document.getElementById('sb-output');
+  if (out && out.querySelector('.sb-result-header') && typeof runCustomScenario === 'function') {
+    try { runCustomScenario(); } catch (e) {}
+  }
+}
+window._sbApplyReformPremium = _sbApplyReformPremium;
+
 function _sbRenderBasis() {
   var sel = document.getElementById('sb-profile');
   var out = document.getElementById('sb-profile-basis');
@@ -53999,8 +54203,9 @@ function _sbRenderBasis() {
     + '</strong> capex \u00b7 <strong style="color:var(--text);">' + (p.peakBblDay / 1000)
     + 'k bbl/d</strong> peak (' + p.rampYears + 'yr ramp, ' + p.plateauYears + 'yr plateau, '
     + Math.round(p.declineRate * 100) + '%/yr decline) \u00b7 <strong style="color:var(--text);">$'
-    + p.opexBbl + '/bbl</strong> opex \u00b7 25-year life \u00b7 '
-    + Math.round(p.discountRate * 100) + '% WACC \u00b7 100% WI';
+    + p.opexBbl + '/bbl</strong> opex \u00b7 25-year life \u00b7 <strong style="color:var(--text);">'
+    + _sbDiscTxt() + '</strong> WACC \u00b7 100% WI';   // v953 (T4): live rate, not the profile constant
+  _sbRenderDiscountNote();
 
   // \u2500\u2500 v878 (T6) \u2014 this line used to claim, in its hover, that the Deepwater option "is the
   // same project behind the NPV on every Country Profile and in Fiscal Compare", and told the
@@ -54541,7 +54746,7 @@ function _sbICDeckClause() {
   }
   if (!parts.length) return '';
   var swing = _sbDeckSwing(deck), kept = _sbDeckKept(deck), lo = _sbDeckAt(deck, 50);
-  var out = '; price deck on the same terms (govt take / contractor NPV @10%) — ' + parts.join(', ');
+  var out = '; price deck on the same terms (govt take / contractor NPV @' + _sbDiscTxt() + ') — ' + parts.join(', ');
   if (swing != null) out += '; price swing ' + (swing >= 0 ? '+' : '') + swing.toFixed(1) + 'pp ($50 to $125)';
   if (lo && lo.npv != null) {
     var flat = _sbDeckFlatNpv(deck);
@@ -54589,7 +54794,7 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
   var noCap   = (R.state === 'no-capital-at-risk');
 
   rows.push(['Government take @ $' + price + '/bbl', res.take != null ? res.take.toFixed(1) + '%' : '—']);
-  rows.push(['Contractor NPV @ 10% WACC', fmtSigned(res.npv)]);
+  rows.push(['Contractor NPV @ ' + _sbDiscTxt(profile && profile.discountRate) + ' WACC', fmtSigned(res.npv)]);
   rows.push(['Contractor NPV @ 15% IOC hurdle',
              fmtSigned(R.npv15) + ' — ' + (clears ? 'CLEARS' : 'FAILS')]);
   rows.push(['Contractor capital at risk', noCap ? 'none on this profile' : riskStr]);
@@ -54693,7 +54898,8 @@ function _sbHurdleLine(res, profile, price, mech) {
   var capexMM = (profile && profile.capexMM) || null;
   // The plain-text artifact. Built here so the on-screen line and the clipboard cannot drift.
   window._sbICLine = mech + ', ' + ((profile && profile.name) || '') + ' profile, $' + price + '/bbl — govt take '
-    + res.take.toFixed(1) + '%, contractor NPV ' + f(res.npv) + ' @10% WACC and ' + f(R.npv15) + ' @15% IOC hurdle ('
+    + res.take.toFixed(1) + '%, contractor NPV ' + f(res.npv) + ' @' + _sbDiscTxt(profile && profile.discountRate)
+    + ' WACC and ' + f(R.npv15) + ' @15% IOC hurdle ('
     + (clears ? 'clears' : 'fails') + '), '
     + (R.state === 'no-capital-at-risk'
         ? 'no contractor capital at risk — cost recovery reimburses capex in the year it is spent, so no IRR exists on this profile'
@@ -54728,7 +54934,7 @@ function _sbHurdleLine(res, profile, price, mech) {
     + '<span style="font-weight:800;color:' + (clears ? 'var(--green)' : 'var(--red)') + ';">'
     + (clears ? '✔ Clears a 15% IOC hurdle' : '✗ Fails a 15% IOC hurdle') + '</span> '
     + '— contractor NPV <strong style="color:var(--text);">' + f(R.npv15) + ' at 15%</strong>'
-    + (res.npv != null ? ' (' + f(res.npv) + ' at the 10% WACC above)' : '') + '. '
+    + (res.npv != null ? ' (' + f(res.npv) + ' at the ' + _sbDiscTxt(profile && profile.discountRate) + ' WACC above)' : '') + '. '
     + riskTxt
     + '<div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
     + '<div style="font-size:11px;opacity:.85;flex:1 1 220px;min-width:0;">Copies as a table — '
@@ -56340,6 +56546,7 @@ function loadPreset(name) {
   window._sbOrigin = null;
   var _sbPfB = document.getElementById('sb-prefill-banner');
   if (_sbPfB) _sbPfB.style.display = 'none';   // v928 (T6): re-shown, with the preset's basis, at the end of this function
+  if (typeof _sbRenderDiscountNote === 'function') _sbRenderDiscountNote();   // v953 (T4): the reform offer belonged to the dropped country
   // v883 (T2): drop any armed R-factor ladder with it, for the same reason.
   if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
   document.getElementById('sb-mechanic').value = p.mechanic;
@@ -56537,6 +56744,10 @@ function sbGetParams() {
   const profileKey = document.getElementById('sb-profile').value;
   const price = parseFloat(document.getElementById('sb-price').value) || 75;
   const profile = { ...DCF_PROFILES[profileKey] };
+  // v953 (T4): the one line that makes the Reform Risk WACC premium executable. The clone above
+  // has existed since the builder was written, so overriding the rate here touches nothing
+  // outside this run; DCF_PROFILES itself is untouched and every other surface still reads 10%.
+  profile.discountRate = _sbDiscount();
   let params;
   if (mech === 'Concession') {
     params = {
@@ -56740,7 +56951,7 @@ function _sbPriceDeckHtml(deck, basePrice) {
     h += '<div class="sb-deck-v ' + (d.here ? 'sb-deck-col-here' : '') + '">'
        + (d.take == null ? '—' : d.take.toFixed(1) + '%') + '</div>';
   }
-  h += '<div class="sb-deck-rh" title="Contractor NPV at the 10% WACC used by the cards above. $50/bbl is the downside column — the ORCA Screener’s IOC Capital Screen is decided on it.">Contractor NPV</div>';
+  h += '<div class="sb-deck-rh" title="Contractor NPV at the ' + _sbDiscTxt() + ' WACC used by the cards above. $50/bbl is the downside column — the ORCA Screener’s IOC Capital Screen is decided on it.">Contractor NPV</div>';
   for (i = 0; i < deck.length; i++) {
     d = deck[i];
     var col = (d.npv != null && d.npv < 0) ? 'color:var(--red);' : '';
@@ -57042,11 +57253,11 @@ ${_sbOriginNote(result, price, profileKey)}
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor NPV</div>
     <div class="sb-result-value" style="color:${npvColor}">${npvDisplay}</div>
-    <div class="sb-result-note">10% disc. rate</div>
+    <div class="sb-result-note">${_sbDiscTxt()} disc. rate${Math.abs(_sbDiscount()*100-10)<0.05?'':' \u00b7 not ORCA\u2019s 10%'}</div>
   </div>
 </div>
 ${_sbPriceDeckHtml(window._sbPriceDeck, price)}
-${_sbHurdleLine(result, DCF_PROFILES[profileKey], price, mech)}
+${_sbHurdleLine(result, profile, price, mech)}
 <div class="dcf-waterfall-title">Fiscal Breakdown (% of Revenue)</div>
 ${wfHtml}
 <div id="sb-cite-line"></div>
@@ -57139,7 +57350,12 @@ ${(function() {
   if (typeof _sbRenderCiteLeg944 === 'function') _sbRenderCiteLeg944();
 
   // Store last result for saving
-  window._lastScenario = { mech, profileKey, price, params, result, reading };
+  window._lastScenario = { mech, profileKey, price, params, result, reading, disc: _sbDiscount() };
+  // v953 (T4): repaint the discount note AFTER _lastScenario lands. _sbRenderDiscountNote() is
+  // reached from _sbRenderBasis() partway through this function, i.e. while _lastScenario still
+  // describes the PREVIOUS run -- so the "results below were run at X" notice was comparing the
+  // new field value against the old run and stayed lit on a run that had just been made current.
+  if (typeof _sbRenderDiscountNote === 'function') _sbRenderDiscountNote();
   _refreshSavedTable();
 
   // Scroll results into view
@@ -57181,6 +57397,7 @@ function saveCustomScenario() {
     var _res = { take: _ls.result.take, irr: _ls.result.irr, npv: _ls.result.npv, waterfall: _ls.result.waterfall };
     saved2.push({ name: name, mech: _ls.mech, profileKey: _ls.profileKey, price: _ls.price,
                   params: _ls.params, result: _res, reading: _ls.reading,
+                  disc: _ls.disc == null ? 0.10 : _ls.disc,   // v953 (T4): the rate this row was run at
                   savedAt: new Date().toISOString() });
     localStorage.setItem('customScenarios', JSON.stringify(saved2));
     _refreshSavedTable();
@@ -57270,8 +57487,8 @@ function _exportScenariosXLSX() {
   // which applied to none of them. The blank now travels with its reason, and beside the two
   // figures that decide the hurdle question for 100% of runs.
   var rows = [['Scenario Name', 'Mechanic', 'Profile', 'Price ($/bbl)',
-    'Govt Take (%)', 'Delta Govt Take vs. base (pp)', 'Delta NPV @10% vs. base ($M)',
-    'What changed vs. base', 'Contractor IRR (%)', 'IRR Basis', 'Contractor NPV @10% ($M)',
+    'Govt Take (%)', 'Delta Govt Take vs. base (pp)', 'Delta NPV vs. base ($M)',
+    'What changed vs. base', 'Contractor IRR (%)', 'IRR Basis', 'Discount rate / WACC (%)', 'Contractor NPV ($M)',
     'Contractor NPV @15% ($M)', 'Clears 15% Hurdle', 'Capital at Risk ($M)', 'Payback Year',
     'Royalty (%)', 'CIT (%)', 'Profit Oil (Govt %)', 'Profit Oil (Ctct %)',
     'Cost Recovery (%)', 'FTP (%)', 'State Equity (%)', 'Other Terms']];
@@ -57304,6 +57521,7 @@ function _exportScenariosXLSX() {
       _sbDeltaDriver(_xd),
       (r.irr != null && r.irr < 500) ? +r.irr.toFixed(2) : '',
       _irrBasis[rd.state] || _irrBasis.unknown,
+      +(((s.disc == null ? 0.10 : s.disc) * 100).toFixed(2)),   // v953 (T4)
       r.npv != null ? +r.npv.toFixed(1) : '',
       rd.npv15 != null ? +rd.npv15.toFixed(1) : '',
       rd.npv15 == null ? '' : (rd.npv15 > 0 ? 'Yes' : 'No'),
@@ -57331,7 +57549,8 @@ function _exportScenariosXLSX() {
     ['What changed vs. base', 'What actually moved between that row and the base: fiscal terms only, price only, or both. READ THIS BEFORE QUOTING A DELTA. Where both price and terms moved, the delta is the combined effect and must not be quoted as the cost of the fiscal change — to isolate a fiscal change, hold price constant between the two rows. Where the row runs a different mechanic or production profile it is a separate project rather than a sensitivity, and its delta reads n/a. Until v889 neither this column nor the deltas existed on any surface: the set printed absolute takes only, so a reader subtracting adjacent rows by hand could charge a price move to a fiscal one.'],
     ['Contractor IRR (%)', 'Pre-tax, unlevered IRR at 100% WI. BLANK does not mean missing data — read the IRR Basis cell beside it. An IRR does not exist wherever the contractor funds no negative year, which is the usual outcome for a cost-recovery regime on these profiles.'],
     ['IRR Basis', 'Why the IRR cell reads what it reads, derived from the contractor cash flow for that scenario. Do not quote an IRR into an IC memo without this cell.'],
-    ['Contractor NPV @10% ($M)', 'NPV at the profile discount rate (10%), 100% WI basis'],
+    ['Discount rate / WACC (%)', 'The rate THIS row was discounted at. 10% is ORCA\u2019s standardized basis and reproduces every published figure on the platform; any other value was set in the Scenario Builder\u2019s Discount Rate field, and rows at different rates are not comparable on NPV.'],
+    ['Contractor NPV ($M)', 'NPV at the discount rate in the column to its left, 100% WI basis'],
     ['Contractor NPV @15% ($M)', 'NPV at a 15% IOC hurdle rate, same cash flow. Positive = clears the hurdle. This is the test the IRR column was standing in for, and unlike IRR it is populated for every scenario.'],
     ['Clears 15% Hurdle', 'Yes where NPV @15% > 0.'],
     ['Capital at Risk ($M)', 'Sum of the contractor negative cash-flow years — the money actually exposed, which is far below project capex wherever cost recovery reimburses capex as it is spent. 0 means no contractor capital is exposed at any point.'],
@@ -57345,7 +57564,11 @@ function _exportScenariosXLSX() {
   var ws = XLSX.utils.aoa_to_sheet(rows);
   var wsMeth = XLSX.utils.aoa_to_sheet(methRows);
   // Column widths
-  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:26},{wch:26},{wch:52},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14},{wch:46}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:26},{wch:26},{wch:52},{wch:16},{wch:64},{wch:22},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14},{wch:46}];  // v953 (T4): 24 widths for 24 columns. The 'Discount rate / WACC' column was inserted at
+  // index 10 without one, which shifted every width after it left by one: 'Other Terms' --
+  // the longest text in the sheet, carrying SPT, windfall, PRRT, service fee, Gross Split and
+  // the tiered-ladder flag -- fell off the end to the ~8ch default, while 'State Equity', two
+  // digits, was handed 46.
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Scenarios');
   XLSX.utils.book_append_sheet(wb, wsMeth, 'Methodology');
   XLSX.writeFile(wb, 'ORCA_scenarios_' + new Date().toISOString().slice(0,10) + '.xlsx');
@@ -57391,11 +57614,19 @@ function _sbDeltaVsBase(base, s) {
   }
   var priceMoved  = (+base.price !== +s.price);
   var fiscalMoved = (_sbFiscalSig(base) !== _sbFiscalSig(s));
+  // v953 (T4): the discount rate is now an input, so it can move between saved rows. An NPV
+  // delta between a 10% row and a 14% row is mostly the rate, not the terms — the same class of
+  // unlike comparison the mechanic/profile guard above already refuses to colour.
+  var _bd = (base.disc == null ? 0.10 : base.disc), _sd = (s.disc == null ? 0.10 : s.disc);
+  var discMoved = Math.abs(_bd - _sd) > 0.0001;
+  var _kind = (priceMoved && fiscalMoved) ? 'both' : priceMoved ? 'price' : fiscalMoved ? 'fiscal' : 'identical';
+  if (discMoved) _kind = (_kind === 'identical') ? 'disc' : 'both';
   return {
-    kind: (priceMoved && fiscalMoved) ? 'both' : priceMoved ? 'price' : fiscalMoved ? 'fiscal' : 'identical',
+    kind: _kind,
     dTake: (s.result.take != null && base.result.take != null) ? (s.result.take - base.result.take) : null,
     dNpv:  (s.result.npv  != null && base.result.npv  != null) ? (s.result.npv  - base.result.npv)  : null,
-    fromPrice: base.price, toPrice: s.price
+    fromPrice: base.price, toPrice: s.price,
+    discMoved: discMoved, fromDisc: _bd, toDisc: _sd
   };
 }
 
@@ -57408,7 +57639,10 @@ function _sbDeltaDriver(d) {
                                             : 'different production profile — not a sensitivity on the base';
   if (d.kind === 'fiscal')    return 'fiscal terms only';
   if (d.kind === 'price')     return 'price only ($' + d.fromPrice + ' → $' + d.toPrice + '/bbl)';
-  if (d.kind === 'both')      return 'price AND fiscal terms both moved — delta not attributable to either';
+  if (d.kind === 'disc')      return 'discount rate only (' + _sbDiscTxt(d.fromDisc) + ' → ' + _sbDiscTxt(d.toDisc)
+                                   + ') — same terms at the same price, so government take is unchanged and the NPV move is the rate';
+  if (d.kind === 'both')      return (d.discMoved ? 'discount rate and other inputs' : 'price AND fiscal terms')
+                                   + ' both moved — delta not attributable to either';
   return 'same inputs as base';
 }
 
@@ -57428,12 +57662,13 @@ function _sbDeltaCell(d) {
   var npvStr  = nv == null ? '' : (nv >= 0 ? '+' : '−') + fmtNpvShared(Math.abs(nv));
   var tag = d.kind === 'fiscal' ? 'terms only'
           : d.kind === 'price'  ? '$' + d.fromPrice + '→$' + d.toPrice + ' price only'
-          : d.kind === 'both'   ? '⚠ price + terms'
+          : d.kind === 'disc'   ? _sbDiscTxt(d.fromDisc) + '→' + _sbDiscTxt(d.toDisc) + ' WACC only'
+          : d.kind === 'both'   ? (d.discMoved ? '⚠ WACC + other inputs' : '⚠ price + terms')
           : 'same inputs';
   return '<div title="' + ttl + '" style="line-height:1.45;">'
     + '<span style="color:' + col + ';font-weight:700;">' + takeStr + '</span>'
     + (npvStr ? ' <span style="color:var(--muted);font-size:10px;">' + npvStr + '</span>' : '')
-    + '<br><span style="color:' + (d.kind === 'both' ? 'var(--orange)' : 'var(--muted)') + ';font-size:10px;">' + tag + '</span></div>';
+    + '<br><span style="color:' + (d.kind === 'both' ? 'var(--orange)' : 'var(--muted)') + ';font-size:10px;">' + tag + '</span></div>';   // v953: 'disc' stays grey — a rate move is real, but it is not a fiscal finding
 }
 
 // Two flavours, matching every other Copy-for-IC-Memo control on the platform: text/html so
@@ -57446,7 +57681,7 @@ function _copyScenariosForIC() {
   function E(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   var base = saved[0];
   var HEAD = ['Scenario', 'Mechanic', 'Profile', 'Price ($/bbl)', 'Govt Take (%)',
-              'Δ Govt Take vs. base (pp)', 'Contractor NPV @10% ($M)', 'Δ NPV @10% vs. base ($M)',
+              'Δ Govt Take vs. base (pp)', 'WACC (%)', 'Contractor NPV ($M)', 'Δ NPV vs. base ($M)',
               'Contractor NPV @15% ($M)', 'Clears 15% hurdle', 'Contractor IRR (%)',
               'What changed vs. base', 'Fiscal terms as run'];
   var body = [], anyBoth = false, anyBasis = false, anyNoIrr = false;
@@ -57468,6 +57703,7 @@ function _copyScenariosForIC() {
       r.take != null ? r.take.toFixed(1) : '—',
       (d.kind === 'base') ? '—' : (d.kind === 'basis' || d.dTake == null) ? 'n/a'
         : ((d.dTake >= 0 ? '+' : '−') + Math.abs(d.dTake).toFixed(1)),
+      (((s.disc == null ? 0.10 : s.disc) * 100).toFixed(1)).replace(/\.0$/, ''),   // v953 (T4)
       r.npv != null ? r.npv.toFixed(1) : '—',
       (d.kind === 'base') ? '—' : (d.kind === 'basis' || d.dNpv == null) ? 'n/a'
         : ((d.dNpv >= 0 ? '+' : '−') + Math.abs(d.dNpv).toFixed(1)),
@@ -57494,7 +57730,7 @@ function _copyScenariosForIC() {
   notes.push('Δ columns are this row minus the base row. A positive Δ Govt Take means government takes more than in the base case.');
   if (anyBoth) notes.push('⚠ One or more rows moved BOTH price and fiscal terms relative to the base. Their Δ is the combined effect and must not be quoted as the cost of the fiscal change. To isolate a fiscal change, hold price constant between the two rows.');
   if (anyBasis) notes.push('⚠ One or more rows run a different mechanic or production profile from the base. Those are separate projects, not sensitivities, so their Δ reads n/a. Government take across fiscal-mechanic families is not comparable in any case — a TSC / RSC / Buy-back take is a remuneration artefact, not a fiscal burden.');
-  notes.push('NPV is contractor NPV at 100% working interest, pre-tax and unlevered. @10% is the profile discount rate; @15% is an IOC hurdle rate on the same cash flow, positive = clears the hurdle.');
+  notes.push('NPV is contractor NPV at 100% working interest, pre-tax and unlevered, at the discount rate named in the WACC column of its own row — 10% is ORCA\u2019s standardized basis. @15% is a fixed IOC hurdle rate applied to the same cash flow, positive = clears the hurdle.');
   if (anyNoIrr) notes.push('A blank or qualified IRR is a finding, not missing data. These production profiles take first oil in year 1, the same year as first capex, so contractor exposure is small and brief and an IRR is frequently undefined or not a project return. Use NPV @15% for the hurdle question.');
   notes.push('Fiscal terms as run are read back from each saved run, as percentages. A blank term means the mechanic has no such term, never that it was not recorded.');
 
@@ -57561,7 +57797,7 @@ function _refreshSavedTable() {
     + '</div>';
   html += `<table class="sb-saved-table"><thead><tr>
     <th>Name</th><th>Mechanic</th><th>Profile</th><th>Price</th>
-    <th>Govt Take</th><th title="Change in government take and contractor NPV against the FIRST saved scenario, which is the base case. The line beneath each delta names what actually moved between that row and the base — fiscal terms, price, or both. Where both moved the delta is the combined effect and is deliberately left uncoloured, because it cannot be quoted as the cost of the fiscal change.">&#916; vs. Base</th><th title="Blank or 'no IRR' is a finding, not missing data — hover the cell for the reason.">IRR</th><th>NPV @10%</th><th title="NPV at a 15% IOC hurdle rate. Positive clears the hurdle. Populated for every scenario, including those where no IRR exists.">NPV @15%</th><th>Key Parameters</th>
+    <th>Govt Take</th><th title="Change in government take and contractor NPV against the FIRST saved scenario, which is the base case. The line beneath each delta names what actually moved between that row and the base — fiscal terms, price, or both. Where both moved the delta is the combined effect and is deliberately left uncoloured, because it cannot be quoted as the cost of the fiscal change.">&#916; vs. Base</th><th title="Blank or 'no IRR' is a finding, not missing data — hover the cell for the reason.">IRR</th><th title="Contractor NPV at the discount rate EACH ROW was run at, printed under the figure wherever that is not ORCA&#39;s standardized 10%. Until v953 the Scenario Builder had no discount-rate field and every row was necessarily a 10% figure, so this column could state the rate once in its header; it now varies per row and states it per row. Two rows run at different rates are not a fiscal comparison — the &#916; vs. Base column says so.">NPV @ WACC</th><th title="NPV at a 15% IOC hurdle rate. Positive clears the hurdle. Populated for every scenario, including those where no IRR exists.">NPV @15%</th><th>Key Parameters</th>
   </tr></thead><tbody>`;
   // The first saved scenario is the base every delta is measured against. Naming it on screen
   // matters as much as the delta does: an unlabelled base is why the column could be read
@@ -57581,7 +57817,15 @@ function _refreshSavedTable() {
       <td style="color:${r.take>70?'var(--negative)':r.take>50?'var(--orange)':'var(--positive)'};font-weight:700;">${r.take.toFixed(1)}%</td>
       <td>${_sbDeltaCell(_d)}</td>
       <td title="${((s.reading && ({'no-capital-at-risk':'No IRR — the contractor funds no negative year on this profile, so there is no capital base to return. Read NPV @15%.','uneconomic':'No IRR — cash flow never turns positive.','unbounded':'IRR exceeds the 500% solver bound.','inflated':'Computed, but first oil lands in the same year as first capex, so this is not a project return.','computed':'Computed from the contractor cash flow.'})[s.reading.state]) || '').replace(/"/g,'&quot;')}">${(s.reading && s.reading.state === 'no-capital-at-risk') ? '<span style="color:var(--muted);font-size:11px;">no IRR</span>' : (s.reading && s.reading.state === 'unbounded') ? '<span style="color:var(--muted);font-size:11px;">&gt;500%</span>' : (r.irr !== null && r.irr < 500) ? r.irr.toFixed(1)+'%' : '—'}</td>
-      <td>${r.npv !== null ? fmtNpvShared(r.npv) : '—'}</td>
+      <td>${r.npv !== null ? fmtNpvShared(r.npv) : '—'}${(function(){
+        // v953 (T4): the rate is an input now, so a row states its own basis. Silent at 10%,
+        // which is every row saved before v953 and every row the default produces.
+        var _sd = (s.disc == null ? 0.10 : s.disc);
+        return Math.abs(_sd - 0.10) < 0.0001 ? ''
+          : '<br><span style="color:var(--accent);font-size:9px;font-weight:700;" title="Run at ' + _sbDiscTxt(_sd)
+            + ', not ORCA\u2019s standardized 10% \u2014 not comparable with a 10% row or with any published ORCA NPV.">@'
+            + _sbDiscTxt(_sd) + '</span>';
+      })()}</td>
       <td style="${(s.reading && s.reading.npv15 != null && s.reading.npv15 <= 0) ? 'color:var(--red);' : 'color:var(--green);'}font-weight:700;">${(s.reading && s.reading.npv15 != null) ? fmtNpvShared(s.reading.npv15) : '—'}</td>
       <td style="font-size:10px;color:var(--muted);">${paramStr}</td>
     </tr>`;
@@ -57855,7 +58099,13 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
     var _rel740     = (Math.abs(_pv740) >= 1) ? Math.abs(_absD740) / Math.abs(_pv740) : null;
     // Material means relatively material. A $686M gap on a $3.6B base is 19% and does not need a
     // paragraph; a 3.2x gap does. Sign mismatch always does -- one of the two is a loss.
-    var _wide740    = (_mult740 != null && (_mult740 >= 1.5 || _mult740 <= 0.667))
+    // v953 (T4): the discount rate is an input now, so it is a THIRD mechanism that can open this
+    // gap — and unlike the other two it invalidates the comparison at any size. A $40M gap that is
+    // entirely the rate must not be read as a terms or population effect, so a rate mismatch
+    // always earns the paragraph rather than having to clear a materiality bar.
+    var _discOff953 = (typeof _sbDiscount === 'function') && Math.abs(_sbDiscount() - 0.10) > 0.0001;
+    var _wide740    = _discOff953
+                   || (_mult740 != null && (_mult740 >= 1.5 || _mult740 <= 0.667))
                    || !_ratioOk740
                    || (Math.abs(_absD740) >= 500 && _rel740 != null && _rel740 >= 0.25);
     var _npvCol740  = _wide740 ? 'var(--red)' : 'var(--muted)';
@@ -57896,6 +58146,13 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
         + (_profOff740
             ? 'They are also not the same project: the published figure is computed on the standardized Deepwater profile, and this scenario is running the '
               + _esc594((typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES[sbProfileKey] && DCF_PROFILES[sbProfileKey].name) || String(sbProfileKey)) + ' profile. '
+            : '')
+        + (_discOff953
+            ? '<strong style="color:var(--accent);">They are also not discounted at the same rate.</strong> ORCA’s published figure is a '
+              + '10% WACC figure, with no country risk premium; this scenario is running at <strong style="color:var(--text);">'
+              + _sbDiscTxt() + '</strong>. Part of the gap above is the rate and nothing else, so do not attribute the whole of it '
+              + 'to terms or to the contract population. Set the field back to 10% to compare like with like — a reform premium '
+              + 'is read as the move BETWEEN your own two runs, not against a published number computed on a different rate. '
             : '')
         + '<strong style="color:var(--text);">Quote the published figure for a country screen; quote this one only with your own capex, opex and terms stated beside it.</strong>'
         + '</div>';
@@ -58083,6 +58340,12 @@ function ddOpenScenarioBuilder(country) {
     loadedVals:   (typeof _sbSnapLoaded944 === 'function') ? _sbSnapLoaded944() : null,
     fingerprint:  _sbFormFingerprint()
   };
+
+  // v953 (T4): the origin country is now known, so the Discount Rate note can name that
+  // jurisdiction's reform verdict and offer its premium band. This is the only surface where the
+  // Reform Risk IC action ("WACC +3-5pp") can be turned into a number, so it is offered at the
+  // field rather than left as an instruction the analyst has to apply by hand.
+  if (typeof _sbRenderDiscountNote === 'function') _sbRenderDiscountNote();
 
   // Auto-run the DCF
   setTimeout(() => runCustomScenario(), 100);
@@ -65637,6 +65900,12 @@ function openScenarioBuilder() {
   // v883 (T2): and no ladder either. ddOpenScenarioBuilder() calls this first and re-arms
   // afterwards, so only a country pre-fill can leave one armed.
   if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
+  // v953 (T4): a fresh open starts at ORCA's standardized 10%, so the first run an analyst
+  // makes always reproduces the published figures. ddOpenScenarioBuilder() calls this first
+  // and the note is re-rendered afterwards with the country's reform premium offered.
+  var _dEl953 = document.getElementById('sb-discount');
+  if (_dEl953) _dEl953.value = 10;
+  if (typeof _sbRenderDiscountNote === 'function') _sbRenderDiscountNote();
   // Focus trap: move focus to first focusable element inside modal
   var focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
   if (focusable.length) focusable[0].focus();
