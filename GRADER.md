@@ -62560,3 +62560,14 @@ deserves its own walk rather than riding along with this one.
 
 ## Friction
 Side-by-Side's take-vs-NPV **inversion notice** was the last ordering claim on the tab still hard-wired to $75. Everything else — the verdict strip, the column order, the ordering chain — moved onto
+
+---
+## Cycle 872 Log — 2026-09-20 14:46
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: I'll let the suites run to completion rather than poll. Summarizing where the cycle stands while they finish.
+
+**Cycle 872 — work complete, final verification in flight.**
+
+**What I found first:** cycle 871 didn't fail, it was *killed* — `subprocess.TimeoutExpired` after 1800s — leaving 271 uncommitted insertions in `index.html`: a complete-looking v953 T4 feature, never verified, never committed, never pushed. That's the worst state this repo can be in, so I verified it against the shipped buil
