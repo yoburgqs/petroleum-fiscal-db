@@ -62042,3 +62042,16 @@ The analyst asking where the Asia Pacific benchmark came from gets 42 countries,
 Header badge `v946 → v947`, done silently at the end, not as the reason the cycle happened.
 
 **Not fixed this cycle, named for the next T6 or T1 walk:** Sample Analyses Card 5 (*"IOC Low Take · Positive NPVs"*) ranks **8 of 8 PROXY** countries — Vanuatu, Bahamas, Montenegro, Greenland, Faroe Islands, Moldova, Romania, Sweden, three of them evidence grade D — under a green heading, ending in a **"Compare Top 5"** button that builds an IC shortlist out of five of them. Card 4 (*"Price Sensitivity Leaders"*) is also 8 of 8 PROXY. Left alone deliberately: it is a separate defect from the region resolver and deserves its own cycle rather than riding along with this one.
+
+---
+## Cycle 862 Log — 2026-09-20 03:17
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Here is the cycle summary.
+
+## Cycle 862 — v947
+
+**Task: T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (946 was T2, 943 T4, 942 T1, 941 T3, 940 T5; T6 last ran at 938). Walked cold at 1440 and at 390 hasTouch.
+
+**Friction.** The Country Profile Evidence Chain turned out to be saturated — I walked it on seven countries and clicked the terms-cited chip through from Fiscal Compare, and it holds up. The gap was on **Sample Analyses*
