@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v949</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v950</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -29991,6 +29991,75 @@ function renderCompare() {
       ? ' ' + Number(st.n3).toLocaleString() + ' of the ' + Number(st.tot).toLocaleString()
         + ' contracts price on PRRT, a cash-flow base — too few to move the column, but read at one price at a time if you drill into them.'
       : '';
+    // ── v950 (T3): the row LABELLED comparability was the last one still ignoring the data-basis gate ──
+    //
+    // Walked "how do these three countries compare side by side?" cold at 1440, no sessionStorage
+    // or localStorage, on the tab's own shipped default set — Norway / United Kingdom /
+    // Netherlands. Read the grid downward and every row enforces the gate except this one:
+    //
+    //   Data basis                PROD-WTD     PROD-WTD     PROXY
+    //   Take basis (mechanic)     Concession   Concession   Concession
+    //                             price-linked — comparable   x3, in green      <- THIS ROW
+    //   Rank among producers      #9 of 21     #17 of 21    not ranked · no production data
+    //   Govt Take ($75/bbl)       49.2%        68.0%        ○ 23.4% not ranked · statutory terms
+    //   Contractor NPV @$75       $1.16B       $826M        $3.56B not comparable · statutory terms
+    //
+    // and the verdict strip 300px above has already said "Set aside — 1 of 3 columns cannot join
+    // that ordering: Netherlands". So on the one row whose LABEL is about comparability, the tab
+    // tells the analyst in its own green go-colour that the column it just set aside is
+    // comparable. The tooltip closed with "may be ranked directly against them" — a direct
+    // instruction to do the thing every other row on the grid refuses to do.
+    //
+    // There are TWO gates on this grid and they are independent:
+    //   1. MECHANIC  — is the take price-linked (Group 1) or a fee-basis artefact (TSC/RSC/Buy-back)
+    //                  or a cash-flow base (PRRT)? This row's existing job. The fee and PRRT
+    //                  branches above already report it correctly, in red and yellow.
+    //   2. DATA BASIS — is the take weighted by verified field production, or a simple average of
+    //                  statutory terms? _cmpBasisGate. Worth about 30pp of take across the
+    //                  database, and it is what sets the column aside.
+    // Passing gate 1 was being printed as an unqualified "comparable" verdict for gate 2 as well.
+    //
+    // 161 of the 185 columns carry no verified production, so every one of them prints this green
+    // verdict, and the cold-load default set is one of the sets where it is wrong. The failure is
+    // not hypothetical: the notice under this same grid reads "Do not carry Netherlands into an IC
+    // memo as the lowest-take column" — the platform already knows this is the wrong action, and
+    // was spending 90 words 1,500px below the fold undoing what this row said in green.
+    //
+    // Scope is exactly _cmpBasisNote()'s and v750's: the gate fires ONLY where the set MIXES
+    // production-weighted and statutory-terms columns. An all-producer set and an all-statutory
+    // set are internally like-for-like and are unchanged — "comparable" is true there. The
+    // mechanic stays the cell's value, the row keeps its two-line height, nothing is deleted:
+    // the Group-1 fact moves into the tooltip, where it is still the first thing stated.
+    if (_cmpBasisGate && !_cmpHasProd(d) && !isStateMonopoly(d.take_75)) {
+      const _peers = _cmpStatNames.filter(c => c !== d.country);
+      return '<span style="color:var(--text);cursor:help;" title="'
+        + _cmpEsc(d.country + ': ' + (st.hasPrrt ? Number(st.n1).toLocaleString() + ' of its '
+            + Number(st.tot).toLocaleString() + ' contracts are' : 'all ' + Number(st.tot).toLocaleString()
+            + ' contracts are')
+          + ' ' + _cmpMechBare(st, 1) + ' — ' + _cmpMechNames(st, 1)
+          + '. On the MECHANIC that is the comparable group (Concession, PSC, Gross Split, Revenue '
+          + 'Share): contractor income moves with the oil price, so it is not a fee-basis or '
+          + 'cash-flow artefact. That is one of the two tests, and it is the one this column '
+          + 'passes. It fails the other. ORCA holds no verified field production for '
+          + d.country + ' (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0)
+          + '), so its take is a simple average of statutory terms across '
+          + (d.n != null ? Number(d.n).toLocaleString() : '?') + ' contracts, while '
+          + (_cmpProdNames.length === 1 ? _cmpProdNames[0] + ' beside it is'
+                                        : _cmpProdNames.join(' and ') + ' beside it are')
+          + ' weighted by barrels. Across the database that difference alone is worth about 30 '
+          + 'percentage points of take, which is why the Govt Take, Contractor NPV and Rank among '
+          + 'producers rows all set this column aside. '
+          + (_peers.length
+              ? 'Read it against ' + _peers.join(' and ') + ', the other statutory-basis column'
+                + (_peers.length > 1 ? 's' : '') + ' in this set.'
+              : 'There is no second statutory-basis column here to read it against — add one, or '
+                + 'state the proxy basis beside the ordering in the memo.') + pr)
+        + '">' + _g1label + '</span>'
+        + _cmpSubLine('price-linked — but not comparable here'
+            + (st.hasPrrt ? ' · ' + st.n3 + ' PRRT of ' + Number(st.tot).toLocaleString() : ''),
+          'var(--orange)')
+        + '<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);">statutory terms, not production-weighted</span>';
+    }
     return '<span style="color:var(--text);cursor:help;" title="'
       + _cmpEsc(d.country + ': ' + (st.hasPrrt ? Number(st.n1).toLocaleString() + ' of its '
           + Number(st.tot).toLocaleString() + ' contracts are' : 'all ' + Number(st.tot).toLocaleString()
@@ -38963,6 +39032,112 @@ function _iocEvidenceMix(rows, totalContracts) {
   return { n: weakN, pct: totalContracts > 0 ? weakN / totalContracts * 100 : 0,
            list: list, graded: graded };
 }
+// ── v950 (T6): "WTD AVG TAKE @$75" NEVER SAID WHAT IT WAS WEIGHTED BY ─────────────────
+// This is the one number on the IOC Portfolio tab an analyst quotes verbatim — "Chevron's
+// portfolio government take is 30%". It is computed at both render sites as
+// SUM(take_75 * n) / SUM(n), where n is THE NUMBER OF CONTRACT DOCUMENTS ORCA HOLDS for that
+// country|mechanic row. Not production. Not reserves. Not working interest. Not value.
+//
+// It was also the only tile in this strip with no title="" at all — Mechanic Mix, C/D-graded
+// exposure, Reform exposure, Instrument-type rows and R-factor PSC each carry one. Its only
+// qualifier read "this operator's own contracts", which answers WHOSE contracts and not how
+// they were weighted, so there was no surface anywhere that named the weight.
+//
+// That matters because the weight is concentrated, measured on the shipped build over the 16
+// quick-pick brands after the country|mechanic dedupe both callers apply:
+//
+//   Chevron   30.2%  <- USA is 74% of the weight at 23.8%;  unweighted country mean 52.7%  (22.5pp)
+//   BP        30.4%  <- USA is 74% of the weight at 23.8%;  unweighted country mean 52.4%  (22.0pp)
+//   Equinor   61.3%  <- Norway is 87% of the weight at 65.4%; country mean 40.9%          (-20.4pp)
+//   Woodside  34.5%  <- Australia 47% of the weight;         country mean 48.9%           (14.5pp)
+//   Shell     39.1%  <- USA is 54% of the weight at 23.8%;   country mean 51.8%           (12.7pp)
+//
+// 467 individual Gulf of Mexico and onshore US lease documents outvote 140 Norwegian
+// concessions 3-to-1 in Chevron's headline, and each of those US leases is a tract, not a
+// position. An analyst reading 30.2% concludes Chevron sits in an unusually contractor-friendly
+// set of regimes; what they are actually reading is ORCA's document count per country.
+//
+// The number is not wrong and is not removed — it is a real contract-count weighted mean, and
+// for a single-country operator it is exactly that country's take. What is added is its basis,
+// which is the T6 question, plus the two figures that let the analyst see when the basis is
+// carrying the answer: which country holds the weight, and the unweighted country mean.
+function _iocTakeBasis(allTakes) {
+  if (!allTakes || !allTakes.length) return null;
+  var perC = {};
+  allTakes.forEach(function(r) {
+    if (!perC[r.country]) perC[r.country] = { n: 0, s: 0 };
+    perC[r.country].n += (r.n || 0);
+    perC[r.country].s += r.take_75 * (r.n || 0);
+  });
+  var list = Object.keys(perC).map(function(c) {
+    return { country: c, n: perC[c].n, take: perC[c].n ? perC[c].s / perC[c].n : null };
+  }).filter(function(x) { return x.n > 0 && x.take !== null; });
+  if (!list.length) return null;
+  list.sort(function(a, b) { return b.n - a.n; });
+  var N  = list.reduce(function(s, x) { return s + x.n; }, 0);
+  var wt = list.reduce(function(s, x) { return s + x.take * x.n; }, 0) / N;
+  var unwt = list.reduce(function(s, x) { return s + x.take; }, 0) / list.length;
+  return { wt: wt, unwt: unwt, gap: unwt - wt, n: N, nCountries: list.length,
+           top: list[0], topShare: list[0].n / N * 100 };
+}
+// One tile, used by the group roll-up and the single-entity table, so the two can never state
+// the headline take on different terms.
+function _iocTakeStat(allTakes) {
+  var b = _iocTakeBasis(allTakes);
+  if (!b) {
+    return '<div class="ioc-stat" title="' + _iocEvEsc('No row in this portfolio carries a '
+      + 'government take at $75/bbl, so there is no weighted average to report.')
+      + '"><div class="sv">&mdash;</div><div class="sk">Wtd Avg Take @$75</div></div>';
+  }
+  var single = b.nCountries === 1;
+  // "Carrying the answer" = one country holds at least 40% of the document weight AND the
+  // weighting moves the figure at least 5pp off the unweighted country mean. Both legs, because
+  // a concentrated portfolio of similar regimes is concentrated without being misleading.
+  var skewed = !single && b.topShare >= 40 && Math.abs(b.gap) >= 5;
+  var sub = '<span style="font-weight:400;text-transform:none;letter-spacing:0;">'
+    + 'weighted by contract count</span>';
+  var conc;
+  if (single) {
+    conc = '<div style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;'
+      + 'color:var(--muted);margin-top:3px;">one country &mdash; ' + _iocEvEsc(b.top.country)
+      + ', so this is its take</div>';
+  } else {
+    conc = '<div style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;'
+      + 'color:' + (skewed ? 'var(--orange)' : 'var(--muted)') + ';margin-top:3px;line-height:1.5;">'
+      + (skewed ? '&#9888; ' : '') + _iocEvEsc(b.top.country) + ' is ' + Math.round(b.topShare)
+      + '% of the weight, at ' + b.top.take.toFixed(1) + '%'
+      + '<br><span style="color:var(--muted);">unweighted country mean '
+      + b.unwt.toFixed(1) + '% &middot; ' + b.nCountries + ' countries</span></div>';
+  }
+  var tip = 'Weighted by THE NUMBER OF CONTRACT DOCUMENTS ORCA HOLDS — '
+    + 'SUM(take × contracts) / SUM(contracts) over this operator’s own rows, after the '
+    + 'country|mechanic dedupe. It is NOT weighted by production, reserves, working interest, '
+    + 'capital employed or value, and ORCA models none of those for an operator. '
+    + b.n.toLocaleString() + ' contract' + (b.n === 1 ? '' : 's') + ' across ' + b.nCountries
+    + ' countr' + (b.nCountries === 1 ? 'y' : 'ies') + ' carry a take at $75/bbl.';
+  if (single) {
+    tip += ' Every one of them is in ' + b.top.country + ', so the weighting does nothing here '
+      + 'and this figure is that country’s take.';
+  } else {
+    tip += ' ' + b.top.country + ' alone supplies ' + Math.round(b.topShare) + '% of that weight '
+      + 'at ' + b.top.take.toFixed(1) + '%, so it moves this figure more than the other '
+      + (b.nCountries - 1) + ' countr' + (b.nCountries - 1 === 1 ? 'y' : 'ies') + ' combined'
+      + (b.topShare >= 50 ? '' : ' or close to it') + '. Give every country equal weight instead '
+      + 'and the same portfolio reads ' + b.unwt.toFixed(1) + '% — a '
+      + Math.abs(b.gap).toFixed(1) + 'pp '
+      + (b.gap > 0 ? 'HIGHER' : 'LOWER') + ' figure. ';
+    tip += skewed
+      ? 'Treat the headline as a document-count artefact rather than a portfolio take: a US '
+        + 'lease tract and a Norwegian concession count as one row each here, and they are not '
+        + 'comparable positions. Quote the per-country rows below, or state the weighting '
+        + 'explicitly beside the number in an IC memo.'
+      : 'The two readings are close, so the weighting is not carrying the answer on this '
+        + 'portfolio. The per-country rows below remain the defensible citation.';
+  }
+  return '<div class="ioc-stat" style="flex:1.2;min-width:190px;" title="' + _iocEvEsc(tip) + '">'
+    + '<div class="sv">' + b.wt.toFixed(1) + '%</div>'
+    + '<div class="sk">Wtd Avg Take @$75<br>' + sub + conc + '</div></div>';
+}
 // The portfolio-level roll-up of that column. Without it an analyst reading a 49-row table has
 // to scan every row to find out whether any of it is weakly evidenced.
 function _iocEvidenceStat(rows, totalContracts) {
@@ -39585,7 +39760,8 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   const countries = [...new Set(rows.map(r=>r.country))];
   const mechanics = [...new Set(rows.map(r=>r.mechanic))];
   const allTakes  = rows.filter(r=>r.take_75!==null);
-  const wtAvgTake = allTakes.length ? allTakes.reduce((s,r)=>s+r.take_75*r.n,0)/allTakes.reduce((s,r)=>s+r.n,0) : null;
+  // v950 (T6): the weighted-take formula now lives once, in _iocTakeBasis(), which both tiles
+  // read. A second copy here is exactly the drift that put two different bases on one number.
   const rfContractsAgg = rows.filter(r => { const cd=COUNTRY_DATA.find(d=>d.country===r.country); return cd&&cd.has_r_factor_tiers&&r.mechanic==='PSC'; }).reduce((s,r)=>s+r.n,0);
   const rfPctAgg = totalContracts > 0 ? Math.round(rfContractsAgg / totalContracts * 100) : 0;
   statsDiv.style.display='flex';
@@ -39597,7 +39773,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStrAgg}</div><div class="sk">Mechanic Mix</div></div>
-    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
+    ${_iocTakeStat(allTakes)}
     ${_iocEvidenceStat(rows, totalContracts)}
     ${_iocReformStat(countries)}
     ${_iocInstrumentStat(rows, totalContracts)}
@@ -39729,7 +39905,8 @@ window.loadIOC = function(operator) {
   const countries = [...new Set(rows.map(r=>r.country))];
   const mechanics = [...new Set(rows.map(r=>r.mechanic))];
   const allTakes  = rows.filter(r=>r.take_75!==null);
-  const wtAvgTake = allTakes.length ? allTakes.reduce((s,r)=>s+r.take_75*r.n,0)/allTakes.reduce((s,r)=>s+r.n,0) : null;
+  // v950 (T6): the weighted-take formula now lives once, in _iocTakeBasis(), which both tiles
+  // read. A second copy here is exactly the drift that put two different bases on one number.
   const rfContracts = rows.filter(r => { const cd=COUNTRY_DATA.find(d=>d.country===r.country); return cd&&cd.has_r_factor_tiers&&r.mechanic==='PSC'; }).reduce((s,r)=>s+r.n,0);
   const rfPct = totalContracts > 0 ? Math.round(rfContracts / totalContracts * 100) : 0;
 
@@ -39741,7 +39918,7 @@ window.loadIOC = function(operator) {
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStr}</div><div class="sk">Mechanic Mix</div></div>
-    <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">this operator&rsquo;s own contracts</span></div></div>
+    ${_iocTakeStat(allTakes)}
     ${_iocEvidenceStat(rows, totalContracts)}
     ${_iocReformStat(countries)}
     ${_iocInstrumentStat(rows, totalContracts)}
