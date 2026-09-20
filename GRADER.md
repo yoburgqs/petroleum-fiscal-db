@@ -62433,3 +62433,117 @@ unchanged.
 
 ## Friction
 The countries the loop keeps re-walking answer T2 cleanly, so I swept the data instead. Across all 185 countries, 
+
+---
+## Cycle 870 Log — 2026-09-20 12:15
+
+- Test before: 500 PASS / 0 FAIL (deployed build, per cycle harness)
+- Test after: **499 PASS / 0 FAIL / 1 WARN — suite RAN this cycle** against the modified local tree
+- Baseline control, pre-change tree, same harness: **499 / 0 / 1 — identical. No delta from this change.**
+  The gap vs the deployed 500/0/0 is the `sw.js` 404 under `python -m http.server`, present in both arms
+  (same as cycles 868/869).
+- JS syntax gate: 11 inline blocks, **PASS**
+- Shipped as **v952** (`5ffec78`)
+
+## Task
+
+**T3 — "How do these three countries compare side by side?"** Stalest in rotation (869 and 868 were T2,
+867 T6, 864/865 T5, 863 T1, 858 T4, T3 last at 855). Walked cold at 1440×900 and 390×844 `hasTouch`,
+fresh browser context, no sessionStorage or localStorage.
+
+## Friction
+
+`renderCompare()`, the take-vs-NPV inversion notice — helpers `_invT` / `_invV` at index.html:31739-31740,
+box emitted at :31822.
+
+v929 gave this tab a **Rank at** control and moved the verdict strip, the column order and the whole
+ordering chain onto `cmpRankPrice`. This notice was the last ordering claim left hard-wired to `75` —
+and it is the **strongest** claim on the tab. It is headed as a paradox, it is drawn in an orange
+red-bordered box, it instructs *"do not present the NPV ordering as the fiscal ranking"*, and it leaves
+the platform as a numbered note in the Copy-for-IC-Memo clipboard.
+
+So the tab contradicted itself on one screen. Angola / Brazil, **Rank at $100**:
+
+| surface | what it said |
+|---|---|
+| verdict strip | `CONTRACTOR VALUE @$100, LARGEST FIRST: Brazil $2.65B › Angola $1.65B` — **"agrees with take order"** |
+| this box, ~200px below | **"Govt Take and Contractor NPV rank these columns in opposite orders.** Brazil takes more of the barrel than Angola (55.6% vs 53.0%) and still shows more contractor NPV ($1.73B vs $1.14B)" |
+
+Every one of those four figures is **$75**. Both statements were carried into the same IC-memo paste,
+as notes 1 and 5 of one numbered list. The box named no price at all, which is precisely what let the
+staleness sit here unseen — nothing on screen said which deck it belonged to.
+
+Measured over the shipped `country_data.json`, across the **420** ordered same-basis producer pairs
+(45 of which invert at $75):
+
+| Rank at | shown a paradox untrue at that price | real inversion at that price, not shown |
+|---|---|---|
+| $50 | 2 | **14** |
+| $100 | **13** | 1 |
+| $125 | **16** | 1 |
+
+The $50 column is the worse half: an analyst running the **downside** deck — the one an IC actually
+interrogates — was shown nothing at all for 14 pairs that genuinely do invert there.
+
+## Change
+
+`_invT` / `_invV` now read `cmpRankPrice` instead of the hard-coded `75`, on both the blended (`g1`)
+and plain legs, as does the `_cmpEcon` eligibility filter. Both headings now **name the price tested**
+(`⚠ At $100/bbl, Govt Take and Contractor NPV rank these columns in opposite orders.`) and the box
+states that the price is the one set by the *Rank at* control and that the inverting pairs are not the
+same at every price.
+
+v768's stated reason for the hard-coding — *"ORCA holds the NPV split at $75 only, which is the only
+price this notice tests"* — is no longer true of the data, and that was checked rather than assumed:
+every `g1` block carries `t50/t75/t100/t125` and `v50/v75/v100/v125`, **all 11 blended countries
+complete with no nulls**, and every top-level `take_`/`npv_` is populated **185/185** at all four
+prices. The null-guards are kept regardless.
+
+**$75 is unchanged by construction** — at `_invP === 75` the test is identical to what shipped, so the
+default view and every all-$75 set are byte-equivalent apart from the added price label.
+
+## Result
+
+An analyst who sets **Rank at $100** to defend a $100 deck no longer reads two contradictory
+conclusions about the same two countries on the same screen, and no longer pastes both into one IC
+memo. Verified live at all four prices on Angola / Brazil: the box fires at $50 and $75 with the
+correct $50 and $75 figures (strip: "disagrees"), and goes **silent** at $100 and $125 (strip:
+"agrees"). The $100 IC-memo export dropped from 5 comparability notes to 4 — the contradictory one is
+gone.
+
+And the inversions that were being **missed** now surface: Brazil / Malaysia is silent at $75 and now
+fires at $50; Azerbaijan / China is silent at $75 and now fires at $100; Azerbaijan / Indonesia fired
+at $75 and now correctly goes silent at $100.
+
+### Cycle 870 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS** (0 failures) |
+| Runtime suite, **ran** this cycle against the modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Runtime suite, baseline control (pre-change tree), same harness | **499 / 0 / 1 — IDENTICAL.** No delta from this change |
+| Horizontal scroll, 8 tabs × 1920/1440/1280/1024/768/390, plus the loaded Side-by-Side state at each | **0 overflow screens** |
+| Page errors across the whole walk | **0** |
+| Mobile, 390×844 `hasTouch` | paradox box renders in-bounds, **0 overflowing elements**, correct price shown |
+| Share-link roundtrip incl. `@100~take_desc` | restores tab, price, order, chips and column order — **clean** |
+| Contradiction at $50 / $75 / $100 / $125 | strip and box **agree at all four** |
+
+**Walked and found sound — recorded so the next T3 does not re-find them as new:**
+
+1. **The 5-country cap is handled.** At 5/5 the search box still offers a normal clickable result and
+   Enter clears the input, but `addCompare` fires a toast naming the country and why it was dropped.
+   I first logged this as a silent failure; that was **wrong** — my selector looked for a toast *class*
+   and the element uses `id="copy-toast"`. Re-measured before acting on it.
+2. **`Rank among producers (take @$75)`** is genuinely a $75 computation (`getProducerContext` sorts and
+   medians on `cpCmpTakeOf(c,'75')` throughout) and is correctly labelled. Its cell contents do **not**
+   drift with the Rank-at control; the columns reorder around it, which is what made it look like they
+   did on a positional read.
+3. Country search is in good shape — alias map, Levenshtein fallback, ranked matches, explicit no-match
+   panel, data-basis badge at the point of choice.
+
+**Left deliberately, named for the next T3:** comparability note 3 ("These columns do not rank the same
+way at every price") narrates from $75 and calls it *"the base-case row"* even when the analyst has
+selected $100. Unlike the box fixed here it makes no false claim — it is an explicitly multi-price note
+and every figure in it is correctly attributed to its own price — but the phrase "base case" is
+anchored to a deck the analyst may not have chosen. It is a wording anchor, not a contradiction, and it
+deserves its own walk rather than riding along with this one.
