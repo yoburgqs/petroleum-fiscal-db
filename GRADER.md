@@ -61829,3 +61829,45 @@ Resolved this cycle from the carried list: **"two charts render below the five c
 **Friction.** I walked Side-by-Side from a cold Playwright context — no sessionStorage, no localStorage — at 1440×900 and at 390×844 with `hasTouch`, on Guyana / Brazil / Angola.
 
 The two chart wraps (`index.html:4080`, `:4086`) are **siblings of `#cmp-output`**, not children of it. `renderCompare()` writes the verdict strip, 
+
+---
+## Cycle 856 Log — 2026-09-19
+- Summary: ## Cycle 856 summary — v942
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (855 was T3, 854 T5, 853 T2, 852 T6; T1 was stalest, last walked at cycle 850.)
+
+**Friction.** Walked T1 cold in a fresh Playwright context — no sessionStorage, no localStorage — at 1440×900 and 390×844 `hasTouch`.
+
+The Screener itself is in good shape and I found nothing worth a cycle there: the preset chip states its own criteria, the proxy warning re-counts against the *filtered* set (`105 of 114`, `93 of 95`), the basis dividers re-word themselves when a screen returns no production-backed rows at all, near-miss chips name the threshold that removed each country and route to its Country Profile, and `_scFeeCmpAt()` correctly stays silent on Russia (1 fee-basis contract of 1,247). I also chased and discarded two false leads: the `sc-region` taxonomy matches the REGION column via optgroups (I had been reading the Explorer's hidden `flt-region`), and the table's 168px overflow at 1440 keeps COUNTRY on screen through the scroll, with a fade cue.
+
+The worst moment is the third Explorer mode — **Bubble Chart**. Its caption (`index.html:3987`) told the analyst, in bold:
+
+> The **left frontier** (low take) with **high NPV** (upper position) represents the most IOC-favorable regimes.
+
+Measured off `COUNTRY_DATA` at $75/bbl, that frontier is:
+
+| rank by NPV | country | take | NPV | verified production |
+|---|---|---|---|---|
+| 1 | Vanuatu | 5.0% | $5,102M | 0% |
+| 2 | Bahamas | 10.0% | $4,671M | 0% |
+| 3 | Montenegro | 10.5% | $4,631M | 0% |
+| 4 | Greenland | 11.6% | $4,542M | 0% |
+| 5 | Faroe Islands | 11.9% | $4,514M | 0% |
+
+**All twenty highest bubbles on the chart carry `prod_coverage_pct = 0`.** Of the 68 countries left of take 25%, exactly **one** has verified production. The 45 `_scTakeIsFloor()` countries span take 5.0–36.5% and NPV $2,419M–$5,102M — precisely the upper-left quadrant the caption points at. They sit there *because* ORCA holds no petroleum rent instrument for them: no rent lever modelled → lowest take → highest NPV → top-left corner.
+
+The Screener already knows this. `_scTakeIsFloor()` drives its `TAKE IS A FLOOR, NOT A MEASUREMENT` divider, prints `≥` on take and `≤` on NPV, and says *"a low take here is missing record, not favourable terms — do not carry this block into a shortlist."* The Bubble Chart imported none of it and drew those 45 identically to every other proxy. v818's own source comment names Vanuatu, Bahamas, Montenegro, Greenland, Faroe Islands as the trap; v870 then labelled only the 22 production-backed bubbles and reasoned the unnamed cloud "reads as what it is." It does not — anonymity was doing the damage.
+
+**Change.**
+1. **The frontier is named.** `_lblPts` was `all.filter(q => q.verified)`; it now appends the 8 highest-NPV unverified points (3 on mobile). Vanuatu, Montenegro and Bahamas are printed at the top of the plot, in the muted grey the plugin already reserves for unverified names, against ink for the verified ones.
+2. **The bounded set is drawn as a bound.** Floor-take countries lose their fill entirely and drop to a 45%-alpha border (region colour kept on the stroke, so v818's "border = region, fill = basis" split is intact), and their label carries a **↘** — the point is plotted at take-floor / NPV-ceiling, so the country's true position is right of and below the mark.
+3. **Third key in the basis legend** stating the bound, and the caption rewritten to send the analyst to the filled bubbles and explain why the dotted ones crowd the corner.
+4. Canvas `aria-label` updated to match.
+
+`_bubFloor()` delegates to the Screener's own `_scTakeIsFloor()`, so the chart and the table cannot drift about who is in the set.
+
+**Result.** The analyst who opens Bubble Chart to answer "which countries should be on my list" now reads *Vanuatu · Montenegro · Bahamas* at the top of the chart instead of five anonymous rings, and the ↘ tells them the number is a bound, not a position. A named Vanuatu at the top of an oil-fiscal attractiveness chart self-corrects in one second. Previously the only way to identify any frontier bubble was to hover them one at a time, and twenty of them overlap.
+
+**Mobile:** inert by construction — at 390 the chart truncates to the top 30 by contract count, which excludes every floor-take country (10 of 30 proxy, 0 floor). No horizontal scroll at 1920/1440/1280/1024/768/390 across 8 tabs; 0 page errors; touched controls all ≥24px under `pointer: coarse`.
+
+**Also committed, not authored by this cycle:** the working tree already carried an uncommitted `v942 (T1)` fix for the Home `.home-ic-cta` tap target (a `[role="button"]` guard that never bound because the element computes `display:inline`). That is a previous cycle's work, killed before it could commit — the `TimeoutExpired` debt described in the cycle 855 log. It is carried in this commit rather than stranded.
