@@ -62846,3 +62846,98 @@ Cycle 877 produced a complete T3 fix to the Side-by-Side picker and then timed o
 ## This cycle's own work — v959 (`0cec93b`)
 
 **Task:** T4 — "What is my fiscal-stability and reform exposure here?"
+
+---
+## Cycle 879 — v960 (T1): the Screener ranked Govt Take on a blend its own tooltip says "cannot be ranked"
+
+**Task:** T1 — "Which countries should even be on my screening list?"
+
+## Friction
+
+Walked cold at 1440x900, no sessionStorage, no localStorage: Home → the Screener card →
+click the **Govt Take** header. That click is the single action T1 makes an analyst take on a
+185-row table, and the cold table is the state they are in for the whole task, because nothing
+in the task makes them touch a slider first.
+
+In that state — no ceiling set — the column ranked on the **published** take rather than the
+comparable one:
+
+| | published basis (before) | comparable basis (after) |
+|---|---|---|
+| Iraq, ascending | **21 of 22** | **6 of 22** |
+| Iraq, descending | **2 of 22** — under Saudi Arabia's state monopoly | 17 of 22 |
+
+Iraq's published 84.8% blends 4 fee-basis (TSC) contract groups; on its 195 PSC/Concession
+contracts government take is **34.1%**. A 50.7pp gap. Six more verified producers were
+misplaced by a rank each: Ecuador 46.5/39.3, Mexico 32.2/29.7, Azerbaijan 60.8/59.8, India
+61.9/63.2, Malaysia 59.4/58.3, Oman 77.6/75.6.
+
+**The page already knew the rule and did not apply it to the one operation the rule is about.**
+`_takeCmpCell()`'s tooltip, on this exact no-ceiling state, reads: the published figure
+*"cannot be ranked against the lower takes in this column: it is measuring how many of Iraq's
+contracts pay a fee rather than how hard its fiscal terms are."* Then the header ranked it
+against them.
+
+**Cause** — one term, `runScreener()`:
+
+```js
+_scTakeSortOnCmp = !!(takeCeilingActive && feeCmpOn && _scFeeCmpCount(price) > 0);
+const _colCmp = _scSortCmp(takeKey, npvKey, takeCeilingActive && feeCmpOn);
+```
+
+`takeCeilingActive` is the correct guard on the **filter** — with the slider at 100% there is no
+ceiling, so nothing is tested and nothing needs correcting. It was carried into the **sort**,
+where it does not belong: sorting is a comparison *between* rows, so the comparability question
+is live whenever one country's take is ranked against another's, ceiling or no ceiling. v882 had
+already made the Swing column's corrected basis unconditional for exactly this reason. Govt Take
+was the column left behind — and it is the one T1 sorts on.
+
+## Change
+
+- `takeCeilingActive` dropped from the sort basis. `_scSortCmp()` is now handed `_scTakeSortOnCmp`
+  itself rather than a second copy of the condition, so the comparator, the leading figure in the
+  cell (`_takeLeadCmp`), the TIER cell and the sort label cannot drift apart.
+- On a cold Govt Take sort the diverging rows **lead with the comparable figure**, carry its tier
+  colour, and name `published 84.8%` directly beneath — the v685 layout, now reachable without a
+  ceiling.
+- **The sort label gains a second wording.** The existing string said "(comparable take — the
+  figure this screen tested)", which on an unfiltered table asserts a screen that was never run —
+  the v802 fault in a label instead of an export header. With no ceiling it now reads
+  "(comparable take, where the published headline blends fee-basis contracts)".
+- **The no-ceiling tooltip splits in two** for the same reason: it said the published figure was
+  "above" the comparable one, which stops being true the moment the two swap places.
+
+## Result
+
+An analyst sorting the Screener by Govt Take to build a shortlist reads Iraq at **6 of 22**
+instead of 21, on the 34.1% the platform's own comparability rule names as the figure to compare
+— and the row prints **both** numbers, so the placement is checkable rather than surprising.
+Unticking "screen on comparable take" under Max Govt Take returns the published-basis ranking
+unchanged. The CSV / XLSX / Copy-for-IC-Memo criteria block carries the new ordering line
+verbatim, so an exported shortlist states the basis it was ranked on.
+
+### What this cycle did NOT do
+
+Walked the near-miss question first — "which verified producers did this screen drop, and why" —
+and found `#sc-prod-out` (v775) already does it, correctly: the IOC Capital Screen names all 7
+removed producers with the threshold that removed each (Norway take 68.0 > 65, Kazakhstan 69.9,
+Malaysia NPV@$50 −$33M < $0M, …). Measured before building, so nothing was rebuilt.
+
+## Cycle 879 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors** — matches the local-server control at cycles 874 and 878. The 15 are the `sw.js` 404 under `python -m http.server`. |
+| A/B vs the pre-change tree, `api/` mounted in **both** arms | default order, default count line, IOC Capital Screen rows, its count line, its `#sc-prod-out` strip, and its ceiling-active take sort: **all 7 byte-identical**. Only the cold no-ceiling take sort moves. |
+| Escape hatch | unticking `#sc-fee-cmp` returns Iraq to rank 2 descending on the published 84.8%, sub-line back to `PSC/Conc 34.1%` |
+| Horizontal scroll, 8 tabs × 1920/1440/1280/1024/768/390, **plus** the Screener with the take sort engaged at each width | **0 overflow screens** |
+| `#tbl-screener` rows + headers under 24px @390 `hasTouch` | **0** |
+| Page errors across the walk | **0** |
+| Export | CSV carries `Ranked by: Govt Take low→high (comparable take, where the published headline blends fee-basis contracts), within data basis (…)`; Iraq row at rank 6 with `GovtTake_75=84.8`, `GovtTake_75_Comparable=34.1`, `FeeBasis_Blend=Yes` |
+| Version | badge + title `v959 → v960`, silently at the end |
+
+- Test before: 500 PASS / 0 FAIL (deployed build, per the cycle harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (local server, **ran** this cycle)
+- JS errors: 0 page errors; 15 console entries, all the `sw.js` 404
+- Summary: Cycle 879 complete. Shipped as **v960** (`454422d`), pushed, mirror updated.
