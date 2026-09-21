@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v956</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v957</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v956</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v957</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46316,7 +46316,7 @@ function loadCountryProfile(country) {
     </div>
   </div>
   <div class="dd-section" id="dd-contracts-${country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}">
-    <h3>Top Contracts <span style="font-weight:400;font-size:11px;color:var(--muted);">ranked by production · all DCF @ $75/bbl</span></h3>
+    <h3>Top Contracts <span id="dd-contracts-basis-${country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}" style="font-weight:400;font-size:11px;color:var(--muted);">all DCF @ $75/bbl</span></h3>
     <div id="dd-contracts-content-${country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}">
       <span style="color:var(--muted);font-size:12px;">Loading from API\u2026</span>
     </div>
@@ -62837,6 +62837,28 @@ function fetchCountryContracts(country) {
       cpRecordObsSpread(country, contracts);
       try { _cpApplyObsSpread(country); } catch (e) {}
       const hasProd = contracts.some(c => c.prod_mmbbl != null);
+      // v957 (T2): this heading read "ranked by production" on all 176 country files that publish
+      // a contract sample. 157 of them contain no production figure on any row, so there is nothing
+      // to rank and no Prod column is even drawn. State the basis that is actually on screen.
+      (function() {
+        var bEl = document.getElementById('dd-contracts-basis-' + slug);
+        if (!bEl) return;
+        var nP = contracts.filter(function(c) {
+          return typeof c.prod_mmbbl === 'number' && isFinite(c.prod_mmbbl) && c.prod_mmbbl > 0;
+        }).length;
+        bEl.textContent = (nP === contracts.length
+            ? 'ranked by production'
+            : nP === 0
+              ? contracts.length + ' rows, none carrying verified production'
+              : nP + ' of ' + contracts.length + ' rows carry verified production and rank first')
+          + ' \u00b7 all DCF @ $75/bbl';
+        bEl.title = nP === contracts.length
+          ? 'Every row below carries a field cumulative production figure, so the table is ordered by it.'
+          : 'ORCA holds a production figure on ' + nP + ' of the ' + contracts.length + ' contract records '
+            + 'published for this country. Rows without one cannot be ranked by production and are not '
+            + 'smaller than the rows above them \u2014 their output is simply not on file. Read their take, '
+            + 'not their position.';
+      })();
       // v916 (T2): rows are grouped by their production figure before rendering, because the
       // figure is field cumulative replicated onto every contract record mapped to that field.
       // See cpGroupContractRecords() / cpRenderContractGroups() for the measurement.
@@ -63545,13 +63567,20 @@ function cpContractColNote(country, contracts) {
 }
 function cpRecordObsSpread(country, contracts) {
   if (!country || !contracts || !contracts.length) return null;
-  var t = [];
+  var t = [], tp = [];
   for (var i = 0; i < contracts.length; i++) {
-    var v = contracts[i] && contracts[i].take;
-    if (typeof v === 'number' && isFinite(v)) t.push(v);
+    var c0 = contracts[i];
+    var v = c0 && c0.take;
+    if (typeof v === 'number' && isFinite(v)) {
+      t.push(v);
+      // v957 (T2): the producing subset, measured rather than assumed. See cpObsProdBasis().
+      var pv = c0.prod_mmbbl;
+      if (typeof pv === 'number' && isFinite(pv) && pv > 0) tp.push(v);
+    }
   }
   if (t.length < 2) return null;
   t.sort(function(a, b){ return a - b; });
+  tp.sort(function(a, b){ return a - b; });
   var distinct = {}; for (var j = 0; j < t.length; j++) distinct[t[j].toFixed(1)] = 1;
   var obs = {
     n: t.length,
@@ -63560,11 +63589,74 @@ function cpRecordObsSpread(country, contracts) {
     spread: t[t.length - 1] - t[0],
     p25: t[Math.floor(t.length * 0.25)],
     p75: t[Math.floor(t.length * 0.75)],
-    distinct: Object.keys(distinct).length
+    distinct: Object.keys(distinct).length,
+    prodN: tp.length,
+    prodMin: tp.length ? tp[0] : null,
+    prodMax: tp.length ? tp[tp.length - 1] : null,
+    prodSpread: tp.length >= 2 ? (tp[tp.length - 1] - tp[0]) : null
   };
+  // Which end of the quoted range is held up by a record that carries production at all.
+  obs.loHasProd = tp.length ? (Math.abs(tp[0] - obs.min) < 1e-9) : false;
+  obs.hiHasProd = tp.length ? (Math.abs(tp[tp.length - 1] - obs.max) < 1e-9) : false;
   window._cpObsSpread[country] = obs;
   return obs;
 }
+// ── v957 (T2) — "the N largest producing contracts" was true on 7 of 176 country files ────────
+// Walked T2 cold at 1440x900 and 390x844, storage cleared: Country Profile opens on Indonesia,
+// and the verdict line an analyst reads before quoting anything says:
+//     "Take is a range here, not a point. The contract table on this page runs 42.5-79.7% across
+//      its 50 largest producing contracts ... Quote 59.5% as a contract average and carry the
+//      range."
+// Measured over all 239 published api/v1/country files, not asserted. 176 carry a top_contracts
+// sample of 2+ priced rows. On 7 of them every row carries a production figure. On 157 NOT ONE
+// row does. On the remaining 12 it is partial -- and on 55 countries in total the floor or the
+// ceiling of the range this page tells the analyst to carry is set by a record with no production
+// on file at all.
+//
+// Indonesia is the worst of them and it is the country the tab opens on. 5 of its 50 rows carry
+// production; those five run 65.1-79.7%. The 42.5% floor -- the number the memo gets as the low
+// end of "what a block here can cost you" -- comes from thirteen near-duplicate Rokan Block /
+// Duri / Minas / WKP records, none of which carries a barrel of production in ORCA. So the page
+// asserts a producing basis for a bound that has none, and the analyst defends a 37.2pp spread
+// that the producing evidence puts at 14.6pp.
+//
+// Nothing is recomputed and no threshold is invented: obs.min/max, the dashed band, the basis
+// chip and the Predictability ceiling all stand exactly as they were. What changes is that the
+// sample stops being described as something it is not, and where the bound is held up by a
+// non-producing record the producing subset is printed beside it. The materiality bar is the
+// existing CP_OBS_REFUTE_PP (1.0pp), the same bar this page uses everywhere else to decide
+// whether a take difference is real or rounding.
+function cpObsProdBasis(obs) {
+  if (!obs || !obs.n) return null;
+  var bar = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+  var pn = obs.prodN || 0;
+  var out = { state: 'all', prodN: pn, sample: obs.n + ' largest producing contracts', note: '' };
+  if (pn === obs.n) return out;
+  if (pn === 0) {
+    out.state = 'none';
+    out.sample = obs.n + ' largest contracts (none with production on file)';
+    return out;
+  }
+  out.state = 'some';
+  out.sample = obs.n + ' largest contracts (' + pn + ' with production on file)';
+  var boundUnbacked = !obs.loHasProd || !obs.hiHasProd;
+  if (boundUnbacked && obs.prodSpread != null && (obs.spread - obs.prodSpread) >= bar) {
+    var which = (!obs.loHasProd && !obs.hiHasProd) ? 'Neither end of that range is'
+              : (!obs.loHasProd ? 'The ' + obs.min.toFixed(1) + '% floor is'
+                                : 'The ' + obs.max.toFixed(1) + '% ceiling is');
+    var flat = obs.prodSpread < 0.05;
+    out.note = ' ' + which + ' set by a record with no production on file; the '
+      + pn + ' that do produce ' + (flat ? 'all price at ' : 'run ')
+      + '<strong style="color:var(--text);">'
+      + (flat ? obs.prodMin.toFixed(1) + '%</strong>'
+              : obs.prodMin.toFixed(1) + '\u2013' + obs.prodMax.toFixed(1) + '%</strong> ('
+                + obs.prodSpread.toFixed(1) + 'pp)')
+      + '. Carry both \u2014 the wider range is what ORCA holds, '
+      + 'the narrower one is what it can evidence against a producing block.';
+  }
+  return out;
+}
+window.cpObsProdBasis = cpObsProdBasis;
 function cpObsSpread(country) { return window._cpObsSpread[country] || null; }
 
 // v715 (T2): the verdict line's instruction, calibrated to the dispersion of the number it
@@ -63682,6 +63774,8 @@ function cpDefendDispersion(d, take) {
   // has used since v559; below it the refutation is still stated, in muted type, without the CTA.
   var MATERIAL_PP = 5;
   var body = null, material = true;
+  var _pb957 = ((typeof cpObsProdBasis === 'function') ? cpObsProdBasis(obs) : null)
+            || { sample: (obs ? obs.n : 0) + ' largest producing contracts', note: '' };
   if (typeof cpSpreadConflict === 'function' && cpSpreadConflict(d, obs)) {
     material = obs.spread >= MATERIAL_PP;
     body = (material
@@ -63689,9 +63783,9 @@ function cpDefendDispersion(d, take) {
         : '<strong style="color:var(--text);">Not a single term, but a narrow one.</strong> ')
          + 'The contract table on this page runs <strong style="color:var(--text);">'
          + obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '%</strong> across its '
-         + obs.n + ' largest producing contracts \u2014 a floor of \u2265' + obs.spread.toFixed(1)
+         + _pb957.sample + ' \u2014 a floor of \u2265' + obs.spread.toFixed(1)
          + 'pp, and the bundled quartiles that call this a single term are not usable for '
-         + d.country + '.'
+         + d.country + '.' + _pb957.note
          + ((material || hd < obs.min - CP_OBS_REFUTE_PP || hd > obs.max + CP_OBS_REFUTE_PP)
             ? ' ' + cpDefendClose(hd, obs.min, obs.max, 'no contract the profile lists', 'headline')
             : ' At that width ' + hd.toFixed(1) + '% is quotable as a contract average.');
@@ -64092,18 +64186,21 @@ function cpDistSkew(d, obs) {
 // The Contract Distribution caption, same conflict rule, same single builder.
 function cpDistNote(d, obs) {
   var p25 = d.p25_take, p75 = d.p75_take;
+  var _pb957 = ((typeof cpObsProdBasis === 'function') ? cpObsProdBasis(obs) : null)
+            || { sample: (obs ? obs.n : 0) + ' largest producing contracts', note: '' };
   if (cpSpreadConflict(d, obs)) {
     return '<strong style="color:var(--orange);">The bundled quartiles say every contract here prices to '
-      + p25.toFixed(1) + '%. The contract table below refutes that</strong> — the ' + obs.n
-      + ' largest producing contracts run <strong>' + obs.min.toFixed(1) + '%</strong> to <strong>'
+      + p25.toFixed(1) + '%. The contract table below refutes that</strong> — the '
+      + _pb957.sample + ' run <strong>' + obs.min.toFixed(1) + '%</strong> to <strong>'
       + obs.max.toFixed(1) + '%</strong> (' + obs.spread.toFixed(1) + 'pp over ' + obs.distinct
-      + ' distinct values). The shaded band below is the bundled zero-width IQR and is not usable for '
+      + ' distinct values).' + _pb957.note
+      + ' The shaded band below is the bundled zero-width IQR and is not usable for '
       + (d.country) + '; the outlined band is the observed range, and because it is a top-'
-      + obs.n + '-by-production sample it is a floor on the true spread, not a measurement of it.';
+      + obs.n + ' sample it is a floor on the true spread, not a measurement of it.';
   }
   if (p25.toFixed(1) === p75.toFixed(1)) {
     return 'Contracts are tightly clustered (low dispersion).'
-      + (obs ? ' Corroborated: the ' + obs.n + ' largest producing contracts below span only '
+      + (obs ? ' Corroborated: the ' + _pb957.sample + ' listed below span only '
                + obs.spread.toFixed(1) + 'pp.' : '')
       + cpDistSkew(d, obs);
   }
