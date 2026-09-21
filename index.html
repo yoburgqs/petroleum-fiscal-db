@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v959</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v960</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v959</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v960</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34053,7 +34053,17 @@ function _scSortLabelNow() {
   if (!_scSortKey) return '';
   var pair = _SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey];
   var s = pair[_scSortDir === 1 ? 0 : 1];
-  if (_scSortKey === 'take' && _scTakeSortOnCmp) s += ' (comparable take \u2014 the figure this screen tested)';
+  // v960 (T1): two wordings, because the sort now runs on the comparable basis with or without a
+  // ceiling and only ONE of those states involves the screen having tested anything. Claiming
+  // "the figure this screen tested" on the cold unfiltered table would assert a screen that was
+  // never run -- the v802 fault, in a label instead of an export header.
+  if (_scSortKey === 'take' && _scTakeSortOnCmp) {
+    var _slTake = document.getElementById('sl-take');
+    var _slCeil = _slTake && +_slTake.value < 100;
+    s += _slCeil
+      ? ' (comparable take \u2014 the figure this screen tested)'
+      : ' (comparable take, where the published headline blends fee-basis contracts)';
+  }
   return s;
 }
 // v858 (T1): the default ranking has a name too. `_scSortLabelNow()` returns '' when
@@ -35775,9 +35785,34 @@ function runScreener() {
   // what v507 built it for.
   // v635 (T1): _scFeeCmpCount() and not _nFeeDivForBadge -- that const is declared further
   // down this function, so reading it here would be the v452 TDZ fault again.
-  _scTakeSortOnCmp = !!(takeCeilingActive && feeCmpOn && _scFeeCmpCount(price) > 0);
+  // v960 (T1): `takeCeilingActive` is GONE from this line. It is the right guard on the FILTER --
+  // with the slider at 100% there is no ceiling, so there is nothing to test and nothing to
+  // correct -- and it was carried into the SORT, where it does not belong. Sorting is a
+  // comparison BETWEEN rows, so the comparability question is live whenever one country's take
+  // is ranked against another's, ceiling or no ceiling.
+  //
+  // The cold, unfiltered table is where that bit was off, and it is the state a T1 analyst
+  // spends the whole task in. Clicking Govt Take ascending on the cold view ranked the 22
+  // verified-production countries on the published blend, so Iraq sat 21st of 22 -- and
+  // descending, it read as the second-highest-take country on earth, under Saudi Arabia's state
+  // monopoly. Iraq's comparable PSC/Concession take is 34.1% against a published 84.8%: a
+  // 50.7pp gap that moves it to 6th. Six other producers move a place each (Ecuador 46.5/39.3,
+  // Mexico 32.2/29.7, Azerbaijan, India, Malaysia, Oman).
+  //
+  // This page already knew the rule. _takeCmpCell()'s own tooltip, on this exact no-ceiling
+  // state, says the published figure "cannot be ranked against the lower takes in this column:
+  // it is measuring how many of Iraq's contracts pay a fee rather than how hard its fiscal terms
+  // are" -- and then the header ranked it against them anyway. v882 had already made the Swing
+  // column's corrected basis unconditional for the same reason; Govt Take was the column left
+  // behind, and it is the one T1 sorts on.
+  //
+  // The box under Max Govt Take still decides: untick it and the ranking goes back to the
+  // published headline, exactly as before. _scSortCmp() is now handed this same flag rather than
+  // a second copy of the condition, so the leading figure in the cell (_takeLeadCmp), the TIER
+  // cell, the sort label and the comparator cannot drift apart.
+  _scTakeSortOnCmp = !!(feeCmpOn && _scFeeCmpCount(price) > 0);
   if (_scSortKey) {
-    const _colCmp = _scSortCmp(takeKey, npvKey, takeCeilingActive && feeCmpOn);
+    const _colCmp = _scSortCmp(takeKey, npvKey, _scTakeSortOnCmp);
     data.sort(_screenerEvidenceFirst
       ? function (a, b) { return (_dqRank(a) - _dqRank(b)) || _colCmp(a, b); }
       : _colCmp);
@@ -36588,8 +36623,14 @@ function runScreener() {
     const fc = _scFeeCmpAt(d, price);
     if (!fc.diverges) return '';
     const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure the platform comparability rules permits comparing against other countries. `
-      + (!_cmpBasisActive
-          ? `Nothing on this screen has been filtered on either figure — no take ceiling is set. The line is here because the ${fc.head.toFixed(1)}% above it cannot be ranked against the ${fc.head >= 50 ? 'lower' : 'other'} takes in this column: it is measuring how many of ${d.country}'s contracts pay a fee rather than how hard its fiscal terms are. Set a Max Govt Take ceiling and it is ${fc.cmp.toFixed(1)}% that gets tested.`
+      // v960 (T1): the no-ceiling wording splits in two, because the comparable basis now drives
+      // the RANKING with or without a ceiling, and in that state the published figure is printed
+      // BELOW the comparable one rather than above it. Saying "above it" there would describe a
+      // layout the analyst is not looking at.
+      + (!_cmpBasisActive && _takeLeadCmp
+          ? `No take ceiling is set, so nothing here has been filtered — but this column is doing the RANKING, and a fee-basis blend cannot be ranked against fiscal terms: it measures how many of ${d.country}'s contracts pay a fee, not how hard its terms are. So the row is placed on ${fc.cmp.toFixed(1)}%, which leads the cell, and the published ${fc.head.toFixed(1)}% is named beneath it. Untick "screen on comparable take" under Max Govt Take to rank on the published figure instead.`
+          : !_cmpBasisActive
+          ? `Nothing on this screen has been filtered on either figure — no take ceiling is set. The line is here because the ${fc.head.toFixed(1)}% above it cannot be ranked against the ${fc.head >= 50 ? 'lower' : 'other'} takes in this column: it is measuring how many of ${d.country}'s contracts pay a fee rather than how hard its fiscal terms are. Sort by Govt Take and the row is ranked on ${fc.cmp.toFixed(1)}%; set a Max Govt Take ceiling and it is ${fc.cmp.toFixed(1)}% that gets tested.`
           : !takeCeilingActive
           ? `This row is in the list because ${fc.cmp.toFixed(1)}% met the scope stated above the table — the ${fc.head.toFixed(1)}% printed beside it did not, and is shown because it is the published figure everywhere else on the platform.`
           : feeCmpOn
