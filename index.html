@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v960</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v961</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v960</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v961</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61516,8 +61516,21 @@ function openFCDrilldown(country) {
   var _ddFeeNames = _ddFee ? (d.mech_mix || []).filter(function(x){ return x.g === 2; })
     .map(function(x){ return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ') : '';
   var _ddFeeN1 = (_ddFee && _ddFee.n1 != null) ? Number(_ddFee.n1).toLocaleString() : '';
-  // ORCA holds the PSC/Concession NPV split at $75 only (g1.v75) — the same rule CP and SbS use.
-  var _citeNpvSel = _ddFee ? ((_fcPricePts[_selIdx] === 75 && d.g1 && d.g1.v75 != null) ? d.g1.v75 : null) : _pricePoints[_selIdx][2];
+  // ── v961 (T5) — the comparable NPV is held at ALL FOUR prices, not just $75 ────────────
+  // This line read `_fcPricePts[_selIdx] === 75`, on the stated premise that "ORCA holds the
+  // PSC/Concession NPV split at $75 only (g1.v75)". The premise is false and the data refutes
+  // it: every one of the 11 fee-blended countries carries g1.v50 / v75 / v100 / v125. v955
+  // already relied on that when it put the like-for-like NPV in the Copy-for-IC-Memo table at
+  // whatever deck the analyst screened on; this drawer was left on the old assumption.
+  // Consequence, measured cold: at the $50, $100 and $125 decks ⎘ IC Citation pasted a fee row
+  // with NO contractor NPV on its citable line at all — the only NPV in the pasted string being
+  // the published blend, on the line that says "Do not quote it with the figure above in one
+  // sentence." Iraq @$100 pasted $840M (blend, unusable) while the like-for-like figure ORCA
+  // holds is $4,508M, 5.4x larger.
+  var _g1NpvAt = function(pp) {
+    return (d.g1 && d.g1['v' + pp] != null && !isNaN(d.g1['v' + pp])) ? Number(d.g1['v' + pp]) : null;
+  };
+  var _citeNpvSel = _ddFee ? _g1NpvAt(_fcPricePts[_selIdx]) : _pricePoints[_selIdx][2];
   var _recGap = (_liveT != null && _citeSel != null && !_dbIsMonopoly) ? Math.abs(_liveT - _citeSel) : null;
   var _selCell = function(i) { return i === _selIdx ? 'background:rgba(176,104,0,.09);border-left:2px solid var(--accent);border-right:2px solid var(--accent);' : ''; };
   var _takeCol = function(v) { return v == null ? 'var(--muted)' : v <= 40 ? 'var(--green)' : v <= 60 ? 'var(--yellow)' : v <= 75 ? 'var(--orange)' : 'var(--negative)'; };
@@ -61561,7 +61574,7 @@ function openFCDrilldown(country) {
   html += '</tr>';
   // NPV row
   // v774 (T6): on a fee-basis-blended row the NPV row is the all-contract figure, not the ⚖ comparable basis above it.
-  html += '<tr style="background:rgba(0,0,0,.03);"><td style="'+_pmLblStyle+'" title="Contractor NPV in $M — discounted at 10% WACC, 100% working interest, pre-financing. Scale by WI% for your equity stake.' + (_ddFee ? ' Averaged across all ' + d.n + ' contracts, including the fee-basis contracts; ORCA holds the PSC/Concession-only NPV split at $75 only.' : '') + '">NPV ($M)' + (_ddFee ? ' · <span style="color:var(--muted);">all contracts</span>' : '') + '</td>';
+  html += '<tr style="background:rgba(0,0,0,.03);"><td style="'+_pmLblStyle+'" title="Contractor NPV in $M — discounted at 10% WACC, 100% working interest, pre-financing. Scale by WI% for your equity stake.' + (_ddFee ? ' Averaged across all ' + d.n + ' contracts, including the fee-basis contracts. ORCA also holds the PSC/Concession-only NPV at each of these four prices — that is the figure ⎘ IC Citation pastes, and it is the one to cite beside the ⚖ comparable take above.' : '') + '">NPV ($M)' + (_ddFee ? ' · <span style="color:var(--muted);">all contracts</span>' : '') + '</td>';
   _pricePoints.forEach(function(p){ var v=p[2]; html += '<td style="'+_pmValStyle+';color:'+(v==null?'var(--muted)':v>0?'var(--green)':'var(--negative)')+';">'+(v!=null?fmtNpvShared(v):'\u2014')+'</td>'; });
   html += '</tr>';
   // v523 (T5): the IRR row that sat here is REMOVED. It read d.irr_50/75/100/125 -- the same
@@ -61644,7 +61657,16 @@ function openFCDrilldown(country) {
       var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '\u2014';
       _tsvRows.push(priceStr+'\t'+takeStr+'\t'+(_ddFee ? (p[1]!=null ? p[1].toFixed(1)+'%' : '\u2014')+'\t' : '')+deltaStr+'\t'+npvStr+'\t'+p[3]);
     });
-    if (_ddFee && d.g1 && d.g1.v75 != null) _tsvRows.push('Contractor NPV on the ' + _ddFeeN1 + ' PSC/Concession contracts alone @ $75/bbl: ' + fmtNpvShared(d.g1.v75) + ' (ORCA holds this split at $75 only).');
+    // v961 (T5): all four prices, not just $75. The NPV column in the rows above is the all-contract
+    // blend at every price; this line is the like-for-like population the ⚖ take column is on, so it
+    // has to span the same four columns or the table has a comparable take with no comparable value
+    // beside it at three of them.
+    if (_ddFee && d.g1) {
+      var _g1Pairs = [50, 75, 100, 125]
+        .filter(function(pp){ return d.g1['v' + pp] != null && !isNaN(d.g1['v' + pp]); })
+        .map(function(pp){ return '$' + pp + ' ' + fmtNpvShared(Number(d.g1['v' + pp])); });
+      if (_g1Pairs.length) _tsvRows.push('Contractor NPV on the ' + _ddFeeN1 + ' PSC/Concession contracts alone — CITE THIS beside the comparable take, not the all-contract NPV column above: ' + _g1Pairs.join(' · ') + '/bbl.');
+    }
     if (_liveT != null) {
       _tsvRows.push('');
       _tsvRows.push('Compare model (' + _profileLabel + ' profile @ $' + _ddPrice + '/bbl, '
@@ -61967,14 +61989,32 @@ function openFCDrilldown(country) {
     var _lines = [];
     // v774 (T6): a fee-basis-blended row pastes the comparable take it is ranked on, and the
     // published blend follows on its own line, named as not comparable.
+    // ── v961 (T5): the DOWNSIDE and the BREAKEVEN, which this branch had never carried ──────
+    // The non-fee branch below has pasted "... and $379M at the $50/bbl downside, BE $29/bbl"
+    // since v523/v895. The fee branch stopped at the base case, so the one question an IC asks
+    // straight after a base-case NPV had no answer in the pasted string — and the only $50
+    // figure the analyst could reach instead (the NPV @$50 column on Explorer, Screener and
+    // Fiscal Compare) is the blended one, on the population this very citation says may not be
+    // quoted beside the take above it. On the 11 affected countries the two bases are not close:
+    // Iraq $389M blended vs $1,438M like-for-like, and Malaysia FLIPS SIGN (-$33M vs +$46M), so
+    // the blended figure says the contractor destroys value through a price break where the
+    // comparable population says it does not.
+    // The BE leg is "not available" for all 11 today — none carries a modelled breakeven — but
+    // the token has to be present for _fcAdoptBePaint() to paint a late-arriving figure into it,
+    // which on this branch it could never do.
     if (_ddFee && _citeSel != null) {
+      var _g1Dn = (_fcPricePts[_selIdx] !== 50) ? _g1NpvAt(50) : null;
       _lines.push(country + ': Govt Take ' + _citeSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
         + ' (ORCA comparable take, n=' + _ddFeeN1 + ' PSC/Concession contracts; ' + _ddFeeNames + ' fee-basis contracts excluded)'
         + (_citeNpvSel != null ? ', contractor NPV ' + fmtNpvShared(_citeNpvSel) + ' @$' + _ddPrice + ' on those contracts' : '')
+        + (_g1Dn != null ? ' and ' + fmtNpvShared(_g1Dn) + ' at the $50/bbl downside on the same contracts' : '')
+        + ', BE ' + _cBe
         + ' — ' + _ddProfileName + ' profile, 10% WACC, 100% WI.');
       _lines.push('Published all-contract figure, not comparable across countries: Govt Take ' + _dbSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
         + _cN + ', contractor NPV ' + (_dbNpv != null ? fmtNpvShared(_dbNpv) : 'n/a')
-        + ' — it blends fee-basis contracts where take% is set by the fee structure, not the terms. Do not quote it with the figure above in one sentence.');
+        + ((_g1Dn != null && d.npv_50 != null) ? ' and ' + fmtNpvShared(d.npv_50) + ' at the $50/bbl downside' : '')
+        + ' — it blends fee-basis contracts where take% is set by the fee structure, not the terms. Do not quote it with the figure above in one sentence.'
+        + ((_g1Dn != null && d.npv_50 != null) ? ' That applies to the downside leg too: the NPV @$50 column on Fiscal Compare, the Screener and the Explorer prints this blended ' + fmtNpvShared(d.npv_50) + ', not the ' + fmtNpvShared(_g1Dn) + ' above.' : ''));
     } else if (_dbSel != null) {
       _lines.push(country + ': Govt Take ' + _dbSel.toFixed(1) + '% @$' + _ddPrice + '/bbl'
         + ' (ORCA contract-database average' + _cN + ')'
@@ -62012,7 +62052,7 @@ function openFCDrilldown(country) {
     var _citeBtnId = 'fc-dd-copy-cite-' + slug;
     html += '<button class="btn btn-sm" id="' + _citeBtnId + '" style="background:rgba(176,104,0,.12);border-color:rgba(176,104,0,.4);color:var(--accent);" onclick="(function(btn){'
       + 'navigator.clipboard.writeText(' + _citeEsc + ').then(function(){btn.textContent=\'✓ Copied\';setTimeout(function(){btn.textContent=\'⎘ IC Citation\';},2000);}).catch(function(){btn.textContent=\'Copy failed\';setTimeout(function(){btn.textContent=\'⎘ IC Citation\';},2000);});'
-      + '})(this)" title="Copy a ready-to-paste IC memo citation — the ORCA contract-database take, contractor NPV at the selected price and at the $50/bbl downside, and breakeven (the citable basis), with the compare-model figure labelled separately as a scenario. No IRR: the country-level figure is a mean of per-contract IRRs, not a project return.">⎘ IC Citation</button>';
+      + '})(this)" title="Copy a ready-to-paste IC memo citation — the ORCA contract-database take, contractor NPV at the selected price and at the $50/bbl downside, and breakeven (the citable basis), with the compare-model figure labelled separately as a scenario. On a fee-blended row all three of those are on the PSC/Concession contracts alone — the same population the ⚖ comparable take is on — and the published all-contract blend follows on its own line, marked not comparable. No IRR: the country-level figure is a mean of per-contract IRRs, not a project return.">⎘ IC Citation</button>';
   })();
   html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table" style="margin-left:auto;">\u2715 Close</button>';
   // v474: keyboard nav hint — analysts don't discover ← → shortcut without a visible cue
