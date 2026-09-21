@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v968</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v969</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v968</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v969</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -27049,6 +27049,86 @@ function _labelRegionControls() {
   _mountRefiledDisclosure();
 }
 
+// ── v969 (T1) — the Screener's region control advertised the whole database ────────────────
+//
+// _labelRegionControls() above opens by stating its own invariant: "so a count on a chip cannot
+// disagree with the number of rows that chip returns. Any option or chip that would return zero
+// rows is taken off the control instead of being left there to hand the analyst an empty table."
+//
+// That holds on the Fiscal Compare chips, which run all 185. It does not hold on #sc-region,
+// because that control lives inside the Screener's filter panel and the counts are taken ONCE
+// off the full COUNTRY_DATA at load and never taken again. The moment any other leg is active
+// — which is the entire purpose of the Screener — the menu is quoting a different population
+// from the one on screen.
+//
+// Walked T1 cold: Home -> "15 countries pass the IOC capital screen -> open the screen". The
+// analyst's next move on a 15-row shortlist is to narrow it by region, and the menu offered:
+//
+//     Africa (54)  -> 1        Europe (33)      -> 1        Americas — all (34) -> 7
+//     Middle East (17) -> 1    CIS/FSU (5)      -> 1        North America (3)   -> 2
+//
+// Africa overstated by 54x. Measured across five shipped presets x ten region options, all 50
+// labels overstated, and NINE of the 50 returned a COMPLETELY EMPTY table from a positive
+// label: Offshore & Deepwater offered "Middle East (17)" and returned 0, "Oceania (16)" and
+// returned 0; Stable Fiscal Record offered "Europe (33)" and returned 0. A blank screen
+// arriving from a control that just promised 17 candidates does not read as "no match" — it
+// reads as a broken tool, and the analyst either re-clicks or abandons the region cut.
+//
+// Fixed by measurement, not by arithmetic: each option is counted off the row set that passes
+// every OTHER leg of the live screen (the `ignoreLeg = 'region'` pass in runScreener), so the
+// number on the option is produced by the same predicate that will produce the rows.
+//
+// Label shape:
+//   - no other filter narrowing anything -> "Africa (54)", the rest state, unchanged.
+//   - a screen is active -> "Africa (1 of 54)". Both numbers, because the universe count is
+//     still what tells the analyst whether 1 is a thin screen or a thin region.
+//   - the option would return nothing -> "Middle East (0 of 17)" and DISABLED, which is the
+//     "taken off the control" half of the invariant above, honouring it without deleting the
+//     region (deleting would read as ORCA holding no Middle East data at all).
+// The currently-selected option is never disabled, or a screen that narrows to zero could not
+// be backed out of.
+function _scLabelRegionLive(base) {
+  const sel = document.getElementById('sc-region');
+  if (!sel || !Array.isArray(base)) return;
+  const ROLL = {'Asia Pacific': ['Asia','Oceania'], 'Americas': ['Latin America','North America'],
+                'Other': ['Other','Unknown']};
+  const liveN = Object.create(null), univN = Object.create(null);
+  base.forEach(function(d) { liveN[d.region] = (liveN[d.region] || 0) + 1; });
+  (Array.isArray(COUNTRY_DATA) ? COUNTRY_DATA : []).forEach(function(d) {
+    univN[d.region] = (univN[d.region] || 0) + 1;
+  });
+  const tally = function(map, v) {
+    return (ROLL[v] || [v]).reduce(function(a, r) { return a + (map[r] || 0); }, 0);
+  };
+  const cur = sel.value;
+  // Narrowed = some other leg is removing rows. At the rest state the two populations are the
+  // same set and the label stays the single universe number it has always been.
+  const narrowed = base.length < (Array.isArray(COUNTRY_DATA) ? COUNTRY_DATA.length : base.length);
+  Array.prototype.forEach.call(sel.options, function(o) {
+    // Pin the caption the markup/_labelRegionControls() left, so repeated runs replace the
+    // suffix instead of stacking a second one onto it.
+    if (typeof o.dataset.regionBase !== 'string') {
+      o.dataset.regionBase = o.textContent.replace(/\s*\(\d+(?: of \d+)?\)\s*$/, '');
+    }
+    const stem = o.dataset.regionBase;
+    const v = o.value;
+    if (!v) {                                   // "All Regions"
+      o.textContent = stem + ' (' + base.length + (narrowed ? ' of ' + COUNTRY_DATA.length : '') + ')';
+      o.disabled = false;
+      return;
+    }
+    const live = tally(liveN, v), univ = tally(univN, v);
+    o.textContent = stem + ' (' + (narrowed ? live + ' of ' + univ : String(univ)) + ')';
+    o.disabled = (live === 0 && v !== cur);
+    o.title = live === 0
+      ? 'No country passes the rest of this screen in ' + stem.trim() + '. ORCA holds ' + univ
+        + ' there — loosen a filter or clear the preset to see them.'
+      : live + ' of the ' + univ + ' countries ORCA holds in ' + stem.trim()
+        + ' pass the rest of this screen.';
+  });
+}
+window._scLabelRegionLive = _scLabelRegionLive;
+
 // The re-filing is a judgement about someone else's data, so it is shown, not buried. One
 // <details>, collapsed (v371 declutter), mounted on both surfaces whose counts it changed.
 // Not a tooltip: it is keyboard-reachable, it names every country, and it prints the region
@@ -35787,10 +35867,17 @@ function runScreener() {
     // settings removed the other 145 for being unlisted, and "shallow" read the mixed bucket.
     // region filter — use _regionMatch() so "Asia Pacific" maps to Asia+Oceania, "Americas" maps to Latin America+North America (v429)
     const scRegion = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
-    if (scRegion && !_regionMatch(d.region, scRegion)) return false;
+    // v969 (T1): skippable, so the region control's own option counts can be MEASURED against
+    // this predicate with only the region leg lifted, rather than re-implemented beside it.
+    // Same mechanism v706 established for the two NPV floors.
+    if (ignoreLeg !== 'region' && scRegion && !_regionMatch(d.region, scRegion)) return false;
     return true;
   };
   let data = COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn));
+  // ── v969 (T1) — the region control counted a population the screen was not showing ─────────
+  // Every leg of this screen except region, applied. That is the exact set each region option
+  // is about to partition, so a count taken off it is the count that option will return.
+  _scLabelRegionLive(COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'region')));
   // ── v706 (T1) — does each NPV floor actually remove anything? ───────────────────────────────
   // npv_50 <= npv_75 for all 185 rows in the database (0 inversions), so a downside floor set at
   // or above the deck floor SUBSUMES it and the deck leg cannot reject a single row. The shipped
