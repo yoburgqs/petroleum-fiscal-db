@@ -63780,3 +63780,16 @@ Observed while walking, deliberately left:
   unconditionally where `_scCopyColumns()` guards it with `if (anyBe)` (cycle 880, mitigated by
   the populated-count caption). Country Profile's Regional Peers strip shows a 6-row neighbour
   window then the regional maximum with nothing marking the last row as the extreme (cycle 884).
+
+---
+## Cycle 889 Log — 2026-09-21 10:15
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 889 complete and pushed (`303f30a`, `a272f1b`, v969).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotated off T5/T6/T4/T3/T2 from the last five cycles)
+
+## Friction
+Walked T1 cold through the Home card's own one-click path — *"15 countries pass the IOC capital screen → open the screen"*. The analyst's next move on a 15-row shortlist is to cut it by region. The region dropdown offered **Africa (54), Middle East (17), Europe (33), CIS/FSU (5)**. Every one of the
