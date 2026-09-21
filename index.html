@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v957</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v958</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v957</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v958</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -28776,6 +28776,7 @@ function orcaRankCountryMatches(list, q, q2) {
 
 var _cmpOpts = [];      // country names currently rendered, in order
 var _cmpFocus = -1;     // index of the highlighted option; Enter adds this one
+var _cmpRefused = [];   // v958: names the cap turned away since the last successful add
 
 function _cmpPaintFocus() {
   var els = cmpDrop.querySelectorAll('.cmp-opt');
@@ -28800,7 +28801,21 @@ function _cmpCloseDrop() {
 /* Adds and leaves the caret in the box, so three countries is three typed names
    rather than type-click-click-type-click-click. */
 function _cmpPick(name) {
-  addCompare(name);
+  // v958 (T3): at CMP_MAX this used to clear the box and close the list -- the exact two
+  // things a SUCCESSFUL add does -- while the country went nowhere. The typed name now
+  // stays put and the list repaints as the full-state panel; addCompare() still raises
+  // its toast, so the aria-live announcement is unchanged.
+  var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var seeded = (typeof _sbsExampleUntouched !== 'undefined' && _sbsExampleUntouched && !_sbsSeeding);
+  if (compareList.length >= cap && compareList.indexOf(name) === -1 && !seeded) {
+    if (_cmpRefused.indexOf(name) === -1) _cmpRefused.push(name);
+    addCompare(name);
+    _cmpRenderDrop();
+    cmpSearch.focus();
+    return;
+  }
+  var ok = addCompare(name);
+  if (ok) _cmpRefused = _cmpRefused.filter(function (c) { return c !== name; });
   cmpSearch.value = '';
   _cmpCloseDrop();
   cmpSearch.focus();
@@ -28841,6 +28856,10 @@ function _cmpPick(name) {
    surprise discovered after it. */
 function _cmpOptHTML(d, i, hint) {
   var already = compareList.indexOf(d.country) !== -1;
+  // v958 (T3): a row that Enter cannot add must not look like a row that Enter can add.
+  // See the _sbsPickerFullHTML block below for the walk this came from.
+  var blocked = !already && compareList.length >= (typeof CMP_MAX === 'number' ? CMP_MAX : 5)
+             && !(typeof _sbsExampleUntouched !== 'undefined' && _sbsExampleUntouched && !_sbsSeeding);
   var dq = (typeof _dqTier === 'function')
     ? _dqTier(d)
     : { label: 'PROXY', cls: 'dq-proxy', hasProduction: false };
@@ -28860,7 +28879,7 @@ function _cmpOptHTML(d, i, hint) {
   return '<div class="cmp-opt" id="cmp-opt-' + i + '" role="option" aria-selected="false"'
     + ' data-country="' + d.country.replace(/"/g, '&quot;') + '"'
     + ' style="padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;'
-    + 'align-items:baseline;gap:8px;' + (already ? 'opacity:.55;' : '') + '">'
+    + 'align-items:baseline;gap:8px;' + (already ? 'opacity:.55;' : blocked ? 'opacity:.45;' : '') + '">'
     + '<span style="font-size:12px;color:var(--text);font-weight:600;">' + d.country + '</span>'
     + '<span style="font-size:10px;color:var(--muted);">' + (d.region || '') + '</span>'
     + '<span class="dq-badge ' + dq.cls + '" title="' + basisTitle + '"'
@@ -28868,6 +28887,7 @@ function _cmpOptHTML(d, i, hint) {
     + dq.label + '</span>'
     + '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;white-space:nowrap;">'
     + (already ? 'in comparison' : take) + '</span>'
+    + (blocked ? '<span style="font-size:10px;color:var(--negative);font-weight:700;white-space:nowrap;">no slot</span>' : '')
     + (hint ? '<span style="font-size:10px;color:var(--accent);">' + hint + '</span>' : '')
     + '</div>';
 }
@@ -28875,6 +28895,71 @@ cmpSearch.setAttribute('role', 'combobox');
 cmpSearch.setAttribute('aria-autocomplete', 'list');
 cmpSearch.setAttribute('aria-controls', 'cmp-dropdown');
 cmpSearch.setAttribute('aria-expanded', 'false');
+
+// ─── v958 (T3): the picker did not know the comparison was full ──────────────────────────────
+// Walked "how do these three countries compare side by side?" cold at 1440x900 and 390x844
+// (hasTouch), storage cleared, typing the analyst's OWN countries into #cmp-search -- the only
+// control on this tab that puts a country the analyst chose into the grid.
+//
+// Measured, adding Guyana, Angola, Brazil, Nigeria, Ghana, then Norway:
+//   * the dropdown row for Norway rendered IDENTICALLY to the five that worked
+//     ("Norway / Europe / PROD-WTD / 68.0% take"). Nothing said it could not be added.
+//   * on Enter the box CLEARED -- the same and only feedback a successful add gives -- and no
+//     column appeared.
+//   * the one statement of what happened was a 12px toast at the bottom-right corner, measured
+//     1,062px from the search box the analyst was typing into, gone in 2.5s.
+//   * #cmp-count-badge does carry "5/5 countries (full)", at 11px, 339px to the right of the
+//     box and 60px above it, and it reads the same before and after the refusal.
+//   * worst: showCopyToast() reuses ONE element. Typing Norway, then Oman, then Qatar -- the
+//     ordinary speed of building a set -- left a single toast naming Qatar. Norway and Oman
+//     were refused with no surviving trace anywhere on the page.
+//
+// This is the asymmetry v808 (T5) already named for the clipboard buttons: the tool reports at
+// the point of action when it worked, and a thousand pixels away when it did not. The fix is the
+// same shape, applied to the control that actually refused, and the dropdown already had the
+// vocabulary for it -- a country already in the set renders dimmed and says "in comparison".
+//
+// No cap is changed, no country is hidden, and addCompare() is untouched, so the toast and the
+// aria-live announcement still fire. What is new is that the refusal is visible where the analyst
+// is looking, survives the next refusal, and can be acted on without leaving the box.
+function _sbsPickerFullHTML() {
+  var cap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var seeded = (typeof _sbsExampleUntouched !== 'undefined' && _sbsExampleUntouched && !_sbsSeeding);
+  var full = compareList.length >= cap && !seeded;
+  var turned = _cmpRefused.filter(function (c) { return compareList.indexOf(c) === -1; });
+  if (!full && !turned.length) return '';
+  var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+  var chip = 'display:inline-flex;align-items:center;gap:5px;min-height:24px;box-sizing:border-box;'
+           + 'padding:2px 8px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;';
+  var h = '<div style="padding:7px 12px;border-bottom:1px solid var(--border);background:var(--surface2);line-height:1.5;">';
+  if (full) {
+    h += '<div style="font-size:11px;font-weight:700;color:var(--negative);">Comparison is full &mdash; '
+       + cap + ' of ' + cap + ' slots used'
+       + (turned.length ? '. Not added: <span style="color:var(--text);">' + esc(turned.join(', ')) + '</span>' : '')
+       + '</div>'
+       + '<div style="font-size:10px;color:var(--muted);margin:3px 0 5px;">Free a slot to add another:</div>'
+       + '<div style="display:flex;flex-wrap:wrap;gap:5px;">'
+       + compareList.map(function (c) {
+           return '<span role="button" tabindex="-1" data-cmp-free="' + esc(c) + '"'
+             + ' title="Remove ' + esc(c) + ' from the comparison and free its slot"'
+             + ' style="' + chip + 'background:var(--card);border:1px solid var(--border);color:var(--text);">'
+             + esc(c) + ' <span style="color:var(--negative);font-weight:700;">&#10005;</span></span>';
+         }).join('')
+       + '</div>';
+  } else {
+    h += '<div style="font-size:11px;font-weight:700;color:var(--accent);">Room for '
+       + (cap - compareList.length) + ' more &mdash; earlier refused:</div>'
+       + '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;">'
+       + turned.map(function (c) {
+           return '<span role="button" tabindex="-1" data-cmp-retry="' + esc(c) + '"'
+             + ' title="Add ' + esc(c) + ' now that a slot is free"'
+             + ' style="' + chip + 'background:var(--card);border:1px solid rgba(150,87,10,.45);color:var(--accent);font-weight:700;">'
+             + '+ ' + esc(c) + '</span>';
+         }).join('')
+       + '</div>';
+  }
+  return h + '</div>';
+}
 
 function _cmpRenderDrop() {
   var raw = cmpSearch.value.toLowerCase().trim();
@@ -28918,7 +29003,7 @@ function _cmpRenderDrop() {
       _cmpOpts = [];
     }
   }
-  cmpDrop.innerHTML = html;
+  cmpDrop.innerHTML = _sbsPickerFullHTML() + html;   // v958
   cmpDrop.setAttribute('role', 'listbox');
   cmpDrop.style.display = 'block';
   cmpSearch.setAttribute('aria-expanded', 'true');
@@ -28945,6 +29030,17 @@ cmpSearch.addEventListener('keydown', function(e) {
   }
 });
 cmpDrop.addEventListener('mousedown', function(e) {
+  // v958: the full-state panel's own controls, handled before the option rows.
+  var free = e.target.closest ? e.target.closest('[data-cmp-free]') : null;
+  if (free) {
+    e.preventDefault();
+    removeCompare(free.getAttribute('data-cmp-free'));
+    if (cmpSearch.value.trim()) _cmpRenderDrop(); else _cmpCloseDrop();
+    cmpSearch.focus();
+    return;
+  }
+  var retry = e.target.closest ? e.target.closest('[data-cmp-retry]') : null;
+  if (retry) { e.preventDefault(); _cmpPick(retry.getAttribute('data-cmp-retry')); return; }
   var el = e.target.closest ? e.target.closest('.cmp-opt') : null;
   if (!el) return;
   e.preventDefault();                       // keep focus in the input
@@ -29055,7 +29151,7 @@ function removeCompare(country) {
   _updateCompareHash();
   if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
 }
-function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash();
+function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; _cmpRefused = [];   /* v958 */ renderCompare(); _updateCompareHash();
   if (typeof _sbsClearRouteMiss925 === 'function') _sbsClearRouteMiss925();   // v925: a deliberate reset ends the link's claim on this page
   if (typeof _basketSyncFromCompare === 'function') _basketSyncFromCompare();   // v857
 }
