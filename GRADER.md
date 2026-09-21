@@ -64094,3 +64094,16 @@ Deliberately scoped to this tab. `getProducerPeers()` / `getProducerContext()` a
 - Test after: 499 PASS / 0 FAIL / 1 WARN (local tree, modified)
 - JS errors: 0
 - Summary: v972 shipped and pushed. Working tree clean, mirror in sync.
+
+---
+## Cycle 894 Log — 2026-09-21 16:57
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 894 complete and pushed (`v972`, commits `bddc024` + `2a47b14`). Working tree clean apart from the loop's own `CYCLE_STATE.json` / `cycle_log.txt`; mirror in sync; test servers stopped.
+
+## Task / Friction / Change / Result
+
+**Task — T3, "How do these three countries compare side by side?"** Rotated off T6 (cycle 893); T3 was the stalest of the remaining options. Walked cold at 1440 and at 390 `hasTouch`.
+
+**Friction.** On Side-by-Side, the **Rank among producers** row ignores the price de
