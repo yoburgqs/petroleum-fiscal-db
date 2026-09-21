@@ -63348,3 +63348,139 @@ was true of the map only after this change — left as is, since it now holds fo
 
 ## Friction
 Cold load, Explorer → Map View — the surface built to answer T1. `renderWorldMap()` resolved every shape through a hand-typed 138-entry `ISO_MAP`. ORCA holds a government take for **all 185 countries** — the one metric at complete coverage — so a country missing from that literal was never missing data, only a
+
+---
+## Cycle 884 Log — 2026-09-21
+- Test before: 500 PASS / 0 FAIL (deployed baseline as reported to the cycle)
+- Test after: 494 PASS / 0 FAIL / 1 WARN — **suite RAN this cycle** against the modified
+  tree on a local server. Control on unmodified HEAD, same harness: 494 / 0 / 1, reports
+  byte-identical excluding the timestamp. The 6 vs the deployed 500 is the harness, not
+  this change.
+- JS errors: 0 page errors. The 12 the suite counts are all `404 fetching the script`
+  (the service worker over `file`-adjacent local serving) and are present in the control.
+- Shipped as **v964** (`afa4835`), pushed, mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest in
+rotation (882 was T1, 881 T6, 880 T5, 879 T1, 878 T4, 877 T3; T2 last ran at 876).
+Walked cold at 1440x900 and 390x844 `hasTouch`, no sessionStorage and no localStorage:
+Home → Country Profile → Indonesia (the auto-load) → Iraq → the full scroll.
+
+## Friction
+
+Two sections on the same Country Profile, 3,500px apart, with nearly the same name and
+contradicting content.
+
+At y=2038 the **Fiscal Regime Breakdown** table — careful, comparability-flagged, reconciled:
+
+```
+REGIME          CONTRACTS   AVG TAKE   AVG NPV
+TSC  not comparable  415 (68%)   98.5%    $319M
+PSC                  115 (19%)   48.2%  $2,139M
+Concession            80 (13%)   13.9%  $4,344M
+```
+
+At y=5566 the **Fiscal Mechanic Breakdown** card — the mechanic IIFE in
+`renderCountryDetail()`:
+
+```
+FISCAL MECHANIC BREAKDOWN
+Concession   PSC   TSC
+$50/bbl 81.5%   $75/bbl 84.8%   $100/bbl 86.9%   610 contracts
+```
+
+The pills are the mechanic names; the chips under them were `d.take_50/75/100` — the
+**country blend** — with nothing labelling them as such. So the card asserted that
+Concession, PSC and TSC in Iraq all price at 84.8%. The platform's own figure for Iraqi
+Concession is 13.9%: the card was **70.9pp** out at exactly the point an analyst goes
+looking for the mechanic. 84.8% is also the fee-basis blend the strip at the top of the
+same page tells them not to use (*"on comparable take 34.1%, not the 84.8% charted below"*).
+
+Not an Iraq special case. Measured over the shipped `country_data.json`: **74 of 185**
+countries hold more than one regime, and **61 of those carry a per-regime spread of 10pp
+or more**. Every one printed a single number under its pills.
+
+Two further defects in the same card, both from reading `d.mechanics` — a stale name list
+— instead of `d.mech_mix`, the record's own contract counts and the source `v673` already
+moved the breakdown table onto:
+
+| | |
+|---|---|
+| **Phantom mechanics** | 4 countries got a **PSC** pill with no PSC contract on record. Canada: 944 of 944 Concession. Also Albania, Namibia, Portugal. |
+| **Omitted mechanics** | 5 countries lost a real one. **Indonesia's Gross Split** — 19 contracts, **65.3% take on -$215.5M contractor NPV**, the mechanic every block awarded since the 2017 reform runs on — appeared nowhere on the card. Also Denmark (Concession), India (RSC + India RSC), Liberia, Philippines. |
+
+And a hole nothing on the page covered: the Fiscal Regime Breakdown is gated on a secondary
+regime holding ≥5% of contracts, so it never renders on the **111 single-regime countries**
+at all. Namibia printed a Concession mean of 9.9% under a published headline of 37.0% —
+**27.1pp** — with nothing on the page acknowledging it. 28 more countries did the same.
+
+## Change
+
+The card is now driven by `d.mech_mix`, so it prints the regimes the country actually holds:
+
+- **Every pill carries its own take.** Government take @$75, contract count and share of the
+  record, with the same zero-rate rule `cpRegimeRows()` applies (`t75p` where the engine could
+  resolve no rates) and the same tier colouring as the rest of the tab.
+- **Group-2 mechanics are tagged `not comparable`** with a muted take, so a fee-basis 98.5%
+  cannot be read against a PSC.
+- **A regime with no priced contract reads `no terms on file`**, not a number.
+- **The three price chips moved below a rule**, under the label
+  *"Published headline — all N contracts on record, not any one mechanic above."*
+- **Where the mechanics disagree by ≥5pp** the card states the range, the spread, and — where
+  fee-basis rows sit inside the blend — the equity-share range on its own.
+- **Where the Regime Breakdown table is NOT rendering**, the card reconciles the pill against
+  the headline itself, on that function's own three verdicts (`reconciles` / production-weighted
+  / does-not-reconcile), including the unpriced-contract exclusion where it applies.
+
+Iraq now reads:
+
+```
+TSC  not comparable   98.5% @$75   415 contracts · 68%
+PSC                   48.2% @$75   115 contracts · 19%
+Concession            13.9% @$75    80 contracts · 13%
+PUBLISHED HEADLINE — ALL 610 CONTRACTS ON RECORD, NOT ANY ONE MECHANIC ABOVE
+$50/bbl 81.5%   $75/bbl 84.8%   $100/bbl 86.9%
+These mechanics do not price alike. They run 13.9–98.5% government take at $75/bbl — a
+84.6pp spread — against a blended headline of 84.8%. The fee-basis mechanic marked not
+comparable is inside that blend, and on the comparability rules its take is a property of
+the remuneration mechanic rather than a fiscal measure — the equity-share mechanics alone
+run 13.9–48.2%. Cite the pill for the mechanic you would sign, not the blend.
+```
+
+Namibia now reads: *"These two figures do not reconcile. The Concession figure above is the
+mean across 125 contracts. The headline is 37.0% and is itself an equal-weighted average, so
+it should equal that mean and is 27.1pp away…"*
+
+## Result
+
+An analyst screening a **Concession** asset in Iraq reads **13.9%**, not 84.8%. One screening
+**Indonesia** sees the **Gross Split** regime they would actually enter — 65.3% take, negative
+contractor NPV — which the card had never named. One screening **Canada** is no longer shown a
+PSC regime that does not exist there. And on **29 single-regime countries** the page now says
+out loud that its two published takes disagree, instead of printing them eight inches apart and
+leaving the analyst to notice.
+
+### What this cycle did NOT do
+
+Still open from cycle 880, untouched: Fiscal Compare's clipboard table carries
+`Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with `if (anyBe)`.
+Also noted while walking and left alone: the Regional Peers strip on Country Profile shows a
+6-row neighbour window and then the regional maximum (Indonesia: …India 61.9%, then Uzbekistan
+85.6%) with nothing saying the last row is the extreme rather than the next neighbour.
+
+## Cycle 884 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **494 PASS / 0 FAIL / 1 WARN** |
+| Control: same suite, same harness, **unmodified HEAD** from `/tmp/ctrl884` | **494 / 0 / 1 — reports byte-identical excluding timestamp** |
+| All 185 country profiles rendered | card present on **185/185**, 0 page errors |
+| Takes out of range / phantom mechanics remaining | **0 / 0** |
+| Mechanics recovered that the card never showed | **5 countries**, incl. Indonesia Gross Split |
+| Phantom PSC pills removed | **4** (Canada, Albania, Namibia, Portugal) |
+| Single-regime countries now carrying a reconciliation | **29** |
+| Horizontal scroll, 8 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| 390×844 `hasTouch` | card 362px in a 390px viewport, pills **67px** tall, **0** titled elements under 24px |
+| Page errors across the walk | **0** |
+| Version | badge + title `v963 → v964`, silently at the end |
