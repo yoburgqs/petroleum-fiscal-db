@@ -63091,3 +63091,127 @@ next candidate rather than bundled in.
 
 ## Friction
 Cold walk: Home → Fiscal Compare → click a row → **⎘ IC Citation**. That's the shortest route from a screen to a memo line, and the FC IC Analyst Guide sends the analyst there by name, promising a string with "take, contractor NPV at the selected price **and at the $5
+
+---
+## Cycle 881 Log — 2026-09-21 05:40
+- Test before: 500 PASS / 0 FAIL (deployed build, per the cycle harness)
+- Test after: 494 PASS / 0 FAIL / 1 WARN (local server, **ran** this cycle, matched by an identical control on the unmodified tree)
+- JS errors: 0 page errors; 12 console entries, all the `sw.js` 404 under `python -m http.server`
+- Summary: Cycle 881 complete. Shipped as **v962** (`2d8558d`), pushed, mirror updated.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in
+rotation (880 was T5, 879 T1, 878 T4, 877 T3, 876 T2).
+
+## Friction
+
+Cold walk, `sessionStorage` and `localStorage` cleared, 1440x900: Explorer → Breakeven
+column → **Vanuatu $28/bbl**. Open the **Breakeven Map** — the one tab whose entire
+subject is that number, and the only surface on the platform that states how many
+countries in each colour band grade C or D.
+
+Vanuatu is not there. It is painted `var(--border)` grey, it does not respond to hover,
+the cursor stays an arrow, and it carries no `<title>` — so on a phone, where `<title>`
+is the only readout, it has no readout at all. A dead shape. The only available reading
+of a grey shape that does not respond is *ORCA has nothing here*.
+
+Measured on the shipped build:
+
+| | |
+|---|---|
+| COUNTRY_DATA countries with a modelled breakeven | **67** |
+| shapes the map paints a breakeven colour on | **29** |
+| SVG corner label printed over the top | **"67 countries with breakeven data"** |
+| coverage chip | "Remaining 118 countries shown as grey on map" — 148 of 177 shapes were grey |
+
+The cause is `renderBreakevenMap()`'s `ISO_MAP` (`index.html:67048`): ~140 numeric-ISO
+codes typed out by hand, through which **every** read on the tab is routed. A code simply
+absent from that literal resolves to `undefined`, and then:
+
+- `fill` / `stroke` / `data-be` see null → painted grey, counted as "No data";
+- `.style('cursor', …)` is `'default'` and the click handler is gated on `name` → no route
+  to the Country Profile;
+- the v324 `<title>` is appended `if (name)` → nothing on touch;
+- `mouseover` opens `if (!name) return;` → **no tooltip at all**. Not the "no modelled cost
+  structure" line v891 wrote, not the evidence letter v891 added.
+
+**v918 fixed the other join on this same tab** — the VALUE read, `cpBeFor()` rather than raw
+`be_75` — and recomputed the four coverage literals so they could not drift again. It did
+not touch the id→country join, and that is where the 38 were going. This is the same defect
+class v918 named in its own comment: *the map was not missing the data; it was declining to
+read it, and printing an affirmative claim of absence over the top.*
+
+Fifteen of the dropped countries sit in this world file under their **exact ORCA name** —
+Vanuatu (548), Serbia (688), Israel (376), Taiwan (158), Fiji (242), Slovakia (703),
+Slovenia (705), Montenegro (499), Moldova (498), Lithuania (440), Belarus (112),
+Bahamas (044), Nepal (524), New Caledonia (540), Puerto Rico (630). Six more are there
+under Natural Earth's abbreviated spelling (`Czechia`, `Bosnia and Herz.`, `Dominican Rep.`,
+`Falkland Is.`, `Solomon Is.`, `W. Sahara`). They were never missing data, only a table row.
+
+Vanuatu is the one that costs an IC memo: **$28/bbl, the map's greenest band**, and the band
+the Screener screens into. v891 put a C/D count on that band's legend precisely to warn that
+it is thin — and the country it was warning about was not drawn, so the warning had no
+referent on screen.
+
+## Change
+
+- A `_beName(feature)` resolver replaces the bare literal at all **nine** read sites in
+  `renderBreakevenMap()`. `ISO_MAP` still wins wherever it names a row ORCA actually holds,
+  so every deliberate mapping is preserved — **including `784 → 'UAE'`, which is correct**:
+  ORCA's modelled $28 belongs to `UAE — Abu Dhabi`, a sub-national entity that must not be
+  painted over the whole federation. Only where `ISO_MAP` has nothing does the feature's own
+  `properties.name` get a turn, and it is accepted only if it names a real ORCA row — a name
+  matching nothing still resolves to nothing.
+- **29 → 49 painted. 29 → 165 shapes with a `<title>`, a pointer cursor and a working
+  click-through.**
+- The SVG corner label is now counted off the shapes: **"49 of 67 modelled breakevens drawn
+  here"**, not 67 asserted over 29.
+- The coverage chip stops claiming a map count it never measured. It read "Remaining 118
+  countries shown as grey on map" — computed (v918) and still wrong, because it was computed
+  against a different table from the one the map paints with.
+- The **18** with no polygon at 110m — Pacific atolls, island dependencies and the one
+  sub-national entity — are named under the map (`#be-offmap-note`) with their value and
+  evidence letter. "They are not grey on the map; they are not on the map." *ORCA modelled no
+  cost structure* and *this projection has no shape for it* are different facts, and only one
+  of them is about the evidence.
+- **49 + 18 = 67.** The tab now reconciles to its own coverage line.
+
+## Result
+
+An analyst who screened a breakeven in the Explorer can open the tab built to qualify it and
+actually **find the country** — with its evidence grade on the hover and a click through to
+its Country Profile. Vanuatu now reads:
+
+```
+Vanuatu — breakeven $28.0/bbl (modelled) — evidence D (too few facts to grade,
+100.0% primary law, only 14 facts) — click for Country Profile
+```
+
+instead of being a shape that does not answer. It sits in the greenest band on the tab, and
+the D is now visible at the exact point the colour is read.
+
+### What this cycle did NOT do
+
+The **Explorer's Map View** has a *second* hand-typed `ISO_MAP` (`index.html:28254`) with the
+identical defect against `take_75` — `Côte d'Ivoire` is a dead shape there despite ORCA holding
+a take for it. Left deliberately: the fix is the same resolver, but Explorer's map colours a
+185/185 metric rather than a 67/185 one, so its blast radius is every shape on the tab and it
+deserves its own walk and its own false-join measurement rather than being bundled here. Next
+candidate. Also still open from cycle 880: Fiscal Compare's clipboard table carries
+`Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with `if (anyBe)`.
+
+## Cycle 881 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **494 PASS / 0 FAIL / 1 WARN / 12 console** (the `sw.js` 404 under `python -m http.server`) |
+| Control: same suite, same harness, **unmodified HEAD** served from `/tmp/ctrl962` | **494 / 0 / 1 / 12 — identical.** The delta vs the deployed 500 is the harness, not this change |
+| False joins — shapes painted with no BE or the wrong BE | **0** |
+| Duplicate joins — one ORCA row claimed by two shapes | **0** |
+| Reconciliation | 49 drawn + 18 off-projection = **67 modelled**, exact |
+| `UAE` shape after the change | still grey, still `UAE` — the sub-national `UAE — Abu Dhabi` was **not** painted over the federation |
+| Horizontal scroll, 9 tabs x 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| `#be-offmap-note` @390 `hasTouch` | 362px in a 390px viewport; widest `nowrap` span 121px; **no new controls**, so the 24px floor is untouched |
+| Page errors across the walk | **0** |
+| Version | badge + title `v961 → v962`, silently at the end |
