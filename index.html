@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v963</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v964</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v963</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v964</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23324,15 +23324,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div id="sb-psc-params" style="display:none">
           <div class="sb-section-hdr">PSC Parameters</div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Cost Recovery Cap (%)</label><input type="number" id="sb-cr-cap" value="60" min="10" max="100" step="5" title="Cost Recovery Cap — maximum % of gross production the contractor can recover as cost oil in any period. Limits government downside but compresses contractor returns when costs exceed the cap. Typical range: 50% (Nigeria deepwater), 60–65% (Angola, Ghana), 75–80% (some SE Asia PSCs). Unrecovered costs carry forward to future periods. 100% = uncapped cost recovery."></div>
-            <div class="sb-control-group"><label>FTP / First Tranche (%)</label><input type="number" id="sb-ftp" value="10" min="0" max="30" step="1" title="FTP (First Tranche Petroleum) — percentage of gross production taken by government or NOC before cost recovery begins. Government's priority slice regardless of contractor's cost recovery position. Typical range: 0% (Nigeria, Indonesia old PSC), 10% (Angola, Ghana), 15–20% (Malaysia Petronas, some MENA PSCs). High FTP = contractor earns nothing until the FTP tranche is cleared."></div>
+            <div class="sb-control-group"><label id="sb-crcap-lbl" for="sb-cr-cap">Cost Recovery Cap (%)</label><input type="number" id="sb-cr-cap" value="60" min="10" max="100" step="5" title="Cost Recovery Cap — maximum % of gross production the contractor can recover as cost oil in any period. Limits government downside but compresses contractor returns when costs exceed the cap. Typical range: 50% (Nigeria deepwater), 60–65% (Angola, Ghana), 75–80% (some SE Asia PSCs). Unrecovered costs carry forward to future periods. 100% = uncapped cost recovery."></div>
+            <div class="sb-control-group"><label id="sb-ftp-lbl" for="sb-ftp">FTP / First Tranche (%)</label><input type="number" id="sb-ftp" value="10" min="0" max="30" step="1" title="FTP (First Tranche Petroleum) — percentage of gross production taken by government or NOC before cost recovery begins. Government's priority slice regardless of contractor's cost recovery position. Typical range: 0% (Nigeria, Indonesia old PSC), 10% (Angola, Ghana), 15–20% (Malaysia Petronas, some MENA PSCs). High FTP = contractor earns nothing until the FTP tranche is cleared."></div>
           </div>
           <div class="sb-row2">
             <div class="sb-control-group"><label id="sb-po-lbl" for="sb-po-govt">Profit Oil - Govt (%)</label><input type="number" id="sb-po-govt" value="60" min="10" max="90" step="5" title="Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier."></div>
-            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-psc-cit" value="25" min="0" max="60" step="1" title="CIT Rate in PSC — applied to contractor's profit oil tranche after cost recovery. In some PSCs (Nigeria, Angola), the NOC pays CIT on behalf of contractor from the government profit oil, making the headline CIT invisible to contractor cash flow. Typical range: 25–35% where contractor-paid; 0–15% where NOC-paid-on-behalf arrangements apply."></div>
+            <div class="sb-control-group"><label id="sb-psccit-lbl" for="sb-psc-cit">CIT Rate (%)</label><input type="number" id="sb-psc-cit" aria-describedby="sb-psc-cit-note" value="25" min="0" max="60" step="1" title="CIT Rate in PSC — applied to contractor's profit oil tranche after cost recovery. In some PSCs (Nigeria, Angola), the NOC pays CIT on behalf of contractor from the government profit oil, making the headline CIT invisible to contractor cash flow. Typical range: 25–35% where contractor-paid; 0–15% where NOC-paid-on-behalf arrangements apply."><div id="sb-psc-cit-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;"></div></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Royalty Rate (%)</label><input type="number" id="sb-psc-royalty" value="0" min="0" max="20" step="1" title="Royalty in PSC — most pure PSCs have 0% royalty (FTP substitutes). Some hybrid PSCs add a small royalty on top. W. Africa: typically 0–5%; SE Asia: 0–10%. If modeling a hybrid concession-PSC or a PSC with production levy, enter the royalty rate here. Pure PSC = 0%."></div>
+            <div class="sb-control-group"><label id="sb-pscroy-lbl" for="sb-psc-royalty">Royalty Rate (%)</label><input type="number" id="sb-psc-royalty" value="0" min="0" max="20" step="1" title="Royalty in PSC — most pure PSCs have 0% royalty (FTP substitutes). Some hybrid PSCs add a small royalty on top. W. Africa: typically 0–5%; SE Asia: 0–10%. If modeling a hybrid concession-PSC or a PSC with production levy, enter the royalty rate here. Pure PSC = 0%."></div>
           </div>
           <!-- v883 (T2): R-FACTOR LADDER. getDCFParams() loads tier_schedule for 51 of 185
                countries and dcfPSC() resolves the government profit-oil share off it year by
@@ -46273,10 +46273,39 @@ function loadCountryProfile(country) {
   })()}
   ${(function(){
     // Mechanic Breakdown section
-    const mechList = d.mechanics ? d.mechanics.split(',').map(m => m.trim()).filter(Boolean) : [];
+    // ── v964 (T2): this card listed the mechanics and then printed ONE take under them — the
+    // country blend — so it asserted that every mechanic in the country prices at the headline.
+    // On Iraq it printed "Concession  PSC  TSC" over "$75/bbl 84.8%", 3,500px below the Fiscal
+    // Regime Breakdown table on the SAME page reading Concession 13.9% / PSC 48.2% / TSC 98.5%.
+    // 84.8% is also the fee-basis blend the strip at the top of this page tells the analyst not
+    // to use (comparable take 34.1%). 61 of the 74 countries with more than one regime on record
+    // carry a per-regime spread of 10pp or more, and every one of them printed a single number.
+    //
+    // It also read d.mechanics — a stale name list — rather than d.mech_mix, the record's own
+    // contract counts, which is the source v673 already moved the breakdown table onto. That list
+    // named a PSC regime for 4 countries whose record holds none (Canada: 944 of 944 Concession),
+    // and omitted 5 real ones, including Indonesia's Gross Split — 19 contracts at 65.3% take on
+    // -$215.5M contractor NPV, the mechanic every block awarded since the 2017 reform runs on.
+    const _mbTotN = (Array.isArray(d.mech_mix) ? d.mech_mix : []).reduce(function(a, x){ return a + ((x && x.n) || 0); }, 0);
+    const _mbRows = (Array.isArray(d.mech_mix) ? d.mech_mix : [])
+      .filter(function(x){ return x && x.m; })
+      .map(function(x){
+        // Same zero-rate rule cpRegimeRows() applies: contracts the engine could resolve no fiscal
+        // rates for are priced at 0% take on the untaxed NPV and must not drag the regime's figure.
+        var zr = (typeof x.zr === 'number' && x.zr > 0) ? x.zr : 0;
+        var tk = zr ? (x.t75p == null ? null : x.t75p) : (x.t75 == null ? null : x.t75);
+        return { m: x.m, n: x.n || 0, take: tk, g: (x.g == null ? 1 : x.g), zr: zr,
+                 pct: _mbTotN ? Math.round((x.n || 0) / _mbTotN * 100) : 0 };
+      })
+      .sort(function(a, b){ return b.n - a.n; });
+    const mechList = _mbRows.length
+      ? _mbRows.map(function(r){ return r.m; })
+      : (d.mechanics ? d.mechanics.split(',').map(m => m.trim()).filter(Boolean) : []);
     if (!mechList.length) return '';
     const mechColors = {
       'Concession':    {bg:'rgba(21,128,61,.12)',   border:'rgba(21,128,61,.35)',   text:'#15803D'},
+      'Gross Split':   {bg:'rgba(21,128,61,.09)',   border:'rgba(21,128,61,.28)',   text:'#15803D'},
+      'India RSC':     {bg:'rgba(194,65,12,.10)',   border:'rgba(194,65,12,.30)',   text:'#C2410C'},
       'PSC':           {bg:'rgba(124,58,237,.12)',  border:'rgba(124,58,237,.35)',  text:'#7C3AED'},
       'TSC':           {bg:'rgba(176,104,0,.10)',   border:'rgba(176,104,0,.30)',   text:'#96570A'},
       'PRRT':          {bg:'rgba(194,65,12,.12)',   border:'rgba(194,65,12,.35)',   text:'#C2410C'},
@@ -46294,11 +46323,40 @@ function loadCountryProfile(country) {
       'RSC':           'Risk service contract — contractor bears exploration risk.',
       'Buy-back':      'Contractor recovers costs + fee; state takes remaining production.',
       'Risk Service':  'Service fee structure — contractor does not own hydrocarbons.',
+      'Gross Split':   'Production split at a fixed gross share — no cost recovery; the contractor carries all cost.',
+      'India RSC':     'Revenue-share contract — government share bid at licence award, applied to gross revenue.',
     };
-    const pills = mechList.map(m => {
+    const _mbPillSrc = _mbRows.length ? _mbRows
+      : mechList.map(function(m){ return { m: m, n: null, take: null, g: 1, zr: 0, pct: null }; });
+    const pills = _mbPillSrc.map(function(r){
+      const m = r.m;
       const c = mechColors[m] || {bg:'rgba(100,116,139,.15)',border:'rgba(100,116,139,.4)',text:'var(--muted)'};
-      return '<span style="display:inline-flex;align-items:center;background:' + c.bg + ';border:1px solid ' + c.border + ';border-radius:16px;padding:4px 14px;font-size:12px;font-weight:700;color:' + c.text + ';white-space:nowrap;">' + m + '</span>';
-    }).join(' ');
+      // Group 2 per the platform comparability rules — the contractor is paid a fee, so take%
+      // approaches 99% as a property of the mechanic and is not rankable against a PSC/Concession.
+      const _fee = (r.g === 2);
+      const _tcol = (_fee || r.take == null) ? 'var(--muted)'
+                  : r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)'
+                  : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
+      const _ttl = r.take == null
+        ? (r.n === null ? 'No contract-level record for this mechanic in ' + d.country + '.'
+           : 'No contract filed under ' + m + ' in ' + d.country + ' carries fiscal rates the DCF could resolve, so this mechanic states no take.')
+        : (_fee ? m + ' is fee-basis: the contractor is paid a fixed fee rather than an equity share, so ' + r.take.toFixed(1) + '% government take is a structural artefact of the mechanic and may not be ranked against the Concession/PSC mechanics here.'
+                : 'Mean government take at $75/bbl across the ' + (r.n - r.zr).toLocaleString() + ' ' + m + ' contract' + ((r.n - r.zr) === 1 ? '' : 's') + ' in ' + d.country + ' that carry fiscal rates. This is the figure to cite for a ' + m + ' asset — not the country blend below.');
+      return '<span title="' + _ttl + '" style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;background:' + c.bg + ';border:1px solid ' + c.border + ';border-radius:10px;padding:5px 12px;min-height:24px;">'
+        + '<span style="font-size:12px;font-weight:700;color:' + c.text + ';white-space:nowrap;">' + m
+          + (_fee ? ' <span style="font-size:9px;font-weight:700;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 3px;">not comparable</span>' : '')
+          + (r.zr ? ' <span style="font-size:9px;font-weight:700;color:#B91C1C;border:1px solid rgba(185,28,28,.35);border-radius:3px;padding:0 3px;">' + Number(r.zr).toLocaleString() + ' unpriced</span>' : '')
+        + '</span>'
+        + '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;font-weight:800;color:' + _tcol + ';white-space:nowrap;">'
+          + (r.take == null
+              ? '<span style="font-size:11px;font-weight:600;font-style:italic;">no terms on file</span>'
+              : r.take.toFixed(1) + '%<span style="font-size:9px;font-weight:600;color:var(--muted);"> @$75</span>')
+          + '</span>'
+        + (r.n === null ? ''
+           : '<span style="font-size:10px;color:var(--muted);white-space:nowrap;">' + r.n.toLocaleString() + ' contract' + (r.n === 1 ? '' : 's')
+             + (r.pct != null ? ' \u00b7 ' + r.pct + '%' : '') + '</span>')
+        + '</span>';
+    }).join('');
     const descParts = mechList.map(m => mechDesc[m] ? '<strong>' + m + ':</strong> ' + mechDesc[m] : null).filter(Boolean);
     // v277 Issue 2: Add take range and contract count to expand the card
     const mechKeyParams = {
@@ -46310,21 +46368,102 @@ function loadCountryProfile(country) {
       'RSC':           'Key parameters: service fee per barrel and cost recovery terms — contractor bears exploration risk but earns a fixed fee, not a share of production.',
       'Buy-back':      'Key parameters: remuneration rate, cost recovery ceiling, and the buy-back period (contracts typically 5–7 years after first production).',
       'Risk Service':  'Key parameters: service fee structure, cost recovery schedule, and operator incentive fee (typically based on production performance).',
+      'Gross Split':   'Key parameters: base split (contractor share of gross production), variable components (field depth, reservoir, CO2, cumulative production) and the progressive price component. There is no cost recovery — the contractor carries capex and opex in full.',
+      'India RSC':     'Key parameters: the bid revenue-share slabs (government share of gross revenue at low and high revenue/cost ratios) and royalty. Costs are not recovered before the share is taken.',
     };
+    // v964 (T2): these three chips are the COUNTRY blend at three prices. They used to sit
+    // directly under the mechanic pills with no label, which is what made the card assert them
+    // as each mechanic's term. The pills now carry their own take, so the blend is labelled as
+    // the blend and placed below a rule, and where the mechanics disagree the card says by how
+    // much rather than leaving the analyst to compare the pills themselves.
+    const _mbTk = _mbRows.filter(function(r){ return r.take != null; });
+    const _mbG1 = _mbTk.filter(function(r){ return r.g === 1; });
+    const _mbLo = _mbTk.length ? Math.min.apply(null, _mbTk.map(function(r){ return r.take; })) : null;
+    const _mbHi = _mbTk.length ? Math.max.apply(null, _mbTk.map(function(r){ return r.take; })) : null;
+    const _mbSpread = (_mbLo == null) ? null : (_mbHi - _mbLo);
+    const _mbMulti = _mbRows.length > 1;
+    const _mbFeeN = _mbRows.filter(function(r){ return r.g === 2; }).length;
+    const _mbBlendLabel = 'Published headline &mdash; all ' + (_mbTotN || d.n || 0).toLocaleString() + ' contracts on record'
+      + (_mbMulti ? ', not any one mechanic above' : '');
+    const _mbBlendTitle = _mbMulti
+      ? 'The published headline for ' + d.country + '. It averages every mechanic above together, so it is not the term of any one of them. Screen and cite on the mechanic your asset would sign.'
+      : 'The published headline for ' + d.country + '. It is computed over the whole record on its own weighting basis, which is not necessarily the mean of the mechanic above.';
+    // v964 (T2): reconcile the pills against the headline -- but only where the Fiscal Regime
+    // Breakdown table above is NOT rendering, so nothing is said twice on one page. That table
+    // is gated on a secondary regime holding >=5% of contracts, so it never reaches the 111
+    // single-regime countries at all: Namibia printed a Concession pill at 9.9% under a headline
+    // of 37.0% with nothing on the page acknowledging the 27.1pp, and 28 more countries did the
+    // same. Same three verdicts cpRegimeRows() uses, on the same bases.
+    const _mbHasRegimeCard = (typeof cpRegimeRows === 'function') && !!cpRegimeRows(d);
+    const _mbReconcile = (function(){
+      if (_mbHasRegimeCard || d.take_75 == null || !_mbTk.length) return '';
+      var bn = 0, bs = 0;
+      _mbRows.forEach(function(r){ if (r.take != null) { var np = Math.max(0, r.n - (r.zr || 0)); bn += np; bs += np * r.take; } });
+      if (!bn) return '';
+      var blend = bs / bn;
+      var gap = d.take_75 - blend;
+      if (Math.abs(gap) < 0.05) return '';
+      var one = (_mbRows.length === 1);
+      var wt = d.weighting || 'simple_avg';
+      var prodBasis = (wt === 'prod_weighted' || wt === 'prod_weighted_blended');
+      var lead = one
+        ? 'The ' + _mbRows[0].m + ' figure above is the mean across ' + bn.toLocaleString() + ' contract' + (bn === 1 ? '' : 's') + '. '
+        : 'The mechanics above blend by contract count to <strong style="color:var(--text);">' + blend.toFixed(1) + '%</strong>. ';
+      if (prodBasis) {
+        return '<p style="font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 0;">' + lead
+          + 'The headline is <strong style="color:var(--text);">' + d.take_75.toFixed(1) + '%</strong>, '
+          + Math.abs(gap).toFixed(1) + 'pp away, because it weights by verified field production ('
+          + ((d.prod_coverage_pct || 0).toFixed(1)) + '% coverage) rather than by contract count. '
+          + 'Both are correct on their own basis &mdash; say which one you are quoting.</p>';
+      }
+      // Where the engine could resolve no rates for some contracts they are excluded above and not
+      // from the headline, which on its own opens a gap -- say so before claiming anything worse.
+      var _drop = _mbRows.reduce(function(a, r){ return a + (r.zr || 0); }, 0)
+                + _mbRows.reduce(function(a, r){ return a + (r.take == null ? r.n : 0); }, 0);
+      return '<p style="font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 0;">'
+        + '<strong style="color:var(--text);">These two figures do not reconcile.</strong> ' + lead
+        + 'The headline is <strong style="color:var(--text);">' + d.take_75.toFixed(1) + '%</strong> and is itself an equal-weighted average, so it should equal that mean and is '
+        + Math.abs(gap).toFixed(1) + 'pp away. '
+        + (_drop
+            ? _drop.toLocaleString() + ' contract' + (_drop === 1 ? '' : 's') + ' carr' + (_drop === 1 ? 'ies' : 'y')
+              + ' no fiscal rates the engine could resolve and ' + (_drop === 1 ? 'is' : 'are') + ' excluded above but not from the headline, which can account for part of it. '
+            : 'The two were computed over different contract sets, and ORCA does not record which. ')
+        + 'Take block-level terms from the contract table below, or run Scenario Builder, before either number goes in an IC memo.</p>';
+    })();
+    const _mbSpreadNote = (_mbMulti && _mbSpread != null && _mbSpread >= 5)
+      ? '<p style="font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 0;">'
+        + '<strong style="color:var(--text);">These mechanics do not price alike.</strong> They run <strong style="color:var(--text);">'
+        + _mbLo.toFixed(1) + '&ndash;' + _mbHi.toFixed(1) + '%</strong> government take at $75/bbl &mdash; a '
+        + _mbSpread.toFixed(1) + 'pp spread &mdash; against a blended headline of '
+        + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : '\u2014') + '. '
+        + (_mbFeeN
+            ? 'The fee-basis mechanic' + (_mbFeeN === 1 ? '' : 's') + ' marked <em>not comparable</em> '
+              + (_mbFeeN === 1 ? 'is' : 'are') + ' inside that blend, and on the comparability rules '
+              + (_mbFeeN === 1 ? 'its' : 'their') + ' take is a property of the remuneration mechanic rather than a fiscal measure'
+              + (_mbG1.length
+                  ? ' \u2014 the equity-share mechanics alone run ' + Math.min.apply(null, _mbG1.map(function(r){ return r.take; })).toFixed(1)
+                    + '&ndash;' + Math.max.apply(null, _mbG1.map(function(r){ return r.take; })).toFixed(1) + '%. '
+                  : '. ')
+            : '')
+        + 'Cite the pill for the mechanic you would sign, not the blend.</p>'
+      : '';
     const takeRangeHtml = (d.take_50 != null && d.take_75 != null && d.take_100 != null)
-      ? '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 6px;">'
+      ? '<div style="margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--border);">'
+        + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;" title="' + _mbBlendTitle + '">' + _mbBlendLabel + '</div>'
+        + '<div style="display:flex;gap:12px;flex-wrap:wrap;">'
         + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$50/bbl</span> <strong style="color:var(--text);">' + d.take_50.toFixed(1) + '%</strong></span>'
         + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$75/bbl</span> <strong style="color:var(--text);">' + d.take_75.toFixed(1) + '%</strong></span>'
         + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$100/bbl</span> <strong style="color:var(--text);">' + d.take_100.toFixed(1) + '%</strong></span>'
-        + '<span style="font-size:11px;color:var(--muted);">' + (d.n || 0) + ' contracts</span>'
+        + '</div>' + _mbSpreadNote + _mbReconcile
         + '</div>'
-      : '<div style="font-size:11px;color:var(--muted);margin:6px 0;">' + (d.n || 0) + ' contracts · take data at standard price points below</div>';
+      : '<div style="margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">' + (_mbTotN || d.n || 0).toLocaleString() + ' contracts on record \u00b7 no published headline on file at the standard price points</div>' + _mbSpreadNote;
     const mechParamsHtml = mechList.map(m => mechKeyParams[m]
       ? '<div style="margin-top:6px;font-size:11px;color:var(--muted);line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">' + m + '</strong> — ' + mechKeyParams[m] + '</div>'
       : null).filter(Boolean).join('');
-    return '<div class="dd-section">'
-      + '<h3>Fiscal Mechanic Breakdown</h3>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + pills + '</div>'
+    return '<div class="dd-section" id="cp-mech-breakdown">'
+      + '<h3>Fiscal Mechanic Breakdown <span style="font-weight:400;font-size:11px;color:var(--muted);cursor:help;" title="Government take at $75/bbl for each mechanic on '
+        + d.country + '\u2019s own contract record, read from the same source as the Fiscal Regime Breakdown table above. The country blend follows below, labelled as the blend.">@ $75/bbl \u00b7 take per mechanic</span></h3>'
+      + '<div id="cp-mech-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2px;">' + pills + '</div>'
       + takeRangeHtml
       + mechParamsHtml
       + (descParts.length ? '<p style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px;">' + descParts.join(' ') + '</p>' : '')
@@ -54708,6 +54847,92 @@ function _sbApplyReformPremium(pct) {
 }
 window._sbApplyReformPremium = _sbApplyReformPremium;
 
+/* ── v964 (T2) — provenance at the field, not just in the banner ───────────────────────
+   The banner is read once, at the top of a form the analyst then scrolls past. The CIT box is
+   where they stop, because it is the one figure on this form they can check against the page
+   they arrived from — and it disagreed with it. This marks every PSC input running the platform
+   template right on its own label, and puts the rate ORCA actually holds under the CIT box with
+   a control that applies it. The 25% stays the default because substituting the record rate
+   measurably worsens agreement with the published take (see _dcfDbTerms) — but that is a
+   judgement the analyst is now able to make, instead of one made silently for them. */
+function _sbClearPscTermNotes() {
+  _SB_PSC_TERMS.forEach(function(t) {
+    if (!t.lbl || !t.base) return;
+    var el = document.getElementById(t.lbl);
+    if (el) el.textContent = t.base;
+  });
+  var n = document.getElementById('sb-psc-cit-note');
+  if (n) n.innerHTML = '';
+}
+window._sbClearPscTermNotes = _sbClearPscTermNotes;
+
+function _sbRenderPscTermNotes(country, params, formMech) {
+  _sbClearPscTermNotes();
+  if (formMech !== 'PSC') return;
+  var db = _dcfDbTerms(country, params);
+  if (!db) return;
+
+  // Label suffix on every term still running the platform figure.
+  db.tmpl.forEach(function(x) {
+    if (!x.t.lbl || !x.t.base) return;
+    var el = document.getElementById(x.t.lbl);
+    if (el) el.textContent = x.t.base + ' — template';
+  });
+  db.held.forEach(function(h) {
+    if (!h.t.lbl || !h.t.base) return;
+    var el = document.getElementById(h.t.lbl);
+    if (el) el.textContent = h.t.base + ' — ' + country;
+  });
+
+  var note = document.getElementById('sb-psc-cit-note');
+  if (!note) return;
+  var cit = null;
+  db.tmpl.forEach(function(x) { if (x.t.key === 'cit_rate') cit = x; });
+  if (!cit) {
+    note.innerHTML = '<span style="color:var(--green);font-weight:600;">' + _sbEscP(country)
+      + '’s own rate</span>, read from ORCA’s record.';
+    return;
+  }
+  if (cit.unread == null) {
+    note.innerHTML = 'Platform ' + _sbEscP(formMech) + ' template. ORCA holds no separate corporate '
+      + 'income tax for ' + _sbEscP(country) + ' — a template figure, not a measured one.';
+    return;
+  }
+  note.innerHTML = '<strong style="color:var(--accent);">' + cit.ran + ' is the platform '
+    + _sbEscP(formMech) + ' template, not ' + _sbEscP(country) + '’s.</strong> ORCA’s record '
+    + 'for ' + _sbEscP(country) + ' holds <strong style="color:var(--text);">'
+    + cit.unread.toFixed(1) + '%</strong> — the figure the Country Profile evidence table prints '
+    + '— and no what-if surface reads it. '
+    + '<button type="button" class="btn btn-sm btn-outline" style="font-size:11px;min-height:26px;margin-top:5px;" '
+    + 'onclick="_sbApplyRecordCit(' + cit.unread.toFixed(2) + ')" '
+    + 'title="Set the CIT box to ' + cit.unread.toFixed(1) + '% — the rate ORCA holds on record for '
+    + _sbEscP(country) + ' — and re-run. Measured across the 46 countries in this position, the '
+    + 'record rate moves the modelled take away from the published country take more often than '
+    + 'toward it, because a PSC record CIT is an effective rate that already carries profit-oil '
+    + 'government take. Use it when you are modelling your own block, not when you are trying to '
+    + 'reproduce the published figure.">Use ' + cit.unread.toFixed(1) + '% (ORCA record)</button>';
+}
+window._sbRenderPscTermNotes = _sbRenderPscTermNotes;
+
+function _sbApplyRecordCit(pct) {
+  var el = document.getElementById('sb-psc-cit');
+  if (!el) return;
+  el.value = pct;
+  var note = document.getElementById('sb-psc-cit-note');
+  if (note) {
+    note.innerHTML = '<span style="color:var(--green);font-weight:700;">Set to ' + Number(pct).toFixed(1)
+      + '% — ORCA’s record rate.</span> This run is now on a rate the platform’s own published '
+      + 'take for this country was not computed with; label it as your own assumption, not as ORCA’s.';
+  }
+  var lbl = document.getElementById('sb-psccit-lbl');
+  if (lbl) lbl.textContent = 'CIT Rate (%) — ORCA record';
+  var out = document.getElementById('sb-output');
+  if (out && out.querySelector('.sb-result-header') && typeof runCustomScenario === 'function') {
+    try { runCustomScenario(); } catch (e) {}
+  }
+}
+window._sbApplyRecordCit = _sbApplyRecordCit;
+
 function _sbRenderBasis() {
   var sel = document.getElementById('sb-profile');
   var out = document.getElementById('sb-profile-basis');
@@ -55572,12 +55797,17 @@ function getDCFParams(country, mechanic, opts) {
   if ((mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') && !countryOverrides[country]) {
     const cd = COUNTRY_DATA && COUNTRY_DATA.find(x => x.country === country);
     if (cd) {
-      if (cd.ftp != null)          { params.ftp_rate           = cd.ftp / 100;             _basis = 'db'; }
-      if (cd.cr_cap != null)       { params.cost_recovery_cap  = cd.cr_cap / 100;          _basis = 'db'; }
-      if (cd.profit_oil_govt != null) { params.profit_oil_govt_pct = cd.profit_oil_govt / 100; _basis = 'db'; }
-      if (cd.royalty != null)      { params.royalty_rate       = cd.royalty / 100;         _basis = 'db'; }
+      // v964 (T2): _dbKeys records WHICH of the form's terms this country actually supplied.
+      // _basis alone says "at least one" — and the two what-if surfaces were reading that as
+      // "all of them", which is how a 25% template CIT came to be presented as Indonesia's.
+      var _dbk = [];
+      if (cd.ftp != null)          { params.ftp_rate           = cd.ftp / 100;             _basis = 'db'; _dbk.push('ftp_rate'); }
+      if (cd.cr_cap != null)       { params.cost_recovery_cap  = cd.cr_cap / 100;          _basis = 'db'; _dbk.push('cost_recovery_cap'); }
+      if (cd.profit_oil_govt != null) { params.profit_oil_govt_pct = cd.profit_oil_govt / 100; _basis = 'db'; _dbk.push('profit_oil_govt_pct'); }
+      if (cd.royalty != null)      { params.royalty_rate       = cd.royalty / 100;         _basis = 'db'; _dbk.push('royalty_rate'); }
       // R-factor tier schedule — enables sliding-scale profit oil in live DCF (populated post-rebuild)
-      if (cd.tier_schedule && cd.tier_schedule.length > 0) { params.tier_schedule = cd.tier_schedule; _basis = 'db'; }
+      if (cd.tier_schedule && cd.tier_schedule.length > 0) { params.tier_schedule = cd.tier_schedule; _basis = 'db'; _dbk.push('tier_schedule'); }
+      if (_dbk.length) params._dbKeys = _dbk;
     }
   }
 
@@ -55637,6 +55867,101 @@ function _dcfRecordTerms(params) {
     zeroNames: join(zero),
     rest: join(zero) + (zero.length > 1 ? ' run' : ' runs') + ' at 0%' + (tmpl.length ? '; ' + tmpl.join('; ') : ''),
     zeroCount: zero.length
+  };
+}
+
+/* ── v964 (T2) — the PSC-family what-if surfaces claimed every term came from the country.
+   ──────────────────────────────────────────────────────────────────────────────────────
+
+   Walked T2 cold: Country Profile (self-seeds Indonesia) → "IRR: → Model in Scenario Builder",
+   the page's only route to a project return and therefore the point where the analyst builds
+   the number they will defend. The modal opened on a banner reading
+
+       Parameters pre-filled for Indonesia — edit any field and click Run DCF to customize.
+
+   and a PSC form whose CIT RATE box read 25. Indonesia's own Key Fiscal Parameters table, one
+   scroll up on the page the analyst arrived from, prints Income Tax Rate 41.82% (statutory 44%).
+   Two different tax rates for one country on one screen, with the modal asserting the record.
+
+   getDCFParams() enriches the PSC family from COUNTRY_DATA field by field — ftp, cr_cap,
+   profit_oil_govt, royalty, tier_schedule — and sets _basis='db' if ANY of them landed. It has
+   never read cd.cit. So _basis='db' means "at least one term is this country's", and both
+   what-if surfaces were reading it as "all of them". Measured over the 185:
+
+       _basis 'db'                                     56 countries, all PSC-family
+         royalty read from the record                  56 of 56
+         cost recovery cap                             51
+         R-factor ladder                               51
+         govt profit oil                               45
+         FTP                                           14     (42 run the 10% template)
+         CIT                                            0     — never read, on any of them
+       of those 56, COUNTRY_DATA holds a CIT that
+       differs from the 25% template                   46     median gap 12.5pp,
+                                                              worst Trinidad and Tobago 50 → 25,
+                                                              Angola 49.9 → 25, Indonesia 41.8 → 25
+
+   v776 fixed the mirror image of this for the 116 Concession countries and gave them itemised
+   wording (_dcfRecordTerms, _basis='record'). The PSC family — every benchmark this platform
+   leads with — fell through to the unqualified branch and got none of it.
+
+   The 25% is NOT changed to the record rate. Measured: substituting cd.cit across those 46 moves
+   the modelled take AWAY from each country's published take on 28 of them and toward it on 18
+   (median |modelled − published| 4.5pp → 5.7pp; Angola 61.3% → 72.0% against a published 53.0%).
+   COUNTRY_DATA.cit on a PSC record is an effective rate that already carries profit-oil-equivalent
+   government take, so layering it on the profit-oil split double-counts. The defect is the claim,
+   not the number: the tool must stop calling 25% Indonesia's, name the rate ORCA does hold, and
+   let the analyst set it. That is what this does — at the banner, at the panel, and at the field.  */
+var _SB_PSC_TERMS = [
+  { key:'cost_recovery_cap',   label:'cost recovery cap', cd:'cr_cap',          lbl:'sb-crcap-lbl',  base:'Cost Recovery Cap (%)' },
+  { key:'ftp_rate',            label:'FTP',               cd:'ftp',             lbl:'sb-ftp-lbl',    base:'FTP / First Tranche (%)' },
+  { key:'profit_oil_govt_pct', label:'govt profit oil',   cd:'profit_oil_govt', lbl:null,            base:null },
+  { key:'royalty_rate',        label:'royalty',           cd:'royalty',         lbl:'sb-pscroy-lbl', base:'Royalty Rate (%)' },
+  { key:'cit_rate',            label:'CIT',               cd:'cit',             lbl:'sb-psccit-lbl', base:'CIT Rate (%)' }
+];
+
+function _dcfJoin964(a) {
+  if (!a || !a.length) return '';
+  return a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
+}
+
+// Which of the five PSC form terms this country actually supplied, and which are still the
+// platform template. Returns null unless the run really is on the 'db' basis.
+function _dcfDbTerms(country, params) {
+  if (!params || params._basis !== 'db') return null;
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+  var dbk = Array.isArray(params._dbKeys) ? params._dbKeys : [];
+  var pct = function(v) { return (Math.round(Number(v || 0) * 1000) / 10).toFixed(1) + '%'; };
+  var held = [], tmpl = [];
+  _SB_PSC_TERMS.forEach(function(t) {
+    var ran = pct(params[t.key]);
+    if (dbk.indexOf(t.key) !== -1) { held.push({ t: t, txt: t.label + ' ' + ran }); return; }
+    var rv = (cd && cd[t.cd] != null && isFinite(cd[t.cd])) ? Number(cd[t.cd]) : null;
+    // A record value the engine does not read, and which is not already the template figure.
+    var unread = (rv != null && Math.abs(rv - Number(params[t.key]) * 100) >= 0.05) ? rv : null;
+    tmpl.push({ t: t, txt: t.label + ' ' + ran, ran: ran, unread: unread });
+  });
+  var tiers = dbk.indexOf('tier_schedule') !== -1;
+  var nTier = (tiers && Array.isArray(params.tier_schedule)) ? params.tier_schedule.length : 0;
+  var heldTxt = _dcfJoin964(held.map(function(h) { return h.txt; })
+    .concat(tiers ? [(nTier ? nTier + '-tier ' : '') + 'R-factor ladder'] : []));
+  var unread = tmpl.filter(function(x) { return x.unread != null; });
+  return {
+    country: country,
+    held: held, tmpl: tmpl, tiers: tiers,
+    nHeld: held.length + (tiers ? 1 : 0), nTerms: _SB_PSC_TERMS.length + (tiers ? 1 : 0),
+    heldTxt: heldTxt,
+    tmplTxt: (function(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; })(
+               _dcfJoin964(tmpl.map(function(x) { return x.txt; }))),
+    unread: unread,
+    // "CIT is the platform's 25.0% template, not Indonesia's — ORCA's record holds 41.8%."
+    unreadTxt: unread.length
+      ? _dcfJoin964(unread.map(function(x) { return x.t.label + ' ' + x.ran; }))
+        + (unread.length > 1 ? ' are ' : ' is ') + 'the platform ' + (params._mechanic || 'PSC')
+        + ' template, not ' + country + '’s — ORCA’s record for ' + country + ' holds '
+        + _dcfJoin964(unread.map(function(x) { return x.t.label + ' ' + x.unread.toFixed(1) + '%'; }))
+        + ', and no what-if surface on this platform reads it.'
+      : ''
   };
 }
 
@@ -55804,11 +56129,25 @@ function renderLiveDCFPanel(country, containerId) {
         + 'The results are that project’s economics &mdash; <em>not</em> ' + country + '’s headline figures, '
         + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
         + 'Reconciliation of the two is at the bottom of this panel.'
-      : '<strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through '
-        + country + '\u2019s ' + _runMech504 + ' terms at a price and profile you choose. '
-        + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
-        + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
-        + 'Reconciliation of the two is at the bottom of this panel.';
+      : (function() {
+          // v964 (T2): the same claim the Scenario Builder banner was making. On the 56 'db'
+          // countries this panel ran a 25% template CIT and called it the country's terms.
+          var _db964 = null;
+          try { _db964 = _dcfDbTerms(country, getDCFParams(country, fcResolveMechanic(d), { record: true })); } catch (e) {}
+          var _lead = (_db964 && _db964.tmpl.length)
+            ? '<strong style="color:var(--text);">What-if tool &mdash; ' + _db964.nHeld + ' of '
+              + _db964.nTerms + ' terms from ' + _cpEsc704(country) + '\u2019s record.</strong> Runs <strong>one</strong> '
+              + 'hypothetical project on ' + _cpEsc704(_db964.heldTxt) + '. '
+              + (_db964.unreadTxt ? _cpEsc704(_db964.unreadTxt) + ' '
+                                  : _cpEsc704(_db964.tmplTxt) + ' '
+                                    + (_db964.tmpl.length > 1 ? 'run' : 'runs') + ' the platform template. ')
+            : '<strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through '
+              + country + '\u2019s ' + _runMech504 + ' terms at a price and profile you choose. ';
+          return _lead
+            + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
+            + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
+            + 'Reconciliation of the two is at the bottom of this panel.';
+        })();
 
   container.innerHTML = `
 <div class="live-dcf-panel" id="ldcf-${country.replace(/[^a-z0-9]/gi,'_')}">
@@ -57244,6 +57583,8 @@ function _sbTierToggle(skipRun) {
 
 function sbUpdateMechanic() {
   const mech = document.getElementById('sb-mechanic').value;
+  // v964 (T2): a hand-switched mechanic is no longer the pre-filled country form.
+  if (typeof _sbClearPscTermNotes === 'function') _sbClearPscTermNotes();
   document.getElementById('sb-concession-params').style.display = mech === 'Concession' ? '' : 'none';
   document.getElementById('sb-psc-params').style.display = mech === 'PSC' ? '' : 'none';
   document.getElementById('sb-tsc-params').style.display = (mech === 'TSC' || mech === 'RSC') ? '' : 'none';
@@ -58553,12 +58894,23 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
              : '')
          + 'Edit the fields to ' + cn + '’s actual terms before quoting anything below as ' + cn + '.';
   } else {
+    // v964 (T2): on the 'db' basis this said "read from ORCA's <country> record" over a form
+    // whose CIT box held the 25% platform template. Name the split instead of asserting the lot.
+    var _db964 = (o.basis === 'db') ? o.dbTerms : null;
     col  = 'var(--accent)';
-    head = 'Loaded from ' + cn + '’s terms — this is one project, not ' + cn + '’s published take';
-    body = 'Fiscal terms are ' + (o.basis === 'country'
-             ? cn + '’s ORCA country override' + (o.overrideKeys && o.overrideKeys.length ? ' (' + _esc594(o.overrideKeys.join(', ')) + ')' : '')
-             : 'read from ORCA’s ' + cn + ' record')
-         + ', run on a single synthetic ' + _esc594(o.profileName) + ' project. '
+    head = (_db964 && _db964.tmpl.length)
+         ? 'Loaded from ' + cn + '’s record: ' + _esc594(_db964.heldTxt)
+           + ' — this is one project, not ' + cn + '’s published take'
+         : 'Loaded from ' + cn + '’s terms — this is one project, not ' + cn + '’s published take';
+    body = ((_db964 && _db964.tmpl.length)
+             ? '<strong>' + _esc594(_db964.unreadTxt || (_db964.tmplTxt + (_db964.tmpl.length > 1 ? ' run' : ' runs')
+                 + ' the platform ' + _esc594(o.mech) + ' template — ORCA holds no value for '
+                 + (_db964.tmpl.length > 1 ? 'them' : 'it') + '.')) + '</strong> '
+             : 'Fiscal terms are ' + (o.basis === 'country'
+                 ? cn + '’s ORCA country override' + (o.overrideKeys && o.overrideKeys.length ? ' (' + _esc594(o.overrideKeys.join(', ')) + ')' : '')
+                 : 'read from ORCA’s ' + cn + ' record') + ', ')
+         + ((_db964 && _db964.tmpl.length) ? 'Run' : 'run')
+         + ' on a single synthetic ' + _esc594(o.profileName) + ' project. '
          + (o.cpTake != null
              ? 'The <strong>' + o.cpTake.toFixed(1) + '%</strong> at $75 on ' + cn + '’s Country Profile is the average across '
                + (o.n != null ? Number(o.n).toLocaleString() + ' actual ' + cn + ' contracts' : 'that country’s actual contracts') + '. '
@@ -58763,7 +59115,21 @@ function ddOpenScenarioBuilder(country) {
       : _sbBasis === 'default'
       ? 'No ' + country + '-specific terms in ORCA — loaded the generic ' + mechanic
         + ' default. Edit the fields before quoting this as ' + country + '.'
-      : 'Parameters pre-filled for ' + country + ' — edit any field and click Run DCF to customize.';
+      : (function() {
+          // v964 (T2): _basis 'db' means SOME terms are this country's, not all of them.
+          var db = _dcfDbTerms(country, _probeParams);
+          if (!db || !db.tmpl.length) {
+            return 'Parameters pre-filled for ' + country + ' — edit any field and click Run DCF to customize.';
+          }
+          return db.nHeld + ' of ' + db.nTerms + ' ' + (_probeParams._mechanic || mechanic)
+            + ' terms pre-filled from ORCA’s record for ' + country + ' — ' + db.heldTxt + '. '
+            + (db.unreadTxt
+                ? db.unreadTxt + ' Set it before quoting this run as ' + country + '.'
+                : db.tmplTxt + ' ' + (db.tmpl.length > 1 ? 'run' : 'runs')
+                  + ' the platform template — ORCA holds no value for '
+                  + (db.tmpl.length > 1 ? 'them' : 'it') + '. Edit before quoting this run as '
+                  + country + '.');
+        })();
     _sbBanner.style.borderColor = _sbMono ? 'var(--red)' : _sbBasis === 'default' ? 'var(--yellow)' : 'rgba(176,104,0,0.25)';
     _sbBanner.style.background  = _sbMono ? 'rgba(185,28,28,0.07)' : _sbBasis === 'default' ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
     _sbBanner.style.color       = _sbMono ? 'var(--red)' : 'var(--accent-dim)';
@@ -58832,6 +59198,12 @@ function ddOpenScenarioBuilder(country) {
     if (el('sb-ept')) el('sb-ept').value = Math.round((params.ept_rate || 0) * 100);
   }
 
+  // v964 (T2): mark which of the PSC inputs are this country's and which are the platform
+  // template, at the field. Clears itself on every other mechanic.
+  if (typeof _sbRenderPscTermNotes === 'function') {
+    try { _sbRenderPscTermNotes(country, params, mechEl ? mechEl.value : null); } catch (e) {}
+  }
+
   // v607 (T2): record where this scenario came from, so runCustomScenario() can print the
   // country's own published take beside the one it just computed. Fingerprint is taken AFTER
   // pre-fill so a later re-run can tell "as loaded" from "edited".
@@ -58840,6 +59212,8 @@ function ddOpenScenarioBuilder(country) {
     mech:         (mechEl ? mechEl.value : mechanic),
     basis:        _sbBasis,
     recordTerms:  _sbBasis === 'record' ? _dcfRecordTerms(_probeParams) : null,  // v776 (T2)
+    // v964 (T2): which of the PSC form's terms are this country's and which are the template.
+    dbTerms:      _sbBasis === 'db' ? _dcfDbTerms(country, _probeParams) : null,
     overrideKeys: _probeParams._overrideKeys || [],
     monopoly:     _sbMono,
     cpTake:       _sbMono ? null : (d.take_75 != null ? Number(d.take_75) : null),
