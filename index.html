@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v962</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v963</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v962</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v963</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23180,7 +23180,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <svg id="breakeven-map-svg" style="width:100%;height:500px;display:block;"></svg>
     <div id="breakeven-map-tooltip" style="position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
   </div>
-  <!-- v962 (T6): populated by renderBreakevenMap(). Hidden when every modelled breakeven has a
+  <!-- v963 (T6): populated by renderBreakevenMap(). Hidden when every modelled breakeven has a
        polygon; it must never render an empty box. -->
   <div id="be-offmap-note" style="display:none;margin-top:8px;background:rgba(107,101,96,.04);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.6;"></div>
   
@@ -28312,6 +28312,55 @@ async function renderWorldMap() {
     }
   });
 
+  // ── v963: the map painted 129 shapes and the badge said 185 ───────────────
+  // ISO_MAP above is ~138 numeric-ISO codes typed out by hand, and every read on this map went
+  // through it. ORCA holds a take_75 for all 185 rows -- this is the one metric with complete
+  // coverage -- so a country absent from that literal was not missing data, only a table row.
+  // What the analyst got instead:
+  //   * fill fell through to '#D0CAC0', the same grey used for "no DCF data";
+  //   * cursor was 'default' and the click handler is gated on `name` -> no route to its profile;
+  //   * mouseover opens `if (!name) return;` -> hovering produced NOTHING AT ALL, so the only
+  //     available reading of a silent grey shape is "ORCA has nothing here".
+  // Cote d'Ivoire is the one that costs a screening list: 144 contracts, a 56.6% modelled take,
+  // and drawn as absent. Liberia (75), Cyprus (71), Morocco (71), South Sudan (58) and Israel
+  // (51) sat in the same hole. All six are in this world file under their own name.
+  //
+  // Same remedy as the Breakeven Map at v963, and deliberately the same precedence: ISO_MAP still
+  // wins wherever it resolves to a real ORCA row, so every deliberate mapping in it is preserved
+  // -- including 784 -> 'UAE', which must not be overwritten by the sub-national 'UAE - Abu Dhabi'.
+  // Only where ISO_MAP has nothing does the feature's own properties.name get a turn, and it is
+  // accepted only if it names a row ORCA actually holds. A name matching nothing still resolves
+  // to nothing. Measured: 129 -> 160 shapes, 0 false joins, 0 duplicate joins.
+  const _orcaNames = new Set(COUNTRY_DATA.map(d => d.country));
+  const NE_ALIAS_X = {
+    'W. Sahara': 'Western Sahara',
+    'Czechia': 'Czech Republic',
+    'Bosnia and Herz.': 'Bosnia and Herzegovina',
+    'Dominican Rep.': 'Dominican Republic',
+    'Falkland Is.': 'Falkland Islands',
+    'Solomon Is.': 'Solomon Islands',
+    'Central African Rep.': 'Central African Republic',
+    'Dem. Rep. Congo': 'Democratic Republic of the Congo',
+    'Congo': 'Republic of the Congo',
+    'Eq. Guinea': 'Equatorial Guinea',
+    'S. Sudan': 'South Sudan',
+    'United States of America': 'USA',
+    'Côte d’Ivoire': "Cote d'Ivoire",
+    'Côte d\'Ivoire': "Cote d'Ivoire"
+  };
+  const _mapName = function(f) {
+    if (!f) return null;
+    const viaIso = ISO_MAP[+f.id];
+    if (viaIso && _orcaNames.has(viaIso)) return viaIso;   // ISO_MAP wins wherever it resolves
+    const raw = f.properties && f.properties.name;
+    if (raw) {
+      if (_orcaNames.has(raw)) return raw;                 // exact ORCA row name
+      const al = NE_ALIAS_X[raw];
+      if (al && _orcaNames.has(al)) return al;             // Natural Earth's abbreviated spelling
+    }
+    return viaIso || null;                                 // unchanged where nothing matches
+  };
+
   const colorScale = d3.scaleSequential()
     .domain([20, 90])
     .interpolator(t => d3.interpolateRgb('#E8F4E8', '#96570A')(t));
@@ -28355,7 +28404,7 @@ async function renderWorldMap() {
     .join('path')
     .attr('d', path)
     .attr('fill', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _mapName(d);
       const take = name ? takeLookup[name] : null;
       if (take == null) return '#D0CAC0';
       return (_explorerRFactorOnly && rfactorLookup[name]) ? rfColorScale(take) : colorScale(take);
@@ -28363,11 +28412,11 @@ async function renderWorldMap() {
     .attr('stroke', '#D0CAC0')
     .attr('stroke-width', 0.5)
     .style('cursor', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _mapName(d);
       return takeLookup[name] != null ? 'pointer' : 'default';
     })
     .on('mouseover', function(event, d) {
-      const name = ISO_MAP[+d.id];
+      const name = _mapName(d);
       const take = name ? takeLookup[name] : null;
       const mech = name ? mechLookup[name] : null;
       const isRF = name ? rfactorLookup[name] : false;
@@ -28388,9 +28437,25 @@ async function renderWorldMap() {
       tooltip.style('display', 'none');
     })
     .on('click', function(event, d) {
-      const name = ISO_MAP[+d.id];
+      const name = _mapName(d);
       if (name && takeLookup[name] != null) openCountryProfileFromFC(name);
     });
+
+  // v963: <title> is the only readout a phone gets -- there is no hover on a touch screen, and
+  // this map had none at all, so every shape on it was silent under a thumb. Added for painted
+  // and unpainted alike: a grey shape now says WHY it is grey instead of leaving the analyst to
+  // infer "no data" from a colour.
+  svg.selectAll('path').append('title').text(d => {
+    const name = _mapName(d);
+    const take = name ? takeLookup[name] : null;
+    if (name && take != null) {
+      return `${name} \u2014 govt take ${take.toFixed(1)}% @ $75 \u2014 ${mechLookup[name] || 'mechanic n/a'}` +
+             `${rfactorLookup[name] ? ' \u2014 R-factor PSC' : ''} \u2014 click for Country Profile`;
+    }
+    const raw = (d.properties && d.properties.name) || name;
+    if (name && _orcaNames.has(name)) return `${name} \u2014 outside the current Mechanic/Region filter`;
+    return `${raw || 'Unnamed'} \u2014 no ORCA fiscal model`;
+  });
 
   // Legend
   const legendW = 200, legendH = 12;
@@ -28408,11 +28473,44 @@ async function renderWorldMap() {
   svg.append('text').attr('x', legendX + legendW).attr('y', legendY - 6)
     .attr('fill', '#6B6560').attr('font-size', 10).attr('text-anchor', 'end').text('90%');
 
-  // Count badge
-  const shown = Object.keys(takeLookup).length;
+  // ── v963: count the shapes, do not assert the table ──────────────────────
+  // This badge read `Object.keys(takeLookup).length` -- the number of ORCA rows that passed the
+  // filter, which is a count of the TABLE. It was never once compared against the map. With no
+  // filter it printed "185 countries mapped" over 129 painted shapes, so nothing on screen told
+  // an analyst the map was 30% short, and the 56 it dropped read as "no data". Now counted off
+  // the shapes that actually got a fill, and the remainder is named below the map rather than
+  // absorbed into the headline.
+  const _selected = Object.keys(takeLookup);
+  const _drawnNames = new Set();
+  countries.features.forEach(f => {
+    const nm = _mapName(f);
+    if (nm && takeLookup[nm] != null) _drawnNames.add(nm);
+  });
+  const drawn = _drawnNames.size;
+  const offmap = _selected.filter(n => !_drawnNames.has(n));
   svg.append('text').attr('x', width - 10).attr('y', legendY + 10)
     .attr('fill', '#6B6560').attr('font-size', 10).attr('text-anchor', 'end')
-    .text(`${shown} countries mapped`);
+    .text(offmap.length ? `${drawn} of ${_selected.length} drawn here` : `${drawn} countries mapped`);
+
+  // The off-projection remainder. "ORCA modelled no take" and "this projection has no shape for
+  // it" are different facts and only one of them is about the data -- a grey shape says the
+  // first, and for these the truth is the second. Named with their take so the analyst can still
+  // read the number, and told where to open them.
+  const oldNote = document.getElementById('expl-map-offmap-note');
+  if (oldNote) oldNote.remove();
+  if (offmap.length) {
+    const sorted = offmap.slice().sort((a, b) => (takeLookup[b] || 0) - (takeLookup[a] || 0));
+    const note = document.createElement('div');
+    note.id = 'expl-map-offmap-note';
+    note.style.cssText = 'margin-top:10px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);line-height:1.7;';
+    note.innerHTML = '<strong style="color:var(--text);">' + offmap.length + ' not on this projection</strong> \u2014 ' +
+      'modelled, but the 110m world file has no polygon for them (small islands, overseas ' +
+      'territories, and sub-national entities that must not be painted over their federation). ' +
+      'They are not grey on the map; they are not on the map. Open them in Table View. &nbsp;' +
+      sorted.map(n => '<span style="color:var(--text);">' + n + '</span> ' +
+        (takeLookup[n] != null ? takeLookup[n].toFixed(1) + '%' : '\u2014')).join(' &middot; ');
+    container.appendChild(note);
+  }
 }
 
 // ─── TAB 2: Country Comparison ───────────────────────────────────────────────
@@ -67145,7 +67243,7 @@ async function renderBreakevenMap() {
     entryLookup[d.country] = d;
   });
 
-  // ── v962 (T6): the id->country join, which is where this tab was actually losing countries ──
+  // ── v963 (T6): the id->country join, which is where this tab was actually losing countries ──
   // v918 fixed the VALUE read on this tab (cpBeFor(), not raw be_75) and recomputed the four
   // coverage literals so they could not drift again. It did not touch the other join, and the
   // other join is where 39 of the 67 were going. Measured on the shipped build, cold, 1440x900:
@@ -67293,7 +67391,7 @@ async function renderBreakevenMap() {
       _upd('be-hdr-coverage', 'Coverage: ' + _nHave + ' of ' + _nAll + ' countries, and every one of '
         + 'them falls between $' + _rLo + ' and $' + _rHi + '/bbl.');
       _upd('be-chip-coverage', 'Coverage: ' + _nHave + ' of ' + _nAll + ' countries');
-      // v962 (T6): this said "Remaining N countries shown as grey on map" and N was 118, off
+      // v963 (T6): this said "Remaining N countries shown as grey on map" and N was 118, off
       // COUNTRY_DATA. 148 of the map's 177 shapes were grey. The sentence was computed (v918) and
       // still wrong, because it was computed against a different table from the one the map paints
       // with. The honest split is stated after the map is drawn — see #be-offmap-note — so this
@@ -67453,7 +67551,7 @@ async function renderBreakevenMap() {
     }
   });
 
-  // ── v962 (T6): drawn-here vs modelled, counted off the shapes rather than asserted ─────
+  // ── v963 (T6): drawn-here vs modelled, counted off the shapes rather than asserted ─────
   // This label read `mapped + ' countries with breakeven data'` off beLookup — the COUNTRY_DATA
   // table — while the choropleth beside it was painted off ISO_MAP. It printed 67 over a map
   // carrying 29 colours. The resolver above closes most of that, but it cannot close all of it:
@@ -67475,7 +67573,7 @@ async function renderBreakevenMap() {
       ? _beOnMap.length + ' of ' + mapped + ' modelled breakevens drawn here'
       : mapped + ' countries with breakeven data');
 
-  // ── v962 (T6): where the ones with no polygon went ────────────────────────────────────
+  // ── v963 (T6): where the ones with no polygon went ────────────────────────────────────
   // A grey shape at least has a shape. These have none, so before this note there was no mark
   // on the tab at all — the analyst who screened Vanuatu or the Faroe Islands in the Explorer
   // came here to see it in context and found neither a colour nor an absence, just ocean. Naming
