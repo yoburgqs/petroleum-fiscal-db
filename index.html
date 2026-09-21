@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v961</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v962</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v961</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v962</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23180,6 +23180,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <svg id="breakeven-map-svg" style="width:100%;height:500px;display:block;"></svg>
     <div id="breakeven-map-tooltip" style="position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
   </div>
+  <!-- v962 (T6): populated by renderBreakevenMap(). Hidden when every modelled breakeven has a
+       polygon; it must never render an empty box. -->
+  <div id="be-offmap-note" style="display:none;margin-top:8px;background:rgba(107,101,96,.04);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.6;"></div>
   
   <!-- v591 (T1): these two cards were "Lowest Breakeven (Most Resilient)" and "Highest
        Breakeven (Most Price-Sensitive)", each a top-10 ranked leaderboard off be_75.
@@ -67141,6 +67144,71 @@ async function renderBreakevenMap() {
     takeLookup[d.country] = d.take_75;
     entryLookup[d.country] = d;
   });
+
+  // ── v962 (T6): the id->country join, which is where this tab was actually losing countries ──
+  // v918 fixed the VALUE read on this tab (cpBeFor(), not raw be_75) and recomputed the four
+  // coverage literals so they could not drift again. It did not touch the other join, and the
+  // other join is where 39 of the 67 were going. Measured on the shipped build, cold, 1440x900:
+  //
+  //     COUNTRY_DATA countries with a modelled breakeven ....... 67
+  //     shapes this map paints a breakeven colour on ........... 29
+  //     SVG corner label printed over the top .................. "67 countries with breakeven data"
+  //
+  // ISO_MAP is ~140 numeric-ISO codes typed out by hand, and every read on this tab goes through
+  // it. A country whose code is simply absent from that literal resolves to `undefined`, and then:
+  //   * fill/stroke/data-be treat it as null  -> painted var(--border), counted as "No data";
+  //   * cursor is 'default' and the click handler is gated on `name` -> no route to its profile;
+  //   * mouseover opens `if (!name) return;` -> hovering it produces NOTHING AT ALL. Not the
+  //     "no modelled cost structure" line v891 wrote, not the evidence letter v891 added. A dead
+  //     shape. The analyst's only available reading of a grey shape that does not respond is
+  //     "ORCA has nothing here";
+  //   * the v324 <title> is appended `if (name)` -> on a phone, where <title> is the only readout,
+  //     there is no readout.
+  //
+  // Vanuatu (548), Serbia (688), Israel (376), Taiwan (158), Fiji (242), Slovakia (703),
+  // Slovenia (705), Montenegro (499), Moldova (498), Lithuania (440), Belarus (112), Bahamas (044),
+  // Nepal (524), New Caledonia (540) and Puerto Rico (630) all carry a modelled breakeven and all
+  // sit in this world file under their exact ORCA name -- they were never missing data, only a
+  // table row. Six more are present under Natural Earth's abbreviated spelling.
+  //
+  // Vanuatu is the one that costs an IC memo: $28/bbl, the map's GREENEST band, and the band the
+  // Screener screens into. The legend's own C/D count (v891) exists to warn that this band is
+  // thin -- and the country it is warning about is not drawn, so the warning has no referent.
+  //
+  // The remedy is to stop treating a hand-typed literal as the only join. ISO_MAP still wins where
+  // it resolves to a real ORCA row, so every deliberate mapping in it is preserved -- including
+  // 784 -> 'UAE', which is correct: ORCA's modelled $28 belongs to 'UAE - Abu Dhabi', a
+  // sub-national entity that must not be painted over the whole federation. Only where ISO_MAP has
+  // nothing does the feature's own properties.name get a turn, and it is accepted only if it names
+  // a row ORCA actually holds. A name that matches nothing still resolves to nothing.
+  const NE_ALIAS = {
+    'W. Sahara': 'Western Sahara',
+    'Czechia': 'Czech Republic',
+    'Bosnia and Herz.': 'Bosnia and Herzegovina',
+    'Dominican Rep.': 'Dominican Republic',
+    'Falkland Is.': 'Falkland Islands',
+    'Solomon Is.': 'Solomon Islands',
+    'Central African Rep.': 'Central African Republic',
+    'Dem. Rep. Congo': 'Democratic Republic of the Congo',
+    'Congo': 'Republic of the Congo',
+    'Eq. Guinea': 'Equatorial Guinea',
+    'S. Sudan': 'South Sudan',
+    'United States of America': 'USA',
+    'C\u00f4te d\u2019Ivoire': "Cote d'Ivoire",
+    'C\u00f4te d\'Ivoire': "Cote d'Ivoire"
+  };
+  const _beName = function(f) {
+    if (!f) return null;
+    const viaIso = ISO_MAP[+f.id];
+    if (viaIso && entryLookup[viaIso]) return viaIso;   // ISO_MAP wins wherever it resolves
+    const raw = f.properties && f.properties.name;
+    if (raw) {
+      if (entryLookup[raw]) return raw;                 // exact ORCA row name
+      const al = NE_ALIAS[raw];
+      if (al && entryLookup[al]) return al;             // Natural Earth's abbreviated spelling
+    }
+    return viaIso || null;                              // unchanged behaviour where nothing matches
+  };
   // v470: Update breakeven legend with live country counts so analysts immediately see distribution
   (function() {
     // v591: tested-only, so the three floor artifacts are counted as No data (which is what
@@ -67225,8 +67293,13 @@ async function renderBreakevenMap() {
       _upd('be-hdr-coverage', 'Coverage: ' + _nHave + ' of ' + _nAll + ' countries, and every one of '
         + 'them falls between $' + _rLo + ' and $' + _rHi + '/bbl.');
       _upd('be-chip-coverage', 'Coverage: ' + _nHave + ' of ' + _nAll + ' countries');
-      _upd('be-chip-rest', '\u00b7 Requires complete royalty + cost data \u00b7 Remaining '
-        + (_nAll - _nHave) + ' countries shown as grey on map');
+      // v962 (T6): this said "Remaining N countries shown as grey on map" and N was 118, off
+      // COUNTRY_DATA. 148 of the map's 177 shapes were grey. The sentence was computed (v918) and
+      // still wrong, because it was computed against a different table from the one the map paints
+      // with. The honest split is stated after the map is drawn — see #be-offmap-note — so this
+      // chip stops claiming a map count it has not measured and states only what it knows here.
+      _upd('be-chip-rest', '\u00b7 Requires complete royalty + cost data \u00b7 The other '
+        + (_nAll - _nHave) + ' carry no modelled cost structure');
       _upd('be-thr-denom', 'of ' + _nHave + ' countries with a modelled breakeven');
     }
   })();
@@ -67288,31 +67361,31 @@ async function renderBreakevenMap() {
     .join('path')
     .attr('d', path)
     .attr('fill', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       return beColor(be);
     })
     .attr('stroke', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       return (be != null && be > currentPrice) ? '#B91C1C' : '#D0CAC0';
     })
     .attr('stroke-width', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       return (be != null && be > currentPrice) ? 1.5 : 0.5;
     })
     .attr('data-be', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       return be != null ? be : '';
     })
     .style('cursor', d => {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       return name ? 'pointer' : 'default';
     })
     .on('mouseover', function(event, d) {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       const take = name ? takeLookup[name] : null;
       if (!name) return;
@@ -67349,7 +67422,7 @@ async function renderBreakevenMap() {
       tooltip.style.top = top + 'px';
     })
     .on('mouseout', function(event, d) {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       const be = name ? beLookup[name] : null;
       const price = parseInt(priceSlider?.value || 70);
       d3.select(this)
@@ -67358,7 +67431,7 @@ async function renderBreakevenMap() {
       tooltip.style.display = 'none';
     })
     .on('click', function(event, d) {
-      const name = ISO_MAP[+d.id];
+      const name = _beName(d);
       if (name && typeof openCountryProfileFromFC === 'function') {
         openCountryProfileFromFC(name);
       }
@@ -67366,7 +67439,7 @@ async function renderBreakevenMap() {
 
   // v324: Add SVG <title> tooltip to each country path for accessibility and touch devices
   svg.selectAll('path').each(function(d) {
-    const name = ISO_MAP[+d.id];
+    const name = _beName(d);
     if (name) {
       const be = beLookup[name];
       // v891 (T6): on a touch device this <title> is the ONLY readout -- there is no hover -- so
@@ -67380,11 +67453,59 @@ async function renderBreakevenMap() {
     }
   });
 
-  const mapped = Object.values(beLookup).filter(v => v != null).length;
+  // ── v962 (T6): drawn-here vs modelled, counted off the shapes rather than asserted ─────
+  // This label read `mapped + ' countries with breakeven data'` off beLookup — the COUNTRY_DATA
+  // table — while the choropleth beside it was painted off ISO_MAP. It printed 67 over a map
+  // carrying 29 colours. The resolver above closes most of that, but it cannot close all of it:
+  // the 110m world file has no polygon for a Pacific atoll or a small island dependency, so a
+  // handful of modelled countries have no shape to paint at any resolution this tab uses. Those
+  // are counted here instead of being silently folded into "No data", because "ORCA modelled no
+  // cost structure" and "this map has no polygon for it" are different facts and only one of
+  // them is about the evidence.
+  const _beDrawn = {};
+  countries.features.forEach(function(f) { var n = _beName(f); if (n) _beDrawn[n] = 1; });
+  const _beModelled = Object.keys(beLookup).filter(function(k) { return beLookup[k] != null; });
+  const _beOnMap  = _beModelled.filter(function(k) { return _beDrawn[k]; });
+  const _beOffMap = _beModelled.filter(function(k) { return !_beDrawn[k]; }).sort();
+  const mapped = _beModelled.length;
   svg.append('text')
     .attr('x', width - 10).attr('y', height - 10)
     .attr('fill', '#6B6560').attr('font-size', 10).attr('text-anchor', 'end')
-    .text(mapped + ' countries with breakeven data');
+    .text(_beOffMap.length
+      ? _beOnMap.length + ' of ' + mapped + ' modelled breakevens drawn here'
+      : mapped + ' countries with breakeven data');
+
+  // ── v962 (T6): where the ones with no polygon went ────────────────────────────────────
+  // A grey shape at least has a shape. These have none, so before this note there was no mark
+  // on the tab at all — the analyst who screened Vanuatu or the Faroe Islands in the Explorer
+  // came here to see it in context and found neither a colour nor an absence, just ocean. Naming
+  // them, with their values, is the whole fix for that group: the number exists, this projection
+  // cannot draw it, and the distribution card below carries it.
+  (function() {
+    var host = document.getElementById('be-offmap-note');
+    if (!host) return;
+    if (!_beOffMap.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    var _g = (typeof _evidenceGrade === 'function') ? _evidenceGrade : null;
+    // Local escaper: _esc is block-scoped to the Country Profile builder and _esc594 is not
+    // declared in this script block. Country names carry no markup, but a name is still data.
+    var _e = function(x) { return String(x == null ? '' : x)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+    var items = _beOffMap.map(function(c) {
+      var e = entryLookup[c], g = _g && e ? _g(e) : null;
+      return '<span style="white-space:nowrap;">' + _e(c) + ' <strong style="font-family:\'IBM Plex Mono\',monospace;">$'
+        + _beLbl(beLookup[c]) + '</strong>'
+        + (g ? ' <span style="color:' + g.color + ';font-weight:700;font-family:\'IBM Plex Mono\',monospace;">' + g.letter + '</span>' : '')
+        + '</span>';
+    }).join('<span style="color:var(--border);"> &middot; </span>');
+    host.style.display = '';
+    host.innerHTML = '<strong style="color:var(--text);">' + _beOffMap.length
+      + ' of the ' + mapped + ' modelled breakevens have no shape on this projection</strong> '
+      + '&mdash; small island states, dependencies and one sub-national entity that the 110m world '
+      + 'file does not carry a polygon for. They are not grey on the map; they are not on the map. '
+      + 'Their figures are real and are in the distribution card below, the Explorer\u2019s Breakeven '
+      + 'column and the CSV export: '
+      + items + '.';
+  })();
 
   // ── v591 LEFT CARD: the distribution, not a leaderboard ──────────────────────────────
   // 65 countries hold 8 distinct integer breakevens. The widest gap between any two of them
