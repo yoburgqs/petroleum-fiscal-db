@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v958</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v959</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v958</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v959</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -51190,12 +51190,22 @@ function renderReformRisk() {
   // event inline, so the number is never on screen without the thing that contradicts it.
   function scoreCell(r) {
     var lh = _rrLastHostile(r);
+    // v959 (T4): a row whose sourced log holds no fiscal law change at ANY date scores 100 for
+    // the sole reason that the formula's input is zero. Ghana and Guyana are both in that
+    // position and both used to be off the table entirely; now that they are on it, the number
+    // must not arrive in the green ramp that every genuinely quiet regime above them earns.
+    var _noFiscal = !r.split || !r.split.fiscal;
     var ramp = r.score > 70 ? 'var(--green)' : r.score > 40 ? 'var(--yellow)' : 'var(--red)';
-    var col = !lh ? ramp : (r.score <= 40 ? 'var(--red)' : 'var(--muted)');
+    var col = _noFiscal ? 'var(--muted)' : (!lh ? ramp : (r.score <= 40 ? 'var(--red)' : 'var(--muted)'));
     var note = '';
-    if (lh) {
+    if (_noFiscal) {
+      note = '<div style="font-size:10px;line-height:1.45;color:var(--muted);margin-top:3px;text-align:right;max-width:190px;margin-left:auto;white-space:normal;overflow-wrap:anywhere;">'
+        + '<span style="color:var(--orange);font-weight:700;">not a stability reading</span> \u2014 no fiscal law change on record at any date; '
+        + 'the log holds context events only, so the formula returns 100 on an empty count.'
+        + '</div>';
+    } else if (lh) {
       var pre = lh.year < 2010;
-      note = '<div style="font-size:10px;line-height:1.45;color:var(--muted);margin-top:3px;text-align:right;max-width:190px;margin-left:auto;">'
+      note = '<div style="font-size:10px;line-height:1.45;color:var(--muted);margin-top:3px;text-align:right;max-width:190px;margin-left:auto;white-space:normal;overflow-wrap:anywhere;">'
         + '<span style="color:' + (pre ? 'var(--red)' : 'var(--orange)') + ';font-weight:700;">'
         + (pre ? 'not counted \u2014 ' : '') + 'take raised ' + lh.year + '</span> '
         + '<span style="font-family:IBM Plex Mono,monospace;color:var(--red);font-weight:700;">' + _rrEsc(lh.change) + '</span>'
@@ -51215,21 +51225,64 @@ function renderReformRisk() {
       + '</td>';
   }
 
-  const topTable = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
+  // v959: overflow-x:auto matches the heatmap card directly below. Without it a long note
+  // inside a score cell escapes the card and widens the whole PAGE, which is what six extra
+  // rows did the first time they were rendered: the Country column lost 53px, the notes in the
+  // Reform Frequency column stopped fitting, and the document scrolled to 1773 at 1024-1920.
+  const topTable = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;overflow-x:auto;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Most Frequently Reformed Regimes</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Countries ranked by sourced <strong style=\"color:var(--text);\">fiscal law changes</strong>, all dates. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts fiscal law changes dated 2010 or later.</strong> Sourced events that changed no fiscal terms \u2014 discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax \u2014 are counted in their own column and stay in the event log, but they neither score nor decide this ranking; before v713 they did, which put Libya 5th and left Canada off the table. Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--text);">All 21 jurisdictions that carry a sourced reform log</strong>, ranked by sourced <strong style=\"color:var(--text);\">fiscal law changes</strong>, all dates — the complete set, <strong style="color:var(--text);">not a top-N cut</strong>. A country missing from this table has no sourced reform log at all (164 of 185 do not), which is missing coverage, not a clean record; check it in the lookup at the top of the tab. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts fiscal law changes dated 2010 or later.</strong> Sourced events that changed no fiscal terms \u2014 discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax \u2014 are counted in their own column and stay in the event log, but they neither score nor decide this ranking; before v713 they did, which put Libya 5th and left Canada off the table. Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>'
-    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Sourced fiscal law changes on record at any date \u2014 the number this table is ranked by. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax) are counted separately beneath it as CONTEXT and do not affect the ranking. Ghana and Guyana carry 3 context events each and no fiscal law change at any date, which is why neither appears here.">Fiscal Law Changes<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">all dates</span></th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Sourced fiscal law changes on record at any date \u2014 the number this table is ranked by. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax) are counted separately beneath it as CONTEXT and do not affect the ranking. Every jurisdiction with a sourced log is listed here, including the two — Ghana and Guyana — whose log holds 3 context events each and no fiscal law change at any date; they sort to the bottom on 0 and are marked there rather than dropped. A country absent from this table has no sourced reform log at all.">Fiscal Law Changes<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">all dates</span></th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform Frequency Score (0\u2013100). Formula: 100 \u2212 (reforms since 2010 \xd7 15). Score 100 = no reforms since 2010 (most stable); 70 = 2 reforms; 55 = 3 reforms; 40 = 4 reforms; 0 = 7+ reforms (most volatile). This measures reform frequency only. Note: the Fiscal Predictability Score in Country Profile is different \u2014 it additionally factors price swing and within-country fiscal term consistency (IQR across contracts). Use both signals together for IC analysis.">Reform Frequency<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">since 2010</span> \u24d8</th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Direction of each sourced event. &#8593; take raised &#183; &#8595; take cut &#183; ? a sourced fiscal law change whose take impact ORCA has not quantified (direction unknown, NOT neutral) &#183; &#183;N events that changed no fiscal terms. The verdict beneath the counts is asserted only where the unmeasured changes could not overturn it.">Direction</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>'
     + '</tr></thead>'
     + '<tbody>'
-    + withScore.slice(0,15).map(function(r) {
+    + (function () {
+        // ── v959 (T4): the flagship ranking silently stopped at 15 of 21 ────────────────────
+        // Walked "what is my fiscal-stability and reform exposure here?" cold at 1440x900 and
+        // 390x844 hasTouch, storage cleared: Home -> Reform Risk.
+        //   * 21 of 185 jurisdictions carry a sourced reform log. This table rendered
+        //     withScore.slice(0,15) and said nothing about a cut, while the heatmap directly
+        //     beneath it discloses its own as "Top 20 of the 21".
+        //   * The six it dropped were Iraq, India, Russia, USA (2 fiscal law changes each) and
+        //     Ghana, Guyana (0). Four of those six hold sourced fiscal law changes and one of
+        //     them holds the single largest recent take rise in the log: Russia 2022, +15pp.
+        //   * This tab's own intro names that exact event -- "Russia's +15pp windfall tax in
+        //     2022 moves it exactly as far as a 1pp administrative change would" -- as the
+        //     reason a high score is not an all-clear, and then the ranking the analyst reads
+        //     first does not carry Russia at all.
+        //   * Worse, the Fiscal Law Changes header tooltip explained the absence of Ghana and
+        //     Guyana by their having "no fiscal law change at any date, which is why neither
+        //     appears here". That states a membership rule the table does not follow, so an
+        //     analyst who fails to find Russia, Iraq, India or USA is told, in writing, that
+        //     the reason is zero fiscal law changes. Each of the four has two.
+        //   * The platform's own IC guidance, in Sample Analyses twice, reads "any portfolio
+        //     country appearing in the top 10 most-reformed list carries a tightening risk
+        //     premium" -- so the table is read as the membership test it was failing.
+        // The universe is 21 rows. There is no reason to rank a 21-row universe and print 15.
+        var _zeroSeen = false;
+        return withScore.map(function(r) {
         var escapedC = r.country.replace(/'/g,"\'");
+        var _noFis = !r.split || !r.split.fiscal;
+        var _pre = '';
+        if (_noFis && !_zeroSeen) {
+          _zeroSeen = true;
+          // The inner max-width is load-bearing, not cosmetic: a colspan cell's max-content
+          // width drives an auto-layout table, so an unconstrained sentence here widened the
+          // whole table to 1742px and put a horizontal scrollbar on the page at 1024-1920.
+          _pre = '<tr><td colspan="6" style="padding:9px 8px 6px;border-top:1px solid var(--border);">'
+            + '<div style="max-width:640px;font-size:10px;line-height:1.5;color:var(--muted);white-space:normal;">'
+            + '<strong style="color:var(--orange);">Below: a sourced log, but no fiscal law change in it at any date.</strong> '
+            + 'These jurisdictions cannot be ranked as reformers and their Reform Frequency of 100 is the formula '
+            + 'returning its floor on an empty count \u2014 not a measured stability finding. They are listed so this table '
+            + 'is the complete roster of the sourced ' + withScore.length + ', and absence from it means no sourced log at all.'
+            + '</div></td></tr>';
+        }
         // v585 (T4): this cell printed a bare 3-number split whose third figure merged
         // unmeasured fiscal changes with non-fiscal context. The verdict line beneath it is the
         // same one the lookup card and the Country Profile sidebar now show, from _rrTilt().
@@ -51239,7 +51292,7 @@ function renderReformRisk() {
             + '<div style="font-size:9px;font-weight:700;color:' + _t.color + ';line-height:1.35;margin-top:2px;white-space:normal;">' + _t.word + '</div>'
           : '—';
         // v812 (T4): stays on this tab and opens this country's reform verdict. See _rrOpenLocal().
-        return '<tr style="cursor:pointer;" onclick="_rrOpenLocal(\'' + escapedC + '\', this)" title="Open ' + r.country + '\u2019s reform verdict — IC action, score and rank, and its own sourced event log — at the top of this tab. The full Country Profile is one further click from there." onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
+        return _pre + '<tr style="cursor:pointer;' + (_noFis ? 'opacity:.72;' : '') + '" onclick="_rrOpenLocal(\'' + escapedC + '\', this)" title="Open ' + r.country + '\u2019s reform verdict — IC action, score and rank, and its own sourced event log — at the top of this tab. The full Country Profile is one further click from there." onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
           + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">›</span></td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;color:var(--accent);font-weight:600;">' + r.split.fiscal
               + (r.split.context
@@ -51248,7 +51301,7 @@ function renderReformRisk() {
               + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;color:' + (r.since2010>2?'var(--red)':r.since2010>0?'var(--orange)':'var(--green)') + ';">' + r.since2010
           + (r.contextIn && r.contextIn.length
-              ? '<div style="font-size:10px;color:var(--orange);font-weight:700;line-height:1.4;margin-top:2px;max-width:150px;margin-left:auto;">+ ' + r.contextIn.length
+              ? '<div style="font-size:10px;color:var(--orange);font-weight:700;line-height:1.4;margin-top:2px;max-width:150px;margin-left:auto;white-space:normal;overflow-wrap:anywhere;">+ ' + r.contextIn.length
                 + ' context event' + (r.contextIn.length === 1 ? '' : 's') + ' not scored</div>'
               : '')
           + '</td>'
@@ -51256,7 +51309,8 @@ function renderReformRisk() {
           + '<td style="padding:5px 8px;font-size:12px;text-align:center;vertical-align:top;max-width:140px;">' + dirHtml + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</td>'
           + '</tr>';
-      }).join('')
+        }).join('');
+      })()
     + '</tbody></table></div>';
 
   // Section 2: Decade heatmap
