@@ -63638,3 +63638,145 @@ Still open, observed while walking and deliberately left:
 - Carried forward from cycle 884: the Country Profile **Regional Peers** strip shows a
   6-row neighbour window and then the regional maximum, with nothing saying the last row is
   the extreme rather than the next neighbour.
+
+---
+
+# Cycle 889 — v969 (T1) — the Screener's region menu advertised 54 African countries and returned 1
+
+## Task
+
+**T1 — "Which countries should even be on my screening list?"**
+
+Rotated off T5 (cycle 888), T6 (887), T4 (886), T3 (885), T2 (884).
+
+## Friction
+
+Walked T1 cold at 1440x900 — no sessionStorage, no localStorage, entering through the
+**Home card's own one-click path**: *"✓ 15 countries pass the IOC capital screen … open the
+screen →"* (`_homeOpenICScreen()`). That lands on the Screener with 15 rows, ranked by
+contractor NPV, Canada first.
+
+The analyst's next move on a 15-row shortlist is to cut it by region. `#sc-region`
+(`index.html:3882`) offered:
+
+| option label | rows it actually returned |
+|---|---|
+| Africa **(54)** | **1** |
+| Middle East **(17)** | **1** |
+| Europe **(33)** | **1** |
+| CIS/FSU **(5)** | **1** |
+| Americas — all **(34)** | 7 |
+| North America **(3)** | 2 |
+
+`_labelRegionControls()` (`index.html:27011`) counts those labels **once**, off the full
+`COUNTRY_DATA`, at data load, and never counts again. Its own opening comment states the
+invariant this breaks, verbatim:
+
+> *"Region control labels, counted off COUNTRY_DATA rather than typed into the markup, **so a
+> count on a chip cannot disagree with the number of rows that chip returns.** Any option or
+> chip that would return zero rows is taken off the control instead of being left there to
+> hand the analyst an empty table."*
+
+That invariant holds on the Fiscal Compare chip row, which runs all 185. It **cannot** hold
+on `#sc-region`, because that control lives inside the Screener's filter panel — and the
+moment any other leg is active, which is the entire purpose of the Screener, the menu is
+quoting a different population from the one on screen.
+
+**Measured across five shipped presets × ten region options — 50 picks, every label
+overstated, and NINE returned a completely empty table from a positive label:**
+
+| preset | option advertised | rows returned |
+|---|---|---|
+| Offshore & Deepwater | Middle East (17) | **0** |
+| Offshore & Deepwater | Oceania (16) | **0** |
+| Offshore & Deepwater | CIS/FSU (5) | **0** |
+| Offshore & Deepwater | North America (3) | **0** |
+| Stable Fiscal Record | Europe (33) | **0** |
+| Stable Fiscal Record | Oceania (16) | **0** |
+| Downside Resilience | Oceania (16) | **0** |
+| Downside Resilience | North America (3) | **0** |
+| Primary-Source Evidence | CIS/FSU (5) | **0** |
+
+A blank table arriving from a control that has just promised 17 candidates does not read as
+"no match". It reads as a broken tool, and the analyst either re-clicks or abandons the
+region cut entirely — which is the worst outcome on T1, because region is the one axis an
+IC screening meeting is actually organised around.
+
+Note the preset menu four inches above **already recomputes live** (`_labelScreenerPresets`,
+v651/v811/v954: `→ 15 of 185 @$75`, recounted on every deck change). The pattern existed on
+the same screen; the region control had simply never been given it.
+
+## Change
+
+New **`_scLabelRegionLive(base)`**, called from `runScreener()`.
+
+- The count is **measured, not asserted**: each option is counted off the row set that passes
+  every *other* leg of the live screen, obtained by running the existing `_scPass` predicate
+  with a new `ignoreLeg = 'region'` — the same mechanism v706 established for the two NPV
+  floors. The number printed on the option is produced by the same code that will produce the
+  rows, so a re-implementation cannot drift from the filter.
+- **Rest state unchanged** — `Africa (54)`. No other leg narrowing anything means the two
+  populations are the same set, and the label stays the single universe number it has always been.
+- **Screen active** — `Africa (1 of 54)`. Both numbers, because the universe count is still
+  what tells the analyst whether "1" is a thin screen or a thin region.
+- **Would return nothing** — `Middle East (0 of 17)`, **disabled**. That is the "taken off the
+  control" half of the invariant above, honoured without *deleting* the region: deletion would
+  read as ORCA holding no Middle East data at all, which is false and worse.
+- **The currently-selected option is never disabled**, so a screen that narrows to zero can
+  still be backed out of. Verified explicitly: select Africa under IOC Capital Screen (1 row),
+  then drag the take ceiling to 40% → Africa goes to 0, stays enabled, analyst escapes.
+- Per-option `title` names the reason either way.
+
+Side effect worth keeping: a **zero-row screen now shows where its survivors went** —
+`All Regions (8 of 185) · Americas — all (6 of 34)` — instead of a bare empty table.
+
+## Result
+
+An analyst cutting a shortlist by region reads the **true hit count before spending the
+click**, and can no longer be handed a blank table by a menu advertising up to 33 countries.
+Before this, nine of fifty region picks across the shipped presets did exactly that.
+
+## Cycle 889 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **RAN** against the modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, **v968 from git HEAD** | **499 / 0 / 1 — identical, no regression** |
+| Label vs actual, 30 picks over 3 presets | **0 mismatches** |
+| Empty-table options now disabled | 9 of 9 that measure 0 |
+| Selected-option escape hatch | Africa→0 stays **enabled**, backs out to North America (2 rows) ✓ |
+| Idempotency, 6 consecutive `runScreener()` | no suffix stacking ✓ |
+| Deck switch $75→$50 with IOC preset | labels recount (Africa 1→2, Europe 1→2, CIS/FSU 1→2) ✓ |
+| Reset All | returns to rest-state universe labels ✓ |
+| Horizontal scroll, **13 panes × 1920/1440/1280/1024/768/390** | **0 of 78 screens** |
+| Pane-activation assertion (per cycle 888's correction) | **78 of 78 panes confirmed active before measuring** |
+| 390×844 `hasTouch`, real tap path | `#sc-region` **44px**; `scrollWidth` 390 = `clientWidth` 390; both label states confirmed on the phone |
+| Page errors across the walk | **0** (excluding the local-server `sw.js` 404) |
+| Version | title + badge `v968 → v969`, silently at the end |
+
+## What this cycle did NOT do
+
+Observed while walking, deliberately left:
+
+- **The REFORM RECORD select (`#sc-reform`) has the same shape of defect** — `(185) / (6) /
+  (13) / (21)` are universe counts that do not move with the screen. Left because its labels
+  read as descriptions of the reform *log's* coverage ("ORCA holds a sourced log for 21 of
+  185"), which is their honest meaning, where "Africa (54)" reads as a promise about what the
+  click returns. Weaker case, and the directive's one-moment rule applies. Next T1 cycle
+  should decide it on that distinction rather than by symmetry.
+- **The mechanic and IOC-operator checkbox grids carry no counts at all.** Same panel.
+- **17 checkboxes in the Advanced Filters panel render at 13px under `pointer: coarse`.**
+  Measured against the v968 control at 390×844: **17 at 13px on both builds** — pre-existing,
+  not introduced or touched by this cycle. Recorded rather than silently passed, because the
+  directive's finalization item 3 is "zero controls under 24px under `pointer: coarse`" and
+  this panel does not meet it.
+- The **engine-override axis** (v967/v968) was checked against the Screener and found **not to
+  apply**: the Screener's Take and NPV columns read `take_75` / `npv_75`, which are the ORCA
+  *database* columns v968 records as unaffected by the hard-coded overrides — not the model
+  columns. Cycle 888 listed the Screener paste as unaudited on that axis; on inspection the
+  ranking itself is clean. The Screener's *IC paste* was not separately audited.
+- Carried forward, still open: Fiscal Compare's clipboard table emits `Breakeven $/bbl`
+  unconditionally where `_scCopyColumns()` guards it with `if (anyBe)` (cycle 880, mitigated by
+  the populated-count caption). Country Profile's Regional Peers strip shows a 6-row neighbour
+  window then the regional maximum with nothing marking the last row as the extreme (cycle 884).
