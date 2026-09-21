@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v966</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v967</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v966</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v967</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61940,6 +61940,9 @@ function openFCDrilldown(country) {
   html += _fcDrillEviBadge;
   // v679 (T6): filled by _fcRenderTermLeg() once api/v1/country/{slug}.json resolves.
   html += '<span id="fc-dd-terms-chip"></span>';
+  // v967 (T6): the engine-override chip. Synchronous, so unlike the citation chip above it
+  // is on screen the instant the drawer opens, not after api/v1/country/{slug}.json lands.
+  html += _fcEngineChipHTML(country);
   if (mc) html += '<span class="mc-badge" title="Price scenario range ($50\u2013$125/bbl)">' + Math.min(mc.p10,mc.p90).toFixed(1) + '\u2013' + Math.max(mc.p10,mc.p90).toFixed(1) + '% range</span>';
   // v892 (T4): same naked badge as the Country Profile strip. In this drawer it read
   // "91 · UNGRADED / one term" between "19.9–26.1% range" and "BE: —", with "Src B",
@@ -62435,6 +62438,40 @@ function openFCDrilldown(country) {
         else if (_domEntry[0] === 'prrt') _domImpl = 'IC note: PRRT dominant = back-loaded; no PRRT in early field life — payout-dependent. Verify uplift rate and LTBR basis.';
         html += '<div style="font-size:11px;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">Largest component: <strong style="color:var(--text);">' + _domLabel + '</strong> at ' + _domEntry[1].toFixed(1) + '% of revenue' + (_domImpl ? ' &mdash; <em>' + _domImpl + '</em>' : '') + '</div>';
       }
+    })();
+    // v967 (T6): the bars above are the ENGINE's rates on the 6 override countries whose
+    // hard-coded terms disagree with ORCA's own record, and the "Largest component" note that
+    // just rendered is derived from them. On Nigeria that note is not merely a different number:
+    // the engine's 50% special tax takes the dominant slot and prints "take accelerates above
+    // $75/bbl", where the record's 65.4% income tax would put it on the CIT-dominant reading.
+    // Stated ON the block it qualifies, not only in the header chip, because this is where the
+    // analyst reads a component split off the screen and into a memo.
+    (function() {
+      var _engO = (typeof _fcEngineOverride === 'function') ? _fcEngineOverride(country) : null;
+      if (!_engO) return;
+      var _engN = _engO.diffs.length;
+      var _engRows = _engO.diffs.map(function(c) {
+        return '<div style="margin-top:2px;">&bull; <strong style="color:var(--text);">' + c.label
+          + '</strong> &mdash; these bars ran ' + _fcEngFmt(c.eng, c.unit)
+          + ', ORCA\u2019s record for ' + country + ' is ' + _fcEngFmt(c.rec, c.unit) + '</div>';
+      }).join('');
+      var _engCEsc = String(country).replace(/'/g, "\\'");
+      html += '<div style="font-size:11px;color:var(--red);margin-top:8px;padding-top:6px;'
+        + 'border-top:1px solid rgba(185,28,28,.35);line-height:1.55;">'
+        + '<strong>\u26a0 These bars are engine rates, not ' + country + '\u2019s record.</strong> '
+        + 'The ' + (_engO.mech || 'DCF') + ' engine hard-codes ' + _engN + ' of the terms behind this '
+        + 'split, and the \u201cLargest component\u201d line above is derived from them:'
+        + _engRows
+        + '<div style="margin-top:4px;color:var(--muted);">A hard-coded override is not a citation. '
+        + 'Cite these as an engine assumption, not as ' + country + '\u2019s terms.</div>'
+        + '<span role="button" tabindex="0" style="display:inline-flex;align-items:center;min-height:24px;'
+        + 'margin-top:5px;background:transparent;border:1px solid rgba(185,28,28,.45);border-radius:4px;'
+        + 'color:var(--red);font-size:10px;font-weight:700;padding:2px 9px;cursor:pointer;"'
+        + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + _engCEsc + '\');"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + _engCEsc + '\');}"'
+        + ' title="Opens ' + country + '\u2019s Key Fiscal Parameters evidence chain, which prints '
+        + '\u26a0 DCF USES on each affected row beside the ORCA value and the statutory value.">'
+        + 'Show the Evidence Chain \u2192</span></div>';
     })();
     html += '</div>';
   }
@@ -63077,6 +63114,113 @@ function _orcaTermLegMeth() {
   ];
 }
 window._orcaTermLegMeth = _orcaTermLegMeth;
+
+// ── v967 (T6): Fiscal Compare printed the ENGINE's hard-coded rates as the Fiscal Breakdown ──
+// getDCFParams() carries a `countryOverrides` table for 9 countries. Fiscal Compare's sweep runs
+// exactly that path -- fcResolveMechanic() -> getDCFParams() -> dcfConcession/dcfPSC/dcfTSC -- so
+// for those 9 the take, the NPV and every bar of `res.waterfall` are computed from hard-coded
+// rates. The drawer then prints that waterfall as "FISCAL BREAKDOWN (% of revenue)", names a
+// "Largest component", and hangs an IC note off it.
+//
+// Measured live against COUNTRY_DATA -- the same record the db-citable columns in the table
+// BEHIND this drawer print, and the ORCA Value column of the Country Profile evidence chain:
+//   USA       Royalty      engine 12.5%     vs record 17.6%   -- and 12.5% IS the Largest component
+//   Iraq      Service fee  engine $6.00/bbl vs record $2.00   -- 3x, on the one term that sets a TSC take
+//             Income tax   engine 35%       vs record 29.4%
+//   Nigeria   Royalty 5% vs 10% | Income tax 30% vs 65.4% | Special tax 50% vs 30%
+//   Libya     Royalty 16% vs 0% | Income tax 55% vs 64.8% | State equity 51% vs 55%
+//   Algeria   Royalty 20% vs 10% | Income tax 38% vs 19%
+//   Iran      Income tax 35% vs 25%
+// Six countries, eleven terms. USA is rank #1 on the cold load and Iraq is #2 -- this is not a
+// long tail. On Nigeria it changes the conclusion, not just the figure: the engine's 26.2%
+// Special/Windfall wins "Largest component" and prints "take accelerates above $75/bbl; high
+// Price Swing expected", where the record's 65.4% income tax would put the drawer on the
+// CIT-dominant note instead.
+//
+// Norway, the United Kingdom and Australia also run overrides and every one of their terms
+// MATCHES the record, so this stays silent on them. A marker that fires on all 9 including the 3
+// that are fine trains the reader to ignore it.
+//
+// The Country Profile has carried exactly this warning per country since v826 (cp-engine-chip).
+// This drawer carried the CITATION chip beside it and not this one -- which actively misdirects,
+// because for USA the royalty term IS cited (BOEM, 18.75%) and the engine still ran 12.5%.
+// Synchronous: no fetch, everything is already in COUNTRY_DATA and getDCFParams().
+var _FC_ENG_MAP = {
+  royalty_rate:        ['royalty',          'Royalty',           100, '%'],
+  cit_rate:            ['cit',              'Income tax',        100, '%'],
+  spt_rate:            ['spt',              'Special tax',       100, '%'],
+  state_equity_pct:    ['state_eq',         'State equity',      100, '%'],
+  cost_recovery_cap:   ['cr_cap',           'Cost recovery cap', 100, '%'],
+  ftp_rate:            ['ftp',              'FTP',               100, '%'],
+  profit_oil_govt_pct: ['profit_oil_govt',  'Profit oil (govt)', 100, '%'],
+  fee_per_bbl:         ['tsc_fee',          'Service fee',         1, '$/bbl']
+};
+// windfall_rate, prrt_rate, severance_rate, ept_rate, return_on_capex, uplift_rate and
+// capex_recovery_years are deliberately absent: none has an unambiguous COUNTRY_DATA
+// counterpart, and a chip that guesses the pairing would be asserting a conflict it cannot
+// show. Every one of them agrees with the record anyway on the countries that carry them.
+function _fcEngFmt(v, unit) {
+  if (unit === '$/bbl') return '$' + Number(v).toFixed(2) + '/bbl';
+  return (Math.abs(v - Math.round(v)) < 0.05 ? Math.round(v) : Number(v).toFixed(1)) + '%';
+}
+function _fcEngineOverride(country) {
+  try {
+    var d = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+      ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+    if (!d) return null;
+    var mech = (typeof fcResolveMechanic === 'function') ? fcResolveMechanic(d) : null;
+    var prm  = getDCFParams(country, mech);
+    if (!prm || prm._basis !== 'country') return null;
+    var diffs = [];
+    (prm._overrideKeys || []).forEach(function(k) {
+      var m = _FC_ENG_MAP[k]; if (!m) return;
+      var rec = d[m[0]];
+      if (rec == null || !isFinite(rec)) return;        // nothing on record to contradict
+      var eng = prm[k] * m[2];
+      if (Math.abs(eng - rec) <= 0.15) return;          // agrees -- not a conflict
+      diffs.push({ label: m[1], eng: eng, rec: rec, unit: m[3] });
+    });
+    if (!diffs.length) return null;
+    return { mech: prm._mechanic || mech, diffs: diffs };
+  } catch (e) { return null; }
+}
+window._fcEngineOverride = _fcEngineOverride;
+
+// "Royalty at 12.5% where ORCA's own record for USA is 17.6%"
+function _fcEngineList(country, o) {
+  return o.diffs.map(function(c) {
+    return c.label + ' at ' + _fcEngFmt(c.eng, c.unit)
+      + ' where ORCA’s own record for ' + country + ' is ' + _fcEngFmt(c.rec, c.unit);
+  }).join('; ');
+}
+
+// The drawer-header chip. Same wording and same destination as the Country Profile's
+// cp-engine-chip, so the two tabs cannot describe the same override differently.
+function _fcEngineChipHTML(country) {
+  var o = _fcEngineOverride(country);
+  if (!o) return '';
+  var n = o.diffs.length;
+  var tip = 'The take, the NPV and every bar in the Fiscal Breakdown below were NOT computed from '
+    + 'the figures ORCA holds for ' + country + '. The ' + (o.mech || 'DCF') + ' engine runs a '
+    + 'hard-coded country override on ' + n + ' term' + (n === 1 ? '' : 's') + ' — '
+    + _fcEngineList(country, o) + '. A hard-coded override is not a citation, and this is a '
+    + 'different question from the one the chip beside it answers: a term can be fully cited and '
+    + 'still not be the number the model ran. Quote ' + (n === 1 ? 'that rate' : 'those rates')
+    + ' as an engine assumption, not as ' + country + '’s terms. Click to open ' + country
+    + '’s Evidence Chain, which prints ⚠ DCF USES on each affected row beside the ORCA '
+    + 'value and the statutory value.';
+  var cEsc = String(country).replace(/'/g, "\\'");
+  return '<span id="fc-dd-engine-chip" role="button" tabindex="0"'
+    + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + cEsc + '\');"'
+    + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + cEsc + '\');}"'
+    + ' style="font-size:10px;font-weight:700;color:var(--red);background:rgba(185,28,28,.12);'
+    + 'border:1px solid rgba(185,28,28,.45);border-radius:3px;padding:1px 6px;white-space:nowrap;'
+    + 'cursor:pointer;min-height:24px;display:inline-flex;align-items:center;" title="'
+    + tip.replace(/"/g, '&quot;') + '">⚠ engine ran ' + n + ' other rate'
+    + (n === 1 ? '' : 's') + ' →</span>';
+}
+window._fcEngineChipHTML = _fcEngineChipHTML;
+
 var _ORCA_TERMLEG_NOTE = 'Model_Terms_Cited / Model_Terms_Run / Model_Terms_Uncited '
   + '— READ THESE WITH THE EVIDENCE GRADE, NOT INSTEAD OF IT, AND DO NOT TREAT THE GRADE AS '
   + 'COVERING THEM. The grade, the primary-law share and the fact count describe a country’s '
