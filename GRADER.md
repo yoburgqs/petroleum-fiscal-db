@@ -63335,3 +63335,16 @@ was true of the map only after this change — left as is, since it now holds fo
 | `#expl-map-offmap-note` @390 `hasTouch` | 362px in a 390px viewport, `scrollWidth === clientWidth`; **no new controls**, so the 24px floor is untouched |
 | Page errors across the walk | **0** |
 | Version | badge + title `v962 → v963`, silently at the end |
+
+---
+## Cycle 882 Log — 2026-09-21 02:13
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 882 complete — shipped as **v963** (`6881f27`), pushed, mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (881 was T6, 880 was T5)
+
+## Friction
+Cold load, Explorer → Map View — the surface built to answer T1. `renderWorldMap()` resolved every shape through a hand-typed 138-entry `ISO_MAP`. ORCA holds a government take for **all 185 countries** — the one metric at complete coverage — so a country missing from that literal was never missing data, only a
