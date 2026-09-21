@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v971</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v972</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v971</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v972</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -30536,12 +30536,65 @@ function renderCompare() {
   // No threshold is invented: the producer set is getProducerPeers(), which reads the existing
   // `weighting` field and drops state monopolies exactly as fmtTake already does. The all-185
   // figure is kept, in the tooltip, so nothing is lost.
+  // ── v972 (T3) — the producer ranking now reads the deck the analyst chose ─────────────
+  // Walked T3 cold (Guyana / Brazil / Angola, the standard Atlantic screening set) with the
+  // "Rank at" control moved to $100. Everything v929 built followed: the verdict strip, the
+  // column order, the two order-dropdown labels, and the lowest/highest-of-N marks on all four
+  // Govt Take rows. This row did not. It is hard-wired to $75 three separate ways -- the label
+  // literal, cpCmpTakeOf(d,'75'), and getProducerContext(), whose peer sort AND median are both
+  // computed at $75 and then cached in _producerPeerCache for the life of the page.
+  //
+  // It is not a stale label. 13 of the 21 producers change rank between $75 and another
+  // published price (China 15->12 at $100, Malaysia 12->15, Brazil 11->13 at $50), and the
+  // median verdict INVERTS on the commonest pair on the tab:
+  //
+  //             @ $75                          @ $100
+  //   Angola    #10, below producer median     #11, at producer median
+  //   Brazil    #11, at producer median        #10, below producer median
+  //
+  // "below producer median" is printed green -- it is the contractor-favourable flag on the one
+  // row that answers "where does this country sit against its real competition". At $100 the
+  // grid handed that green flag to the wrong country, silently, while every other row on screen
+  // had already moved to $100. v935 makes it reachable without touching the control at all: a
+  // set arriving from the Screener adopts that tab's deck, so an analyst who priced at $100 and
+  // clicked "Load top 5 in Side-by-Side" never chose $75 anywhere and still got a $75 placement.
+  //
+  // Scoped to this tab on purpose. getProducerPeers()/getProducerContext() are shared with
+  // Country Profile, whose headline IS a $75 question, and _producerPeerCache is a page-lifetime
+  // cache -- re-sorting it here would move CP's numbers as a side effect. Same call v889 made
+  // for renderStabilityBadge(): re-base in this scope, leave the shared helper alone. At
+  // cmpRankPrice === 75 this returns exactly what getProducerContext() returns, so the default
+  // cold load is unchanged.
+  const _cmpProdCtxAt = (countryName, pp) => {
+    const peers = (COUNTRY_DATA || []).filter(c =>
+        c.take_75 != null && !isStateMonopoly(c.take_75)
+        && String(c.weighting || '').indexOf('prod_weighted') === 0
+        && cpCmpTakeOf(c, String(pp)) != null)
+      .sort((a, b) => cpCmpTakeOf(a, String(pp)) - cpCmpTakeOf(b, String(pp)));
+    if (peers.length < 3) return null;
+    let idx = -1;
+    for (let i = 0; i < peers.length; i++) { if (peers[i].country === countryName) { idx = i; break; } }
+    const vals = peers.map(c => cpCmpTakeOf(c, String(pp))).sort((a, b) => a - b);
+    const median = vals.length % 2 ? vals[(vals.length - 1) / 2]
+                                   : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2;
+    return { n: peers.length, median: median, rank: idx >= 0 ? idx + 1 : null, inSet: idx >= 0,
+             nEqualWeighted: ((COUNTRY_DATA || []).filter(c => c.take_75 != null).length) - peers.length };
+  };
+  // The all-185 line in the tooltip is ranked at the same price for the same reason.
+  const _cmpAllRankAt = (countryName, pp) => {
+    const list = (COUNTRY_DATA || []).filter(c => c['take_' + pp] != null)
+      .sort((a, b) => a['take_' + pp] - b['take_' + pp]);
+    const i = list.findIndex(c => c.country === countryName);
+    return i >= 0 ? { rank: i + 1, n: list.length } : null;
+  };
   const _cmpProducerRankCell = (d) => {
-    const ctx = (typeof getProducerContext === 'function') ? getProducerContext(d.country) : null;
-    const all = _cmpRankMap[d.country];
-    const allNote = all
-      ? ' Across all 185 countries it is #' + all + ' of ' + _cmpN + ', but that basis mixes '
-        + (ctx ? ctx.nEqualWeighted : (_cmpN - 21)) + ' countries with no production data into the ranking.'
+    const _rkP  = cmpRankPrice;                       // v972 (T3): the deck the analyst chose
+    const ctx   = _cmpProdCtxAt(d.country, _rkP);
+    const _allR = _cmpAllRankAt(d.country, _rkP);
+    const allNote = _allR
+      ? ' Across all 185 countries it is #' + _allR.rank + ' of ' + _allR.n + ' at $' + _rkP
+        + '/bbl, but that basis mixes '
+        + (ctx ? ctx.nEqualWeighted : (_allR.n - 21)) + ' countries with no production data into the ranking.'
       : '';
     const sub = (txt, col) => '<span style="display:block;font-size:10px;font-weight:600;color:'
       + col + ';">' + txt + '</span>';
@@ -30567,7 +30620,7 @@ function renderCompare() {
       // it is a shipped preset, and the wrong verdict is the elimination verdict.
       // Both legs now read cpCmpTakeOf() -- one basis for the whole cell, as v552 established.
       const med = ctx.median;
-      const t75 = (typeof cpCmpTakeOf === 'function') ? cpCmpTakeOf(d, '75') : d.take_75;
+      const t75 = (typeof cpCmpTakeOf === 'function') ? cpCmpTakeOf(d, String(_rkP)) : d['take_' + _rkP];
       const tier = ctx.rank <= ctx.n / 4        ? ['lowest-take quartile', 'var(--green)']
                  : ctx.rank >  ctx.n * 3 / 4    ? ['highest-take quartile', 'var(--red)']
                  : (med == null || t75 == null) ? ['mid-range among producers', 'var(--muted)']
@@ -30578,19 +30631,20 @@ function renderCompare() {
       // sees 84.8% two rows down and #6 of 21 here and cannot reconcile them. State the number
       // the placement was computed on, in the cell, wherever it differs from the headline.
       const _rkSt   = _cmpMixStat(d);
-      const _rkDiff = (t75 != null && d.take_75 != null && Math.abs(t75 - d.take_75) >= 0.05);
+      const _rkHead = d['take_' + _rkP];
+      const _rkDiff = (t75 != null && _rkHead != null && Math.abs(t75 - _rkHead) >= 0.05);
       const _rkBasis = _rkDiff
         ? '<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);">ranked on '
-          + t75.toFixed(1) + '% comparable, not ' + d.take_75.toFixed(1) + '%</span>'
+          + t75.toFixed(1) + '% comparable, not ' + _rkHead.toFixed(1) + '%</span>'
         : '';
       return '<span title="' + _cmpEsc(d.country + ': #' + ctx.rank + ' of the ' + ctx.n
-        + ' countries whose take is weighted by verified field production, sorted lowest take first — #1 is the most contractor-favourable. Producer median take @$75/bbl is '
+        + ' countries whose take is weighted by verified field production, sorted lowest take first — #1 is the most contractor-favourable. Producer median take @$' + _rkP + '/bbl is '
         + (med != null ? med.toFixed(1) + '%' : 'n/a') + ' and this country is at '
         + (t75 != null ? t75.toFixed(1) + '%' : 'n/a')
         + (_rkDiff
             ? ' — its take across the ' + (_rkSt.g1 && _rkSt.g1.n != null ? Number(_rkSt.g1.n).toLocaleString() : '?')
               + ' production-sharing and concession contracts alone. The published headline of '
-              + d.take_75.toFixed(1) + '% blends in ' + Number(_rkSt.n2).toLocaleString()
+              + _rkHead.toFixed(1) + '% blends in ' + Number(_rkSt.n2).toLocaleString()
               + ' fee-basis contracts (' + _cmpMechBare(_rkSt, 2) + '), whose take% is set by the '
               + 'remuneration fee rather than by the fiscal terms, and is not rankable against the other columns. '
               + 'Every producer in this list is placed on its own comparable take, so the set is like-for-like.'
@@ -30771,7 +30825,7 @@ function renderCompare() {
         return '<span style="font-family:\'IBM Plex Mono\',monospace;' + (thin?'color:var(--orange);':'') + '" title="' + _cmpEsc(d.country + ': ' + Number(nf).toLocaleString() + ' verified fiscal facts across ' + (d.n!=null?Number(d.n).toLocaleString():'?') + ' contracts.' + (thin?' Thin fact base — treat single-parameter conclusions with caution.':'')) + '">' + Number(nf).toLocaleString() + (thin?' ⚠':'') + '</span>'; }},
     {label:'Take basis (mechanic) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Whether this column&rsquo;s government take may be compared with the others at all. A take% is comparable only when contractor income is tied to the oil price. PRODUCTION-SHARING (Concession, PSC, Gross Split, Revenue Share) qualifies. FEE-BASIS (TSC, RSC, Buy-back) does not: the contractor is paid a fixed $/bbl remuneration and keeps no price upside, so government take% climbs toward 97&ndash;99% because of the mechanic, not because the terms are hard &mdash; Iraq&rsquo;s 415 technical service contracts average 98.5% take AND +$319M contractor NPV at the same time. CASH-FLOW basis (Australia and Denmark, PRRT) is comparable only at the same oil price. Where a country blends the two, the take across its production-sharing and concession contracts alone is printed under each Govt Take row so there is a like-for-like number to rank on. Counts come from the DCF result set, not from the mechanics string at the foot of this table.">ⓘ</span>',
       key:(d)=>_cmpMechBasisCell(d)},
-    {label:'Rank among producers (take @$75) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $75/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
+    {label:'Rank among producers (take @$' + cmpRankPrice + ') <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $' + cmpRankPrice + '/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
       key:(d)=>_cmpProducerRankCell(d), bold:false},
     {grp:'ev', label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>{
       const _b = renderStabilityBadge(getFiscalPredictabilityScore(d), d);
