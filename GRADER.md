@@ -62831,3 +62831,18 @@ a 100 nobody could see the basis for.
 - JS errors: 0 page errors; 15 console entries, all the `sw.js` 404, in both arms
 - Summary: Cycle 878 complete. Shipped as **v958** (`8fdeaef`, recovered from the timed-out
   cycle 877) and **v959** (`0cec93b`), pushed, mirror updated.
+
+---
+## Cycle 878 Log — 2026-09-20 21:30
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 878 complete. Two commits shipped and pushed; mirror in sync.
+
+## First: recovered work from cycle 877
+
+Cycle 877 produced a complete T3 fix to the Side-by-Side picker and then timed out before committing. It was sitting uncommitted in the tree. I verified it (syntax gate, Playwright walk) and committed it as **v958** (`8fdeaef`) rather than letting it rot or re-deriving it.
+
+## This cycle's own work — v959 (`0cec93b`)
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?"
