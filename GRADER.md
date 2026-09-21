@@ -64030,3 +64030,67 @@ So the "500 PASS" figure every cycle email carries describes the **previously de
 **Task** — T6, *"Where did this number come from and how solid is the evidence?"* (rotated off T2, which cycle 891 used).
 
 **Friction** — In Country Profile → *Key Fiscal Parameters — Evidence Chain*, 38 cited rows across 19 countries record a source address that **resolves but opens a listing, not the instrument** — a site root, a default page, or a "Legislation"/"Regula
+
+---
+
+## Cycle 894 — v972 — 2026-09-21
+
+**Task** — T3, *"How do these three countries compare side by side?"* (rotated off T6, which cycle 893 used; 891 T2, 889 T1 — T3 was stalest of the three remaining.) Walked cold at 1440 and at 390 `hasTouch`, no sessionStorage, no localStorage.
+
+**Friction** — Side-by-Side, the **Rank among producers** row (`_cmpProducerRankCell`, `index.html` ~30539). v929 gave this tab a **Rank at** control so an analyst defending a $100 deck could re-rank the set at $100, and everything it built follows that control: the verdict strip, the left-to-right column order, both Govt-take labels in the *Order columns* dropdown, and the *lowest/highest of N* marks on all four Govt Take rows. This one row does not. It is pinned to $75 in three separate places — the label literal `'Rank among producers (take @$75)'`, the call `cpCmpTakeOf(d, '75')`, and `getProducerContext()`, whose peer **sort** and **median** are both computed at $75 and then frozen in the page-lifetime `_producerPeerCache`.
+
+That is not a stale label. Measured against the live `COUNTRY_DATA`:
+
+| | |
+|---|---|
+| producers changing rank between $75 and another published price | **13 of 21** |
+| largest moves | China **15 → 12** at $100 · Malaysia **12 → 15** · Brazil **11 → 13** at $50 |
+| producer median take | $50 **46.9%** · $75 **55.6%** · $100 **60.2%** · $125 **64.1%** |
+
+And the verdict **inverts on the commonest pair on the tab** — Angola/Brazil, two thirds of the standard Atlantic screening set:
+
+| | @ $75 | @ $100 |
+|---|---|---|
+| Angola | #10, **below producer median** | #11, at producer median |
+| Brazil | #11, at producer median | #10, **below producer median** |
+
+`below producer median` renders **green**. It is the contractor-favourable flag on the single row that answers *where does this country sit against its real competition*. At $100 the grid handed that flag to the wrong country — and contradicted its own column order while doing it, because the columns **had** moved: the first column (lowest take) was labelled `#11` and the second `#10`. That self-contradiction, in adjacent cells, is the moment the analyst stops and squints.
+
+v935 makes it reachable without the analyst ever touching the control: a set arriving via *"Load top 5 in Side-by-Side"* adopts the Screener's deck, so someone who priced at $100 and handed the set over never chose $75 anywhere on the platform and still got a $75 placement.
+
+**Change** — Added `_cmpProdCtxAt()` and `_cmpAllRankAt()` inside the Side-by-Side render scope. Peer set, sort, median, and the all-185 tooltip line are all computed at `cmpRankPrice`. The row **label**, the median/quartile verdict, the *"ranked on X% comparable, not Y%"* basis line and the tooltip now all name the live price.
+
+Deliberately scoped to this tab. `getProducerPeers()` / `getProducerContext()` are shared with Country Profile — whose headline *is* a $75 question — and `_producerPeerCache` is a page-lifetime cache, so re-sorting it here would move CP's numbers as an invisible side effect. Same call v889 recorded for `renderStabilityBadge()`: re-base in this scope, leave the shared helper alone.
+
+**Result** — An analyst defending a $100 or $50 deck now reads a producer placement, a median verdict and a quartile colour computed **at that deck**. At $50, Brazil reads `#13 of 21 · above producer median` against the 46.9% $50 median; the grid used to print `#11 · at producer median`, a figure from a price the analyst had already left. At $75 the output is byte-identical, so the cold load is unchanged.
+
+### Cycle 894 verification — all measured this cycle, nothing assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks (before and after version bump) | **PASS, 0 errors** |
+| Runtime suite, **RAN** against the modified LOCAL tree (`TEST_URL=localhost`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness / server / run, v971 from git HEAD | **499 / 0 / 1 — identical, no regression** |
+| `FAIL`/`WARN` lines, control vs modified | **byte-identical** (`diff` clean) |
+| The 1 WARN | local-server service-worker 404; present identically on the control |
+| A/B, Guyana·Brazil·Angola @ **$75** | control and modified **identical** — default path unchanged |
+| A/B @ **$100** | control `Brazil #11 at median · Angola #10 below` (flag on wrong column, order contradicted); modified `Brazil #10 below · Angola #11 at median` |
+| A/B @ **$50** | control `Brazil #11 at median`; modified `Brazil #13 above median` — matches the 46.9% $50 producer median |
+| Rank drift recomputed from live `COUNTRY_DATA` | 13 of 21 producers move; 2 median-side flips ($75→$100) |
+| 390x844 `hasTouch` | `scrollWidth` 390 == `clientWidth` 390, at default **and** after switching to $100 |
+| controls under 24px on `#t2` under `pointer: coarse` | **0**; `Rank at` select **30px** |
+| page errors, desktop walk and mobile walk | **0** |
+| mobile card view (desktop table is `display:none` at 390 — pre-existing, identical on control) | carries the priced label: `Rank among producers (take @$100)` |
+| Version | title + badge `v971 → v972`, silently at the end |
+
+### What this cycle did NOT do
+
+- The **Contractor NPV** rows are ranked by `_cmpRankNpvAt(d, cmpRankPrice)` and already follow the control — checked, no change needed.
+- Carried forward, still open: the Evidence Quality summary strip's missing index-only tally (893); the **regional-extreme cue** on Nigeria / Norway / Australia (884, 891); the Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891); Fiscal Compare's clipboard emitting `Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with `if (anyBe)` (880); the Screener's Advanced Filters panel rendering 17 checkboxes at 13px under `pointer: coarse` (889), against finalization item 3.
+
+---
+## Cycle 894 Log — 2026-09-21
+- Test before: 499 PASS / 0 FAIL / 1 WARN (local tree, control)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (local tree, modified)
+- JS errors: 0
+- Summary: v972 shipped and pushed. Working tree clean, mirror in sync.
