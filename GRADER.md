@@ -63965,3 +63965,55 @@ asserting the pane is actually active is the part that makes the number mean any
 **Task** — T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* (rotated off T1, which cycle 889 used).
 
 **Friction.** Walked T2 cold into Country Profile, which auto-loads Indonesia. The Regional Peers panel printed *"26 countries in region"* above a 7-row window, and the only route to the rest was **"View all in Explorer →"**. That button lands on the Explorer chip whose *visible label is also 
+
+---
+## Cycle 893 — T6
+
+**Task** — T6, *"Where did this number come from and how solid is the evidence?"* (rotated off T2, which cycle 891 used).
+
+**A note on what this cycle inherited.** Cycle 892 picked T6, wrote this change, and was killed by `autonomous_cycle.py`'s 1800s subprocess timeout before it committed, verified, mirrored or logged anything. Its work was sitting uncommitted in the tree at the start of this cycle. Rather than discard it or ship it on trust, this cycle audited it against the data and the rendered page, then finished it. The audit is below, because "a previous cycle wrote it" is not evidence.
+
+**Friction.** Country Profile → *Key Fiscal Parameters — Evidence Chain*, built by `renderSourcedFacts()` inside `renderReformTimeline()` (index.html ~L41679–41830). 38 cited rows across 19 countries record a source address that **resolves** but opens a **listing, not the instrument** — a site root, a generic default page, or a "Legislation" / "Regulations" / "Legal framework" section carrying no document identifier in its path or query.
+
+Libya is the worst case and the one walked cold: **all four** of its citations are `https://noc.ly/index.php/en/new2/petroleum-agreements`, and **three wear tier A**. Nothing is dead, so `_citeLinkDead()` returns false, `_deadNote641` and `_citeScope641` are both empty, and the four rows rendered as perfectly healthy citations — instrument name, tier letter, a bare `↗` titled "Open the cited source document". An analyst clicking through to read the EPSA-IV clause behind a 79.7% government take lands on a page of links.
+
+v872 fixed this exact shape for the bulk harvest and stated why it is the worse of the two failures: *"A dead link announces itself; the analyst knows to go looking. A link to a publisher's homepage passes every check this page performs and still delivers nothing."* That fix was scoped to `isBulk`, so the same address shape on the **strongest evidence claim the platform makes** — tier-A primary law — went on rendering clean.
+
+**Change.** A third citation bucket, `_CITE_INDEX_ONLY`, deliberately disjoint from `_CITE_DEAD` and from the pwc bulk index. On those 38 rows:
+- an amber **INDEX ONLY** chip, whose tooltip names *what the address actually opens* ("the National Oil Corporation's Petroleum Agreements listing") rather than asserting the link is bad;
+- the **⌕ find document** control — until now only on dead rows — now offered here too, searching the instrument by title with ORCA's harvest annotation stripped;
+- a note block **separate** from the dead-link note, because "cannot be retrieved" and "retrieves a listing" are different problems with different next steps, and a country can have both (Angola has 2 dead and 2 index-only);
+- the green **"All N independently sourced parameters match the rate stated in the cited source"** tick is scoped by the same caveat, so where every citation is index-only it can no longer read as an unqualified pass.
+
+The `href` is **unchanged** — a ministry's legislation section is a real place to start, and rerouting away from it would lose an affordance. The LINK DEAD chip is **not** reused: these addresses resolve, and saying otherwise would be the same untrue-but-reassuring signal this removes. Tier letters, rates, takes, NPVs and grades are all untouched.
+
+**Result.** On Libya, Kenya, Thailand, Angola, Côte d'Ivoire, Saudi Arabia, Iraq-Kurdistan and 12 more, the analyst can tell **before clicking** which citations will produce the clause and which will produce a list — and has a title search on the ones that will not. Where previously the page's strongest reassurance (tier A + green tick) sat on top of four links to a directory, the reassurance is now scoped to what it can actually support.
+
+### Cycle 893 verification — all measured this cycle, nothing assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks (before and after version bump) | **PASS, 0 errors** |
+| Runtime suite, **RAN** against the modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, **v970 from git HEAD** | **499 / 0 / 1 — identical, no regression** |
+| Tree hash before suite == after suite | `942a93079b4d` both — the suite tested what shipped |
+| The 1 WARN / 15 JS errors | local-server service-worker 404; **present identically on the control** |
+| A/B on Libya, control vs modified | control **0** chips / **0** find anchors / no note; modified **4** chips on exactly the 4 citation rows |
+| Norway (no index-only URLs) | **0** chips, note absent — does not false-fire |
+| Coverage audit, all 239 `api/v1/country/*.json` | 500 cited rows: **354** already LINK DEAD, **38** new bucket, **1** pwc bulk, **145** untouched |
+| Generic-collection URLs left unclassified | **0** — the 19-entry list is complete for the non-dead population |
+| False positives (addresses naming a specific instrument) | **0** — `zakon.hr/z/445/Zakon-o-rudarstvu`, `parliament.gh/document/53`, `.pdf`, `?docid=`, `/eli/` all correctly excluded |
+| 390x844 `hasTouch` | `scrollWidth` 390 == `clientWidth` 390; chips **24px**; find anchors **25px**; **0** under 24px |
+| Page errors on the mobile walk | **0** |
+| Version | title + badge `v970 → v971`, silently at the end |
+
+### A correction to how this cycle measured, worth recording
+
+My first suite run hung for **43 minutes with zero stdout** and I nearly recorded it as a stall. It was not stalling. `runtime_comprehensive.js` line 13 defaults to `TEST_URL = https://yoburgqs.github.io/petroleum-fiscal-db/` — the **deployed** site — and `autonomous_cycle.py` sets `TEST_URL` **only** in `run_pixel_gate()` (step 7b), never in `run_playwright()` (step 2).
+
+So the "500 PASS" figure every cycle email carries describes the **previously deployed build**, not the tree the cycle is about to modify. It cannot, by construction, detect a regression introduced during the cycle that reports it — the pixel gate is the only step that looks at local work. That is worth knowing before anyone reads a green step-2 number as clearance to push. Re-running with `TEST_URL` pointed at the local tree is what produced the 499/0/1 above, and what makes the control comparison meaningful.
+
+### What this cycle did NOT do
+
+- **The Evidence Quality summary strip still says only "1 of 3 source links dead."** `#cp-evidence-panel` (collapsed by default) now correctly shows an INDEX ONLY chip in its sources list, but its one-line summary has no index-only tally. Small, and inside a collapsed panel.
+- Carried forward, still open: the **regional-extreme cue** on Nigeria / Norway / Australia (cycles 884, 891); the Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891); Fiscal Compare's clipboard table emitting `Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with `if (anyBe)` (880); the Screener's Advanced Filters panel rendering 17 checkboxes at 13px under `pointer: coarse` (889), against finalization item 3.
