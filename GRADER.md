@@ -62725,3 +62725,109 @@ Header badge `v954 → v955`, done silently at the end.
 
 ## Task
 **T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation (873 was T1, 872 T4, 870 T3, 868/869 T2, 867 T6; T5 last ran at 865). Walked cold at 1440×900 and 390×844 `hasTouch`, no storage, with `navigator.clipboard.write` shimmed so every artifact was actually produced and read back — Fiscal Compare → Side-by-Side → IOC Portfolio → Reform Risk → Country Profile → Screener
+
+---
+## Cycle 878 Log — 2026-09-20 (v958 + v959)
+
+### Head of cycle — v958 (T3) was recovered, not re-done
+
+Cycle 877 produced a complete T3 change to the Side-by-Side picker and then timed out at
+1800s before it could commit. The work was sitting uncommitted in the tree. It was verified
+here (syntax gate PASS, Playwright walk at 1440×900 with storage cleared: 5 adds seat, Norway
+and Oman both refused and both named in the panel, 5 free-chips render, freeing Ghana repaints
+to the retry panel, `+ Norway` seats it, 0 page errors) and committed as `8fdeaef`.
+
+---
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in rotation
+(874 T5, then v956 T6 and v957 T2, and v958 T3 above; T4 last ran at 872/v953). Walked cold
+at 1440×900 and 390×844 `hasTouch`, no sessionStorage, no localStorage: Home → Reform Risk →
+the "Check one country" lookup (Nigeria, Mozambique, Guyana, Senegal, Russia, USA) → the
+global rankings below it → the Country Profile reform sidebar and its
+`openReformRiskFor()` route back.
+
+## Friction
+
+The per-country lookup is in good shape — Nigeria returns a SIZE UNKNOWN IC action, Mozambique
+returns a named "no sourced reform log, read as missing coverage" card with the statute to
+start from, and the Country Profile → Reform Risk route lands the verdict card at the top of
+the viewport with the lookup already set. The worst moment is one scroll further down.
+
+**"Most Frequently Reformed Regimes" rendered `withScore.slice(0,15)` of 21 sourced
+jurisdictions and disclosed no cut** — while the Reform Activity Heatmap directly beneath it
+discloses its own as "Top 20 of the 21".
+
+The six it dropped, measured from `REFORM_HISTORY`:
+
+| rank | country | fiscal law changes | since 2010 | score | largest recorded rise |
+|---|---|---|---|---|---|
+| 16 | Iraq | 2 (+1 context) | 1 | 85 | — |
+| 17 | India | 2 | 1 | 85 | — |
+| 18 | **Russia** | 2 | 1 | 85 | **2022 +15pp windfall tax** |
+| 19 | USA | 2 | 0 | 100 | 2007 +3pp |
+| 20 | Ghana | 0 (+3 context) | 0 | 100 | — |
+| 21 | Guyana | 0 (+3 context) | 0 | 100 | — |
+
+Three things made that cut worse than an arbitrary N:
+
+1. **The tab's own intro names the missing row.** It reads "the score is a count, never a
+   magnitude — Russia's +15pp windfall tax in 2022 moves it exactly as far as a 1pp
+   administrative change would." The ranking the analyst reads immediately after did not
+   carry Russia at all.
+2. **The header tooltip stated a membership rule the table did not follow.** "Ghana and
+   Guyana carry 3 context events each and no fiscal law change at any date, which is why
+   neither appears here." An analyst who fails to find Russia, Iraq, India or USA is told, in
+   writing, that absence means zero fiscal law changes. Each of the four has two.
+3. **This platform's own IC guidance treats the table as a membership test** — Sample
+   Analyses, twice: "any portfolio country appearing in the top 10 most-reformed list carries
+   a tightening risk premium."
+
+## Change
+
+- **All 21 rows render.** Russia is at 18 carrying `⚠ take raised 2022 +15pp · Windfall tax
+  on oil export revenues` inline in its score cell; Iraq, India and USA at 16, 17, 19. Every
+  row keeps the existing row-click → `_rrOpenLocal()` route to that country's verdict card.
+- **A divider row** separates the two jurisdictions whose sourced log holds no fiscal law
+  change at any date: *"Below: a sourced log, but no fiscal law change in it at any date …
+  their Reform Frequency of 100 is the formula returning its floor on an empty count — not a
+  measured stability finding."* Those two rows render muted and their score prints grey with
+  `not a stability reading` beside it, rather than arriving in the green ramp the genuinely
+  quiet regimes above them earn.
+- **The lead** now opens "All 21 jurisdictions that carry a sourced reform log … the complete
+  set, not a top-N cut" and states that absence means no sourced log at all (164 of 185),
+  pointing at the lookup.
+- **The header tooltip's false rule is replaced** with the real one.
+- **Layout.** The six extra rows cost the Country column 53px (246 → 193), which pushed the
+  `white-space: nowrap`-inherited notes out of the Reform Frequency cells and widened the
+  document to 1773px at 1024–1920 — caught by this cycle's own sweep, not shipped. The notes
+  now wrap (`white-space:normal` + `overflow-wrap:anywhere`), the divider text is capped at
+  640px, and the card carries `overflow-x:auto` like the heatmap card below it.
+
+## Result
+
+An analyst holding Russia, Iraq, India or USA can find it in the reform ranking and read its
+take-raising event there. Those four were invisible in the one table this tool's own IC
+guidance tells them to check, and the header explained the absence with a rule that was false
+for all four. Ghana and Guyana are now on the table too, marked, instead of being off it with
+a 100 nobody could see the basis for.
+
+## Cycle 878 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **499 PASS / 0 FAIL / 1 WARN / 15 JS errors** — identical to the local-server control recorded at cycle 874. The 15 errors and the gap vs the deployed 500/0/0 are the `sw.js` 404 under `python -m http.server`, present in both arms. |
+| Horizontal scroll, 8 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens.** Intermediate state measured 4 (1920/1440/1280/1024) and was fixed before commit; the control tree measured 0. |
+| In-card horizontal scrollbar, Most Frequently Reformed card | **none** at 1920 / 1440 / 1024 / 390 |
+| Table rows under 24px, `#treformrisk` @390 `hasTouch` | 22 rows, **0 under 24px** |
+| Page errors across the whole walk | **0** |
+| Row set | **21 country rows + 1 divider**, order unchanged for the 15 that were already there |
+| Row-click route | Russia row → lookup set to Russia, verdict card at top, "← Back to the rankings" present |
+| Version | badge and title `v958 → v959`, silently at the end. The suite carries no assertion on the version string, so the bump cannot move the number above. |
+
+- Test before: 500 PASS / 0 FAIL (deployed build, as reported by the cycle harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (local server, ran this cycle)
+- JS errors: 0 page errors; 15 console entries, all the `sw.js` 404, in both arms
+- Summary: Cycle 878 complete. Shipped as **v958** (`8fdeaef`, recovered from the timed-out
+  cycle 877) and **v959** (`0cec93b`), pushed, mirror updated.
