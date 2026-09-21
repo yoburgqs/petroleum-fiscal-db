@@ -63078,3 +63078,16 @@ next candidate rather than bundled in.
 - Test after: 494 PASS / 0 FAIL / 1 WARN (local server, **ran** this cycle, matched by an identical control on the unmodified tree)
 - JS errors: 0 page errors; 12 console entries, all the `sw.js` 404
 - Summary: Cycle 880 complete. Shipped as **v961** (`697f041`), pushed, mirror updated.
+
+---
+## Cycle 880 Log — 2026-09-20 23:53
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 880 complete. Shipped as **v961** (`697f041`), pushed, mirror updated.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation (879 was T1, 878 T4, 877 T3, 876 T2, 875 T6).
+
+## Friction
+Cold walk: Home → Fiscal Compare → click a row → **⎘ IC Citation**. That's the shortest route from a screen to a memo line, and the FC IC Analyst Guide sends the analyst there by name, promising a string with "take, contractor NPV at the selected price **and at the $5
