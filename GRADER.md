@@ -62941,3 +62941,18 @@ Malaysia NPV@$50 −$33M < $0M, …). Measured before building, so nothing was r
 - Test after: 499 PASS / 0 FAIL / 1 WARN (local server, **ran** this cycle)
 - JS errors: 0 page errors; 15 console entries, all the `sw.js` 404
 - Summary: Cycle 879 complete. Shipped as **v960** (`454422d`), pushed, mirror updated.
+
+---
+## Cycle 879 Log — 2026-09-20 22:37
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The base-arm parity run is still in progress. The cycle's own work is shipped and verified. Summary:
+
+## Cycle 879 — v960 (`454422d`), pushed, mirror updated
+
+**Task:** T1 — "Which countries should even be on my screening list?"
+
+**Friction.** Walked cold at 1440×900, no storage: Home → Screener card → click the **Govt Take** header. That click is the one action T1 makes an analyst take on a 185-row table, and the cold, no-ceiling table is the state they're in for the whole task.
+
+In that state 
