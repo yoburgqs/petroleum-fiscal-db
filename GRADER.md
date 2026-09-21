@@ -62956,3 +62956,125 @@ Malaysia NPV@$50 −$33M < $0M, …). Measured before building, so nothing was r
 **Friction.** Walked cold at 1440×900, no storage: Home → Screener card → click the **Govt Take** header. That click is the one action T1 makes an analyst take on a 185-row table, and the cold, no-ceiling table is the state they're in for the whole task.
 
 In that state 
+
+---
+
+## Cycle 880 — v961 (`697f041`), pushed, mirror updated — 2026-09-21
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in
+rotation: 879 was T1, 878 T4, 877 T3, 876 T2, 875 T6, and T5 last ran at 874. Walked cold
+at 1440×900 and at 390×844 `hasTouch`, no sessionStorage, no localStorage.
+
+## Friction
+
+The walk: Home → Fiscal Compare → click a row → **⎘ IC Citation**. That is the shortest
+route in the tool from a screen to a memo line, and the FC IC Analyst Guide routes the
+analyst to it by name ("click **⎘ IC Citation** to copy a ready-to-paste IC memo cite
+string (take, contractor NPV at the selected price **and at the $50 downside, breakeven**)").
+
+On the 11 fee-blended countries the citation did not deliver any of the three extra legs
+that sentence promises. Two separate omissions, in the v774 fee branch of the citation
+builder inside `openFCDrilldown()`:
+
+| deck | what the fee branch pasted on its CITABLE line | what ORCA holds |
+|---|---|---|
+| $75 | take + base NPV, **no downside, no BE** | `g1.v50` = $1,438M |
+| **$50** | take only — **no NPV at all** | `g1.v50` = $1,438M |
+| **$100** | take only — **no NPV at all** | `g1.v100` = $4,508M |
+| **$125** | take only — **no NPV at all** | `g1.v125` = $6,038M |
+
+At $100 the *entire* pasted string contained exactly one contractor NPV — **$840M, the
+published blend**, sitting on the line that reads "not comparable across countries … **Do
+not quote it with the figure above in one sentence.**" The analyst is handed a take they
+may cite and a value they may not, and the one they may is 5.4× smaller than the figure
+the page is holding in memory.
+
+**Cause** — one gate and the false premise written directly above it:
+
+```js
+// ORCA holds the PSC/Concession NPV split at $75 only (g1.v75) — the same rule CP and SbS use.
+var _citeNpvSel = _ddFee ? ((_fcPricePts[_selIdx] === 75 && d.g1 && d.g1.v75 != null) ? d.g1.v75 : null) : …
+```
+
+The premise is false and the data refutes it: every one of the 11 fee-blended countries
+carries `g1.v50 / v75 / v100 / v125`. **v955 already relied on that** when it put the
+like-for-like NPV in the Copy-for-IC-Memo table at whatever deck the analyst screened on.
+This drawer was left behind on the old assumption — the same shape as v960, where the
+Screener's Swing column had been corrected and Govt Take had not.
+
+The missing downside leg is the more dangerous half, because the analyst *can* find a $50
+number elsewhere and it is the wrong one. The **NPV @$50** column on Fiscal Compare, the
+Screener and the Explorer is the blended `npv_50`:
+
+| | comparable (`g1.v50`) | blended (`npv_50`) | |
+|---|---|---|---|
+| Iraq | **$1,438M** | $389M | 3.7× |
+| Oman | **$364M** | $118M | 3.1× |
+| South Sudan | **$833M** | $448M | 1.9× |
+| **Malaysia** | **+$46M** | **−$33M** | **sign flip** |
+| Ecuador | **$871M** | $1,166M | correction runs the *other* way |
+
+A memo built the obvious way reads Iraq as retaining 13% of its value through a price
+break; on the population its own take is quoted on, it retains 47%. For Malaysia the two
+bases disagree on whether the contractor position survives $50/bbl at all.
+
+## Change
+
+- `_citeNpvSel` reads `g1['v' + deck]` at **every** price deck, through one `_g1NpvAt()`
+  helper so the base-case and downside legs cannot drift onto different populations.
+- The fee citation line gains the **$50 downside leg on the same PSC/Concession
+  contracts**, suppressed when the deck already is $50, and the **BE leg**. BE reads
+  "not available" for all 11 today — none carries a modelled breakeven — but the token
+  has to be present for `_fcAdoptBePaint()` to patch a late-arriving figure into the
+  onclick string, which on this branch it could never do.
+- The **published** line gains its own $50 leg and then names the trap explicitly: the
+  NPV @$50 column on Fiscal Compare, the Screener and the Explorer prints *this blended
+  figure*, not the one above it.
+- The two other places that asserted "at $75 only" are corrected: the drawer's NPV row
+  tooltip, and the **4-price TSV footnote**, which now lists the comparable NPV at all
+  four prices instead of $75 alone.
+- The IC Citation button's own tooltip now states that on a fee-blended row all three
+  legs are on the PSC/Concession population.
+
+## Result
+
+An analyst pasting one of the 11 fee-blended countries into an IC memo now gets a
+**citable contractor NPV at whatever deck they ran** — not just at $75 — plus the
+downside on the same contracts, and an explicit warning naming the $50 figure elsewhere
+in the tool that does not belong beside it.
+
+```
+Iraq: Govt Take 34.1% @$75/bbl (ORCA comparable take, n=195 PSC/Concession contracts;
+TSC 415 fee-basis contracts excluded), contractor NPV $3.04B @$75 on those contracts
+and $1.44B at the $50/bbl downside on the same contracts, BE not available — …
+```
+
+### What this cycle did NOT do
+
+Also walked the Country Profile, Screener, Side-by-Side and IOC Portfolio paste artifacts
+and measured every column of each for blank cells and bad tokens. Found one lesser issue
+and left it: the **Fiscal Compare** clipboard table carries `Breakeven $/bbl`
+unconditionally, so a shortlist whose rows all lack one (breakeven is modelled for 65 of
+185) pastes a column that is empty on every row — where `_scCopyColumns()` already guards
+the same column with `if (anyBe)`. The FC caption does state the count, and it is a
+cosmetic cost against a wrong number, so it was not the worst moment. Logged here as the
+next candidate rather than bundled in.
+
+## Cycle 880 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **494 PASS / 0 FAIL / 1 WARN / 12 JS errors** (the `sw.js` 404 under `python -m http.server`) |
+| Control: same suite, same server, **unmodified** tree | **494 / 0 / 1 / 12 — identical.** The delta vs the deployed 500 is the harness, not this change |
+| A/B citation strings, 22 countries, both arms served locally | the **10** rows that diverge at $75 changed; all **11** non-fee citations byte-identical; Russia (does not diverge at $75) unchanged |
+| Escape hatch | non-fee rows take the untouched `else if` branch — Norway/Guyana/Angola/USA/Brazil/Nigeria/Indonesia/Colombia/Ghana/Somalia/Kuwait all byte-identical to the base arm |
+| Horizontal scroll, 9 tabs × 1920/1440/1280/1024/768/390, **plus** the Iraq drawer open at each width | **0 overflow screens** |
+| `#fc-dd-copy-cite-Iraq` @390 `hasTouch` | 44px tall, visible; **0** drawer controls under 24px |
+| Page errors across the walk | **0** in both arms |
+| Version | badge + title `v960 → v961`, silently at the end |
+
+- Test before: 500 PASS / 0 FAIL (deployed build, per the cycle harness)
+- Test after: 494 PASS / 0 FAIL / 1 WARN (local server, **ran** this cycle, matched by an identical control on the unmodified tree)
+- JS errors: 0 page errors; 12 console entries, all the `sw.js` 404
+- Summary: Cycle 880 complete. Shipped as **v961** (`697f041`), pushed, mirror updated.
