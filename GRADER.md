@@ -63952,3 +63952,16 @@ asserting the pane is actually active is the part that makes the number mean any
   `if (anyBe)` (cycle 880). The Screener's Advanced Filters panel still renders 17
   checkboxes at 13px under `pointer: coarse` (cycle 889), against finalization
   item 3.
+
+---
+## Cycle 891 Log — 2026-09-21 12:34
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Shipped and pushed. Servers cleaned up, working tree clean.
+
+## Cycle 891 — T2
+
+**Task** — T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* (rotated off T1, which cycle 889 used).
+
+**Friction.** Walked T2 cold into Country Profile, which auto-loads Indonesia. The Regional Peers panel printed *"26 countries in region"* above a 7-row window, and the only route to the rest was **"View all in Explorer →"**. That button lands on the Explorer chip whose *visible label is also 
