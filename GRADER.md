@@ -63215,3 +63215,16 @@ candidate. Also still open from cycle 880: Fiscal Compare's clipboard table carr
 | `#be-offmap-note` @390 `hasTouch` | 362px in a 390px viewport; widest `nowrap` span 121px; **no new controls**, so the 24px floor is untouched |
 | Page errors across the walk | **0** |
 | Version | badge + title `v961 → v962`, silently at the end |
+
+---
+## Cycle 881 Log — 2026-09-21 01:04
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 881 complete. Shipped as **v962** (`2d8558d`), pushed, mirror in sync.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest in rotation; 880 was T5)
+
+## Friction
+Cold walk, storage cleared, 1440×900: Explorer → Breakeven column → **Vanuatu $28/bbl**. Open the **Breakeven Map** — the one tab whose whole subject is that number — and Vanuatu isn't there. Grey, no hover response, arrow cursor, no `<title>`, so on a phone no readout at all. A dead shape, w
