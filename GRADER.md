@@ -63499,3 +63499,142 @@ Also noted while walking and left alone: the Regional Peers strip on Country Pro
 Two sections on the same Country Profile, 3,500px apart, with nearly the same name and contradicting content.
 
 At y=2038 the **Fiscal Regime Breakdown** table for Iraq: Concession 13.9% / PSC 48.2% 
+
+---
+## Cycle 888 Log — 2026-09-21
+
+- Test before: 500 PASS / 0 FAIL (harness, deployed URL)
+- Test after (RAN this cycle, graded suite, local server, modified tree): **499 PASS / 0 FAIL / 1 WARN**
+- Control (same harness, v966 pulled from git, served from `/tmp/ctrl888`): **499 PASS / 0 FAIL / 1 WARN — unchanged.** The WARN is the local-server `sw.js` 404 on both sides.
+- JS syntax gate: 11 inline blocks, **0 errors**
+- Shipped: **v968** (`2eab7fc`), pushed, mirror in sync.
+- Also recovered and shipped this cycle: **v967** (`0e2cf72`) — see the note at the end.
+
+## Task
+
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation
+(967 was T6, 966 T4, 965 T3, 884 T2, 882 T1). Walked cold at 1440×900 and 390×844
+`hasTouch`, no sessionStorage or localStorage, with `navigator.clipboard` instrumented so
+both flavours of every paste could be read as text.
+
+## Friction
+
+Fiscal Compare → Run Compare → tick USA / Iraq / Norway / Nigeria / Guyana → the button
+whose entire purpose is to be pasted into a memo. `copyFCForIC()` emits a **Model basis**
+column — the one column in the artifact that exists to answer *where did this number come
+from*. It read:
+
+```
+ 1   USA      23.4  3308 ...  22.3   3798   Country-specific terms
+ 2   Iraq     34.1  3043 ...  67.2   -627   Country-specific terms
+28   Guyana   54.1  1068 ...  55.4   1540   ORCA contract database terms
+57   Norway   68.0   826 ...  54.1   1211   Country-specific terms
+63   Nigeria  81.1   302 ...  47.3   1592   Country-specific terms
+```
+
+Four of the five rows got the most reassuring value in the column. On three of them it was
+the opposite of true. `getDCFParams()` carries a hard-coded country override table, and
+measured live against `COUNTRY_DATA` the engine ran:
+
+| country | term | engine | ORCA record |
+|---|---|---|---|
+| USA | royalty | 12.5% | 17.6% |
+| Iraq | service fee | $6.00/bbl | $2.00/bbl |
+| Iraq | income tax | 35% | 29.4% |
+| Nigeria | royalty | 5% | 10% |
+| Nigeria | income tax | 30% | **65.4%** |
+| Nigeria | special tax | 50% | 30% |
+
+Iraq's **−$627M** model NPV is produced by a service fee three times the recorded one, on
+the single term that sets a TSC take. Nigeria's **47.3%** model take sits **33.8pp** under
+its own citable column *in the same row*, on a 30% CIT where the record holds 65.4%.
+
+And the caveat block directly above the table already told the reader, on the Iraq
+sign-flip: *"do not quote the model figure for these rows without saying which basis it is
+on."* The basis cell then answered that question with the country's own name on it.
+
+**Export XLSX**, the button immediately beside it, carried the identical defect in its
+`Terms_Basis` column (column 6 of the main sheet).
+
+v967 — one cycle earlier, committed at the top of this cycle — put exactly this warning on
+the drawer. It never reached the two artifacts that actually leave the building.
+
+## Change
+
+New `_fcEngBasisCell(country, plain)`, which calls v967's own `_fcEngineOverride()` so the
+drawer chip and the memo cannot describe one override differently.
+
+- **Both artifacts' basis cell names the conflict in the cell**, per row:
+  *"HARD-CODED ENGINE OVERRIDE on 3 terms — Royalty at 5% where ORCA's own record for
+  Nigeria is 10%; Income tax at 30% where … is 65.4%; Special tax at 50% where … is 30%.
+  The model columns on this row are engine assumptions, NOT Nigeria's terms, and a
+  hard-coded override is not a citation. The ORCA database columns beside them are drawn
+  from the contract record and are unaffected."* In the cell rather than as a pointer,
+  because a memo reader does not have the tab.
+- The paste gains a **counted caveat sentence**, placed with the GENERIC DEFAULT sentence —
+  same axis, and read before the fee-basis and sign-flip notes, one of which (Iraq) is
+  caused by an override this block now names.
+- **Norway, the United Kingdom and Australia keep the plain label.** They run overrides too
+  and every one of their terms matches the record. Same rule as v967: a marker that fires
+  on all 9 including the 3 that are fine trains the reader to ignore it.
+- The database columns are untouched. Only the basis cell and one caveat sentence move.
+
+## Result
+
+An analyst pasting the Fiscal Compare shortlist into an IC memo can now tell which rows'
+model columns are the country's terms and which are engine constants ORCA's own record
+contradicts — with **both numbers in the cell**, so the committee reader can check it
+without opening the tool. Before this, the memo asserted "Country-specific terms" on USA
+(rank 1), Iraq (rank 2) and Nigeria, and the reader had no way to know.
+
+## Cycle 888 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite (graded copy), **RAN** against modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, **v966 from git** | **499 / 0 / 1 — unchanged** |
+| Full-table paste, 185 rows | **6** rows marked; warn reads "6 of the 185"; Australia / UK / Norway keep the plain label |
+| Export XLSX `Terms_Basis`, main sheet | same **6** marked, same **3** plain |
+| Horizontal scroll, **13 panes × 1920/1440/1280/1024/768/390** | **0 of 78 screens** |
+| 390×844 `hasTouch` | `fc-copy-ic-btn` and `fc-export-btn` **44px**; 0 controls under 24px; copy re-run on the phone carried all 6 markers; `scrollWidth` 390 = `clientWidth` 390 |
+| Page errors across the walk | **0** (excluding the local-server `sw.js` 404) |
+| Version | badge + title `v967 → v968`, silently at the end |
+
+### Measurement correction made during this cycle, recorded because it would have been a false pass
+
+The first overflow sweep called `switchTab('home')`, `switchTab('compare')`, … Those pane
+ids **do not exist** — the panes are `thome, t0, texplorer, t2, t4, t5, t6, t7, t9,
+tmethodology, tbreakevenmap, tsamples, treformrisk`, and `switchTab()` refuses an unknown
+id by design (v582) with a `console.warn` and no visible change. So the sweep measured the
+**default pane six times per viewport** and reported "0 overflow across 60 screens" without
+ever leaving Home. Re-run against the real ids: **13 panes × 6 viewports = 78 screens, 0
+overflow.** Any cycle reusing a sweep harness should assert that the pane actually changed,
+not that the call returned.
+
+### v967 recovered and shipped at the top of this cycle
+
+Cycle 887 timed out at 1800s with a complete, uncommitted change in the working tree —
+the engine-override chip and Fiscal Breakdown block on the Fiscal Compare drawer (T6).
+Rather than discard it, cycle 888 verified it live (syntax gate 11/0; `_fcEngineOverride()`
+returns exactly 6 countries / 12 terms and `null` on the other 179 including
+Norway/UK/Australia; 0 page errors) and committed it as `0e2cf72`. Reading that change is
+what surfaced this cycle's own friction: the warning was on the screen and absent from the
+artifact.
+
+### What this cycle did NOT do
+
+Still open, observed while walking and deliberately left:
+
+- The **Screener**, **Side-by-Side** and **IOC Portfolio** pastes were not audited for the
+  same override axis. Only the Fiscal Compare pair (paste + XLSX, the two buttons on one
+  toolbar) was fixed, on the directive's one-moment rule.
+- At 390×844 the **`fc-dock-*` buttons measure 0px** because the dock is hidden until a
+  shortlist exists. Pre-existing, untouched, and not a control this cycle added.
+- Carried forward from cycle 880 and still not closed: Fiscal Compare's clipboard table
+  emits `Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with
+  `if (anyBe)`. It is mitigated — the caption states the populated count ("Breakeven is
+  populated for 1 of these 5 rows") — so it is an empty column, not a wrong one.
+- Carried forward from cycle 884: the Country Profile **Regional Peers** strip shows a
+  6-row neighbour window and then the regional maximum, with nothing saying the last row is
+  the extreme rather than the next neighbour.
