@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v970</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v971</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v970</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v971</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -24801,6 +24801,68 @@ function _bulkAddrClause(url, dead) {
       + 'figure. Re-checked ' + _PWC_CHECKED + '. ';
 }
 
+// ── v971 (T6) — A PRIMARY-LAW CITATION WHOSE ADDRESS IS A LISTING, NOT THE INSTRUMENT ───────
+// v872 fixed exactly this for the bulk harvest, and said in as many words why it is the worse of
+// the two failures: "A dead link announces itself; the analyst knows to go looking. A link to a
+// publisher's homepage passes every check this page performs and still delivers nothing." That
+// fix was scoped to `isBulk`. The same address shape on a TIER-A PRIMARY-LAW row — the strongest
+// evidence claim this platform makes — still renders as a perfectly healthy citation: instrument
+// name, tier letter, a bare ↗ titled "Open the cited source document", no chip, and no mention in
+// the dead-link note underneath, because the address is not dead.
+//
+// Walked T6 cold on Libya. All FOUR citations on its Evidence Chain are one address —
+// https://noc.ly/index.php/en/new2/petroleum-agreements — the NOC's Petroleum Agreements
+// LISTING, and three of the four wear tier A. Nothing on that page is dead, so _deadNote641 is
+// empty, _citeScope641 is empty, and the green "✓ All 4 independently sourced parameters match
+// the rate stated in the cited source" tick renders unqualified. An analyst clicking through to
+// read the EPSA-IV clause behind a 79.7% government take lands on a page of links.
+//
+// Classified from the ADDRESS, not from a network probe — reachability is a different question
+// and stays with _CITE_DEAD. Every entry below is a site root, a generic default page, or a
+// "Legislation" / "Regulations" / "Legal framework" / "Publications" section, with no instrument
+// identifier anywhere in its path or query. Addresses that DO carry one (`?docid=30628`,
+// `?regnum=HK9900370`, `/eli/1987/act/10/`, a .pdf) are not here and are left completely alone.
+// The value against each key is what the address actually opens, so the row can say it.
+//
+// Nothing here changes a value, a tier letter, a take, an NPV or a grade — it changes what the
+// page claims a click will get you. The LINK DEAD chip is NOT reused: these addresses resolve,
+// and saying otherwise would be the same untrue-but-reassuring signal this removes. They take
+// v872's INDEX ONLY chip, and they are counted in their own bucket so "N of M cited sources
+// cannot be retrieved" keeps meaning exactly what it says.
+const _CITE_INDEX_ONLY = (function() {
+  const m = {};
+  [
+    ['https://noc.ly/index.php/en/new2/petroleum-agreements',        'the National Oil Corporation’s Petroleum Agreements listing'],
+    ['https://gov.krd/mnr-en/publications/contracts/',               'the KRG Ministry of Natural Resources’ contracts publications listing'],
+    ['https://www.eppo.go.th/index.php/en/en-petroleum/en-petroleum-laws', 'EPPO’s petroleum-laws section index'],
+    ['https://anpg.co.ao',                                           'the ANPG home page'],
+    ['https://www.petroci.ci/en/legal-framework/',                   'PETROCI’s legal-framework section index'],
+    ['https://www.mof.gov.sa/en/Laws/Pages/default.aspx',            'the Ministry of Finance laws index'],
+    ['https://www.mpm.gov.my',                                       'the Malaysia Petroleum Management home page'],
+    ['https://www.sainthelena.gov.sh/government/departments/',       'the St Helena government departments index'],
+    ['https://www.minirena.gov.rw/mining-sector/legislation',        'the ministry’s mining-sector legislation section index'],
+    ['https://www.mines.gov.zw/legislation',                         'the ministry’s legislation section index'],
+    ['https://www.turkmengaz.com/en/legislation',                    'Türkmengaz’s legislation section index'],
+    ['https://www.petrosyria.com/en/legislation',                    'the operator’s legislation section index'],
+    ['https://www.lpa.gov.lb/en/regulations',                        'the Lebanese Petroleum Administration’s regulations section index'],
+    ['https://www.inami.gov.mz/index.php/legislacao',                'INAMI’s legislação section index'],
+    ['https://www.doe.gov.ph/petroleum/petroleum-service-contracts', 'the Department of Energy’s petroleum service contracts listing'],
+    ['https://www.sunat.gob.pe/legislacion/renta/ley/',              'SUNAT’s income-tax legislation directory'],
+    ['https://www.nalog.gov.ru/rn77/taxation/taxes/profitul/',       'the federal tax service’s profit-tax topic page'],
+    ['https://www.nalog.gov.ru/rn77/taxation/taxes/ndpi/',           'the federal tax service’s mineral-extraction-tax topic page'],
+    ['https://www.nema.go.ke/index.php?option=com_phocadownload&view=category&id=64', 'a NEMA download-category listing']
+  ].forEach(function(p) { m[p[0]] = p[1]; });
+  return m;
+})();
+// Returns what the address opens, or '' when it is not one of the listings above. Matched on the
+// recorded address with a trailing slash tolerated, because the stored value and the rendered
+// href disagree on it for two entries.
+function _citeIndexOnly(url) {
+  const u = String(url || '').trim();
+  if (!u) return '';
+  return _CITE_INDEX_ONLY[u] || _CITE_INDEX_ONLY[u.replace(/\/+$/, '')] || '';
+}
+
 const _BULK_SOURCES = ['EY_KPMG_CIT_Guide_2025', 'EY_IHS_BulkHarvest_2025'];
 function _isBulkSource(name) { return _BULK_SOURCES.indexOf(name) !== -1; }
 // v569 (T6): promoted out of buildEvidencePanel() so the per-parameter Evidence Chain table
@@ -41352,6 +41414,12 @@ function renderReformTimeline(country) {
     // a row can be A-tier, independently sourced, matching the statute, and still unverifiable.
     let deadLinkCount = 0;
     let deadLinkLabels = [];
+    // v971 (T6): rows whose cited document IS retrievable at the address on record, but whose
+    // address is a listing rather than the instrument. Deliberately a separate bucket from
+    // deadLinkCount -- the address resolves, so counting it as dead would be false, and the
+    // "N of M cannot be retrieved" sentence must keep meaning exactly what it says.
+    let idxLinkCount = 0;
+    let idxLinkLabels = [];
     // v956 (T6): rows whose cited instrument predates a fiscal reform ORCA's own log records
     // for this country. Orthogonal to every other bucket, exactly as v641's was: a row can be
     // A-tier, independently sourced, retrievable, matching the statute — and cited to a document
@@ -41599,6 +41667,7 @@ function renderReformTimeline(country) {
           sS: sourcedSrcs.length,   // v755: rolled back with the rest when a row is off-model
           uL: unsourcedLabels.length, uZ: unsourcedZeroLabels.length, bL: bulkLabels.length,
           sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
+          idx: idxLinkCount, iL: idxLinkLabels.length,   // v971
           spR: supersedeRows.length, sNC: srcNamedCount,   // v956
           tC: Array.from(_termsCited)
         };
@@ -41753,6 +41822,10 @@ function renderReformTimeline(country) {
             // is not a citation either, and it must not keep rendering as a healthy one.
             const _isDeadUrl = _citeLinkDead(srcMeta.url);
             const _idxOnly   = !_isDeadUrl && isBulk && _isBulkIndexUrl(srcMeta.url);
+            // v971 (T6): the same test on the OTHER branch -- a non-bulk citation whose recorded
+            // address is a listing rather than the instrument. Only reached when the address is
+            // neither dead nor the bulk publication's front page, so the three are exclusive.
+            const _srcIdx971 = (!_isDeadUrl && !_idxOnly) ? _citeIndexOnly(srcMeta.url) : '';
             if (_isDeadUrl || _idxOnly) {
               if (_isDeadUrl) { deadLinkCount++; deadLinkLabels.push(label); }
               // v850 (T6): the click. Until now this anchor still pointed at the address the
@@ -41812,6 +41885,29 @@ function renderReformTimeline(country) {
                   ? `<a href="${_esc(_pwcU)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.8;" title="${_bTip}">${_deadChipB}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ ${_esc(country)} page ↗</span></a>`
                   : `<span class="source-badge ${confClass}" style="opacity:.7;" title="${_bTip}">${_deadChipB}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-nopage-chip">no page for ${_esc(country)}</span></span>`)
                 : `<a href="${_esc(_citeFindHref(_dTitle))}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.85;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} <span class="ec-find-chip">⌕ find document ↗</span></a>`;
+            } else if (_srcIdx971) {
+              // v971 (T6): the address resolves and stays the destination -- a ministry's
+              // legislation section is a real place to start, and rerouting away from it would
+              // lose an affordance. What changes is that the row stops PROMISING the clause: the
+              // chip says what the click actually opens, and the ⌕ find document control that
+              // until now only appeared on dead rows is offered here too, so the analyst has the
+              // title search without having to construct it.
+              idxLinkCount++; idxLinkLabels.push(label);
+              const _iTitle971 = _srcTitleSplit(srcLabel).title;
+              const _iTip971 = _esc(label + ': the address ORCA has on record for this citation — '
+                + srcMeta.url + ' — resolves, but it opens ' + _srcIdx971 + ', not '
+                + _iTitle971 + ' itself. It names no rate and no clause, so clicking it does not '
+                + 'check the figure in this row. This is not a judgement on the instrument: the '
+                + 'tier letter is unchanged and the rate in the Statutory column was read off the '
+                + 'document at harvest time. It means the one step that would let you read that '
+                + 'rate yourself stops at a list. Use ⌕ find document to locate the text by '
+                + 'title, or search that listing for it, before this figure goes in an IC memo.');
+              const _iChip971 = '<span class="cite-index-chip" style="background:rgba(194,65,12,.14);'
+                + 'border:1px solid rgba(194,65,12,.5);color:var(--orange);font-size:10px;'
+                + 'font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;'
+                + 'cursor:help;white-space:nowrap;" title="' + _iTip971 + '">INDEX ONLY</span> ';
+              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="${bulkSty}opacity:.85;" title="${_iTip971}">${_iChip971}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`
+                + `<a href="${_esc(_citeFindHref(_iTitle971))}" target="_blank" rel="noopener" class="ec-find-chip" style="text-decoration:none;margin-left:4px;" title="${_esc('Search for ' + _iTitle971 + ' by title. ORCA’s harvest annotation (the trailing rate list, shown separately as ORCA note) is stripped off, because no catalogue matches the annotated string.')}">⌕ find document ↗</a>`;
             } else {
               badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
             }
@@ -41998,6 +42094,8 @@ function renderReformTimeline(country) {
           bulkLabels.length          = _snap742.bL;
           sharedLabels.length        = _snap742.sL;
           deadLinkLabels.length      = _snap742.dL;
+          idxLinkCount               = _snap742.idx;   // v971
+          idxLinkLabels.length       = _snap742.iL;    // v971
           modelConflicts.length      = _snap742.mC;
           supersedeRows.length       = _snap742.spR;   // v956
           srcNamedCount              = _snap742.sNC;   // v956
@@ -42429,6 +42527,56 @@ function renderReformTimeline(country) {
         + 'catalogue matches the annotated string.'
         + '</div>'
       : '';
+    // ── v971 (T6): the citations that open a list instead of the clause ─────────────────────
+    // Same shape and same voice as _deadNote641 above, and deliberately a SEPARATE block rather
+    // than a clause bolted onto it: "cannot be retrieved" and "retrieves a listing" are two
+    // different problems with two different next steps, and a country can have both (Angola has
+    // 2 dead and 2 index-only). Amber, not red, because the address does resolve.
+    const _allIdx971 = citedLinkCount > 0 && idxLinkCount === citedLinkCount;
+    const _idxNote971 = idxLinkCount > 0
+      ? '<div style="margin-top:8px;background:rgba(194,65,12,.06);border:1px solid rgba(194,65,12,.28);'
+        + 'border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;'
+        + 'color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">⚠ '
+        + (_allIdx971
+            ? (citedLinkCount === 1
+                ? 'The only cited source above opens a listing, not the instrument'
+                : 'Every one of the ' + citedLinkCount + ' cited sources above opens a listing, not the instrument')
+            : idxLinkCount + ' of the ' + citedLinkCount + ' cited sources above open'
+              + (idxLinkCount === 1 ? 's' : '') + ' a listing, not the instrument')
+        + '.</strong> '
+        + _esc(idxLinkLabels.join(', ')) + ' point'
+        + (idxLinkCount === 1 ? 's' : '')
+        + ' at an address that resolves — a site root, a generic default page, or a '
+        + '“Legislation” / “Regulations” / “Publications” section — '
+        + 'carrying no identifier for the document named beside it. '
+        + '<strong style="color:var(--text);">This is not a judgement on the instrument, and it is '
+        + 'not a dead link.</strong> The tier letter is unchanged, the address works, and the rate '
+        + 'in the Statutory column was read off the document at harvest time. What it means is '
+        + 'that the click stops at a list'
+        + (_allIdx971
+            ? ', so nothing on this table can currently be checked against its source from here, '
+              + 'and the tick above confirms two columns agreeing about documents this page cannot '
+              + 'open for you.'
+            : '.')
+        + ' <strong style="color:var(--text);">Locate the instrument inside that listing, or by '
+        + 'name, before ' + (idxLinkCount === 1 ? 'this figure goes' : 'these figures go')
+        + ' in an IC memo</strong> — the '
+        + '<span class="ec-find-chip" style="cursor:default;">⌕ find document</span> control '
+        + 'now sits on each of those rows too, and searches for the title with ORCA’s harvest '
+        + 'annotation stripped off.'
+        + '</div>'
+      : '';
+    const _idxScope971 = idxLinkCount > 0
+      ? ' <strong style="color:var(--orange);">'
+        + (_allIdx971
+            ? (citedLinkCount === 1
+                ? 'That citation opens a listing, not the instrument.'
+                : (citedLinkCount === 2 ? 'Both' : 'All ' + citedLinkCount)
+                  + ' of those citations open a listing, not the instrument.')
+            : idxLinkCount + ' of those ' + citedLinkCount + ' citations open a listing, not the instrument.')
+        + '</strong>'
+      : '';
     // Scopes the tick sentence itself, in the same place and the same voice as v625's _scope625.
     // "All 3 independently sourced parameters match the rate stated in the cited source" is the
     // string that misleads when the cited source is a dead address.
@@ -42520,6 +42668,7 @@ function renderReformTimeline(country) {
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
         + _concScope755
         + _citeScope641
+        + _idxScope971
         + _supScope956
         + _scope625
         + '</div>'
@@ -42530,7 +42679,7 @@ function renderReformTimeline(country) {
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
                 + (offRows.length ? ' the model reads' : '') + ' match')
-          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _supScope956 + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _idxScope971 + _supScope956 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
@@ -42626,7 +42775,7 @@ function renderReformTimeline(country) {
           return h;
         })()
       : '';
-    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 + _sharedNote;
+    const reconNote = _mainNote + _deadNote641 + _idxNote971 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
