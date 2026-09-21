@@ -63793,3 +63793,162 @@ Observed while walking, deliberately left:
 
 ## Friction
 Walked T1 cold through the Home card's own one-click path — *"15 countries pass the IOC capital screen → open the screen"*. The analyst's next move on a 15-row shortlist is to cut it by region. The region dropdown offered **Africa (54), Middle East (17), Europe (33), CIS/FSU (5)**. Every one of the
+
+---
+## Cycle 891 Log — 2026-09-21
+
+- Test before: 500 PASS / 0 FAIL (live build, autonomous_cycle gate)
+- Test after: **499 PASS / 0 FAIL / 1 WARN** — suite **RAN** against the final modified tree
+- JS errors: 0 (11 inline script blocks, syntax gate)
+- Version: v969 -> v970
+
+## Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(rotated off T1, which cycle 889 used)
+
+**Provenance, stated plainly:** cycle 890 timed out at its 1800s limit with an
+uncommitted, unverified, un-version-bumped edit to the Regional Peers panel sitting
+in the working tree. This cycle did not discard it. It verified it against the
+live database and a v969 control, found and fixed **two defects in it**, bumped the
+version, and shipped it. The walk below is this cycle's own, not cycle 890's.
+
+## Friction
+
+Walked T2 cold — no sessionStorage, no localStorage — into Country Profile, which
+auto-loads **Indonesia**. The defensibility question lands on the **Regional Peers**
+panel (`loadCountryProfile()`, the `Regional Peers` IIFE at index.html:45846).
+
+On the v969 control the panel printed:
+
+    Regional Peers   Asia · govt take @ $75/bbl
+    26 countries in region
+    ... 7 rows ...
+    20 more countries in region          [ View all in Explorer → ]
+
+Three things are wrong at that point, and the analyst cannot see any of them.
+
+**1. The only way to the other 19 countries changes the population out from under
+the analyst, silently.** "View all in Explorer →" navigates to the Explorer chip
+whose *visible label is also* **"Asia"** — but that chip's `data-value` is
+**`Asia Pacific`** (`_REGION_TO_CHIP`, index.html:28252), which `_regionMatch()`
+expands to `['Asia','Oceania']`. Measured on the shipped `country_data.json`:
+
+| set | n | median take @ $75 |
+|---|---|---|
+| Country Profile "Asia" (`c.region === 'Asia'`) | 26 | **51.4%** |
+| Explorer chip reading "Asia" (`Asia Pacific`) | 42 | **24.6%** |
+
+The comparison base moves **26.8pp** on a click, under a chip bearing the same
+word. Sixteen low-take Oceania micro-jurisdictions get folded in. Nothing on
+either screen says the set changed, or that it changed size.
+
+This is not confined to Indonesia: **76 of 185 countries** are filed under a
+differently-named region on the two tabs — Asia→Asia Pacific (26),
+Oceania→Asia Pacific (16), Latin America→Americas (31), North America→Americas (3).
+
+And the Country Profile's own Regional Peer Comparison section computes its median
+on the **fine** region (`p.region === region`, index.html:46697). So the number the
+page defends its verdict with is drawn from the 26-set, while the only button
+offered for "show me the rest" opens the 42-set.
+
+**2. The "N more countries in region" line was wrong on almost every country.**
+The old formula was `allRegional.length - 6`, against a window that is only
+sometimes 6 peers — it is 2 peers whenever the country is its region's maximum.
+Measured across all 185 on the control build: **165 of the 177** countries that
+printed that line printed a wrong number. Worst case Australia — "10 more" when
+13 were actually hidden. Nigeria said "48 more" while 51 were hidden.
+
+**3. There is no way to see the regional ladder at all without leaving the page.**
+
+## Change
+
+- The six-peer window now has a sibling: the **full regional ladder**, rendered in
+  place and opened by a new primary button — **"Show all 26 in Asia ▾"** — which
+  names the count and the taxonomy it is on. Opening it centres the selected
+  country's own row rather than landing on the top of a 54-row list. The bar scale
+  is recomputed over the rendered set (`_rpScaler`), so the expanded bars are not
+  clipped to the six-peer range. Toggle is idempotent and reverses.
+- The count line now reads **"26 countries filed under Asia · Explorer files
+  Indonesia under Asia Pacific (42)"** — both taxonomies, both sizes, on screen.
+- The Explorer button is relabelled from "View all in Explorer →" to
+  **"Explorer · Asia Pacific (42) →"** on the 76 countries where the two
+  taxonomies disagree, so the destination and its size are named *before* the
+  click. It keeps "View all in Explorer →" on the 109 where they agree.
+- The miscounted "N more countries in region" line is **gone**, replaced by the
+  toggle whose own count is computed as `allRegional.length - (shown + 1)`.
+  Verified: declared count == rendered rows on **179 of 179** countries with a toggle.
+
+### Two defects found in cycle 890's draft and fixed here
+
+- **The expanded ladder scrolled sideways.** The selected country's row carries
+  `margin:-1px -8px` so its highlight bleeds to the panel edge. Dropped inside a
+  new `overflow-y:auto` box, that 8px bleed became a real horizontal scrollbar on
+  the ladder — measured at 1440 **and** at 390. `overflow-x:hidden` only hides the
+  bar and leaves the box programmatically overscrolled, so the fix gives the
+  container the 8px back as padding and pulls the container out by the same 8px:
+  `padding:0 8px;margin:0 -8px`. `scrollWidth == clientWidth` on both branches now.
+- **The new tooltip named a button that is not on screen.** North America holds 3
+  records, so USA, Canada and Greenland render their whole ladder in the window and
+  get no toggle — yet the Explorer button's tooltip said *Use "Show all 3 in North
+  America"*. It now says the list above already shows all 3. 0 dangling references
+  across 185 countries.
+
+## Result
+
+On Indonesia the analyst can now open all 26 Asia records **in place, on the page
+whose median they are about to quote**, instead of being sent to a chip that reads
+"Asia" and holds 42 records at a median 26.8pp lower. Where the two taxonomies
+disagree, the Explorer button names its destination and its size before the click
+rather than after. And the count of what is hidden is now correct on all 179
+countries that show one, where 165 of 177 were wrong.
+
+## Cycle 891 verification — all measured this cycle, nothing assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **RAN** against the final modified tree | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, **v969 from git HEAD** (port 8981) | **499 / 0 / 1 — identical, no regression** |
+| Tree hash before suite == after suite | `1cec65d4…` both — the suite tested what shipped |
+| The 1 WARN | local-server service-worker 404; **present identically on the control**, absent on the deployed HTTPS build |
+| Regional Peers sweep, **all 185 countries** | **0 defects, 0 page errors** |
+| Declared count vs rendered rows | **179 of 179 match** (control: 165 of 177 wrong) |
+| Self row present in expanded ladder | 179 of 179 |
+| Collapsed-label math (`Show the closest N` == window rows) | 179 of 179 |
+| Inner horizontal scroll on the ladder | **0px**, both branches, 1440 and 390 |
+| Dangling "Show all" tooltip references | **0 of 185** (was 3: USA, Canada, Greenland) |
+| Toggle idempotency, open/close/open | reverses cleanly, no row duplication |
+| Horizontal scroll, **14 panes x 1920/1440/1280/1024/768/390** | **0 of 84** |
+| Pane-activation assertion | **84 of 84 confirmed `.active` before measuring** |
+| 390x844 `hasTouch`, real tap path | both buttons **24px**; `scrollWidth` 390 == `clientWidth` 390 |
+| Page errors across the walk | **0** |
+| Version | title + badge `v969 → v970`, silently at the end |
+
+### A harness correction worth recording
+
+My first pane matrix reported "Screener NOT ACTIVE" at all six widths. That was my
+harness being wrong, not the page: **there is no `tscreener` pane.** The Screener is
+a *mode* of `#texplorer`, entered through `_scTabEnter()`, and `switchTab('tscreener')`
+is correctly refused by the v582 guard — which leaves the previous pane active and
+would have had me measuring the wrong pane and calling it clean. Re-measured through
+the real entry point: 84 of 84 panes confirmed active. Per cycle 888's correction,
+asserting the pane is actually active is the part that makes the number mean anything.
+
+### What this cycle did NOT do
+
+- **The regional-extreme cue is still missing.** On Nigeria (#54 of 54 in Africa),
+  Norway (#33 of 33 in Europe) and Australia (#16 of 16 in Oceania) the collapsed
+  window renders 2 peers and the country itself, and nothing on that strip says the
+  row at the bottom *is* the regional maximum. The new toggle gives the analyst a
+  way to find out; it does not tell them. This is cycle 884's carried-forward item
+  and it is **still open** — the expand path mitigates it, it does not close it.
+- **The Explorer's own chip label is still "Asia" for a 42-record `Asia Pacific`
+  set.** This cycle fixed the Country Profile's side of the mismatch, which is where
+  the analyst meets it. Renaming the chip touches the Explorer's control row and
+  every deep link keyed to it, and is a bigger change than one moment.
+- Carried forward, still open: Fiscal Compare's clipboard table emits
+  `Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with
+  `if (anyBe)` (cycle 880). The Screener's Advanced Filters panel still renders 17
+  checkboxes at 13px under `pointer: coarse` (cycle 889), against finalization
+  item 3.
