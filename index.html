@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v964</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v965</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v964</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v965</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -53960,13 +53960,90 @@ function copyComparisonTable(btn) {
       }
       return out;
     }
-    return walk(td).replace(/\s+/g, ' ').trim();
+    // ── v965 (T3): the strikethrough was the whole signal, and the clipboard ate it ───────
+    //
+    // Walked "how do these three countries compare side by side?" cold at 1440x900 and 390x844
+    // (hasTouch), storage cleared, on this tab's own shipped Atlantic Frontier Quartet preset
+    // (Guyana / Angola / Brazil / Nigeria) -- then pressed the control the walk ends on,
+    // "Copy for IC Memo", with navigator.clipboard.write shimmed so the artifact was read back.
+    //
+    // v864 withdraws the bundled take-spread band where the country's own contract file refutes
+    // it, and -- deliberately, in its own words -- "keeps that band on screen, struck through,
+    // because the analyst has to be able to see what was withdrawn rather than watch a number
+    // change." On the preset above that fires on two of the four columns:
+    //
+    //   Take spread across contracts   Brazil  >=20.6pp observed / 50.4-71.0% across top 50
+    //                                          bundled  5̶0̶.̶4̶-̶6̶8̶.̶2̶%̶ ̶(̶1̶7̶.̶8̶p̶p̶)̶
+    //                                  Nigeria >=33.9pp observed / 57.5-91.4% across top 50
+    //                                          bundled  8̶3̶.̶1̶-̶8̶3̶.̶5̶%̶ ̶(̶0̶.̶4̶p̶p̶)̶
+    //
+    // cellText() walks the cell for TEXT. text-decoration carries no text, so both flavours of
+    // the paste -- TSV and the text/html Word renders -- came out as
+    //
+    //   Nigeria  >=33.9pp observed - 57.5-91.4% across top 50 - bundled - 83.1-83.5% (0.4pp)
+    //
+    // Three readings separated by mid-dots, the last of them the one this platform has
+    // WITHDRAWN, now indistinguishable from the two it stands behind. A committee reader quotes
+    // "Nigeria 83.1-83.5%, 0.4pp -- uniform terms", which is the exact claim v864 exists to
+    // refute, delivered by the export button on the flagship preset. The screen is right and
+    // the memo is wrong, and the memo is the artifact that leaves the building.
+    //
+    // 9 of 185 countries render a struck band on this row -- Brazil, Kazakhstan, Mauritania,
+    // Mexico, Morocco, Nigeria, Qatar, Republic of the Congo, Sao Tome and Principe -- and two
+    // of them are in the four-country preset the tab ships.
+    //
+    // The Predictability Score row one line up already survives the paste, because v875 put the
+    // WORD beside the struck score ("stored: 62 <triangle> withdrawn"). This gives the same word
+    // to every struck reading in the grid, and keeps the rule to the cell level so it cannot
+    // double-mark the row that already carries it.
+    function _struckIn(td) {
+      var out = [], all = td.querySelectorAll('*');
+      for (var q = 0; q < all.length; q++) {
+        var e = all[q], tn = e.tagName, hit = (tn === 'S' || tn === 'DEL' || tn === 'STRIKE');
+        if (!hit && (e.getAttribute('style') || '').indexOf('line-through') !== -1) hit = true;
+        if (!hit) {
+          // Class-based rules too. #cmp-data-table is display:none, so this is the computed
+          // value rather than the used one -- which is what we want: it still resolves.
+          var dec = '';
+          try { dec = (getComputedStyle(e) || {}).textDecorationLine || ''; } catch (x) {}
+          if (dec.indexOf('line-through') !== -1) hit = true;
+        }
+        // Skip a struck element nested inside another: the outer one already covers its text.
+        if (hit) {
+          var nested = false;
+          for (var r = 0; r < out.length; r++) if (out[r].contains(e)) { nested = true; break; }
+          if (!nested) out.push(e);
+        }
+      }
+      return out;
+    }
+    function cellStruck(td) {
+      var els = _struckIn(td), seen = {}, out = [];
+      for (var q = 0; q < els.length; q++) {
+        var s = clean(els[q].textContent).trim();
+        if (s && !seen[s]) { seen[s] = 1; out.push(s); }
+      }
+      return out;
+    }
+    var _txt = walk(td).replace(/\s+/g, ' ').trim();
+    var _st  = cellStruck(td);
+    if (_st.length && !/withdrawn/i.test(_txt)) {
+      for (var z = 0; z < _st.length; z++) {
+        var at = _txt.indexOf(_st[z]);
+        if (at === -1) continue;
+        _txt = _txt.slice(0, at + _st[z].length) + ' ▲ withdrawn' + _txt.slice(at + _st[z].length);
+      }
+    }
+    return { text: _txt, struck: _st };
   }
-  var matrix = [];
+  var matrix = [], struckM = [];
   for (var i = 0; i < src.rows.length; i++) {
-    var row = [];
-    for (var j = 0; j < src.rows[i].cells.length; j++) row.push(cellText(src.rows[i].cells[j]));
-    matrix.push(row);
+    var row = [], srow = [];
+    for (var j = 0; j < src.rows[i].cells.length; j++) {
+      var _c = cellText(src.rows[i].cells[j]);
+      row.push(_c.text); srow.push(_c.struck);
+    }
+    matrix.push(row); struckM.push(srow);
   }
   var countries = matrix[0].slice(1);
   var caption = 'ORCA fiscal comparison — ' + countries.join(' / ');
@@ -54040,6 +54117,19 @@ function copyComparisonTable(btn) {
 
   // --- rich HTML flavour (Word / Docs / Outlook) ---
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  // v965 (T3): Word, Docs and Outlook all render text-decoration, so the rich flavour carries
+  // the strike itself and not only the word — the pasted cell then looks like the screen it was
+  // copied from. The TSV flavour keeps the word alone, because Excel has no run formatting here.
+  function escCell(txt, struck) {
+    var h = esc(txt);
+    if (!struck || !struck.length) return h;
+    for (var q = 0; q < struck.length; q++) {
+      var e = esc(struck[q]), needle = e + ' ▲ withdrawn';
+      if (h.indexOf(needle) === -1) continue;
+      h = h.replace(needle, '<s>' + e + '</s> ▲ withdrawn');
+    }
+    return h;
+  }
   var th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
   var td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
   var tdL = td + 'font-weight:bold;';
@@ -54048,8 +54138,9 @@ function copyComparisonTable(btn) {
     + '<p style="font-size:9pt;color:#555;margin:0 0 6px;">' + esc(assump) + '</p>'
     + '<table style="border-collapse:collapse;">'
     + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
-    + '<tbody>' + matrix.slice(1).map(function(r){
-        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+    + '<tbody>' + matrix.slice(1).map(function(r, ri){
+        var sr = struckM[ri + 1] || [];
+        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + escCell(c, sr[ci]) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>'
     + (_notes.length
         ? '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">' + esc(_notesHead) + '</p>'
