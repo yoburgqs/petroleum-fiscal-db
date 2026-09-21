@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v969</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v970</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v969</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v970</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41257,6 +41257,37 @@ function _cpScrollToTierSchedule() {
 }
 window._cpScrollToTierSchedule = _cpScrollToTierSchedule;
 
+// v970 (T2): Regional Peers — swap the six-peer window for the full regional ladder in place.
+// The panel prints a count ("26 countries filed under Asia") above a list of seven, and the
+// only control that offered the rest navigated to the Explorer's COARSER region (Asia Pacific,
+// 42) under a different name. This keeps the analyst on the set the count — and this page's
+// own regional median — are actually drawn from.
+function _cpToggleRegionLadder(winId, fullId, togId) {
+  var win = document.getElementById(winId);
+  var full = document.getElementById(fullId);
+  var tog = document.getElementById(togId);
+  if (!win || !full || !tog) return;
+  var open = tog.getAttribute('data-open') === '1';
+  win.style.display  = open ? '' : 'none';
+  full.style.display = open ? 'none' : '';
+  tog.setAttribute('data-open', open ? '0' : '1');
+  tog.innerHTML = open
+    ? (tog.getAttribute('data-lbl-collapsed') || 'Show all &#9662;')
+    : (tog.getAttribute('data-lbl-expanded') || 'Show the closest only &#9652;');
+  if (!open) {
+    // Opened: centre the selected country's own row in the box rather than landing on the top
+    // of a 54-row list. Set scrollTop directly — scrollIntoView() walks every ancestor and would
+    // drag the whole page, and block:'nearest' parks the row at one edge, which shows the
+    // analyst only one side of the regional distribution.
+    var me = full.querySelector('div[style*="background:var(--surface2)"]');
+    if (me && full.scrollHeight > full.clientHeight) {
+      full.scrollTop = Math.max(0, me.offsetTop - full.clientHeight / 2 + me.offsetHeight / 2);
+    }
+  }
+}
+window._cpToggleRegionLadder = _cpToggleRegionLadder;
+
+
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -45820,10 +45851,16 @@ function loadCountryProfile(country) {
     const above = peers.filter(p => p.take_75 > selfTake).slice(0, 4);
     shown = [...below, ...above].slice(0, 6);
     if (shown.length === 0) shown = peers.slice(0, 6);
-    const minTake = Math.min(selfTake, ...shown.map(p => p.take_75));
-    const maxTake = Math.max(selfTake, ...shown.map(p => p.take_75));
-    const takeRange = Math.max(maxTake - minTake, 10); // at least 10pp range for bar scaling
-    const barScale = (take) => Math.max(5, Math.round((take - minTake + 5) / (takeRange + 10) * 100));
+    // v970 (T2): the bar scale is now derived per rendered SET, because this panel renders two
+    // of them -- the six-peer window and the full regional ladder the header counts. A scale
+    // computed off `shown` clips every bar in the expanded set.
+    const _rpScaler = (setArr) => {
+      const mn = Math.min(selfTake, ...setArr.map(p => p.take_75));
+      const mx = Math.max(selfTake, ...setArr.map(p => p.take_75));
+      const rg = Math.max(mx - mn, 10); // at least 10pp range for bar scaling
+      return (take) => Math.max(5, Math.round((take - mn + 5) / (rg + 10) * 100));
+    };
+    const barScale = _rpScaler(shown);
     // v814 (T2): this whole column rendered as ~836px of blank space in every row. The bar
     // fills were laid out and sized correctly -- Uzbekistan measured 727px against Indonesia's
     // 162px -- but their colour was written as 'var(--yellow)' + '55', a CSS custom property
@@ -45837,51 +45874,114 @@ function loadCountryProfile(country) {
     // carrying a third copy of the same broken CSS) removed.
     const _rpHex = (t) => t <= 40 ? '#15803D' : t <= 60 ? '#A16207' : t <= 75 ? '#C2410C' : '#B91C1C';
     const _rpRule = '#D0CAC0';
-    const selfW = barScale(selfTake);
-    // The scale is relative with a padded origin, so a bar length on its own means nothing.
-    // This drops the selected country's own position into every peer track as a rule, so a
-    // peer bar reads as "stops short of us" / "runs past us" -- which is the comparison the
-    // analyst came to this section to make.
-    const _rpMark = '<div style="position:absolute;left:'+selfW+'%;top:-3px;bottom:-3px;width:2px;background:#96570A;opacity:.7;border-radius:1px;"></div>';
     const selfCol = _rpHex(selfTake);
-    const selfRow = '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;border-bottom:1px solid '+_rpRule+'55;background:var(--surface2);border-radius:4px;padding:5px 8px;margin:-1px -8px;">'
-      + '<span style="font-size:12px;font-weight:700;color:var(--accent);">' + country + ' ★</span>'
-      + '<div style="background:'+_rpRule+'66;border-radius:3px;height:12px;position:relative;overflow:visible;">'
-      + '<div style="position:absolute;left:0;top:0;height:100%;width:'+selfW+'%;background:'+selfCol+'CC;border-radius:3px;border:1px solid '+selfCol+';"></div>'
-      + '</div>'
-      + '<span style="font-size:12px;font-weight:800;color:'+selfCol+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + selfTake.toFixed(1) + '%</span>'
-      + '</div>';
-    // Insert self at correct position among shown peers
-    const allWithSelf = [...shown, {country, take_75: selfTake, _self: true}].sort((a,b) => a.take_75 - b.take_75);
-    const combinedHtml = allWithSelf.map(p => {
-      if (p._self) return selfRow;
-      const col = _rpHex(p.take_75);
-      const w = barScale(p.take_75);
-      const pEsc = p.country.replace(/'/g,"\\'");
-      return '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid '+_rpRule+'55;cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\''+pEsc+'\';loadCountryProfile(\''+pEsc+'\')" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\';">'
-        + '<span style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+p.country+(p.has_r_factor_tiers?' (R-factor PSC)':'')+'">' + p.country + (p.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;">◆</span>' : '') + '</span>'
-        + '<div style="background:'+_rpRule+'44;border-radius:3px;height:12px;position:relative;">'
-        + '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+col+'99;border-radius:3px;"></div>'
-        + _rpMark
+    // v970 (T2): one builder, two sets. The rule that drops the selected country's own
+    // position into every peer track has to be recomputed per set -- the scale is relative
+    // with a padded origin, so a bar length on its own means nothing, and a mark drawn on the
+    // six-peer scale lands in the wrong place on the full regional ladder.
+    const _rpRows = (setArr) => {
+      const sc = _rpScaler(setArr);
+      const sw = sc(selfTake);
+      const mark = '<div style="position:absolute;left:'+sw+'%;top:-3px;bottom:-3px;width:2px;background:#96570A;opacity:.7;border-radius:1px;"></div>';
+      const sRow = '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;border-bottom:1px solid '+_rpRule+'55;background:var(--surface2);border-radius:4px;padding:5px 8px;margin:-1px -8px;">'
+        + '<span style="font-size:12px;font-weight:700;color:var(--accent);">' + country + ' ★</span>'
+        + '<div style="background:'+_rpRule+'66;border-radius:3px;height:12px;position:relative;overflow:visible;">'
+        + '<div style="position:absolute;left:0;top:0;height:100%;width:'+sw+'%;background:'+selfCol+'CC;border-radius:3px;border:1px solid '+selfCol+';"></div>'
         + '</div>'
-        + '<span style="font-size:12px;font-weight:800;color:'+col+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + p.take_75.toFixed(1) + '%</span>'
+        + '<span style="font-size:12px;font-weight:800;color:'+selfCol+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + selfTake.toFixed(1) + '%</span>'
         + '</div>';
-    }).join('');
+      // Insert self at its correct position among the peers of this set
+      return [...setArr, {country, take_75: selfTake, _self: true}]
+        .sort((a,b) => a.take_75 - b.take_75)
+        .map(p => {
+          if (p._self) return sRow;
+          const col = _rpHex(p.take_75);
+          const w = sc(p.take_75);
+          const pEsc = p.country.replace(/'/g,"\\'");
+          return '<div style="display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid '+_rpRule+'55;cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\''+pEsc+'\';loadCountryProfile(\''+pEsc+'\')" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\';">'
+            + '<span style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+p.country+(p.has_r_factor_tiers?' (R-factor PSC)':'')+'">' + p.country + (p.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;">◆</span>' : '') + '</span>'
+            + '<div style="background:'+_rpRule+'44;border-radius:3px;height:12px;position:relative;">'
+            + '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+col+'99;border-radius:3px;"></div>'
+            + mark
+            + '</div>'
+            + '<span style="font-size:12px;font-weight:800;color:'+col+';font-family:\'IBM Plex Mono\',monospace;text-align:right;">' + p.take_75.toFixed(1) + '%</span>'
+            + '</div>';
+        }).join('');
+    };
+    const combinedHtml = _rpRows(shown);
+    // The full regional ladder -- the same set `allRegional.length` counts in the header, so
+    // the number above the list and the list the analyst can actually open are one object.
+    const _rpFullPeers = allRegional.filter(p => p.country !== country);
+    const _rpFullHtml  = _rpRows(_rpFullPeers);
+    const _rpShownN = shown.length + 1;                 // peers rendered + this country
+    const _rpHidden  = Math.max(0, allRegional.length - _rpShownN);
+    const _rpSlug    = (country || '').replace(/[^A-Za-z0-9]/g, '');
+    const _rpWinId   = 'cp-rp-win-' + _rpSlug;
+    const _rpFullId  = 'cp-rp-full-' + _rpSlug;
+    const _rpTogId   = 'cp-rp-tog-' + _rpSlug;
+    // v970 (T2): this panel and the Explorer are on TWO DIFFERENT region taxonomies.
+    // COUNTRY_DATA.region is the fine one (Asia / Oceania / Latin America / North America);
+    // the Explorer's chip row is the coarse one (_REGION_TO_CHIP collapses Asia+Oceania into
+    // "Asia Pacific" and Latin America+North America into "Americas"). 76 of 185 countries are
+    // filed under a differently-named region on the two tabs. The button below therefore cannot
+    // deliver the count printed above it, and used to say "View all" as though it could --
+    // Indonesia's panel reads "26 countries in region" and the click lands on Asia Pacific,
+    // 42 countries, which is where Australia's PRRT regime is and where this page's own
+    // "Asia producer median" never looked. Name the destination and its size.
+    const _rpAttr = (t) => String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const _rpChip = (typeof getRegion === 'function') ? getRegion(country) : region;
+    const _rpChipN = (_rpChip && _rpChip !== region)
+      ? COUNTRY_DATA.filter(p => (typeof getRegion === 'function' ? getRegion(p.country) : p.region) === _rpChip).length
+      : allRegional.length;
+    const _rpWider = !!(_rpChip && _rpChip !== region);
+    const _rpChipBtn = _rpWider
+      ? ('Explorer &middot; ' + _rpChip + ' (' + _rpChipN + ') →')
+      : 'View all in Explorer →';
+    // The closing sentence has to know whether the "Show all" button is actually on screen.
+    // North America holds 3 records, so USA, Canada and Greenland render the whole ladder in
+    // the window and get NO toggle -- and an unconditional "Use Show all 3 in North America"
+    // sent the analyst hunting for a control that is not there. Where the list is already
+    // complete, say so instead of naming a button.
+    const _rpChipTip = _rpWider
+      ? ('The Explorer files this country under "' + _rpChip + '" (' + _rpChipN + ' jurisdictions), not under "'
+         + region + '" (' + allRegional.length + '). It is a coarser grouping — the same click therefore opens a WIDER set than this list, and than the '
+         + region + ' median quoted on this page. '
+         + (_rpHidden > 0
+              ? ('Use "Show all ' + allRegional.length + ' in ' + region + '" for the set behind that median.')
+              : ('The list above already shows all ' + allRegional.length + ' of them — that is the set behind that median.')))
+      : ('Opens the Explorer filtered to ' + region + ' — the same ' + allRegional.length + ' jurisdictions this list is drawn from, with the full metric table.');
+    // The count line says which taxonomy it is on the moment the two disagree.
+    const _rpLblCollapsed = 'Show all ' + allRegional.length + ' in ' + region + ' &#9662;';
+    const _rpLblExpanded  = 'Show the closest ' + _rpShownN + ' &#9652;';
+    const _rpChipNote = _rpWider
+      ? (' <span style="opacity:.85;" title="' + _rpAttr(_rpChipTip) + '">· Explorer files ' + country + ' under ' + _rpChip + ' (' + _rpChipN + ')</span>')
+      : '';
     return '<div class="dd-section">'
       + '<h3>Regional Peers <span style="font-weight:400;font-size:11px;color:var(--muted);">'+region+' · govt take @ $75/bbl</span></h3>'
-      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+allRegional.length+' countries in region</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+allRegional.length+' countries filed under '+region+_rpChipNote+'</div>'
       + '<div style="margin:0 -4px;">'
       + '<div style="display:grid;grid-template-columns:130px 1fr 60px;gap:8px;padding:3px 8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">COUNTRY</span>'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">TAKE (relative) <span style="font-weight:400;letter-spacing:0;">&mdash; <span style="display:inline-block;width:2px;height:8px;background:#96570A;opacity:.7;vertical-align:-1px;"></span> '+country.replace(/'/g,"\\'")+'</span></span>'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;text-align:right;">TAKE%</span>'
       + '</div>'
-      + combinedHtml
+      + '<div id="'+_rpWinId+'">' + combinedHtml + '</div>'
+      // The `padding:0 8px;margin:0 -8px` pair is load-bearing, not tidying. The selected
+      // country's own row carries `margin:-1px -8px` so its highlight bleeds to the panel edge;
+      // the moment that row sits inside an `overflow-y:auto` box, the 8px bleed on the inline-end
+      // side becomes a real horizontal scrollbar on the ladder -- measured at 1440 and at 390.
+      // `overflow-x:hidden` only hides the bar and leaves the box programmatically overscrolled,
+      // so instead give the container the 8px back as padding and pull the container itself out
+      // by the same 8px. The row then exactly fills the padding box, scrollWidth == clientWidth,
+      // and the ladder still lines up with the collapsed window above it.
+      + '<div id="'+_rpFullId+'" style="display:none;padding:0 8px;margin:0 -8px;'+(_rpFullPeers.length > 13 ? 'max-height:420px;overflow-y:auto;overscroll-behavior:contain;' : '')+'">' + _rpFullHtml + '</div>'
       + '</div>'
-      + '<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">'
-      + (allRegional.length > 7 ? '<span style="font-size:10px;color:var(--muted);">'+(allRegional.length - 6)+' more countries in region</span>' : '<span></span>')
-      + '<button onclick="(function(){const expBtn=document.getElementById(\'tab-btn-texplorer\');switchTab(\'texplorer\',expBtn);const chipRegion=typeof getRegion===\'function\'?getRegion(\'' + country.replace(/'/g,"\\'") + '\'):\'all\';const regionEl=document.querySelector(\'#chip-row-region .chip[data-value=\\\'\'+chipRegion+\'\\\']\');if(regionEl)regionEl.click();})()" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--muted);cursor:pointer;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--muted)\'">'
-      + 'View all in Explorer →</button>'
+      + '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">'
+      + (_rpHidden > 0
+          ? '<button id="'+_rpTogId+'" data-open="0" data-lbl-collapsed="'+_rpLblCollapsed+'" data-lbl-expanded="'+_rpLblExpanded+'" onclick="_cpToggleRegionLadder(\''+_rpWinId+'\',\''+_rpFullId+'\',\''+_rpTogId+'\')" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 10px;min-height:24px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;" title="'+_rpAttr('Opens the remaining '+_rpHidden+' '+region+' '+(_rpHidden===1?'jurisdiction':'jurisdictions')+' in place, on a scale recomputed over the full set. This is the set the count above this list describes, and the set the '+region+' median quoted on this page is drawn from.')+'">'+_rpLblCollapsed+'</button>'
+          : '<span></span>')
+      + '<button onclick="(function(){const expBtn=document.getElementById(\'tab-btn-texplorer\');switchTab(\'texplorer\',expBtn);const chipRegion=typeof getRegion===\'function\'?getRegion(\'' + country.replace(/'/g,"\\'") + '\'):\'all\';const regionEl=document.querySelector(\'#chip-row-region .chip[data-value=\\\'\'+chipRegion+\'\\\']\');if(regionEl)regionEl.click();})()" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 10px;min-height:24px;font-size:11px;color:var(--muted);cursor:pointer;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--muted)\'" title="'+_rpAttr(_rpChipTip)+'">'
+      + _rpChipBtn + '</button>'
       + '</div>'
       + '</div>';
   })()}
