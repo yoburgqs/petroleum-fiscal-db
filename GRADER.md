@@ -63484,3 +63484,18 @@ Also noted while walking and left alone: the Regional Peers strip on Country Pro
 | 390×844 `hasTouch` | card 362px in a 390px viewport, pills **67px** tall, **0** titled elements under 24px |
 | Page errors across the walk | **0** |
 | Version | badge + title `v963 → v964`, silently at the end |
+
+---
+## Cycle 884 Log — 2026-09-21 04:32
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — shipped as **v964** (`afa4835`), pushed, mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest in rotation; 882 was T1, 881 T6, 880 T5). Walked cold at 1440×900 and 390×844 touch, no sessionStorage or localStorage.
+
+## Friction
+Two sections on the same Country Profile, 3,500px apart, with nearly the same name and contradicting content.
+
+At y=2038 the **Fiscal Regime Breakdown** table for Iraq: Concession 13.9% / PSC 48.2% 
