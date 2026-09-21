@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v965</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v966</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v965</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v966</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41072,6 +41072,49 @@ function _rrTokenTier(tokTxt, fallbackCol) {
 }
 window._rrTokenTier = _rrTokenTier;
 
+// ── v966 (T4): the IC verdict, on the Reform Risk tab's own ranked table ──────────────
+// Every other surface on this platform renders the six-way classification: the Fiscal
+// Compare REFORM VERDICT column (v744), the Country Profile sidebar Stability line (v644),
+// the IOC Portfolio row chip (v880/v906), the lookup card at the top of this very tab
+// (v502/v514). The one table that did not was "Most Frequently Reformed Regimes" -- the
+// flagship ranking, and the one the platform's own Sample Analyses twice instruct the
+// analyst to read as the premium list. It printed four raw counts and left the verdict to
+// be inferred from row order, which is exactly the inference the old sort made wrong.
+// These two helpers add no rule of their own. _rrWacc() is _rrTokenTier().isAction -- the
+// same predicate that decides whether a token renders as a filled pill everywhere else --
+// so "carries a WACC premium" has one definition on this platform, not two.
+function _rrWacc(r) {
+  var c = (r && r.country) ? r.country : r;
+  var v = (typeof _rrClassify === 'function') ? _rrClassify(c) : null;
+  if (!v) return false;
+  return !!_rrTokenTier(v.icToken, v.icColor).isAction;
+}
+window._rrWacc = _rrWacc;
+
+// Renders under the Since-2010 count rather than in a seventh column: that count IS the
+// rule's input, so the verdict belongs against it, and the table keeps the width it was
+// measured clean at (adding a column put the card to 1742px at 1024 once already -- see the
+// v959 note on the colspan max-width).
+function _rrIcTokenCell(country) {
+  var v = (typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  if (!v || !v.icToken) return '';
+  var tier = _rrTokenTier(v.icToken, v.icColor);
+  var tip = country + ' \u2014 ' + _icPlain(v.icLabel) + '. ' + _icPlain(v.icRule)
+    + ' Reform Frequency Score ' + v.score + '/100, ' + _icPlain(v.rankTxt) + '. '
+    + 'Same classification the Fiscal Compare Reform verdict column, the Country Profile '
+    + 'reform line and the IOC Portfolio chip render for this jurisdiction \u2014 one '
+    + 'definition, so this ranking cannot disagree with them.';
+  var base = 'display:inline-block;margin-top:3px;font-size:9px;font-weight:700;line-height:1.3;'
+    + 'letter-spacing:.02em;white-space:nowrap;cursor:help;border-radius:3px;padding:1px 4px;';
+  var style = tier.isAction
+    ? base + 'color:#fff;background:' + tier.col + ';'
+    : base + 'color:' + tier.col + ';background:transparent;border:1px solid ' + tier.col + '44;'
+      + (tier.dotted ? 'border-bottom-style:dotted;' : '');
+  return '<div style="text-align:right;"><span style="' + style + '" title="' + _iocEvEsc(tip) + '">'
+    + v.icToken + '</span></div>';
+}
+window._rrIcTokenCell = _rrIcTokenCell;
+
 // v601 (T2): the Evidence Chain conflict note ends in a control. Scrolls the Live DCF panel into
 // view and flashes its Fiscal Breakdown, so "the DCF panel uses a different number" is something
 // the analyst can see rather than something they have to take on trust.
@@ -51391,8 +51434,30 @@ function renderReformRisk() {
   // Libya and Australia and withheld one from Ecuador and Algeria.
   // Context events are NOT dropped: they keep their own column below, per the v583 rule
   // that they stay on screen and stay labelled. They just stop deciding the ranking.
-  }).sort((a,b) => (b.split.fiscal - a.split.fiscal)
-                || (b.since2010 - a.since2010)
+  // ── v966 (T4): rank by the count the IC rule actually uses ──────────────────
+  // v713 moved this ranking off `total` (every sourced event) and onto `split.fiscal`
+  // (sourced fiscal law changes, ALL DATES). That fixed the events-vs-law-changes axis and
+  // left the other one untouched, and the other one is the axis every decision on this tab
+  // runs on. This tab's own intro states the rule: "3 or more law changes since 2010 -> add
+  // 3-5pp WACC premium". _rrClassify() applies it. On the shipped reform_history.json exactly
+  // two jurisdictions clear it -- United Kingdom (5) and Brazil (3).
+  // Ranked on all-dates, the table rendered:
+  //     1 United Kingdom (5 since 2010)  <- premium
+  //     2 Nigeria        (2)             <- no premium
+  //     3 Angola         (2)             <- no premium
+  //     4 Kazakhstan     (1, and its take rise is 2007 -- a pre-2010 window artefact)
+  //     5 Brazil         (3)             <- premium, ranked under three that carry none
+  //    10 Algeria        (0 since 2010)
+  // The v713 comment quotes the reason this matters and then does not close it: this
+  // platform's own IC guidance, in Sample Analyses twice, reads "any portfolio country
+  // appearing in the top 10 most-reformed list carries a tightening risk premium". Following
+  // that instruction against the old order put a premium on eight jurisdictions that carry
+  // none -- including Algeria, which has had ZERO fiscal law changes since 2010 -- and buried
+  // one of the two that do at row 5.
+  // All-dates is not discarded; it keeps its column and is now the tiebreak, which is what it
+  // is good for. It stops deciding an order the analyst reads as a risk order.
+  }).sort((a,b) => (b.since2010 - a.since2010)
+                || (b.split.fiscal - a.split.fiscal)
                 || (b.total - a.total)
                 || a.country.localeCompare(b.country));
 
@@ -51512,11 +51577,11 @@ function renderReformRisk() {
   // Reform Frequency column stopped fitting, and the document scrolled to 1773 at 1024-1920.
   const topTable = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;overflow-x:auto;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Most Frequently Reformed Regimes</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--text);">All 21 jurisdictions that carry a sourced reform log</strong>, ranked by sourced <strong style=\"color:var(--text);\">fiscal law changes</strong>, all dates — the complete set, <strong style="color:var(--text);">not a top-N cut</strong>. A country missing from this table has no sourced reform log at all (164 of 185 do not), which is missing coverage, not a clean record; check it in the lookup at the top of the tab. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts fiscal law changes dated 2010 or later.</strong> Sourced events that changed no fiscal terms \u2014 discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax \u2014 are counted in their own column and stay in the event log, but they neither score nor decide this ranking; before v713 they did, which put Libya 5th and left Canada off the table. Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;"><strong style="color:var(--text);">All 21 jurisdictions that carry a sourced reform log</strong>, ranked by <strong style=\"color:var(--text);\">sourced fiscal law changes since 2010</strong> — the window this tab’s WACC-premium rule is written on — with the all-dates count as tiebreak and its own column. The complete set, <strong style="color:var(--text);">not a top-N cut</strong>. A country missing from this table has no sourced reform log at all (164 of 185 do not), which is missing coverage, not a clean record; check it in the lookup at the top of the tab. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts fiscal law changes dated 2010 or later.</strong> Sourced events that changed no fiscal terms \u2014 discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax \u2014 are counted in their own column and stay in the event log, but they neither score nor decide this ranking; before v713 they did, which put Libya 5th and left Canada off the table. Before v966 the ranking keyed on the all-dates count instead of this one, which put Brazil — one of only two jurisdictions carrying a WACC premium — at row 5, beneath three that carry none. Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>'
-    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Sourced fiscal law changes on record at any date \u2014 the number this table is ranked by. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax) are counted separately beneath it as CONTEXT and do not affect the ranking. Every jurisdiction with a sourced log is listed here, including the two — Ghana and Guyana — whose log holds 3 context events each and no fiscal law change at any date; they sort to the bottom on 0 and are marked there rather than dropped. A country absent from this table has no sourced reform log at all.">Fiscal Law Changes<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">all dates</span></th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Sourced fiscal law changes on record at any date. This is the TIEBREAK, not the ranking key: the table ranks on the Since 2010 column, because that is the window this tab\u2019s WACC-premium rule is written on. Both are kept \u2014 a long record with a quiet decade is a different jurisdiction from a short record with a busy one. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax) are counted separately beneath it as CONTEXT and do not affect the ranking. Every jurisdiction with a sourced log is listed here, including the two — Ghana and Guyana — whose log holds 3 context events each and no fiscal law change at any date; they sort to the bottom on 0 and are marked there rather than dropped. A country absent from this table has no sourced reform log at all.">Fiscal Law Changes<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">all dates</span></th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform Frequency Score (0\u2013100). Formula: 100 \u2212 (reforms since 2010 \xd7 15). Score 100 = no reforms since 2010 (most stable); 70 = 2 reforms; 55 = 3 reforms; 40 = 4 reforms; 0 = 7+ reforms (most volatile). This measures reform frequency only. Note: the Fiscal Predictability Score in Country Profile is different \u2014 it additionally factors price swing and within-country fiscal term consistency (IQR across contracts). Use both signals together for IC analysis.">Reform Frequency<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">since 2010</span> \u24d8</th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Direction of each sourced event. &#8593; take raised &#183; &#8595; take cut &#183; ? a sourced fiscal law change whose take impact ORCA has not quantified (direction unknown, NOT neutral) &#183; &#183;N events that changed no fiscal terms. The verdict beneath the counts is asserted only where the unmeasured changes could not overturn it.">Direction</th>'
@@ -51547,10 +51612,34 @@ function renderReformRisk() {
         //     premium" -- so the table is read as the membership test it was failing.
         // The universe is 21 rows. There is no reason to rank a 21-row universe and print 15.
         var _zeroSeen = false;
+        // ── v966 (T4): the WACC-premium line, drawn where this tab's own rule falls ────────
+        // The rule is stated in this tab's intro and applied by _rrClassify(): 3+ sourced
+        // fiscal law changes since 2010 -> add a WACC premium. Two jurisdictions clear it.
+        // Nothing on this table said which, so "who do I discount?" was an arithmetic
+        // exercise against a column, on a table the platform's own IC guidance tells the
+        // analyst to read as the membership test. It is now a line you can see.
+        // No new rule and no new threshold: _rrWacc() asks _rrClassify() for the icToken the
+        // Fiscal Compare verdict column, the Country Profile sidebar and the IOC Portfolio
+        // chip already render, so this table cannot drift from them.
+        var _waccSeen = false, _nWacc = withScore.filter(_rrWacc).length;
         return withScore.map(function(r) {
         var escapedC = r.country.replace(/'/g,"\'");
         var _noFis = !r.split || !r.split.fiscal;
         var _pre = '';
+        if (!_rrWacc(r) && !_waccSeen) {
+          _waccSeen = true;
+          _pre += '<tr><td colspan="6" style="padding:9px 8px 6px;border-top:2px solid var(--orange);">'
+            + '<div style="max-width:640px;font-size:10px;line-height:1.5;color:var(--muted);white-space:normal;">'
+            + '<strong style="color:var(--orange);">Above this line carries a WACC premium; below it does not.</strong> '
+            + 'The bar is this tab\u2019s own rule \u2014 <strong style="color:var(--text);">3 or more sourced fiscal law '
+            + 'changes since 2010</strong> \u2014 and on the sourced record exactly <strong style="color:var(--text);">'
+            + _nWacc + '</strong> of ' + withScore.length + ' clear it. Every row below is <em>no frequency premium under '
+            + 'this rule</em>, which is not the same finding as no exposure: the rule counts changes and never reads how '
+            + 'large one was, so a row can sit below this line and still carry a quantified take rise (Russia +15pp in 2022) '
+            + 'or a rewrite whose size was never measured (Nigeria\u2019s 2021 Petroleum Industry Act). Read the IC action '
+            + 'under each Since-2010 count, not the row\u2019s position.'
+            + '</div></td></tr>';
+        }
         if (_noFis && !_zeroSeen) {
           _zeroSeen = true;
           // The inner max-width is load-bearing, not cosmetic: a colspan cell's max-content
@@ -51581,6 +51670,7 @@ function renderReformRisk() {
                   : '')
               + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;color:' + (r.since2010>2?'var(--red)':r.since2010>0?'var(--orange)':'var(--green)') + ';">' + r.since2010
+          + _rrIcTokenCell(r.country)
           + (r.contextIn && r.contextIn.length
               ? '<div style="font-size:10px;color:var(--orange);font-weight:700;line-height:1.4;margin-top:2px;max-width:150px;margin-left:auto;white-space:normal;overflow-wrap:anywhere;">+ ' + r.contextIn.length
                 + ' context event' + (r.contextIn.length === 1 ? '' : 's') + ' not scored</div>'
@@ -51597,7 +51687,7 @@ function renderReformRisk() {
   // Section 2: Decade heatmap
   const heatmap = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;overflow-x:auto;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Reform Activity Heatmap \u2014 By Decade</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Top 20 of the 21 jurisdictions with a sourced reform log, ranked by sourced fiscal law changes (v713 \u2014 it was ranked by total sourced events, which gave Guyana a row on three events that changed no terms and cut India, which has two that did). A lit cell is <strong style="color:var(--text);">fiscal law changes only</strong> \u2014 amber = 1, orange = 2, red = 3+. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation) never light a cell; they show as a muted <strong style="color:var(--muted);">\u00b7n</strong> on an unlit cell, so the record is visible without being read as reform. Before v694 they were counted as law changes here and Guyana \u2014 zero fiscal law changes on record at any date \u2014 was painted orange in the 2020s. The <strong style="color:var(--text);">&lt;1970</strong> column holds everything before 1970, which the grid used to discard: Mexico 1938, Indonesia 1966, Algeria 1963, Libya 1955, Nigeria 1969.</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Top 20 of the 21 jurisdictions with a sourced reform log, in the same order as the ranked table above \u2014 sourced fiscal law changes since 2010, all-dates count as tiebreak (v713 dropped non-fiscal events from the key, which had given Guyana a row on three events that changed no terms and cut India, which has two that did; v966 moved the key onto the 2010 window the premium rule uses). A lit cell is <strong style="color:var(--text);">fiscal law changes only</strong> \u2014 amber = 1, orange = 2, red = 3+. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation) never light a cell; they show as a muted <strong style="color:var(--muted);">\u00b7n</strong> on an unlit cell, so the record is visible without being read as reform. Before v694 they were counted as law changes here and Guyana \u2014 zero fiscal law changes on record at any date \u2014 was painted orange in the 2020s. The <strong style="color:var(--text);">&lt;1970</strong> column holds everything before 1970, which the grid used to discard: Mexico 1938, Indonesia 1966, Algeria 1963, Libya 1955, Nigeria 1969.</div>'
     + '<table style="border-collapse:collapse;min-width:500px;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);min-width:140px;">Country</th>'
@@ -52145,13 +52235,19 @@ function renderReformRisk() {
   // v467: Global reform summary sentence — headline context before the section blocks
   var activeReformers = withScore.filter(r => r.since2010 >= 2).length;
   var highFreq = withScore.filter(r => r.since2010 >= 4).length;
+  // v966 (T4): the snapshot reported the 2+ and 4+ counts and never the 3+ one, which is
+  // the only threshold this tab's stated IC rule uses. An analyst reading "1 had 4+"
+  // concluded one jurisdiction needs the premium. Two do -- United Kingdom and Brazil.
+  // Counted through _rrWacc() rather than `since2010 >= 3` so the headline number and the
+  // line drawn in the table below it cannot disagree.
+  var waccCarriers = withScore.filter(_rrWacc);
   // v585 (T4): "net-tightening overall" was a majority of 27 vs 10 taken while 35 fiscal
   // changes sat unmeasured in the third bucket. The claim is now made only if it survives them.
   var _sTilt = _rrTilt(globalSplit);
   var tiltLabel = '<span style="color:' + (_sTilt.color === 'var(--red)' ? 'var(--negative)' : _sTilt.color) + ';font-weight:700;">' + _sTilt.word + '</span>';
   var summaryBar = '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:8px;padding:12px 18px;margin-bottom:18px;font-size:12px;color:var(--text);line-height:1.7;">'
     + '<strong style="font-size:13px;">Reform Risk Snapshot:</strong> '
-    + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + activeReformers + '</strong> had 2+ fiscal law changes since 2010, and <strong>' + highFreq + '</strong> had 4+. '
+    + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + waccCarriers.length + '</strong> clear this tab\u2019s WACC-premium bar of <strong>3+ fiscal law changes since 2010</strong> \u2014 ' + (waccCarriers.length ? waccCarriers.map(function(r){return r.country;}).join(' and ') + ' \u2014 they are the top rows of the ranked table below, above the orange line' : 'none') + '. A further <strong>' + Math.max(0, activeReformers - waccCarriers.length) + '</strong> had 2 changes, which does not reach that bar; <strong>' + highFreq + '</strong> had 4+. '
     + (function(){
         var _ctx = withScore.reduce(function(a, r){ return a + (r.contextIn ? r.contextIn.length : 0); }, 0);
         return _ctx
@@ -53960,7 +54056,7 @@ function copyComparisonTable(btn) {
       }
       return out;
     }
-    // ── v965 (T3): the strikethrough was the whole signal, and the clipboard ate it ───────
+    // ── v966 (T3): the strikethrough was the whole signal, and the clipboard ate it ───────
     //
     // Walked "how do these three countries compare side by side?" cold at 1440x900 and 390x844
     // (hasTouch), storage cleared, on this tab's own shipped Atlantic Frontier Quartet preset
@@ -54117,7 +54213,7 @@ function copyComparisonTable(btn) {
 
   // --- rich HTML flavour (Word / Docs / Outlook) ---
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  // v965 (T3): Word, Docs and Outlook all render text-decoration, so the rich flavour carries
+  // v966 (T3): Word, Docs and Outlook all render text-decoration, so the rich flavour carries
   // the strike itself and not only the word — the pasted cell then looks like the screen it was
   // copied from. The TSV flavour keeps the word alone, because Excel has no run formatting here.
   function escCell(txt, struck) {
