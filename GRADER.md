@@ -64017,3 +64017,16 @@ So the "500 PASS" figure every cycle email carries describes the **previously de
 
 - **The Evidence Quality summary strip still says only "1 of 3 source links dead."** `#cp-evidence-panel` (collapsed by default) now correctly shows an INDEX ONLY chip in its sources list, but its one-line summary has no index-only tally. Small, and inside a collapsed panel.
 - Carried forward, still open: the **regional-extreme cue** on Nigeria / Norway / Australia (cycles 884, 891); the Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891); Fiscal Compare's clipboard table emitting `Breakeven $/bbl` unconditionally where `_scCopyColumns()` guards it with `if (anyBe)` (880); the Screener's Advanced Filters panel rendering 17 checkboxes at 13px under `pointer: coarse` (889), against finalization item 3.
+
+---
+## Cycle 893 Log — 2026-09-21 15:34
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 893 complete and pushed. Working tree clean, mirror in sync, servers cleaned up.
+
+## Task / Friction / Change / Result
+
+**Task** — T6, *"Where did this number come from and how solid is the evidence?"* (rotated off T2, which cycle 891 used).
+
+**Friction** — In Country Profile → *Key Fiscal Parameters — Evidence Chain*, 38 cited rows across 19 countries record a source address that **resolves but opens a listing, not the instrument** — a site root, a default page, or a "Legislation"/"Regula
