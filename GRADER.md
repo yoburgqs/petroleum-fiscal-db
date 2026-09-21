@@ -63228,3 +63228,110 @@ candidate. Also still open from cycle 880: Fiscal Compare's clipboard table carr
 
 ## Friction
 Cold walk, storage cleared, 1440×900: Explorer → Breakeven column → **Vanuatu $28/bbl**. Open the **Breakeven Map** — the one tab whose whole subject is that number — and Vanuatu isn't there. Grey, no hover response, arrow cursor, no `<title>`, so on a phone no readout at all. A dead shape, w
+
+---
+## Cycle 882 Log — 2026-09-21 07:10
+- Test before: 500 PASS / 0 FAIL (deployed baseline, reported by the cycle harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN — **suite RAN this cycle** against the modified tree
+  on a local server, number read from the suite's own `ORCA_REPORT_FILE`, not assumed.
+  Control on **unmodified HEAD**, same harness, `/tmp/ctrl963b`: **499 / 0 / 1 — identical.**
+  The delta vs the deployed 500 is the `sw.js` 404 under `python -m http.server`, not this change.
+- JS errors: 0 page errors
+- Summary: Cycle 882 complete. Shipped as **v963** (`6881f27`), pushed, mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (881 was T6, 880 was T5)
+
+## Friction
+
+Cold walk, storage cleared, 1440×900: Home → **Explorer** → **Map View**. This is the surface
+built to answer T1 — a global choropleth of government take at $75, scanned to spot which
+jurisdictions are worth screening.
+
+`renderWorldMap()` (`index.html:28242`) resolved every shape through a **hand-typed 138-entry
+`ISO_MAP`**. ORCA holds `take_75` for **all 185 rows** — this is the one metric at complete
+coverage — so a country absent from that literal was never missing data, only a table row.
+It still rendered as absent:
+
+- `fill` fell through to `#D0CAC0`, **the same grey the map uses for "no DCF data"**;
+- `cursor` was `'default'`, and the click handler is gated on `name` → no route to its profile;
+- `mouseover` opens `if (!name) return;` → **hovering produced nothing at all**;
+- there was no `<title>` anywhere on this map, so under a thumb every shape on it was silent.
+
+Measured live, not inferred: **177 shapes, 129 painted, 48 grey with `cursor:default`.**
+
+And the corner badge printed `Object.keys(takeLookup).length` — the number of ORCA rows that
+passed the filter, **a count of the TABLE, never once compared against the map**. With no filter
+it read **"185 countries mapped" over 129 painted shapes.** Nothing on screen told the analyst
+the map was 30% short, so the only available reading of a silent grey shape was *ORCA has
+nothing here*.
+
+**Côte d'Ivoire is the one that costs a screening list:** 144 contracts — one of the
+best-evidenced rows in the entire database — a modelled **56.6%** take, and drawn as absent.
+Liberia (75 contracts), Cyprus (71), Morocco (71), South Sudan (58) and Israel (51) sat in the
+same hole. Six real petroleum jurisdictions, silently dropped from the screen.
+
+This is the T1 failure in its purest form: **a country is excluded from the screening list
+because the screening surface drew it as absent.**
+
+## Change
+
+- **`_mapName()` resolver**, deliberately the same precedence as the Breakeven Map at v962:
+  `ISO_MAP` **wins wherever it resolves to a real ORCA row**, so every deliberate mapping in it
+  is preserved — including `784 -> 'UAE'`, which must not be overwritten by the sub-national
+  `UAE — Abu Dhabi`. Only where `ISO_MAP` has nothing does the feature's own `properties.name`
+  get a turn, and it is accepted **only if it names a row ORCA actually holds**. A name matching
+  nothing still resolves to nothing. A 14-entry `NE_ALIAS_X` covers Natural Earth's abbreviated
+  spellings (`S. Sudan`, `Côte d'Ivoire`, `Czechia`, `W. Sahara`, `Solomon Is.` …).
+- **129 → 160 shapes painted. 129 → 160 pointer cursors and working click-throughs.**
+- The **badge stops asserting the table**: it is now counted off the shapes that actually got a
+  fill — **"160 of 185 drawn here"**, not 185 over 129. It falls back to `"N countries mapped"`
+  when nothing is off-projection, so a filtered view with full coverage does not grow a caveat
+  it does not need.
+- The **25 with no polygon at 110m** — small islands, overseas territories, and the sub-national
+  entities — are **named with their take** under the map (`#expl-map-offmap-note`), with where to
+  open them. *ORCA modelled no take* and *this projection has no shape for it* are different
+  facts, and a grey shape asserted the first when the truth was the second.
+- **160 + 25 = 185.** The tab reconciles to its own coverage line.
+- **`<title>` on all 177 shapes** — the only readout a phone gets. A grey shape now says *why*
+  it is grey (`no ORCA fiscal model`, or `outside the current Mechanic/Region filter`) instead
+  of leaving the analyst to infer "no data" from a colour.
+
+## Result
+
+An analyst building a screening list off the Explorer map can now **see, hover, read and click
+through to** Côte d'Ivoire, Liberia, Cyprus, Morocco, South Sudan and Israel, instead of reading
+six modelled jurisdictions as uncovered. Côte d'Ivoire now reads:
+
+```
+Cote d'Ivoire — govt take 56.6% @ $75 — Concession,PSC — R-factor PSC — click for Country Profile
+```
+
+instead of being a grey shape that does not respond. And the headline count reconciles to the
+shapes rather than overstating them by 56.
+
+### What this cycle did NOT do
+
+Still open from cycle 880: Fiscal Compare's clipboard table carries `Breakeven $/bbl`
+unconditionally where `_scCopyColumns()` guards it with `if (anyBe)`. Also noted while walking:
+the Browse context strip asserts "all 185 countries displayed", which is true of the table and
+was true of the map only after this change — left as is, since it now holds for both surfaces.
+
+## Cycle 882 verification — measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline script blocks | **PASS, 0 errors** |
+| Runtime suite, **ran** this cycle against the modified tree, local server | **499 PASS / 0 FAIL / 1 WARN** |
+| Control: same suite, same harness, **unmodified HEAD** from `/tmp/ctrl963b` | **499 / 0 / 1 — identical.** Delta vs deployed 500 is the harness, not this change |
+| Shapes painted | **129 → 160** |
+| False joins — a shape painted with a take that is not its own | **0** (every painted title's take reconciled against its `COUNTRY_DATA` row) |
+| Duplicate joins — one ORCA row claimed by two shapes | **0** |
+| Reconciliation | 160 drawn + 25 off-projection = **185**, exact |
+| `784 -> 'UAE'` after the change | still `UAE`; sub-national `UAE — Abu Dhabi` **not** painted over the federation |
+| Click-through | `Côte d'Ivoire → Cote d'Ivoire`, `Morocco → Morocco`, `S. Sudan → South Sudan` — all land on the right profile |
+| Filter interaction | Africa 48/54, Europe 31/33, PSC 4 (no caveat), back to all 160/185; note never duplicates |
+| Horizontal scroll, 9 tabs × 1920/1440/1280/1024/768/390 | **0 overflow screens** |
+| `#expl-map-offmap-note` @390 `hasTouch` | 362px in a 390px viewport, `scrollWidth === clientWidth`; **no new controls**, so the 24px floor is untouched |
+| Page errors across the walk | **0** |
+| Version | badge + title `v962 → v963`, silently at the end |
