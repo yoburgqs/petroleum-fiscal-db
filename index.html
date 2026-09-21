@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v967</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v968</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v967</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v968</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -63221,6 +63221,38 @@ function _fcEngineChipHTML(country) {
 }
 window._fcEngineChipHTML = _fcEngineChipHTML;
 
+// ── v968 (T5): the Model basis column of the two IC artifacts asserted the opposite of v967 ──
+// v967 put the override warning on the DRAWER. The artifacts that LEAVE THE BUILDING — the two
+// buttons beside Run Compare, "⌘ Copy for IC Memo" (copyFCForIC) and "Export XLSX"
+// (exportFCResults) — each carry a Model basis / Terms_Basis cell that printed
+// "Country-specific terms" on exactly those rows: the most reassuring value in the column, on the
+// rows where the engine ran rates ORCA's own record contradicts.
+//
+// Walked T5 cold at $75, Deepwater, USA / Iraq / Norway / Nigeria / Guyana ticked. The paste read:
+//     1   USA      23.4  3308  ...  22.3   3798   Country-specific terms
+//     2   Iraq     34.1  3043  ...  67.2   -627   Country-specific terms
+//    63   Nigeria  81.1   302  ...  47.3   1592   Country-specific terms
+// Iraq's -$627M model NPV is run on a $6.00/bbl service fee where ORCA's record holds $2.00, and
+// Nigeria's 47.3% model take on a 30% CIT where the record holds 65.4% — 33.8pp under its own
+// citable column in the same row. The caveat block above the table already told the reader
+// "do not quote the model figure for these rows without saying which basis it is on", and the
+// basis cell answered that question with the country's name on it.
+//
+// Norway, the United Kingdom and Australia run overrides too and every one of their terms matches
+// the record, so they keep the plain label — same rule as v967: a marker that fires on all 9
+// including the 3 that are fine trains the reader to ignore it. One definition of "override",
+// shared with the drawer chip, so the screen and the memo cannot disagree.
+function _fcEngBasisCell(country, plain) {
+  var o = (typeof _fcEngineOverride === 'function') ? _fcEngineOverride(country) : null;
+  if (!o) return plain;
+  return 'HARD-CODED ENGINE OVERRIDE on ' + o.diffs.length + ' term'
+    + (o.diffs.length === 1 ? '' : 's') + ' \u2014 ' + _fcEngineList(country, o)
+    + '. The model columns on this row are engine assumptions, NOT ' + country + '\u2019s terms, and a '
+    + 'hard-coded override is not a citation. The ORCA database columns beside them are drawn from '
+    + 'the contract record and are unaffected.';
+}
+window._fcEngBasisCell = _fcEngBasisCell;
+
 var _ORCA_TERMLEG_NOTE = 'Model_Terms_Cited / Model_Terms_Run / Model_Terms_Uncited '
   + '— READ THESE WITH THE EVIDENCE GRADE, NOT INSTEAD OF IT, AND DO NOT TREAT THE GRADE AS '
   + 'COVERING THEM. The grade, the primary-law share and the fact count describe a country’s '
@@ -66117,6 +66149,7 @@ function copyFCForIC(btn) {
   }
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
+  var nEngOvr = 0, engOvrNames = [];   // v968 (T5)
   var nProxy = 0, proxyNames = [];   // v596 (T5)
   var nNpvFix = 0, npvFixNames = [];   // v955 (T5)
   var nSignFlip = 0, flipNames = [];   // v568 (T5)
@@ -66141,6 +66174,20 @@ function copyFCForIC(btn) {
       : r.termsBasis === 'country' ? 'Country-specific terms'
       : r.termsBasis === 'db' ? 'ORCA contract database terms'
       : 'GENERIC DEFAULT (' + (typeof describeDefaultTerms === 'function' ? describeDefaultTerms(r.mechanic) : r.mechanic) + ') — mechanic standard, not this country’s terms. Directional only, NOT citable.';
+    // v968 (T5): on a country-override row the plain label is the wrong answer to the question
+    // this column exists to answer. Named per row, with the engine rate and the record rate, so
+    // the cell carries the conflict rather than pointing at a tab the memo reader does not have.
+    if (!mono && r.termsBasis === 'country' && typeof _fcEngBasisCell === 'function') {
+      var _ebCell = _fcEngBasisCell(c, basis);
+      if (_ebCell !== basis) {
+        basis = _ebCell;
+        nEngOvr++;
+        var _eoR = _fcEngineOverride(c);
+        if (engOvrNames.length < 6) engOvrNames.push(c + ' (' + _eoR.diffs.map(function(x) {
+          return x.label.toLowerCase() + ' ' + _fcEngFmt(x.eng, x.unit) + ' vs record ' + _fcEngFmt(x.rec, x.unit);
+        }).join(', ') + ')');
+      }
+    }
     var _pb = (typeof _icProdBasis === 'function') ? _icProdBasis(meta) : null;   // v596 (T5)
     if (_pb && _pb.label === 'PROXY') { nProxy++; if (proxyNames.length < 8) proxyNames.push(c); }
     var _row = [
@@ -66226,6 +66273,16 @@ function copyFCForIC(btn) {
     + (_isShortlist
         ? 'Those rows are not ranked at all: they carry \u201c\u2014\u201d in the # column. Do not read their position in this list as a placing. '
         : 'Since v563 those rows are not ranked: they carry \u201c\u2014\u201d in the # column and sit at the end of the table, after the ' + (N - nGeneric - nMono) + ' countries modelled on their own fiscal terms. Do not read their position as a placing. ');
+  // v968 (T5): placed with the GENERIC DEFAULT sentence because it is the same axis — whether the
+  // model columns on a row are that country's terms — and read before the fee-basis and sign-flip
+  // notes, one of which (Iraq) is caused by an override this block names.
+  if (nEngOvr) warn += nEngOvr + ' of the ' + N + ' rows were modelled on a HARD-CODED ENGINE '
+    + 'OVERRIDE: the DCF carries a country table that replaces some fiscal terms, and on these rows '
+    + 'at least one of those hard-coded rates contradicts the figure ORCA\u2019s own record holds \u2014 '
+    + engOvrNames.join('; ') + (nEngOvr > engOvrNames.length ? '; and ' + (nEngOvr - engOvrNames.length) + ' more' : '')
+    + '. Their two model columns are engine assumptions and may not be cited as the country\u2019s terms; '
+    + 'a hard-coded override is not a citation. Their ORCA database columns are drawn from the contract '
+    + 'record and are unaffected. See the Model basis column, which names the conflict per row. ';
   if (nMono) warn += nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
   // v596 (T5): the PROXY count, on this view, with the rule stated. The omission was biased —
   // low take and no production evidence are the same rows, so the head of an ascending shortlist
@@ -66619,7 +66676,9 @@ function exportFCResults() {
                   : _mono ? 'n/c — state monopoly, no contractor position'
                   : '— not ranked (generic mechanic default, not this country\u2019s terms)';
       const _tiedWith = (_k !== null && _xlCount[_k] > 1) ? _xlCount[_k] - 1 : 0;
-      const _basis = r.termsBasis === 'country' ? 'Country-specific terms'
+      // v968 (T5): same column, same override, same correction as the clipboard artifact above.
+      const _basis = r.termsBasis === 'country'
+                     ? ((typeof _fcEngBasisCell === 'function') ? _fcEngBasisCell(r.country, 'Country-specific terms') : 'Country-specific terms')
                    : r.termsBasis === 'db'      ? 'ORCA contract database terms'
                    : 'GENERIC DEFAULT (' + describeDefaultTerms(r.mechanic) + ') — directional only, not citable';
       return [
