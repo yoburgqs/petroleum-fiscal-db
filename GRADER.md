@@ -64816,3 +64816,18 @@ is gone.
   still not measured against a page width (901).
 - **Suite copies remain diverged** — the graded copy that runs is
   `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
+## Cycle 903 Log — 2026-09-22 05:27
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 903 complete — v979 shipped and pushed (`506cf44`), grader log `1b6d40e`, mirror in sync.**
+
+## Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Rotated off T6 (902), T5 (901), T4 (900), T1 (899).
+
+## Friction
+
+Cold walk at 1440×900 (storage cleared), Home → Country Profile → **Australia**. In reading order the page said: *"Contractor-favorable — low government take, 6 of the 20 production-weighted producers take less at $75/bbl"* → *"38.5% govt take — i
