@@ -64221,3 +64221,100 @@ correction is a basis and not an uplift, and the sheet says so: 9 of the 10 rows
 **Task — T5, "Give me something I can paste straight into an IC memo."** The last committed cycle was T4 (v973), so this doesn't repeat it.
 
 **Friction.** The Fiscal Compare XLSX export is the one artifact that leaves the platform and gets read by people who never see the on-screen caveats. Since v674 it carries a 
+
+---
+## Cycle 899 Log — 2026-09-21 23:5x
+
+- Test before: 500 PASS / 0 FAIL (deployed site, cycle harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (local tree) — control v974 measured identically
+- JS errors: 0
+- Shipped: `v975`, commit `5d4120e`, pushed to origin/main, mirror in sync
+
+### Housekeeping note — this cycle adopted an orphan
+
+Cycle 898 timed out at its 1800s limit mid-edit and left its work **uncommitted** in
+`index.html` (`cycle_log.txt` records the `TimeoutExpired`). The change was real T1 work,
+so this cycle verified it rather than discarding it — and found two things wrong with it
+that had never been measured. Both are corrected below. An unverified edit sitting in the
+working tree is exactly the "stable but wrong" failure this repo keeps hitting: the next
+cycle would have committed it blind.
+
+## Task / Friction / Change / Result
+
+**Task — T1, "Which countries should even be on my screening list?"** The last committed
+cycle was T5 (v974), so this does not repeat it.
+
+**Friction.** Measured cold at 1440x900, Screener, no filters, default grouping on, 187
+rendered rows. Clicking **GOVT TAKE high→low returned Saudi Arabia as row 1** — take cell
+`—`, contractor NPV `$0M`, swing `—`, tier `State Monopoly`. Clicking **CONTRACTOR NPV
+low→high returned the same row 1**. Bahrain and Kuwait sat at 24 and 25, the top of the
+proxy block, for the same reason.
+
+`state_eq = 100` zeroes the contractor out of the model, so take pins to 100.0% at every
+deck and NPV to $0. Every display surface already treats those as non-measurements —
+`fmtTake` prints `—`, `_scSwingAt` returns `sort:null`, `tierLabel` prints "State
+Monopoly", `_retentionSub` prints "no position". `_scSortVal` (line 34319) was still
+handed the raw figures. The number the cell refuses to print was the number the sort
+ranked on — the same defect class as v635 and v832, on the last surface carrying it.
+
+The placement was **direction-dependent**, which is the tell: sorted the other way the
+same three rows fell to 22 / 140 / 141. The table asserted two different things about
+them depending on which way the analyst had clicked.
+
+**Change.** `_scSortVal` returns `null` for a state monopoly on the `take`, `npv` and
+`npv50` cases; the comparator immediately below already routes `null` to the foot of the
+row's own data-basis block in both directions. Deck-aware via `takeKey` with a `take_75`
+fallback. `prodcov` and `evidence` are deliberately **not** guarded — Saudi Arabia's 0.3%
+coverage and 1,908 facts are real measurements of the record, not of a contractor
+position. The Screener count line now names the exclusion.
+
+**Result.** Sorting by government take answers the question the analyst asked. **Nigeria's
+81.1%** — the highest take among the 22 verified-production countries — is row 1 where a
+blank cell used to be, and the three monopolies hold **one fixed position (22 / 140 /
+141) whichever way either column points**.
+
+### Two corrections made to cycle 898's uncommitted draft
+
+1. **Its comment block cited positions that are measurably false.** It claimed "grouping
+   off: 1 Bahrain, 2 Kuwait, 3 Saudi Arabia, 4 Turkmenistan" and that Turkmenistan's 87.2%
+   "was the FOURTH row". Measured against the actual control build: Saudi Arabia alone is
+   row 1, Bahrain and Kuwait are 24 and 25, and **Nigeria 81.1% was row 2**. Turkmenistan
+   carries 0.0% production coverage, so it ranks inside the proxy block and never competes
+   with Nigeria at all. The block was rewritten to the measured figures with the control
+   named.
+2. **Its visible label said "(bottom)", which points at the wrong place.** With the default
+   grouping on, Saudi Arabia lands at **22 of 187** — the foot of the verified block, not
+   the end of the table. An analyst reading "bottom" would scroll to the last row and not
+   find it. The label now follows `_grouped`: "at the foot of each data-basis block" when
+   grouped, "at the bottom" when not.
+
+### Cycle 899 verification — all measured this cycle, nothing assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** (re-run after the version bump) |
+| Runtime suite **RAN** vs modified local tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v974 from git HEAD | **499 / 0 / 1 — no regression** |
+| `PASS`/`FAIL`/`WARN` lines, control vs modified | **byte-identical** (`diff` clean) |
+| The 1 WARN | `sw.js` 404 from serving over `python http.server`; **present in control too** — harness artifact, not a page defect |
+| Monopoly row positions, 5 sort states x 2 builds | control direction-dependent (1 vs 22); **modified fixed at 22 / 140 / 141 in all five** |
+| Row 1 after fix, take high→low | Nigeria 81.1% (was Saudi Arabia `—`) |
+| `data` / `takeKey` / `_grouped` scope at the count-line site | declared 36024 / earlier / 36171, all before use |
+| 390x844 `hasTouch` | **10 of 10 tabs** `scrollWidth` 390 == `clientWidth` 390 |
+| new `<span>` height under `pointer: coarse` | 35px (text, not a control) |
+| page errors, desktop and mobile walks | **0** |
+| Version | title + badge v974 → v975, silently at the end |
+
+### What this cycle did NOT do
+
+- No new control was added, so finalization item 3 is untouched by this change.
+- Carried forward, still open: the Evidence Quality summary strip's missing index-only
+  tally (893); the regional-extreme cue on Nigeria / Norway / Australia (884, 891); the
+  Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891); Fiscal
+  Compare's clipboard emitting `Breakeven $/bbl` unconditionally where `_scCopyColumns()`
+  guards it with `if (anyBe)` (880); the Screener's Advanced Filters panel rendering 17
+  checkboxes at 13px under `pointer: coarse` (889), against finalization item 3.
+- **Suite copies remain diverged** — the graded copy that actually runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; the repo copy at
+  `petroleum-fiscal-db/tests/` is idle. Not fixed this cycle; flagged again.
+- **The 1800s cycle timeout that orphaned 898's work is not addressed** and will recur.
