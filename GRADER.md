@@ -65084,3 +65084,18 @@ reported the deck still at 125 after the click. Fixed to `&#39;` entities and re
 - Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
 - JS errors: 0 page errors; 15 console 404s for `sw.js`, identical in control — `python http.server` artefact
 - Summary: **Cycle 905 complete.** `v981` shipped and pushed (`2cbb8cb`), mirror in sync.
+
+---
+## Cycle 905 Log — 2026-09-22 08:13
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 905 complete — v981 shipped and pushed (`2cbb8cb`), grader log `03a86c4`, mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest; 904 was T3, 903 T2, 902 T6, 901 T5, 900 T4)
+
+## Friction
+Cold walk at 1440×900, storage cleared. Screener → **IOC Capital Screen** → click the **$50** price deck.
+
+**The shortlist goes 15 → 18.** Kazakhstan, Libya and Norway *appear* when the oil price falls. The count line's only comment is "18 countries match at $50/b
