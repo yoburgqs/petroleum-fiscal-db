@@ -65416,3 +65416,114 @@ pastes with the published take to reconcile the scenario figure against, which
 **Friction.** Cold walk at 1440×900, storage cleared: Country Profile → Angola → *Model in Scenario Builder* → Run DCF → **Copy for IC Memo**.
 
 The screen warns three times that this run is not Angola — the pre-fill banner says *"CIT 
+
+---
+## Cycle 910 Log — 2026-09-22
+
+- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors (cycle-910 harness, live URL)
+- Test after: **499 PASS / 0 FAIL / 1 WARN** — the WARN and all 15 console errors are `sw.js` 404s, because the SW registers at the absolute path `/petroleum-fiscal-db/sw.js` while the local harness serves the repo at root. Identical to the cycle-907 control. Not caused by this change. (suite **RAN** this cycle against the **modified tree**, `TEST_URL=http://localhost:8977/index.html`)
+- JS syntax gate: **11 blocks, 0 errors**
+- JS errors: **0 page errors** across 11 tabs x 6 widths
+
+### First: the tree was dirty, and that was the finding
+
+`index.html` had **139 uncommitted lines** when this cycle started, and
+`cycle_log.txt` says why: **cycle 909 timed out at 1800s** inside
+`run_claude_cycle()` and was killed. It had authored a complete v984 (T6)
+change and never reached its own verification, commit, mirror or push.
+
+So the work sitting in the tree had **never been syntax-checked, never been
+rendered, and never been run against the suite**. `renderSourcedFacts()` is the
+Country Profile evidence block; an undefined identifier there throws and takes
+the whole chain with it on a client-facing build. Cycle 910 treated verifying it
+as the job, rather than writing a second unverified change on top of it.
+
+### Verification performed before shipping (none of it assumed)
+
+| Check | Result |
+|---|---|
+| All 20 identifiers referenced by the new code, defined in `renderSourcedFacts()` scope | **20/20**, all declared before line 43320 |
+| `c.ladder` is a real property, not an invention | confirmed — already read at 42906 / 42958 / 42993 |
+| All 8 notes open `<div ` so the id + badge injection matches | **8/8** |
+| JS syntax gate, all inline blocks | **11 blocks, 0 errors** |
+| Cold render, storage cleared, 6 countries | **0 page errors**, **0 broken jump targets** |
+| Findings counted per country | Nigeria 4 · Angola 6 · Indonesia 5 · Canada 3 · Norway 3 · Guyana 4 |
+| Badge injected 1..N, note text intact | Nigeria 1-4, Angola 1-6; note char counts unchanged |
+| Chip height vs the 24px floor | **24px** desktop · **44px** under `pointer: coarse` |
+| Horizontal scroll | `scrollWidth == clientWidth`, **11 tabs x 6 widths = 66 combinations, 0 overflow** |
+| Severity colours resolve to real CSS vars | `--red` `--orange` `--muted` `--surface2` `--border` all defined |
+| Suite assertions covering the notes this change reorders | PASS — off-model divider, conflict-note-is-a-control, verdict denominator |
+
+**One scare, run to ground and dismissed.** A probe asked for Nigeria and got
+`ecf-indonesia-*` ids. That was the probe's own race, not the product:
+**Indonesia is the cold-open default** for Country Profile, and the script called
+`switchTab('t7')` and `loadCountryProfile()` in the same tick, so the tab's
+default render landed last. With settle time inserted, Nigeria / Angola / Canada
+each render their own ids and their own counts. Recorded because the next cycle
+will write the same probe and see the same thing.
+
+Also noted, deliberately **not** actioned: `switchTab('country-profile')` is not
+a real tab id — the Country Profile tab is `t7`. Calls with the string form are
+silent no-ops that leave the panel `display:none`, which is why an unwary probe
+measures every control in it at **0px height** and concludes the 24px floor is
+met. Any future cycle measuring Country Profile controls must open `t7`.
+
+### The change itself — Task T6
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?"
+
+**Friction.** `renderSourcedFacts()` built the note block as a fixed string
+concatenation in the order the notes were *written* across eighteen months of
+cycles — `_mainNote + _deadNote641 + _idxNote971 + _regimeNote625 +
+_conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 +
+_sharedNote`. That is not severity order and is not any order.
+
+Measured from the container's own rects: **1440 → 701px of six notes, 5,789
+characters**; **390 → 1,903px, 2.25 phone screens** of unbroken 11px prose
+beginning 6,637px down the page. Every note renders at the same size in the same
+grey, none carries a heading, and nothing states how many there are.
+
+On Nigeria the note that decides whether the headline can be quoted at all — the
+DCF ran royalty 5%, CIT 30% and special tax 50%, **three rates no column on the
+page prints** — was **third of six, 1,575 characters in**. Above it sat a
+divergence note and a dead-link note: both real, neither decisive. And
+`_offNote742`, which says *in its own words* that its rows are "not a gap in the
+evidence behind the number above", rendered **fourth** — ahead of the
+bulk-harvest and superseded-instrument warnings.
+
+**Change.** Nothing deleted, nothing collapsed; every word still renders.
+- Findings are ranked **worst-first on fixed scores**, so two countries with the
+  same problem always rank it the same way.
+- Each carries a severity-coloured number injected **into its own opening tag**,
+  so the stack keeps its exact vertical rhythm — this adds no height to any note.
+- A new index line — **"4 findings · worst first"** — states the block is finite
+  and names each finding; every chip scroll-jumps to its note and flashes it.
+- `_mainNote` stays the unnumbered lead (it is the verdict, not a finding).
+  `_offNote742` moves up directly under the verdict and stays unnumbered, because
+  counting it would inflate every count on screen.
+
+**Result.** The analyst sees **how many** findings exist before reading any of
+them, reads the **decisive one first**, and reaches any of them in **one click** —
+instead of reading 5,789 characters of undifferentiated grey to discover which
+paragraph invalidates the headline they came for.
+
+### Carried forward, still open
+
+- Scenario Builder paste's **IRR row** is still a bare `41.1%` while the screen
+  labels the same tile "not Angola's IRR" (907). Next thing to move.
+- `_fpCohortLine()` one-term cohort rank still computed from the refuted score (906).
+- Deck-change inversion still disclosed on the **Screener only** (905).
+- Side-by-Side take-ordering chain still places a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio still
+  not measured against a page width (901).
+- **Suite copies remain diverged** — graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+- **`_ctl907.html`** — a 9.7 MB untracked control render left by cycle 907. Left
+  in place rather than deleted (not this cycle's file); it is scratch and is what
+  made the dirty tree look ambiguous at cycle start.
