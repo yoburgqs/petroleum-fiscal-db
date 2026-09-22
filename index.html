@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v982</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v983</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1553,6 +1553,17 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   text-transform: uppercase; white-space: nowrap; vertical-align: middle; line-height: 1.5;
 }
 
+/* ── v983 (T5): IOC Country Breakdown — the state-monopoly row marker ───────────
+   The breakdown ranks by take descending, so a 100%-take row is row 1 of the table the
+   "Copy for IC Memo" and "XLSX" buttons build from. The fiscal-exposure table at the top of
+   the same tab already withholds that take through fmtTake(); this table printed it bare.
+   Marked rather than suppressed — on an exposure annex the 100% is the finding — and sized as
+   a sub-line so it takes no column width of its own. See _iocNoPosition(). */
+.ioc-no-position {
+  font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: #C2410C; line-height: 1.3; margin-top: 2px; white-space: nowrap; cursor: help;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    v612 — MOBILE LAYER
    Zach, by email 2026-08-30: "Make THIS more mobile friendly.."
@@ -2697,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v982</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v983</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -49275,9 +49286,11 @@ function renderIOCExposure(operatorName) {
           <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${_iocMechModelledSafe(d.mechanic) ? '' : `<div style="font-size:10px;line-height:1.4;color:#C2410C;font-weight:600;" title="${(('"'+d.mechanic+'" is the instrument type on the contract record, not one of the eight fiscal mechanics ORCA models, so no model of that name produced the take or NPV on this row. ') + (_iocResolvedModelSafe(d.country) ? ('They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country) + ' model.') : ('ORCA cannot resolve which model ' + d.country + ' was run on.'))).replace(/"/g,'&quot;')}">not a fiscal mechanic${_iocResolvedModelSafe(d.country) ? ` \u00b7 <span style="color:var(--muted);font-weight:400;">on ${_iocResolvedModelSafe(d.country)}</span>` : ''}</div>`}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%${_iocExpCtryWide(d, isCtry, operatorName)}</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%${_iocNoPosition(d) ? `<div class="ioc-no-position" title="${_iocNoPositionWhy(d.country, d.take75).replace(/"/g,'&quot;')}">no contractor position</div>` : ''}${_iocExpCtryWide(d, isCtry, operatorName)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
+          ${_iocNoPosition(d)
+            ? `<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);cursor:help;" title="${_iocNoPositionWhy(d.country, d.take75).replace(/"/g,'&quot;')}">\u2014<div style="font-size:9px;font-weight:600;line-height:1.3;margin-top:2px;">withheld</div></td>`
+            : `<td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>`}
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);">${d.n||'\u2014'}</td>
         </tr>`;}).join('')}
       </tbody>
@@ -49318,6 +49331,67 @@ window.renderIOCExposure = renderIOCExposure;
 //   2. Fee-basis rows are not rankable against the rest. Shell's Oman (RSC, 85.0%) and Iraq
 //      (blended TSC, 84.8%) top this table because of contract STRUCTURE, not because the terms
 //      are hard — the same correction Country Profile and Side-by-Side already carry.
+// ── v983 (T5) — "give me something I can paste straight into an IC memo." ────────────────────
+//
+// Walked T5 cold at 1440x900, storage cleared: IOC Portfolio -> Shell (the default) -> scroll to
+// COUNTRY BREAKDOWN -> the two buttons that sit directly on top of it, "Copy for IC Memo" and
+// "XLSX". The table is ranked by government take, highest first, so the rows an IC memo opens on
+// are the top two. On Shell they are:
+//
+//     Philippines   Service Contract   100.0%   $0M    <- red
+//     Kuwait        Concession         100.0%   $0M    <- red
+//
+// 1,640px HIGHER UP THE SAME TAB, the fiscal-exposure table prints those two rows as:
+//
+//     Philippines   —  (State monopoly — no contractor access)      country-wide 46.5%
+//     Kuwait        —  (State monopoly — no contractor access)
+//
+// One tab, two tables, two different answers for the same operator and the same country — and
+// the one that disagrees with the rest of the platform is the one the export buttons build from.
+// The exposure table renders through fmtTake(), which has suppressed >= 99.5% since it was
+// written; the Country Breakdown interpolates `d.take75.toFixed(1)` raw and has never been
+// through it.
+//
+// The NPV cell is the worse half. $0M is printed in #B91C1C — the same red as Oman's -$1,797M
+// two rows below — so on screen a structural closure is styled exactly like a loss-making
+// position, and in the XLSX the cell is the NUMBER 0. Anyone who sums or averages that column,
+// which is what an exposure annex is for, silently folds in two zeros that are not valuations.
+// This platform already made that call everywhere else and wrote down why: _cpMonoNpvNote()
+// (v879) withholds the same figure on the Country Profile because "the DCF does return $0M at
+// every price, but that is the arithmetic of a 100% take leaving nothing to discount — not a
+// contractor position valued at zero", and v851 makes the same point for the Explorer.
+//
+// Measured on the shipped IOC_DATA (1,772 operator rows): 58 rows across 12 countries — Angola,
+// Bolivia, Colombia, Kuwait, Mexico, Peru, Philippines, Sao Tome and Principe, Saudi Arabia,
+// Tanzania, Turkmenistan, Uzbekistan — and 55 distinct operator selections reach the breakdown
+// with at least one. Because the sort is take-descending they are never buried; they are row 1.
+//
+// The take figure is NOT suppressed here the way fmtTake() suppresses it, and that is deliberate:
+// on an exposure annex "Shell's 3 Philippine contracts carry 100% government take" IS the
+// finding — it says there is no economic position — and a dash in an exported column is worse
+// than a marked number. It is marked instead, with the same rule (isStateMonopoly) the exposure
+// table above uses, so the two tables stop disagreeing. The NPV is withheld, on the v879
+// precedent, in all three places the row leaves the screen.
+function _iocNoPosition(d) {
+  if (!d) return false;
+  var t = (d.take75 != null) ? Number(d.take75) : (d.take_75 != null ? Number(d.take_75) : null);
+  if (t == null || !isFinite(t)) return false;
+  return (typeof isStateMonopoly === 'function') ? isStateMonopoly(t) : (t >= 99.5);
+}
+function _iocNoPositionNpvCell() { return 'not reported \u2014 no contractor position'; }
+function _iocNoPositionWhy(country, take) {
+  var t = (take != null && isFinite(take)) ? Number(take).toFixed(1) : '100.0';
+  return country + ': government take is ' + t + '% on these contracts at $50, $75, $100 and $125/bbl '
+    + 'alike. The acreage is held on state terms and ORCA models no investor cash flow against it, so '
+    + 'there is no contractor NPV, no breakeven and no rank on contractor value. The DCF does return '
+    + '$0M, but that is the arithmetic of a ' + t + '% take leaving nothing to discount \u2014 not a '
+    + 'position valued at zero, and it must not be summed or averaged with the modelled NPVs in this '
+    + 'column. Carry the ' + t + '% take and the closure to IOC equity into the memo; carry no NPV. '
+    + 'The fiscal-exposure table at the top of this tab withholds the take figure here as well '
+    + '(\u201cState monopoly \u2014 no contractor access\u201d); this annex prints it, marked, because on an '
+    + 'exposure sheet the 100% IS the finding.';
+}
+
 // v637 (T5): one formatter for the NPV cell. The screen printed Oman's negative NPV as
 // "$-1797M"; a minus sign wedged between the currency symbol and the digits reads as a typo
 // in a Word table. The screen cell and both export flavours now share this.
@@ -49405,7 +49479,13 @@ function _iocExpRows() {
       // The subtraction done here rather than left to the reader: an IC reader scanning 33 rows
       // for the ones that will not reconcile should not have to difference two columns by eye.
       'Take gap (pp)': _gap == null ? null : +_gap.toFixed(1),
-      'Contractor NPV @$75 ($M)': d.npv75 != null ? Math.round(d.npv75) : null,
+      // v983 (T5): a STRING, not the number 0, on a state-monopoly row. This column is the one
+      // an exposure annex gets summed and averaged on; a numeric 0 there is not a valuation and
+      // folding it in understates the portfolio silently. Same withholding _cpMonoNpvNote() has
+      // applied on the Country Profile since v879. Every other row is unchanged and numeric.
+      'Contractor NPV @$75 ($M)': _iocNoPosition(d)
+        ? _iocNoPositionNpvCell()
+        : (d.npv75 != null ? Math.round(d.npv75) : null),
       Contracts: d.n != null ? d.n : null,
       // v653 (T6): the grade the Evidence column now shows on screen, carried into the sheet and
       // the clipboard. A badge visible only while the analyst is on the page is not evidence in
@@ -49441,8 +49521,13 @@ function _iocExpRows() {
           + fb.names + '), where the contractor is paid a fixed $/bbl fee and keeps no price upside. '
           + 'Rank on ' + fb.cmpTake.toFixed(1) + '% — the take on its '
           + Number(fb.n1).toLocaleString() + ' PSC/Concession contracts.'
-        : (d.take75 != null && d.take75 >= 99.5)
-          ? 'State monopoly at 100% take — no contractor position; not comparable with contractor-participation regimes.'
+        : _iocNoPosition(d)
+          ? 'State monopoly at ' + Number(d.take75).toFixed(1) + '% take — no contractor position; not '
+            + 'comparable with contractor-participation regimes, and not rankable against them. The '
+            + 'Contractor NPV cell on this row is withheld for the same reason (v983): the DCF returns '
+            + '$0M because a ' + Number(d.take75).toFixed(1) + '% take leaves nothing to discount, which '
+            + 'is the absence of a contractor and not a position valued at zero. Do not sum or average '
+            + 'that cell with the modelled NPVs in the column.'
           : 'comparable'
     };
   });
@@ -49587,6 +49672,40 @@ function _iocExpBasisLines() {
       + 'PSC/Concession-only take to rank on instead. Do not rank those rows against the others as published.'
     : 'No row blends fee-basis (TSC / RSC / Buy-back) contracts. All take figures on this sheet are price-linked and mutually rankable.');
   L.push('');
+  // v983 (T5): the state-monopoly block. The Portfolio sheet withholds the NPV on these rows and
+  // prints a string in the cell; the sheet a reader checks the workbook against has to say why,
+  // and has to give the average without them, because the unweighted average above carries them
+  // at 100% and it is the number the tab's headline KPI is built on.
+  (function() {
+    var np = rows.filter(function(r){ return /^State monopoly at /.test(r['Take comparability']); });
+    if (!np.length) return;
+    L.push('STATE-MONOPOLY ROWS \u2014 TWO CELLS ON THESE ROWS DO NOT MEAN WHAT THE COLUMN MEANS');
+    L.push(np.length + ' of ' + rows.length + ' rows carry a government take at or above 99.5% at every '
+      + 'modelled price: ' + np.map(function(r){ return r.Country + ' '
+          + r['Govt Take @$75 (%)'].toFixed(1) + '%'; }).join('; ')
+      + '. The acreage is held on state terms, ORCA models no investor cash flow against it, and the '
+      + 'take figure is a closure rather than a fiscal parameter \u2014 it is not rankable against the '
+      + 'contractor-participation rows and the take%, NPV and rank of those rows are not comparable.');
+    L.push('Contractor NPV on those rows reads "' + _iocNoPositionNpvCell() + '" instead of a number. '
+      + 'The DCF does return $0M, but that is the arithmetic of a 100% take leaving nothing to discount, '
+      + 'not a contractor position valued at zero. It is withheld here the way the ORCA Country Profile '
+      + 'has withheld the same figure since v879, and the way this tab\u2019s own fiscal-exposure table '
+      + 'withholds the take. If you sum or average the NPV column, exclude these rows \u2014 they are '
+      + 'absences, not zeros.');
+    (function() {
+      var rest = rows.filter(function(r){ return !/^State monopoly at /.test(r['Take comparability'])
+                                               && typeof r['Govt Take @$75 (%)'] === 'number'; });
+      if (!rest.length) return;
+      var a = rest.reduce(function(x, r){ return x + r['Govt Take @$75 (%)']; }, 0) / rest.length;
+      L.push('THE HEADLINE AVERAGE CARRIES THEM. The unweighted portfolio average of '
+        + st.avgTake.toFixed(1) + '% above counts each of these rows once at its 100% closure. Across '
+        + 'the other ' + rest.length + ' row(s) it is ' + a.toFixed(1) + '%. Both are defensible \u2014 '
+        + 'the first answers "how much of ' + st.operator + '\u2019s footprint is closed to contractor '
+        + 'economics", the second "how hard are the terms where ' + st.operator + ' actually has a '
+        + 'position". State which one a quoted figure is.');
+    })();
+    L.push('');
+  })();
   L.push('NPV BASIS');
   L.push('Contractor NPV is on the ' + _icEngineBasis()
          + ' It is a jurisdiction comparison, not a valuation of '
@@ -49680,6 +49799,32 @@ function copyIOCPortfolio() {
       + 'rows were resolved on the country\u2019s own model; the Mechanic basis column names it. '
       + 'They are contracts ORCA holds, not regimes it prices.';
   }
+  // v983 (T5): the state-monopoly rows, named in the paragraph above the table. They sort to the
+  // TOP because the table is ranked by take descending, so they are the first rows an IC reader
+  // sees — and both their figures need reading differently from every row under them.
+  var _noPosRows = rows.filter(function(r){ return /^State monopoly at /.test(r['Take comparability']); });
+  if (_noPosRows.length) {
+    var _rest = rows.filter(function(r){ return !/^State monopoly at /.test(r['Take comparability'])
+                                             && typeof r['Govt Take @$75 (%)'] === 'number'; });
+    var _restAvg = _rest.length
+      ? _rest.reduce(function(a, r){ return a + r['Govt Take @$75 (%)']; }, 0) / _rest.length : null;
+    assump += ' ' + _noPosRows.length + ' row(s) at the top of this table \u2014 '
+      + _noPosRows.map(function(r){ return r.Country + ' ' + r['Govt Take @$75 (%)'].toFixed(1) + '%'; }).join(', ')
+      + ' \u2014 are STATE-MONOPOLY CLOSURES, not fiscal terms a contractor could take. Government take '
+      + 'is at or above 99.5% at $50, $75, $100 and $125/bbl alike, ORCA models no investor cash flow, '
+      + 'and the Contractor NPV cell on those rows therefore reads "' + _iocNoPositionNpvCell()
+      + '" rather than the $0M the DCF returns \u2014 $0M there is a 100% take leaving nothing to '
+      + 'discount, not a position valued at zero, and summing or averaging it with the modelled NPVs '
+      + 'in that column understates the portfolio. They also move the headline: the unweighted average '
+      + 'take above includes them at 100%'
+      + (_restAvg != null
+          ? ', and is ' + _restAvg.toFixed(1) + '% across the other ' + _rest.length
+            + ' row(s) without them \u2014 quote whichever you mean and say which'
+          : '')
+      + '. The fiscal-exposure table at the top of the ORCA IOC Portfolio tab withholds the take '
+      + 'figure on these rows entirely; this annex prints it, marked, because on an exposure sheet '
+      + 'the closure is the finding.';
+  }
   var feeRows = rows.filter(function(r){ return /^NOT rankable/.test(r['Take comparability']); });
   if (feeRows.length) {
     assump += ' ' + feeRows.length + ' row(s) — ' + feeRows.map(function(r){ return r.Country; }).join(', ')
@@ -49704,7 +49849,8 @@ function copyIOCPortfolio() {
       var v = r[c];
       if (v == null) return '\u2014';
       if (c === 'Govt Take @$75 (%)' || c === 'Country-wide take @$75 (%)') return v.toFixed(1) + '%';
-      if (c === 'Contractor NPV @$75 ($M)') return _iocNpvFmt(v);
+      // v983 (T5): the withheld state-monopoly cell is a string; _iocNpvFmt() would render it "$NaNM".
+      if (c === 'Contractor NPV @$75 ($M)') return (typeof v === 'number') ? _iocNpvFmt(v) : String(v);
       return String(v);
     });
   }));
@@ -56555,6 +56701,29 @@ function _sbReturnReading(res) {
 // reports as a state monopoly with no contractor position. It names no country, so an analyst
 // pasting it under a Saudi Arabia heading was not contradicted by anything in the string.
 // Fires only when the modal was opened from a country AND the terms are not that country's own.
+// ── v983 (T5) ─ the terms this run did NOT read from the origin country's record ─────
+// One source for the clipboard's basis note and its table row, so the two cannot disagree.
+// _dcfDbTerms() already resolves them for the on-screen banner; this filters out any the
+// analyst has since overtyped, because an overtyped field is their own stated assumption
+// and not a template figure passing silently under the country's name.
+function _sbUnreadTerms983() {
+  var o = window._sbOrigin;
+  if (!o || !o.country || o.monopoly) return null;
+  var db = o.dbTerms;
+  if (!db || !db.unread || !db.unread.length) return null;
+  var live = db.unread.filter(function(x) {
+    return !(typeof _sbTermEdited944 === 'function' && _sbTermEdited944(x.t.key));
+  });
+  if (!live.length) return null;
+  var J = (typeof _dcfJoin964 === 'function') ? _dcfJoin964 : function(a) { return a.join(', '); };
+  return {
+    country: o.country,
+    n:    live.length,
+    ran:  J(live.map(function(x) { return x.t.label + ' ' + x.ran; })),
+    held: J(live.map(function(x) { return x.t.label + ' ' + x.unread.toFixed(1) + '%'; }))
+  };
+}
+
 function _sbICBasisClause() {
   var o = window._sbOrigin;
   if (!o) return '';
@@ -56572,6 +56741,36 @@ function _sbICBasisClause() {
   if (o.basis === 'default') {
     return '; terms are the generic ' + o.mech + ' default, not ' + o.country + '-specific'
          + (o.cpTake != null ? ' (' + o.country + " published take @$75 is " + o.cpTake.toFixed(1) + '%)' : '');
+  }
+  // ── v983 (T5) ─ the two basis states that fell past every branch above ──────────────
+  // Measured on the shipped build across all 185 countries, resolving the mechanic exactly the
+  // way ddOpenScenarioBuilder() does (fcResolveMechanic -> getDCFParams(..., {record:true})):
+  // 116 resolve to basis 'record' and 4 to 'default' — and 56 to 'db' and 9 to 'country'.
+  // For those 65 this function returned the empty string, so the one artifact on the platform
+  // whose assumptions are recorded NOWHERE else left the tool captioned "Angola — ORCA Scenario
+  // Builder" carrying no reconciliation to Angola at all: not the published take the screen puts
+  // in a tile beside it, and no statement that the terms are a mix of ORCA's record and the
+  // platform template.
+  // Sharpest on the 46 'db' countries that carry an unread term. The banner on screen says, in
+  // amber, "CIT 25.0% is the platform PSC template, not Angola's — ORCA's record for Angola holds
+  // CIT 49.9%, and no what-if surface on this platform reads it." The paste printed
+  // "Terms as run … CIT 25%" flat under Angola's name with nothing to contradict it — a 24.9pp
+  // gap on the largest single rate in the run, invisible to everyone downstream of the analyst.
+  var _pub983 = (o.cpTake != null)
+    ? ' (' + o.country + ' published take @$75 is ' + o.cpTake.toFixed(1) + '%)' : '';
+  if (o.basis === 'db' && o.dbTerms) {
+    var _u983 = _sbUnreadTerms983();
+    return '; terms: ' + o.dbTerms.nHeld + ' of ' + o.dbTerms.nTerms + ' pre-filled from ORCA\u2019s '
+         + o.country + ' record — ' + o.dbTerms.heldTxt + '; the rest run the platform '
+         + o.mech + ' template'
+         + (_u983 ? ', and ' + _u983.ran + (_u983.n === 1 ? ' is' : ' are') + ' NOT '
+                    + o.country + '\u2019s — ORCA\u2019s record for ' + o.country + ' holds '
+                    + _u983.held : '')
+         + ' — one synthetic project, not ' + o.country + '\u2019s published take' + _pub983;
+  }
+  if (o.basis === 'country') {
+    return '; terms are ORCA\u2019s ' + o.country + ' record entry run on one synthetic project, not '
+         + o.country + '\u2019s published take' + _pub983;
   }
   return '';
 }
@@ -56795,6 +56994,20 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
   if (tc) rows.push(['Terms as run', tc]);
   var pc = _sbICProjectClause(profile).replace(/^;\s*project as run — /, '');
   if (pc) rows.push(['Project as run', pc]);
+
+  // v983 (T5): a rate the run did NOT take from the country's record belongs in the TABLE, beside
+  // the row that states the terms — an IC reader scanning the exhibit must not have to reach the
+  // notes to learn that the CIT under Angola's name is not Angola's. The note below carries the
+  // reasoning; this row carries the two numbers.
+  var _ur983 = (typeof _sbUnreadTerms983 === 'function') ? _sbUnreadTerms983() : null;
+  if (_ur983) {
+    rows.push(['Term' + (_ur983.n === 1 ? '' : 's') + ' NOT read from ' + _ur983.country + '\u2019s record',
+      _ur983.ran + ' — the platform ' + mech + ' template. ORCA\u2019s record for ' + _ur983.country
+      + ' holds ' + _ur983.held + '. The take, NPV and IRR above are arithmetic on the template '
+      + (_ur983.n === 1 ? 'figure' : 'figures') + ', so '
+      + (_ur983.n === 1 ? 'it is' : 'they are') + ' an assumption in this memo, not '
+      + _ur983.country + '\u2019s terms.']);
+  }
 
   // The basis caveat leads the notes: it is the one that can make every figure above the wrong
   // country's. _sbICBasisClause() emits '; <clause>' or ''.
