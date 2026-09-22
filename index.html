@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v974</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v975</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v974</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v975</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34287,16 +34287,57 @@ var _SC_SORT_LABEL = {
 // The rule now is one line long: the ranking uses the number the screen used. Untick the
 // comparable-basis box and the ceiling tests the published headline again -- and this
 // sort follows it back. The two can no longer disagree.
+// ── v975 (T1): the column sorts stop ranking the three state monopolies ─────────────────────
+// Same defect class as v635 and v832, on the last surface still carrying it: the number the CELL
+// refuses to print is the number the SORT ranks on.
+//
+// state_eq = 100 on Bahrain, Kuwait and Saudi Arabia zeroes the contractor out of the model, so
+// take pins to 100.0% at all four decks, contractor NPV to $0 and IRR to -100%. Every display
+// surface already treats those as non-measurements: fmtTake prints "—", _scSwingAt returns
+// sort:null, tierLabel prints "State Monopoly", _retentionSub prints "no position", and the v832
+// exclusion strip sorts them to the back of their group. _scSortVal was handed the raw figures.
+//
+// Measured cold at 1440x900, Screener, no filters, default grouping ON (187 rendered rows,
+// including the two block dividers). Control is v974 at git HEAD:
+//   GOVT TAKE high->low      ->  row 1 = Saudi Arabia, take cell "—", NPV $0M, swing "—",
+//                                tier "State Monopoly".  Nigeria 81.1% was row 2.
+//   CONTRACTOR NPV low->high ->  row 1 = Saudi Arabia, $0M.  Nigeria $302M was row 2.
+// Bahrain and Kuwait sat at 24 and 25 -- the top of the proxy block -- for the same reason, both
+// directions of both columns. The placement was DIRECTION-DEPENDENT, which is the tell: sorted the
+// other way the same three rows fell to 22 / 140 / 141, so the table asserted two different things
+// about them depending on which way the analyst had clicked.
+//
+// An analyst clicking GOVT TAKE descending is asking "which jurisdictions are too punitive to
+// screen", and the first answer was a blank cell. Clicking Contractor NPV ascending asks the same
+// question from the value side and returned the same row, one cell away from the words "no
+// position". Nigeria's 81.1% is the highest take among the 22 verified-production countries and it
+// was ranked second to a row with nothing in that column. (Turkmenistan's 87.2% is the highest
+// take in the database outright, but it carries 0.0% production coverage and so ranks inside the
+// proxy block, not against Nigeria.)
+//
+// 100.0% is not a take a contractor pays and $0M is not a valuation — they are degenerate outputs
+// of an empty position. The guard returns null, which the comparator two functions below already
+// routes to the BOTTOM in both directions ("no value -> bottom, whichever way the column points"),
+// and with the default grouping on that means the bottom of the row's own data-basis block --
+// the same placement v832 chose for the exclusion strip.
+//
+// Deck-aware, with the v832 fallback: takeKey follows the active price deck, take_75 covers a
+// deck whose take is absent. prodcov and evidence are NOT guarded -- Saudi Arabia's 0.3% coverage
+// and 1,908 facts are real measurements of the record, not of a contractor position. swing needs
+// no guard here; _scSwingAt has returned sort:null for a monopoly since v882.
 function _scSortVal(d, key, takeKey, npvKey, cmpBasis) {
+  var _mono = (typeof isStateMonopoly === 'function') && !!d
+              && isStateMonopoly(d[takeKey] != null ? d[takeKey] : d.take_75);
   switch (key) {
     case 'country':  return d.country || '';
     case 'region':   return d.region || '';
-    case 'take':     return (cmpBasis && typeof _scFeeCmpAt === 'function')
+    case 'take':     return _mono ? null
+                            : (cmpBasis && typeof _scFeeCmpAt === 'function')
                               ? _scFeeCmpAt(d, takeKey.slice(5)).cmp
                               : d[takeKey];
     case 'evidence': return (typeof _evidenceSortVal === 'function') ? _evidenceSortVal(d) : null;
-    case 'npv':      return d[npvKey];
-    case 'npv50':    return d.npv_50;
+    case 'npv':      return _mono ? null : d[npvKey];
+    case 'npv50':    return _mono ? null : d.npv_50;
     case 'prodcov':  return d.prod_coverage_pct;
     // v882 (T1): the rule stated six lines above -- "the ranking uses the number the screen
     // used" -- applied to the column it was not applied to. See _scSwingAt().
@@ -36246,8 +36287,23 @@ function runScreener() {
   // v858 (T1): the null branch used to be empty unless the R-factor preset was on, so the count
   // line above a ranked shortlist said nothing about what ranked it. When the rows are grouped the
   // basis sentence below carries the ordering, so this stays quiet there rather than saying it twice.
+  // v975 (T1): when a guarded economics sort is running, say how many rows it could not rank and
+  // where they went. The analyst who sorts by Govt Take and then scans for Saudi Arabia needs to
+  // read its position at the bottom as "not measured", not as "lowest take in the region".
+  const _monoUnranked = (['take', 'npv', 'npv50'].indexOf(_scSortKey) !== -1)
+    ? data.filter(d => (typeof isStateMonopoly === 'function')
+        && isStateMonopoly(d[takeKey] != null ? d[takeKey] : d.take_75)).length
+    : 0;
+  // The visible words have to match where the rows actually ARE. With the default grouping on,
+  // "bottom" is the bottom of the row's own data-basis block -- Saudi Arabia lands at 22 of 187,
+  // not at the end of the table -- so saying plain "(bottom)" would send an analyst scrolling to
+  // the last row to find it. Ungrouped, the same rows do land at the table bottom.
+  const _monoWhere = _grouped ? 'at the foot of each data-basis block' : 'at the bottom';
+  const monoSortNote = _monoUnranked
+    ? ` · <span style="color:var(--muted);cursor:help;" title="State participation of 100% leaves no contractor position, so government take pins to 100.0%, contractor NPV to $0 and IRR to −100% at every price deck. Those are degenerate outputs of an empty position, not fiscal measurements — the GOVT TAKE and SWING cells print “—” and the tier reads “State Monopoly” for the same reason. This sort cannot rank them, so they hold one fixed position whichever way the column points, rather than heading the table in one direction and trailing it in the other.">${_monoUnranked} state-monopoly ${_monoUnranked === 1 ? 'row' : 'rows'} unranked, ${_monoWhere}</span>`
+    : '';
   const sortNote = _scSortKey
-    ? ` · sorted by <strong style="color:var(--accent);">${_scSortLabelNow()}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
+    ? ` · sorted by <strong style="color:var(--accent);">${_scSortLabelNow()}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>${monoSortNote}`
     : (_grouped ? '' : ` · ranked by <strong style="color:var(--muted);">${_scRankLabelNow()}</strong>`);
   // v718: a screen the analyst has edited is no longer the preset that named it. The prefix
   // says so rather than letting the name sit in front of thresholds it does not describe.
