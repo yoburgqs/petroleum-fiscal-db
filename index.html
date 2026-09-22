@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v980</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v981</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v980</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v981</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3972,6 +3972,10 @@ window.copyPlatformCitation = function(btn) {
     <!-- v775 (T1): the verified-production countries the active screen removed, each named with the
          threshold that removed it and each opening its Country Profile. Filled by runScreener(). -->
     <div id="sc-prod-out" style="display:none;margin-top:8px;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.4;"></div>
+    <!-- v981 (T1) — the price-deck delta strip. Filled by _scSetDeck() -> _scRenderDeckDelta().
+         Hidden until the analyst actually moves the deck with a screen loaded; cleared by
+         Reset All, by loading a preset, and by any slider move. -->
+    <div id="sc-deck-delta" style="display:none;margin-top:10px;font-size:11.5px;line-height:1.55;border-radius:6px;padding:9px 12px;"></div>
   </div>
 
   <!-- v747 (T1): hidden at every width except the one where it is true. Two columns step
@@ -29356,7 +29360,7 @@ document.addEventListener('click', e => {
 // always announced instead of being a silent no-op.
 const CMP_MAX = 5;
 
-// ── v980 (T3): a column that is INSIDE another column of the same set. ─────────────────────
+// ── v981 (T3): a column that is INSIDE another column of the same set. ─────────────────────
 // Walking T3 cold on UAE / UAE — Abu Dhabi / UAE — Dubai, the verdict strip ranked all three and
 // then closed with "All 3 columns are on one basis — nothing is set aside, the ordering above is
 // the whole set." Two of those three are the same jurisdiction, and UAE — Abu Dhabi carries the
@@ -31638,7 +31642,7 @@ function renderCompare() {
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
         + '<span style="font-size:12px;">No column in this set carries a take that is comparable with any other. The take rows are readable one at a time; the set does not order.</span>';
     }
-    // ── v980 (T3): jurisdictional containment, stated before the orderings are trusted. ──────
+    // ── v981 (T3): jurisdictional containment, stated before the orderings are trusted. ──────
     // See SBS_CONTAINED. This is the one comparability failure on the tab that is NOT a basis
     // failure, so it renders as its own line rather than joining the "Set aside" list: the
     // contained column is not on a wrong basis, it is a column the set already counts.
@@ -31692,7 +31696,7 @@ function renderCompare() {
         + ' correct on their own basis — ' + (_vdOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
         + ' in this set.</div>'
       : (_vdRanked.length >= 2 && !_vdReb.length
-          // v980 (T3): this reassurance is about BASIS, and it used to be printed whenever the
+          // v981 (T3): this reassurance is about BASIS, and it used to be printed whenever the
           // basis test found nothing. On a set holding a jurisdiction and its own subdivision the
           // basis test finds nothing — they are on the same basis — so "nothing is set aside, the
           // ordering above is the whole set" fired over a ranking containing a duplicate column.
@@ -31971,7 +31975,7 @@ function renderCompare() {
     const specBadge = SPECULATIVE_COUNTRIES.has(d.country)
       ? `<span title="Pre-production or speculative (Somalia, South Sudan, North Korea, Afghanistan, Central African Republic, Comoros, Sao Tome and Principe) — fiscal terms modeled from standard profile; no production history for DCF validation" style="color:var(--yellow);font-size:10px;margin-left:4px;cursor:help;">⚠ speculative</span>`
       : '';
-    // v980 (T3): a column that is part of another column in this same set is marked in its own
+    // v981 (T3): a column that is part of another column in this same set is marked in its own
     // header, not only in the strip above. The analyst reading down the Govt Take rows to compare
     // two figures is looking at the header, and until now nothing there said the neighbouring
     // column contained this one.
@@ -34810,6 +34814,11 @@ function _scReturnHurdles(deckKey) {
 window._scReturnHurdles = _scReturnHurdles;
 
 function applyScreenerPreset(preset) {
+  // v981 (T1): a preset replaces the whole screen, so any deck-delta strip still on screen is
+  // describing a comparison between two screens that no longer exist. Cleared before the rebuild.
+  // This runs inside _labelScreenerPresets()'s counting pass too, which is harmless: _scSetDeck()
+  // renders the strip AFTER that pass has finished and restored the analyst's screen.
+  if (typeof _scDeckDeltaClear === 'function') _scDeckDeltaClear();
   // v587 (T1): a preset defines the whole screen, ranking included — R-factor PSC ranks by price
   // sensitivity, the rest by the v507 evidence-first order. So loading one clears any column sort
   // the analyst had clicked, rather than letting a stale sort silently override the preset's own.
@@ -35335,9 +35344,209 @@ window._methJumpEvidence = _methJumpEvidence;
 function _scSetDeck(v) {
   var r = document.querySelector('input[name="price"][value="' + v + '"]');
   if (!r) return;
-  if (!r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
+  if (r.checked) { _scSyncDeckButtons(); return; }
+  // ── v981 (T1) — capture the screen BEFORE the deck moves, so the strip below can diff it ──
+  var was = {
+    deck:   (typeof getPriceKey === 'function') ? getPriceKey() : '75',
+    names:  Array.isArray(window._screenerLastNames) ? window._screenerLastNames.slice() : null,
+    ceil:   window._screenerLastCeiling,
+    ceilOn: window._screenerLastCeilOn,
+    feeCmp: window._screenerLastFeeCmp
+  };
+  r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true }));
   _scSyncDeckButtons();
+  try { _scRenderDeckDelta(was, v); } catch (e) { _scDeckDeltaClear(); }
 }
+
+// ── v981 (T1) — "I ran my downside case and MORE countries passed." ─────────────────────────
+//
+// Walked T1 cold at 1440x900, storage cleared: Screener -> IOC Capital Screen -> $50 deck.
+// The shortlist goes 15 -> 18. Kazakhstan, Libya and Norway APPEAR when the oil price falls,
+// and the count line says only "18 countries match at $50/bbl". Every take-ceiling preset does
+// this, measured this cycle on the live build:
+//
+//     IOC Capital Screen        $50: 18   $75: 15   $100: 12   $125: 11
+//     Low Take - Positive NPV   $50: 164  $75: 143  $100: 122  $125: 118
+//     Stable Fiscal Record      $50: 12   $75: 11   $100:  9   $125:  8
+//
+// The direction is not a bug: government take FALLS as price falls under progressive terms, so
+// a fixed take ceiling stops binding. Kazakhstan is 69.9% at $75 and 63.4% at $50, and a 65%
+// ceiling admits the second figure. But the analyst reading the screen has been handed the one
+// conclusion that is materially wrong -- that their downside case is the *less* restrictive one,
+// and that these countries are robust at $50. They entered because the ceiling moved, not
+// because they improved. Pre-change nothing on the page said so: the deck buttons' own tooltips
+// describe the mechanism, but tooltips do not fire on a number that moved the wrong way, and the
+// preset menu's "-> N of 185 @$deck" captions are read BEFORE the click, not after it.
+//
+// The strip states the diff, names the entrants with their take at both decks, and offers the
+// screen the analyst was actually trying to build: the countries that pass at BOTH decks.
+function _scDeckDeltaClear() {
+  var h = document.getElementById('sc-deck-delta');
+  if (h) { h.style.display = 'none'; h.innerHTML = ''; }
+  window._scDeckBothSet = null;
+}
+window._scDeckDeltaClear = _scDeckDeltaClear;
+
+function _scDeckRowByName(name) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return null;
+  for (var i = 0; i < COUNTRY_DATA.length; i++) if (COUNTRY_DATA[i].country === name) return COUNTRY_DATA[i];
+  return null;
+}
+// The take the ceiling was actually tested on — the comparable figure where the published
+// headline blends fee-basis contracts, exactly as _scPass() and the Govt Take cell do.
+function _scDeckTake(d, deck, feeCmp) {
+  if (!d) return null;
+  if (feeCmp !== false && typeof _scFeeCmpAt === 'function') {
+    var fc = _scFeeCmpAt(d, deck);
+    if (fc && fc.diverges) return fc.cmp;
+  }
+  var t = d['take_' + deck];
+  return (t == null || (typeof isStateMonopoly === 'function' && isStateMonopoly(t))) ? null : t;
+}
+
+function _scRenderDeckDelta(was, now) {
+  var host = document.getElementById('sc-deck-delta');
+  if (!host) return;
+  var nowNames = Array.isArray(window._screenerLastNames) ? window._screenerLastNames : null;
+  // No screen to diff (cold tab, or the deck moved from somewhere other than this control).
+  if (!was.names || !nowNames) { _scDeckDeltaClear(); return; }
+  // An unfiltered 185-country universe is not a shortlist; diffing it tells the analyst nothing.
+  var universe = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA.length : 185;
+  if (was.names.length >= universe && nowNames.length >= universe) { _scDeckDeltaClear(); return; }
+
+  var prevSet = {}, nowSet = {};
+  was.names.forEach(function (n) { prevSet[n] = 1; });
+  nowNames.forEach(function (n) { nowSet[n] = 1; });
+  var entered = nowNames.filter(function (n) { return !prevSet[n]; });
+  var left    = was.names.filter(function (n) { return !nowSet[n]; });
+  var both    = nowNames.filter(function (n) { return prevSet[n]; });
+
+  if (!entered.length && !left.length) { _scDeckDeltaClear(); return; }
+
+  var priceFell = (+now < +was.deck);
+  var grew      = nowNames.length > was.names.length;
+  // The counter-intuitive case: the screen got LOOSER as the price got worse, or TIGHTER as it
+  // got better. This is the moment the analyst stops and squints.
+  var inverted  = (priceFell && grew) || (!priceFell && !grew && nowNames.length < was.names.length);
+
+  // Attribute each entrant. "ceiling" = it failed the take ceiling at the old deck and passes it
+  // at the new one, i.e. it entered because the ceiling stopped binding, not on its economics.
+  var ceilOn = (was.ceilOn !== false) && (window._screenerLastCeilOn !== false);
+  var ceilV  = (typeof window._screenerLastCeiling === 'number') ? window._screenerLastCeiling : was.ceil;
+  var feeCmp = window._screenerLastFeeCmp;
+  var onCeiling = [], onOther = [];
+  entered.forEach(function (n) {
+    var d = _scDeckRowByName(n);
+    var tWas = _scDeckTake(d, was.deck, feeCmp), tNow = _scDeckTake(d, now, feeCmp);
+    if (ceilOn && typeof ceilV === 'number' && ceilV < 100 && tWas != null && tNow != null
+        && tWas > ceilV && tNow <= ceilV) {
+      onCeiling.push({ n: n, a: tWas, b: tNow });
+    } else {
+      onOther.push({ n: n, a: tWas, b: tNow });
+    }
+  });
+
+  host.style.background = inverted ? 'rgba(176,104,0,.07)' : 'var(--surface)';
+  host.style.border     = '1px solid ' + (inverted ? 'rgba(176,104,0,.32)' : 'var(--border)');
+  host.style.color      = 'var(--muted)';
+
+  var chip = function (o, tone) {
+    var lbl = o.n + (o.a != null && o.b != null
+      ? '  ' + o.a.toFixed(1) + '% → ' + o.b.toFixed(1) + '%' : '');
+    return '<button type="button" class="sc-deck-chip" onclick="openCountryProfileFromFC(&quot;' + o.n.replace(/"/g, '') + '&quot;)"'
+      + ' title="' + o.n + ' — government take at $' + was.deck + '/bbl vs $' + now + '/bbl, on the basis the ceiling is tested on. Opens its Country Profile."'
+      + ' style="font-family:inherit;font-size:10.5px;font-weight:600;cursor:pointer;min-height:24px;padding:2px 9px;border-radius:12px;white-space:nowrap;'
+      + (tone === 'ceil'
+          ? 'background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.38);color:var(--accent);'
+          : 'background:var(--surface);border:1px solid var(--border);color:var(--muted);')
+      + '">' + lbl + '</button>';
+  };
+
+  var h = '';
+  h += '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">'
+     + '<span style="font-weight:700;color:var(--text);">Price deck $' + was.deck + ' → $' + now + '</span>'
+     + '<span>shortlist <strong style="color:var(--text);">' + was.names.length + ' → ' + nowNames.length + '</strong>'
+     + ' (' + (entered.length ? '+' + entered.length + ' in' : '') + (entered.length && left.length ? ', ' : '')
+     + (left.length ? '−' + left.length + ' out' : '') + ')</span></div>';
+
+  if (inverted) {
+    h += '<div style="margin-top:5px;color:var(--text);">'
+       + (priceFell
+          ? '⚠ A <strong>lower</strong> price deck <strong>widened</strong> this screen.'
+          : '⚠ A <strong>higher</strong> price deck <strong>narrowed</strong> this screen.')
+       + ' Government take moves <em>with</em> price under progressive terms — cost-recovery caps, '
+       + 'profit-oil tiers, PRRT and Norway’s special tax all bite harder at high prices — so a fixed '
+       + 'take ceiling ' + (priceFell ? 'stops binding as the price falls' : 'binds harder as the price rises') + '.'
+       + (onCeiling.length
+          ? ' <strong>' + onCeiling.length + ' of the ' + entered.length + '</strong> '
+            + (onCeiling.length === 1 ? 'country' : 'countries') + ' below crossed the '
+            + ceilV + '% ceiling for that reason alone. '
+            + (priceFell ? 'They did not become more attractive at $' + now + '; the ceiling moved.'
+                         : 'They did not become less attractive; the ceiling moved.')
+          : '')
+       + '</div>';
+  }
+
+  if (onCeiling.length) {
+    h += '<div style="margin-top:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">'
+       + '<span style="font-weight:600;">Entered on the take ceiling:</span>'
+       + onCeiling.map(function (o) { return chip(o, 'ceil'); }).join('') + '</div>';
+  }
+  if (onOther.length) {
+    h += '<div style="margin-top:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">'
+       + '<span style="font-weight:600;">Entered on an NPV or evidence leg:</span>'
+       + onOther.map(function (o) { return chip(o, 'plain'); }).join('') + '</div>';
+  }
+  if (left.length) {
+    h += '<div style="margin-top:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">'
+       + '<span style="font-weight:600;">Dropped out at $' + now + ':</span>'
+       + left.map(function (n) {
+           var d = _scDeckRowByName(n);
+           return chip({ n: n, a: _scDeckTake(d, was.deck, feeCmp), b: _scDeckTake(d, now, feeCmp) }, 'plain');
+         }).join('') + '</div>';
+  }
+
+  // The action. This is the screen the analyst was reaching for when they clicked the other deck.
+  window._scDeckBothSet = { names: both.slice(), a: was.deck, b: now };
+  h += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+     + '<button type="button" class="btn btn-sm btn-outline" onclick="_scDeckApplyBoth()"'
+     + ' title="Restrict the screen to the countries that passed every threshold at $' + was.deck
+     + '/bbl AND pass them at $' + now + '/bbl. This is the two-price test a take ceiling alone cannot make:'
+     + ' a country admitted only because the ceiling stopped binding at the lower deck is removed."'
+     + ' style="min-height:24px;">Keep only the ' + both.length + ' that pass at <strong>both</strong> $'
+     + was.deck + ' and $' + now + '</button>'
+     + '<button type="button" class="btn btn-sm btn-outline" onclick="_scSetDeck(&#39;' + String(was.deck).replace(/[^0-9]/g, '') + '&#39;)"'
+     + ' title="Put the price deck back to $' + was.deck + '/bbl and re-run this screen there."'
+     + ' style="min-height:24px;">Back to $' + was.deck + '</button>'
+     + '<button type="button" onclick="_scDeckDeltaClear()" aria-label="Dismiss the price-deck comparison"'
+     + ' title="Dismiss this comparison" style="background:transparent;border:1px solid var(--border);border-radius:12px;'
+     + 'color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;min-height:24px;padding:2px 10px;cursor:pointer;">Dismiss</button>'
+     + '</div>';
+
+  host.innerHTML = h;
+  host.style.display = 'block';
+}
+window._scRenderDeckDelta = _scRenderDeckDelta;
+
+// Applies the both-decks intersection through the SAME named-set leg presets use
+// (_screenerCountrySet / _screenerSetLabel at runScreener line ~36058), so the count line, the
+// exports and the IC-memo paste all describe the restriction without a second code path.
+function _scDeckApplyBoth() {
+  var s = window._scDeckBothSet;
+  if (!s || !s.names) return;
+  _screenerCountrySet = s.names.slice();
+  _screenerSetLabel   = 'the ' + s.names.length + ' countries that pass this screen at $' + s.a
+                      + '/bbl AND at $' + s.b + '/bbl';
+  _screenerSetOnCmp   = false;
+  if (typeof _activePresetName === 'string' && _activePresetName) _activePresetModified = true;
+  _scDeckDeltaClear();
+  if (typeof runScreener === 'function') runScreener();
+  if (typeof showCopyToast === 'function') {
+    showCopyToast('Screen restricted to the ' + s.names.length + ' countries that pass at $' + s.a
+      + ' and at $' + s.b + '. Reset All clears it.');
+  }
+}
+window._scDeckApplyBoth = _scDeckApplyBoth;
 function _scSyncDeckButtons() {
   var cur = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   [].slice.call(document.querySelectorAll('#sc-deck-btns .sc-deck-btn')).forEach(function (b) {
@@ -35470,6 +35679,10 @@ function _labelScreenerPresets() {
 window._labelScreenerPresets = _labelScreenerPresets;
 
 function resetScreenerAll() {
+  // v981 (T1): the deck-delta strip describes a screen that Reset All is about to destroy,
+  // including a "keep only the N that pass at both decks" button whose N would no longer mean
+  // anything. It goes with the rest of the state.
+  if (typeof _scDeckDeltaClear === 'function') _scDeckDeltaClear();
   // Hard reset: all sliders to maximum range, all checkboxes checked, no IOC filter
   // v507: also restore evidence-first ranking, otherwise "Reset All" left the analyst
   // on the proxy-topped ordering with every filter control back at its default.
@@ -36362,6 +36575,13 @@ function runScreener() {
   // the size of EVERY preset -- including one that returns nothing -- off the real filter path
   // rather than off a second, parallel re-implementation of it that would drift.
   window._screenerLastCount = data.length;
+  // v981 (T1): the same publish point now also carries WHICH countries passed and WHAT the take
+  // ceiling was, so a deck change can diff one screen against the other. _scSetDeck() reads these
+  // before it moves the radio and again after runScreener() has re-filtered.
+  window._screenerLastNames   = data.map(function (d) { return d.country; });
+  window._screenerLastCeiling = maxTake;
+  window._screenerLastCeilOn  = takeCeilingActive;
+  window._screenerLastFeeCmp  = feeCmpOn;
 
   // active filters count badge (v99: take/irr/npv/breakeven sliders included)
   const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
@@ -70583,6 +70803,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (slider && display) {
       slider.addEventListener('input', function() {
         display.textContent = this.value;
+        // v981 (T1): the deck-delta strip is a diff of one threshold set across two prices. Moving
+        // a threshold makes both halves of that diff stale, and the "pass at both decks" set with
+        // them, so it is dismissed rather than left to describe a screen that no longer exists.
+        if (typeof _scDeckDeltaClear === 'function') _scDeckDeltaClear();
         // v718 — was `window._activePresetName = null;`, which was inert: _activePresetName is a
         // top-level `let`, so it is a global declarative binding and never a window property. The
         // assignment created an unrelated window._activePresetName and left the real one set, so
