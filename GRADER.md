@@ -64696,3 +64696,16 @@ which the old header chip's bare "2 of 5" could not distinguish.
 - Test after: 499 PASS / 0 FAIL / 1 WARN (suite RAN this cycle; control from git HEAD scores identically)
 - JS errors: 0
 - Summary: **Cycle 902 complete.** `v978` shipped and pushed (`5e7b189`), mirror in sync.
+
+---
+## Cycle 902 Log — 2026-09-22 04:17
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 902 complete — v978 shipped and pushed (`5e7b189`), mirror in sync.**
+
+## Task / Friction / Change / Result
+
+**Task — T6, "Where did this number come from and how solid is the evidence?"** Rotated off T5 (901), T4 (900), T1 (899); T6 was stalest, last run at 893.
+
+**Friction.** Cold walk at 1440×900 → Fiscal Compare → Angola row → drawer. The drawer's **Fiscal Breakdown** is the most granular answer this platform gives to T6: it decomposes the take into the levies that produced it, names
