@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v975</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v976</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v975</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v976</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61151,8 +61151,13 @@ function renderFCResults(results, price) {
   var stabCell = function(country) {
     var ec = String(country).replace(/'/g, "\\'");
     var info = stabilityInfo[country];
+    // v976 (T4): display:block + width:100% so the button occupies the cell's full content
+    // width rather than shrinking to a 19px token. The td around it carries the same handler
+    // (see the showStability branch in renderFCResults), so the padding is live too; this
+    // keeps the KEYBOARD target and the focus ring the same size as the mouse target.
     var btnOpen = '<button onclick="event.stopPropagation();openReformRiskFor(\'' + ec + '\');" '
-      + 'style="background:none;border:none;padding:0;cursor:pointer;font:inherit;line-height:1;" ';
+      + 'style="background:none;border:none;padding:0;cursor:pointer;font:inherit;line-height:1;'
+      + 'display:block;width:100%;text-align:right;" ';
 
     // State 1 — no sourced reform log. Say so. Do not render a score.
     if (!info) {
@@ -62118,7 +62123,26 @@ function renderFCResults(results, price) {
     }
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
     if (showStability) {
-      html += '<td class="num">' + stabCell(r.country) + '</td>';
+      // ── v976 (T4): the Reform verdict CELL is the control, not the 19px token inside it ──
+      // This column's own header tooltip, the IC analyst guide and stabCell()'s comment all
+      // say "click any cell for the full event log". They were describing an intent, not the
+      // build. The handler lived only on the inner <button>, which is sized to its content
+      // with padding:0, so the live click target was measured at 1440x900 as:
+      //     n/c rows (164 of 185)   19 x 14px inside a 130 x 57px cell   —  4% of the cell
+      //     scored rows (21)        86 x 24-30px inside 130 x 41-57px    — 28-43%
+      //     mean coverage across the cold default table                  —  12.1%
+      // Every one of the other 88% of pixels fell through to the row's own
+      // openFCDrilldown(country) and opened the Fiscal Compare drilldown instead. That is
+      // not a dead click the analyst can learn from — it silently answers a DIFFERENT
+      // question, on a surface that looks like an answer, with nothing on screen saying the
+      // reform panel was ever the destination. An analyst asking "what is my reform exposure
+      // here" aims at the reform cell, misses by four pixels and reads the wrong panel.
+      // The 19 x 14px n/c token also fails finalization item 3 outright under pointer:coarse,
+      // where it is not hittable with a thumb at all.
+      // The whole <td> now carries the same handler and stops propagation, so the row
+      // drilldown still owns every other cell and the inner button keeps keyboard focus.
+      // Nothing moves: this adds a hit area, not a pixel.
+      html += '<td class="num" style="cursor:pointer;" onclick="event.stopPropagation();openReformRiskFor(\'' + cEsc + '\');">' + stabCell(r.country) + '</td>';
     }
     html += '<td class="num"><button class="fc-compare-btn" onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max ' + CMP_MAX + ' countries). Tip: use the Screener + basket for larger sets.">+Compare</button></td>';
     html += '</tr>';

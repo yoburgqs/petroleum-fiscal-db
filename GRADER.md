@@ -64331,3 +64331,97 @@ Cycle 899 complete. `v975` shipped and pushed (`5d4120e` + `5860054`), mirror in
 ## Task / Friction / Change / Result
 
 **Task — T1, "Which countries should even be on my screening list?"** Las
+
+---
+## Cycle 900 Log — 2026-09-22 — v976
+
+## Task / Friction / Change / Result
+
+**Task — T4, "What is my fiscal-stability and reform exposure here?"** The last two committed
+cycles were T1 (v974/v975), so this does not repeat them.
+
+**Friction.** Walked cold at 1440x900 — no sessionStorage, no localStorage — Home → Fiscal
+Compare, which renders the **Reform verdict** column ticked ON by default
+(`#fc-stability-check` carries `checked` in the markup at line 3333). This is the surface where
+the T4 question is actually asked: 185 rows, one verdict per row, and the column's own header
+tooltip says *"Hover any cell for the full IC action; click it for the Reform Risk panel."* The
+IC analyst guide repeats it — *"Click any cell for the full event log"* — and `stabCell()`'s own
+comment block asserts *"The cell is still the same button onto the same panel."*
+
+All three were describing an intent, not the build. The handler lived only on the inner
+`<button>` emitted by `btnOpen`, styled `padding:0` and left at its content width. Measured on
+the cold default table:
+
+| row class | cell | live click target | coverage |
+|---|---|---|---|
+| `n/c` — 164 of 185 | 130 x 57px | **19 x 14px** | **4%** |
+| scored — 21 of 185 | 130 x 41–57px | 86 x 24–30px | 28–43% |
+| **mean across the rendered table** | | | **12.1%** |
+
+The other ~88% of every cell fell through to the row's own `onclick="openFCDrilldown(country)"`.
+That is not a dead click an analyst can learn from — it **silently answers a different question**,
+opening the Fiscal Compare drilldown, a surface that looks exactly like an answer, with nothing
+on screen indicating the reform panel was ever the destination. An analyst asking "what is my
+reform exposure here", aiming at the reform cell, misses by four pixels and reads the wrong
+panel — and on the 164 `n/c` rows, which is the majority case, they miss 96 times in 100.
+
+The same 19 x 14px token fails **finalization item 3** outright: under `pointer: coarse` it is
+not hittable with a thumb at all, so on a phone the reform cell was *unreachable* — every tap
+opened the drilldown instead.
+
+**Change.** The `<td>` itself now carries `openReformRiskFor(country)` with
+`event.stopPropagation()` and `cursor:pointer` (the `showStability` branch of the FC row
+template), so the whole cell is the control the three tooltips already claimed it was. `btnOpen`
+gains `display:block;width:100%;text-align:right` so the **keyboard** target and focus ring match
+the mouse target rather than remaining a 19px island. Nothing moves: this adds hit area, not a
+pixel. No new control, no new text, no threshold, no recomputation — the same handler the cell
+already called, reachable from the pixels that already looked clickable.
+
+**Result.** All **185 of 185** reform cells are clickable across 100% of their area. Clicking the
+left edge of Somalia's `n/c` cell — 2px from the cell border, dead before v976 — now lands on
+`#/reform/somalia` with Somalia selected in the Reform Risk lookup. On a phone the tap target is
+**49px minimum cell height** (button 36px), against 24px required. The row drilldown still owns
+every other cell: a click on the Mechanic cell still opens `openFCDrilldown` on t0, verified
+after the change.
+
+### Cycle 900 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified local tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v975 from git HEAD (`_ctl_v976.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **differs on the timestamp line only** (1 hunk, 4 lines) |
+| The 1 WARN | `sw.js` 404 from `python http.server`; present in control too — harness artefact |
+| Reform-cell hit area, before | mean **12.1%**, min 4% (19 x 14px in 130 x 57px) |
+| Reform-cell hit area, after | **100%** on all 185 rows, min cell height 39.5px desktop |
+| Dead-zone click, Somalia `n/c` cell left edge | → pane `treformrisk`, hash `#/reform/somalia`, lookup `Somalia` |
+| Row-drilldown non-regression, Mechanic cell | → stays on `t0`, drilldown opened (`hasDrill:true`) |
+| 390x844 `hasTouch` | **9 of 9 visible tabs** `scrollWidth` 390 == `clientWidth` 390 |
+| Reform cell under `pointer: coarse` | cell **49px**, button **36px** — both clear 24px |
+| page errors, desktop and mobile walks | **0** |
+| Version | title + badge v975 → v976, silently at the end |
+
+### Also walked this cycle and found sound — recorded so the next T4 cycle does not re-walk it
+
+- Reform Risk country lookup: 185 options in two labelled optgroups (21 sourced / 164 not), built
+  only after `reform_history.json` lands (v805 guard holding).
+- Verdict card for a covered country (Nigeria) and an uncovered one (Malaysia): both honest,
+  both name the ceiling correction, 0 page errors, card reachable above the fold at 1440/1280/390.
+- FC `Reform ▼` sort button: correct band order (WACC → TAKE → SIZE UNKNOWN → NET 0 → PRE-2010),
+  auto-ticks `Reform-scored only`, `n/c` sorts last. Works.
+- Country Profile reform block for an uncovered country: consistent with the Reform Risk card.
+
+### Carried forward, still open
+
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Fiscal Compare clipboard emits `Breakeven $/bbl` unconditionally where `_scCopyColumns()`
+  guards it with `if (anyBe)` (880).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889), against
+  finalization item 3. Measured again this cycle at 390x844: 5 `INPUT` at h=13.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+- The `_rrIcTokenCell()` token on the Reform Risk ranking table is `cursor:help` only — it is a
+  caption there, not a control. Noted, not changed; that table's row is already clickable.
