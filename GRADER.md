@@ -64554,3 +64554,16 @@ in all three shapes it can take.
   them before changing anything.
 - **Suite copies remain diverged** — the graded copy that runs is
   `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
+## Cycle 901 Log — 2026-09-22 02:46
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 901 complete.** `v977` shipped and pushed (`600de9b` + `b49de05`), mirror in sync.
+
+## Task / Friction / Change / Result
+
+**Task — T5, "Give me something I can paste straight into an IC memo."** Last two committed cycles were T4 and T1, so this repeats neither.
+
+**Friction.** Cold walk at 1440×900 → Fiscal Compare → ticked five countries → pressed **⎘ Copy for IC Memo** → pasted into a letter-portrait page at Word's 6.5in (624px) text column. The button's tooltip promises it "pastes into
