@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v985</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v986</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46238,8 +46238,58 @@ function loadCountryProfile(country) {
       charLabel = 'High-moderate take with constrained returns — contractor NPV clears at $75/bbl but not at $50/bbl; viability depends on the price environment and specific block economics';
       charColor = 'var(--orange)';
     } else if (take > 65) {
-      charLabel = 'Moderate-to-high take (' + take.toFixed(1) + '%) — above the typical IOC sweet spot; viability depends on field scale, cost structure, and price environment. Run Scenario Builder to test at your actual project parameters before IC submission';
-      charColor = 'var(--orange)';
+      // ── v986 (T2): "Moderate-to-high" is a band this platform does not have ──────────
+      // This branch is selected by `take > 65` and fires for 11 countries — Norway (7,643
+      // contracts, the largest file here), Kazakhstan, Libya, Qatar, UAE, UAE — Abu Dhabi,
+      // Iran, Venezuela, Algeria, Bolivia, Equatorial Guinea. Measured live against
+      // COUNTRY_DATA, on ALL ELEVEN the headline paragraph rendered two lines below prints
+      // "high-take tier (61–75%)" off the SAME comparable take this sentence opens with:
+      // Norway 68.0%, Kazakhstan 69.9%, Libya 71.1%, Qatar 74.5%, Venezuela 74.9%. The page's
+      // first line and its second called one number two different bands — and
+      // "Moderate-to-high" is the softer of the two, in the half an analyst pastes into an IC
+      // memo. v760 promoted this line to sit directly under the country name precisely because
+      // it is this page's one direct answer to "is this attractive at $75?".
+      //
+      // "above the typical IOC sweet spot" is a threshold at 65% that exists nowhere else on
+      // this platform, and it contradicts the branch immediately above it, which tells a 62%
+      // country that "the terms sit in the typical IOC benchmark range" — the tier scale files
+      // both readings in the same band. The remainder — "viability depends on field scale, cost
+      // structure, and price environment" — is true of all 185 published regimes and
+      // discriminates nothing, and the trailing "Run Scenario Builder…" is a routing hint to a
+      // control the headline strip already carries.
+      //
+      // Same defect and same fix as v648 / v663 / v931 / v946, on the last populous branch those
+      // four did not reach. No new threshold is introduced: the bands are the tier scale v589's
+      // headline paragraph prints, the swing wording is the platform's own <10 / 10–20 / >20pp
+      // scale (the legend under Fiscal Compare and the Swing chip both use it) and separates this
+      // set properly — Qatar 5.5pp against Venezuela 18.0pp, two countries that until now got a
+      // byte-identical verdict — the producer position is _posClause648, and the no-production
+      // clause is the one the take≤40 branches already print for the identical evidence state:
+      // 9 of these 11 hold prod_coverage_pct = 0 and a 10th (Libya) holds 0.7%.
+      _posInLabel648 = _hasPos648;
+      var _lvl986 = take <= 60 ? 'moderate tier (41–60%)'
+                  : take <= 75 ? 'high-take tier (61–75%)'
+                  : 'NOC-dominated tier (>75%)';
+      charLabel = 'High-take regime — at ' + take.toFixed(1) + '% the $75 base sits in the '
+        + _lvl986 + ', the same band the headline below prints'
+        + (_hasPos648 ? ', and ' + _posClause648 : '') + '.'
+        + (swing != null
+            ? ' Government take moves ' + swing.toFixed(1) + 'pp from $50 to $125/bbl — the Price '
+              + 'Swing figure on this page, '
+              + (swing < 10
+                  ? 'royalty-stable on this platform’s scale, so a higher price deck will not relieve these terms'
+                  : swing < 20
+                  ? 'moderate on this platform’s scale, so the deck you screen at moves the terms'
+                  : 'price-progressive on this platform’s scale, so the contractor keeps a smaller share of the barrel as price climbs')
+              + '.'
+            : '')
+        + (_noProd663
+            ? ' No verified block-level production is held here, so both figures are a statutory '
+              + 'model over ' + _nStr663 + ' — directional, not realised.'
+            : '');
+      // Tier colours are v589's, so this line and the paragraph beneath it are not painted on
+      // two different scales.
+      charColor = take <= 75 ? 'var(--orange)' : 'var(--red)';
     } else {
       charLabel = 'Moderate take (' + take.toFixed(1) + '%) — within standard IOC benchmarking range; contractor NPV at the $50/bbl downside not computed for this regime. Verify with Scenario Builder using your project-specific capex/opex';
       charColor = 'var(--accent)';
