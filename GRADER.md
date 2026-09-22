@@ -64208,3 +64208,16 @@ correction is a basis and not an uplift, and the sheet says so: 9 of the 10 rows
   `office/tools/petroleum/tests/runtime_comprehensive.js` (sha 045f00a6dddc); the repo copy
   at `petroleum-fiscal-db/tests/` (sha e87e483cb5dd) is idle. Test edits made to the repo
   copy do not affect the graded result. Not fixed this cycle; flagged again.
+
+---
+## Cycle 897 Log — 2026-09-21 21:06
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 897 complete. `v974` shipped and pushed (`1a43a26` + `940b4fb`), mirror in sync, working tree clean apart from the loop's own state files.
+
+## Task / Friction / Change / Result
+
+**Task — T5, "Give me something I can paste straight into an IC memo."** The last committed cycle was T4 (v973), so this doesn't repeat it.
+
+**Friction.** The Fiscal Compare XLSX export is the one artifact that leaves the platform and gets read by people who never see the on-screen caveats. Since v674 it carries a 
