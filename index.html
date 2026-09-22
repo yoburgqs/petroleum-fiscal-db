@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v986</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v987</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -36162,6 +36162,19 @@ function _scProdCovTip(d) {
 // opening with 60 chips buries the production-backed group above it. The rest are IN the DOM, not
 // re-derived on click, so the count on the button is the count that appears.
 const SC_OUT_B_SHOWN = 10;
+// v987 (T1): group C carries its own marker. _scToggleOutMore() selects [data-sc-extra="1"]
+// across the whole host, so reusing that attribute would make either button open both groups.
+function _scToggleClearedMore(btn) {
+  const host = document.getElementById('sc-prod-out');
+  if (!host || !btn) return;
+  const extra = [...host.querySelectorAll('[data-sc-xc="1"]')];
+  const opening = btn.getAttribute('data-sc-open') !== '1';
+  extra.forEach(el => { el.style.display = opening ? 'inline-flex' : 'none'; });
+  btn.setAttribute('data-sc-open', opening ? '1' : '0');
+  btn.textContent = opening ? 'Show fewer' : ('+' + (btn.getAttribute('data-sc-more') || extra.length) + ' more');
+}
+window._scToggleClearedMore = _scToggleClearedMore;
+
 function _scToggleOutMore(btn) {
   const host = document.getElementById('sc-prod-out');
   if (!host || !btn) return;
@@ -37035,12 +37048,51 @@ function runScreener() {
         + '<span>' + _out.length + ' of ' + _inScopeA.length + ' verified-production countries removed:</span>'
         + _out.map(x => _chip(x, false)).join('');
     }
+    // ── v987 (T1) — the countries that PASSED this screen and are off the list anyway ──────
+    // Walked T1 cold at 1440 and 390: Screener → IOC Capital Screen. 15 rows. The strip below the
+    // count bar is the ONE surface whose whole job is "why isn't X on here?", and under this preset
+    // it read:
+    //
+    //     ALSO NOT ON IT   13 of 118 modelled-terms countries removed
+    //
+    // 13 of 118 is a true count of THRESHOLD failures and a false account of the list. The preset
+    // also sets the data-basis filter, so all 118 modelled-terms countries are off the screen —
+    // 118 of 118, not 13 of 118. The other 105 CLEARED every fiscal test this screen applies
+    // (take ≤ 65% on the comparable basis, contractor NPV ≥ $0 at $75 AND at $50) and were removed
+    // for one reason the strip never gave: ORCA holds no verified field production for them.
+    // Measured this cycle on the live data: Namibia 37.0% / $2.67B, Egypt 45.1% / $1.82B,
+    // Ghana 52.6% / $1.58B, Mozambique 54.0% / $1.49B, Tanzania 58.7% / $1.42B, Vietnam 56.7% /
+    // $1.27B, Senegal 56.9% / $1.09B, Guyana 54.1% / $1.07B, Suriname 54.2% / $1.01B — the
+    // Atlantic and East-Africa frontier, i.e. the exact set the sc-floor-keep label says this
+    // platform's own basis distinction exists to protect, every one of them passing.
+    //
+    // T1 is "which countries should even be on my screening list?". A tool that answers it with
+    // 15 rows, and then accounts for the absentees with a denominator implying 105 of them made
+    // the cut, has answered the wrong question and hidden the evidence for the right one. The
+    // analyst's only cue was the count line's "163 proxy-economics countries excluded" — a lump
+    // sum that does not separate "failed your screen" from "passed your screen, no production on
+    // file", and those two are different decisions: the first is a reject, the second is a
+    // data-coverage call the analyst is entitled to make themselves.
+    //
+    // Scope is deliberately narrow. The set is non-empty ONLY when the data-basis filter is off,
+    // which is the only path by which a modelled-terms country can clear every threshold and still
+    // be absent — verified this cycle across all 11 presets: iochurdle 105, downsidereturns 53,
+    // and 0 on every preset that keeps proxy rows. Floor-take rows stay out on v830's reasoning:
+    // a take that is a lower bound cannot meaningfully clear a ceiling. State monopolies stay out
+    // on v832's: a zeroed contractor position was never measured, so it cannot have passed.
+    const _clearedB = (!includeProxy)
+      ? _inScopeB.filter(d => !_curSet.has(d.country) && !_isMono(d) && !_why(d).length)
+          .sort((a, b) => (b.n_facts || 0) - (a.n_facts || 0))
+      : [];
     if (_outB.length) {
       const _shown = _outB.slice(0, SC_OUT_B_SHOWN), _rest = _outB.slice(SC_OUT_B_SHOWN);
       _html += '<span style="flex-basis:100%;height:0;"></span>'
         + _lbl(_out.length ? 'Also not on it' : 'Not on this list')
         + '<span title="Countries ORCA models on real PSC or Concession terms but holds no verified field production for, so their NPV and breakeven are indicative. Ordered by how many fiscal facts ORCA has on file for the country — deepest record first — because contractor NPV rises as take falls and an NPV sort puts the least-documented regimes on top. Floor-take countries (royalty and income tax only, on a record under 50 facts) are not counted here; their take is a lower bound, not a measurement, so it cannot near-miss a ceiling.">'
-        + _outB.length + ' of ' + _inScopeB.length + ' modelled-terms countries removed <span style="opacity:.8;">(no verified production · deepest record first)</span>:</span>'
+        + (_clearedB.length
+            ? 'all ' + _inScopeB.length + ' modelled-terms countries are off this screen — <span style="color:var(--text);font-weight:700;">' + _outB.length + '</span> of them fail a threshold <span style="opacity:.8;">(deepest record first)</span>'
+            : _outB.length + ' of ' + _inScopeB.length + ' modelled-terms countries removed <span style="opacity:.8;">(no verified production · deepest record first)</span>')
+        + ':</span>'
         + _shown.map(x => _chip(x, false)).join('')
         + _rest.map(x => _chip(x, true)).join('')
         + (_rest.length
@@ -37048,6 +37100,47 @@ function runScreener() {
               + ' title="Show the remaining ' + _rest.length + ' modelled-terms countries this screen removed, each with the threshold that removed it"'
               + ' style="display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px dashed var(--border);border-radius:12px;background:transparent;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+' + _rest.length + ' more</button>'
             : '');
+    }
+    // v987 (T1): group C renders the inverse of groups A and B — not a failure with a reason,
+    // a pass with a reason it is missing anyway. Neutral colour, not var(--negative): nothing
+    // here fell short of anything. Each chip carries the two numbers the screen was decided on
+    // (the take it was tested at and its deck NPV) so the analyst can triage without opening
+    // 105 profiles, and clicking still opens the Country Profile like every other chip here.
+    if (_clearedB.length) {
+      const _cTake = d => {
+        const fc = (takeCeilingActive && feeCmpOn) ? _scFeeCmpAt(d, price) : null;
+        const t = (fc && fc.diverges) ? fc.cmp : d[takeKey];
+        return t == null ? '\u2014' : t.toFixed(1) + '%' + (fc && fc.diverges ? ' cmp' : '');
+      };
+      const _chipC = (d, hidden) => {
+        const nm = d.country.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const _tip = d.country + ' passes every threshold on this screen at ' + priceLabel
+          + ' \u2014 it is off the list only because ORCA holds no verified field production for it, so its '
+          + 'NPV and breakeven are modelled on regional proxy terms and are indicative, not realised. '
+          + 'Record on file: ' + (d.n_facts || 0) + ' fiscal facts. Click to open its Country Profile.';
+        return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="' + _tip.replace(/"/g, '&quot;') + '"'
+          + (hidden ? ' data-sc-xc="1" style="display:none;' : ' style="display:inline-flex;')
+          + 'align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;">'
+          + d.country + ' <span style="font-weight:400;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;font-size:10px;">'
+          + _cTake(d) + ' \u00b7 ' + fmtNpvShared(d[npvKey]) + '</span></button>';
+      };
+      const _cShown = _clearedB.slice(0, SC_OUT_B_SHOWN), _cRest = _clearedB.slice(SC_OUT_B_SHOWN);
+      _html += '<span style="flex-basis:100%;height:0;"></span>'
+        + _lbl('Cleared this screen \u2014 held back on data basis')
+        + '<span title="These countries pass every fiscal threshold this screen tests. They are excluded by the data-basis filter alone: ORCA holds no verified field production for them, so their fiscal terms are regional proxy estimates and their NPV and breakeven are indicative. That is a coverage judgement, not a fiscal one, and it is yours to make. Ordered deepest record first.">'
+        + '<span style="color:var(--text);font-weight:700;">' + _clearedB.length + '</span> of those ' + _inScopeB.length
+        + ' pass every threshold at ' + priceLabel + ' and are off the list only because ORCA holds no verified field production for them'
+        + ' <span style="opacity:.8;">(deepest record first)</span>:</span>'
+        + _cShown.map(d => _chipC(d, false)).join('')
+        + _cRest.map(d => _chipC(d, true)).join('')
+        + (_cRest.length
+            ? '<button type="button" onclick="_scToggleClearedMore(this)" data-sc-more="' + _cRest.length + '"'
+              + ' title="Show the remaining ' + _cRest.length + ' countries that cleared this screen and were held back on data basis, each with the take it was tested at and its contractor NPV"'
+              + ' style="display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px dashed var(--border);border-radius:12px;background:transparent;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+' + _cRest.length + ' more</button>'
+            : '')
+        + '<button type="button" onclick="_scSetBasis(true)"'
+        + ' title="Put all modelled-terms countries back into this screen. They rank below a labelled divider that states their NPV and breakeven are indicative only. Same control as the Data Basis checkbox under Advanced Filters, and as the button on the count bar above. Reversible."'
+        + ' style="display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px solid rgba(176,104,0,.5);border-radius:4px;background:rgba(176,104,0,.14);color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">&#43; Put these ' + _clearedB.length + ' back in</button>';
     }
     host.innerHTML = _html;
     host.style.display = 'flex';
