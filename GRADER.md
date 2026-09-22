@@ -64831,3 +64831,112 @@ is gone.
 ## Friction
 
 Cold walk at 1440×900 (storage cleared), Home → Country Profile → **Australia**. In reading order the page said: *"Contractor-favorable — low government take, 6 of the 20 production-weighted producers take less at $75/bbl"* → *"38.5% govt take — i
+
+---
+
+## Cycle 904 Log — 2026-09-22 — v980
+
+## Task
+
+**T3 — "How do these three countries compare side by side?"** Rotated off T2 (903), T6 (902), T5 (901), T4 (900), T1 (899).
+
+## Friction
+
+Cold walk at 1440×900, storage cleared, Home → Side-by-Side. The tab does not open empty — it seeds
+the North Sea Trio. Walking the real entry paths (quickstart buttons, the search box, `addCompare`,
+`removeCompare`, the `_sbsExampleUntouched` seed-collapse) turned up no defect: alias search resolves
+UAE / Emirates / Britain / Holland / Burma / Ivory Coast / Kurdistan correctly, and removing a chip
+correctly converts the example into the analyst's own set.
+
+The defect is in the **verdict strip**, on a set an analyst assembles without knowing it is malformed:
+
+    UAE  /  UAE — Abu Dhabi  /  UAE — Dubai
+
+    GOVT TAKE @$75, LOWEST FIRST:
+    UAE — Dubai 36.5% › UAE 74.6% › UAE — Abu Dhabi 74.6%     [38.1pp apart] [order holds $50–$125]
+    All 3 columns are on one basis — nothing is set aside, the ordering above is the whole set.
+
+Two of the three columns are the same jurisdiction. `UAE — Abu Dhabi` carries the **national figures
+byte for byte** — 70.9 / 74.6 / 76.5 / 77.6 and $967.6M at every published price, identical to `UAE`.
+So the chain printed an ordering **arrow between a regime and itself**, the spread pill measured
+38.1pp across a set that double-counts, and the closing line explicitly told the analyst nothing was
+set aside — a licence to carry the ranking into an IC memo.
+
+**Why nothing caught it.** Every comparability test on this tab keys off **basis** — production-weighted
+vs statutory, fee-blended, state monopoly. A subdivision shares its parent's basis, so containment is
+invisible to all of them by construction. The `_aside` fallback at `renderCompare()` printed its
+reassurance whenever the basis test found nothing, and here the basis test was right and irrelevant.
+
+## Change
+
+`SBS_CONTAINED` — an explicit, closed relation table:
+
+| parent | child | relation |
+|---|---|---|
+| UAE | UAE — Abu Dhabi | `same:true` — identical take and NPV at all four prices |
+| UAE | UAE — Dubai | `same:false` — own terms, inside the parent's perimeter |
+| Iraq | Iraq-Kurdistan | `same:false` — own terms, inside the parent's perimeter |
+
+A name-prefix rule was **rejected**: it pairs Guinea with Guinea-Bissau, which are two sovereign
+states, and would mispair any future Congo-style name. These are the only three relations in the 185.
+
+When both sides of a relation are in the set:
+
+1. An amber notice renders **directly under the take ordering and above the contractor-value
+   ordering** — containment has to be read before any ordering is trusted. It names each pair, says
+   whether the child *duplicates* the parent's figures or is *nested* inside them, and states how many
+   **distinct jurisdictions** the set actually holds ("This set holds 1 distinct jurisdiction, not 3").
+2. The **"All N columns are on one basis — nothing is set aside"** claim is **withheld** while a pair
+   is present. This is the false statement the cycle exists to kill.
+3. Each contained column carries a **`within <parent>`** chip in its own grid header, so the marker is
+   on the column being read and not only in the strip.
+
+The notice lives inside `#cmp-verdict` (`.cmp-notice`), so `copyComparisonTable()` already sweeps it
+into the Copy-for-IC-Memo paste — no separate export change needed.
+
+## Result
+
+An analyst who loads UAE alongside Abu Dhabi and Dubai is told, **before** the orderings, that the set
+holds **1 distinct jurisdiction and not 3**, that two of its columns are one regime printed twice, and
+which side of each pair to drop. They can no longer paste a three-country ranking whose 38.1pp spread
+is manufactured by double-counting. Loading Iraq with Iraq-Kurdistan gets the same treatment on the
+nested branch.
+
+### Cycle 904 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, all inline blocks | **PASS, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v979 from git HEAD (`_ctl_v979.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **differs on the timestamp line only** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| 390×844 `hasTouch`, all tabs | **10 of 10**, `scrollWidth` == `clientWidth`, no sideways scroll |
+| Containment notice at 390 | 334px wide in a 390px viewport — no overflow |
+| `within <parent>` chip | 63.1 × 15.5px; a static `cursor:help` label, not a control — not focusable, no handler, and its text is fully duplicated in the on-screen notice |
+| Regression: Guinea / Guinea-Bissau | **correctly NOT flagged**, keeps "All 2 columns are on one basis" |
+| Regression: North Sea Trio, Guyana/Angola/Brazil, Iraq/Kurdistan/Kuwait | strips unchanged apart from the intended notice |
+| Page errors, every set walked | **0** |
+| Version | title + badge v979 → v980, silently at the end |
+
+### Carried forward, still open
+
+- **Surfaced and NOT fixed:** the take-ordering chain still *places* the duplicate column — it prints
+  `UAE 74.6% › UAE — Abu Dhabi 74.6%` with the notice above it, rather than collapsing the pair or
+  withholding the arrow. Collapsing would mean editing the ordering engine that five other surfaces
+  read, so it was flagged rather than guessed at.
+- The `38.1pp apart` pill is likewise still computed across the uncollapsed set.
+- Containment is enforced on **Side-by-Side only**. Fiscal Compare, the Screener and the Breakeven Map
+  will still rank UAE and UAE — Abu Dhabi as two rows; the same relation table is available to them.
+- Country Profile rank pills still compute Australia's position against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio and Scenario Builder still
+  not measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
