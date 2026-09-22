@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v981</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v982</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v981</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v982</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -51268,6 +51268,60 @@ function _rrPaintObsSpread(c, d, obs) {
       + ' points is a floor on the penalty and ' + bound + ' is a CEILING on the score - the true '
       + 'figure is at or below it, never above. Carry ' + bound + ' \u00b7 ' + bLabel + ' into the IC '
       + 'memo, with the observed range ' + range + ' attached, and not the printed ' + fp + '.';
+  }
+
+  // ── v982 (T4): withdraw the one-term COHORT RANK where the ceiling has refuted its basis ──
+  // v784 does this on the sibling 'measured' branch (_rrPaintIqrUnderstated, gated on bandMoves).
+  // The 'single' branch never did, so the card contradicted itself three lines apart. Walked cold
+  // at 1440x900, Reform Risk -> Check one country -> Thailand:
+  //
+  //     [headline]  <=51 LOW ceiling      printed 80 UNGRADED  ^ best case
+  //     [bound]     Carry <=51 * LOW, not 80. ...
+  //     [cohort]    81st of 132 one-term regimes -- a cohort the spread penalty never touches,
+  //                 which is why this score is shown UNGRADED rather than banded. ... A one-term
+  //                 score above a measured one is not the steadier regime.
+  //
+  // Every clause of that last paragraph is withdrawn by the two lines above it. The rank (81st)
+  // is computed from the 80 the card just struck through. "a cohort the spread penalty never
+  // touches" is the basis the contract table refuted. "shown UNGRADED rather than banded" is
+  // false on a headline now reading LOW. And the closing rule inverts: at 51 this country is no
+  // longer above the measured cohort at all -- their own ceiling is Turkmenistan 74.
+  //
+  // Measured across all 185 lookups: 36 one-term countries paint a material ceiling and all 36
+  // printed a rank off the refuted score -- Uzbekistan 89 -> 46th of 132 (ceiling 49 * LOW),
+  // Netherlands 84 -> 73rd (59 * LOW), Albania and Lebanon 81 -> 78th/79th (49 * LOW),
+  // Thailand 80 -> 81st (51 * LOW), Norway 76 -> 84th (52 * LOW). Six of them -- Norway,
+  // Indonesia, Angola, Colombia, Ecuador, Libya -- are among the 21 that carry a reform log,
+  // so this is the closing line of the T4 answer on the tab's own headline jurisdictions.
+  //
+  // Gated on _cl784.material, the SAME flag _rrFpHeadlineCeiling() is gated on, so the ceiling
+  // headline and the withdrawn rank always appear together and the card has no third state.
+  // Nothing is recomputed: the bound is the same _fpObsCeilingFrom() object, and the cohort
+  // ceiling is _fpCohortStats().measuredTop, already on screen elsewhere.
+  var _coh982 = document.getElementById('rr-fp-cohort');
+  if (_coh982 && _cl784 && _cl784.material && !_coh982.dataset.withdrawn) {
+    _coh982.dataset.withdrawn = '1';
+    var _k982 = (typeof _fpCohortStats === 'function') ? _fpCohortStats() : null;
+    var _top982 = _k982 && _k982.measuredTop;
+    var _nSingle = (_k982 && _k982.single) ? _k982.single.length : 132;
+    var _nMeas   = (_k982 && _k982.measured) ? _k982.measured.length : 28;
+    var _below   = !!(_top982 && bound != null && bound < _top982.s);
+    _coh982.innerHTML =
+      '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
+      + 'border-left:2px solid var(--orange);max-width:230px;">'
+      + '<strong style="color:var(--orange);">No cohort rank for ' + _rrEsc(c) + '.</strong> '
+      + 'Its place among the ' + _nSingle + ' one-term regimes is computed from the printed ' + fp
+      + ', and that cohort is defined as the one the take-spread penalty never touches — the '
+      + 'basis this country’s own contract table has just refuted. '
+      + (_below
+          ? 'At ≤' + bound + ' · ' + bLabel + ' the spread term IS charged, on the same footing as the '
+            + _nMeas + ' countries ORCA can measure, and ' + bound + ' falls below their own ceiling ('
+            + _rrEsc(_top982.c) + ' ' + _top982.s + '). So the usual reading here — <em>a one-term score '
+            + 'above a measured one is not the steadier regime</em> — does not arise: at its ceiling '
+            + _rrEsc(c) + ' is not above one.'
+          : 'Rank it on ≤' + bound + ' · ' + bLabel + ', the bound the spread term puts on it, and not on '
+            + 'the printed ' + fp + '.')
+      + '</div>';
   }
 
   var claim = document.getElementById('rr-fp-claim');
