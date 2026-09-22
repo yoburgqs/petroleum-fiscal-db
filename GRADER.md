@@ -65832,3 +65832,201 @@ first.
 
 ## Friction
 The first line under the country name is the "Fiscal character" verdict — the page's one direct answer to
+
+---
+## Cycle 913 Log — 2026-09-22 18:10
+- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- JS errors: 0
+- Shipped: `v987` (`f5a63e2`), mirror in sync, pushed.
+
+## Task
+
+**T1 — "Which countries should even be on my screening list?"** Stalest in
+rotation: 912 was T2, 911 T3, 910 T6, 907 T5, 906 T4; T1 last walked at 905.
+Walked cold at 1440x900 and 390x844 `hasTouch`, `sessionStorage` and
+`localStorage` cleared, over the real `/petroleum-fiscal-db/` path prefix.
+
+## Friction
+
+Home → **Screener** → preset **IOC Capital Screen**. 15 rows. `runScreener()`'s
+`#sc-prod-out` strip (index.html:36905) is the ONE surface on this platform whose
+whole job is answering *"why isn't X on here?"*. Under the flagship IC screen it
+read:
+
+> **ALSO NOT ON IT**  13 of 118 modelled-terms countries removed
+
+**13 of 118 is a true count of threshold failures and a false account of the
+list.** The preset also sets the data-basis filter (`sc-proxy-keep` off), so
+**118 of 118** modelled-terms countries are off the screen. `_outOfScope` at
+36910 covers region, mechanic, named set, reform log, IOC and R-factor — it does
+**not** cover the data-basis filter — so `_inScopeB` stayed at the full 118 while
+`_outB` counted only the 13 that failed a *fiscal* test. Printed as
+"13 of 118 … removed", the sentence asserts that the other 105 are on the list.
+
+They are not. **Those 105 CLEARED every fiscal test this screen applies** —
+take ≤ 65% on the comparable basis, contractor NPV ≥ $0 at $75 **and** at $50 —
+and were removed for one reason the strip never gave: ORCA holds no verified
+field production for them. Measured against the live `COUNTRY_DATA` this cycle:
+
+| country | take @$75 | NPV @$75 | NPV @$50 | on the list? |
+|---|---|---|---|---|
+| Namibia | 37.0% | $2,668.9M | $1,169.1M | no |
+| Egypt | 45.1% | $1,821.5M | $528.2M | no |
+| Ghana | 52.6% | $1,581.2M | $791.6M | no |
+| Mozambique | 54.0% | $1,490.7M | $747.0M | no |
+| Tanzania | 58.7% | $1,424.9M | $764.3M | no |
+| Vietnam | 56.7% | $1,267.7M | $658.0M | no |
+| Senegal | 56.9% | $1,087.6M | $522.6M | no |
+| Guyana | 54.1% | $1,067.6M | $511.4M | no |
+| Suriname | 54.2% | $1,010.4M | $435.9M | no |
+
+That is the Atlantic and East-Africa frontier — and it is the *same list of
+names* the `sc-floor-keep` label already uses to argue why the floor/modelled
+distinction has to exist ("Guyana, Namibia, Mozambique, Senegal and Suriname …
+are modelled on real PSC terms, and this filter keeps them"). The page argues
+for protecting them two checkboxes away and then accounts for their absence with
+a denominator that says they made the cut.
+
+The analyst's only cue was `#screener-count`'s lump sum — *"verified field
+production only; 163 proxy-economics countries excluded"* — which does not
+separate **"failed your screen"** from **"passed your screen, no production on
+file"**. Those are different decisions. The first is a reject the tool is
+entitled to make. The second is a data-coverage call that belongs to the analyst,
+and T1 is precisely the moment they should be asked to make it.
+
+Measured across all 11 presets before the change:
+
+| preset | rows | strip claimed | truly absent | passed-but-unexplained |
+|---|---|---|---|---|
+| IOC Capital Screen | 15 | 13 of 118 removed | 118 of 118 | **105** |
+| Two-Price Return Screen | 5 | 65 of 118 removed | 118 of 118 | **53** |
+| Primary-Source Evidence | 35 | 88 of 118 removed | 88 | 0 |
+| Downside Resilience | 24 | 101 of 118 removed | 101 | 0 |
+| the other 7 | — | — | — | 0 |
+
+Only the two presets that turn the data-basis filter off are affected — which is
+also the proof that the defect is the missing basis leg and nothing else.
+
+## Change
+
+**Group B's heading no longer asserts a denominator that implies the rest are
+listed.** When a cleared-but-withheld set exists it now reads:
+
+> **ALSO NOT ON IT**  all 118 modelled-terms countries are off this screen —
+> **13** of them fail a threshold *(deepest record first)*:
+
+**New group C — `CLEARED THIS SCREEN — HELD BACK ON DATA BASIS`:**
+
+> **105** of those 118 pass every threshold at $75/bbl and are off the list only
+> because ORCA holds no verified field production for them *(deepest record
+> first)*:
+> `Russia 46.4% · $700M`  `Peru 27.0% · $3.23B`  `Republic of the Congo 60.2% ·
+> $918M`  `Ghana 52.6% · $1.58B`  `Egypt 45.1% · $1.82B`  `Mozambique 54.0% ·
+> $1.49B`  `Myanmar 60.4% · $1.26B`  `Tunisia 43.9% · $1.82B`  `Philippines
+> 46.5% · $1.59B`  `Thailand 20.9% · $3.76B`  `+95 more`
+> **+ Put these 105 back in**
+
+Deliberate choices:
+
+- **Colour is neutral, not `var(--negative)`.** Groups A and B colour their
+  reason text as a shortfall. Nothing in group C fell short of anything; painting
+  it red would repeat the v832 mistake of dressing a structural exclusion as a
+  failed measurement.
+- **Each chip carries the two numbers the screen was decided on** — the take it
+  was tested at (comparable basis where it diverges, suffixed `cmp`, same
+  derivation as `_why()`) and its deck NPV — so 105 countries can be triaged
+  without opening 105 profiles. Click still opens the Country Profile.
+- **Ordered by fact depth**, same signal and same reasoning as group B: NPV rises
+  as take falls, so an NPV sort would surface the least-documented regimes and
+  bury Guyana.
+- **`+95 more` uses `data-sc-xc`, not `data-sc-extra`.** `_scToggleOutMore()`
+  selects `[data-sc-extra="1"]` across the whole host, so reusing that attribute
+  would have made either button open both groups. New `_scToggleClearedMore()`.
+- **The CTA drives the existing `_scSetBasis(true)`** — no second copy of the
+  basis state, so the Advanced Filters checkbox, the count-bar button and this
+  button can never disagree, and `#screener-advanced-details` stays collapsed
+  (v371/v373, locked).
+- **Scope is narrow by construction:** gated on `!includeProxy`, the only path by
+  which a modelled-terms country can clear every threshold and still be absent.
+  Floor-take rows stay out on v830's reasoning — a take that is a lower bound
+  cannot meaningfully clear a ceiling. State monopolies stay out on v832's — a
+  zeroed contractor position was never measured, so it cannot have passed.
+
+## Result
+
+An analyst running the flagship IC screen can now see that **Guyana, Namibia,
+Mozambique, Senegal, Suriname, Ghana and 99 others passed their own thresholds**
+and were withheld on evidence coverage rather than on fiscal terms — with the
+take and NPV each cleared at, a click into any profile, and one button to put
+them back. The screen's exclusions are separated into *"rejected by your
+criteria"* and *"your criteria had nothing to say about it"*, and only the first
+of those is the tool's call to make. T1 is answered with a defensible list plus a
+named, quantified account of what is missing from it, instead of a 15-row list
+and a denominator that quietly overstated its own coverage by 105 countries.
+
+## Verification — every figure measured this cycle
+
+- **JS syntax gate: PASS** — 11 inline blocks, 0 errors.
+- **Runtime suite RAN this cycle** against the **modified tree** at the real path
+  prefix (`TEST_URL=http://127.0.0.1:8987/petroleum-fiscal-db/index.html`,
+  graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`):
+  **500 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own report
+  at `/tmp/cyc913/report.txt`, not assumed from a prior baseline.
+- **All 11 presets re-run** after the change: group C fires on exactly
+  `iochurdle` (105) and `downsidereturns` (53), and on none of the other nine.
+- **Toggle independence proved by execution:** opening group C moved 95 chips
+  from hidden to visible and left group B's 3 hidden chips at 0 visible.
+- **CTA proved by execution:** `+ Put these 105 back in` → 15 rows become 167,
+  `sc-proxy-keep` flips to checked, group C correctly disappears (nothing is
+  held back once they are in the list).
+- **Mobile 390x844 `hasTouch: true`:** `scrollWidth == clientWidth` (390/390) on
+  all 9 reachable tabs, before the preset, after it, and with all 95 hidden chips
+  expanded. `tab-btn-tsamples` is not reachable at 390 — unchanged, pre-existing.
+- **24px floor:** 128 buttons in the strip under `pointer: coarse`, **0 under
+  24px**, minimum height 24.0px, widest chip 336px inside the 390 viewport.
+- **0 page errors and 0 console errors** on every walk.
+
+### Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| v371/v373 declutter | `#screener-advanced-details` | still collapsed on cold load; CTA drives the same checkbox, does not expand it |
+| v371/v373 preset dropdown | `#screener-preset-select` | still a dropdown, untouched |
+| v775 group A | IOC Capital Screen | still "7 of 22 verified-production countries removed", same 7, same reasons |
+| v830 group B scope | floor-take rows | still excluded from both B and C |
+| v832 monopoly guard | Saudi Arabia · Kuwait | still "state monopoly — no contractor position to value"; excluded from C |
+| v896 retention leg | Downside Resilience | reasons unchanged |
+| v981 deck-delta strip | `#sc-deck-delta` | untouched, still hidden until the deck moves |
+| v612 mobile layer | 9 tabs at 390 `hasTouch` | untouched, no sideways scroll |
+
+### Carried forward, still open
+
+- The `take > 75` Country Profile branch (Nigeria, Oman, Turkmenistan,
+  Uzbekistan) still carries no take figure, no swing figure and no
+  evidence-basis clause — next in the v946/v986 chain (912).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable on a cold load (912).
+- `Take spread across contracts` renders Guyana two ways depending on the set (911).
+- Scenario Builder paste's bare `41.1%` IRR row (907).
+- `_fpCohortLine()` one-term cohort rank computed from the refuted score (906).
+- Deck-change inversion disclosed on the Screener only (905).
+- Side-by-Side take-ordering chain places a duplicate jurisdiction column (904).
+- Country Profile rank pills compute Australia against production-basis takes (903).
+- Evidence Quality summary vs Evidence Chain population labels (902); missing
+  index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio not
+  measured against a page width (901).
+- **New, found this cycle, not fixed:** group C names the countries that cleared
+  the screen but `window._screenerExportBasis` — the text the XLSX/CSV/IC-memo
+  export carries — still does not. An exported shortlist reaches the investment
+  committee saying 163 proxy countries were excluded, without saying 105 of them
+  passed. Same defect, one surface downstream.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`;
+  `petroleum-fiscal-db/tests/` is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+- Summary: **Cycle 913 complete.** `v987` shipped and pushed (`f5a63e2`), mirror in sync.
