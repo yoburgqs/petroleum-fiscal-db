@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v984</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v985</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -31698,6 +31698,65 @@ function renderCompare() {
       t += '</div>';
       return t;
     })();
+    // ── v985 (T3): "on one basis" is not the same claim as "on a basis you can rank on". ────
+    // v981 narrowed this reassurance once already, for contained jurisdictions. The same hole was
+    // still open for the case that matters most on a frontier screen: a set in which EVERY column
+    // is a statutory-terms proxy.
+    //
+    // Walked cold at 1440: Guyana / Suriname / Namibia — the standard 2026 Atlantic frontier trio.
+    // Nothing is set aside, because the set-aside test is RELATIVE: a proxy column is pulled out of
+    // the ordering only when the set also holds production-weighted columns to pull it out against.
+    // All three therefore rank, and the strip closed with the identical sentence it prints for
+    // Norway / United Kingdom / Nigeria — three fully production-weighted producers:
+    //
+    //     "All 3 columns are on one basis — nothing is set aside, the ordering above is the whole set."
+    //
+    // Same words, opposite evidence. Every number in the frontier ordering (Namibia 37.0% › Guyana
+    // 54.1% › Suriname 54.2%) is a simple average of statutory terms with zero verified barrels
+    // behind it, and the grid's own Rank among producers row four rows below reads
+    // "not ranked · no production data" for all three — so the strip ranks a set the grid says
+    // cannot be ranked. The strip is the line that gets read and pasted into the memo; the proxy
+    // warning under the grid is ~2,800 characters down and names only the WINNING column.
+    //
+    // A set does not become comparable by being uniformly weak. Where the ranked columns carry no
+    // verified production the clearance is withheld and the basis is stated instead, as a warning
+    // rather than as muted grey. Where they are production-backed the v981 sentence is unchanged.
+    const _vdProxy = _vdRanked.filter(x => {
+      const _t = (typeof _dqTier === 'function' && x.d) ? _dqTier(x.d) : null;
+      return !!_t && _t.hasProduction === false;
+    });
+    const _vdBasisClear = (function () {
+      if (_vdRanked.length < 2 || _vdContain.length) return '';
+      const _nAll = _vdRanked.length, _nPx = _vdProxy.length;
+      if (_nPx === 0) {
+        // unchanged v981 line — every ranked column is backed by verified production
+        return _vdReb.length ? ''
+          : '<div style="font-size:11px;color:var(--muted);line-height:1.55;">All '
+            + _nAll + ' columns are on one basis — nothing is set aside, the ordering above is the whole set.</div>';
+      }
+      const _all = (_nPx === _nAll);
+      const _names = _vdProxy.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong>').join(', ');
+      return '<div style="font-size:11px;color:var(--text);line-height:1.55;background:rgba(194,65,12,.07);'
+        + 'border-left:2px solid var(--orange);border-radius:3px;padding:5px 8px;">'
+        + '<strong style="color:var(--orange);">'
+        + (_all
+            ? 'Nothing is set aside because every ranked column is on the weaker basis — all ' + _nAll + ' are statutory-terms proxies:'
+            : _nPx + ' of ' + _nAll + ' ranked columns ' + (_nPx === 1 ? 'is a statutory-terms proxy' : 'are statutory-terms proxies') + ':')
+        + '</strong> ' + _names
+        + ' — ORCA holds no verified field production for ' + (_nPx === 1 ? 'it' : (_all ? 'any of them' : 'them'))
+        + ', so ' + (_nPx === 1 ? 'its take is a simple average' : 'their takes are simple averages')
+        + ' of statutory terms rather than a figure weighted by barrels. '
+        + (_all
+            ? 'The ordering above is a ranking of legal regimes, not of realised economics — which is why the '
+              + '<strong style="color:var(--text);">Rank among producers</strong> row below reads '
+              + '<strong style="color:var(--text);">not ranked · no production data</strong> for every column in this set. '
+              + 'A set does not become comparable by being uniformly proxy: the ordering is readable against other '
+              + 'statutory-basis columns, and is not a like-for-like ranking against any production-weighted country '
+              + 'on this platform. Carry it into an IC memo on the proxy basis or not at all.'
+            : 'Read ' + (_nPx === 1 ? 'that column' : 'those columns') + ' against other statutory-basis columns; the '
+              + 'production-weighted columns of this set are the ones that rank like-for-like. State the proxy basis in the IC memo.')
+        + '</div>';
+    })();
     const _aside = _vdOut.length
       ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
         + '<strong style="color:var(--text);">Set aside — ' + _vdOut.length + ' of ' + selected.filter(d => !!d).length
@@ -31706,17 +31765,7 @@ function renderCompare() {
         + '. ' + (_vdOut.length === 1 ? 'Its take rows print, and are' : 'Their take rows print, and are')
         + ' correct on their own basis — ' + (_vdOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
         + ' in this set.</div>'
-      : (_vdRanked.length >= 2 && !_vdReb.length
-          // v981 (T3): this reassurance is about BASIS, and it used to be printed whenever the
-          // basis test found nothing. On a set holding a jurisdiction and its own subdivision the
-          // basis test finds nothing — they are on the same basis — so "nothing is set aside, the
-          // ordering above is the whole set" fired over a ranking containing a duplicate column.
-          // Where a contained pair is present the claim is withheld; _ovlLine directly below says
-          // what is actually true of the set instead.
-          ? (_vdContain.length ? ''
-              : '<div style="font-size:11px;color:var(--muted);line-height:1.55;">All '
-                + _vdRanked.length + ' columns are on one basis — nothing is set aside, the ordering above is the whole set.</div>')
-          : '');
+      : _vdBasisClear;
     // v823 (T3): the line above used to end the strip. On a set holding a fee-blended column it
     // ended it with a reassurance that was not true of the figures printed: Iraq / Norway / Angola
     // has nothing set aside, so the analyst was told "all 3 columns are on one basis — nothing is
