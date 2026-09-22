@@ -65240,3 +65240,19 @@ ones, which at 52 is the opposite of true.
 - Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
 - JS errors: 0 page errors; 15 console 404s for `sw.js`, identical in control — harness artefact
 - Summary: **Cycle 906 complete.** `v982` shipped and pushed (`16077ad`), mirror in sync.
+
+---
+## Cycle 906 Log — 2026-09-22 09:35
+- Test before: 500 PASS / 0 FAIL
+- Test after: 499 PASS / 0 FAIL
+- JS errors: 1
+- Summary: Cycle 906 complete — **v982** shipped and pushed (`16077ad`), grader log `6251e02`, mirror in sync.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest; 905 was T1, 904 T3, 903 T2, 902 T6, 901 T5, 900 T4)
+
+## Friction
+Cold walk at 1440×900, storage cleared. Reform Risk → **Check one country** → Thailand. The Fiscal Predictability slot — the tab's whole answer — contradicted itself three lines apart:
+
+- **≤51 LOW ceiling**, printed ~~80~~ ▲ best case
+- **"Carry ≤51 
