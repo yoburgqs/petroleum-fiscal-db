@@ -64117,3 +64117,94 @@ Deliberately scoped to this tab. `getProducerPeers()` / `getProducerContext()` a
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 897 Log — 2026-09-21
+
+- Test before: 499 PASS / 0 FAIL / 1 WARN (local tree, control = v973 at git HEAD)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (local tree, modified) — suite RAN this cycle
+- JS errors: 0 page errors; the 15 console entries are the local server's service-worker 404 and are present identically on the control
+- Summary: v974 shipped and pushed (`1a43a26`). Mirror in sync.
+
+**Note on provenance.** Cycle 896 timed out at 1800s with uncommitted work in
+`index.html` — the v974 XLSX change below, unverified and uncommitted. This cycle did
+not discard it and did not take it on trust. Every factual claim in its comments was
+re-checked against `country_data.json` and against a live export, which is how the
+hardcoded-take defect below was found. The suite was run, not assumed.
+
+## Task / Friction / Change / Result
+
+**Task — T5, "Give me something I can paste straight into an IC memo."** Last committed
+cycle was T4 (v973, reform heatmap), so T5 does not repeat it.
+
+**Friction.** `exportFCResults()` (index.html:66832) is the one artifact that leaves the
+platform and is read by people who never see the on-screen caveats. Since v674 it carries
+a **Comparable take %** column for the 10 countries that blend fee-basis (TSC / RSC /
+Buy-back) contracts, because the 2026-08-26 comparability rules forbid ranking their
+published take against the PSC/Concession rows. The four **Contractor NPV** columns were
+left on the published all-contract blend and nothing in the workbook said so. Worse, the
+sheet's own Methodology block calls both figures citable and instructs the analyst to
+"read a take and an NPV from the SAME price" — so on these 10 rows, pairing a
+like-for-like take with a blended NPV was not a mistake the file warned against, it was
+the instruction the file gave. Measured live at $75: Iraq exports a 34.1% comparable take
+next to **$642M**, where the NPV over those same PSC/Concession contracts is **$3,043M** —
+a 4.7x understatement, on the row carrying the largest take correction on the platform
+(84.8% published vs 34.1% comparable).
+
+**Change.** A `Comparable contractor NPV $M @$<price>` column is inserted at index 17,
+immediately after the four NPV columns — the same placement rule v674 used for the take
+pair, so it is read *with* the figure it corrects rather than found later. It follows the
+three rules the take pair already follows: carried only when a row in this export actually
+blends fee-basis contracts, blank on rows the rule does not touch (so the column reads as
+"these are the affected rows"), and the four published NPV columns are left alone, so
+workbook and screen still agree row for row. The per-row *Take comparability* sentence now
+names the NPV correction beside the take one, and the Methodology sheet gains a worked
+example plus the statement that the correction runs both ways.
+
+**A defect found and fixed in that inherited block.** The Methodology worked example
+hardcoded Iraq's **34.1%** — the $75 comparable take — into a sentence that renders at
+every deck. At $50 the sheet read "$1,438M ... the same rows the 34.1% comparable take is
+computed over" when Iraq's $50 comparable take is **28.6%**: a take from a price the
+analyst had already left, inside the one sentence asserting the two figures share a
+contract population. It now reads off the same `_xlFeeAt` entry the column uses, exactly
+as the take section above it does — 28.6 / 34.1 / 37.8 / 39.7 at $50 / $75 / $100 / $125.
+
+**Result.** An analyst exporting the workbook as an IC attachment can now cite a take and
+a contractor NPV computed over the **same contract population at the deck they chose**,
+instead of quoting a low government take against a value the country does not have. The
+correction is a basis and not an uplift, and the sheet says so: 9 of the 10 rows move up
+(Iraq 642→3,043, Oman 566→866, Iran 899→1,248, Qatar 1,061→1,244, South Sudan
+1,534→1,868, Malaysia 627→720, Mexico 2,882→3,001, Azerbaijan 2,951→3,027, Ecuador
+2,127→2,184) and **India moves down**, 1,113→1,095.
+
+### Cycle 897 verification — all measured this cycle, nothing assumed
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** |
+| Runtime suite **RAN** vs modified local tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v973 from git HEAD | **499 / 0 / 1 — no regression** |
+| `FAIL`/`WARN` lines, control vs modified | **byte-identical** (`diff` clean) |
+| Full workbook diff vs control @ $75, new column removed | **10 differing cells, all col 12**, on exactly the 10 fee-blended rows |
+| Ranks, sort order, published NPV/take columns | **unchanged across 186 rows x 30 cols** |
+| Export exercised at **$50 / $75 / $100 / $125** | column header, values and worked example all follow the deck |
+| Values vs `country_data.json` `g1` | exact match; all 11 g1 countries carry `v50/v75/v100/v125` |
+| Russia (has `g1`, take does not diverge) | correctly **excluded** from both the take and the NPV column |
+| 390x844 `hasTouch` | **0 of 10 tabs** scroll sideways; `scrollWidth` 390 == `clientWidth` 390 |
+| controls under 24px on `#t2` under `pointer: coarse` | **0** |
+| page errors, desktop and mobile walks | **0** |
+| Version | title + badge v973 → v974, silently at the end |
+
+### What this cycle did NOT do
+
+- No new control was added, so finalization item 3 is untouched by this change.
+- Carried forward, still open: the Evidence Quality summary strip's missing index-only
+  tally (893); the regional-extreme cue on Nigeria / Norway / Australia (884, 891); the
+  Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891); Fiscal
+  Compare's clipboard emitting `Breakeven $/bbl` unconditionally where `_scCopyColumns()`
+  guards it with `if (anyBe)` (880); the Screener's Advanced Filters panel rendering 17
+  checkboxes at 13px under `pointer: coarse` (889), against finalization item 3.
+- **Suite copies remain diverged** — the graded copy that actually runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js` (sha 045f00a6dddc); the repo copy
+  at `petroleum-fiscal-db/tests/` (sha e87e483cb5dd) is idle. Test edits made to the repo
+  copy do not affect the graded result. Not fixed this cycle; flagged again.
