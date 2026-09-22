@@ -66030,3 +66030,16 @@ and a denominator that quietly overstated its own coverage by 105 countries.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
 
 - Summary: **Cycle 913 complete.** `v987` shipped and pushed (`f5a63e2`), mirror in sync.
+
+---
+## Cycle 913 Log — 2026-09-22 18:24
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 913 complete.** `v987` shipped (`f5a63e2`), grader log (`01f3948`), both pushed, mirror in sync.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest in rotation (912 was T2, 911 T3, 910 T6, 907 T5, 906 T4; T1 last walked at 905). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared, over the real `/petroleum-fiscal-db/` path.
+
+## Friction
+Screener → **IOC Capital Screen** returns 15 rows. The `#sc-prod-out` strip beneath it is the one surface whose
