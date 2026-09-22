@@ -64953,3 +64953,134 @@ nested branch.
 
 ## Friction
 Cold walk at 1440×900, storage cleared. The entry paths were clean — alias search resolves UAE, Emirates, Britain, Holland, Burma, Ivory Coast, Kurdistan; removing a chip correctly converts the seeded example into the analyst's own set. The defect is in the **verdict strip**, on a set an a
+
+---
+## Cycle 905 Log — 2026-09-22 — v981
+
+### Task
+
+**T1 — "Which countries should even be on my screening list?"** Rotated off T3 (904), T2 (903),
+T6 (902), T5 (901), T4 (900). T1 was the stalest of the six.
+
+### Friction
+
+Cold walk at 1440×900, `sessionStorage` and `localStorage` cleared. Home → Screener → **IOC
+Capital Screen** → click the **$50** price deck.
+
+The shortlist goes **15 → 18**. Kazakhstan, Libya and Norway *appear* when the oil price falls.
+The count line's only comment on this is "18 countries match at $50/bbl".
+
+Measured this cycle on the live build — it is not one preset, it is every take-ceiling preset:
+
+| preset | $50 | $75 | $100 | $125 |
+|---|---|---|---|---|
+| IOC Capital Screen | **18** | 15 | 12 | 11 |
+| Low Take · Positive NPV | **164** | 143 | 122 | 118 |
+| Stable Fiscal Record | **12** | 11 | 9 | 8 |
+| PSC Africa | 35 | 34 | 34 | 32 |
+
+The direction is correct fiscal mechanics, not a bug: government take moves **with** price under
+progressive terms (cost-recovery caps, profit-oil tiers, PRRT, Norway's SPT), so a fixed take
+ceiling stops binding as the price falls. Kazakhstan is 69.9% at $75 and 63.4% at $50; a 65%
+ceiling admits the second figure and not the first. Libya 71.1 → 64.3. Norway 68.0 → 59.3.
+
+But the analyst running their downside stress case has been handed the one conclusion that is
+**materially wrong** — that the $50 screen is the *less* restrictive one, and that these three
+countries are robust at $50. They entered because the ceiling moved, not because they improved.
+At that moment the page said nothing. The deck buttons' own `title` text describes the mechanism,
+but a tooltip does not fire on a number that moved the wrong way, and `_labelScreenerPresets()`'s
+`→ N of 185 @$deck` captions are read **before** the click, not after it. The v651 comment block
+above `_labelScreenerPresets()` has carried these exact counts since it was written — the numbers
+were known to the code and never shown to the analyst at the point of confusion.
+
+### Change
+
+New **`#sc-deck-delta`** strip directly under the Screener count bar, rendered by `_scSetDeck()`
+→ `_scRenderDeckDelta()` whenever the deck moves with a screen loaded:
+
+- `Price deck $75 → $50 · shortlist 15 → 18 (+3 in)`
+- When the move is counter-intuitive — list **grows** as price falls, or **shrinks** as it rises —
+  an amber-toned line naming the mechanism and the count: *"3 of the 3 countries below crossed the
+  65% ceiling for that reason alone. They did not become more attractive at $50; the ceiling moved."*
+- Every entrant and leaver as a 24px chip carrying its take at **both** decks —
+  `Kazakhstan 69.9% → 63.4%` — split into **Entered on the take ceiling** vs **Entered on an NPV or
+  evidence leg**, on the same comparable-take basis `_scPass()` screens on (`_scFeeCmpAt`) and with
+  the same state-monopoly withdrawal `fmtTake` uses. Each chip opens that country's Profile.
+- Three actions: **Keep only the N that pass at both $75 and $50**, **Back to $75**, **Dismiss**.
+
+`_scDeckApplyBoth()` runs through the **same** `_screenerCountrySet` / `_screenerSetLabel` leg the
+presets use (runScreener ~line 36058), so the count line, the CSV, the XLSX and the IC-memo paste
+all carry `"the 15 countries that pass this screen at $75/bbl AND at $50/bbl"` with no second code
+path. Cleared by `resetScreenerAll()`, by `applyScreenerPreset()`, and by any slider `input` —
+the strip is a diff of one threshold set across two prices and goes stale the moment either moves.
+Suppressed when both sides are the unfiltered 185-country universe.
+
+Publish point extended: `runScreener()` now emits `_screenerLastNames`, `_screenerLastCeiling`,
+`_screenerLastCeilOn` and `_screenerLastFeeCmp` beside the existing `_screenerLastCount`, off the
+real filter path rather than a parallel re-implementation of it.
+
+### Result
+
+An analyst who stress-tests the IOC Capital Screen at $50 is told, **at the moment the number
+moves**, that their shortlist grew because the take ceiling stopped binding and not because
+Kazakhstan, Libya and Norway got better — with each one's take at both prices on the chip — and
+can build the two-price screen they were actually reaching for in **one click** instead of
+concluding the price deck is inverted and abandoning the tool.
+
+### Cycle 905 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, all inline blocks | **11 blocks, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v980 from git HEAD (`_ctl.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **identical apart from the timestamp line** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| Horizontal scroll, strip visible, 1920 / 1440 / 1280 / 1024 / 768 | `scrollWidth == clientWidth` at **all five** |
+| 390×844 `hasTouch`, all 10 tabs, cold **and** with the strip rendered | **10 of 10** clean, both sweeps |
+| Strip width at 390 | **336px** in a 390px viewport — no overflow |
+| Control heights at 390 under `pointer: coarse` | 6 of 6 buttons at **24.0px** — 3 chips, 2 actions, Dismiss |
+| Page errors across every action walked | **0** |
+| A — deck change with **no** screen loaded (185 → 185) | strip correctly **stays hidden** |
+| B — $75 → $125 (price up, list 15 → 11) | flagged, four leavers named: Azerbaijan 59.8→68.0, China 61.0→65.5, India 63.2→71.5, Indonesia 59.5→70.3 |
+| C — **Back to $75** round trip from $125 | deck returns to 75, 11 → 15 rows, reverse delta re-renders |
+| D — **Dismiss** | strip hidden, `_scDeckBothSet` nulled |
+| E — chip click | opens Country Profile on the named country (`tab-btn-t7`, Kazakhstan) |
+| F — slider move after a deck change | strip cleared, stale both-decks set discarded |
+| **Keep only the 15 that pass at both** | 18 → **15** rows; count line reads "scope: the 15 countries that pass this screen at $75/bbl AND at $50/bbl" |
+| Version | title + badge v980 → v981, silently at the end |
+
+**Defect found and fixed inside this cycle:** the first build of the **Back to $75** button wrote
+its inline handler with `JSON.stringify(String(deck))`, emitting `onclick="_scSetDeck("75")"` —
+the double quote terminated the HTML attribute and the click threw
+`Failed to execute 'click' on 'HTMLElement': Unexpected end of input`. Caught by test C, which
+reported the deck still at 125 after the click. Fixed to `&#39;` entities and re-verified.
+
+### Carried forward, still open
+
+- **Surfaced and NOT fixed:** the inversion is disclosed on the **Screener only**. Fiscal Compare,
+  Country Profile and the Breakeven Map all recompute take at the deck price with no equivalent
+  signal, and the Explorer's Browse table ranks on it. The same `_screenerLastNames`-style publish
+  point does not exist on those surfaces.
+- The strip fires on essentially every deck change while a take ceiling is active. That is the
+  correct trigger — the fact is true every time — but if it proves noisy, the fix is a per-session
+  "seen it" flag, **not** narrowing the condition.
+- Side-by-Side take-ordering chain still *places* a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia's position against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio and Scenario Builder
+  still not measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
+
+## Cycle 905 Log — 2026-09-22
+- Test before: 499 PASS / 0 FAIL / 1 WARN (control, v980 from git HEAD, same harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
+- JS errors: 0 page errors; 15 console 404s for `sw.js`, identical in control — `python http.server` artefact
+- Summary: **Cycle 905 complete.** `v981` shipped and pushed (`2cbb8cb`), mirror in sync.
