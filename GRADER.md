@@ -64567,3 +64567,132 @@ in all three shapes it can take.
 **Task — T5, "Give me something I can paste straight into an IC memo."** Last two committed cycles were T4 and T1, so this repeats neither.
 
 **Friction.** Cold walk at 1440×900 → Fiscal Compare → ticked five countries → pressed **⎘ Copy for IC Memo** → pasted into a letter-portrait page at Word's 6.5in (624px) text column. The button's tooltip promises it "pastes into
+
+---
+
+## Cycle 902 Log — 2026-09-22 — v978
+
+### Task — T6, "Where did this number come from and how solid is the evidence?"
+
+Rotated off T5 (cycle 901), T4 (900) and T1 (899). T6 was the stalest, last run at 893.
+Walked cold at 1440x900 with sessionStorage and localStorage cleared: Home → Fiscal Compare →
+Angola row → drawer, then Australia / Nigeria / Guyana / Norway / Somalia / USA / Iraq /
+Micronesia. Also walked the Country Profile Evidence Quality panel and the per-term Evidence
+Chain for Angola, Norway and Guyana to see what the drawer was and was not carrying.
+
+### Friction
+
+The drawer is where a Fiscal Compare analyst asks this question — 185 ranked rows lead into it
+and it ends with **⎘ IC Citation**. Its **Fiscal Breakdown** is the most granular answer the
+platform gives: it decomposes the take into the four to six levies that produced it, names a
+**Largest component**, and hangs an IC note off that component telling the analyst what to put
+in front of the committee.
+
+Every bar rendered clean. Angola's read:
+
+    Royalty              2.6%
+    FTP                 20.0%
+    Profit Oil (Govt)   28.0%
+    CIT                 10.7%
+    Largest component: Profit Oil (Govt) at 28.0% of revenue — IC note: profit oil
+    dominant = R-factor-linked regimes escalate govt take as project profitability
+    rises; show $100/$125 sensitivity.
+
+Angola's own Evidence Chain, on a different tab behind a country selection ~3,900px down, says
+`Profit Oil (Govt) — ⚠ No source · contract average`. The largest single component of the take,
+and the IC note derived from it, rest on a rate no source on this platform states. The drawer
+said nothing.
+
+The only citation signal in the drawer was the header chip (`_fcRenderTermLeg`, v679) — **"3 of
+5 model terms cited"**. That is an aggregate ~500px above the bars: it says how MANY terms are
+uncited and never which, and it counts terms (Cost Recovery Cap) that draw no bar at all. So
+there was nothing to separate a bar ORCA read out of a statute from one it holds no source for.
+
+**Measured live on the shipped v977 across all 185 rows**, on `_fcTermLeg()`'s own rule — bulk
+harvest, an instrument shared across jurisdictions and a D-confidence value do not count, the
+rule the Country Profile Evidence Chain uses:
+
+| | |
+|---|---|
+| countries whose drawer runs THEIR OWN terms | 65 |
+| of those, largest component is an **uncited** term | **61** |
+| of those, at least one uncited bar | 62 |
+| their rendered bars that are uncited | **115 of 237 — 48.5%** |
+| remaining rows (generic mechanic default) | 120 — already covered by the v505 banner |
+
+It lands on the rows that matter: Australia's **PRRT at 28.9%** of revenue, Nigeria's **Special
+Tax at 26.2%** where the IC note reads *"take accelerates above $75/bbl"*, China's Profit Oil at
+31.1%, Angola's at 28.0%, **Somalia uncited on all five terms it runs**.
+
+### Change
+
+v944 built exactly this leg — for the **Scenario Builder modal only**. This ports it to the
+drawer, with the same rule, the same wording and the same destination:
+
+- Each uncited bar carries a **`NO CITATION`** caption inside the existing 130px label column.
+  `display:block`, so no row can widen and no bar can be pushed — measured identical to control.
+- A verdict block under the split names each uncited term, **the line it produces** (the term and
+  the line are not always the same word — "State Participation" produces the *State Equity* line;
+  on a TSC the *Service Fee* produces the *Govt Direct* line), and ends in
+  **Open <country>'s Evidence Chain →**.
+- Terms with no bar of their own are named separately rather than pinned to a neighbour's bar.
+- **New over v944:** when the uncited term IS the largest component, the **"Largest component"
+  sentence itself** now ends *"— and it is uncited"*. That is the sentence read into a memo, so
+  it is said there and not only in a block underneath it.
+- Three clean states are distinguished, because they are different claims: uncited bars (red),
+  every bar cited but not every term (amber — USA), and generic terms (silent).
+
+`severance_rate` is deliberately mapped to **no bar**: `dcfConcession()` computes it into neither
+the waterfall nor `totalGovt`, so captioning the Royalty bar beside it would have flagged a bar
+whose own term is cited. Caught by walking USA after the first draft, and fixed before shipping.
+
+Nothing about the take, NPV, IRR, waterfall, rank or grade changes.
+
+### Result
+
+The analyst can tell, without leaving the drawer, which components of the split ORCA can stand
+behind — and is told **before** quoting the largest component in an IC memo, not after. On
+Australia the PRRT line now reads `PRRT / NO CITATION / 28.9%` with *"— and it is uncited"* on
+the sentence beside it; on Nigeria the same on the Special/Windfall line the price-sensitivity
+note is derived from; on USA the block says the bars are all cited and three terms are not,
+which the old header chip's bare "2 of 5" could not distinguish.
+
+### Cycle 902 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v977 from git HEAD (`_ctl_v978.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **differs on the timestamp line only** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| 390x844 `hasTouch`, all tabs | **10 of 10**, `scrollWidth` == `clientWidth`, no sideways scroll |
+| drawer bar widths on mobile, control vs modified | **52px on both** — the caption does not squeeze the bar |
+| in-drawer elements past `clientWidth`, control vs modified | **24 on both** — pre-existing, inside the scrolling table region |
+| `Open Evidence Chain →` button under `pointer: coarse` | **24px tall** — meets the floor |
+| page errors, desktop walk (9 countries) and mobile walk | **0** |
+| generic-terms rows stay silent (Micronesia) | **confirmed** — no caption, no block, no dom flag |
+| Version | title + badge v977 → v978, silently at the end |
+
+### Carried forward, still open
+
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889), against
+  finalization item 3.
+- The other IC-memo pastes — Screener, Side-by-Side, Country Profile, IOC Portfolio, Scenario
+  Builder — still not measured against a page width (901).
+- **New, surfaced by this walk:** the Country Profile Evidence Quality summary says
+  "2 of 3 source links dead" (its three Key sources) while the Evidence Chain below says "1 of
+  the 4 cited sources above cannot be retrieved" (the model-term citations). Both are honest
+  about different populations, but neither label says which population it counts. Not fixed —
+  it is a wording question and this cycle's budget went to the bars.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+## Cycle 902 Log — 2026-09-22 08:55
+- Test before: 500 PASS / 0 FAIL
+- Test after: 499 PASS / 0 FAIL / 1 WARN (suite RAN this cycle; control from git HEAD scores identically)
+- JS errors: 0
+- Summary: **Cycle 902 complete.** `v978` shipped and pushed (`5e7b189`), mirror in sync.
