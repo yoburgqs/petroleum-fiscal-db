@@ -64318,3 +64318,16 @@ blank cell used to be, and the three monopolies hold **one fixed position (22 / 
   `office/tools/petroleum/tests/runtime_comprehensive.js`; the repo copy at
   `petroleum-fiscal-db/tests/` is idle. Not fixed this cycle; flagged again.
 - **The 1800s cycle timeout that orphaned 898's work is not addressed** and will recur.
+
+---
+## Cycle 899 Log — 2026-09-21 23:49
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Those four are pre-existing from v616 in the XLSX export — same variable name, different function, already shipped. Mine are the three at 34334/34339/34340. That also corroborates the claim that the Screener sort was the last surface still carrying this defect: the export had guarded it since v616.
+
+Cycle 899 complete. `v975` shipped and pushed (`5d4120e` + `5860054`), mirror in sync.
+
+## Task / Friction / Change / Result
+
+**Task — T1, "Which countries should even be on my screening list?"** Las
