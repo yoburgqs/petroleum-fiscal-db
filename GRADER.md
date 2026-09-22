@@ -65099,3 +65099,144 @@ reported the deck still at 125 after the click. Fixed to `&#39;` entities and re
 Cold walk at 1440×900, storage cleared. Screener → **IOC Capital Screen** → click the **$50** price deck.
 
 **The shortlist goes 15 → 18.** Kazakhstan, Libya and Norway *appear* when the oil price falls. The count line's only comment is "18 countries match at $50/b
+
+---
+
+## Cycle 906 — v982 — 2026-09-22
+
+### Task
+
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest: 905 was T1,
+904 T3, 903 T2, 902 T6, 901 T5, 900 T4.)
+
+### Friction
+
+Cold walk at 1440x900, sessionStorage and localStorage cleared. Home → **Reform Risk** →
+**Check one country** → Thailand. The card is the tab's whole answer, and its Fiscal
+Predictability slot contradicted itself three lines apart:
+
+| line | what it said |
+|---|---|
+| headline | **≤51 LOW ceiling** &nbsp; printed ~~80~~ UNGRADED ▲ best case |
+| bound | **Carry ≤51 · LOW, not 80.** At 36.6pp the take-spread term alone costs 29 points and the printed score charged none of it. |
+| cohort | **81st of 132 one-term regimes** — a cohort the spread penalty never touches, which is why this score is shown **UNGRADED** rather than banded. … *A one-term score above a measured one is not the steadier regime.* |
+
+Every clause of that last paragraph is withdrawn by the two lines above it:
+
+- the rank **81st** is computed from the 80 the card has just struck through;
+- *"a cohort the spread penalty never touches"* is precisely the basis the contract table
+  refuted — the ceiling exists because the spread **is** charged;
+- *"shown UNGRADED rather than banded"* is false on a headline now reading **LOW**;
+- and the closing rule **inverts**. At 51 the country is no longer above the measured
+  cohort at all: their own ceiling is Turkmenistan 74.
+
+That paragraph is the one sentence on the card telling an analyst how to rank the number
+against other countries — the same role v937 fixed on the measured branch — and it is the
+last thing read before the IC memo.
+
+`_rrPaintIqrUnderstated()` already withdraws this block on the sibling **measured** branch
+(v784, gated on `bandMoves`, index.html:51537). `_rrPaintObsSpread()` — the **single**
+(one-term) branch — never touched `#rr-fp-cohort` at all. The larger population was the
+one left unguarded.
+
+**Measured across all 185 lookups: 36 one-term countries paint a material ceiling, and all
+36 printed a rank off the refuted score.**
+
+| country | printed | rank printed | ceiling |
+|---|---|---|---|
+| Uzbekistan | 89 HIGH | 46th of 132 | **≤49 · LOW** |
+| Netherlands | 84 HIGH | 73rd | ≤59 · LOW |
+| Albania / Lebanon | 81 HIGH | 78th / 79th | ≤49 · LOW |
+| Thailand | 80 HIGH | 81st | ≤51 · LOW |
+| Papua New Guinea | 78 HIGH | 82nd | ≤66 · MODERATE |
+| Namibia | 77 HIGH | 83rd | ≤60 · MODERATE |
+| **Norway** | 76 HIGH | 84th | ≤52 · LOW |
+| Libya | 74 MODERATE | 87th | ≤60 · MODERATE |
+| Colombia | 72 MODERATE | 93rd | ≤40 · VERY LOW |
+| Angola | 62 MODERATE | 109th | ≤26 · VERY LOW |
+| Indonesia | 62 MODERATE | 118th | ≤32 · VERY LOW |
+| … 25 more | | | |
+
+Six of the 36 — **Norway, Indonesia, Angola, Colombia, Ecuador, Libya** — are among the
+21 jurisdictions that carry a sourced reform log at all, so this was the closing line of
+the T4 answer on the tab's own headline countries.
+
+### Change
+
+`_rrPaintObsSpread()` now **replaces** `#rr-fp-cohort` where the ceiling is material —
+the same `material` flag `_rrFpHeadlineCeiling()` is gated on, so the ceiling headline and
+the withdrawn rank always appear together and the card has no third state. Replacement,
+not a retraction appended beneath, for the v784 reason: two paragraphs whose net content
+is one line is how an analyst learns to skip the line.
+
+The rank comes **off the screen**. In its place the block states why, and then what is
+still decidable at the bound:
+
+- **Ceiling below the measured cohort's ceiling** (Thailand, Uzbekistan, Norway, Libya —
+  34 of 36): *"At ≤51 · LOW the spread term IS charged, on the same footing as the 28
+  countries ORCA can measure, and 51 falls below their own ceiling (Turkmenistan 74). So
+  the usual reading here — a one-term score above a measured one is not the steadier
+  regime — does not arise: at its ceiling Thailand is not above one."*
+- **Ceiling still above it** (USA, ceiling 82 > 74): *"Rank it on ≤82 · HIGH, the bound the
+  spread term puts on it, and not on the printed 91."*
+
+Nothing is recomputed and no threshold is introduced. The bound is the same
+`_fpObsCeilingFrom()` object Country Profile's Copy for IC Memo and the XLSX read; the
+cohort ceiling is `_fpCohortStats().measuredTop`. Both are already on screen elsewhere.
+
+### Result
+
+An analyst reading the Reform Risk verdict for any of those 36 countries no longer gets a
+stability **ordering** that contradicts the **number** the same card told them to carry two
+lines earlier. On Norway they now read *"carry ≤52 · LOW, and at that bound Norway is not
+above the measured cohort"* — instead of *"carry ≤52 · LOW"* followed by a rank of
+84th-of-132 computed from 76 and a rule asserting that one-term scores outrank measured
+ones, which at 52 is the opposite of true.
+
+### Cycle 906 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, all inline blocks | **11 blocks, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v981 from git HEAD (`_ctl906.html`, removed after) | **499 / 0 / 1 — no regression** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| Gating sweep, **all 185 lookups** | **36 of 36** one-term material ceilings withdraw; **0** false positives; **0** page errors |
+| Untouched controls | Guyana (62, no material ceiling) and Oman (83) keep their rank **verbatim** |
+| Sibling branch untouched | Nigeria (measured, v784) renders its own withdrawal unchanged |
+| Both copy branches exercised | below-cohort — Thailand, Uzbekistan, Norway, Libya; above-cohort — USA (ceiling 82 > 74) |
+| Horizontal scroll, 10 tabs | `scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** |
+| Same, with the ceiling card rendered | clean at all six |
+| 390x844 `hasTouch` | block **230 x 180**, right edge **282** of 390 — no overflow |
+| Controls under 24px | **none added or touched** — the block contains no control |
+| Version | title + badge v981 → v982, silently at the end |
+
+### Carried forward, still open
+
+- **Surfaced and NOT fixed:** the same one-term cohort line is printed by `_fpCohortLine()`
+  on **Country Profile** and in the **Fiscal Compare** stability tooltip. This cycle fixed
+  the Reform Risk card only, because that is the surface T4 walks; the shared function
+  still hands the other two a rank computed from the refuted score. The clean fix is to
+  move the withdrawal into `_fpCohortLine()` itself, which needs the ceiling resolved
+  before the line is built — it is not, on either of those surfaces.
+- The deck-change inversion is still disclosed on the **Screener only** (905): Fiscal
+  Compare, Country Profile and the Breakeven Map recompute take at the deck price with no
+  equivalent signal.
+- Side-by-Side take-ordering chain still *places* a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia's position against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio and Scenario
+  Builder still not measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
+## Cycle 906 Log — 2026-09-22
+- Test before: 499 PASS / 0 FAIL / 1 WARN (control, v981 from git HEAD, same harness)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
+- JS errors: 0 page errors; 15 console 404s for `sw.js`, identical in control — harness artefact
+- Summary: **Cycle 906 complete.** `v982` shipped and pushed (`16077ad`), mirror in sync.
