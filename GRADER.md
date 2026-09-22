@@ -64438,3 +64438,119 @@ after the change.
 **Task — T4, "What is my fiscal-stability and reform exposure here?"** The last two committed cycles were T1, so this does not repeat them.
 
 **Friction.** Walked cold at 1440×900 into Fiscal Compare, which renders the **Reform verdict** column ticked on by default. Its header tooltip says *"Hover any cell for the full IC action; click it for the Reform Risk panel."* The IC analys
+
+---
+## Cycle 901 Log — 2026-09-22 — v977
+
+## Task / Friction / Change / Result
+
+**Task — T5, "Give me something I can paste straight into an IC memo."** The last two committed
+cycles were T4 (v976) and T1 (v975), so this repeats neither.
+
+**Friction.** Walked cold at 1440x900 — no sessionStorage, no localStorage — Home → Fiscal
+Compare, ticked Iraq / Angola / Guyana / Iraq-Kurdistan / Norway, pressed **⎘ Copy for IC Memo**,
+and pasted the result into a letter-portrait page at Word's 6.5in / 624px text column. The button's
+own tooltip promises it "pastes into Word, Google Docs, Outlook and PowerPoint as a formatted
+table". It does emit `text/html` — that part was true. What arrives is not usable.
+
+Measured on the `text/html` flavour Word actually consumes (`copyFCTableForIC`, index.html ~66860):
+
+| measurement | before |
+|---|---|
+| columns | **14**, three header strings over **120 characters** |
+| longest cell | **430 characters** (`Model basis`, override row) |
+| table width, auto layout | **1038px** — **1.66x** the 624px text column |
+| header row height, AutoFit-to-window | **317px = 3.3in** |
+| Iraq's row height, same | **945px = 9.8in** — taller than a whole page, for one country |
+| cells overflowing their box | **27** |
+| preamble above the table | **5,049 characters** |
+| total | **2.83 letter pages for a FIVE-row shortlist** |
+
+Two consequences, and the second is the one that decides the cycle.
+
+1. The exhibit does not begin until **page 2**, because 5,049 characters of preamble sit above it.
+2. Under AutoFit-to-window all 14 columns are set to **0.46in**. At that width an unbreakable word
+   is wider than its cell, so it does not wrap — it **spills into the neighbour**. Norway pastes as
+   **`Concess68.0`**: the government take printed on top of the Mechanic cell. The headline number
+   this entire tab exists to deliver is illegible in the pasted memo.
+
+The content was right. Every caveat on that paste is load-bearing and hard-won — v664's
+comparability correction, v955's like-for-like NPV, v968's engine-override naming. What was wrong
+is that **all of it was inside the table**.
+
+**Change.** An IC exhibit puts figures in the cells and qualifications in notes underneath.
+Applied to the `text/html` flavour only:
+
+- **Short column labels**, with no word over six characters, so nothing can spill regardless of the
+  font Word substitutes. Keyed `a`..`h` to notes carrying the full header strings **verbatim**.
+- **The two basis columns emit a token** — `ENGINE over-ride, 2 terms`, `PROXY`, `PROD-WTD 11.6%` —
+  with the sentence keyed to a note. One note per **distinct basis**, not one per row, so the same
+  PROXY sentence is not printed twice.
+- **Proportional column widths by content class** (rank 4 / country 10 / region 8 / mechanic 11 /
+  numeric 6 / basis 9), declared on the `<th>` and again as a `<colgroup>`, so AutoFit cannot
+  equalise them. Weights are by class, not hand-tuned per column, so they hold when the two
+  reference columns are absent.
+- **The table moves ABOVE the preamble**, which becomes the notes block.
+- Numeric cells right-aligned and `nowrap`.
+
+`text/plain` is **byte-identical** — verified by diff against a control built from git HEAD. Excel
+has no page to overflow and wants the full strings in-cell, so the two flavours legitimately differ
+in layout while carrying the same words.
+
+**Result.** The pasted exhibit is **624px — exactly the text column — with ZERO overflowing cells**,
+in all three shapes it can take.
+
+| | before | after |
+|---|---|---|
+| table width vs 624px page | 1038 (1.66x) | **624 (1.00x)** |
+| header row | 317px / 3.3in | **54px** |
+| worst row (Iraq, override) | 945px / 9.8in | **58px** |
+| overflowing cells | 27 | **0** |
+| pages, 5-country shortlist | 2.83 | **1.30** |
+| exhibit starts on | page 2 | **page 1, line 2** |
+| figures printed over their neighbour | yes (`Concess68.0`) | **none** |
+| qualifying words dropped | — | **none** |
+
+### Cycle 901 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v976 from git HEAD (`_ctl_v977.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **differs on the timestamp line only** |
+| The 1 WARN / 15 JS errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| Paste fit, 12-col no-fee shortlist (Norway/Angola/Guyana) | 624px, **0 overflow**, hdr 43px, 1.16 pages |
+| Paste fit, 14-col fee-blended shortlist | 624px, **0 overflow**, hdr 54px, 1.30 pages |
+| Paste fit, **full 185-row table**, nothing ticked | 624px, **0 overflow**, 185 rows emitted |
+| Table rendered before the notes block | **true** on all three shapes |
+| `text/plain` TSV, before vs after | **byte-identical** |
+| 390x844 `hasTouch` | **10 of 10 tabs**, `scrollWidth` == `clientWidth`, no sideways scroll |
+| page errors, desktop and mobile walks | **0** |
+| Version | title + badge v976 → v977, silently at the end |
+
+### Also walked this cycle and found sound
+
+- The `text/html` flavour exists and is a real `<table>` on all four IC-memo surfaces checked —
+  the "pastes as a formatted table" claim is true; only its *fit* was wrong.
+- Arm-then-paste guard (v828) still fires on the unticked 185-row table and is unaffected by the
+  layout change.
+- The greying of the two reference-only columns (`ci===5`, `ci===7`, v777/v955) survives the
+  rewrite — index positions were held through both `head`/`headShort` splices.
+- Carried item 880 (FC clipboard emits `Breakeven $/bbl` unconditionally): the header is now
+  keyed to note `e` and the caption already states the coverage count per shortlist. Left as is —
+  the column is honest, and dropping it would cost the downside read. Still open as a tidy.
+
+### Carried forward, still open
+
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889), against
+  finalization item 3.
+- The other IC-memo pastes — Screener, Side-by-Side, Country Profile, IOC Portfolio, Scenario
+  Builder — were **not** measured against a page width this cycle. Fiscal Compare was the widest
+  at 14 columns, but the same defect class is plausible on Screener. Next T5 cycle should measure
+  them before changing anything.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
