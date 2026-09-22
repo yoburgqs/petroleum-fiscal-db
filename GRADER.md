@@ -64425,3 +64425,16 @@ after the change.
   `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
 - The `_rrIcTokenCell()` token on the Reform Risk ranking table is `cursor:help` only — it is a
   caption there, not a control. Noted, not changed; that table's row is already clickable.
+
+---
+## Cycle 900 Log — 2026-09-22 01:18
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 900 complete.** `v976` shipped and pushed (`dce357f`), mirror in sync.
+
+## Task / Friction / Change / Result
+
+**Task — T4, "What is my fiscal-stability and reform exposure here?"** The last two committed cycles were T1, so this does not repeat them.
+
+**Friction.** Walked cold at 1440×900 into Fiscal Compare, which renders the **Reform verdict** column ticked on by default. Its header tooltip says *"Hover any cell for the full IC action; click it for the Reform Risk panel."* The IC analys
