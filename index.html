@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v972</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v973</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v972</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v973</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -30536,7 +30536,7 @@ function renderCompare() {
   // No threshold is invented: the producer set is getProducerPeers(), which reads the existing
   // `weighting` field and drops state monopolies exactly as fmtTake already does. The all-185
   // figure is kept, in the tooltip, so nothing is lost.
-  // ── v972 (T3) — the producer ranking now reads the deck the analyst chose ─────────────
+  // ── v973 (T3) — the producer ranking now reads the deck the analyst chose ─────────────
   // Walked T3 cold (Guyana / Brazil / Angola, the standard Atlantic screening set) with the
   // "Rank at" control moved to $100. Everything v929 built followed: the verdict strip, the
   // column order, the two order-dropdown labels, and the lowest/highest-of-N marks on all four
@@ -30588,7 +30588,7 @@ function renderCompare() {
     return i >= 0 ? { rank: i + 1, n: list.length } : null;
   };
   const _cmpProducerRankCell = (d) => {
-    const _rkP  = cmpRankPrice;                       // v972 (T3): the deck the analyst chose
+    const _rkP  = cmpRankPrice;                       // v973 (T3): the deck the analyst chose
     const ctx   = _cmpProdCtxAt(d.country, _rkP);
     const _allR = _cmpAllRankAt(d.country, _rkP);
     const allNote = _allR
@@ -52075,13 +52075,45 @@ function renderReformRisk() {
     + '</tbody></table></div>';
 
   // Section 2: Decade heatmap
+  // ── v973 (T4): draw the 2010 scoring window INTO the grid ─────────────────────────
+  // Every finding on this tab keys on one boundary -- events dated 2010 or later. The ranked
+  // table draws that boundary as its orange premium line. This grid -- the one place the analyst
+  // reads WHEN a regime moved -- drew the gap between 2000s and 2010s exactly like every other
+  // column gap, and filled a pre-window cell with the same saturated amber/orange/red as an
+  // in-window one. So the grid's visual weight pointed at the wrong decade. Measured on the live
+  // data: 10 of the 20 rows carry MORE lit cells before 2010 than inside it, and four -- Algeria,
+  // Libya, Colombia, USA -- have every lit cell outside the window and score 100. Algeria reads as
+  // four solid amber cells and carries no premium; Russia reads as one and is the jurisdiction
+  // that raised take +15pp inside the window. An analyst scanning rows for "who has been busy"
+  // ranked them close to the reverse of the order this tab scores them in -- which is exactly the
+  // misread the tab's own prose warns about ("a country whose last take rise was 2005 or 2007
+  // scores 85-100") and which nothing on this grid was doing anything to prevent.
+  //
+  // Three structural changes, no new prose block: (1) a solid accent rule down the 2010 boundary,
+  // continuous through header and body; (2) a header band naming each side, NOT COUNTED vs
+  // SCORES; (3) pre-window lit cells drawn as outlines rather than fills, so the record stays
+  // fully visible and fully countable but stops out-shouting the two columns that decide the
+  // score. A trailing Scored column carries the in-window count, so the rule's meaning is a
+  // number on every row rather than a convention the analyst has to remember.
+  const RR_WIN = 2010;
+  const rrWinEdge = 'border-left:2px solid var(--accent);';
+  const rrPreN = decades.filter(function(d){ return d <  RR_WIN; }).length;
+  const rrWinN = decades.filter(function(d){ return d >= RR_WIN; }).length;
   const heatmap = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;overflow-x:auto;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Reform Activity Heatmap \u2014 By Decade</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Top 20 of the 21 jurisdictions with a sourced reform log, in the same order as the ranked table above \u2014 sourced fiscal law changes since 2010, all-dates count as tiebreak (v713 dropped non-fiscal events from the key, which had given Guyana a row on three events that changed no terms and cut India, which has two that did; v966 moved the key onto the 2010 window the premium rule uses). A lit cell is <strong style="color:var(--text);">fiscal law changes only</strong> \u2014 amber = 1, orange = 2, red = 3+. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation) never light a cell; they show as a muted <strong style="color:var(--muted);">\u00b7n</strong> on an unlit cell, so the record is visible without being read as reform. Before v694 they were counted as law changes here and Guyana \u2014 zero fiscal law changes on record at any date \u2014 was painted orange in the 2020s. The <strong style="color:var(--text);">&lt;1970</strong> column holds everything before 1970, which the grid used to discard: Mexico 1938, Indonesia 1966, Algeria 1963, Libya 1955, Nigeria 1969.</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Top 20 of the 21 jurisdictions with a sourced reform log, in the same order as the ranked table above \u2014 sourced fiscal law changes since 2010, all-dates count as tiebreak (v713 dropped non-fiscal events from the key, which had given Guyana a row on three events that changed no terms and cut India, which has two that did; v966 moved the key onto the 2010 window the premium rule uses). A lit cell is <strong style="color:var(--text);">fiscal law changes only</strong> \u2014 amber = 1, orange = 2, red = 3+. Sourced events that changed no fiscal terms (discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation) never light a cell; they show as a muted <strong style="color:var(--muted);">\u00b7n</strong> on an unlit cell, so the record is visible without being read as reform. Before v694 they were counted as law changes here and Guyana \u2014 zero fiscal law changes on record at any date \u2014 was painted orange in the 2020s. The <strong style="color:var(--text);">&lt;1970</strong> column holds everything before 1970, which the grid used to discard: Mexico 1938, Indonesia 1966, Algeria 1963, Libya 1955, Nigeria 1969. <strong style="color:var(--accent);">The rule down the middle is the 2010 scoring window.</strong> Only the two columns to its right are counted by the Reform Frequency Score and by this tab\u2019s 3-changes WACC-premium rule; everything to its left is drawn as an <strong style="color:var(--text);">outline rather than a fill</strong> because it is on the record and scores nothing. Four of these rows \u2014 Algeria, Libya, Colombia and the USA \u2014 have every lit cell left of the rule and therefore score 100. The <strong style="color:var(--text);">Scored</strong> column at the right is that in-window count, the number the premium rule is written on.</div>'
     + '<table style="border-collapse:collapse;min-width:500px;">'
-    + '<thead><tr>'
+    + '<thead>'
+    + '<tr>'
+    + '<th></th>'
+    + '<th colspan="' + rrPreN + '" style="text-align:center;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 10px 5px;white-space:nowrap;">NOT COUNTED \u2014 BEFORE 2010</th>'
+    + '<th colspan="' + rrWinN + '" style="' + rrWinEdge + 'text-align:center;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 10px 5px;white-space:nowrap;">SCORES \u2014 2010 WINDOW</th>'
+    + '<th style="border-left:1px solid var(--border);"></th>'
+    + '</tr>'
+    + '<tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);min-width:140px;">Country</th>'
-    + decades.map(function(d) { return '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;">' + decLabel(d) + '</th>'; }).join('')
+    + decades.map(function(d) { return '<th style="' + (d === RR_WIN ? rrWinEdge : '') + 'text-align:center;color:' + (d >= RR_WIN ? 'var(--accent)' : 'var(--muted)') + ';font-size:10px;font-weight:' + (d >= RR_WIN ? '700' : '600') + ';padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;">' + decLabel(d) + '</th>'; }).join('')
+    + '<th style="border-left:1px solid var(--border);text-align:center;color:var(--accent);font-size:10px;font-weight:700;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;" title="Sourced fiscal law changes dated 2010 or later \u2014 the only count the Reform Frequency Score (100 \u2212 15 \u00d7 this number) and this tab\u2019s WACC-premium rule read. 3 or more clears the premium bar and prints red. It is a COUNT and is blind to magnitude: Russia\u2019s +15pp windfall tax in 2022 moves this number exactly as far as a 1pp administrative amendment would.">Scored</th>'
     + '</tr></thead>'
     + '<tbody>'
     + heatCountries.map(function(r) {
@@ -52103,12 +52135,33 @@ function renderReformRisk() {
                         + 'hidden; it carries no reform-frequency premium.'
                     : 'No sourced event in ' + lbl);
               var txt = n ? String(n) : (cx ? '\u00b7' + cx : '');
-              return '<td style="text-align:center;padding:4px 6px;" title="' + _rrEsc(r.country + ' \u2014 ' + tip) + '">'
-                + '<div style="width:32px;height:20px;background:' + cellColor(n) + ';border-radius:3px;margin:0 auto;display:flex;align-items:center;justify-content:center;'
-                + (n ? '' : (cx ? 'border:1px dashed var(--border);' : '')) + '">'
-                + '<span style="font-size:10px;color:' + (n ? '#fff' : 'var(--muted)') + ';">' + txt + '</span>'
+              // v973: a lit cell OUTSIDE the 2010 window is drawn as an outline, not a fill. It is
+              // on the record and still reads its own count; it simply stops carrying the visual
+              // weight of a change that scores, because it does not score.
+              var inWin = d >= RR_WIN;
+              if (n) tip += inWin
+                ? ' \u2014 inside the 2010 scoring window, so it is counted in the Reform Frequency Score.'
+                : ' \u2014 BEFORE the 2010 scoring window, so it is NOT counted in the Reform Frequency Score and carries no frequency premium. Drawn as an outline for that reason.';
+              var col = cellColor(n);
+              var box = n
+                ? (inWin ? 'background:' + col + ';'
+                         : 'background:transparent;border:1.5px solid ' + col + ';')
+                : ('background:' + col + ';' + (cx ? 'border:1px dashed var(--border);' : ''));
+              return '<td style="' + (d === RR_WIN ? rrWinEdge : '') + 'text-align:center;padding:4px 6px;" title="' + _rrEsc(r.country + ' \u2014 ' + tip) + '">'
+                + '<div style="width:32px;height:20px;' + box + 'border-radius:3px;margin:0 auto;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">'
+                + '<span style="font-size:10px;font-weight:' + (n && !inWin ? '700' : '400') + ';color:' + (n ? (inWin ? '#fff' : col) : 'var(--muted)') + ';">' + txt + '</span>'
                 + '</div></td>';
             }).join('')
+          + (function(){
+              var sc = r.since2010 || 0;
+              var col = sc >= 3 ? 'var(--red)' : (sc ? 'var(--text)' : 'var(--muted)');
+              var tt = sc >= 3
+                ? sc + ' sourced fiscal law changes since 2010 \u2014 clears this tab\u2019s bar of 3, so ' + r.country + ' carries a WACC premium. Reform Frequency Score ' + Math.max(0, 100 - sc * 15) + '/100.'
+                : (sc
+                    ? sc + ' sourced fiscal law change' + (sc === 1 ? '' : 's') + ' since 2010 \u2014 below this tab\u2019s bar of 3, so no frequency premium. That is not the same finding as no exposure: the rule counts changes and never reads how large one was. Reform Frequency Score ' + Math.max(0, 100 - sc * 15) + '/100.'
+                    : 'No sourced fiscal law change dated 2010 or later, so the score returns its ceiling of 100. Read the row to the LEFT of the rule before treating that as stability \u2014 for several of these jurisdictions the whole record sits outside the window.');
+              return '<td style="border-left:1px solid var(--border);text-align:center;padding:4px 10px;font-family:\'IBM Plex Mono\',monospace;font-size:12px;font-weight:' + (sc >= 3 ? '700' : '600') + ';color:' + col + ';" title="' + _rrEsc(r.country + ' \u2014 ' + tt) + '">' + sc + '</td>';
+            })()
           + '</tr>';
       }).join('')
     + '</tbody></table></div>';
