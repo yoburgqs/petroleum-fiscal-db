@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v976</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v977</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v976</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v977</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61151,7 +61151,7 @@ function renderFCResults(results, price) {
   var stabCell = function(country) {
     var ec = String(country).replace(/'/g, "\\'");
     var info = stabilityInfo[country];
-    // v976 (T4): display:block + width:100% so the button occupies the cell's full content
+    // v977 (T4): display:block + width:100% so the button occupies the cell's full content
     // width rather than shrinking to a 19px token. The td around it carries the same handler
     // (see the showStability branch in renderFCResults), so the padding is live too; this
     // keeps the KEYBOARD target and the focus ring the same size as the mouse target.
@@ -62123,7 +62123,7 @@ function renderFCResults(results, price) {
     }
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
     if (showStability) {
-      // ── v976 (T4): the Reform verdict CELL is the control, not the 19px token inside it ──
+      // ── v977 (T4): the Reform verdict CELL is the control, not the 19px token inside it ──
       // This column's own header tooltip, the IC analyst guide and stabCell()'s comment all
       // say "click any cell for the full event log". They were describing an intent, not the
       // build. The handler lived only on the inner <button>, which is sized to its content
@@ -66600,6 +66600,35 @@ function copyFCForIC(btn) {
     // shortlist paste had no column for it, so 163 PROXY rows left the tool indistinguishable
     // from the 22 with production behind them.
     'Data basis'];
+  // ── v977 (T5) ─ the exhibit has to fit the page it is pasted onto ──────────────────────
+  // Walked cold at 1440x900: tick five countries on Fiscal Compare, press Copy for IC Memo,
+  // paste into a letter-portrait Word document (6.5in / 624px text column). Measured on the
+  // text/html flavour Word actually consumes:
+  //     14 columns, three header strings over 120 characters, and a Model basis cell of 430
+  //     characters on the override row. Auto layout: the table renders 1038px wide, 1.66x the
+  //     text column. Word AutoFit-to-window instead crushes all 14 to 0.46in each, at which
+  //     width the header row is 317px (3.3in) tall, Iraq's row is 945px (9.8in) tall, 27 cells
+  //     overflow their box, and the figures overprint their neighbours -- Norway pastes as
+  //     "Concess68.0", with the government take sitting on top of the Mechanic cell.
+  //     Total 2.83 letter pages for a FIVE-row shortlist, and the table itself does not begin
+  //     until page 2 because 5,049 characters of preamble sit above it.
+  // The content is right and stays; what was wrong is that all of it was in the table. An IC
+  // exhibit puts figures in the cells and qualifications in notes underneath. So: short column
+  // labels keyed a..h, per-row basis prose keyed out of the cells, and the table moved ABOVE
+  // the preamble, which becomes the notes block. text/plain is untouched -- Excel has no page
+  // to overflow and wants the full strings in-cell.
+  // Labels are kept to words of six characters or fewer ("Break-even" breaks at its hyphen).
+  // A longer word cannot be broken, so at 0.46in it spills into the next cell instead of
+  // wrapping -- that is the mechanism behind the overprinting, not the column count itself.
+  var headShort = ['#', 'Country', 'Region', 'Mechanic',
+    'Govt take % @$' + P,
+    'NPV $M @$' + P,
+    'Break-even $/bbl',
+    'Price swing pp',
+    'Model take % @$' + P,
+    'Model NPV $M @$' + P,
+    'Model basis',
+    'Data basis'];
   // ── v664 (T5) ─ the comparability rule that governs every other paste artifact ─────
   // MECHANIC_COMPARABILITY (2026-08-26): a fee-basis take% — TSC, RSC, Buy-back — may not be
   // ranked against a PSC/Concession take%, because a fee contractor is paid a fixed $/bbl
@@ -66662,12 +66691,14 @@ function copyFCForIC(btn) {
     head[4] = 'Govt Take % @$' + P + ' — ORCA database, like-for-like (CITABLE)';
     head.splice(5, 0, 'Published all-contract take % @$' + P
       + ' — blends TSC / RSC / Buy-back fee contracts, NOT comparable across rows (reference only)');
+    headShort.splice(5, 0, 'Pub. take % @$' + P);   // v977 (T5)
     for (var _gk in _g1At) { if (Object.prototype.hasOwnProperty.call(_g1At, _gk)) { _anyG1 = true; break; } }
     if (_anyG1) {
       head[6] = 'Contractor NPV $M @$' + P
         + ' — ORCA database, standardized Deepwater, like-for-like (CITABLE) — same contract population as the take column';
       head.splice(7, 0, 'Published all-contract contractor NPV $M @$' + P
         + ' — blends the fee-basis contracts, NOT comparable across rows (reference only)');
+      headShort.splice(7, 0, 'Pub. NPV $M @$' + P);   // v977 (T5)
     }
   }
   var matrix = [head];
@@ -66862,18 +66893,87 @@ function copyFCForIC(btn) {
     + '\n\n' + srcLine;
 
   function esc(x){ return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-  var thS = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;vertical-align:bottom;';
-  var tdS = 'border:1px solid #999;padding:3px 8px;font-family:Calibri,Arial,sans-serif;font-size:9.5pt;';
+  var thS = 'border:1px solid #999;padding:3px 2px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:7.5pt;font-weight:bold;text-align:left;vertical-align:bottom;word-wrap:break-word;';
+  var tdS = 'border:1px solid #999;padding:3px 4px;font-family:Calibri,Arial,sans-serif;font-size:8.5pt;word-wrap:break-word;';
+
+  // ── v977 (T5) ─ keyed notes, so the cells carry figures and the prose sits underneath ──
+  var _nLet = 'abcdefghijklmnopqrstuvwxyz';
+  var _notes = [], _noteAt = {};
+  function _noteKey(txt) {
+    if (_noteAt[txt]) return _noteAt[txt];                 // one key per distinct note
+    var k = _nLet.charAt(_notes.length) || ('n' + (_notes.length + 1));
+    _notes.push({ k: k, txt: txt }); _noteAt[txt] = k; return k;
+  }
+  function _mk(k) { return k ? '<sup style="font-size:7pt;">' + k + '</sup>' : ''; }
+  // The full header string becomes the note; the cell carries the label an IC reader scans.
+  var _colKey = [];
+  for (var _hi = 0; _hi < head.length; _hi++) {
+    _colKey[_hi] = (headShort[_hi] !== head[_hi]) ? _noteKey(head[_hi]) : '';
+  }
+  // The two basis columns hold sentences, not values. On the override row that sentence is 430
+  // characters, which is what made a single row 9.8in tall at page width. Token in the cell,
+  // sentence in the notes, keyed per distinct sentence so repeated bases key once.
+  function _shortBasis(t) {
+    t = String(t || ''); if (!t) return '';
+    var m;
+    if (/^STATE MONOPOLY/.test(t)) return 'State monopoly';
+    if (/^HARD-CODED ENGINE OVERRIDE/.test(t)) {
+      m = t.match(/^HARD-CODED ENGINE OVERRIDE on (\d+) term/);
+      return 'ENGINE over-ride' + (m ? ', ' + m[1] + ' term' + (m[1] === '1' ? '' : 's') : '');
+    }
+    if (/^GENERIC DEFAULT/.test(t)) return 'GENERIC de-fault';
+    if (/^PROXY/.test(t)) return 'PROXY';
+    if (/^PROD-WTD/.test(t)) { m = t.match(/([\d.]+%) of contracts/); return 'PROD-WTD' + (m ? ' ' + m[1] : ''); }
+    return t;
+  }
+  var _iModel = head.indexOf('Model basis'), _iData = head.indexOf('Data basis');
+  var _htmlRows = matrix.slice(1).map(function(row) {
+    // v777 (T5): the reference-only blend column is muted so it does not read as a second ranked take.
+    return '<tr>' + row.map(function(c, ci) {
+      var cell = esc(c), nud = '';
+      if ((ci === _iModel || ci === _iData) && c) {
+        var sh = _shortBasis(c);
+        if (sh !== c) { nud = _mk(_noteKey(headShort[ci] + ' — ' + c)); cell = esc(sh); }
+      }
+      var numeric = (ci > 3 && ci !== _iModel && ci !== _iData);
+      return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '')
+        + (numeric ? 'text-align:right;white-space:nowrap;' : '')
+        + (_anyFee && (ci === 5 || (_anyG1 && ci === 7)) ? 'color:#777;' : '')
+        + '">' + cell + nud + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  // Proportional widths, declared on the header cells and again as a colgroup, because Word's
+  // AutoFit-to-window otherwise divides the text column equally: 14 columns at 0.46in, which is
+  // what put a government take on top of its neighbouring Mechanic cell. Weights are by content
+  // class, not hand-tuned per column, so they hold when the two reference columns are absent.
+  var _wt = matrix[0].map(function(c, ci) {
+    return ci === 0 ? 4 : ci === 1 ? 10 : ci === 2 ? 8 : ci === 3 ? 11
+         : (ci === _iModel || ci === _iData) ? 9 : 6;
+  });
+  var _wtSum = _wt.reduce(function(a, b){ return a + b; }, 0);
+  var _pct = _wt.map(function(w){ return (100 * w / _wtSum).toFixed(2) + '%'; });
+  var _colGroup = '<colgroup>' + _pct.map(function(w){ return '<col style="width:' + w + '">'; }).join('') + '</colgroup>';
+  var _htmlHead = '<tr>' + matrix[0].map(function(c, ci) {
+    return '<th width="' + _pct[ci] + '" style="' + thS + 'width:' + _pct[ci] + ';'
+      + ((ci > 3 && ci !== _iModel && ci !== _iData) ? 'text-align:right;' : '')
+      + '">' + esc(headShort[ci]) + _mk(_colKey[ci]) + '</th>';
+  }).join('') + '</tr>';
+  var _noteHtml = _notes.map(function(n) {
+    return '<p style="font-size:8pt;color:#555;margin:0 0 3px;"><b>' + n.k + '</b>&nbsp; ' + esc(n.txt) + '</p>';
+  }).join('');
+
+  // Table first. Until v977 the 5,049-character preamble sat above it, so on a five-country
+  // shortlist the exhibit itself did not start until page 2 of the pasted memo.
   var htmlOut = '<div style="font-family:Calibri,Arial,sans-serif;">'
-    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
-    + '<p style="font-size:8.5pt;color:#555;margin:0 0 4px;">' + esc(assump) + '</p>'
-    + (warn ? '<p style="font-size:8.5pt;color:#8a4b00;margin:0 0 6px;">' + esc(warn) + '</p>' : '')
-    + '<table style="border-collapse:collapse;">'
-    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + thS + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
-    + '<tbody>' + matrix.slice(1).map(function(row){
-        // v777 (T5): the reference-only blend column is muted so it does not read as a second ranked take.
-        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + (_anyFee && (ci === 5 || (_anyG1 && ci === 7)) ? 'color:#777;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
-      }).join('') + '</tbody></table>'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 4px;">' + esc(caption) + '</p>'
+    + '<table width="100%" style="border-collapse:collapse;width:100%;table-layout:fixed;">'
+    + _colGroup
+    + '<thead>' + _htmlHead + '</thead>'
+    + '<tbody>' + _htmlRows + '</tbody></table>'
+    + '<p style="font-size:8.5pt;font-weight:bold;margin:8px 0 3px;">Notes</p>'
+    + _noteHtml
+    + '<p style="font-size:8pt;color:#555;margin:6px 0 3px;">' + esc(assump) + '</p>'
+    + (warn ? '<p style="font-size:8pt;color:#8a4b00;margin:0 0 3px;">' + esc(warn) + '</p>' : '')
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
 
