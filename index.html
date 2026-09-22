@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v983</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v984</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v983</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v984</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41785,6 +41785,46 @@ function _cpScrollToEvidenceChain(slug) {
 }
 window._cpScrollToEvidenceChain = _cpScrollToEvidenceChain;
 
+// ── v984 (T6) — the Evidence Chain's note stack had no order, no count and no index ──────────
+// Walked T6 cold at 1440 and at 390, storage cleared, on Nigeria — rank #63 on Fiscal Compare and
+// one of the seven countries an IC analyst screens first. The chain answers "where did this number
+// come from", and it answers it well: every absence on the platform has a named state under that
+// table. What it had no shape for was HOW MANY answers there are and which one matters.
+//
+// Measured on the shipped build, Country Profile -> Nigeria, from the chain container's own rects:
+//
+//   1440x900   container 1,249px  =  499px table  +  701px of SIX notes, 5,789 characters
+//   390x844    container 2,996px  =  1,037px table + 1,903px of the same six — 2.25 phone screens
+//              of unbroken 11px prose, starting 6,637px down the page
+//
+// Angola 8 notes / 5,893ch, Indonesia 7 / 5,173ch, Canada 4 / 2,947ch. Every note renders at the
+// same 11px in the same muted grey, none carries a heading, and the stack was a fixed string
+// concatenation in the order the notes were WRITTEN across eighteen months of cycles —
+//     _mainNote + _deadNote641 + _idxNote971 + _regimeNote625 + _conflictNote601
+//       + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 + _sharedNote
+// — which is not severity order and is not any order. So on Nigeria the one note that decides
+// whether the page's headline can be quoted at all — the DCF ran royalty 5%, CIT 30% and special
+// tax 50%, three rates NO column on this page prints — is the THIRD of six, 1,757 characters long,
+// 1,575 characters into the block, and at 390px it begins ~700px below the table. Above it sit a
+// divergence note and a dead-link note, both real, neither decisive. And _offNote742, which states
+// in its own words that its rows are "not a gap in the evidence behind the number above", rendered
+// FOURTH — ahead of the bulk-harvest and superseded-instrument warnings.
+//
+// An analyst with 20 minutes cannot see where the block ends, cannot tell which paragraph is the
+// one that matters, and has no way to reach it except to read all of it. That is the give-up point
+// in this walk. Nothing here is deleted or collapsed — every word of every disclosure still
+// renders. They are ranked, numbered and indexed, so the wall becomes a finite list.
+function _ecJumpFinding(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(194,65,12,.5)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._ecJumpFinding = _ecJumpFinding;
+
 // v780 (T6): the headline take is the number an analyst asks "where did this come from?" about,
 // and it was inert -- clicking 68.0% on Norway did nothing. The per-term Evidence Chain that
 // answers it sits ~2,750px lower, and the only control reaching it was the "N of M model terms
@@ -43268,7 +43308,100 @@ function renderReformTimeline(country) {
           return h;
         })()
       : '';
-    const reconNote = _mainNote + _deadNote641 + _idxNote971 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _supNote956 + _sharedNote;
+    // ── v984 (T6): rank, number and index the note stack ─────────────────────────────────
+    // _mainNote stays the unnumbered lead — it is the verdict sentence ("All N match" /
+    // "N of M differ" / "no parameter is independently sourced"), the topic of the block rather
+    // than one of its findings. _offNote742 goes LAST and unnumbered for the opposite reason: it
+    // says on its face that its rows are not a gap in the evidence behind the number above, so
+    // counting it as a finding would inflate every count on screen. Everything between them is a
+    // finding, ordered worst first, and every one of them is reachable in one click from the index
+    // line. Scores are fixed, not derived from wording, so two countries with the same problem
+    // always rank it the same way.
+    const _ecFind984 = [];
+    const _ecAdd984 = function(html, sev, subject) {
+      if (html) _ecFind984.push({ h: html, s: sev, t: subject });
+    };
+    (function () {
+      const _n = function (c, one, many) { return c + ' ' + (c === 1 ? one : many); };
+      // 100 — the take, NPV and IRR on this page were produced by a rate the page does not print.
+      // Nothing else under this table can be acted on until this is read. A ladder bypass scores
+      // far lower: there the engine resolves off a tier table that IS printed on this page.
+      if (_conflictNote601) {
+        const _lad = modelConflicts.every(function (c) { return !!c.ladder; });
+        const _nc  = modelConflicts.length;
+        _ecAdd984(_conflictNote601, _lad ? 55 : 100,
+          _lad ? _n(_nc, 'printed row the model bypasses', 'printed rows the model bypasses')
+               : 'the DCF ran ' + _n(_nc, 'rate', 'rates') + ' this table does not print');
+      }
+      // 90 — a term the model reads, corroborated by nothing at all.
+      _ecAdd984(_unsourcedNote601, 90,
+        _n(unsourcedCount, 'model term with no source at all', 'model terms with no source at all'));
+      // 85 when the model INVENTS a substitute for the missing term, 60 when it only reports it.
+      _ecAdd984(_regimeNote625, _missInvented.length ? 85 : 60,
+        _n(_missTerms.length, 'model term ORCA holds no value for', 'model terms ORCA holds no value for'));
+      // 80 / 70 — the citation exists and cannot be produced. All-dead outranks partial, because
+      // that is where the verdict line above is most misleading.
+      _ecAdd984(_deadNote641, _allDead ? 80 : 70,
+        _n(deadLinkCount, 'citation cannot be retrieved', 'citations cannot be retrieved'));
+      // 62 — the address resolves but stops at a listing.
+      _ecAdd984(_idxNote971, 62,
+        _n(idxLinkCount, 'citation opens a listing', 'citations open a listing'));
+      // 58 — the document may no longer be the law.
+      _ecAdd984(_supNote956, 58,
+        _n(supersedeRows.length, 'citation predates a logged reform', 'citations predate a logged reform'));
+      // 45 / 40 — self-agreement rather than corroboration.
+      _ecAdd984(_sharedNote, 45,
+        _n(sharedCount, 'term on a shared regional instrument', 'terms on a shared regional instrument'));
+      _ecAdd984(_bulkNote, 40,
+        _n(bulkCount, 'term on the bulk harvest only', 'terms on the bulk harvest only'));
+    })();
+    _ecFind984.sort(function (a, b) { return b.s - a.s; });
+
+    const _ecSevCol984 = function (s) {
+      return s >= 90 ? 'var(--red)' : (s >= 55 ? 'var(--orange)' : 'var(--muted)');
+    };
+    // The number is injected into the note's own opening tag rather than wrapped around it, so the
+    // stack keeps the exact vertical rhythm it had — this adds no height to any note.
+    const _ecNumbered984 = _ecFind984.map(function (f, i) {
+      const _id = 'ecf-' + slug + '-' + (i + 1);
+      const _badge = '<span style="display:inline-flex;align-items:center;justify-content:center;'
+        + 'min-width:15px;height:15px;border-radius:8px;background:var(--surface2);'
+        + 'border:1px solid ' + _ecSevCol984(f.s) + ';color:' + _ecSevCol984(f.s) + ';font-size:9px;'
+        + 'font-weight:800;margin-right:6px;vertical-align:-2px;flex:0 0 auto;">' + (i + 1) + '</span>';
+      return f.h
+        .replace(/^<div /, '<div id="' + _id + '" ')
+        .replace(/^(<div[^>]*>)/, '$1' + _badge);
+    }).join('');
+
+    // The index line. It is what tells the analyst the block is finite, what is in it, and which
+    // one to read first — and each chip lands on its note. 24px floor because these are controls.
+    const _ecIndex984 = _ecFind984.length
+      ? '<div class="ec-findings-idx" style="margin-top:10px;display:flex;flex-wrap:wrap;'
+        + 'align-items:center;gap:6px;">'
+        + '<span style="font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;'
+        + 'color:var(--muted);white-space:nowrap;">' + _ecFind984.length + ' finding'
+        + _pl(_ecFind984.length) + (_ecFind984.length > 1 ? ' &middot; worst first' : '') + '</span>'
+        + _ecFind984.map(function (f, i) {
+            const _id = 'ecf-' + slug + '-' + (i + 1);
+            return '<span role="button" tabindex="0"'
+              + ' onclick="_ecJumpFinding(\'' + _id + '\');"'
+              + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_ecJumpFinding(\'' + _id + '\');}"'
+              + ' style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface2);'
+              + 'border:1px solid var(--border);border-radius:12px;padding:2px 9px;cursor:pointer;'
+              + 'min-height:24px;display:inline-flex;align-items:center;gap:5px;max-width:100%;"'
+              + ' title="Jump to finding ' + (i + 1) + ' of ' + _ecFind984.length + '">'
+              + '<strong style="color:' + _ecSevCol984(f.s) + ';flex:0 0 auto;">' + (i + 1) + '</strong>'
+              + '<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">' + _esc(f.t) + '</span></span>';
+          }).join('')
+        + '</div>'
+      : '';
+
+    // _offNote742 sits between the verdict and the findings, not after them. It is the note that
+    // explains the denominator the verdict has just used ("N of the M rows the Concession model
+    // reads"), so it reads as the scope of the verdict rather than as a finding — and it stays
+    // within a screen of the divider it describes, which is what v743 asked for and the old
+    // insertion-ordered stack never gave it.
+    const reconNote = _mainNote + _offNote742 + _ecIndex984 + _ecNumbered984;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
