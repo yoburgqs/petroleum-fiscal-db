@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v978</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v979</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v978</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v979</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -25741,6 +25741,55 @@ function cpFeeBasis(d) {
              .map(function(x) { return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ')
   };
 }
+// ── v979 (T2): the OTHER half of the comparability rule Country Profile never received ──────
+//
+// v552 brought Group 2 (fee-basis TSC / RSC / Buy-back) to this tab. Group 3 was left behind.
+// ~/MECHANIC_COMPARABILITY, Group 3: PRRT is a CASH-FLOW base, not a production/revenue base.
+// Its effective rate is very low at low prices and very high at high ones, and it is comparable
+// with a Group-1 take "only at the same oil price AND with the user told it is a different base."
+//
+// Side-by-Side has enforced that since v593: _cmpRankTake() returns null for a PRRT-only column
+// and _vdWhy() prints "PRRT cash-flow basis — comparable at one price, not across the deck", so
+// the column is set ASIDE from the take ordering entirely. Country Profile does the opposite for
+// the same country at the same price — it ranks it, medians it, tiers it, and licenses the cite.
+//
+// Walked cold at 1440x900, Home -> Country Profile -> Australia. Four readings, in reading order:
+//     "Fiscal character: Contractor-favorable — low government take, and 6 of the 20
+//      production-weighted producers take less at $75/bbl"
+//     "38.5% govt take @$75 — investor-friendly tier (<=40%)"
+//     "#7 of 21 producers · -17.1pp vs producer median @$75 · All 185: #109"
+//     "IC: favorable regime — SINGLE-PRICE CITE ACCEPTABLE; cite it with the evidence grade."
+// Every one is a cross-country comparison of a cash-flow take against production-basis takes,
+// and the last one is the sentence that ends up in the memo. The word PRRT appears on the page
+// only as a mechanic tag. Meanwhile the same platform, on the same country, at the same price,
+// refuses to rank it three tabs over.
+//
+// Firing rule: identical to _cmpMixStat().prrt — a column with Group-3 contracts and NO Group-1
+// and NO Group-2 contracts. Measured against the shipped country_data.json that is Australia and
+// Australia alone (PRRT 1,219 of 1,219). Denmark holds 109 Concession + 1 PRRT and is correctly
+// NOT selected: its headline is a production-basis figure with a rounding-error of PRRT in it.
+// No new threshold is introduced and nothing is recomputed.
+function cpCashFlowBasis(d) {
+  var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix : [];
+  if (!mx.length) return null;
+  var tot = 0, n1 = 0, n2 = 0, n3 = 0;
+  for (var i = 0; i < mx.length; i++) {
+    var n = mx[i].n || 0; tot += n;
+    if (mx[i].g === 2) n2 += n; else if (mx[i].g === 3) n3 += n; else n1 += n;
+  }
+  if (!tot || !n3 || n2 || n1) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
+  var names = mx.filter(function (x) { return x.g === 3; }).map(function (x) { return x.m; });
+  var lo = d.take_50, hi = d.take_125;
+  return {
+    mech: names.join(' · ') || 'PRRT',
+    n: tot,
+    t50: lo, t75: d.take_75, t100: d.take_100, t125: hi,
+    // The deck spread is the point: it is the same number the Price Swing pill prints, but here
+    // it is the evidence that a single-price read is a read of one point on a steep curve.
+    spread: (lo != null && hi != null) ? (hi - lo) : null
+  };
+}
 // ── v889 (T3): does this column's take-spread band have its top quartile in the fee-basis
 //    cluster? Module-level, beside cpFeeBasis(), because BOTH the Side-by-Side grid rows and
 //    the verdict strip's `measured` filter read it. See the note above the alias inside
@@ -44290,6 +44339,18 @@ function loadCountryProfile(country) {
       + _cpFee552.names + '), where take% is a structural artefact of the remuneration mechanic and the headline reads '
       + d.take_75.toFixed(1) + '%)'
     : '';
+  // v979 (T2): Group-3 state for THIS country. Declared beside _cpFee552 and ahead of every
+  // consumer, for the same TDZ reason v424/v452/v552 all recorded. Null for 184 of 185.
+  const _cpCash979 = (typeof cpCashFlowBasis === 'function') ? cpCashFlowBasis(d) : null;
+  // The clause that travels with any verdict sentence quoting this country's take, so the base
+  // is never left implied. Mirrors _cmpBasisNote552 exactly, one group over.
+  const _cashBasisNote979 = _cpCash979
+    ? ' (basis: ' + _cpCash979.mech + ' is a cash-flow base, not a share of production'
+      + (_cpCash979.spread != null ? ' \u2014 ' + _cpCash979.t50.toFixed(1) + '% at $50 and '
+         + _cpCash979.t125.toFixed(1) + '% at $125 on the same terms' : '')
+      + ', so it is comparable with a PSC or Concession take at $75 only)'
+    : '';
+
   // v500: Quick IC verdict — one-line bottom-line verdict above the headline strip
   // Answers "is this entry viable?" immediately for a senior IOC analyst opening a CP for the first time
   const _quickIcVerdict497 = (!isStateMonopoly(d.take_75) && d.take_75 != null) ? (function() {
@@ -44416,7 +44477,7 @@ function loadCountryProfile(country) {
           + '<span class="cp-why-body" hidden>' + cpBandNpvNote(d, _band734) + '</span>'
         : '';
       msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
-          + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(cpPair75(_dn786, npv))
+          + _cmpBasisNote552 + _cashBasisNote979 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(cpPair75(_dn786, npv))
           + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
           + _baseClause589 + (_band734 ? '' : _dependClause589)
           // The contract count travels with the instruction, so "defend on the take" is
@@ -44454,7 +44515,7 @@ function loadCountryProfile(country) {
         : '';
       msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(cpPair75(_dn786, npv)) + ' @$75 but ' + cpNpvFmt(npv50)
           + ' at $50/bbl' + cpDownside50Basis(_dn786) + ': this regime does not survive a price break on the standardized profile, at '
-          + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + _rareF589 + beStr
+          + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + _cashBasisNote979 + '.' + _rareF589 + beStr
           // v732 (T4): same control as the passing branch above. This arm carries no `favourable`
           // suppression of its own, so it was silent on reform for a different reason -- it simply
           // never called the CTA. Both countries that reach it (Malaysia, Yemen) are unscored, so
@@ -44466,7 +44527,7 @@ function loadCountryProfile(country) {
       bg = take <= 55 ? 'rgba(21,128,61,.05)' : 'rgba(161,98,7,.05)';
       border = take <= 55 ? 'rgba(21,128,61,.2)' : 'rgba(161,98,7,.2)';
       msg = 'Clears the 10% WACC at $75/bbl \u2014 contractor NPV ' + cpNpvFmt(npv) + ' at ' + take.toFixed(1)
-          + '% govt take' + _cmpBasisNote552 + '. Downside case at $50/bbl not computed for this country.' + beStr;
+          + '% govt take' + _cmpBasisNote552 + _cashBasisNote979 + '. Downside case at $50/bbl not computed for this country.' + beStr;
     } else if (hasNpv && npv <= 0) {
       icon = '\u2717'; col = 'var(--red)'; bg = 'rgba(185,28,28,.05)'; border = 'rgba(185,28,28,.2)';
       msg = 'Below the 10% WACC at $75/bbl \u2014 contractor NPV ' + cpNpvFmt(npv)
@@ -44968,6 +45029,21 @@ function loadCountryProfile(country) {
     } else if (swing != null && swing > 20) {
       msg = 'IC: progressive regime — show multi-price sensitivity; take varies ' + swing.toFixed(0) + 'pp across price range';
       col = 'var(--orange)'; bg = 'rgba(194,65,12,.06)'; border = 'rgba(194,65,12,.2)';
+    } else if (_cpCash979) {
+      // v979 (T2): this is the sentence that ends up in the memo, and for a PRRT-only country
+      // the branch below it said "single-price cite acceptable" — in green — off a 38.5% that is
+      // a share of project CASH FLOW, not of production. Australia's take is 28.6% at $50 and
+      // 46.3% at $125 on the identical terms and the identical profile; a single-price cite of a
+      // cash-flow instrument is the one thing ~/MECHANIC_COMPARABILITY Group 3 forbids without
+      // the base being stated. The price is still citable — it is the BASE that has to travel
+      // with it, and the deck is printed so the analyst can see why one point is not the answer.
+      msg = 'IC: cash-flow-basis regime (' + _cpCash979.mech + ') — cite the price you are defending AND the base. '
+          + 'Take is charged on project cash flow after an uplifted threshold, not on production value, so it runs '
+          + (_cpCash979.t50 != null ? _cpCash979.t50.toFixed(1) + '% @$50 to ' + _cpCash979.t125.toFixed(1) + '% @$125'
+             : 'well below this figure at low prices and well above it at high ones')
+          + ' on the same terms. It is not like-for-like with a PSC or Concession take, and Side-by-Side will not rank it against one. '
+          + 'Cite it with the evidence grade on this strip.';
+      col = 'var(--yellow)'; bg = 'rgba(161,98,7,.07)'; border = 'rgba(161,98,7,.28)';
     } else if (take <= 40) {
       msg = 'IC: favorable regime — single-price cite acceptable; cite it with the evidence grade on this strip.';
       col = 'var(--green)'; bg = 'rgba(21,128,61,.06)'; border = 'rgba(21,128,61,.2)';
@@ -45073,6 +45149,45 @@ function loadCountryProfile(country) {
       + '<span style="display:block;font-size:10px;opacity:.9;">on the '
       + Number(_cpFee552.g1.n).toLocaleString() + ' PSC/Concession contracts · the headline '
       + d.take_75.toFixed(1) + '% is not comparable across countries</span>'
+      + '</span></div>';
+  })() : '';
+
+  // v979 (T2): the Group-3 sibling of _cpCmpLine552, in the same slot on the same strip.
+  // There is no "comparable take" to substitute here the way there is for a fee blend — ORCA
+  // holds no Group-1 contracts for a PRRT-only country, so there is nothing to re-base onto.
+  // What the analyst is missing is the BASE, and the deck that proves it moves: Australia reads
+  // 28.6% at $50 and 46.3% at $125 on the same terms. The published 38.5% is kept exactly as it
+  // is (v449/v451 lock that cell); this line says what it is a percentage OF, immediately above
+  // the rank pill that compares it with regimes measured on a different base.
+  const _cpCashLine979 = (_cpCash979 && !_isMonopoly) ? (function() {
+    var cb = _cpCash979;
+    var col = 'var(--yellow)';                    // the register Side-by-Side already gives Group 3
+    var bg  = 'rgba(161,98,7,.09)';
+    var bd  = 'rgba(161,98,7,.30)';
+    var deck = (cb.t50 != null && cb.t125 != null)
+      ? cb.t50.toFixed(1) + '% @$50 → ' + cb.t75.toFixed(1) + '% @$75 → ' + cb.t125.toFixed(1) + '% @$125'
+      : '';
+    var tip = country + ': all ' + Number(cb.n).toLocaleString() + ' contracts here are '
+      + cb.mech + '. ~/MECHANIC_COMPARABILITY puts that in Group 3 — a CASH-FLOW base. '
+      + 'A Concession or PSC take is a share of production value; a resource-rent tax is charged on '
+      + 'project cash flow only after an uplifted return threshold is cleared, so it takes very little '
+      + 'early and at low prices and a great deal late and at high ones. '
+      + (deck ? 'On ORCA’s own standardized profile that is ' + deck + '. ' : '')
+      + 'The rule: comparable with the Group-1 takes elsewhere on this platform at ONE price, and only '
+      + 'with the reader told the base differs. Side-by-Side already enforces it — it sets a PRRT-only '
+      + 'column aside from the take ordering rather than ranking it. The rank and median pill below this '
+      + 'line do NOT: they place this figure against production-basis takes. Carry the base into the memo '
+      + 'with the number, and quote the price you are defending.';
+    return '<div style="display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:3px 10px;'
+      + 'background:' + bg + ';border:1px solid ' + bd + ';border-radius:5px;cursor:help;max-width:340px;line-height:1.45;" title="'
+      + tip.replace(/"/g, '&quot;') + '">'
+      + '<span style="color:' + col + ';flex-shrink:0;">⚠</span>'
+      + '<span style="color:var(--muted);">'
+      + '<strong style="color:' + col + ';">' + cb.mech + ' — cash-flow base</strong>'
+      + ', not a share of production'
+      + (deck ? '<span style="display:block;font-size:10px;opacity:.9;">' + deck
+                + ' · comparable with a PSC/Concession take at one price only, and only if the memo says so</span>'
+              : '')
       + '</span></div>';
   })() : '';
 
@@ -45336,6 +45451,7 @@ function loadCountryProfile(country) {
         <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">sources &darr;</span>
       </div>
       ${_cpCmpLine552}
+      ${_cpCashLine979}
       ${_cpRegimeSplit570}
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${_grankHtml452}${_vsMedianHtml452}</div>
       ${_allBasisHtml534 ? `<div style="max-width:340px;line-height:1.45;">${_allBasisHtml534}</div>` : ''}
@@ -45651,7 +45767,20 @@ function loadCountryProfile(country) {
         + ' PSC/Concession contracts. ' + _cpFee552.feePct.toFixed(0) + '% of contracts here are fee-basis ('
         + _cpFee552.names + ') and are not described by this verdict.</span>'
       : '';
-    return charLabel ? '<div style="font-size:11px;color:' + charColor + ';margin-bottom:14px;padding:6px 12px;background:rgba(0,0,0,.02);border-left:3px solid ' + charColor + ';border-radius:0 4px 4px 0;line-height:1.5;"><strong style="color:var(--text);">Fiscal character:</strong> ' + charLabel + _posPill648 + _verdictCTA + _charBasis + '</div>' : '';
+    // v979 (T2): the Group-3 sibling. This is the FIRST sentence on the page since v760, and on
+    // Australia it read "Contractor-favorable — low government take, and 6 of the 20
+    // production-weighted producers take less at $75/bbl, so this sits inside the band an IOC
+    // actually allocates capital across" — a placement of a cash-flow take inside a distribution
+    // of production-basis takes, stated as a capital-allocation conclusion. The verdict is kept;
+    // what it is a verdict ON is now said underneath it, same as the fee-basis line above.
+    var _charCash979 = _cpCash979
+      ? '<span style="display:block;font-size:10px;color:var(--muted);margin-top:3px;">Read on a '
+        + _cpCash979.mech + ' <strong style="color:var(--yellow);">cash-flow base</strong> — take is charged on project cash flow '
+        + 'after an uplifted threshold, not on production value'
+        + (_cpCash979.t50 != null ? ' (' + _cpCash979.t50.toFixed(1) + '% @$50 → ' + _cpCash979.t125.toFixed(1) + '% @$125)' : '')
+        + '. The producers it is placed against here are measured on production value, so this ranking holds at $75 only.</span>'
+      : '';
+    return charLabel ? '<div style="font-size:11px;color:' + charColor + ';margin-bottom:14px;padding:6px 12px;background:rgba(0,0,0,.02);border-left:3px solid ' + charColor + ';border-radius:0 4px 4px 0;line-height:1.5;"><strong style="color:var(--text);">Fiscal character:</strong> ' + charLabel + _posPill648 + _verdictCTA + _charBasis + _charCash979 + '</div>' : '';
   })() : '';
   // v760 (T2): the Fiscal character verdict is the page's one direct answer to "is this country
   // attractive at $75?", and it rendered THIRD — under the ~170-word defend paragraph and the
