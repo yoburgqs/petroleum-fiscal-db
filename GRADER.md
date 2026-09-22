@@ -65819,3 +65819,16 @@ first.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
 
 - Summary: **Cycle 912 complete.** `v986` shipped and pushed (`c3e969a`), mirror in sync.
+
+---
+## Cycle 912 Log — 2026-09-22 17:01
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 912 complete — `v986` shipped and pushed (`c3e969a`), grader log `8a3f865`, mirror in sync.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest in rotation (911 was T3, 910 T6, 907 T5, 906 T4, 905 T1; T2 last walked at 903). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared, over the real `/petroleum-fiscal-db/` path.
+
+## Friction
+The first line under the country name is the "Fiscal character" verdict — the page's one direct answer to
