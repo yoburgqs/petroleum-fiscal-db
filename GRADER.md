@@ -64709,3 +64709,110 @@ which the old header chip's bare "2 of 5" could not distinguish.
 **Task — T6, "Where did this number come from and how solid is the evidence?"** Rotated off T5 (901), T4 (900), T1 (899); T6 was stalest, last run at 893.
 
 **Friction.** Cold walk at 1440×900 → Fiscal Compare → Angola row → drawer. The drawer's **Fiscal Breakdown** is the most granular answer this platform gives to T6: it decomposes the take into the levies that produced it, names
+
+---
+## Cycle 903 Log — 2026-09-22 10:20
+- Test before: 500 PASS / 0 FAIL
+- Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle; v978 control from git HEAD scores identically on the same harness)
+- JS errors: 0 page errors; 15 console 404s for `sw.js`, identical in control — `python http.server` artefact
+- Summary: **Cycle 903 complete.** `v979` shipped and pushed (`506cf44`), mirror in sync.
+
+### Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Rotated off T6 (902),
+T5 (901), T4 (900), T1 (899). T2 was the stalest of the six.
+
+### Friction
+
+Walked cold at 1440×900, `sessionStorage` and `localStorage` cleared, Home → Country Profile →
+**Australia**. In reading order the page says:
+
+| where | what it says |
+|---|---|
+| Fiscal character (first line on the page since v760) | "Contractor-favorable — low government take, and **6 of the 20 production-weighted producers take less at $75/bbl**, so this sits inside the band an IOC actually allocates capital across" |
+| headline take | "**38.5%** govt take @$75 — **investor-friendly tier (≤40%)**" |
+| rank pills | "**#7 of 21 producers** · **−17.1pp vs producer median @$75**" · "All 185 countries: **#109**" |
+| IC MEMO strip | "IC: favorable regime — **single-price cite acceptable**; cite it with the evidence grade on this strip." — in **green** |
+
+Every one of those is a cross-country comparison of Australia's take against other countries'
+takes, and the last one is the sentence that ends up in the memo.
+
+`~/MECHANIC_COMPARABILITY` puts PRRT in **Group 3 — a cash-flow base**, comparable with Group 1
+*"only at the same oil price **and** with the user told it is a different base."* The user is
+never told: the word PRRT appears on Country Profile only as a mechanic tag.
+
+The platform already knows this. **Side-by-Side has enforced the rule since v593** —
+`_cmpRankTake()` returns `null` for a PRRT-only column and `_vdWhy()` prints
+*"PRRT cash-flow basis — comparable at one price, not across the deck"*, so the column is set
+**aside** from the take ordering entirely. So the same platform, on the same country, at the same
+price, both **refuses to rank** Australia and **ranks it #7 of 21**. The surface that licenses the
+memo sentence is the one with no caveat.
+
+v552 brought Group 2 (fee-basis TSC/RSC/Buy-back) to Country Profile — that is why Iraq's headline
+carries `⚠ 68% fee-basis — comparable take 34.1%`. **Group 3 was left behind.**
+
+### Change
+
+New module-level **`cpCashFlowBasis(d)`** beside `cpFeeBasis()`. Firing rule is *identical* to
+`_cmpMixStat().prrt`, which Side-by-Side already uses: Group-3 contracts present, **no Group-1 and
+no Group-2**. Measured against the shipped `country_data.json` that selects **Australia and
+Australia alone** (PRRT 1,219 of 1,219). **Denmark** holds 109 Concession + 1 PRRT and is correctly
+**not** selected — its headline is a production-basis figure with a rounding error of PRRT in it.
+No new threshold is introduced, nothing is recomputed, and the published 38.5% cell is untouched
+(v449/v451 lock it).
+
+Four surfaces now carry the base:
+
+| surface | what is now on screen |
+|---|---|
+| headline strip | new caveat block in `_cpCmpLine552`'s slot, **directly above the rank pill**: `⚠ PRRT — cash-flow base, not a share of production / 28.6% @$50 → 38.5% @$75 → 46.3% @$125 · comparable with a PSC/Concession take at one price only, and only if the memo says so` |
+| Fiscal character | one sentence beneath the verdict, the same treatment the fee blend gets: *"Read on a PRRT cash-flow base … The producers it is placed against here are measured on production value, so this ranking holds at $75 only."* |
+| defend paragraph | basis clause beside `_cmpBasisNote552` — mutually exclusive with it by construction (`n2 > 0` vs `n2 === 0`) |
+| **IC MEMO** | the green *"favorable regime — single-price cite acceptable"* is **replaced** by *"IC: cash-flow-basis regime (PRRT) — cite the price you are defending AND the base … it runs 28.6% @$50 to 46.3% @$125 on the same terms. It is not like-for-like with a PSC or Concession take, and Side-by-Side will not rank it against one."* — in the **yellow** register Side-by-Side already gives Group 3 |
+
+### Result
+
+An analyst opening Australia to answer T2 is told, **before** the rank pill and **before** the two
+copy-to-memo buttons, that 38.5% is a share of project **cash flow after an uplifted threshold**
+rather than of production, and that the identical terms read **28.6% at $50 and 46.3% at $125**.
+They can still cite the figure — with the price and the base attached, which is the only form
+ORCA's own comparability rule permits. The green badge that told them a single-price cite was safe
+is gone.
+
+### Cycle 903 verification — every figure measured this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, 11 inline blocks | **PASS, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| Control, same harness, v978 from git HEAD (`_ctl_v978.html`, removed after) | **499 / 0 / 1 — no regression** |
+| Full report diff, control vs modified | **differs on the timestamp line only** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server`; identical in control — harness artefact |
+| 390×844 `hasTouch`, all tabs | **10 of 10**, `scrollWidth` == `clientWidth`, no sideways scroll — and **10 of 10 on the control too** |
+| in-CP elements past `clientWidth`, Australia, mobile | **347 on BOTH** control and modified — pre-existing, inside internally-scrolling regions; the page itself does not scroll |
+| new caveat block at 390 | 340px wide inside a 390px viewport, 67px tall — no overflow, no sub-24px control |
+| page errors, desktop walk and mobile walk | **0** |
+| Denmark / Indonesia / Iraq / Norway regression walk | **unchanged** — no Group-3 caveat emitted, Iraq's fee-basis layer intact |
+| Version | title + badge v978 → v979, silently at the end |
+
+### Carried forward, still open
+
+- **Surfaced and NOT fixed by this cycle:** the rank pills themselves (`#7 of 21 producers`,
+  `−17.1pp vs producer median`, `All 185: #109`) still *compute* Australia's position against
+  production-basis takes. The new caveat renders immediately above them, so the base is stated
+  before they are read, but the ranking is still performed. Side-by-Side's answer is to withhold
+  the rank entirely. Whether Country Profile should do the same — or keep the rank with the caveat
+  — is a judgement call, not a bug fix, and it was left rather than guessed.
+- The other Group-3 consumers were not walked: Fiscal Compare's take column, the Screener TAKE
+  column and the Breakeven Map all place Australia on the same cash-flow figure. Only Country
+  Profile was in this cycle's scope.
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889), against
+  finalization item 3.
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio and Scenario Builder
+  still not measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
