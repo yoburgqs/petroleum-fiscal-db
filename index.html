@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v977</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v978</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v977</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v978</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -62942,7 +62942,9 @@ function openFCDrilldown(country) {
     for (const [key, pct] of Object.entries(r.waterfall)) {
       if (pct < 0.1) continue;
       var _wft = wfTitles[key] ? ' title="' + wfTitles[key].replace(/"/g,'&quot;') + '"' : '';
-      html += '<div class="dcf-wf-row"><div class="dcf-wf-label"' + _wft + ' style="cursor:' + (wfTitles[key]?'help':'default') + ';">' + (wfLabels[key]||key) + '</div><div class="dcf-wf-bar-wrap"><div class="dcf-wf-bar" style="width:' + Math.min(100,pct) + '%;background:' + (wfColors[key]||'#6B6560') + '"></div></div><div class="dcf-wf-pct">' + pct.toFixed(1) + '%</div></div>';
+      // v978 (T6): data-wf-key so _fcRenderWfCiteLeg978() can find the row a given model term
+      // produces. Same attribute the Scenario Builder waterfall (v944) already carries.
+      html += '<div class="dcf-wf-row" data-wf-key="' + key + '"><div class="dcf-wf-label"' + _wft + ' style="cursor:' + (wfTitles[key]?'help':'default') + ';">' + (wfLabels[key]||key) + '</div><div class="dcf-wf-bar-wrap"><div class="dcf-wf-bar" style="width:' + Math.min(100,pct) + '%;background:' + (wfColors[key]||'#6B6560') + '"></div></div><div class="dcf-wf-pct">' + pct.toFixed(1) + '%</div></div>';
     }
     // v470: Dominant instrument callout — tells analyst which single fiscal mechanism captures the most revenue
     // v489: regime-specific IC implication for dominant instrument type
@@ -62959,9 +62961,15 @@ function openFCDrilldown(country) {
         else if (_domEntry[0] === 'special') _domImpl = 'IC note: windfall/supplemental tax dominant = take accelerates above $75/bbl; high Price Swing expected — show price range table.';
         else if (_domEntry[0] === 'state_eq') _domImpl = 'IC note: NOC equity dominant = carried/paying interest reduces contractor entitlement proportionally to WI dilution.';
         else if (_domEntry[0] === 'prrt') _domImpl = 'IC note: PRRT dominant = back-loaded; no PRRT in early field life — payout-dependent. Verify uplift rate and LTBR basis.';
-        html += '<div style="font-size:11px;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">Largest component: <strong style="color:var(--text);">' + _domLabel + '</strong> at ' + _domEntry[1].toFixed(1) + '% of revenue' + (_domImpl ? ' &mdash; <em>' + _domImpl + '</em>' : '') + '</div>';
+        // v978 (T6): id + data-wf-key so the citation leg can amend THIS sentence when the
+        // component it names is the uncited one. The IC note hangs off this line, so a reader
+        // who copies it is copying a reading built on that term.
+        html += '<div id="fc-dd-domline" data-wf-key="' + _domEntry[0] + '" style="font-size:11px;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid var(--border);">Largest component: <strong style="color:var(--text);">' + _domLabel + '</strong> at ' + _domEntry[1].toFixed(1) + '% of revenue' + (_domImpl ? ' &mdash; <em>' + _domImpl + '</em>' : '') + '<span id="fc-dd-dom-nocite"></span></div>';
       }
     })();
+    // v978 (T6): filled asynchronously by _fcRenderWfCiteLeg978(). Stays empty if the fetch
+    // fails, if the regime runs generic terms, or if every model term is cited.
+    html += '<div id="fc-dd-citeline"></div>';
     // v967 (T6): the bars above are the ENGINE's rates on the 6 override countries whose
     // hard-coded terms disagree with ORCA's own record, and the "Largest component" note that
     // just rendered is derived from them. On Nigeria that note is not merely a different number:
@@ -63304,6 +63312,8 @@ function openFCDrilldown(country) {
     setTimeout(function() { fetchFCDrawerProductionChart(country, drawerProdId, drawerCanvasId); }, 50);
     // v679 (T6): model-term citation leg beside the Src badge.
     _fcRenderTermLeg(country);
+    // v978 (T6): the same leg, on the BARS it produces, in the Fiscal Breakdown below.
+    _fcRenderWfCiteLeg978(country, r);
   }
 }
 
@@ -63826,6 +63836,182 @@ function _fcRenderTermLeg(country) {
   });
 }
 window._fcRenderTermLeg = _fcRenderTermLeg;
+
+// ── v978 (T6): the Fiscal Breakdown said nothing about which of its bars is sourced ─────────
+// The drawer is where a Fiscal Compare analyst asks "where did this number come from?", and the
+// Fiscal Breakdown is the most granular answer on the platform: it decomposes the take into the
+// four to six levies that produced it, names a "Largest component", and hangs an IC note off
+// that component telling the analyst what to put in front of the committee.
+//
+// Every bar rendered clean. The only citation signal in the drawer was the header chip -- "3 of
+// 5 model terms cited" -- an aggregate that says how MANY are uncited and never which, sitting
+// ~500px above the bars and counting terms (Cost Recovery Cap) that have no bar at all. So the
+// analyst read a component split with nothing to separate a bar ORCA read out of a statute from
+// one it holds no source for whatsoever.
+//
+// Measured live on the shipped v977 across all 185 rows, on _fcTermLeg()'s own rule -- the bulk
+// harvest, an instrument shared across jurisdictions and a D-confidence value do not count, the
+// rule the Country Profile Evidence Chain uses:
+//   * Of the 65 countries whose drawer runs THEIR OWN terms, 61 have their LARGEST Fiscal
+//     Breakdown component on a term with no citation; 62 have at least one uncited bar.
+//   * 115 of those 65 countries' 237 rendered bars -- 48.5% -- are uncited.
+//   * It lands on the rows that matter: Australia's PRRT at 28.9% of revenue, Nigeria's Special
+//     Tax at 26.2% (where the IC note reads "take accelerates above $75/bbl"), China's Profit
+//     Oil at 31.1%, Angola's Profit Oil at 28.0%, Somalia uncited on all five terms it runs.
+//
+// The other 120 rows run the generic mechanic default and already carry the v505 "Generic terms"
+// banner saying no country terms were loaded, so there is nothing to source and this stays
+// silent on them -- the same exclusion _sbRenderCiteLeg944() makes for the same reason.
+//
+// This is v944's Scenario Builder leg on the surface that 185 ranked rows lead into and that
+// ends with "⎘ IC Citation": same rule, same wording, same destination, and the same `no
+// citation` caption inside the existing 130px label column, which is display:block and so
+// cannot widen a row or push its bar. The one addition is that when the uncited term IS the
+// largest component, the "Largest component" sentence says so where it is read, not only in a
+// block underneath it.
+//
+// Nothing about the take, NPV, IRR, waterfall, rank or grade changes.
+var _FC_TERM_WF978 = {
+  royalty_rate: ['royalty'], cit_rate: ['cit'], spt_rate: ['special'],
+  state_equity_pct: ['state_eq'], ftp_rate: ['ftp'], profit_oil_govt_pct: ['profit_oil'],
+  ept_rate: ['ept'], prrt_rate: ['prrt'],
+  // windfall_rate genuinely feeds the `special` bar: dcfConcession() sums sptLiable +
+  // windfallLiable into one `special` key, so both terms produce that one line.
+  windfall_rate: ['special'], fee_per_bbl: ['base_govt'],
+  // No line of their own in this waterfall. Named in the block, never pinned to a bar, because
+  // a caption on a bar the term did not produce would be asserting a link that is not there.
+  // severance_rate is here for exactly that reason: dcfConcession() computes it and it reaches
+  // neither the waterfall NOR totalGovt, so the Royalty bar beside it is the royalty and
+  // captioning it "severance is uncited" would flag a bar whose own term is cited (USA).
+  cost_recovery_cap: [], return_on_capex: [], severance_rate: []
+};
+
+// The row label as printed, with any caption this function has already appended stripped off,
+// so the block quotes the line's own name and nothing else.
+function _fcWfRowLabel978(row) {
+  var lab = row.querySelector('.dcf-wf-label');
+  if (!lab) return null;
+  var txt = '';
+  Array.prototype.forEach.call(lab.childNodes, function(n) {
+    if (n.nodeType === 3) txt += n.nodeValue;
+    else if (n.nodeType === 1 && n.className !== 'sb-wf-nocite') txt += n.textContent;
+  });
+  return txt.trim() || null;
+}
+
+// Late-binding and additive: one cached fetch behind _fcTermLeg(). If it fails, if the regime
+// runs generic terms, or if every model term is cited, the drawer is exactly what it was.
+function _fcRenderWfCiteLeg978(country, r) {
+  try {
+    if (!r || !r.waterfall) return;
+    if (r.termsBasis === 'default') return;
+    if (typeof _fcTermLeg !== 'function') return;
+  } catch (e) { return; }
+  _fcTermLeg(country).then(function(t) {
+    if (!t || !t.total || !t.uncited || !t.uncited.length) return;
+    if (_fcDrawerOpen !== country) return;                    // analyst has stepped on
+    var line = document.getElementById('fc-dd-citeline');
+    if (!line || !line.isConnected) return;
+
+    var lbl2key = {};
+    Object.keys(_FC_TERM_LABEL).forEach(function(k) { lbl2key[_FC_TERM_LABEL[k]] = k; });
+    var rows = {};
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#fc-drawer-row .dcf-wf-row[data-wf-key]'),
+      function(el) { rows[el.getAttribute('data-wf-key')] = el; });
+    var domEl  = document.getElementById('fc-dd-domline');
+    var domKey = domEl ? domEl.getAttribute('data-wf-key') : null;
+
+    var onBars = [], offBars = [], domHit = null;
+    t.uncited.forEach(function(labelTxt) {
+      var key = lbl2key[labelTxt];
+      var wfKeys = key ? (_FC_TERM_WF978[key] || []) : [];
+      var row = null, wfKey = null;
+      for (var i = 0; i < wfKeys.length && !row; i++) {
+        if (rows[wfKeys[i]]) { row = rows[wfKeys[i]]; wfKey = wfKeys[i]; }
+      }
+      if (!row) { offBars.push(labelTxt); return; }
+      var pEl = row.querySelector('.dcf-wf-pct');
+      var hit = { label: labelTxt, pct: pEl ? pEl.textContent.trim() : null,
+                  rowLbl: _fcWfRowLabel978(row), isDom: (wfKey === domKey) };
+      onBars.push(hit);
+      if (hit.isDom && !domHit) domHit = hit;
+      if (!row.querySelector('.sb-wf-nocite')) {
+        var lab = row.querySelector('.dcf-wf-label');
+        if (lab) lab.insertAdjacentHTML('beforeend',
+          '<span class="sb-wf-nocite" title="' + _esc594(labelTxt) + ' is one of the ' + t.total
+          + ' fiscal terms the ' + _esc594(t.mech || 'DCF') + ' model ran to produce this split, '
+          + 'and ORCA holds no citation behind the rate it used — no statute, no secondary '
+          + 'guide, no contract-level source. The bulk harvest, an instrument shared across '
+          + 'jurisdictions and a D-confidence value do not count, the same rule the Country '
+          + 'Profile Evidence Chain uses. The bar is still ' + _esc594(country) + '’s '
+          + 'modelled value — what is missing is anything to check it against.">no citation</span>');
+      }
+    });
+
+    // The "Largest component" sentence is what the IC note is read off, and on 61 of the 65
+    // own-terms countries it is the uncited one. Said there, not only underneath.
+    if (domHit) {
+      var domSpan = document.getElementById('fc-dd-dom-nocite');
+      if (domSpan) domSpan.outerHTML =
+        ' <span id="fc-dd-dom-nocite" style="color:var(--red);font-weight:700;cursor:help;" title="'
+        + _esc594(domHit.label) + ' is the model term that produces this line, and ORCA holds no '
+        + 'source behind the rate it used — so the largest single component of '
+        + _esc594(country) + '’s take, and the IC note derived from it, rest on an uncited '
+        + 'number. Read the block below before quoting either.">— and it is uncited.</span>';
+    }
+
+    var safe = String(country).replace(/'/g, "\\'");
+    var chain = '<button type="button" class="sb-cite-chain" onclick="event.stopPropagation();'
+      + '_fcOpenTermChain(\'' + safe + '\');">Open ' + _esc594(country)
+      + '’s Evidence Chain →</button>';
+
+    var named = onBars.map(function(f) {
+      // The term's name and the line's name are not always the same word -- the term is "State
+      // Participation" and the line is "State Equity", and on a TSC the term is the Service Fee
+      // while the line is what the state keeps AFTER it. So this says the term PRODUCES that
+      // line; it never claims the term IS that number.
+      return '<strong style="color:var(--text);">' + _esc594(f.label) + '</strong>'
+        + (f.pct ? ' <span style="color:var(--muted);">(produces the ' + _esc594(f.pct) + ' '
+                   + _esc594(f.rowLbl || '') + ' line above'
+                   + (f.isDom ? ', the largest component' : '') + ')</span>' : '');
+    }).join(onBars.length === 2 ? ' and ' : ', ');
+
+    var offTxt = offBars.length
+      ? ' <span style="color:var(--muted);">' + _esc594(offBars.join(', ')) + ' '
+        + (offBars.length === 1 ? 'is' : 'are') + ' uncited too, with no bar of '
+        + (offBars.length === 1 ? 'its' : 'their') + ' own in this split — the header chip counts '
+        + (offBars.length === 1 ? 'it' : 'them') + ', these bars cannot show '
+        + (offBars.length === 1 ? 'it' : 'them') + '.</span>'
+      : '';
+
+    var html;
+    if (!onBars.length) {
+      html = '<strong style="color:var(--orange);">Evidence — every bar above carries a '
+        + 'citation, but not every term does.</strong> ' + t.cited + ' of ' + t.total
+        + ' model terms are cited on ORCA’s record for ' + _esc594(country) + '.'
+        + offTxt + ' ' + chain;
+      line.style.borderLeftColor = 'var(--orange)';
+    } else {
+      html = '<strong style="color:var(--red);">Evidence — '
+        + onBars.length + ' of the bars above '
+        + (onBars.length === 1 ? 'rests' : 'rest') + ' on a rate with no citation.</strong> '
+        + named + ' ' + (onBars.length === 1 ? 'has' : 'have')
+        + ' no statute, no secondary guide and no contract-level source behind the value the '
+        + _esc594(t.mech || 'DCF') + ' model applied — the same rule the Country Profile '
+        + 'Evidence Chain uses. The split, the "Largest component" line and the IC note beside '
+        + 'it are arithmetic on '
+        + (onBars.length === 1 ? 'that number' : 'those numbers') + ', so state '
+        + (onBars.length === 1 ? 'it' : 'them') + ' as a modelled assumption rather than as '
+        + _esc594(country) + '’s terms. ' + t.cited + ' of ' + t.total
+        + ' model terms are cited.' + offTxt + ' ' + chain;
+      line.style.borderLeftColor = 'var(--red)';
+    }
+    line.className = 'sb-cite-line';
+    line.innerHTML = html;
+  }, function() { /* fetch failed: drawer stays exactly as rendered */ });
+}
+window._fcRenderWfCiteLeg978 = _fcRenderWfCiteLeg978;
 
 // The chip's destination: the Country Profile for this country, scrolled to the Evidence
 // Chain. loadCountryProfile fetches the same file, so the table is a beat behind the tab
