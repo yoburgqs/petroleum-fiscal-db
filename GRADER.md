@@ -65653,3 +65653,169 @@ instead of being told that nothing is set aside and the ordering is the whole se
 - **Suite copies remain diverged** — graded copy that runs is
   `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+---
+
+## Cycle 912 Log — 2026-09-22 — v986
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?"
+
+Stalest in rotation: 911 was T3, 910 T6, 907 T5, 906 T4, 905 T1 — T2 last walked
+at cycle 903. Walked cold at 1440x900 and at 390x844 `hasTouch`, `sessionStorage`
+and `localStorage` cleared, over `http://…/petroleum-fiscal-db/index.html` — not
+`file://`, and not the changelog.
+
+### Friction
+
+A cold Country Profile auto-loads Indonesia; the analyst changes the dropdown to
+their country. The **first line under the country name** is the "Fiscal character"
+verdict — v760 promoted it there precisely because it is this page's one direct
+answer to T2.
+
+On the branch selected by `take > 65` that line read, in full:
+
+> Moderate-to-high take (74.5%) — above the typical IOC sweet spot; viability
+> depends on field scale, cost structure, and price environment. Run Scenario
+> Builder to test at your actual project parameters before IC submission
+
+**Two lines below, the headline paragraph printed the same comparable take as
+`high-take tier (61–75%)`.** Measured live by loading all 185 profiles and
+reading both strings off the rendered DOM, that held on **11 of 11** countries
+the branch fires for:
+
+| country | comparable take | verdict said | paragraph 2 lines below said | contracts | prod cov |
+|---|---|---|---|---|---|
+| Norway | 68.0% | Moderate-to-high | high-take tier (61–75%) | 7,643 | 18.2% |
+| Kazakhstan | 69.9% | Moderate-to-high | high-take tier (61–75%) | 302 | 30.5% |
+| Libya | 71.1% | Moderate-to-high | high-take tier (61–75%) | 301 | 0.7% |
+| Qatar | 74.5% | Moderate-to-high | high-take tier (61–75%) | 146 | 0% |
+| UAE | 74.6% | Moderate-to-high | high-take tier (61–75%) | 241 | 0% |
+| UAE — Abu Dhabi | 74.6% | Moderate-to-high | high-take tier (61–75%) | 6 | 0% |
+| Iran | 74.4% | Moderate-to-high | high-take tier (61–75%) | 547 | 0% |
+| Venezuela | 74.9% | Moderate-to-high | high-take tier (61–75%) | 287 | 0% |
+| Algeria | 69.5% | Moderate-to-high | high-take tier (61–75%) | 177 | 0% |
+| Bolivia | 72.1% | Moderate-to-high | high-take tier (61–75%) | 168 | 0% |
+| Equatorial Guinea | 65.8% | Moderate-to-high | high-take tier (61–75%) | 125 | 0% |
+
+One number, two adjacent lines, two different bands — and **"Moderate-to-high" is
+the softer of the two**, on the half an analyst pastes into an IC memo. This set
+is not marginal: it is Norway (the largest contract file on the platform),
+Kazakhstan, Libya, Qatar, the UAE and Iran.
+
+Three further defects in the same sentence:
+
+- **"above the typical IOC sweet spot" is a threshold at 65% that exists nowhere
+  else on this platform**, and it contradicts the branch immediately above it,
+  which tells a 62% country that "the terms sit in the typical IOC benchmark
+  range". The tier scale files both readings in the same band.
+- **"viability depends on field scale, cost structure, and price environment"** is
+  true of all 185 published regimes and discriminates nothing. Qatar (5.5pp swing,
+  royalty-stable) and Venezuela (18.0pp) received a **byte-identical** verdict.
+- **9 of the 11 hold `prod_coverage_pct = 0`** — the take is a statutory model —
+  and this branch said so for none of them, while the `take ≤ 40` branches print
+  exactly that clause for the identical evidence state.
+
+This is the v648 / v663 / v931 / v946 defect on the last populous branch those
+four did not reach. `_verdictCTA` and the "N / M producers take less" pill were
+already rendering underneath; the sentence itself carried the contradiction.
+
+### Change
+
+`else if (take > 65)` rebuilt the same way v946 rebuilt the `swing > 20` branch.
+Qatar now reads:
+
+> **High-take regime** — at 74.5% the $75 base sits in the **high-take tier
+> (61–75%), the same band the headline below prints**, and 19 of the 21
+> production-weighted producers take less at $75/bbl. Government take moves
+> **5.5pp** from $50 to $125/bbl — the Price Swing figure on this page,
+> **royalty-stable** on this platform's scale, so a higher price deck will not
+> relieve these terms. No verified block-level production is held here, so both
+> figures are a statutory model over 146 contracts — directional, not realised.
+
+Venezuela, previously byte-identical to Qatar, now reads `18.0pp … moderate on
+this platform's scale, so the deck you screen at moves the terms`. Norway and
+Kazakhstan correctly omit the no-production clause (18.2% / 30.5% coverage).
+
+**No new threshold is introduced.** Bands are the tier scale v589's headline
+paragraph prints (`_lvl986`, same table as `_lvl946`); the swing wording is the
+platform's own `<10 / 10–20 / >20pp` scale, which the Fiscal Compare legend and
+the Swing chip already use; the producer position is `_posClause648`; the
+no-production clause is the take≤40 branches' existing string. The routing hint
+("Run Scenario Builder…") is dropped — v371/v373 bans routing hints and the
+headline strip already carries a `→ Model in Scenario Builder` control.
+Colour is computed off the tier scale rather than hardcoded orange, so the line
+and the paragraph beneath it are not painted on two different scales.
+
+### Result
+
+An analyst screening **Norway, Kazakhstan, Libya, Qatar, UAE, Iran, Venezuela,
+Algeria, Bolivia or Equatorial Guinea** reads **one** tier for the country, not
+two, and gets the price-sensitivity band and the evidence basis **in the same
+sentence as the verdict**. "Is it attractive at $75" and "can I defend that" are
+now answered by the same line, instead of the second line quietly disowning the
+first.
+
+### Verification — every figure measured this cycle
+
+- **All 185 verdicts re-enumerated before and after**, off the rendered DOM:
+  **exactly the 11 changed**; the other 174 bucket byte-identical
+  (61 "Low take … nothing that produces sits below", 48 Contractor-favorable,
+  32 Commercially attractive, 14 Progressive regime, 10 Moderate-take open
+  access, 4 High fiscal burden, 3 suppressed state monopolies, 1 Highly
+  contractor-favorable, 1 Marginal at $75).
+- **JS syntax gate: PASS** — 11 inline blocks, 0 errors.
+- **Runtime suite RAN this cycle** against the **modified tree** at the real
+  `/petroleum-fiscal-db/` path prefix (`TEST_URL=http://localhost:8981/petroleum-fiscal-db/index.html`):
+  **500 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own report
+  at `/tmp/cyc912/report.txt`, not assumed from a prior baseline.
+- **Mobile 390x844 `hasTouch: true`:** `scrollWidth == clientWidth` (390/390) on
+  all 9 reachable tabs. The changed verdict block measures **362px wide** inside
+  the 390 viewport on Norway, Qatar, Venezuela, Kazakhstan and UAE — Abu Dhabi.
+  It is prose, not a control, so the 24px floor does not apply.
+- **0 page errors** on every country loaded.
+
+### Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| v946 Progressive-regime branch | Indonesia · Chad · Iraq-Kurdistan | unchanged, still 14 members |
+| v931 Moderate-take open access | Azerbaijan · Brazil · India | unchanged, still 10 members |
+| v663 producing-floor branch | Albania · Nauru · USA | unchanged |
+| v648 `_posPill648` / `_verdictCTA` | Nigeria · Qatar · Norway | pill and CTA still render |
+| v552 fee-basis `_charBasis` line | Iraq · Qatar | still renders beneath the verdict |
+| v979 cash-flow `_charCash979` line | Australia | still renders |
+| v760 verdict-first ordering | all 11 | verdict still first under the country name |
+| v612 mobile layer | 9 tabs at 390 `hasTouch` | untouched, no sideways scroll |
+
+### Carried forward, still open
+
+- The four `.cmp-quickstart-btn` benchmark sets are **unreachable on a cold load**
+  — the `t2` seed replaces `#cmp-output`'s empty state before they are ever seen.
+  Still the next thing to move.
+- `Take spread across contracts` renders Guyana two different ways depending on
+  the rest of the set (911).
+- Scenario Builder paste's IRR row still a bare `41.1%` against a tile labelled
+  "not Angola's IRR" (907).
+- `_fpCohortLine()` one-term cohort rank still computed from the refuted score (906).
+- Deck-change inversion still disclosed on the Screener only (905).
+- Side-by-Side take-ordering chain still places a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia against production-basis takes (903).
+- Evidence Quality summary vs Evidence Chain population labels (902); missing
+  index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio still
+  not measured against a page width (901).
+- **New, found this cycle, not fixed:** the `take > 75` branch ("High fiscal
+  burden — government captures the majority of project economics; NOC/state-
+  dominant structure") still carries **no take figure, no swing figure and no
+  evidence-basis clause** — the same defect this cycle fixed one band up. It
+  fires for **Nigeria, Oman, Turkmenistan, Uzbekistan**, and Nigeria is a
+  first-rank IOC screening jurisdiction. It does not contradict its own headline
+  band, which is why it was not this cycle's worst moment. Next in this chain.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+- Summary: **Cycle 912 complete.** `v986` shipped and pushed (`c3e969a`), mirror in sync.
