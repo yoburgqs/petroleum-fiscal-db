@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v973</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v974</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2697,7 +2697,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v973</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v974</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -67184,6 +67184,55 @@ function exportFCResults() {
         + Number(_st.cmp).toFixed(1) + '%, exactly as the on-screen # column and tier dividers are.');
     }
   }
+  // ── v974 (T5) ─ the contractor-side half of the same correction, in the XLSX ──────────
+  // v674 put the comparable TAKE in this workbook and v788 put the Rank and Tier on it. The
+  // contractor NPV was left on the published all-contract blend, and nothing in the file said so.
+  // The clipboard artifact from the button beside this one has carried the corrected NPV since
+  // v955 and states the rule outright: "Quoting the blended NPV beside the like-for-like take
+  // states a low government take against a value the country does not have." This workbook did
+  // exactly that, and its own Methodology sheet called both figures citable and told the analyst
+  // to "read a take and an NPV from the SAME price" — pairing a like-for-like take with a blended
+  // NPV was therefore not a slip the file warned against, it was the instruction the file gave.
+  //
+  // Measured on the live build at $75, all 10 fee-blended rows: Iraq 642 -> 3043 ($M), a 4.7x
+  // understatement of the contractor position on the row whose take correction is the largest on
+  // the platform (84.8% published vs 34.1% comparable); then South Sudan 1534 -> 1868, Iran
+  // 899 -> 1248, Oman 566 -> 866, Qatar 1061 -> 1244, Mexico 2882 -> 3001, Malaysia 627 -> 720,
+  // Azerbaijan 2951 -> 3027, Ecuador 2127 -> 2184, and India 1113 -> 1095 — the one row where the
+  // correction is DOWNWARD, which is why this is a basis and not a discount.
+  //
+  // Same three rules the take pair already follows: carried only when a row in THIS export
+  // actually blends fee-basis contracts; blank on a row the rule does not touch, so the column
+  // reads as "these are the affected rows"; and the four published NPV columns are NOT changed,
+  // so the workbook and the screen still agree row for row. Placed immediately after the four
+  // NPV columns for the same reason v674 placed the take pair after the four take columns — it
+  // has to be read WITH the figure it corrects, not found later.
+  if (_xlAnyFee) {
+    const _xlNpvKey = 'v' + _xlPP;
+    // The four published NPV columns sit at 13..16 (50/75/100/125) once the take pair is in.
+    // Name the one at the SELECTED price in the per-row sentence, not a hardcoded $75 — this
+    // export runs at whichever of the four the analyst had on screen.
+    const _xlNpvCol = 13 + [50, 75, 100, 125].indexOf(_xlPP);
+    data[0].splice(17, 0,
+      'Comparable contractor NPV $M @$' + _xlPP + ' (fee-basis contracts excluded) — CITE ON THIS where populated, WITH the comparable take');
+    for (let _di = 1; _di < data.length; _di++) {
+      const _cn = data[_di][2];
+      const _g1 = (_xlFeeAt[_cn] && _xlCD[_cn]) ? _xlCD[_cn].g1 : null;
+      const _g1v = (_g1 && _g1[_xlNpvKey] != null && !isNaN(_g1[_xlNpvKey])) ? +Number(_g1[_xlNpvKey]).toFixed(1) : null;
+      data[_di].splice(17, 0, _g1v);
+      // The per-row comparability sentence already names the take correction; it now also names
+      // the NPV one, so a reader who sorts or filters the sheet still gets both on the row.
+      const _pubNpv = data[_di][_xlNpvCol];
+      if (_g1v != null && typeof data[_di][12] === 'string' && data[_di][12]) {
+        data[_di][12] += ' The contractor NPV is corrected on the same contract population: cite $'
+          + Number(_g1v).toLocaleString() + 'M'
+          + (_pubNpv != null ? ', not the published all-contract $' + Number(_pubNpv).toLocaleString() + 'M' : '')
+          + ', which blends the fee-basis contracts where the contractor is paid a fixed $/bbl '
+          + 'remuneration and the DCF returns a far smaller position. Read it WITH the comparable '
+          + 'take beside it: the two are the same contract population and belong in one sentence.';
+      }
+    }
+  }
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Fiscal Compare');
@@ -67309,6 +67358,37 @@ function exportFCResults() {
     ['  The published headline is kept because it is the correct all-contract average and is what the'],
     ['    ORCA database and the public JSON API publish. This is the same treatment the Country Profile'],
     ['    IC citation, the Screener and this tab\u2019s "Copy for IC Memo" paste already give it.'],
+    [''],
+    // v974 (T5): the contractor-side leg. Until this version the section above corrected the take
+    // and stopped, while the four "Contractor NPV (database, $M)" columns stayed on the published
+    // blend with nothing in this sheet saying so \u2014 and the paragraph further up tells the analyst
+    // to read a take and an NPV from the same price, which on these rows paired a corrected take
+    // with an uncorrected value.
+    ['  The contractor NPV is corrected on the SAME contract population (v974):'],
+    ['    "Comparable contractor NPV $M @$' + _xlPP + '" is the NPV across each country\u2019s PSC/Concession'],
+    ['    contracts alone \u2014 the same rows the Comparable take is computed over. Read the two TOGETHER.'],
+    ['    The four "Contractor NPV (database, $M)" columns are the published all-contract figures and'],
+    ['    are unchanged; on a fee-blended row they average in the fee contracts, where the contractor'],
+    ['    is paid a fixed $/bbl remuneration and the DCF returns a far smaller position.'],
+    ['  Quoting the blended NPV beside the comparable take states a low government take against a'],
+    ['    value the country does not have. Worked example, at the time of writing:'
+      + (function(){
+          var c = _xlCD['Iraq'];
+          if (!_xlFeeAt['Iraq'] || !c || !c.g1 || c.g1['v' + _xlPP] == null) return ' see the Take comparability column.';
+          var pub = c['npv_' + _xlPP];
+          return ' Iraq at $' + _xlPP + '/bbl is $' + Math.round(Number(c.g1['v' + _xlPP])).toLocaleString()
+            + 'M on its PSC/Concession contracts'
+            + (pub != null ? ', against $' + Math.round(Number(pub)).toLocaleString() + 'M published all-contract' : '')
+            // v974 fix: the comparable take moves with the price deck (Iraq is 28.6% at $50,
+            // 34.1% at $75, 37.8% at $100, 39.7% at $125). Hardcoding the $75 figure printed a
+            // take from a price the analyst had already left, in the same sentence that tells
+            // them the two figures share a contract population. Read it off the same _xlFeeAt
+            // entry the Take comparability column uses, exactly as the take section above does.
+            + ' — the same rows the ' + Number(_xlFeeAt['Iraq'].cmp).toFixed(1)
+            + '% comparable take is computed over.';
+        })()],
+    ['  It runs both ways, exactly as the take correction does \u2014 on at least one row the comparable'],
+    ['    NPV is LOWER than the published blend. This is a basis, not an uplift.'],
     ['']
     ] : []),
     ['Terms_Basis definitions (v505) — what the Take% (model) in each row was computed FROM:'],
