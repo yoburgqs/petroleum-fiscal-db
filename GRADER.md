@@ -65401,3 +65401,18 @@ pastes with the published take to reconcile the scenario figure against, which
 - Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
 - JS errors: 0 page errors; 15 console 404s for `sw.js` — harness artefact
 - Summary: **Cycle 907 complete.** `v983` shipped and pushed (`c623ca6`), mirror in sync.
+
+---
+## Cycle 908 Log — 2026-09-22 12:27
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: It's progressing normally. Here's the cycle while that control run finishes.
+
+## Cycle 907 — v983 shipped and pushed (`c623ca6`)
+
+**Task — T5:** "Give me something I can paste straight into an IC memo." (stalest; 906 was T4, 905 T1, 904 T3, 903 T2, 902 T6, 901 T5)
+
+**Friction.** Cold walk at 1440×900, storage cleared: Country Profile → Angola → *Model in Scenario Builder* → Run DCF → **Copy for IC Memo**.
+
+The screen warns three times that this run is not Angola — the pre-fill banner says *"CIT 
