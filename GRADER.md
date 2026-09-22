@@ -65542,3 +65542,114 @@ Cycle 910 is closed and verified:
 - Working tree clean apart from `CYCLE_STATE.json` / `cycle_log.txt` (the loop writes those itself) and the pre-existing `_ctl907.html` scratch file
 
 **What sh
+
+---
+## Cycle 911 Log — 2026-09-22 — v985
+
+**Task — T3:** "How do these three countries compare side by side?"
+
+Walked cold at 1440 (fresh context, no sessionStorage, no localStorage) over
+`http://…/petroleum-fiscal-db/index.html` — not `file://`, which never clears
+`#loading-overlay` because both `country_data.json` fetches fail, and not the
+changelog.
+
+**Friction.** The Side-by-Side verdict strip — the first thing read on the tab and
+the thing that gets pasted — closes with a basis-clearance line built in
+`renderCompare()`'s `_aside` branch. It printed the identical sentence for two sets
+carrying opposite evidence:
+
+| set | Data basis row | strip closed with |
+|---|---|---|
+| Norway · United Kingdom · Nigeria | `PROD-WTD` ×3 | *All 3 columns are on one basis — nothing is set aside, the ordering above is the whole set.* |
+| Guyana · Suriname · Namibia | `PROXY` ×3 | **the same sentence, verbatim** |
+
+The cause is that the set-aside test is **relative**. A proxy column is lifted out
+of the ordering only when the set also holds production-weighted columns to lift it
+out *against*. `Angola · Brazil · Guyana` therefore warns loudly — *"Set aside — 1
+of 3 columns cannot join that ordering: Guyana"* — while `Guyana · Suriname ·
+Namibia`, which is **strictly weaker evidence**, warns not at all and is handed an
+explicit all-clear. The weakest set on the tab was the only one with no flag.
+
+That set is not hypothetical: it is the standard 2026 Atlantic frontier trio. The
+strip ranked it **Namibia 37.0% › Guyana 54.1% › Suriname 54.2%**, tagged it
+*"17.2pp apart"*, and declared nothing set aside — four rows below which the grid's
+own **Rank among producers** row read `not ranked · no production data` for **all
+three columns**. The strip ranked a set the grid on the same screen says cannot be
+ranked. The one notice that does cover this, *"⚠ The column that wins this
+comparison is a proxy"*, renders **~2,800 characters below the grid** and names only
+the **winning** column — Guyana and Suriname go unmentioned.
+
+This is the same hole v981 closed once already, for contained jurisdictions, left
+open for the basis case.
+
+**Change.** Nothing is deleted and the good case is untouched.
+- Where **any** ranked column carries no verified field production
+  (`_dqTier(d).hasProduction === false`), the muted grey one-liner is replaced by an
+  **orange left-bordered warning block** — the same treatment `_ovlLine` already
+  uses — that names every proxy column, states their takes are simple averages of
+  statutory terms rather than barrel-weighted figures, points at the
+  `not ranked · no production data` row that contradicts the ordering, and says the
+  ordering is readable only against other statutory-basis columns.
+- Where every ranked column is production-backed, the v981 sentence renders
+  **byte-identical**.
+- A partial branch exists and is worded separately, though the relative set-aside
+  gate means the live cases are the two clean ends.
+
+**Result.** An analyst screening Guyana / Suriname / Namibia is told **on the first
+line they read** that the ordering ranks legal regimes, not realised economics —
+instead of being told that nothing is set aside and the ordering is the whole set.
+
+### Locks verified held, not assumed
+
+| lock | set probed | outcome |
+|---|---|---|
+| v981 contained-jurisdiction suppression | Iraq · Iraq-Kurdistan · Norway | clearance still withheld, `_ovlLine` unchanged |
+| v823 re-based line | Iraq · Norway · Angola | `_rebLine` renders, no clearance |
+| mixed-set "Set aside" wording | Angola · Nigeria · Ghana | unchanged |
+| all-producer clearance text | Norway · UK · Nigeria · and Norway · UK | unchanged, verbatim |
+| new warning | Guyana+Suriname / +Namibia / 5-proxy | fires at n=2, 3 and 5 |
+
+### Verification
+
+- **JS syntax gate:** PASS — 11 inline script blocks.
+- **Runtime suite RAN this cycle.** Against the local build at the **real
+  `/petroleum-fiscal-db/` path prefix**: **500 PASS / 0 FAIL / 0 WARN / 0 JS
+  errors.** Recorded, not assumed.
+- **The 1 WARN is a harness artefact and was run to ground.** Served at a bare root
+  the suite reports `499 PASS / 0 FAIL / 1 WARN`, 15 JS errors, all
+  *"bad HTTP response code (404) … fetching the script"*. `index.html:49` registers
+  the service worker at the absolute path `/petroleum-fiscal-db/sw.js`, which 404s
+  at any other prefix. A **pre-change control build was served and graded at the
+  same wrong prefix and scored identically** — so the change contributes **zero
+  delta**, and at the correct prefix both are clean.
+- **Mobile 390×844 `hasTouch:true`:** `scrollWidth == clientWidth` on all **11
+  tabs**. New block measures **334×232px**, inside the viewport. It is prose, not a
+  control, so the 24px floor does not apply to it.
+- **0 page errors** across every set probed.
+
+### Carried forward, still open
+
+- The four `.cmp-quickstart-btn` benchmark sets (Atlantic Frontier Quartet, North
+  Sea Trio, USA vs Iraq, West Africa Trio) are **unreachable on a cold load**: the
+  `t2` seed populates `compareList` and replaces `#cmp-output`'s empty state before
+  the analyst ever sees them, so they only appear after clicking **Clear**. Four
+  curated IOC screening sets, zero cold-load reachability. Next thing to move.
+- `Take spread across contracts` renders Guyana two different ways depending on the
+  rest of the set — `bundled 50.4–68.2% (17.8pp)` beside producers, bare
+  `single term` with no value in an all-proxy set.
+- Scenario Builder paste's **IRR row** still a bare `41.1%` against a tile labelled
+  "not Angola's IRR" (907).
+- `_fpCohortLine()` one-term cohort rank still computed from the refuted score (906).
+- Deck-change inversion still disclosed on the **Screener only** (905).
+- Side-by-Side take-ordering chain still places a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio still
+  not measured against a page width (901).
+- **Suite copies remain diverged** — graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
