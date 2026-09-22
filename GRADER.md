@@ -65256,3 +65256,148 @@ Cold walk at 1440×900, storage cleared. Reform Risk → **Check one country** �
 
 - **≤51 LOW ceiling**, printed ~~80~~ ▲ best case
 - **"Carry ≤51 
+
+---
+
+## Cycle 907 Log — 2026-09-22
+
+**Task: T5 — "Give me something I can paste straight into an IC memo."**
+(rotation: 906 was T4, 905 T1, 904 T3, 903 T2, 902 T6, 901 T5 — T5 was stalest)
+
+### Friction
+
+Cold walk at 1440x900, `sessionStorage` and `localStorage` cleared. Home →
+**Country Profile** → Angola → **→ Model in Scenario Builder** → **▶ Run DCF** →
+**⎘ Copy for IC Memo**.
+
+The screen does its job. It warns three separate times that this run is not
+Angola:
+
+1. the pre-fill banner — *"CIT 25.0% is the platform PSC template, not Angola's —
+   ORCA's record for Angola holds CIT 49.9%, and no what-if surface on this
+   platform reads it."*
+2. the take tile — scenario **61.4%** printed beside *Angola published @$75
+   **53.0%*** and a **+8.4pp** delta.
+3. the IRR tile and a full paragraph — *"This IRR is not Angola's IRR."*
+
+The **clipboard artifact carried none of the three.** Captured off the shipped
+build, 1,574 characters of `text/plain`:
+
+    Angola — ORCA Scenario Builder — PSC, Deepwater profile, $75/bbl
+    Custom scenario: analyst-set fiscal terms run on one synthetic project,
+    not Angola's published country average. …
+    Government take @ $75/bbl        61.4%
+    …
+    Terms as run    cost recovery cap 50%, FTP 20%, govt profit oil on the
+                    filed 4-tier R-factor ladder (50–80%…), CIT 25%, royalty 3%
+    Notes — carried from the ORCA Scenario Builder run above:
+    1. These fiscal terms and this production profile were set in the Scenario
+       Builder. They are not held in the ORCA database … [generic boilerplate]
+
+One note, and it is the generic one. No published take to reconcile 61.4%
+against. And `CIT 25%` printed flat, under Angola's name, against a record
+ORCA itself holds at **49.9%** — a **24.9pp gap on the largest single rate in
+the run**, invisible to everyone downstream of the analyst who saw the banner.
+
+**Cause — `_sbICBasisClause()`, index.html.** Written at v607 precisely to stop
+a scenario figure being pasted under a country heading. It branches on
+`o.monopoly`, `o.basis === 'record'` and `o.basis === 'default'`.
+`ddOpenScenarioBuilder()` resolves through `fcResolveMechanic(d)` →
+`getDCFParams(country, mech, {record:true})`, which writes **`'db'`** or
+**`'country'`**. Measured on the shipped build over all 185:
+
+| `_sbOrigin.basis` | countries | basis clause emitted |
+|---|---|---|
+| `record` | 116 | yes |
+| `db` | 56 | **'' — fell past every branch** |
+| `country` | 9 | **'' — fell past every branch** |
+| `default` | 4 | yes |
+
+**65 of 185** pasted with no basis note at all. **46 of the 56 `db` countries**
+carry an *unread term* — a rate ORCA's own record holds and the DCF did not
+read — and printed it as fact.
+
+### Change
+
+- **`_sbICBasisClause()` gains the two dead branches.** `db` names how many of
+  the terms came from the country's record, which ran the platform template,
+  which of those contradict the record, and the published take at $75.
+  `country` states the terms are ORCA's record entry on one synthetic project
+  and carries the published take. **All 185 countries now emit a basis note.**
+- **A new TABLE ROW**, on the 46 countries carrying an unread term, beside
+  `Terms as run` — not buried in the notes, because an IC reader scanning the
+  exhibit must not have to reach a footnote to learn the CIT under Angola's name
+  is not Angola's:
+
+      Term NOT read from Angola's record | CIT 25.0% — the platform PSC
+      template. ORCA's record for Angola holds CIT 49.9%. The take, NPV and
+      IRR above are arithmetic on the template figure, so it is an assumption
+      in this memo, not Angola's terms.
+
+- **New `_sbUnreadTerms983()`** is the single source for both the row and the
+  clause, so they cannot drift — and it **withdraws** any term the analyst has
+  overtyped: an edited field is their own stated assumption, not a template
+  figure passing silently.
+- **On screen**, the affordance line under the hurdle verdict moves from
+  *"Copies as a table — 16 metrics and 1 note"* to *"17 metrics and 2 notes"* on
+  Angola, so the button states what the paste now carries.
+
+Nothing was removed. Text/plain and text/html flavours both carry the new row.
+
+### Result
+
+An analyst can no longer paste a Scenario Builder run under a country heading
+and put a CIT rate in front of an IC that ORCA's own record contradicts by
+24.9pp without the memo saying so — and every one of the 185 countries now
+pastes with the published take to reconcile the scenario figure against, which
+65 of them did not carry at all.
+
+### Verified this cycle
+
+| check | result |
+|---|---|
+| JS syntax gate, all inline blocks | **11 blocks, 0 errors** — re-run after the version bump |
+| Runtime suite **RAN** vs modified tree (graded copy, `office/tools/petroleum/tests/`) | **499 PASS / 0 FAIL / 1 WARN** |
+| The 1 WARN / 15 console errors | `sw.js` 404 from `python http.server` — harness artefact, identical in the cycle-906 control |
+| Gating sweep, **all 185 countries**, through `ddOpenScenarioBuilder` + `runCustomScenario` | **0 empty basis clauses** (was 65) · row present on **exactly 46 of 185** · **0 mismatches** · **0 page errors** |
+| Withdrawal on edit | Angola as loaded → row present; overtype `#sb-psc-cit` to 50 → row **and** clause fragment withdraw, basis note stays |
+| Untouched branches | `record` (116) and `default` (4) clauses byte-identical; monopoly branch untouched |
+| Both new branches exercised | `db` — Angola, Guyana, Indonesia · `country` — Nigeria, Norway |
+| `db` without an unread term | Guyana — basis note yes, extra row **no** (correct) |
+| Horizontal scroll, 10 tabs | `scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** |
+| Same, with Scenario Builder open on Angola | clean at all six |
+| 390x844 `hasTouch` | no `#sb-output` control under 24px; Copy for IC Memo **128 x 28** |
+| Controls under 24px | **none added or touched** — this cycle added no control |
+| Version | title + badge v982 → v983, silently at the end |
+
+### Carried forward, still open
+
+- **Surfaced and NOT fixed this cycle:** the Scenario Builder paste's **IRR row**
+  is still a bare `41.1%`, while the screen labels the same tile *"not Angola's
+  IRR"* and prints a paragraph explaining why the rate is earned at the
+  scenario's 61.4% take and not at Angola's published 53.0%. Same defect class
+  as the one fixed here — the qualifier is on screen and not in the artifact —
+  and it is the next thing to move.
+- The one-term cohort line is still printed by `_fpCohortLine()` on Country
+  Profile and in the Fiscal Compare stability tooltip with a rank computed from
+  the refuted score (906).
+- Deck-change inversion still disclosed on the **Screener only** (905).
+- Side-by-Side take-ordering chain still *places* a duplicate jurisdiction column (904).
+- Country Profile rank pills still compute Australia's position against production-basis takes (903).
+- Country Profile Evidence Quality summary vs Evidence Chain population labels (902).
+- Evidence Quality summary strip's missing index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip still labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile and IOC Portfolio
+  still not measured against a page width (901). *Scenario Builder is now
+  measured — see v977's Fiscal Compare work for the method.*
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/` is idle.
+
+---
+## Cycle 907 Log — 2026-09-22
+- Test before: 499 PASS / 0 FAIL / 1 WARN (cycle-906 recorded baseline, v982)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (suite **RAN** this cycle against the modified tree)
+- JS errors: 0 page errors; 15 console 404s for `sw.js` — harness artefact
+- Summary: **Cycle 907 complete.** `v983` shipped and pushed (`c623ca6`), mirror in sync.
