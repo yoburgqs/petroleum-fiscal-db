@@ -66934,3 +66934,16 @@ suite reads 500 PASS / 0 JS errors, as it did for cycles 918–922.
   does not link to it.
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in the
   repo root.
+
+---
+## Cycle 923 Log — 2026-09-23 07:39
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Everything is committed, pushed, and live.
+
+## Cycle 923 — v992 (T4)
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (stalest in rotation; last walked at cycle 914). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared.
+
+**Friction.** The Reform Risk tab's **Regional Reform Tilt** panel — the one view that answers the regional half of T4 — showed **one of its eight columns on a phone**. Measured cold: the table's content is 981px wide in
