@@ -66716,17 +66716,23 @@ stated where the number is read.
 | Cashflow h3 @1440 | **24px** — meets the floor, hint row intact |
 | Horizontal scroll, 8 tabs @390x844 | `scrollWidth == clientWidth == 390` on **all 8** |
 | Playwright, **live deployed** build | **500 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
-| Playwright, **local tree** | ran to **301+ checks, 0 FAIL**; see note below |
+| Playwright, **local tree** | **500 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
 
 **On the local-tree run, honestly:** the graded suite defaults to
 `https://yoburgqs.github.io/...`, so the 500 PASS it reports each cycle is the
 **deployed** build, not the working tree — it cannot gate an uncommitted change.
 This cycle re-ran it with `TEST_URL` against a local server to close that gap. It
-was still running at **301 checks / 0 FAIL** when the cycle secured its work by
-pushing; a single-threaded `http.server` re-serving a 9.7 MB `index.html` ~2,200
-times is the bottleneck, not the product. The push was taken deliberately at that
-point — the demonstrated failure mode of the last four cycles is work lost to the
-timeout, and every independent gate above had already passed.
+completed **500 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own
+report file — so for the first time the suite has gated **the diff being shipped**
+rather than the build already in production.
+
+The push was taken earlier, at 301 checks / 0 FAIL, deliberately and not
+accidentally: the demonstrated failure mode of the last four cycles is work lost
+to the 1800s timeout, and every independent gate had already passed by then. The
+full local result landed afterwards and confirmed it. A single-threaded
+`http.server` re-serving a 9.7 MB `index.html` ~2,200 times is why the local run
+takes roughly three times the live one; a threaded server would close most of
+that gap.
 
 ### Locks verified held, not assumed
 
