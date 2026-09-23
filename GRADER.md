@@ -66440,3 +66440,186 @@ Guide". Re-probed by id: open. The probe was wrong, not the lock.)*
 I took the route the tab's own IC Analyst Interpretation Guide prescribes: Fiscal Compare → click a row → 4-price drilldown → **"Copy 4-price as IC table"** → paste into the memo.
 
 That button called `navigator
+
+## Cycle 916 Log — 2026-09-23
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors (read from the suite report file, run this cycle)
+- JS errors: 0
+- Summary: Cycle 916 complete. `v990` shipped and pushed.
+
+## Working tree carried an uncommitted `v990` from an interrupted cycle — recorded, not claimed
+
+Before any edit this cycle, `git diff` against `HEAD` (cycle 915, `fb6154f`) already showed
+the header badge bumped `v989 -> v990` and a complete, self-documented T6 change in place:
+the Evidence Quality panel's **`no source behind the model opens ->`** chip
+(`cp-cite-open-chip`, `buildEvidencePanel` + the block at ~43768), which distinguishes the
+44 countries whose `N of 3 source links dead` chip implies one citation still opens when
+every model-term citation is in fact dead.
+
+**That work is not this cycle's and is not claimed here.** It had no GRADER entry, so it
+never completed. It is carried into this commit rather than reverted, because it is
+finished, it is what every measurement below was taken against, and discarding another
+cycle's shipped-but-unlogged work would destroy it unrecoverably. This cycle's change is
+additive to it and touches no line of it: `_cpCostBasis`, the Cost Profile `<h3>`, and the
+`NPV ($M)` header cell. Both carry the `v990` marker.
+
+## Task
+
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in
+rotation (915 was T5, 914 T4, 913 T1, 912 T2, 911 T3; T6 last ran at 910). Walked cold
+at 1440×900 and at 390×844 `hasTouch`, `sessionStorage` and `localStorage` cleared and
+the page reloaded before each pass, over the real `/petroleum-fiscal-db/` path.
+
+## Friction
+
+Walked five countries spanning every sourcing branch — Nigeria, USA, Somalia (proxy),
+Guyana (all-citations-dead), Madagascar (single-document).
+
+**For the take, this platform is excellent and I found nothing worth a cycle.** Three
+independent controls reach the take's provenance — the headline figure
+(`_cpTakeToEvidence`), the Evidence Quality chip (`_cpScrollToEvidenceChain`), and the
+"N of M terms cited" chip on Fiscal Compare / Explorer / Screener / Side-by-Side
+(`_fcOpenTermChain`) — and all three land on a per-term Evidence Chain naming the ORCA
+value, the statutory value, the instrument, the tier, whether the URL still resolves,
+and a severity-ranked findings list. Cross-surface consistency was measured, not
+assumed: the chip reads identically on Explorer and Country Profile for all eight
+countries probed (Nigeria 3 of 4, Iraq 1 of 3, Libya 4 of 6, Kazakhstan 4 of 5 …).
+
+**The contractor NPV had none of it.** Measured on the shipped build, Country Profile →
+Nigeria:
+
+- **4-Price Sensitivity** prints NPV `$161M / $302M / $440M / $584M` and carries the
+  **"Copy as IC table"** button. Its prose names *"this standardized Deepwater profile"* —
+  a name, with no numbers behind it.
+- The deck those four figures were actually computed on — **50 MBD peak, 241.9 MMbbl
+  recovered, $1.0B all-in capex, $18/bbl opex escalating 2%/yr, 10% WACC, 25 years,
+  held identical across all 185 countries** — lives one section lower in **Cost Profile
+  Assumptions**, at `display:none`.
+
+The only thing that opened it was that section's `<h3>`, and every property of it was wrong:
+
+| probe | measured |
+|---|---|
+| inbound links | `cost-profile-<slug>` occurs **once in 72,144 lines** — nothing on the platform links to it |
+| `role` / `tabindex` / `aria-expanded` | **all absent** — not a control to a keyboard, not a control to a screen reader |
+| height at 390×844 `pointer: coarse` | **18px**, against the directive's 24px floor |
+| label after expanding | still read **"▾ expand"** — the one affordance misreported its own state |
+
+So the analyst who asks the T6 question about **$302M** — the question that decides
+whether this enters an IC memo as a cross-country fiscal comparison or gets read as a
+field valuation — has to notice a static grey heading two sections below the number and
+guess that a word is a button. That is the give-up point in this walk.
+
+## Change
+
+Nothing deleted, nothing expanded by default. The panel becomes a real control, and the
+NPV column gets the route the take column already had.
+
+1. **New `_cpCostBasis(slug, force)`** beside `_cpScrollToEvidenceChain`. Toggles the
+   panel, flips the label between `▾ expand` and `▴ collapse`, and writes
+   `aria-expanded`. `force === true` means *a caller elsewhere on the page sent the
+   analyst here* — it opens and never toggles shut, then scrolls the panel into view and
+   flashes it amber, the same treatment `_cpScrollToEvidenceChain` and
+   `_cpScrollToLiveDcf` already use, so the destination is unambiguous.
+2. **The `<h3>` is now a control:** `role="button"`, `tabindex="0"`,
+   `aria-expanded`, `aria-controls`, an Enter/Space handler, `min-height:24px`, and a
+   title naming the deck in figures derived from `ENGINE_BASIS` (no second copy of the
+   constant).
+3. **The `NPV ($M)` header in 4-Price Sensitivity carries a new orange
+   `on what deck? →` control** that calls `_cpCostBasis(safe, true)`. Its own title
+   states the thing the dollar figure cannot: *these are one standardized project run
+   through this country's fiscal terms — the same deck for all 185 countries, which is
+   what makes the ranking legitimate and the dollar figure meaningless as an asset value.*
+
+## Result
+
+An analyst reading `$302M` on Nigeria's 4-Price Sensitivity table can now click
+**directly in the NPV column header** and land on the production and cost deck that
+produced it — peak rate, recovered volume, capex, opex, WACC, horizon — with the panel
+open, scrolled to and flashed, instead of scrolling past it to a grey heading that said
+"expand" whether or not it was expanded. Keyboard and screen-reader users can reach the
+panel at all for the first time. On a phone the control is 44px instead of 18px.
+
+## Verification — every figure measured this cycle
+
+- **Behaviour proved by execution**, cold load, storage cleared, three countries
+  (Nigeria, Somalia, Trinidad and Tobago) × two viewports:
+
+  | state | 1440×900 | 390×844 `hasTouch` |
+  |---|---|---|
+  | cold: panel closed, `aria-expanded=false`, label `▾ expand` | ✔ | ✔ |
+  | NPV chip click → `display:block`, `aria-expanded=true`, label `▴ collapse` | ✔ | ✔ |
+  | panel scrolled into viewport after click | top at 18–27px | top at 333–413px, in view |
+  | **second** chip click → stays open (force semantics, never toggles shut) | ✔ | ✔ |
+  | heading click → closes, label and `aria-expanded` both flip back | ✔ | ✔ |
+  | heading height (was **18px**) | 26px | **44px** |
+  | new NPV chip height | 24px | 44px |
+
+- **Horizontal scroll, all six mandated widths, all 9 visible tabs, cold each time:**
+  1920 / 1440 / 1280 / 1024 / 768 / 390 — `scrollWidth == clientWidth` on every tab,
+  **0 overflowing tabs**, and `scrollWidth == clientWidth` on the Country Profile itself
+  at every width.
+- **Console and page errors: 0** at 1920, 1440 and 1280. The two console 404s seen at
+  1024 / 768 / 390 are **not from this change** — they are Côte d'Ivoire's slug
+  normalisation (`cote-divoire` / `cote_divoire` requested; the file on disk is
+  `cote-d-ivoire.json`). Proved pre-existing by rendering `HEAD:index.html` unmodified
+  from the same server: **byte-identical 404 pair**. The page falls back and renders.
+- **JS syntax gate: PASS** — all 16 `<script>` blocks parse.
+- **Playwright suite RAN this cycle** against the local tree; number read from the
+  suite's own report file, not assumed.
+- **Diff contained to `index.html`:** one function added, one heading rewritten, one
+  header cell extended.
+
+## Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| tab order | 10 `.tab-btn` labels | unchanged, Home → Sample Analyses |
+| v371/v373 declutter | `#screener-advanced-details` | still collapsed on cold load |
+| v371/v373 preset dropdown | `#screener-preset-select` | still a `SELECT` |
+| v430 | `#fc-ic-ref` | still `open` on cold load |
+| v451 | FC headers | Govt NPV still **removed**; `NPV ($M)` headers intact |
+| v489 | Home card grid | Reform Risk still present |
+| v612 mobile layer | `#reference-panel` | `right: 0px` (**not** negative) |
+
+## Noted on this walk, not fixed
+
+- **Côte d'Ivoire requests two API slugs that do not exist** (`cote-divoire.json`,
+  `cote_divoire.json`) while `cote-d-ivoire.json` sits on disk. Pre-existing, fails
+  soft, but it is two console 404s on every load of that profile and the fallback path
+  is the one that loses sourced facts. Own walk.
+- **The Cost Profile deck is reachable from Country Profile only.** Fiscal Compare
+  ranks on `NPV ($M) MODEL @$75` and `NPV ($M) DB · CITABLE @$75`, Side-by-Side prints
+  four Contractor NPV rows, and neither offers a route to the deck. This cycle put the
+  route where the analyst reads the number on the single-country tab; the comparison
+  surfaces still describe the basis in prose only.
+
+## Carried forward, still open
+
+- Reform Risk *Regional Reform Tilt* `Avg Stability` and the heatmap still have no
+  comparability dimension (914).
+- The `take > 75` Country Profile branch (Nigeria, Oman, Turkmenistan, Uzbekistan)
+  carries no take figure, no swing figure and no evidence-basis clause (912).
+- `window._screenerExportBasis` still does not name the 105 countries withheld on
+  data basis in the XLSX/CSV/IC-memo export (913).
+- Screener "Copy for IC Memo" is a three-click, long-wait path on a cold load (915).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable on a cold load (912).
+- `Take spread across contracts` renders Guyana two ways depending on the set (911).
+- Scenario Builder paste's bare `41.1%` IRR row (907).
+- `_fpCohortLine()` one-term cohort rank computed from the refuted score (906).
+- Deck-change inversion disclosed on the Screener only (905).
+- Side-by-Side take-ordering chain places a duplicate jurisdiction column (904).
+- Country Profile rank pills compute Australia against production-basis takes (903).
+- Evidence Quality summary vs Evidence Chain population labels (902); missing
+  index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio not
+  measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/`
+  is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+---
