@@ -66043,3 +66043,194 @@ and a denominator that quietly overstated its own coverage by 105 countries.
 
 ## Friction
 Screener → **IOC Capital Screen** returns 15 rows. The `#sc-prod-out` strip beneath it is the one surface whose
+
+---
+## Cycle 914 Log — 2026-09-22 19:25
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors — suite RAN this cycle against the modified tree, number read from `/tmp/runtime_test_report.txt`, not assumed
+- JS errors: 0
+- Summary: **Cycle 914 complete.** `v988` shipped and pushed (`84008b2`), mirror byte-identical.
+
+## Task
+
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in
+rotation (913 was T1, 912 T2, 911 T3, 910 T6, 907 T5; T4 last walked at 906).
+Walked cold at 1440×900 and 390×844 `hasTouch`, `sessionStorage` and
+`localStorage` cleared before every walk, over the real `/petroleum-fiscal-db/`
+path prefix.
+
+The reform half of T4 is in good shape and was not the problem. The 164
+unscored jurisdictions return a full "no Reform Frequency Score" card with the
+sourced statute to start the external check from, the n/c ≠ 100 warning, and
+the predictability fallback. The lookup is grouped into *scoreable (21)* and
+*predictability only (164)*. `_rrClassify()` is genuinely single-source across
+the three surfaces. The route/back-button layer works. None of that was the
+worst moment.
+
+## Friction
+
+The tab pairs a reform verdict with a **government-take figure**, so the
+analyst can see whether a jurisdiction that rewrites its terms is *also*
+already taking a hard share. **Six sites printed that figure and every one
+printed the published blend:**
+
+| site | function |
+|---|---|
+| ranked table `Take @$75` cell | `renderReformRisk()` |
+| verdict card Govt Take block, branch A | `renderReformCountryVerdict()` |
+| verdict card Govt Take block, branch B | `renderReformCountryVerdict()` |
+| Below-the-line card take chip | `renderReformRisk()` |
+| quiet-rise card take chip | `renderReformRisk()` |
+| actively-reforming card take chip | `renderReformRisk()` |
+
+For **Iraq** that inverts the finding outright. Measured on the live data:
+
+| | published blend | comparable (PSC/Concession only) |
+|---|---|---|
+| Iraq take @$75 | **84.8%** — highest of the 21 | **34.1%** — 3rd lowest of the 21 |
+
+415 of Iraq's 610 contracts are **TSC**, where the contractor is paid a fixed
+$/bbl remuneration fee and keeps no price upside; Iraq's TSC contracts read
+**98.5%** take — the ~99% structural artefact `MECHANIC_COMPARABILITY.md`
+describes. The analyst saw `SIZE UNKNOWN · 1 change · score 85 · 84.8%` — terms
+rewritten in-window with the size never measured, on top of apparently the
+harshest fiscal regime in the sourced set — and read maximum exposure.
+`takeColor()` painted the 84.8% **red**. Rank 1 of 21 where the comparable
+basis puts it 19 of 21.
+
+Two aggravating facts found in the same walk:
+
+- `Take @$75` was **the only numeric column on the tab with no `title` at all**.
+  Every other one carries a paragraph.
+- `_rrVerdictPayload()` reads the **rendered** card, so Iraq's *Copy for IC
+  Memo* paste carried `GOVT TAKE @ $75 — 84.8%` with nothing beside it, into
+  the memo, from the surface the product itself nominates as the last gate
+  before filing.
+
+**This was not a new rule and not a new number.** The platform comparability
+rules (2026-08-26) say a fee-basis blend may not be compared across countries,
+and **v549** (Side-by-Side), **v552** (Country Profile), **v553** (the IC-memo
+clipboard) and **v554** (the Screener take ceiling — *"Iraq is screened at
+34.1%, not 84.8%"*) had each already put the correction on screen. ORCA's own
+FAQ says it in as many words: *"a '85% take' TSC in Iraq is not comparable to
+an '85% take' PSC in Nigeria."* Reform Risk was the one surface left reading
+the raw blend.
+
+## Change
+
+One shared helper — `_rrFeeCmp()` / `_rrFeeTitle()` / `_rrTakeChip()` /
+`_rrTakeBlock()` — reused at all six sites, calling **`_scFeeCmpAt()`
+verbatim**, the same call the Screener ceiling and Side-by-Side ordering make.
+Seven surfaces now cannot give one country two comparable takes.
+
+Where the two bases diverge the cell prints the PSC/Concession figure marked
+`⊘ cmp`, tier-coloured **on the comparable number**, with `blend 84.8%`
+beneath it and a hover naming the contract split. The verdict card gets the
+same two-zone form at card scale. The header gets the tooltip it never had.
+
+`_scFeeCmpAt()`'s own 0.1pp divergence test means **17 of the 21 rows are
+byte-identical to before**. Four change:
+
+| country | before | after | |
+|---|---|---|---|
+| Iraq | 84.8% | **34.1%** | 415 of 610 TSC |
+| Ecuador | 46.5% | **39.3%** | 31 of 169 TSC |
+| Mexico | 32.2% | **29.7%** | 27 of 537 TSC |
+| India | 61.9% | **63.2%** | 97 of 653 RSC — **correction goes UP** |
+
+India going up is the check that this is a basis change and not a thumb on the
+scale. The published headline is never removed anywhere. Row **order** is
+untouched — the table ranks on `Since 2010`, not on take, so no ranking
+semantics moved.
+
+Deliberate choices:
+
+- **`takeColor` is passed into the helper, not closed over.** It is a
+  block-scoped `const` declared **three times in this file with three
+  different band definitions** (49506, 50264, 53009), and the helper sits in a
+  different inline `<script>` from its call sites. The first attempt closed over
+  it and threw `takeColor is not defined`, blanking the tab — caught by
+  execution, not by reading. Passing it keeps the bands byte-identical.
+- **Mechanic labels are country-prefix-stripped before de-duplication.** India's
+  `mech_mix` holds both `India RSC` (93) and `RSC` (4); without this the cell
+  read "India RSC/RSC".
+- **Nothing was added to the clipboard code.** Because `_rrVerdictPayload()`
+  reads the rendered DOM by design, fixing the card fixed the paste for free —
+  verified, not assumed.
+
+## Result
+
+An analyst asking "what is my reform exposure in Iraq" now reads **34.1%
+comparable**, with the 84.8% blend and its 415-of-610 TSC basis printed
+underneath, instead of a figure that ranked Iraq **1st of 21 for fiscal
+hardness when the comparable basis ranks it 19th**. The one jurisdiction on
+this tab whose take figure could be misread by 50.7 percentage points in the
+punitive direction now states its own basis, and the IC-memo paste carries the
+correction into the memo.
+
+## Verification — every figure measured this cycle
+
+- **JS syntax gate: PASS** — 11 inline blocks, 0 errors.
+- **Runtime suite RAN this cycle** against the **modified tree** at the real
+  path prefix (`TEST_URL=http://127.0.0.1:8991/petroleum-fiscal-db/index.html`,
+  graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`):
+  **500 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own
+  report file, timestamped `2026-09-23T00:22:03Z`.
+- **All 21 scoreable countries re-rendered** after the change: exactly 4 carry
+  `⊘ cmp`, 17 print as before, 0 raw `takeColor(r.take75)` call sites remain.
+- **Clipboard proved by execution:** Iraq's `_rrVerdictPayload()` now contains
+  `34.1`, `84.8` and the fee/TSC basis. Before the change it contained only
+  `84.8`.
+- **Mobile 390×844 `hasTouch: true`:** `scrollWidth == clientWidth` (390/390)
+  on all **9 reachable tabs**, and on Reform Risk with the Iraq card open.
+  `tab-btn-tsamples` is not reachable at 390 — unchanged, pre-existing.
+- **24px floor under `pointer: coarse`:** 25 buttons in the tab, **0 under
+  24px**; 10 corrected cells, **0 under 24px**; widest corrected cell 230px
+  inside the 390 viewport.
+- **0 page errors and 0 console errors** on every walk.
+
+### Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| tab order | 10 `.tab-btn` labels | unchanged, Home → Sample Analyses |
+| v371/v373 declutter | `#screener-advanced-details` | still collapsed on cold load |
+| v371/v373 preset dropdown | `#screener-preset-select` | still a `SELECT` |
+| v430 | FC IC Analyst Guide `<details>` | still `open` on cold load |
+| v451 | FC headers | Govt NPV still **removed**; `NPV ($M)` header intact |
+| v489 | Home card grid | Reform Risk still in the primary grid |
+| v612 mobile layer | `#reference-panel` | `right: 0px` (**not** negative), `translateX(428.4px)` state intact |
+| v554 basis | `_scFeeCmpAt` | untouched; 10 diverging countries globally @$75, unchanged |
+
+### Carried forward, still open
+
+- The `take > 75` Country Profile branch (Nigeria, Oman, Turkmenistan,
+  Uzbekistan) still carries no take figure, no swing figure and no
+  evidence-basis clause (912).
+- `window._screenerExportBasis` still does not name the 105 countries that
+  passed the screen and were withheld on data basis — group C names them on
+  screen, the XLSX/CSV/IC-memo export does not (913).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable on a cold load (912).
+- `Take spread across contracts` renders Guyana two ways depending on the set (911).
+- Scenario Builder paste's bare `41.1%` IRR row (907).
+- `_fpCohortLine()` one-term cohort rank computed from the refuted score (906).
+- Deck-change inversion disclosed on the Screener only (905).
+- Side-by-Side take-ordering chain places a duplicate jurisdiction column (904).
+- Country Profile rank pills compute Australia against production-basis takes (903).
+- Evidence Quality summary vs Evidence Chain population labels (902); missing
+  index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio not
+  measured against a page width (901).
+- **New, found this cycle, not fixed:** the Reform Risk **CSV export**
+  (`exportReformRiskCSV()`) is an 83-row event dump and carries no take figure
+  at all, so it is not wrong — but the tab's *Regional Reform Tilt* `Avg
+  Stability` column and the heatmap still have no comparability dimension, and
+  Iraq's row in the Middle East tilt aggregate is built from the same blended
+  basis this cycle corrected downstream.
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`;
+  `petroleum-fiscal-db/tests/` is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
