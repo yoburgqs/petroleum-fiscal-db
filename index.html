@@ -851,14 +851,44 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
+  /* v991 (T2): was 20px tall with the only state marker flexed to the far end of a 1354px row --
+     1,300px from the label it belonged to, at 10px in --muted. It read as a section heading whose
+     content had failed to render, at the bottom of an 8,850px page. Marker now sits against the
+     label, and the row is a real target. */
+  min-height: 24px;
 }
-.cashflow-panel h3::after {
-  content: '▼';
+.cashflow-panel h3::before {
+  content: '▾';
+  font-size: 11px;
+  color: var(--accent);
+  flex: 0 0 auto;
+  width: 11px;
+  text-align: center;
+}
+.cashflow-panel.collapsed h3::before { content: '▸'; }
+.cashflow-panel h3:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.cf-h3-hint {
+  margin-left: auto;
   font-size: 10px;
   color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  text-align: right;
 }
-.cashflow-panel.collapsed h3::after { content: '▶'; }
+/* v991 (T2): mirrors the v612 mobile layer's scoping exactly (pointer: coarse AND max-width:720px)
+   so nothing changes for a mouse. This heading was the one collapse control on the Country Profile
+   still under the directive's 24px floor under a thumb. */
+@media (pointer: coarse) and (max-width: 720px) {
+  .cashflow-panel h3 { min-height: 44px; }
+  .cf-h3-hint { display: none; }
+}
 .cashflow-panel.collapsed .cf-table-wrap { display: none; }
 .cf-table-wrap {
   overflow-x: auto;
@@ -2708,7 +2738,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v990</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v991</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -30237,6 +30267,7 @@ function renderCompare() {
     return !!(c && c.inSet);
   };
   let _cmpBasisGate = false;   // assigned below, once `selected` exists — no TDZ in the closures
+  let _cmpNSel = 0;            // v991 (T3): column count, same assign-below pattern, same reason
   let _cmpProdNames = [], _cmpStatNames = [];   // assigned with _cmpBasisGate, same reason
   // A column the gate dropped says so in place of the marker, rather than going silently blank:
   // otherwise the lowest number in the row carries no label while a larger one is tagged "lowest
@@ -30314,6 +30345,70 @@ function renderCompare() {
         + 'regime. This is the same exclusion the Rank among producers row above already applies. '
         + 'Read the number, and compare it against other statutory-basis columns.')
       + '">not ranked \u00b7 statutory terms</span>';
+  };
+  // ── v991 (T3): the PRRT cash-flow exclusion never reached the Govt Take cells ────────────
+  //
+  // Walked "how do these three countries compare side by side?" cold at 1440x900 and 390x844
+  // (hasTouch), both storages cleared, on Australia / Norway / Malaysia -- an ordinary IC screening
+  // triple, and the only one of the walked sets that puts a PRRT column beside a Concession one.
+  //
+  // _cmpRankTake() has TWO independent null branches and the grid had only ever been taught one
+  // of them. The DATA-BASIS branch (no verified production) has been pushed into every row over
+  // five cycles -- v626 the take cells, v684 the take chart, v705 the NPV rows, v750 the tier
+  // colour, v950 the Take basis row. The PRRT branch (`if (st.prrt) return null`) reached the
+  // verdict strip, the column ordering and the Take basis row, and stopped there. Measured on the
+  // shipped build:
+  //
+  //     Take basis (mechanic)   ...Concession          Cash-flow basis / PRRT - same price only
+  //     Govt Take ($50/bbl)     59.3% "highest of 2"   28.6%      <- bare
+  //     Govt Take ($75/bbl)     68.0% "highest of 2"   38.5%      <- bare
+  //     Govt Take ($100/bbl)    72.4% "highest of 2"   43.3%      <- bare
+  //     Govt Take ($125/bbl)    75.0% "highest of 2"   46.3%      <- bare
+  //     Price Swing ($50->$125)        +15.7pp         +17.7pp    <- bare
+  //
+  // Bare is not neutral on this grid: bare is what the MIDDLE of a ranking looks like. In the
+  // Iraq / Indonesia / Norway set walked the same way, Indonesia is bare precisely because it is
+  // ranked and is neither end. So the one column the tab has set aside renders identically to a
+  // ranked one -- and it renders as the lowest take on screen by 20 to 30 percentage points,
+  // which is the number an IC memo gets written on.
+  //
+  // The neighbours make it worse, not better: Norway's cell reads "highest of 2" inside a
+  // three-column grid, and _cmpOrderMark's tooltip explains the shortfall only through
+  // `r.gated` -- the data-basis gate -- which is FALSE here, because Australia has production.
+  // So "of 2" had no account of itself anywhere on the row.
+  //
+  // The verdict strip does say it, ~300px above the grid on a desktop and ~1,800px above the
+  // Govt Take rows on a phone. This is the same asymmetry v626/v705/v750 closed for the other
+  // branch: state it where the analyst is reading the number.
+  //
+  // Wording is NOT the statutory wording. A PRRT take IS readable against a Concession or PSC
+  // column at the SAME price with the basis stated -- that is the platform's own position
+  // (_vdWhy: "comparable at one price, not across the deck") and MECHANIC_COMPARABILITY.md's
+  // Group 3 rule. What it is not is a rank position, or a figure to carry across the price deck.
+  const _cmpPrrtNote = (d, p) => {
+    if (!d || _cmpNSel < 2) return '';
+    if (_cmpBasisGate && !_cmpHasProd(d)) return '';   // already spoken for by the data-basis gate
+    const v = d['take_' + p];
+    if (v == null || isStateMonopoly(v)) return '';
+    const st = _cmpMixStat(d);
+    if (!st.prrt) return '';
+    const ranked = !!_cmpPriceRank[p];
+    const nc = st.n3 != null ? Number(st.n3).toLocaleString() : (d.n != null ? Number(d.n).toLocaleString() : '?');
+    return '<span style="display:block;font-size:10px;font-weight:600;color:var(--yellow);cursor:help;" title="'
+      + _cmpEsc(d.country + ': ' + Number(v).toFixed(1) + '% at $' + p + '/bbl is a PRRT figure \u2014 a '
+        + 'CASH-FLOW base, not a production or revenue base. PRRT is only assessed once a project\u2019s '
+        + 'cumulative cash flow clears an uplift threshold, so across its ' + nc + ' contracts the '
+        + 'effective rate is structurally low at $50/bbl and structurally high at $125/bbl. That is the '
+        + 'mechanic firing, not the fiscal terms hardening. '
+        + 'You MAY read this figure against the other columns AT THIS PRICE, with the basis stated. '
+        + 'What it is not: (1) a rank position \u2014 it is excluded from the highest/lowest ordering on '
+        + 'this row and from the \u201cof N\u201d count in the markers beside it'
+        + (ranked ? '' : ', and this row has no ordering at all')
+        + '; (2) a figure to carry ACROSS the four Govt Take rows, or into the Price Swing row, as if it '
+        + 'were a royalty-and-tax rate. The Take basis (mechanic) row above and the verdict strip above '
+        + 'the grid state the same exclusion. Its Contractor NPV rows below ARE ranked, deliberately: a '
+        + 'contractor NPV is a cash result on one standardized profile and does not have this problem.')
+      + '">' + (ranked ? 'not ranked' : 'not comparable') + ' \u00b7 cash-flow basis</span>';
   };
   // v705 (T3): the DATA-BASIS gate reaches the ECONOMICS block — the last numeric block on this
   // grid that did not have it.
@@ -30405,6 +30500,18 @@ function renderCompare() {
               + 'not on the same basis as this figure. Those columns are marked \u201cnot ranked \u00b7 statutory '
               + 'terms\u201d on this row, the same exclusion the Rank among producers row applies. '
             : '')
+        // v991 (T3): the second reason "of N" can be short of the visible column count. Before this,
+        // a PRRT column left the ordering silently and this tooltip's only account of a shortfall
+        // was r.gated -- which is false whenever the set-aside column is itself a producer, e.g.
+        // Australia in Australia / Norway / Malaysia, where Norway read "highest of 2" of three.
+        + ((r.prrtOut && r.prrtOut.length)
+            ? (r.prrtOut.length === 1 ? r.prrtOut[0] + ' is' : _cmpJoin(r.prrtOut) + ' are')
+              + ' also outside the \u201cof ' + r.n + '\u201d: a PRRT take is a cash-flow base, assessed only '
+              + 'after cumulative project cash flow clears an uplift threshold, so it is readable against '
+              + 'this column at ONE price with the basis stated but is not a rank position across the deck. '
+              + (r.prrtOut.length === 1 ? 'That column is' : 'Those columns are')
+              + ' marked \u201cnot ranked \u00b7 cash-flow basis\u201d on this row. '
+            : '')
         + (onG1
             ? 'This marker ranks the PSC/Conc figure directly above it, NOT the headline '
               + (d['take_' + p] == null ? '' : Number(d['take_' + p]).toFixed(1) + '% ') + 'take at the top of the cell \u2014 that headline '
@@ -30481,6 +30588,10 @@ function renderCompare() {
     // v626: no ordering marker on a column the basis gate dropped. v750: and no tier colour on it
     // either -- the two statements have to agree, or the caption is arguing with the number.
     if (gated) return _cmpStatTakeFigure(d, v) + gated;
+    // v991 (T3): _cmpRankTake()'s OTHER null branch. Same shape as `gated` above -- the figure is
+    // kept at full size and in its place, and gains the caption saying it is not a rank position.
+    const prrtNote = _cmpPrrtNote(d, p);
+    if (prrtNote) return base + prrtNote;
     if (!st.blended || !st.g1 || st.g1['t' + p] == null || v == null || isStateMonopoly(v)) return base + _cmpOrderMark(d, p, false);
     const g1v = st.g1['t' + p];
     return base + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
@@ -31104,6 +31215,21 @@ function renderCompare() {
           + '">○ ' + _swBase + '</span>'
           + _cmpSubLine('not ranked · statutory terms', 'var(--muted)');
       }
+      // v991 (T3): a PRRT column's swing is the uplift threshold being crossed, not the regime
+      // getting harder with price -- and the legend under this grid reads it as progressivity.
+      if (_cmpNSel >= 2 && _swSt.prrt) {
+        return _swBase + '<span style="display:block;font-size:10px;font-weight:600;color:var(--yellow);cursor:help;" title="'
+          + _cmpEsc(d.country + ': ' + _swBase + ' is the movement of a PRRT cash-flow base across the '
+            + 'price deck, and it is NOT comparable with the swing of a Concession or PSC column beside '
+            + 'it. PRRT is assessed only once cumulative project cash flow clears an uplift threshold, '
+            + 'so the rate is structurally low at $50/bbl and structurally high at $125/bbl by design. '
+            + 'The legend under this grid (<10pp stable / 10-20pp moderate / >20pp high) grades how '
+            + 'progressively a royalty-and-tax or production-sharing regime tightens with price; on this '
+            + 'column it is grading the trigger, not the terms. The four Govt Take rows this figure is '
+            + 'computed from carry the same caption. Read this country at ONE price, and state the '
+            + 'basis beside it in the memo.')
+          + '">not comparable \u00b7 cash-flow basis</span>';
+      }
       if (_swSt.blended && _swSt.g1 && _swSt.g1.t50 != null && _swSt.g1.t125 != null) {
         const _swCmp = _swSt.g1.t125 - _swSt.g1.t50;
         return _swBase + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
@@ -31302,6 +31428,18 @@ function renderCompare() {
   // columns. All-producer sets and all-statutory sets are internally like-for-like and unchanged.
   const _cmpNProd = selected.filter(d => d && _cmpHasProd(d)).length;
   _cmpBasisGate = _cmpNProd > 0 && _cmpNProd < selected.filter(d => !!d).length;
+  _cmpNSel = selected.filter(d => !!d).length;
+  // v991 (T3): the columns _cmpRankTake() dropped for the PRRT cash-flow reason specifically --
+  // NOT the ones the data-basis gate already accounts for, which _cmpOrderMark reports via r.gated.
+  // Keeps "of N" honest: without this the shortfall between N and the visible column count had no
+  // explanation anywhere on the row whenever the set-aside column was a producer.
+  const _cmpPrrtOutAt = (p) => selected.filter(d => {
+    if (!d) return false;
+    const v = d['take_' + p];
+    if (v == null || isStateMonopoly(v)) return false;
+    if (_cmpBasisGate && !_cmpHasProd(d)) return false;
+    return !!_cmpMixStat(d).prrt;
+  }).map(d => d.country);
   _cmpProdNames = selected.filter(d => d && _cmpHasProd(d)).map(d => d.country);
   _cmpStatNames = selected.filter(d => d && !_cmpHasProd(d)).map(d => d.country);
   const _cmpAnyBlended = selected.some(d => _cmpMixStat(d).blended);
@@ -31340,6 +31478,7 @@ function renderCompare() {
       loV: srt[0].v, hiV: srt[last].v,
       basis: _cmpAnyBlended ? 'the PSC/Concession take where a column blends fee-basis contracts' : '',
       gated: _cmpBasisGate,
+      prrtOut: _cmpPrrtOutAt(p),
       nCols: selected.filter(d => !!d).length,
       flips: false
     };
@@ -31561,6 +31700,36 @@ function renderCompare() {
   };
   const _vdValOut = selected.filter(d => d && _cmpRankNpv(d) == null)
     .map(d => ({ c: d.country, why: _vdValWhy(d) }));
+  // ── v991 (T3): the columns this line ranks that the TAKE line above does not. ───────────────
+  //
+  // Walked T3 cold: Side-by-Side -> Australia, Norway, United Kingdom. Three OECD offshore
+  // regimes, about as ordinary as an IC screening set gets. 22 pixels apart the strip read:
+  //
+  //   Set aside — 1 of 3 columns cannot join that ordering: Australia — PRRT cash-flow basis …
+  //   CONTRACTOR VALUE @$75, LARGEST FIRST: Australia $2.29B › United Kingdom $1.16B › Norway $826M
+  //                                         [agrees with take order]   <- green
+  //
+  // Australia is struck from the take ordering and then printed FIRST in the value ordering,
+  // under a green pill saying the two agree. The agreement is real but it was computed over
+  // _vdBoth — {United Kingdom, Norway} — and Australia is in neither the take order nor the
+  // test. Nothing on screen said so. The rule is deliberate and correct (a PRRT take% is
+  // comparable at one price only, while a contractor NPV on the shared profile is a cash result
+  // that is comparable), but it lived ONLY in the title= of the "Contractor value" label. An
+  // analyst who does not hover reads Australia as the set's best column on value, endorsed as
+  // consistent with a ranking that excludes it.
+  //
+  // The strip already knows how to name an exception beside this line — _valAside prints "Not in
+  // the value ordering" for columns missing FROM it. There was no mirror for a column present in
+  // it but missing from the take order, so that case had no clause anywhere. This is that mirror.
+  // The reason is read from _vdWhy, the same function the take-side clause uses, so the two can
+  // never give different accounts of one column.
+  //
+  // Fires only where the two orderings actually hold different columns. On the shipped
+  // country_data.json that is the 2 PRRT jurisdictions — Australia and Denmark — and only when
+  // the set also reaches two take-rankable columns, so it is an exception report, not wallpaper.
+  const _vdValOnly = _vdVal
+    .filter(x => !_vdRanked.some(y => y.c === x.c))
+    .map(x => ({ c: x.c, why: _vdWhy(x.d) }));
   // v869 (T3): fill the per-price contractor-value ordering declared beside _cmpPriceRank above.
   // Runs here, after _cmpRankNpv / _cmpMixStat / _cmpBasisGate are all established, so the grid's
   // markers and the strip's ordering are computed from one rule and cannot disagree.
@@ -31846,10 +32015,19 @@ function renderCompare() {
                 + 'contractor value and nothing else — it is not a statement about field size or cost in these '
                 + 'countries.');
       if (_vdAgree === true) {
-        _h += _pill('agrees with take order', 'var(--green)', 'rgba(21,128,61,.10)',
+        // v991 (T3): say what the agreement was measured over whenever this line and the take line
+        // hold different columns. Unqualified, "agrees with take order" reads as an endorsement of
+        // the whole chain — including a column the take order struck out.
+        _h += _pill('agrees with take order' + (_vdValOnly.length ? ' \u00b7 on the ' + _vdBoth.length + ' in both' : ''),
+          'var(--green)', 'rgba(21,128,61,.10)',
           'The columns that carry both orderings rank the same way on comparable government take and on '
           + 'comparable contractor value: the lower-take column is also the larger contractor position. The two '
-          + 'lines above are one finding, and either can be quoted.');
+          + 'lines above are one finding, and either can be quoted.'
+          + (_vdValOnly.length
+              ? ' Measured over ' + _vdBoth.join(' and ') + ' only — '
+                + _vdValOnly.map(x => x.c).join(', ') + ' is ranked on this line but not on the take line '
+                + 'above, so it is not part of this agreement and the pill says nothing about it.'
+              : ''));
       } else if (_vdAgree === false) {
         _h += _pill('⚠ disagrees with take order', 'var(--orange)', 'rgba(194,65,12,.12)',
           'Take and contractor value do NOT rank these columns the same way — a lower government take here does '
@@ -31878,7 +32056,25 @@ function renderCompare() {
         + 'not the blended headline, and all four Contractor NPV rows below carry that same basis.</div>';
       // The re-basing note earns its line only where a column is actually re-based; on a set with
       // no fee-blended column the four price rows are all on one basis and there is nothing to warn about.
-      return _h + _valAside + (_vdValReb.length ? _valOnly75 : '');
+      // v991 (T3): the mirror of _valAside — columns ranked HERE that the take order above struck
+      // out. Same shape and same register as the clause beside the take line, so the two read as
+      // one pair rather than as a rule and an exception to it.
+      const _valOnlyHere = _vdValOnly.length
+        ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
+          + '<strong style="color:var(--orange);">Ranked here, but not in the take order above — '
+          + _vdValOnly.length + ' of ' + selected.filter(d => !!d).length + ':</strong> '
+          + _vdValOnly.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> — ' + x.why).join('; ')
+          + '. ' + (_vdValOnly.length === 1 ? 'Its contractor NPV is' : 'Their contractor NPVs are')
+          + ' ranked because every column here is run on the same standardized profile, so a contractor '
+          + 'NPV is a cash result and is comparable even where the take% is not. '
+          + (_vdValOnly.length === 1 ? 'It is therefore' : 'They are therefore')
+          + ' a rank position on THIS line only. The take ordering above is the set\u2019s fiscal ranking, and '
+          + (_vdValOnly.length === 1 ? 'this column is not in it' : 'these columns are not in it')
+          + ' \u2014 do not carry '
+          + (_vdValOnly.length === 1 ? _cmpEsc(_vdValOnly[0].c) : 'them')
+          + ' into an IC memo as the lower-take jurisdiction on the strength of this line.</div>'
+        : '';
+      return _h + _valOnlyHere + _valAside + (_vdValReb.length ? _valOnly75 : '');
     })();
     // ── v840 (T3): the DOWNSIDE line. ────────────────────────────────────────────────────────
     //
@@ -59015,7 +59211,15 @@ function _buildTornadoChart(country, profileKey, basePrice) {
   if (!d) return;
   const mechanic = fcResolveMechanic(d);  // v548 (T1) — keeps this run on the same regime as the Live DCF panel and Fiscal Compare
   const profile = { ...(DCF_PROFILES[profileKey] || DCF_PROFILES.deepwater) };
-  const params = getDCFParams(country, mechanic);
+  // v991 (T2): this chart's own basis strip says, in words, that it runs "the two settings in the
+  // Live DCF panel above". runLiveDCF() has read the country's own royalty/CIT/SPT via
+  // {record:true} since v776. This chart did not, so it ran the bare mechanic template instead --
+  // royalty 10% / CIT 25% / SPT 0 / state equity 0 for 126 of 185 countries. That is why Brazil,
+  // Mexico and Qatar all drew an identical $4.26B base case under a strip naming their country's
+  // terms, while the Live DCF panel one scroll up printed $3.5B, $4.2B and $4.1B for the same
+  // three. Same basis as the panel the strip points at; 114 of 185 countries change at least one
+  // of royalty/CIT/SPT, and _basis 'default' falls from 120 countries to 4.
+  const params = getDCFParams(country, mechanic, { record: true });  // v991 (T2)
   const runType = (mechanic === 'PSC' || mechanic === 'EPSA') ? 'psc' :
                   (mechanic === 'TSC' || mechanic === 'RSC') ? 'tsc' :
                   (mechanic === 'PRRT') ? 'prrt' :
@@ -59141,7 +59345,11 @@ function renderCashflowTable(country, containerId, profileKey, price) {
   if (!d) return;
   const mechanic = fcResolveMechanic(d);  // v548 (T1) — keeps this run on the same regime as the Live DCF panel and Fiscal Compare
   const profile = { ...(DCF_PROFILES[profileKey] || DCF_PROFILES.deepwater) };
-  const params = getDCFParams(country, mechanic);
+  // v991 (T2): the year-by-year table is what an analyst opens to DEFEND the NPV -- v528 already
+  // fixed its state-participation treatment for exactly that reason. It was still running the
+  // mechanic template while the Live DCF panel above it ran the country's record, so the two
+  // disagreed on the fiscal terms, not just on the project. Now on the same basis as both.
+  const params = getDCFParams(country, mechanic, { record: true });  // v991 (T2)
   const pr = price || 75;
   const r = profile.discountRate;
 
@@ -59217,10 +59425,13 @@ function renderCashflowTable(country, containerId, profileKey, price) {
 
   let tableHtml = `
 <div class="cashflow-panel" id="cf-panel-${country.replace(/[^a-z0-9]/gi,'_')}">
-  <h3 onclick="toggleCFPanel('${country.replace(/'/g,"\\'")}')" title="Click to expand/collapse">
-    25-Year Cashflow Breakdown
+  <h3 role="button" tabindex="0" aria-expanded="false" aria-controls="cf-wrap-${country.replace(/[^a-z0-9]/gi,'_')}"
+      onclick="toggleCFPanel('${country.replace(/'/g,"\\'")}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCFPanel('${country.replace(/'/g,"\\'")}');}">
+    <span>25-Year Cashflow Breakdown</span>
+    <span class="cf-h3-hint">${rows.length} yrs \u00b7 revenue, govt take, contractor net, cum NPV@10%</span>
   </h3>
-  <div class="cf-table-wrap">
+  <div class="cf-table-wrap" id="cf-wrap-${country.replace(/[^a-z0-9]/gi,'_')}">
     <table class="cf-table">
       <thead>
         <tr>
@@ -59259,7 +59470,20 @@ function renderCashflowTable(country, containerId, profileKey, price) {
 
 function toggleCFPanel(country) {
   const panel = document.getElementById('cf-panel-' + country.replace(/[^a-z0-9]/gi,'_'));
-  if (panel) panel.classList.toggle('collapsed');
+  if (!panel) return;
+  panel.classList.toggle('collapsed');
+  // v991 (T2): the control announced nothing -- no aria-expanded, no role, tabIndex -1 -- so a
+  // keyboard or screen-reader user could not reach the 25-year schedule at all, and a sighted
+  // user got no confirmation the click had landed. Both now follow the class.
+  const open = !panel.classList.contains('collapsed');
+  const h = panel.querySelector('h3');
+  if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) {
+    const wrap = panel.querySelector('.cf-table-wrap');
+    if (wrap && typeof wrap.scrollIntoView === 'function') {
+      try { wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { wrap.scrollIntoView(); }
+    }
+  }
 }
 
 // ================================================================
