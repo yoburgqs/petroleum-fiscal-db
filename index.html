@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v988</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v989</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -55262,6 +55262,78 @@ function cpCopyICTable(safe) {
   } else { fail(); }
 }
 
+// ── v989 (T5): the Fiscal Compare drilldown's "Copy 4-price as IC table", in both flavours ──
+//
+// The twin of cpCopyICTable() above, for the payload window.__FC_IC_TBL stashes when the
+// drilldown renders. Word, Google Docs, Outlook and PowerPoint take the text/html and lay out a
+// bordered table; Excel takes the text/plain and splits it into columns. Header, body and tail
+// all come from the one payload, so the two flavours cannot describe different tables.
+//
+// The tail lines are prose, not matrix rows, and they stay prose here -- the "Compare model"
+// line is the one exception: it is tab-separated but only two or three cells wide, so forcing it
+// into the six-column grid above would invent columns it does not have. It is rendered as its
+// own labelled line with the tabs shown as separators, which is how it already reads in the TSV.
+function fcCopyDrilldownICTable(slug) {
+  var P = (window.__FC_IC_TBL || {})[slug];
+  if (!P) {
+    if (typeof _icRefuse === 'function') _icRefuse('Table not ready — reopen this country’s drilldown and try again.');
+    return;
+  }
+  var tsv = P.tsv;
+
+  function _e(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var _th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;vertical-align:bottom;';
+  var _td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 6px;">' + _e(P.title) + '</p>'
+    + '<table style="border-collapse:collapse;"><thead><tr>'
+    + P.header.map(function(h){ return '<th style="' + _th + '">' + _e(h) + '</th>'; }).join('')
+    + '</tr></thead><tbody>'
+    + P.body.map(function(r){
+        return '<tr>' + r.map(function(c, ci){
+          return '<td style="' + _td + (ci === 0 ? 'font-weight:bold;' : '') + '">' + _e(c == null ? '—' : c) + '</td>';
+        }).join('') + '</tr>';
+      }).join('')
+    + '</tbody></table>';
+
+  var _tail = (P.tail || []).filter(function(t){ return !!t; });
+  var _nNote = 0;
+  _tail.forEach(function(t) {
+    var isNote = /^NOTE:/.test(t);
+    if (isNote || /^Contractor NPV on the /.test(t)) _nNote++;
+    // A tab-separated tail line is the "Compare model" measurement: show its cells joined rather
+    // than run together, which is what a raw tab does when Word pastes it as text.
+    var body = t.indexOf('\t') >= 0
+      ? t.split('\t').map(function(c){ return _e(c); }).join(' &nbsp;&middot;&nbsp; ')
+      : _e(t);
+    html += '<p style="font-size:9pt;color:' + (isNote ? '#8a3b00' : '#555') + ';margin:6px 0 0;'
+          + (isNote ? 'font-weight:bold;' : '') + '">' + body + '</p>';
+  });
+  html += '</div>';
+
+  var okMsg = 'Copied as a table — ' + P.body.length + ' price rows × ' + P.header.length
+            + ' columns, with the basis lines beneath it. Pastes as a formatted table into '
+            + 'Word/Docs/Outlook, as columns into Excel.';
+  function _restore(label) {
+    var t = document.getElementById(P.btnId);
+    if (t) { t.innerHTML = label; setTimeout(function(){ t.innerHTML = 'Copy 4-price as IC table'; }, 2000); }
+  }
+  function done() { _restore('✓ Copied!'); if (typeof showCopyToast === 'function') showCopyToast(okMsg); }
+  function fail() { _restore('Clipboard unavailable'); }
+
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], {type:'text/html'}),
+      'text/plain': new Blob([tsv],  {type:'text/plain'})
+    })]).then(done).catch(function(){
+      navigator.clipboard.writeText(tsv).then(done).catch(fail);
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(done).catch(fail);
+  } else { fail(); }
+}
+window.fcCopyDrilldownICTable = fcCopyDrilldownICTable;
+
 // ── v752 (T5): the one row in this paste that carried no note was the one the page shouts about ──
 //
 // Walked T5 cold: Country Profile -> "Copy for IC Memo" -> paste into a memo. The paste is a
@@ -63980,20 +64052,46 @@ function openFCDrilldown(country) {
     // Compare twin of it and was missed.
     // v774 (T6): on a fee-basis-blended row the pasted table leads with the comparable take \u2014 the
     // figure the row is ranked on \u2014 and names the blend as the published figure beside it.
-    var _tsvRows = [_contextHeader, _ddFee
-      ? 'Price\tComparable take% (' + _ddFeeN1 + ' PSC/Concession contracts) \u2014 CITE THIS\tPublished take% (all ' + d.n + ' contracts, blends ' + _ddFeeNames + ' fee-basis \u2014 not comparable across countries)\t\u0394 vs $50 (comparable)\tContractor NPV ($M, all contracts)\tBreakeven ($/bbl)'
-      : 'Price\tGovt Take% (database)\t\u0394 vs $50\tContractor NPV ($M)\tBreakeven ($/bbl)'];
+    // v989 (T5): this artifact is the Fiscal Compare twin of the Country Profile's "Copy as IC
+    // table", and it was the last table-shaped IC payload on the platform still written with a
+    // bare writeText(). Measured cold on the shipped build, the clipboard flavours offered here
+    // were ["text/plain"] alone, while the CP twin (v690), Side-by-Side (v503), Screener (v728),
+    // IOC Portfolio and Fiscal Compare's own whole-table copy (v676) every one of them emit
+    // text/html alongside the TSV. Pasted into Word this was six run-on lines of tab characters
+    // -- from the control whose own label is the word "table", on the centerpiece tab, reached by
+    // the exact route the IC Analyst Guide above it tells a first-time analyst to take. The
+    // fee-basis variant is worse: SIX columns with sentence-length headers, so the ragged paste
+    // was widest precisely where the comparability correction has to survive into the memo.
+    //
+    // Header, body and tail are built once, here, and BOTH flavours are derived from them in
+    // fcCopyDrilldownICTable() -- the same one-source-two-renderings rule v696 applies to the
+    // vintage bars and their CSV, so the table an analyst reads in Word cannot drift from the
+    // columns Excel receives. The plain-text flavour is byte-identical to what this button
+    // produced before; nothing is added to it and nothing is dropped.
+    var _icHdr = _ddFee
+      ? ['Price',
+         'Comparable take% (' + _ddFeeN1 + ' PSC/Concession contracts) — CITE THIS',
+         'Published take% (all ' + d.n + ' contracts, blends ' + _ddFeeNames + ' fee-basis — not comparable across countries)',
+         'Δ vs $50 (comparable)',
+         'Contractor NPV ($M, all contracts)',
+         'Breakeven ($/bbl)']
+      : ['Price', 'Govt Take% (database)', 'Δ vs $50', 'Contractor NPV ($M)', 'Breakeven ($/bbl)'];
+    var _icBody = [];
+    var _icTail = [];
     var _take50b = _ddFee ? (d.g1 ? d.g1.t50 : null) : d.take_50;
-    var _be75 = d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '\u2014';
-    [['$50',d.take_50,d.npv_50,'\u2014',50],['$75',d.take_75,d.npv_75,_be75,75],['$100',d.take_100,d.npv_100,'\u2014',100],['$125',d.take_125,d.npv_125,'\u2014',125]].forEach(function(p){
+    var _be75 = d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '—';
+    [['$50',d.take_50,d.npv_50,'—',50],['$75',d.take_75,d.npv_75,_be75,75],['$100',d.take_100,d.npv_100,'—',100],['$125',d.take_125,d.npv_125,'—',125]].forEach(function(p){
       var priceStr = p[0];
       var _cmpV = (_ddFee && d.g1 && d.g1['t' + p[4]] != null) ? d.g1['t' + p[4]] : null;
       var _lead = _ddFee ? _cmpV : p[1];
-      var takeStr = _lead!=null ? _lead.toFixed(1)+'%' : '\u2014';
+      var takeStr = _lead!=null ? _lead.toFixed(1)+'%' : '—';
       var delta = (_lead!=null && _take50b!=null) ? (_lead-_take50b) : null;
-      var deltaStr = delta===null ? '\u2014' : delta===0 ? '0.0pp' : (delta>0?'+':'')+delta.toFixed(1)+'pp';
-      var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '\u2014';
-      _tsvRows.push(priceStr+'\t'+takeStr+'\t'+(_ddFee ? (p[1]!=null ? p[1].toFixed(1)+'%' : '\u2014')+'\t' : '')+deltaStr+'\t'+npvStr+'\t'+p[3]);
+      var deltaStr = delta===null ? '—' : delta===0 ? '0.0pp' : (delta>0?'+':'')+delta.toFixed(1)+'pp';
+      var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '—';
+      var _cells = [priceStr, takeStr];
+      if (_ddFee) _cells.push(p[1]!=null ? p[1].toFixed(1)+'%' : '—');
+      _cells.push(deltaStr, npvStr, p[3]);
+      _icBody.push(_cells);
     });
     // v961 (T5): all four prices, not just $75. The NPV column in the rows above is the all-contract
     // blend at every price; this line is the like-for-like population the ⚖ take column is on, so it
@@ -64003,30 +64101,37 @@ function openFCDrilldown(country) {
       var _g1Pairs = [50, 75, 100, 125]
         .filter(function(pp){ return d.g1['v' + pp] != null && !isNaN(d.g1['v' + pp]); })
         .map(function(pp){ return '$' + pp + ' ' + fmtNpvShared(Number(d.g1['v' + pp])); });
-      if (_g1Pairs.length) _tsvRows.push('Contractor NPV on the ' + _ddFeeN1 + ' PSC/Concession contracts alone — CITE THIS beside the comparable take, not the all-contract NPV column above: ' + _g1Pairs.join(' · ') + '/bbl.');
+      if (_g1Pairs.length) _icTail.push('Contractor NPV on the ' + _ddFeeN1 + ' PSC/Concession contracts alone — CITE THIS beside the comparable take, not the all-contract NPV column above: ' + _g1Pairs.join(' · ') + '/bbl.');
     }
     if (_liveT != null) {
-      _tsvRows.push('');
-      _tsvRows.push('Compare model (' + _profileLabel + ' profile @ $' + _ddPrice + '/bbl, '
-        + (r.termsBasis === 'default' ? 'generic ' + r.mechanic + ' default terms \u2014 directional only, not citable'
+      _icTail.push('');
+      _icTail.push('Compare model (' + _profileLabel + ' profile @ $' + _ddPrice + '/bbl, '
+        + (r.termsBasis === 'default' ? 'generic ' + r.mechanic + ' default terms — directional only, not citable'
            : r.termsBasis === 'country' ? country + ' country-specific terms' : 'ORCA contract-database terms')
         + ')\tGovt Take% ' + _liveT.toFixed(1) + '%'
         + (_recGap != null ? '\t' + ((_liveT - _citeSel) > 0 ? '+' : '') + (_liveT - _citeSel).toFixed(1) + 'pp vs ' + (_ddFee ? 'comparable' : 'database') : ''));
-      if (_recGap != null && _recGap >= 10) _tsvRows.push(_ddFee
+      if (_recGap != null && _recGap >= 10) _icTail.push(_ddFee
         ? 'NOTE: the model and the comparable take differ by ' + _recGap.toFixed(1) + 'pp at $' + _ddPrice + '/bbl. Cite the comparable figure; the published blend and the model are not comparable across countries. Do not quote any two as one number.'
         : 'NOTE: the two bases differ by ' + _recGap.toFixed(1) + 'pp at $' + _ddPrice + '/bbl. Cite the database figure; do not quote both as one number.');
     }
     // v523: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page
     // -- the same rule v516 applied to the Country Profile TSV.
-    _tsvRows.push('');
+    _icTail.push('');
     // v596 (T5): the production-data basis travels with the matrix. The take rows above are
     // a simple average of statutory terms for 163 of the 185 countries and said so nowhere.
-    if (typeof _icProdBasisNote === 'function') _tsvRows.push(_icProdBasisNote(d));
-    _tsvRows.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
-    var _tsv = _tsvRows.join('\n');
-    var _tsvEsc = JSON.stringify(_tsv).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    if (typeof _icProdBasisNote === 'function') _icTail.push(_icProdBasisNote(d));
+    _icTail.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
+    var _tsv = [_contextHeader, _icHdr.join('\t')]
+      .concat(_icBody.map(function(_r){ return _r.join('\t'); }))
+      .concat(_icTail).join('\n');
     var _copyBtnId = 'fc-drilldown-copy-'+slug;
-    html += '<div style="text-align:right;margin-bottom:10px;"><button id="'+_copyBtnId+'" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="(function(){var t=document.getElementById(\''+_copyBtnId+'\');navigator.clipboard.writeText('+_tsvEsc+').then(function(){t.innerHTML=\'&#x2713; Copied!\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);}).catch(function(){t.innerHTML=\'Clipboard unavailable\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);})})()" title="Copy the 4-price matrix (Take / \u0394vs$50 / Contractor NPV / Breakeven) as tab-separated text \u2014 paste into Excel or an IC memo. No IRR column: the country-level IRR is a mean of per-contract IRRs and is not a project return; the pasted text says so and routes you to Scenario Builder.">Copy 4-price as IC table</button></div>';
+    // Stashed rather than serialised into the onclick attribute: the HTML flavour carries
+    // style="..." on every cell, which cannot survive inside a double-quoted attribute. Same
+    // reason window.__CP_IC_TBL exists on the twin.
+    window.__FC_IC_TBL = window.__FC_IC_TBL || {};
+    window.__FC_IC_TBL[slug] = { title:_contextHeader, country:country, header:_icHdr,
+                                 body:_icBody, tail:_icTail, tsv:_tsv, btnId:_copyBtnId };
+    html += '<div style="text-align:right;margin-bottom:10px;"><button id="'+_copyBtnId+'" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="fcCopyDrilldownICTable(\''+slug+'\')" title="Copy the 4-price matrix (Take / Δvs$50 / Contractor NPV / Breakeven) to the clipboard as a real table — pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. No IRR column: the country-level IRR is a mean of per-contract IRRs and is not a project return; the pasted table says so and routes you to Scenario Builder.">Copy 4-price as IC table</button></div>';
   })();
   // v523 (T5): this callout used to grade the country against a 15% IOC hurdle using d.irr_75.
   // Two separate failures. (1) It fired "\u2713 Clears IOC hurdle (15%)" for 118 of the 124
