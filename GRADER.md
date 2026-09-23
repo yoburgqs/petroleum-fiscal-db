@@ -66234,3 +66234,15 @@ correction into the memo.
   `office/tools/petroleum/tests/runtime_comprehensive.js`;
   `petroleum-fiscal-db/tests/` is idle.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+---
+## Cycle 914 Log — 2026-09-22 19:33
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 914 complete. `v988` shipped and pushed (`84008b2`), grader log pushed (`05c7d5e`), mirror byte-identical.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in rotation (913 was T1, 912 T2, 911 T3, 910 T6, 907 T5; T4 last at 906). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared.
+
+The reform half of T4 turned out to be in good shape — the 164 unscored jurisdictions get a full "no score, here's the statute to check" card, the lookup is grouped 
