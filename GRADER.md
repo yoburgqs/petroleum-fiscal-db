@@ -66947,3 +66947,107 @@ suite reads 500 PASS / 0 JS errors, as it did for cycles 918–922.
 **Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (stalest in rotation; last walked at cycle 914). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared.
 
 **Friction.** The Reform Risk tab's **Regional Reform Tilt** panel — the one view that answers the regional half of T4 — showed **one of its eight columns on a phone**. Measured cold: the table's content is 981px wide in
+
+---
+## Cycle 924 Log — 2026-09-23
+
+- Test before: 500 PASS / 0 FAIL (deployed, carried from cycle 923)
+- Test after: **499 PASS / 0 FAIL / 1 WARN**, local tree, read from the suite's own
+  report file (`ORCA_REPORT_FILE=/tmp/rt924.txt`), not assumed. The 1 WARN is the
+  documented local-harness artifact: `index.html` registers its service worker at the
+  absolute Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a server rooted at the
+  repo (verified: that path returns 404 locally, 200 deployed). Same 499/0/1 as cycle 923.
+- JS syntax gate: **PASS** (11 inline blocks)
+- `pixel_audit`, 10 tabs x 5 viewports, local tree: **PIXEL GATE PASS**
+- 390x844 `hasTouch`: no horizontal scroll on any tab; no touched control under 24px
+
+### First: recovered work that was about to be lost — v993 / v993b (T2)
+
+The working tree held an uncommitted 93-line diff from a cycle killed at the 1800s
+harness limit. It was **verified independently and committed**, not discarded and not
+trusted on its own comments:
+
+| claim | how it was checked | outcome |
+|---|---|---|
+| "NOC/state-dominant structure" unsupportable | swept `mech_mix` across all 185 records | **confirmed** — filed mechanics are Concession, PSC, Gross Split, RSC, TSC, Buy-back, India RSC, PRRT. No NOC/state/national mechanic exists anywhere. Nigeria is 671 Concession + 163 PSC |
+| `take>75 && swing>20` branch is dead | computed swing over the cohort | **confirmed** — widest is Iran 13.5pp, so it fired for zero countries |
+| v992b's 900px breakpoint too narrow | A/B against `git show HEAD:index.html` on the same server | **confirmed** — BEFORE 1024 Nigeria `doc 1189/1024` H-SCROLL, summary 1168 in a 982 box; AFTER `1024/1024`. 1280 and 768 byte-identical both sides |
+
+Its comment's cohort count reads on the *comparable* take, not raw `take_75` — checked
+rather than assumed. Closes carried item 912. Locks respected: the v612 `<=720px` rule
+untouched; the new rule is a strict superset of the 900px one it replaces.
+
+### Cycle 924 — v994 (T5)
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in the
+rotation (tail was T6, T1, T6, T2, T3, T3, T1, T4, and the recovered T2).
+
+**Walked cold**, both storages cleared, 1440x900 and 390x844 `hasTouch`: Home → Fiscal
+Compare (copy, XLSX, shortlist) → Country Profile (IC Citation, IC summary, IC table,
+XLSX) → Side-by-Side → Screener.
+
+**Most of the walk is genuinely finished-grade, and is recorded as such rather than
+re-worked.** Measured this cycle, not assumed:
+
+- The FC paste handles mechanic comparability correctly: on a mixed shortlist it swaps in
+  Iraq's like-for-like **34.1%** as the citable take, demotes the blended **84.8%** to a
+  reference-only column, and names the hard-coded engine override per row.
+- Export XLSX honours the tick shortlist — 3 rows, filename `…shortlist-3…`, global rank
+  preserved. Both XLSX files parse (`openpyxl`) and carry Basis & Assumptions / Methodology.
+- Every table copy surface emits a valid `text/html` flavour: 1 table, 14 cells on every
+  row, `colgroup` + `thead`. (CP IC Citation is plain-text only, which is correct — it is
+  a one-sentence cite, not a table.)
+- Screener tick narrows the copy in ONE click and relabels to "⎘ Copy 3 selected"; its
+  caption correctly reads "3 of 185" and names the hand-picked rows.
+- Ruled out as a harness artifact, not a bug: calling `loadCountryProfile()` directly
+  leaves `#dd-country-select` stale, but **every real entry path** — dropdown, deep link
+  `#/profile/angola`, and FC drilldown "Full Profile →" — sets it, and all three cite the
+  right country.
+
+**Friction (the one worst moment).** `copyFCForIC()`, the Breakeven cell. Ticking Saudi
+Arabia, Angola and Norway and pressing ⎘ Copy for IC Memo pasted:
+
+    Angola        ""        <- ORCA holds no modelled breakeven
+    Norway        "28.7"
+    Saudi Arabia  ""        <- 100% govt take, no contractor position to break even
+
+Two different facts rendered as the same empty cell, in the document that goes to the IC.
+**v914 fixed exactly this on the Screener**, and its reasoning applies verbatim: "no
+contractor position" is a property of the regime and is **final**, while "not modelled" is
+missing cost data that **may fill in later**. As on the Screener, Fiscal Compare has **no
+breakeven column on screen** — its own legend says so — so nothing warned the analyst
+before it was in the memo.
+
+**Change.** The cell now names which state applies, using the **same strings** the Screener
+has emitted since v873/v914, so one memo built from both tabs cannot carry two
+vocabularies for one fact. The caption above the table claimed "no reason for the gap is
+recorded … so none is given here" — which the cell change falsified — so it was rewritten
+to name **and count** both states, derived from `nBe`/`nMono`, which the caption already
+computed for its own counts. All four branches exercised live (mixed / all-monopoly /
+single populated / all populated) with counts checked against the cells.
+
+**Result.** An IC reader can tell a permanent structural absence from a temporary data gap
+without leaving the table, and cannot silently read one as the other.
+
+### Carried forward, still open
+
+- **HARNESS: `claude -p` is killed at 1800s and uncommitted work dies with it.** It nearly
+  did again this cycle — v993/v993b sat uncommitted in the tree and only survived because
+  the cycle checked the tree before starting. Still the highest-value open item.
+- The graded suite's default `TEST_URL` is the DEPLOYED site, so the harness cannot gate
+  the diff it is about to ship; overridden by hand again this cycle.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable cold (912).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at
+  768 and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- Reform Risk decade heatmap caption reads "Top 20 of the 21".
+- The Fiscal Reform History event-log browser lives in the off-tab-bar Vintage pane (`#t4`).
+- **Minor, not worth a cycle on its own:** Side-by-Side carries two buttons — "⎘ Copy for
+  IC Memo" and "⎘ Copy Table for IC Memo" — whose output is byte-identical (7,691 chars).
+  They sit in two different toolbars at different scroll positions, i.e. the same
+  deliberate pattern as the FC dock, so this is redundancy rather than a defect.
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still
+  in the repo root.
