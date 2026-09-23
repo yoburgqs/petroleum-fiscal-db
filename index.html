@@ -2132,6 +2132,90 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .orca-npv-band-pill { display: inline-block !important; white-space: normal !important; max-width: 100%; }
 }
 
+/* ── v992 (T4) — Regional Reform Tilt stops being a table on a phone ─────────────────────
+   Walked T4 ("what is my fiscal-stability and reform exposure here?") cold at 390x844 with
+   hasTouch. The Reform Risk tab's Regional Reform Tilt panel is the one view on the platform
+   that answers the regional half of that question, and on a phone it was answering one
+   eighth of it.
+
+   Measured, cold, no storage: the table's content is 981px wide inside a 324px window.
+   The column boxes sit at
+
+     REGION 33-254 (221px) · TIGHTENED 254-335 · LIBERALIZED 335-424 · UNMEASURED 424-519
+     NO FISCAL CHANGE 519-646 · MIX 646-762 · TILT 762-890 · AVG STABILITY 890-1014
+
+   so at rest the analyst sees the region name, its "n of N sourced" line, and the TIGHTENED
+   count. Nothing else. LIBERALIZED is sliced mid-word at the container edge. TILT — the
+   panel's own headline finding — starts 438px past the right edge, and AVG STABILITY, the
+   column the caption above is almost entirely written about, starts 566px past it: nearly
+   two further screen-widths.
+
+   The table IS a scroll container (the generic mobile rule gives it display:block /
+   overflow-x:auto), but there is no affordance of any kind: it is not inside a .tbl-wrap, so
+   the v612 layer's right-edge gradient — "the only honest signal that there is more table" —
+   never draws on it, and the DOCUMENT does not scroll, so there is no page-level cue either.
+   The failure is worse than a truncation, because what remains reads as a complete finding
+   and is the wrong one: Europe 5, Africa 0, North America 0, Middle East 0 invites
+   "Europe is tightening, nobody else is reforming", when the hidden columns say six of the
+   eight rows are Not established, three of them on more unmeasured changes than measured
+   ones, and that two rows' Avg Stability is explicitly not a stability reading.
+
+   Fixed on the v761 (.ec-chain) precedent rather than the v747 one: pinning the region column
+   and adding a fade would still leave the two decision cells two swipes away, so the row
+   stops being a row. Each region becomes a block — name and basis on their own line, the four
+   event counts in a 2x2 grid, then Mix, Tilt and Avg Stability each full width. Every cell
+   carries its column name from the data-h attribute added this cycle, because the <thead> is
+   what scrolls away first and a bare "2" under no label is not a finding.
+
+   Nothing scrolls, nothing is hidden, no column is dropped and no figure is reworded. Scoped
+   to max-width:720px: the desktop table is byte-identical, and data-h renders nothing there.
+   No selector in the v612 layer is removed, weakened or narrowed, #reference-panel is
+   untouched, and no negative offset is introduced. ── */
+@media (max-width: 720px) {
+  table.rr-tilt { display: block; overflow-x: visible; width: 100%; }
+  table.rr-tilt thead { display: none; }
+  table.rr-tilt tbody { display: block; }
+  table.rr-tilt tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.rr-tilt tbody tr:last-child { border-bottom: 0; }
+  table.rr-tilt td {
+    display: block;
+    min-width: 0;
+    padding: 2px 0 !important;
+    text-align: left !important;
+    vertical-align: baseline;
+    overflow-wrap: anywhere;
+  }
+  table.rr-tilt td[data-h]::before {
+    content: attr(data-h);
+    display: block;
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: .85;
+    margin-bottom: 1px;
+  }
+  table.rr-tilt td.rr-tl-region,
+  table.rr-tilt td.rr-tl-mix,
+  table.rr-tilt td.rr-tl-tilt,
+  table.rr-tilt td.rr-tl-avg { grid-column: 1 / -1; }
+  table.rr-tilt td.rr-tl-region { font-size: 13px !important; padding-bottom: 4px !important; }
+  table.rr-tilt td.rr-tl-tilt { padding-top: 6px !important; }
+  table.rr-tilt td.rr-tl-avg { padding-top: 6px !important; }
+  /* the Mix bar is a fixed 100px flex box; it reads as a stray rule on its own full-width
+     line without its label, and the label is what the data-h ::before supplies. */
+  table.rr-tilt td.rr-tl-mix > div { width: 100% !important; max-width: 220px; }
+}
+
 @media (max-width: 390px) {
   .dd-take-grid { grid-template-columns: 1fr 1fr; }
   .dd-section h3 { font-size: 12px; }
@@ -2738,7 +2822,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v991</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v992</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -54123,23 +54207,27 @@ function renderReformRisk() {
       : '<span style="font-weight:700;color:var(--muted);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;" title="Band withheld: ' + _rArte.length + ' of this row&#39;s ' + members.length + ' scored jurisdiction' + (members.length === 1 ? '' : 's') + ' score clean only because their last take-raising event falls before 2010. A green band here would assert regional stability on scores this tab tells you not to read that way.">' + _avgTxt + '</span>'
         + '<div style="font-size:9.5px;font-weight:700;color:var(--orange);line-height:1.35;">not a stability reading</div>';
     _avgCell += '<div style="font-size:9.5px;font-weight:400;color:var(--muted);line-height:1.35;">n=' + members.length + '</div>' + _artLine;
+    // v992 (T4): every cell carries its own column name in data-h and a class. On a desktop
+    // neither is used — the <thead> labels the columns and the attribute renders nothing. On a
+    // phone this table stops being a table (see the .rr-tilt block in the v612 mobile layer):
+    // the header scrolls away with the columns, so each cell has to say what it is.
     return '<tr>'
-      + '<td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--text);">' + _rrEsc(region)
+      + '<td class="rr-tl-region" style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--text);">' + _rrEsc(region)
       + '<div style="font-size:10px;font-weight:400;color:var(--muted);">' + basis + '</div></td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--red);">' + totalT + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--green);">' + totalL + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--orange);font-weight:700;">' + totalU + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalC + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + _allLine + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;">' + _avgCell + '</td>'
+      + '<td class="rr-tl-n" data-h="Tightened 2010+" style="padding:5px 8px;font-size:12px;text-align:center;color:var(--red);">' + totalT + '</td>'
+      + '<td class="rr-tl-n" data-h="Liberalized 2010+" style="padding:5px 8px;font-size:12px;text-align:center;color:var(--green);">' + totalL + '</td>'
+      + '<td class="rr-tl-n" data-h="Unmeasured 2010+" style="padding:5px 8px;font-size:12px;text-align:center;color:var(--orange);font-weight:700;">' + totalU + '</td>'
+      + '<td class="rr-tl-n" data-h="No fiscal change 2010+" style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalC + '</td>'
+      + '<td class="rr-tl-mix" data-h="Mix" style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
+      + '<td class="rr-tl-tilt" data-h="Tilt 2010+" style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + _allLine + '</td>'
+      + '<td class="rr-tl-avg" data-h="Avg stability of sourced, 2010+" style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;">' + _avgCell + '</td>'
       + '</tr>';
   }).filter(Boolean).join('');
 
   var regionalTilt = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Regional Reform Tilt Since 2010</div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? <strong>Every count, bar and tilt in this table is events dated 2010 or later</strong> \u2014 the same window as the Avg Stability column and as the Reform Frequency Score. The full sourced record, which runs back to 1938, is printed as a second line under each Tilt so the two are never read as one number. They are not the same: over the whole record Latin America is +8 and Africa +1, while inside the window they are +1 and \u22121. Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. <strong>Avg Stability</strong> = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010), and it is <strong>banded in colour only where that mean is supported</strong>. A jurisdiction whose last take-raising event predates 2010 scores near 100 for the sole reason that the window opens after its rupture \u2014 the card headed <em>Below the line</em> further down names all seven. Where those outnumber the rest of the row the figure prints grey and reads <em>not a stability reading</em>, with the countries responsible beneath it: on the live data that is <strong>North America</strong>, whose 93 is USA 100 (last take rise 2007) and Canada 85 (2009) and nothing else, and <strong>CIS/FSU</strong>. n is printed under every figure \u2014 two of these rows are a mean of one country.</div>'
-    + '<table style="width:100%;border-collapse:collapse;">'
+    + '<table class="rr-tilt" style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>'
     + '<th style="text-align:center;color:var(--red);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Take-raising events dated 2010 or later. Pre-2010 rises are in the full-record line under the Tilt cell, not in this column.">Tightened<div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
