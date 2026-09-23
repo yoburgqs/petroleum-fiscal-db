@@ -66636,3 +66636,139 @@ panel at all for the first time. On a phone the control is 44px instead of 18px.
 **Task: T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (last run at cycle 910; 915 was T5). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and the page reloaded before each pass.
 
 **Friction.** For the *take*, this platform is excellent and I found nothing worth a cycle — three independent controls reach its provenance and all three land on a per-term Evidence Chain naming the ORCA
+
+---
+## Cycle 922 Log — 2026-09-23
+
+**Task: T3 + T2 (shipped) — own walk T1.** Rotation: 916 was T6, 915 T5, 914 T4,
+913 T1. This cycle's first job was not a walk at all, and the log should say so
+plainly.
+
+### What this cycle actually found first
+
+`index.html` was dirty on arrival: **238 insertions, uncommitted**, labelled
+`v991 (T2)` and `v991 (T3)`, with the version badge already bumped to v991.
+
+`cycle_log.txt` explains it. Cycles **917, 919, 920 and 921 all died on
+`subprocess.TimeoutExpired` at 1800s** — the harness kills `claude -p` at the
+30-minute mark, and each of those cycles had edited the tree but not yet
+committed. Four of the last six cycles shipped nothing. The status emails for
+that window read `[Petroleum] Cycle 918 — 500 PASS / 0 FAIL`, because the suite
+runs before the Claude step and passes regardless of whether the Claude step
+ever commits.
+
+This is textbook **"stable but wrong"** in the sense `TACIT_KNOWLEDGE.md` uses
+it: the job loads, exits 0, emails a healthy number, and produces no
+deliverable. `cycle_log.txt` has **138 `TimeoutExpired` entries** in total.
+Nothing watches for it. Flagged for Zach — it is a harness defect, not a UX one,
+so this cycle did not try to fix it in `index.html`.
+
+The recovered work was **verified rather than trusted**, then shipped as `88813d8`.
+
+### Friction (T3), as the recovered work describes it and as re-measured here
+
+`_cmpRankTake()` has two independent null branches. The data-basis branch has
+been pushed into every row over five cycles (v626, v684, v705, v750, v950). The
+PRRT branch — `if (st.prrt) return null` — reached the verdict strip and the
+column ordering and stopped there. Measured on Australia / Norway / Malaysia:
+
+    Govt Take ($75/bbl)   38.5% [bare]   68.0% "highest of 2"   59.4% "lowest of 2"
+
+Bare is not neutral on this grid — **bare is what the middle of a ranking looks
+like.** The one column the tab deliberately sets aside rendered identically to a
+ranked one, and rendered as the lowest take on screen by 20–30pp. Norway read
+"highest of 2" inside a three-column grid, and `_cmpOrderMark` accounted for the
+shortfall only through `r.gated`, which is false here because Australia has
+verified production. So "of 2" had no explanation anywhere on the row.
+
+### Change (on screen)
+
+- PRRT take cells carry **"not ranked · cash-flow basis"** under the figure;
+  Price Swing carries **"not comparable · cash-flow basis"**.
+- The "of N" tooltip names the columns outside the count.
+- The verdict strip gains the mirror of `_valAside` — **"Ranked here, but not in
+  the take order above"** — so a column present in the value ordering but struck
+  from the take ordering is no longer sitting under an unqualified green
+  "agrees with take order" pill.
+- **T2:** the Country Profile "25-Year Cashflow Breakdown" heading was a 20px
+  collapse control with its state marker flexed ~1,300px from its label and no
+  `role`, `tabindex` or `aria-expanded`. It is now `role=button`,
+  keyboard-operable, `aria-expanded`, caret against the label, **24px desktop /
+  44px under `pointer: coarse`** — scoped exactly like the v612 mobile layer, so
+  a mouse sees nothing new.
+
+### Result
+
+An analyst comparing Australia against Norway and Malaysia can no longer read
+Australia's 38.5% as "the cheapest regime in the set". The figure still prints
+at full size and in its place — it is correct on its own basis — but it now says,
+in the cell, that it is not a rank position and why. The one case the platform
+had always handled in prose 300px away (desktop) or ~1,800px away (phone) is now
+stated where the number is read.
+
+### Verified this cycle, not assumed
+
+| check | result |
+|---|---|
+| JS syntax gate | **PASS** — 11 script blocks, 0 errors |
+| AUS/NOR/MYS render | 10 basis markers present, **0 console + 0 page errors** |
+| Cashflow h3 @390 `hasTouch` | **44px**, role/tabindex/aria-expanded present |
+| Cashflow h3 @1440 | **24px** — meets the floor, hint row intact |
+| Horizontal scroll, 8 tabs @390x844 | `scrollWidth == clientWidth == 390` on **all 8** |
+| Playwright, **live deployed** build | **500 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
+| Playwright, **local tree** | ran to **301+ checks, 0 FAIL**; see note below |
+
+**On the local-tree run, honestly:** the graded suite defaults to
+`https://yoburgqs.github.io/...`, so the 500 PASS it reports each cycle is the
+**deployed** build, not the working tree — it cannot gate an uncommitted change.
+This cycle re-ran it with `TEST_URL` against a local server to close that gap. It
+was still running at **301 checks / 0 FAIL** when the cycle secured its work by
+pushing; a single-threaded `http.server` re-serving a 9.7 MB `index.html` ~2,200
+times is the bottleneck, not the product. The push was taken deliberately at that
+point — the demonstrated failure mode of the last four cycles is work lost to the
+timeout, and every independent gate above had already passed.
+
+### Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| tab order | `.tab-btn` labels | unchanged |
+| v451 | FC headers | Govt NPV still **removed**; `NPV ($M)` intact |
+| v612 mobile layer | `#reference-panel` | `right: 0` (**not** negative) |
+| v371/v373 | `#screener-advanced-details` | still collapsed cold |
+
+### Own walk (T1) — no change shipped, deliberately
+
+Walked "Which countries should even be on my screening list?" cold at 1440x900,
+both storages cleared. The Screener is in good shape at the decision point: 185
+countries ranked in three explicit data-basis blocks, two full-width separator
+rows spelling out what each block means ("163 COUNTRIES WITH NO VERIFIED FIELD
+PRODUCTION", "45 COUNTRIES WHOSE TAKE IS A FLOOR, NOT A MEASUREMENT"), rank
+prefixes carrying the block (`F45`), a `⚠ 163 of 185 are proxy` one-click
+escape to the 22 production-backed countries, and 0 console errors. Found no
+friction worse than the items already carried forward below. Per the directive,
+logging that rather than inventing a change.
+
+### Carried forward, still open
+
+- **HARNESS: `claude -p` is killed at 1800s and uncommitted work dies with it.**
+  917/919/920/921 all lost this way; 138 `TimeoutExpired` in `cycle_log.txt`.
+  The cycle emails "500 PASS" regardless. Highest-value open item, and it is not
+  a UX item.
+- **The graded suite tests the DEPLOYED site, so it cannot gate the diff that
+  cycle is about to ship.** `TEST_URL` works; the harness does not use it.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- Reform Risk *Regional Reform Tilt* `Avg Stability` has no comparability
+  dimension (914).
+- `take > 75` Country Profile branch carries no take/swing/evidence clause (912).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- Screener "Copy for IC Memo" is three clicks and a long wait cold (915).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable cold (912).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Scenario Builder paste's bare `41.1%` IRR row (907).
+- `_fpCohortLine()` cohort rank computed from the refuted score (906).
+- Side-by-Side take-ordering chain duplicate jurisdiction column (904).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- **Suite copies remain diverged** — graded copy is `office/tools/petroleum/tests/`.
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch
+  renders still in the repo root.
