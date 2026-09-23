@@ -66789,3 +66789,148 @@ logging that rather than inventing a change.
 ## Cycle 922
 
 **The cycle's first finding wasn't a UX problem.** `index.html` was dirty on arrival — 238 uncommitted insertions labelled v991. `cycle_log.txt` explained it: **cycles 917, 919, 920 and 921 all died on `subprocess.TimeoutExpired` at 1800s**, each having edited the tree but never committing. Four of the last six cycles shipped nothing while the status emails read `Cycle 918 — 500 PASS / 0 FAIL`, because the suite runs *befo
+
+---
+
+## Cycle 923 — v992 (T4): the Regional Reform Tilt showed one of its eight columns on a phone
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation:
+922 shipped T3/T2 and logged its own T1 pass, 916 was T6, 915 T5, and T4 last ran at cycle 914.
+Walked cold at 1440x900 and at 390x844 with `hasTouch: true`, both storages cleared and the page
+reloaded before each pass.
+
+### What the walk cleared before it found anything
+
+The country half of T4 is in good shape and nothing in it was changed. Verified live, cold:
+
+| path | result |
+|---|---|
+| `#/reform/nigeria`, `#/reform/oman`, `#/reform` deep links | all three land on the tab, pre-select the lookup and render the verdict · 0 page errors |
+| Country Profile → `Reform Risk →` handoff | sets `#/reform/<slug>`, switches tab, selects the country, scrolls to the verdict |
+| CP strip for an UNSCORED country (Oman, Malaysia) | prints `Stability: n/c (no sourced reform log · 21 of 185 jurisdictions covered)` — the absence is stated, not omitted |
+| lookup for an unscored country | names the statute ORCA read the terms from, says plainly it is a citation and not a reform log, refuses to imply a zero premium |
+| `⎘ Copy for IC Memo` | full verdict + 6-event table + basis footer, pasteable |
+| reform source enrichment | 21 of 21 countries resolved their API JSON; 83 of 83 events carry a citation; **0 HTTP ≥400 on the whole cold load** |
+| Side-by-Side | carries a `REFORM EXPOSURE, HIGHEST FIRST` ordering chain that names the unscored column separately |
+| Fiscal Compare `Reform-scored only` | filters 185 → 21 and switches the Reform verdict column on, as its tooltip claims |
+
+### Friction — Regional Reform Tilt at 390x844 (`renderReformRisk()`, the `regionalTilt` table)
+
+Measured cold. The table's content is **981px wide inside a 324px window**:
+
+```
+REGION 33-254 (221px) · TIGHTENED 254-335 · LIBERALIZED 335-424 · UNMEASURED 424-519
+NO FISCAL CHANGE 519-646 · MIX 646-762 · TILT 762-890 · AVG STABILITY 890-1014
+```
+
+At rest the analyst sees the region name, its *n of N sourced* line, and the **TIGHTENED** count.
+Nothing else. LIBERALIZED is sliced mid-word at the container edge. **TILT — the panel's own
+headline finding — starts 438px past the right edge, and AVG STABILITY, the column the caption
+above it is almost entirely written about, starts 566px past it.**
+
+The table *is* a scroll container (the generic mobile rule gives it `display:block` /
+`overflow-x:auto`), but it carries no affordance at all: it is not inside a `.tbl-wrap`, so the
+v612 layer's right-edge gradient — *"the only honest signal that there is more table"* — never
+draws on it, and the DOCUMENT does not scroll (390 = 390), so there is no page-level cue either.
+
+That is worse than a truncation. What remains reads as a complete finding and is the wrong one:
+**Europe 5, Africa 0, North America 0, Middle East 0** invites *"Europe is tightening, nobody
+else is reforming"*, when the hidden columns say six of the eight rows are **Not established**,
+three of them on more unmeasured changes than measured ones, and that two rows' Avg Stability is
+explicitly flagged *not a stability reading*.
+
+### Change
+
+Fixed on the **v761 (`.ec-chain`) precedent rather than the v747 one** — pinning the region column
+and adding a fade would still leave the two decision cells two swipes away, so the row stops being
+a row. At `max-width: 720px` each region becomes a block: name and basis on their own line, the
+four event counts in a 2x2 grid, then Mix, Tilt and Avg Stability each full width. Every cell
+carries its column name from a `data-h` attribute added this cycle, because the `<thead>` is what
+scrolls away first and a bare "2" under no label is not a finding.
+
+Nothing scrolls, nothing is hidden, no column is dropped and no figure is reworded.
+
+### Result
+
+On a phone the analyst reading Regional Reform Tilt now sees, per region and without a gesture:
+the sourced basis, all four event counts **each under its own label**, the mix bar, the in-window
+**Tilt verdict with its unmeasured denominator and its full-record second line**, and **Avg
+Stability with n and its window-artefact caveat**. Before this cycle, seven of those eight cells
+were off-screen behind an unsignalled swipe.
+
+### v992b — a second, separate defect, found by the gate and NOT authored by this cycle
+
+`pixel_audit` **blocked the v992 push** with `tablet-768::2-t7: clipped-text 1 -> 2`. A/B'd
+against `git show HEAD~1:index.html` served from the same origin: **both builds** measure
+`#cp-terms-chip` scrollWidth 143 in a 44px box and `#cp-cite-open-chip` 196 in a 55px box at
+768x1024. It shipped earlier and the gate had simply not been reached — cycle 922 pushed at
+301 checks, before `pixel_audit` finished.
+
+Cause: `#cp-evidence-panel`'s `<summary>` is `display: flex` with the default `flex-wrap: nowrap`.
+The v612 layer already wraps it, but only inside `@media (max-width: 720px)`. The strip's nine
+chips need ~958px including gaps, so **from 721px to roughly 890px the summary is too narrow to
+fit them and too wide to wrap**: flex shrinks the two longest to 42–55px while they are
+`white-space: nowrap; overflow: visible`, so *"3 of 5 model terms cited →"* and *"no source behind
+the model opens →"* paint straight over the chips beside them. Those two are the Country Profile's
+answer to "how much of this model is actually cited" — illegible on a tablet.
+
+| viewport | before | after |
+|---|---|---|
+| 721 | chips shrunk to 42px, 2 overflowing | wraps · **0 overflowing** |
+| 768 | 44px and 55px, 2 overflowing | wraps · **0 overflowing** |
+| 900 | fits on one line | fits on one line (wrap is a no-op) |
+| 1024 / 1100 / 1200 / 1280 / 1440 | nowrap, 0 overflowing | **unchanged** |
+
+### Verified this cycle — measured, not assumed
+
+| check | before | after |
+|---|---|---|
+| tilt table `scrollWidth` vs `clientWidth` @390 | 981 vs 324 | **324 vs 324** |
+| tilt cells inside the 390 viewport | 1 of 8 | **8 of 8** (all within x 33–357) |
+| `document.scrollWidth` vs `clientWidth` @390 | 390 = 390 | **390 = 390** (unchanged) |
+| sub-24px controls on Reform Risk under `pointer: coarse` | 0 | **0** |
+| desktop 1920 / 1440 / 1280 / 1024 / 768 | — | `thead` visible, rows still `table-row`, no horizontal scroll, tilt `innerText` byte-identical to the pre-change dump |
+| JS syntax gate | — | **PASS** (11 inline blocks) |
+| `pixel_audit` (10 tabs x 5 viewports, local tree) | **exit 1 — REGRESSION** | **exit 0 — PIXEL GATE PASS** |
+| runtime suite, local tree, read from its own report file | — | **499 PASS / 0 FAIL / 1 WARN**, reproduced identically on a second clean run after the final commit |
+
+**On the 499 and the 15 "JS errors": both are the local harness, not the build.** `index.html`
+registers its service worker at the absolute Pages path `/petroleum-fiscal-db/sw.js`, which does
+not exist on a server rooted at the repo, so it 404s once per page load — 15 loads, 15 console
+errors, and the `[ConsoleErrors]` check WARNs instead of passing. That check is the 500th. A
+network trace of a full cold load on this server returns **0 HTTP ≥400 for every asset the page
+itself requests**; the only failure is that one registration. Against the deployed URL the same
+suite reads 500 PASS / 0 JS errors, as it did for cycles 918–922.
+
+### Locks re-probed live, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| v612 mobile layer | `#reference-panel` | `right: 0px` — **not** negative; no selector in the layer narrowed, weakened or removed |
+| tab order | visible `.tab-btn` labels | Home · Fiscal Compare · Country Profile · Explorer · Screener · Side-by-Side · IOC Portfolio · Breakeven Map · Reform Risk — unchanged |
+| v451 | FC headers | Govt NPV still **removed** |
+| v371/v373 | `#screener-advanced-details` | still collapsed cold (`open: false`) |
+
+### Carried forward, still open
+
+- **HARNESS: `claude -p` is killed at 1800s and uncommitted work dies with it** (917/919/920/921).
+  Still the highest-value open item and still not a UX item.
+- The graded suite's default `TEST_URL` is the DEPLOYED site, so the harness cannot gate the diff
+  it is about to ship. This cycle again overrode it by hand — and v992b is the direct cost of that
+  gap: a layout defect rode the deployed-only gate for at least one cycle.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `take > 75` Country Profile branch carries no take/swing/evidence clause (912).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- Screener "Copy for IC Memo" is three clicks and a long wait cold (915).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable cold (912).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px tall under `pointer: coarse` at both
+  768 and 390 — the only remaining sub-24px finding in `pixel_audit`, present at baseline.
+- The Reform Risk decade heatmap caption reads "Top 20 of the 21" — it drops one scored
+  jurisdiction from the grid, while the ranked table above it prints all 21.
+- The global filterable **Fiscal Reform History — Sourced Event Log** browser (`#tbl-reforms`,
+  `reform-filter-*`) lives in the Vintage pane (`#t4`), which is not on the tab bar; Reform Risk
+  does not link to it.
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in the
+  repo root.
