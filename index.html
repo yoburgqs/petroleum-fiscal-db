@@ -2216,6 +2216,30 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   table.rr-tilt td.rr-tl-mix > div { width: 100% !important; max-width: 220px; }
 }
 
+/* ── v992b (T4, gate repair) — the Country Profile evidence strip between 721px and ~890px ──
+   Surfaced by pixel_audit as `tablet-768::2-t7: clipped-text 1 -> 2`, which BLOCKED this cycle's
+   push. It is NOT from this cycle: A/B'd against `git show HEAD~1:index.html` served from the
+   same origin, both builds measure #cp-terms-chip scrollWidth 143 in a 44px box and
+   #cp-cite-open-chip 196 in a 55px box at 768 x 1024. It shipped earlier and the gate had not
+   been reached — cycle 922 pushed at 301 checks, before pixel_audit finished.
+
+   Cause: #cp-evidence-panel's <summary> is `display: flex` with the default `flex-wrap: nowrap`.
+   The v612 layer already wraps it — `#cp-evidence-panel summary { flex-wrap: wrap; row-gap: 6px }`
+   — but only inside `@media (max-width: 720px)`. The strip's nine chips need ~958px including
+   the 10px gaps, so from 721px up to roughly 890px the summary is too narrow to fit them and too
+   wide to wrap: flex shrinks the two longest chips to 42-55px while they are `white-space: nowrap;
+   overflow: visible`, so "3 of 5 model terms cited →" and "no source behind the model opens →"
+   paint straight over the chips beside them. Those two chips are the Country Profile's answer to
+   "how much of this model is actually cited" — the T6 question — rendered illegible on a tablet.
+
+   Measured band: 721 (chips at 42px) and 768 (44 / 55px) overflow; 900 and up fit on one line.
+   Wrapped to 900px, which is a no-op at the top of that band because `flex-wrap: wrap` only
+   breaks a line that does not fit. Nothing at >=901px changes, and the ≤720px rule above is
+   untouched — not removed, not weakened, not narrowed. ── */
+@media (max-width: 900px) {
+  #cp-evidence-panel summary { flex-wrap: wrap; row-gap: 6px; }
+}
+
 @media (max-width: 390px) {
   .dd-take-grid { grid-template-columns: 1fr 1fr; }
   .dd-section h3 { font-size: 12px; }
