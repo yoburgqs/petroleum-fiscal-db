@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v989</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v990</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -25221,6 +25221,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};${_aEmph}">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};${_nfEmph}">${_nfTxt}</span></span>
       <span id="cp-terms-chip"></span>
       <span id="cp-engine-chip"></span>
+      <span id="cp-cite-open-chip"></span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
       ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
       ${_srcDeadN > 0 ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_cpEsc(_srcNoneOpen ? 'Not one of the documents this profile cites can be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; all of this country\u2019s returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second. There is currently no citation on this profile you can click through to before an IC memo; locate the instruments by name.' : 'At least one of the documents this profile cites cannot be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; the ones marked LINK DEAD in the source list below returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second.')}">${_srcNoneOpen ? 'no cited source opens' : _srcDeadN + ' of ' + _srcCitedN + ' source links dead'}</span>` : ''}
@@ -41927,6 +41928,62 @@ function _cpScrollToEvidenceChain(slug) {
 }
 window._cpScrollToEvidenceChain = _cpScrollToEvidenceChain;
 
+// ── v990 (T6) — the NPV had no route to the deck it was computed on ──────────────────────────
+// Walked T6 cold at 1440x900 and 390x844 hasTouch, storage cleared and reloaded before each pass,
+// on Nigeria, Somalia, Guyana, Madagascar and USA.
+//
+// The take is superbly served. Three independent controls reach its provenance — the headline
+// take (_cpTakeToEvidence), the Evidence Quality chip (_cpScrollToEvidenceChain) and the
+// "N of M terms cited" chip on Fiscal Compare / Explorer / Screener / Side-by-Side
+// (_fcOpenTermChain) — and they land on a per-term Evidence Chain that names the ORCA value, the
+// statutory value, the instrument, the tier, whether the link still resolves, and a severity-
+// ranked findings list.
+//
+// The contractor NPV had NONE of that, and the NPV is the number that decides capital.
+// Measured on the shipped build, Country Profile -> Nigeria:
+//
+//   4-Price Sensitivity prints NPV $161M / $302M / $440M / $584M and carries the "Copy as IC
+//   table" button. Its prose names "this standardized Deepwater profile" — a NAME, no numbers.
+//   The deck those four figures were actually computed on — 50 MBD peak, 241.9 MMbbl recovered,
+//   $1.0B all-in capex, $18/bbl opex escalating 2%/yr, 10% WACC, 25 years, IDENTICAL for all 185
+//   countries — lives in the next section down, Cost Profile Assumptions, at display:none.
+//
+// The only thing that opened it was the section's <h3>. Measured:
+//   - `cost-profile-<slug>` appears ONCE in 72,144 lines. Nothing on the platform links to it.
+//   - The <h3> carried cursor:pointer and an inline onclick, but no role, no tabindex and no
+//     aria-expanded — not a control to a keyboard and not a control to a screen reader.
+//   - 18px tall at 390x844 under pointer:coarse, against the directive's 24px floor.
+//   - Its label read "▾ expand" and went on reading "▾ expand" after it was expanded, so the one
+//     affordance on it misreported its own state.
+//
+// So an analyst who asks "where did $302M come from?" — the question that decides whether this
+// goes in an IC memo as a fiscal comparison or gets read as a field valuation — has to notice a
+// static grey heading two sections below the number and guess that a word is a button. That is
+// the give-up point in this walk. Nothing is deleted and nothing is expanded by default: the
+// panel becomes a real control, and the NPV column gets the route the take column already had.
+function _cpCostBasis(slug, force) {
+  var body = document.getElementById('cost-profile-' + slug);
+  if (!body) return;
+  var head = document.getElementById('cost-profile-h-' + slug);
+  var lbl  = document.getElementById('cost-profile-lbl-' + slug);
+  var wasOpen = body.style.display !== 'none';
+  // force === true means "a caller elsewhere on the page sent the analyst here" — open, never
+  // toggle shut, because arriving at a collapsed panel is the failure this exists to stop.
+  var open = (force === true) ? true : !wasOpen;
+  body.style.display = open ? 'block' : 'none';
+  if (lbl) lbl.innerHTML = open ? '▴ collapse' : '▾ expand';
+  if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (force === true) {
+    var el = head || body;
+    try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+    var prev = body.style.boxShadow;
+    body.style.transition = 'box-shadow .3s';
+    body.style.boxShadow = '0 0 0 3px rgba(194,65,12,.45)';
+    setTimeout(function() { body.style.boxShadow = prev || ''; }, 1800);
+  }
+}
+window._cpCostBasis = _cpCostBasis;
+
 // ── v984 (T6) — the Evidence Chain's note stack had no order, no count and no index ──────────
 // Walked T6 cold at 1440 and at 390, storage cleared, on Nigeria — rank #63 on Fiscal Compare and
 // one of the seven countries an IC analyst screens first. The chain answers "where did this number
@@ -42268,6 +42325,11 @@ function renderReformTimeline(country) {
     // construction). Read back after the table renders to build the third leg of the Evidence
     // Quality chip at the top of this profile.
     const _termsCited = new Set();
+    // ── v990 (T6): of the cited model terms, which ones can actually be OPENED ────────────
+    // _termsCited answers "does a citation stand behind this term". It does not ask whether
+    // the document that citation names can still be fetched. Filled in the same branch, so it
+    // is a strict subset of _termsCited by construction.
+    const _termsCiteOpen = new Set();
 
     // ── v743 (T6): WHICH ROWS THE NUMBER IS ACTUALLY BUILT FROM ──────────────────────────
     // v625 fixed the missing direction: a term the model runs and the fact base does not hold
@@ -42344,7 +42406,8 @@ function renderReformTimeline(country) {
           sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
           idx: idxLinkCount, iL: idxLinkLabels.length,   // v971
           spR: supersedeRows.length, sNC: srcNamedCount,   // v956
-          tC: Array.from(_termsCited)
+          tC: Array.from(_termsCited),
+          tO: Array.from(_termsCiteOpen)   // v990 (T6)
         };
         const val = (typeof rawVal === 'number') ? _fmtPct(rawVal) : String(rawVal);
         const numVal = (typeof rawVal === 'number') ? rawVal : null;
@@ -42443,7 +42506,11 @@ function renderReformTimeline(country) {
             // v755 (T6): the document, not just the tally. srcLabel is already the human-readable
             // instrument name this row prints in its Source cell.
             sourcedSrcs.push({ label: label, name: String(srcLabel || srcMeta.source || '') });
-            if (_MODEL_KEY[label]) _termsCited.add(_MODEL_KEY[label]);   // v660 (T6)
+            if (_MODEL_KEY[label]) {
+              _termsCited.add(_MODEL_KEY[label]);   // v660 (T6)
+              // v990 (T6): the same row's link, measured by v641's own dead-URL set.
+              if (srcMeta.url && !_citeLinkDead(srcMeta.url)) _termsCiteOpen.add(_MODEL_KEY[label]);
+            }
             isDivergent = numVal != null &&
               Math.abs(numVal - srcVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(srcVal), 1));
             if (isDivergent) {
@@ -42775,6 +42842,7 @@ function renderReformTimeline(country) {
           supersedeRows.length       = _snap742.spR;   // v956
           srcNamedCount              = _snap742.sNC;   // v956
           _termsCited.clear(); _snap742.tC.forEach(function(k) { _termsCited.add(k); });
+          _termsCiteOpen.clear(); _snap742.tO.forEach(function(k) { _termsCiteOpen.add(k); });   // v990 (T6)
         }
       });
 
@@ -43699,6 +43767,75 @@ function renderReformTimeline(country) {
           + ' title="' + _tcTip + '">' + _tcCited + ' of ' + _tcTot + ' model terms cited &rarr;</span>';
       }
     } catch (e) { /* the chip is additive; never let it take the table down */ }
+
+    /* ── v990 (T6): "2 of 3 source links dead" implied one still opened. For 44 countries none did ──
+       Walked T6 cold at 1440x900 and 390x844 hasTouch, both storages cleared, over http.
+       Fiscal Compare -> the Quality column's "N of M terms cited" chip -> Country Profile
+       Evidence Chain. The chain itself is in good shape. The break is one surface earlier.
+
+       The Evidence Quality panel is the FIRST evidence surface -- v647 says so in its own
+       comment, it sits directly under the profile header, and _homeOpenEvidence() opens it on
+       arrival. Its red chip reads "N of M source links dead", and _srcNoneOpen escalates that
+       to "no cited source opens" when M are all dead. Both are computed from entry.top_sources
+       -- the country's fact-count-ranked source list, capped at three -- which is NOT the set of
+       citations standing behind the take, NPV and IRR printed above it.
+
+       Measured in-page across all 185 shipped api/v1/country files, using getDCFParams()'s own
+       term set, this table's sourcing rules (bulk, shared-regional and D-confidence excluded,
+       exactly as sourcedCount excludes them) and v641's _citeLinkDead set:
+
+         89 of 185 countries have EVERY model-term citation dead. Not one document behind the
+            headline can be opened.
+         44 of those 89 render "N of 3 source links dead" instead of the escalation -- a chip
+            whose plain reading is that at least one citation still opens. Among them:
+            Guyana 3/3 dead, Indonesia 3/3, Iraq 1/1, Colombia 3/3, Egypt 3/3, Malaysia 3/3,
+            Algeria 4/4, Kuwait 2/2, Bahrain 2/2, Gabon 3/3, Ecuador 2/2, Denmark 1/1.
+         45 of the 89 do get "no cited source opens" -- by coincidence, because their
+            top_sources happened to be all-dead too, not because anything measured the model.
+          0 countries fail the other way, so this chip never contradicts the existing one.
+
+       The analyst asking T6 reads "2 of 3 source links dead" on Guyana, concludes one citation
+       is retrievable, and has no reason to scroll 2,750px to the chain that would show all five
+       of its linked rows marked LINK DEAD. That is the give-up point: they stop at a number that
+       is true of a population they cannot see and false of the one they are about to cite.
+
+       Nothing is removed and no count changes -- the existing chip keeps its own population and
+       its own wording, because top_sources is what the Key sources rows below it list. This adds
+       the one fact that population cannot carry, and only when it is not already being said:
+       it is suppressed when the panel already reads "no cited source opens". Same shape as the
+       two chips above it -- a control, not a caption; clicking opens the Evidence Chain. */
+    try {
+      const _coEl = document.getElementById('cp-cite-open-chip');
+      const _coCited = _termKeys.filter(function(k) { return _termsCited.has(k); });
+      const _coOpen  = _coCited.filter(function(k) { return _termsCiteOpen.has(k); });
+      const _coSum   = document.querySelector('#cp-evidence-panel > summary .cite-dead-chip');
+      const _coSaid  = !!(_coSum && /no cited source opens/.test(_coSum.textContent || ''));
+      if (_coEl && _coCited.length && !_coOpen.length && !_coSaid) {
+        const _coNames = _coCited.map(function(k) { return _termLabels[k] || k; });
+        const _coTip = _esc('Not one of the citations behind the numbers on this page can be '
+          + 'opened. ' + country + ' has ' + _coCited.length + ' of its ' + _termKeys.length + ' '
+          + (_termsMech || 'DCF') + ' model terms independently cited — '
+          + _coNames.join(', ') + ' — and every one of those citations points at an address that '
+          + 'returned a 404, or named a hostname that did not resolve, when every citation URL on '
+          + 'the platform was fetched on ' + ((typeof _CITE_DEAD_CHECKED !== 'undefined') ? _CITE_DEAD_CHECKED : 'the last sweep') + '. '
+          + 'This counts a different population from the "source links dead" chip beside it, which '
+          + 'measures this country’s top sources by fact count — mostly contract metadata — and can '
+          + 'read as though one citation still opens while none of the ones producing the take, NPV '
+          + 'and IRR does. 89 of 185 countries are in this state. '
+          + 'No tier letter, percentage or grade changes: whether an instrument is authoritative and '
+          + 'whether ORCA can hand you a copy of it are different questions, and this is the second. '
+          + 'Each dead row in the Evidence Chain carries a ⌕ find document control that searches for '
+          + 'the instrument by name. Locate them before any figure here goes in an IC memo. '
+          + 'Click to jump to the term-by-term Evidence Chain.');
+        _coEl.outerHTML = '<span id="cp-cite-open-chip" role="button" tabindex="0"'
+          + ' onclick="event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + slug + '\');"'
+          + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + slug + '\');}"'
+          + ' style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
+          + 'color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;'
+          + 'cursor:pointer;white-space:nowrap;min-height:24px;display:inline-flex;align-items:center;"'
+          + ' title="' + _coTip + '">no source behind the model opens &rarr;</span>';
+      }
+    } catch (e) { /* additive; never let it take the table down */ }
 
     // ── v826 (T6): "N of M model terms cited" counts citation, not whether the model ran it ──
     // The chip beside this one asks of each model term whether a citation stands behind it. It
@@ -47188,7 +47325,7 @@ function loadCountryProfile(country) {
           <th style="text-align:left;color:var(--muted);padding:5px 8px 5px 0;font-weight:700;font-size:11px;letter-spacing:.04em;">PRICE</th>
           <th style="text-align:right;color:var(--muted);padding:5px 8px;font-weight:700;font-size:11px;letter-spacing:.04em;">GOVT TAKE %</th>
           <th style="text-align:right;color:var(--muted);padding:5px 8px;font-weight:700;font-size:11px;letter-spacing:.04em;" title="Change in govt take vs $50/bbl scenario">Δ vs $50</th>
-          <th style="text-align:right;color:var(--muted);padding:5px 8px;font-weight:700;font-size:11px;letter-spacing:.04em;" title="Contractor net present value discounted at 10% WACC, 100% working interest basis. Scale by WI% for stake economics.">NPV ($M)</th>
+          <th style="text-align:right;color:var(--muted);padding:5px 8px;font-weight:700;font-size:11px;letter-spacing:.04em;" title="Contractor net present value discounted at 10% WACC, 100% working interest basis. Scale by WI% for stake economics.">NPV ($M)<span id="cp-npv-basis-${safe}" role="button" tabindex="0" onclick="_cpCostBasis('${safe}', true)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();_cpCostBasis('${safe}', true);}" style="display:flex;align-items:center;justify-content:flex-end;min-height:24px;margin-top:1px;font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--orange);cursor:pointer;" title="These four NPVs are not this country's field economics. They are one standardized project run through ${country}'s fiscal terms — the SAME production and cost deck for all 185 countries, which is what makes the cross-country ranking legitimate and what makes the dollar figure meaningless as an asset value. Opens the deck: peak rate, recovered volume, capex, opex, WACC and horizon. Open this before an NPV goes in an IC memo.">on what deck? &rarr;</span></th>
           <th style="text-align:right;color:var(--muted);padding:5px 8px;font-weight:700;font-size:11px;letter-spacing:.04em;cursor:help;" title="Breakeven oil price ($/bbl) — minimum price for Contractor NPV ≥ 0. Computed at $75/bbl baseline only — the same value appears in all 4 price rows. Breakeven is a regime characteristic, not price-dependent. Available for 65 of 185 countries (requires verified royalty + cost data per contract). — = insufficient data; use Scenario Builder with field-specific inputs for a project estimate.">BREAKEVEN ⓘ</th>
         </tr>
       </thead>
@@ -47481,9 +47618,16 @@ function loadCountryProfile(country) {
     const opex        = '$' + (_eb833 ? _eb833.opexBbl : 18) + '/bbl, escalating '
                         + (_eb833 ? (_eb833.opexEscal*100).toFixed(0) : '2') + '%/yr real';
     const collapseId = 'cost-profile-' + safe;
+    // v990 (T6): a real control. role/tabindex/aria-expanded so it exists to a keyboard and to a
+    // screen reader, min-height 24px so it clears the coarse-pointer floor at 390 (it measured
+    // 18px), and a label that reports its own state instead of saying "expand" while expanded.
     return `<div class="dd-section">
-      <h3 style="cursor:pointer;user-select:none;" onclick="(function(){var el=document.getElementById('${collapseId}');el.style.display=el.style.display==='none'?'block':'none';})()">
-        Cost Profile Assumptions <span style="font-size:11px;font-weight:400;color:var(--muted);">▾ expand</span>
+      <h3 id="cost-profile-h-${safe}" role="button" tabindex="0" aria-expanded="false" aria-controls="${collapseId}"
+          style="cursor:pointer;user-select:none;min-height:24px;padding:3px 0;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"
+          onclick="_cpCostBasis('${safe}')"
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();_cpCostBasis('${safe}');}"
+          title="The production and cost deck every take, NPV and breakeven on this page was computed on \u2014 ${(_eb833 ? ((_eb833.peakBblDay/1000).toFixed(0) + 'k bbl/d peak, ' + _eb833.totalProdMM.toFixed(1) + ' MMbbl recovered, $' + (_eb833.capexAllInMM/1000).toFixed(1) + 'B all-in capex, $' + _eb833.opexBbl + '/bbl opex, ' + (_eb833.discountRate*100).toFixed(0) + '% WACC') : 'the ORCA engine basis')}. It is held IDENTICAL across all 185 countries, so these figures are a fiscal comparison basis and not the field economics of any asset in ${country}. Open it before quoting an NPV.">
+        Cost Profile Assumptions <span id="cost-profile-lbl-${safe}" style="font-size:11px;font-weight:400;color:var(--muted);">▾ expand</span>
       </h3>
       <div id="${collapseId}" style="display:none;">
         <div style="font-size:12px;color:var(--muted);line-height:1.9;font-family:'IBM Plex Mono',monospace;">
