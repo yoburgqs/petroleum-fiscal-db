@@ -2708,7 +2708,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v987</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v988</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -51515,6 +51515,114 @@ function _rrLeaveByHistory() {
 }
 
 // The verdict card's headline. Byte-identical to the old one unless a return is armed.
+// ── v988 (T4): this tab's Take @$75 figure, on the basis the rest of the platform ranks on ──
+// T4 is "what is my fiscal-stability and reform exposure here?", and this tab is the surface
+// the product itself nominates as the last gate before an IC memo is filed. It pairs a reform
+// verdict with a government-take figure so the analyst can see whether a jurisdiction that
+// rewrites its terms is also already taking a hard share. Six sites on this tab printed that
+// figure -- the verdict card, the ranked table cell, and the take chip on the Below-the-line,
+// quiet-rise and actively-reforming cards -- and every one of them printed the PUBLISHED BLEND.
+//
+// For Iraq that inverts the finding completely. Iraq's published take at $75 is 84.8%, the
+// HIGHEST of the 21 scoreable jurisdictions. 415 of its 610 contracts are TSC, where the
+// contractor is paid a fixed $/bbl remuneration fee and keeps no price upside, so take% rises
+// toward 97-99% as a structural artefact of the mechanic. On its 195 PSC/Concession contracts
+// Iraq takes 34.1% -- third LOWEST of the 21, below Ghana, Guyana, Norway and the UK. An
+// analyst reading the Iraq row saw "terms rewritten in-window, size never quantified" beside
+// the harshest take in the sourced set and concluded maximum exposure. The comparable figure
+// says the opposite, and takeColor() painted the wrong one red.
+//
+// This is not a new rule and not a new number. The platform comparability rules (2026-08-26)
+// say a fee-basis blend may not be compared across countries, and v549 (Side-by-Side), v552
+// (Country Profile), v553 (the IC-memo clipboard) and v554 (the Screener take ceiling) each
+// already put this correction on screen. This tab was the one left reading the raw blend --
+// including into the clipboard, because _rrVerdictPayload() reads the RENDERED card, so the
+// Iraq "Copy for IC Memo" paste carried 84.8% with nothing beside it.
+//
+// Reuses _scFeeCmpAt() verbatim -- the same call the Screener's ceiling and Side-by-Side's
+// ordering make -- so the seven surfaces cannot give one country two comparable takes. Its
+// own 0.1pp divergence test means 17 of the 21 are byte-identical to before: only Iraq
+// (84.8 -> 34.1), Ecuador (46.5 -> 39.3), Mexico (32.2 -> 29.7) and India (61.9 -> 63.2)
+// change. India's correction goes UP, which is the check that this is a basis change and not
+// a thumb on the scale. The published headline is never removed -- it is printed beneath the
+// comparable figure, which is the same two-line form Country Profile uses.
+function _rrFeeCmp(country) {
+  if (typeof _scFeeCmpAt !== 'function' || typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return null;
+  var d = COUNTRY_DATA.filter(function (x) { return x.country === country; })[0];
+  if (!d) return null;
+  var fc = _scFeeCmpAt(d, '75');
+  if (!fc || !fc.diverges) return null;
+  // Some mech_mix labels carry a country prefix ("India RSC" alongside a plain "RSC", 93 and 4
+  // contracts, both RSC). Strip the prefix before de-duplicating, or the cell reads "India RSC/RSC".
+  var mechs = [];
+  (Array.isArray(d.mech_mix) ? d.mech_mix : []).forEach(function (m) {
+    if (m.g !== 2 || !m.m) return;
+    var lbl = String(m.m).replace(new RegExp('^' + country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+'), '').trim() || String(m.m);
+    if (mechs.indexOf(lbl) < 0) mechs.push(lbl);
+  });
+  return { head: fc.head, cmp: fc.cmp, n1: fc.n1, n2: fc.n2, mechs: mechs.join('/') || 'fee-basis' };
+}
+
+// The one-line explanation, shared by the card, the table cell and the chips so the tooltip and
+// the visible text cannot drift apart.
+function _rrFeeTitle(c, f) {
+  return c + '’s published take of ' + f.head.toFixed(1) + '% at $75/bbl blends '
+    + Number(f.n2).toLocaleString() + ' fee-basis contracts (' + f.mechs + ') with '
+    + Number(f.n1).toLocaleString() + ' PSC/Concession contracts. On a fee-basis contract the '
+    + 'contractor is paid a fixed $/bbl remuneration fee and keeps no oil-price upside, so take% '
+    + 'rises toward 97–99% as an artefact of the contract structure rather than a measure of '
+    + 'how hard the fiscal terms are, and the blend is not comparable across countries. '
+    + f.cmp.toFixed(1) + '% is the take on the PSC/Concession contracts alone — the figure to '
+    + 'carry into a comparison, and the same one the Screener ceiling, Side-by-Side ordering and '
+    + 'the Country Profile IC memo use. The published blend is printed beneath it and is unchanged.';
+}
+
+// The right-hand take chip used by the ranked table cell and the three ranked cards.
+function _rrTakeChip(country, take75, forCell, takeColor) {
+  // takeColor is passed in, not closed over: it is a block-scoped const declared three
+  // times in this file with three different band definitions, and this helper sits in a
+  // different inline <script> from its call sites. Passing it keeps the colour bands
+  // byte-identical to what the ranked table and cards drew before.
+  var f = _rrFeeCmp(country);
+  var pad = forCell ? 'padding:5px 8px;' : '';
+  if (take75 == null) {
+    return forCell
+      ? '<td style="' + pad + 'font-size:12px;text-align:right;color:' + takeColor(null) + ';font-weight:400;">—</td>'
+      : '<span style="font-size:12px;color:' + takeColor(null) + ';font-weight:600;white-space:nowrap;">—</span>';
+  }
+  var inner;
+  if (f) {
+    inner = '<span style="color:' + takeColor(f.cmp) + ';font-weight:600;">' + f.cmp.toFixed(1) + '%</span>'
+          + '<span style="color:var(--orange);font-weight:700;font-size:10px;"> ⊘ cmp</span>'
+          + '<div style="font-size:9px;color:var(--muted);font-weight:400;line-height:1.35;">blend ' + f.head.toFixed(1) + '%</div>';
+  } else {
+    inner = '<span style="color:' + takeColor(take75) + ';font-weight:600;">' + take75.toFixed(1) + '%</span>';
+  }
+  var ttl = f ? ' title="' + _rrEsc(_rrFeeTitle(country, f)).replace(/"/g, '&quot;') + '"' : '';
+  var cur = f ? 'cursor:help;' : '';
+  return forCell
+    ? '<td style="' + pad + 'font-size:12px;text-align:right;' + cur + '"' + ttl + '>' + inner + '</td>'
+    : '<span style="font-size:12px;white-space:nowrap;' + cur + '"' + ttl + '>' + inner + '</span>';
+}
+
+// The verdict card's Govt Take block. Same two-zone form as the chip, at card scale.
+function _rrTakeBlock(country, takeTxt) {
+  var f = _rrFeeCmp(country);
+  var head = '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>';
+  if (!f) {
+    return '<div>' + head + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + takeTxt + '</div></div>';
+  }
+  var ttl = _rrEsc(_rrFeeTitle(country, f)).replace(/"/g, '&quot;');
+  return '<div style="cursor:help;" title="' + ttl + '">' + head
+    + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + f.cmp.toFixed(1) + '%'
+    + '<span style="font-size:10px;font-weight:700;color:var(--orange);"> ⊘ comparable</span></div>'
+    + '<div style="font-size:10px;color:var(--muted);line-height:1.45;max-width:230px;">published blend <strong style="color:var(--text);">'
+    + f.head.toFixed(1) + '%</strong> — ' + Number(f.n2).toLocaleString() + ' of '
+    + Number(f.n1 + f.n2).toLocaleString() + ' contracts are ' + f.mechs
+    + ', where the contractor is paid a fixed fee and keeps no price upside. Carry '
+    + f.cmp.toFixed(1) + '% into any cross-country comparison.</div></div>';
+}
+
 function _rrVerdictHead(title, mb) {
   var head = '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:' + mb + 'px;">' + title + '</div>';
   var r = window._rrReturn;
@@ -52591,8 +52699,7 @@ function renderReformCountryVerdict() {
             + '<div id="rr-fp-bound" style="display:none;"></div>'
             + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
           : '')
-      + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
-      + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
+      + _rrTakeBlock(c, take)
       + '</div>'
       + '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;">'
       + (fpDisp.state === 'monopoly'
@@ -52750,8 +52857,7 @@ function renderReformCountryVerdict() {
           + '<div id="rr-fp-bound" style="display:none;"></div>'
           + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
         : '')
-    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
-    + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
+    + _rrTakeBlock(c, take)
     + '</div>'
     + _rrLatestLine(events, latest)
     // v598 (T4): the events themselves, on the tab three other surfaces send the analyst to
@@ -53008,7 +53114,7 @@ function renderReformRisk() {
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform Frequency Score (0\u2013100). Formula: 100 \u2212 (reforms since 2010 \xd7 15). Score 100 = no reforms since 2010 (most stable); 70 = 2 reforms; 55 = 3 reforms; 40 = 4 reforms; 0 = 7+ reforms (most volatile). This measures reform frequency only. Note: the Fiscal Predictability Score in Country Profile is different \u2014 it additionally factors price swing and within-country fiscal term consistency (IQR across contracts). Use both signals together for IC analysis.">Reform Frequency<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">since 2010</span> \u24d8</th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Direction of each sourced event. &#8593; take raised &#183; &#8595; take cut &#183; ? a sourced fiscal law change whose take impact ORCA has not quantified (direction unknown, NOT neutral) &#183; &#183;N events that changed no fiscal terms. The verdict beneath the counts is asserted only where the unmeasured changes could not overturn it.">Direction</th>'
-    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Government take at $75/bbl, production-weighted, on the basis this platform ranks on. Where a country&#39;s published take blends fee-basis contracts (TSC / RSC / Buy-back) with PSC/Concession contracts, the cell prints the PSC/Concession figure marked &#8856; cmp with the published blend beneath it — on a fee-basis contract the contractor is paid a fixed $/bbl fee and keeps no price upside, so take% rises toward 97–99% as an artefact of the contract structure and is not comparable across countries. 4 of the 21 rows are corrected: Iraq 84.8% blend &rarr; 34.1% comparable (415 of 610 contracts are TSC), Ecuador 46.5% &rarr; 39.3%, Mexico 32.2% &rarr; 29.7%, India 61.9% &rarr; 63.2%. The correction is symmetric — India&#39;s goes up — and uses the same _scFeeCmpAt() basis as the Screener take ceiling, Side-by-Side ordering and the Country Profile IC memo. This column is NOT the ranking key; the table ranks on Since 2010. Hover a corrected cell for its contract split.">Take @$75 \u24d8</th>'
     + '</tr></thead>'
     + '<tbody>'
     + (function () {
@@ -53101,7 +53207,7 @@ function renderReformRisk() {
           + '</td>'
           + scoreCell(r)
           + '<td style="padding:5px 8px;font-size:12px;text-align:center;vertical-align:top;max-width:140px;">' + dirHtml + '</td>'
-          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</td>'
+          + _rrTakeChip(r.country, r.take75, true, takeColor)
           + '</tr>';
         }).join('');
       })()
@@ -53359,7 +53465,7 @@ function renderReformRisk() {
     return '<div style="padding:6px 0;border-bottom:1px solid var(--border);' + (demoted ? 'opacity:.92;' : '') + '">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
       + _rrRowBtn(ec, r.country)
-      + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;white-space:nowrap;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</span>'
+      + _rrTakeChip(r.country, r.take75, false, takeColor)
       + '</div>'
       + windowLine
       + '<div style="font-size:10px;line-height:1.5;margin-top:2px;">' + note + '</div>'
@@ -53408,7 +53514,7 @@ function renderReformRisk() {
     return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
       + _rrRowBtn(ec, r.country)
-      + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;white-space:nowrap;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span>'
+      + _rrTakeChip(r.country, r.take75, false, takeColor)
       + '</div>'
       + '<div style="font-size:10px;line-height:1.5;margin-top:2px;">'
       + '<span style="color:var(--orange);font-weight:700;">2 changes since 2010</span>'
@@ -53464,7 +53570,7 @@ function renderReformRisk() {
             return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">'
               + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
               + _rrRowBtn(ec, r.country)
-              + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;white-space:nowrap;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</span>'
+              + _rrTakeChip(r.country, r.take75, false, takeColor)
               + '</div>'
               + '<div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:2px;">'
               + '<span style="color:var(--red);font-weight:700;">' + r.since2010 + ' changes since 2010</span> · ' + yrs.join(', ')
