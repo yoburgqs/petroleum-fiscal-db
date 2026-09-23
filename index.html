@@ -2236,9 +2236,31 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
    Wrapped to 900px, which is a no-op at the top of that band because `flex-wrap: wrap` only
    breaks a line that does not fit. Nothing at >=901px changes, and the ≤720px rule above is
    untouched — not removed, not weakened, not narrowed. ── */
-@media (max-width: 900px) {
-  #cp-evidence-panel summary { flex-wrap: wrap; row-gap: 6px; }
-}
+/* ── v993b (T2) — the same strip, the same defect, one country further out ──────────────
+   v992b measured this band on the country the page loads by default and hard-coded the result
+   as a 900px breakpoint. But the strip's width is a function of its CHIP TEXT, which is
+   per-country, so a single measured number can only ever be right for the country it was
+   measured on. Nigeria's nine chips carry longer strings — "no source behind the model opens →"
+   is 206px against Indonesia's 154, "⚠ engine ran 3 other rates →" 166 — and need 1168px, not
+   the ~958px v992b measured. At 1024 x 768 that puts the summary 186px past its 982px box while
+   `flex-wrap: nowrap` still applies, and `documentElement.scrollWidth` reads 1189 against a
+   1024 client width: the whole page scrolls sideways on a laptop, on one of the six widths the
+   DIRECTIVE names as a hard finalization criterion.
+
+   NOT authored by this cycle. A/B'd against the pre-change build served from this same repo
+   root (`_before_t2.html`): both read doc 1189/1024 and summary 1168/982 on Nigeria, identical.
+   The v993 verdict edit above is geometry-neutral.
+
+   Fixed by making the wrap content-driven instead of breakpoint-driven. `flex-wrap: wrap` only
+   breaks a line that does not already fit, so at every width where the strip fits — 1280, 1440,
+   1920, and ≤900 on the short-chip countries — this is a no-op and the rendered layout is
+   byte-identical. Where it does not fit, it wraps instead of overflowing the document. No third
+   hand-measured number to go stale on country number three.
+
+   Both existing rules are left in place and untouched: the ≤720px rule inside the v612 MOBILE
+   LAYER is not removed, weakened or narrowed, and this rule is a strict superset of the ≤900px
+   one it replaces. ── */
+#cp-evidence-panel summary { flex-wrap: wrap; row-gap: 6px; }
 
 @media (max-width: 390px) {
   .dd-take-grid { grid-template-columns: 1fr 1fr; }
@@ -46649,12 +46671,67 @@ function loadCountryProfile(country) {
         + _dsFrag648 + ' of ' + _dsTot648 + ' published regimes do; viability depends on the price environment'
         + (_hasPos648 ? '. On terms alone, ' + _posClause648 : '');
       charColor = 'var(--yellow)';
-    } else if (take > 75 && swing != null && swing > 20) {
-      charLabel = 'Challenging entry — high take with strong price sensitivity; fiscal exposure rises sharply above $75/bbl';
-      charColor = 'var(--red)';
     } else if (take > 75) {
-      charLabel = 'High fiscal burden — government captures the majority of project economics; NOC/state-dominant structure';
-      charColor = 'var(--orange)';
+      // ── v993 (T2): the last two branches in this chain still carrying the raw v470 string ──
+      // These were the only branches left that print NO measured content — no take, no tier, no
+      // producer position, no statutory-model clause — and one of them asserted a MECHANIC the
+      // data does not hold. v648 / v663 / v760 / v946 rebuilt every other branch for exactly this
+      // defect and each stopped short of this one, because it sits last in the if-chain.
+      //
+      // Counted live against COUNTRY_DATA: `take > 75` on the comparable take reaches SEVEN
+      // countries, three of which (Bahrain, Kuwait, Saudi Arabia at 100.0%) are state monopolies
+      // this whole function never runs for. The live cohort is four — Nigeria 81.1%, Uzbekistan
+      // 85.6%, Turkmenistan 87.2%, Oman 75.6% — and Nigeria is an 834-contract jurisdiction with
+      // real production coverage that an IOC screens every cycle.
+      //
+      // "NOC/state-dominant structure" was fired off `take > 75` and nothing else. Swept over the
+      // whole dataset, the mechanics ORCA actually files are Concession, PSC, Gross Split, RSC,
+      // TSC, Buy-back, India RSC and PRRT: there is NO NOC or state-dominant mechanic anywhere in
+      // mech_mix, so the claim is unsupportable for every country it can ever fire on. All four in
+      // the live cohort are 100% Concession/PSC/RSC — Nigeria is 671 Concession + 163 PSC, and its
+      // own Fiscal Regime Breakdown four inches down the same page says so. The page asserted a
+      // structure its own table contradicts, at the point the analyst forms the view.
+      //
+      // The `swing > 20` variant ("Challenging entry … rises sharply above $75/bbl") fires for
+      // ZERO countries — the widest swing in the cohort is Nigeria's 12.7pp — and it described a
+      // direction above $75 off a figure measured $50→$125. Folded in as a conditional clause
+      // rather than left as a dead branch asserting an unmeasured slope.
+      //
+      // No new threshold: the tier names are v589's (the same ones the headline paragraph prints
+      // two lines below, so the two cannot state different bands), the producer position is
+      // _posClause648, the no-production clause is v663's, and the mechanic mix is the record's
+      // own mech_mix — the array cpRegimeRows() and the breakdown table below already render.
+      _posInLabel648 = _hasPos648;
+      var _mx993 = (d && Array.isArray(d.mech_mix)) ? d.mech_mix.slice() : [];
+      _mx993.sort(function(a, b) { return (b.n || 0) - (a.n || 0); });
+      var _named993 = _mx993.filter(function(x) { return x && x.m && (x.n || 0) > 0; });
+      // A filed mechanic that actually denotes state/NOC operatorship. None exists in the current
+      // dataset; computed rather than assumed so the sentence stays true if one is ever harvested.
+      var _nocFiled993 = _named993.some(function(x) { return /noc|state|national/i.test(x.m); });
+      var _mechStr993 = _named993.slice(0, 3).map(function(x) {
+        return Number(x.n).toLocaleString() + ' ' + x.m;
+      }).join(_named993.length === 2 ? ' and ' : ', ');
+      var _structClause993 = (_named993.length && !_nocFiled993)
+        ? ' The contracts ORCA holds here are ' + _mechStr993
+          + ' — no NOC or state-operated mechanic is filed against this country, so read the tier '
+          + 'as a take LEVEL, not as a structure.'
+        : '';
+      charLabel = 'High-take regime — at ' + take.toFixed(1) + '% the $75 base sits in the '
+        + 'NOC-dominated tier (>75%), the same band the headline below prints'
+        + (_hasPos648 ? ', and ' + _posClause648 : '') + '.'
+        + _structClause993
+        + (swing != null
+            ? ' Government take ' + (swing > 20 ? 'then rises ' : 'moves ') + swing.toFixed(1)
+              + 'pp from $50 to $125/bbl — the Price Swing figure on this page'
+              + (swing > 20
+                  ? ', so the contractor keeps a smaller share of the barrel as price climbs.'
+                  : ', so the level is the finding here and the deck you screen at barely moves it.')
+            : '')
+        + (_noProd663
+            ? ' No verified block-level production is held here, so the take is a statutory model '
+              + 'over ' + _nStr663 + ' — directional, not realised.'
+            : '');
+      charColor = (swing != null && swing > 20) ? 'var(--red)' : 'var(--orange)';
     } else if (swing != null && swing > 20) {
       // ── v946 (T2): "mid-range base take" was a level this branch never measured ───────
       // This branch is selected by `swing != null && swing > 20` and is reached only once the
