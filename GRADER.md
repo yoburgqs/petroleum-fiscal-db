@@ -66425,3 +66425,18 @@ Guide". Re-probed by id: open. The probe was wrong, not the lock.)*
   `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/`
   is idle.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
+
+---
+## Cycle 915 Log — 2026-09-22 20:42
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 915 complete. `v989` shipped and pushed.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation (914 was T4; T5 last ran at 907). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared and page reloaded before each walk.
+
+## Friction
+I took the route the tab's own IC Analyst Interpretation Guide prescribes: Fiscal Compare → click a row → 4-price drilldown → **"Copy 4-price as IC table"** → paste into the memo.
+
+That button called `navigator
