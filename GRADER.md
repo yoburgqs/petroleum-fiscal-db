@@ -66623,3 +66623,16 @@ panel at all for the first time. On a phone the control is 44px instead of 18px.
 - **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
 
 ---
+
+---
+## Cycle 918 Log — 2026-09-23 00:36
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed. Cycle complete.
+
+## Cycle 916 — v990
+
+**Task: T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (last run at cycle 910; 915 was T5). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and the page reloaded before each pass.
+
+**Friction.** For the *take*, this platform is excellent and I found nothing worth a cycle — three independent controls reach its provenance and all three land on a per-term Evidence Chain naming the ORCA
