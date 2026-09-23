@@ -68749,7 +68749,37 @@ function copyFCForIC(btn) {
       r.mechanic || '',
       num(_feeAt[c] ? _feeAt[c].cmp : dv, 1),   // v777 (T5): the figure the # rank is built on
       mono ? '' : num(meta['npv_' + P], 0),
-      hasBe ? num(_fcBe(r), 1) : '',   // v895 (T5): the resolved figure, matching the caption's count
+      // ── v994 (T5) ─ the same blank-cell defect v914 fixed on the Screener, on Fiscal Compare ──
+      // Walked T5 cold at 1440x900, storage cleared: tick Saudi Arabia, Angola and Norway on
+      // Fiscal Compare and press ⎘ Copy for IC Memo. Measured on the pasted artifact, the
+      // Breakeven column came back
+      //     Angola        ""      <- ORCA holds no modelled breakeven
+      //     Norway        "28.7"
+      //     Saudi Arabia  ""      <- 100% government take, no contractor position to break even
+      // Two different facts, rendered as the same empty cell, in the document that goes to the
+      // investment committee. v914's finding applies verbatim here and its reasoning is the
+      // reason this one is worse rather than cosmetic: "no contractor position" is a property of
+      // the regime and is FINAL, while "not modelled" is missing cost data that may fill in
+      // later — an IC reader who reads one as the other draws the opposite conclusion about
+      // whether the number can ever arrive.
+      //
+      // And exactly as on the Screener, Fiscal Compare has NO breakeven column on screen — its
+      // own table legend says so in terms ("Breakeven is not a column on this table and not a
+      // filter") — so nothing warns the analyst before it is in the memo. The first sight of
+      // either state is the blank cell in Word.
+      //
+      // The caption above the table already counts the populated rows ("Breakeven is populated
+      // for 1 of these 3 rows"), but a count 1.5 pages up does not tell a reviewer which of two
+      // things THIS cell means, and the two reference columns beside it are legitimately blank
+      // by design (v664), so blankness carries no single meaning in this table.
+      //
+      // Same three states and the SAME STRINGS the Screener's breakeven cell has emitted since
+      // v873/v914, so one memo built from both tabs cannot show two vocabularies for one fact.
+      // No new threshold and no new column: `hasBe` and `mono` are both already computed above
+      // for the caption's own counts.
+      hasBe ? num(_fcBe(r), 1)
+        : mono ? 'n/a — 100% govt take, no contractor position to break even'
+               : '— not modelled',
       num(r.swing, 1),
       mono ? '' : num(r.liveTake, 1),
       mono ? '' : num(r.liveNPV, 0),
@@ -68817,9 +68847,27 @@ function copyFCForIC(btn) {
     // file for more non-producers than producers, and the driver is not recorded anywhere this
     // page can read. A memo should not carry a reason the tool cannot support, so it states the
     // coverage and points at the downside figure that IS present on every row.
+    // v994 (T5): the cells no longer sit blank, so the caption may no longer say a reason is not
+    // given. It now names the same two states the cells do, and counts them, so the sentence and
+    // the column cannot drift apart. nNotMod is derived rather than assumed: hasBe already
+    // excludes monopoly rows, so the unpopulated remainder is exactly nMono + nNotMod.
     + ' Breakeven is populated for ' + nBe + ' of these ' + N + ' row' + (N === 1 ? '' : 's')
-    + '; ORCA does not hold a modelled breakeven for the rest, and no reason for the gap is recorded '
-    + 'in the database, so none is given here. Use the $50/bbl contractor NPV column as the downside test.';
+    + ((N - nBe) > 0
+        ? '; the other ' + (N - nBe) + ' name the reason in the cell rather than sitting blank'
+          + ((N - nBe - nMono) > 0
+              ? ' \u2014 \u201c\u2014 not modelled\u201d on ' + (N - nBe - nMono) + ' of them, where ORCA holds no '
+                + 'modelled breakeven and no reason for that gap is recorded in the database, so none '
+                + 'is given here'
+              : '')
+          + (nMono
+              ? ((N - nBe - nMono) > 0 ? '; and ' : ' \u2014 ')
+                + '\u201cn/a\u201d on the ' + nMono + ' state-monopoly row' + (nMono === 1 ? '' : 's')
+                + ', where government take is 100% and there is no contractor position to break even. '
+                + 'That is a property of the regime and is final; \u201cnot modelled\u201d is missing cost '
+                + 'data that may fill in later. Do not read the two as the same absence'
+              : '')
+        : '')
+    + '. Use the $50/bbl contractor NPV column as the downside test.';
   var warn = '';
   if (nGeneric) warn += nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. '
     + (_isShortlist
