@@ -66778,3 +66778,14 @@ logging that rather than inventing a change.
 - **Suite copies remain diverged** — graded copy is `office/tools/petroleum/tests/`.
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch
   renders still in the repo root.
+
+---
+## Cycle 922 Log — 2026-09-23 05:44
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Everything is committed, pushed, and live.
+
+## Cycle 922
+
+**The cycle's first finding wasn't a UX problem.** `index.html` was dirty on arrival — 238 uncommitted insertions labelled v991. `cycle_log.txt` explained it: **cycles 917, 919, 920 and 921 all died on `subprocess.TimeoutExpired` at 1800s**, each having edited the tree but never committing. Four of the last six cycles shipped nothing while the status emails read `Cycle 918 — 500 PASS / 0 FAIL`, because the suite runs *befo
