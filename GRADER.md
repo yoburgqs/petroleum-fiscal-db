@@ -66246,3 +66246,182 @@ correction into the memo.
 **T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in rotation (913 was T1, 912 T2, 911 T3, 910 T6, 907 T5; T4 last at 906). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared.
 
 The reform half of T4 turned out to be in good shape — the 164 unscored jurisdictions get a full "no score, here's the statute to check" card, the lookup is grouped 
+
+---
+## Cycle 915 Log — 2026-09-23
+
+- **Test before:** 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- **Test after:** **500 PASS / 0 FAIL / 0 WARN / 0 JS errors** — the suite
+  **RAN this cycle** against the modified tree
+  (`TEST_URL=http://127.0.0.1:8991/petroleum-fiscal-db/index.html`, graded copy
+  `office/tools/petroleum/tests/runtime_comprehensive.js`), and the number is read
+  from the suite's own report file, timestamped **`2026-09-23T01:32:07.581Z`**.
+  The report present *before* the run was stamped `01:10:45Z` — stale, from a prior
+  cycle — so it was deliberately not read; the run was launched at `01:24:48Z` and
+  the file was only trusted once its timestamp moved past that.
+- **Shipped:** `v989`, commit `57e98de`, pushed to `origin/main`. Mirror at
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html` byte-identical
+  (`af58513c11f961e25f5b8b37fbd42e94`).
+- **JS syntax gate:** PASS — 11 inline blocks, 0 errors (run twice: after the change, and again after the version bump)
+
+### Task
+
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in
+rotation: 914 was T4, 913 T1, 912 T2, 911 T3, 910 T6 — T5 last ran at 907.
+Walked cold at 1440×900 and 390×844 `hasTouch`, `sessionStorage` and
+`localStorage` cleared and the page reloaded before every walk.
+
+### Friction
+
+The walk took the route the tab's own IC Analyst Interpretation Guide
+prescribes: Fiscal Compare → click a row → 4-price drilldown → **"Copy 4-price
+as IC table"** (`#fc-drilldown-copy-<slug>`, built at index.html:64028) → paste
+into the memo.
+
+That button wrote **`navigator.clipboard.writeText()` — text/plain only.**
+Measured cold on the shipped build with `navigator.clipboard` shimmed to read
+the artifact back, the offered flavours were `["text/plain"]`.
+
+Pasted into Word, Google Docs, Outlook or PowerPoint that is not a table. It is
+five or six run-on lines of tab characters, ragged and unaligned — from the one
+control on the platform whose own label is the word **table**, on the centerpiece
+tab, reached by the exact route a first-time analyst is told to take.
+
+It was the **last table-shaped IC payload on the platform still doing this.**
+Measured, same cold session, same shim, every sibling surface:
+
+| surface | clipboard flavours |
+|---|---|
+| Country Profile — "Copy as IC table" (v690) | **RICH** — `text/html` + `text/plain` |
+| Country Profile — "Copy for IC Memo" | **RICH** |
+| Side-by-Side — "Copy for IC Memo" (v503) | **RICH** |
+| IOC Portfolio — "Copy for IC Memo" | **RICH** |
+| Screener — "Copy for IC Memo" (v728) | **RICH** |
+| **Fiscal Compare drilldown — "Copy 4-price as IC table"** | **TEXT-ONLY** |
+
+The Country Profile row is the decisive one. `cpCopyICTable()` is this button's
+**twin** — the same label, the same 4-price matrix, and the v460 comment on the
+drilldown says so in as many words ("matches the CP 4-price table copy button").
+The twin was upgraded to rich copy at v690, whose comment names this precise
+defect and lists the siblings already fixed. The drilldown was not on that list
+and was left behind.
+
+The fee-basis variant was the worst case: that branch is **six** columns with
+sentence-length headers ("Published take% (all 610 contracts, blends TSC 415
+fee-basis — not comparable across countries)"), so the ragged paste was widest
+exactly where the Group-2 comparability correction has to survive into the memo.
+
+IC Citation buttons are one-line cite strings and are correctly text-only. They
+were left alone.
+
+### Change
+
+`v989`. The drilldown now builds its payload **once** as structure — header cells,
+body rows, tail lines — stashes it on `window.__FC_IC_TBL[slug]`, and both
+clipboard flavours are derived from that one payload in a new
+`fcCopyDrilldownICTable()`, placed beside its twin `cpCopyICTable()`. Same
+one-source-two-renderings rule v696 applies to the vintage bars and their CSV, so
+the table Word lays out cannot drift from the columns Excel receives.
+
+- `text/html` — bordered Calibri 10pt table, bold price column, shaded header row;
+  the tail lines follow as paragraphs, with the `NOTE:` divergence line in bold amber.
+- `text/plain` — **byte-identical to what the button produced before.** Verified by
+  md5 on Norway: `7c4924f3299057ffb8d6e1902eb40682` before and after. Nothing added
+  to the TSV, nothing dropped, Excel behaviour unchanged.
+- The payload is stashed rather than serialised into the `onclick` attribute,
+  because the HTML flavour carries `style="..."` on every cell — the same reason
+  `window.__CP_IC_TBL` exists on the twin.
+
+### Result
+
+An analyst on Fiscal Compare can open any country's drilldown, press "Copy 4-price
+as IC table", and paste a **formatted table** straight into the IC memo — the
+4-price take/Δ/NPV/breakeven matrix as a real table in Word, Docs, Outlook and
+PowerPoint, and still as columns in Excel. On a fee-basis country such as Iraq the
+6-column comparable-vs-published split arrives as six aligned columns with the
+"CITE THIS" instruction in the header and the 33.1pp divergence NOTE bolded
+beneath, instead of a run-on line the analyst had to re-type or re-table by hand.
+
+### Verification — every figure measured this cycle
+
+- **Clipboard proved by execution**, cold load, shim reading the artifact back.
+  Six countries spanning both branches:
+
+  | country | branch | flavours | `<th>` | `<td>` | text len |
+  |---|---|---|---|---|---|
+  | Norway | standard | `text/html` + `text/plain` | 5 | 20 | 983 |
+  | Iraq | fee-basis | `text/html` + `text/plain` | **6** | **24** | 1450 |
+  | Indonesia | standard | `text/html` + `text/plain` | 5 | 20 | 877 |
+  | Bahrain | standard | `text/html` + `text/plain` | 5 | 20 | 1137 |
+  | Malaysia | fee-basis | `text/html` + `text/plain` | **6** | **24** | 1316 |
+  | Cyprus | standard | `text/html` + `text/plain` | 5 | 20 | 1267 |
+
+  4 price rows × the branch's column count in every case. **0 page errors,
+  0 console errors** across all six.
+- **TSV byte-identity:** Norway before `7c4924f3299057ffb8d6e1902eb40682`,
+  after `7c4924f3299057ffb8d6e1902eb40682`. `diff` reports no difference.
+- **Iraq's rendered HTML read back as text** to confirm the content survived:
+  the ⚖ comparable column (28.6 / 34.1 / 37.8 / 39.7), the published blend
+  (81.5 / 84.8 / 86.9 / 88.1), the like-for-like NPV line, the 33.1pp NOTE, the
+  11.6% production-coverage basis and the IRR note are all present and in order.
+- **Mobile 390×844 `hasTouch: true`:** `scrollWidth == clientWidth` (390/390) on
+  **all 10 tabs**, and with the Norway drilldown open. The touched control is
+  **44px** tall, 154px wide, right edge 314 inside the 390 viewport. All **10**
+  drawer buttons ≥ 24px under `pointer: coarse`, **0 under**.
+- **Diff is contained:** index.html +126 / −21, one function added and one
+  payload builder restructured. No other file touched.
+
+### Locks verified held, not assumed
+
+| lock | probe | outcome |
+|---|---|---|
+| tab order | 10 `.tab-btn` labels | unchanged, Home → Sample Analyses |
+| v371/v373 declutter | `#screener-advanced-details` | still collapsed on cold load |
+| v371/v373 preset dropdown | `#screener-preset-select` | still a `SELECT` |
+| v430 | `#fc-ic-ref` | still `open` on cold load |
+| v451 | FC headers | Govt NPV still **removed**; `NPV ($M)` headers intact |
+| v489 | Home card grid | Reform Risk still present |
+| v612 mobile layer | `#reference-panel` | `right: 0px` (**not** negative) |
+
+*(The first pass of the v430 probe reported MISSING — the probe searched for the
+string "IC Analyst Guide" and the element is labelled "IC Analyst **Interpretation**
+Guide". Re-probed by id: open. The probe was wrong, not the lock.)*
+
+### Noted on this walk, not fixed
+
+- **Screener "Copy for IC Memo" on a cold load is a three-click, long-wait path.**
+  The first click enters `_scTermGate()`, which prefetches the source record for
+  every country in the screen (185 on a cold load, 8 concurrent, 20s cap) before
+  anything reaches the clipboard; the second click arms the bulk-copy confirm; the
+  third copies. Each step is individually justified — v940 already narrowed the
+  prefetch to the ticked set, and the v828 arm exists to stop a 185-row "shortlist"
+  landing in a memo — but stacked on an unfiltered cold load they read as a dead
+  button for the first several seconds. Not changed this cycle: it is a
+  deliberate guard and re-opening it needs its own walk.
+
+### Carried forward, still open
+
+- Reform Risk *Regional Reform Tilt* `Avg Stability` and the heatmap still have no
+  comparability dimension (914).
+- The `take > 75` Country Profile branch (Nigeria, Oman, Turkmenistan, Uzbekistan)
+  carries no take figure, no swing figure and no evidence-basis clause (912).
+- `window._screenerExportBasis` still does not name the 105 countries withheld on
+  data basis in the XLSX/CSV/IC-memo export (913).
+- The four `.cmp-quickstart-btn` benchmark sets unreachable on a cold load (912).
+- `Take spread across contracts` renders Guyana two ways depending on the set (911).
+- Scenario Builder paste's bare `41.1%` IRR row (907).
+- `_fpCohortLine()` one-term cohort rank computed from the refuted score (906).
+- Deck-change inversion disclosed on the Screener only (905).
+- Side-by-Side take-ordering chain places a duplicate jurisdiction column (904).
+- Country Profile rank pills compute Australia against production-basis takes (903).
+- Evidence Quality summary vs Evidence Chain population labels (902); missing
+  index-only tally (893).
+- Regional-extreme cue on Nigeria / Norway / Australia (884, 891).
+- Explorer chip labelled "Asia" for a 42-record `Asia Pacific` set (891).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- IC-memo pastes for Screener, Side-by-Side, Country Profile, IOC Portfolio not
+  measured against a page width (901).
+- **Suite copies remain diverged** — the graded copy that runs is
+  `office/tools/petroleum/tests/runtime_comprehensive.js`; `petroleum-fiscal-db/tests/`
+  is idle.
+- **`_ctl907.html`** — 9.7 MB untracked scratch render from cycle 907, still in place.
