@@ -67051,3 +67051,16 @@ without leaving the table, and cannot silently read one as the other.
   deliberate pattern as the FC dock, so this is redundancy rather than a defect.
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still
   in the repo root.
+
+---
+## Cycle 925 Log — 2026-09-23 23:53
+- Test before: 500 PASS / 0 FAIL
+- Test after: 461 PASS / 5 FAIL
+- JS errors: 7
+- Summary: Cycle 924 complete. Two things shipped.
+
+## First: recovered work that was about to be lost (v993/v993b, T2)
+
+The working tree held an uncommitted 93-line diff from a prior cycle killed at the 1800s harness limit. I verified it against the data and a live browser rather than trusting its own comments, then committed it:
+
+- **"NOC/state-dominant structure" was unsupportable.** Swept `mech_mix` across all 185 records — the filed mechanics are Concession, PSC, Gross Split, RSC, TSC, Buy-back, India
