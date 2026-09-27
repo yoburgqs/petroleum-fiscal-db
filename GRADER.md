@@ -67064,3 +67064,124 @@ without leaving the table, and cannot silently read one as the other.
 The working tree held an uncommitted 93-line diff from a prior cycle killed at the 1800s harness limit. I verified it against the data and a live browser rather than trusting its own comments, then committed it:
 
 - **"NOC/state-dominant structure" was unsupportable.** Swept `mech_mix` across all 185 records — the filed mechanics are Concession, PSC, Gross Split, RSC, TSC, Buy-back, India
+
+---
+## Cycle 927 Log — 2026-09-27
+
+- Test before: 0 PASS / 0 FAIL (the harness recorded nothing — see HARNESS below)
+- Test after: **499 PASS / 0 FAIL / 1 WARN**, read from the suite's own report file,
+  run against the LOCAL tree via `TEST_URL=http://localhost:8971/index.html`.
+- JS errors captured: 15, all one repeated 404 for `/petroleum-fiscal-db/sw.js` — the
+  service worker's GitHub Pages path, which does not exist when the repo root is served
+  on localhost. Harness artefact, present at baseline, unrelated to either diff.
+- JS syntax gate: PASS (11 inline blocks).
+
+Two things shipped.
+
+### First: recovered work that was about to be lost (v995, T6)
+
+The working tree held an uncommitted 38-line diff from a cycle killed at the 1800s harness
+limit. Re-verified against the shipped data and in a live browser before committing rather
+than trusted from its own comments — and the verification mattered, because the first
+measurement pass got `_EV_ORDER` backwards and had to be redone against the real
+`['d','c','b','a']`. On the correct order its three claims hold exactly: **80 of 185**
+countries are graded by the DEPTH leg, **79 of those 80** would grade A on sourcing alone,
+and **25** printed a literal "100% primary law" beside a C or D letter.
+
+`#cp-ic-ev-pill` printed only the SOURCING leg of a two-leg grade, inside the box the page
+stamps IC MEMO. Falkland Islands read "Evidence C · 100% primary law · n=8"; the `n=` was
+the CONTRACT count sitting beside a percentage OF FACTS, on a 16-fact base. It now leads
+with the binding leg and carries `_evidenceGrade()`'s own label — "Evidence C · very thin
+fact base · 16 facts · 100% primary law" — in the vocabulary `#cp-evidence-panel` has used
+since v619. Rendered live for Falkland Islands / Norway / Netherlands / CAR; letter, colour
+and the v899 model-term chip unchanged.
+
+### Then this cycle's own walk (v996, T1)
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* Rotation: the tail
+was T6 (v995), T5, T2, T4, T3, so T1.
+
+**Walked cold**, both storages cleared, Home → Screener at 1440x900 and 390x844 `hasTouch`.
+
+Most of the T1 surface is genuinely finished-grade and is recorded as such rather than
+re-worked. Measured, not assumed: the three-band structure is sound — 22 production-verified,
+118 proxy, 45 floor-take, summing to 185 — each band under its own explanatory divider, with
+`≥` on the take cell and `≤` on the NPV cell of every floor row, and `F`/`P` rank prefixes.
+Mechanic comparability is handled correctly: Iraq shows "84.8% PSC/Conc 34.1%".
+
+**Friction (the one worst moment).** Every per-axis counter filtered raw `COUNTRY_DATA` and
+printed a hard-wired "of 185": the take ceiling (`#sc-take-n`, v692), both NPV floors
+(`paint()`, v617) and the evidence axis (`#sc-evid-n`, v681). The two data-basis checkboxes
+ARE the T1 question, and none of the four counters read them.
+
+The page's own one-click move — the count-bar button "163 of 185 are proxy → **Production-backed
+only (22)**", `_scSetBasis(false)` — declares a 22-country universe. From there:
+
+| control | table | axis counter said |
+|---|---|---|
+| Max Govt Take 40 | 8 of 22 | `110 of 185 clear this` |
+| Min NPV ≥ $1000M | 7 of 22 | `164 of 185 clear this` |
+| Evidence ≥ 60% | **1** of 22 | `55 of 185 clear this` |
+
+Three counters reading 110, 164 and 55 on a screen holding one row.
+
+**And the signal inverted.** These counters drive `.sc-axis-inert`, which greys an axis amber
+once ≥90% of the set clears it, to say *this control is doing no work*. On the same
+22-country screen, **Min NPV ≥ $800M removed 6 of 22 — 27% of the shortlist — and read
+"175 of 185 clear this", painted amber-inert.** The page told the analyst to ignore the floor
+that was deleting a quarter of their candidates. That is worse than a loose number; it points
+the wrong way. Separately, with `sc-floor-keep` unticked at take ≤ 20 the table held 19 rows
+while the counter read "38 of 185" — a 2× disagreement between a counter and the table beside it.
+
+**Change.** New `_scAxisUniverse()` resolves the admissible set from the **same two lines**
+`runScreener()` gates rows with (`!includeProxy && !hasProduction`, `!includeFloor &&
+_scTakeIsFloor`), and all four counters count and divide by it, so a counter and the table
+cannot disagree about who is eligible. Measured after: take reads "8 of 22" against a table
+of 8; Min NPV ≥ $800M reads "16 of 22" and is **no longer amber**; floor-keep unticked at
+take ≤ 20 reads "19 of 140" against a table of 19. The take axis drops its "· N verified"
+tail once the universe is already production-only, where it only restated its own first number.
+
+Deliberately not a new control, and not a new string on the default path: with both boxes
+ticked `_scAxisUniverse()` returns `COUNTRY_DATA` and all four counters render
+**byte-identical** to before — verified at 160/185·14, 110/185·8, 38/185·0, with the NPV amber
+thresholds unmoved. Strings are at or below their previous length ("8 of 22" is shorter than
+"110 of 185"), so the nowrap-in-a-slider-label overflow v681 caused cannot recur.
+
+**Mobile (step 5b).** Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390, the
+last two with `hasTouch`, with all four axes engaged simultaneously so every counter rendered
+its longest string; and again at 390 on the production-only universe. Zero page errors at
+every width. No control added or resized, so the 24px floor is untouched.
+
+**Result.** An analyst who narrows the universe first — the page's own recommended first move
+for T1 — can read how hard each axis is working on the countries they actually admitted, and
+is no longer told that a floor removing a quarter of their shortlist is doing no work.
+
+### Carried forward, still open
+
+- **HARNESS: `claude -p` is killed at 1800s and uncommitted work dies with it.** It happened
+  again — cycle 926 was killed mid-flight and v995 survived only because this cycle checked
+  the tree before starting. Third occurrence. Still the highest-value open item.
+- **HARNESS: the graded suite could not run at all this cycle before being redirected.** Its
+  default `TEST_URL` is the DEPLOYED site and `page.goto` timed out at 45s, so the loop
+  recorded "0 PASS / 0 FAIL" and the gate measured nothing. The same default also means the
+  harness cannot gate the diff it is about to ship. Overridden by hand again.
+- **The two suite copies have diverged** — the loop runs
+  `office/tools/petroleum/tests/runtime_comprehensive.js` (sha 045f00a6dddc) while
+  `petroleum-fiscal-db/tests/runtime_comprehensive.js` (sha e87e483cb5dd) is idle. Edits to
+  the repo copy do not affect the graded result.
+- `petroleum_overnight` chain has emailed FAILED on 2026-09-23/24/25/26/27, and CYCLE-STALE
+  fired on 09-25/26/27. Not investigated this cycle — outside the UX finalization scope, but
+  five consecutive failures should not keep going unread.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at
+  768 and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- Reform Risk decade heatmap caption reads "Top 20 of the 21".
+- The Fiscal Reform History event-log browser lives in the off-tab-bar Vintage pane (`#t4`).
+- Side-by-Side carries two buttons whose output is byte-identical (7,691 chars) — redundancy
+  rather than a defect.
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in
+  the repo root. Left in place: they predate this session and deleting another session's files
+  is not this cycle's call.
