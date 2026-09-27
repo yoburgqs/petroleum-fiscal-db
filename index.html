@@ -46175,10 +46175,40 @@ function loadCountryProfile(country) {
         + 'padding:2px 8px;border-radius:12px;white-space:normal;cursor:pointer;max-width:100%;'
         + 'min-height:24px;box-sizing:border-box;'
         + 'border:1px solid ' + _ev670.color + '55;background:' + _ev670.color + '14;" title="'
-        + _evTip670.replace(/"/g, '&quot;') + '">'
-        + '<strong style="color:' + _ev670.color + ';font-weight:800;white-space:nowrap;">Evidence ' + _ev670.letter + '</strong>'
-        + '<span style="color:var(--muted);white-space:nowrap;">' + _ev670.aPct.toFixed(0) + '% primary law'
-        + (d.n != null ? ' · n=' + Number(d.n).toLocaleString() : '') + '</span>'
+        + _evTip670.replace(/"/g, '&quot;') + '">';
+        // ── v995 (T6): the pill named the leg that was FINE and hid the leg that set the letter ──
+        // _evidenceGrade() takes the WORSE of two legs -- primary-law share and fact depth -- and
+        // already returns which one is binding (`limiter`) and a label keyed on (grade, limiter).
+        // v619 put that reading on the face of the Evidence Quality badge for exactly this reason.
+        // This pill, added at v670, printed only the SOURCING leg, so on every depth-graded country
+        // the two numbers on the face argued the opposite of the letter beside them:
+        //
+        //   Fiji              "Evidence D   100% primary law · n=4"
+        //   UAE — Dubai       "Evidence D   100% primary law · n=2"
+        //   Falkland Islands  "Evidence C   100% primary law · n=8"
+        //
+        // Measured against the shipped country_data.json: 80 of 185 countries are graded by the
+        // DEPTH leg, and on 79 of those 80 the sourcing leg alone would grade A. 25 print a literal
+        // "100% primary law" beside a C or D letter. This is the box the page stamps IC MEMO and the
+        // verdict line beside it says "cite it with the evidence grade on this strip" -- so the
+        // reading an analyst carries out of here is "100% primary-law sourced", off an 8-fact base
+        // ORCA itself grades D.
+        //
+        // Worse, `n=` was the CONTRACT count, not the fact count. It sits directly beside a
+        // percentage OF FACTS, so it reads as that percentage's sample size and is a different
+        // quantity: Central African Republic printed "69% primary law · n=11" on 29 facts, Fiji
+        // "100% · n=4" on 8. The contract count is not lost -- #dd-profile-head prints it one row
+        // below ("834 contracts") and the verdict sentence carries it.
+        //
+        // The pill now carries the label and leads with the BINDING leg, in the same vocabulary
+        // #cp-evidence-panel has used since v619, so one country cannot read two ways on one screen.
+        // The letter, the colour and the v899 model-term chip are unchanged.
+        var _legs995 = (_ev670.limiter === 'depth')
+          ? Number(_ev670.nFacts).toLocaleString() + ' facts \u00b7 ' + _ev670.aPct.toFixed(0) + '% primary law'
+          : _ev670.aPct.toFixed(0) + '% primary law \u00b7 ' + Number(_ev670.nFacts).toLocaleString() + ' facts';
+        _evSeg670 += '<strong style="color:' + _ev670.color + ';font-weight:800;white-space:nowrap;">Evidence ' + _ev670.letter + '</strong>'
+        + '<span style="color:' + _ev670.color + ';font-weight:700;">' + _ev670.label + '</span>'
+        + '<span style="color:var(--muted);">' + _legs995 + '</span>'
         + '<span id="cp-ic-ev-terms"></span>'
         + '</span>';
     }
