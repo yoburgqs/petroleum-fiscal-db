@@ -67185,3 +67185,16 @@ is no longer told that a floor removing a quarter of their shortlist is doing no
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in
   the repo root. Left in place: they predate this session and deleting another session's files
   is not this cycle's call.
+
+---
+## Cycle 927 Log — 2026-09-27 16:12
+- Test before: 0 PASS / 0 FAIL
+- Test after: 471 PASS / 5 FAIL
+- JS errors: 0
+- Summary: Cycle 927 complete. All steps executed; nothing left uncommitted.
+
+## Two things shipped
+
+### First — recovered work that was about to be lost (v995, T6)
+
+The tree held an uncommitted diff from cycle 926, which the harness killed at 1800s. I re-verified it against the shipped data rather than trusting its own comments, and that mattered: my first measurement pass had `_EV_ORDER` backwards. Redone against the real `['d','c','b','a']`, its three claims hold exactly — 80 of 185 countries are graded
