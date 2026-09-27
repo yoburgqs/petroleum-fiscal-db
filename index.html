@@ -36128,6 +36128,63 @@ function _scSetBasis(keepProxy) {
 }
 window._scSetBasis = _scSetBasis;
 
+// ── v996 (T1): the axis counters counted against a universe the analyst had already rejected ──
+// Every per-axis counter -- the take ceiling (v692), both NPV floors (v617, paint() below) and the
+// evidence axis (v681) -- filtered raw COUNTRY_DATA and printed a hard-wired "of 185". The two
+// data-basis checkboxes are the literal T1 control, "which countries should even be on my
+// screening list", and none of the four counters read them.
+//
+// Walked T1 cold and measured. The page's own one-click move -- the count-bar button
+// "163 of 185 are proxy -> Production-backed only (22)", i.e. _scSetBasis(false) -- declares a
+// 22-country universe. Dragging the sliders from there:
+//
+//   Max Govt Take 40   table  8 of 22    axis said "110 of 185 clear this"
+//   Min NPV >= $1000M  table  7 of 22    axis said "164 of 185 clear this"
+//   Evidence >= 60%    table  1 of 22    axis said  "55 of 185 clear this"
+//
+// Three counters reading 110, 164 and 55 on a screen holding ONE row.
+//
+// The counters are not decoration: .sc-axis-inert greys an axis amber once >=90% of the set
+// clears it, to say "this control is doing no work". Against the wrong universe that signal
+// INVERTS. Measured on the same 22-country screen:
+//
+//   Min NPV >= $800M   removes 6 of 22 -- 27% of the shortlist -- and read
+//                      "175 of 185 clear this", painted AMBER-INERT.
+//
+// So the page told the analyst to ignore the floor that was deleting a quarter of their
+// candidates. That is worse than an imprecise number; it is a signal pointing the wrong way.
+//
+// Fix: the counters count on the admissible set, using the SAME two lines runScreener() gates
+// rows with (`!includeProxy && !hasProduction`, `!includeFloor && _scTakeIsFloor`), resolved in
+// one place so a counter and the table cannot disagree about who is eligible. The denominator
+// becomes the universe, so the ratio and the amber threshold are taken on the right base.
+//
+// Deliberately NOT a new control and NOT a new string when nothing is excluded: with both boxes
+// ticked -- the cold default -- _scAxisUniverse() returns COUNTRY_DATA and every counter renders
+// byte-identical to before. The strings also stay at or below their current length ("8 of 22" is
+// shorter than "110 of 185"), because .sc-axis-n is white-space:nowrap inside a slider label and
+// v681 put 36px of horizontal scroll on a phone by writing a long string into one of these spans.
+function _scAxisUniverse() {
+  var all = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  if (!all.length) return all;
+  var keepProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
+  var keepFloor = document.getElementById('sc-floor-keep')?.checked !== false;
+  if (keepProxy && keepFloor) return all;   // cold default -- identical output to pre-v996
+  var out = all.filter(function (d) {
+    if (!keepProxy && !(typeof _dqTier === 'function' && _dqTier(d).hasProduction)) return false;
+    if (!keepFloor && typeof _scTakeIsFloor === 'function' && _scTakeIsFloor(d)) return false;
+    return true;
+  });
+  return out.length ? out : all;   // never divide by zero; a 0-country universe cannot be screened
+}
+window._scAxisUniverse = _scAxisUniverse;
+
+// True once the universe is already production-only, in which case the take axis's
+// "\u00b7 N verified" tail restates its own first number and is dropped rather than repeated.
+function _scAxisUniverseIsVerified() {
+  return document.getElementById('sc-proxy-keep')?.checked === false;
+}
+
 // v500: show/hide the " · no ceiling" / " · no floor" flags next to each slider label so the analyst
 // can see at a glance which sliders are actually constraining the result set and which are inert.
 function _scUpdateNeutralFlags() {
@@ -36209,7 +36266,9 @@ function _scUpdateNeutralFlags() {
       const _tkPrice = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
       const _tkKey   = 'take_' + _tkPrice;
       const _tkCmpOn = (document.getElementById('sc-fee-cmp') || {}).checked !== false;
-      const _tkPass = COUNTRY_DATA.filter(function (d) {
+      // v996: counted on the admissible set, not on all 185. See _scAxisUniverse().
+      const _tkUni  = _scAxisUniverse();
+      const _tkPass = _tkUni.filter(function (d) {
         const _h = d[_tkKey];
         if (_h === null || _h === undefined) return false;
         const _fc = _tkCmpOn ? _scFeeCmpAt(d, _tkPrice) : null;
@@ -36222,12 +36281,14 @@ function _scUpdateNeutralFlags() {
       // "clear this" is load-bearing: like sc-npv-n this is a PER-AXIS count, not the size of the
       // result set. Under a preset that also filters region or mechanic the two differ -- IOC
       // Capital Screen returns 15 rows while 167 countries clear its 65% ceiling on its own.
-      _tkAxis.textContent = '\u00b7 ' + _tkPass.length + ' of ' + COUNTRY_DATA.length
-                          + ' clear this \u00b7 ' + _tkVer + ' verified';
+      // v996: the "\u00b7 N verified" tail is dropped once the universe is already
+      // production-only, where it would only restate _tkPass.length.
+      _tkAxis.textContent = '\u00b7 ' + _tkPass.length + ' of ' + _tkUni.length + ' clear this'
+                          + (_scAxisUniverseIsVerified() ? '' : ' \u00b7 ' + _tkVer + ' verified');
       // A ceiling removing under a tenth of the set is doing no work and should read that way --
-      // same threshold the NPV axes use in paint().
+      // same threshold the NPV axes use in paint(). v996: "the set" is the admissible set.
       _tkAxis.className = 'sc-axis-n'
-        + (_tkPass.length >= COUNTRY_DATA.length * 0.9 ? ' sc-axis-inert' : '');
+        + (_tkPass.length >= _tkUni.length * 0.9 ? ' sc-axis-inert' : '');
     }
   }
 
@@ -36246,25 +36307,26 @@ function _scUpdateNeutralFlags() {
       const _evDepthOn = !!(document.getElementById('sc-evid-depth') || {}).checked;
       const _evFloor = Math.max(_evDepthOn ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
       const _nDep = document.getElementById('sc-evid-depth-n');
+      const _evUni = _scAxisUniverse();   // v996
       if (_evV <= 0) {
-        if (_nDep) _nDep.textContent = COUNTRY_DATA.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
-          + ' of ' + COUNTRY_DATA.length + ' countries fall short';
+        if (_nDep) _nDep.textContent = _evUni.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
+          + ' of ' + _evUni.length + ' countries fall short';
         const _fl0 = document.getElementById('sc-evid-depth-floor');
         if (_fl0) _fl0.textContent = SC_EVID_MIN_FACTS;
       }
       if (_evAxis) {
         if (_evV <= 0) { _evAxis.textContent = ''; _evAxis.className = 'sc-axis-n'; }
         else {
-          const _shareOnly = COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV).length;
-          const _both = COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) >= _evFloor).length;
+          const _shareOnly = _evUni.filter(d => (d.a_pct || 0) >= _evV).length;
+          const _both = _evUni.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) >= _evFloor).length;
           // Kept to the same short shape as the NPV axes: .sc-axis-n is white-space:nowrap and
           // sits inside a slider label, so a long string here forces the whole filter card wider
           // than the viewport. The share-vs-depth comparison goes on the checkbox line below,
           // which wraps. (v681 shipped that text here first and put 36px of horizontal scroll on
           // a phone and 37-141px at 1024/1280/1440.)
-          _evAxis.textContent = '\u00b7 ' + _both + ' of ' + COUNTRY_DATA.length + ' clear this';
+          _evAxis.textContent = '\u00b7 ' + _both + ' of ' + _evUni.length + ' clear this';
           // An axis that is removing nobody should read as inert rather than as work being done.
-          _evAxis.className = 'sc-axis-n' + (_both >= COUNTRY_DATA.length ? ' sc-axis-inert' : '');
+          _evAxis.className = 'sc-axis-n' + (_both >= _evUni.length ? ' sc-axis-inert' : '');
           // The floor the analyst is told about must be the floor that is actually applied:
           // the Primary-Source Evidence preset raises it to 150, which beats the checkbox's 50.
           const _flEl = document.getElementById('sc-evid-depth-floor');
@@ -36272,7 +36334,7 @@ function _scUpdateNeutralFlags() {
           if (_nDep) {
             _nDep.textContent = _evFloor > 0
               ? (_shareOnly - _both) + ' of the ' + _shareOnly + ' that clear the share are held on a thinner record and removed'
-              : COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
+              : _evUni.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
                 + ' of the ' + _shareOnly + ' rows below hold the share on fewer than ' + SC_EVID_MIN_FACTS + ' facts';
           }
         }
@@ -36420,13 +36482,16 @@ function _scSyncNpvAxis() {
     if (!sp || !s2) return;
     var floor = +s2.value;
     if (floor <= -500) { sp.textContent = ''; sp.className = 'sc-axis-n'; return; }
-    var pass = COUNTRY_DATA.filter(function(d){
+    // v996: the admissible set, not all 185 -- this counter drove the amber inert flag, and on a
+    // production-only universe a floor removing 6 of 22 read "175 of 185" and greyed itself out.
+    var uni = _scAxisUniverse();
+    var pass = uni.filter(function(d){
       var x = d[dataKey];
       return !(x !== null && x !== undefined && x < floor);
     }).length;
-    sp.textContent = '\u00b7 ' + pass + ' of ' + COUNTRY_DATA.length + ' clear this';
+    sp.textContent = '\u00b7 ' + pass + ' of ' + uni.length + ' clear this';
     // Flag a floor that is barely screening, so an inert axis reads as inert.
-    sp.className = 'sc-axis-n' + (pass >= COUNTRY_DATA.length * 0.9 ? ' sc-axis-inert' : '');
+    sp.className = 'sc-axis-n' + (pass >= uni.length * 0.9 ? ' sc-axis-inert' : '');
   }
   paint('sc-npv-n',   'sl-npv',   key);
   paint('sc-npv50-n', 'sl-npv50', 'npv_50');
