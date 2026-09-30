@@ -68012,3 +68012,18 @@ before they have read a number.
   Filters 17 checkboxes at 13px under `pointer: coarse` (889); the `summary "Reading this table"`
   at 18px; Side-by-Side's two byte-identical export buttons; the two diverged suite copies.
 - **`_ctl907.html` (9.7 MB) and `_baseline_t3.html`** are still untracked in the repo root.
+
+---
+## Cycle 934 Log — 2026-09-30 01:59
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 934 complete. Committed, mirrored, and pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (previous cycle was T6, before that T5)
+
+## Friction
+Fiscal Compare's **"⇌ Load Top 5 in Side-by-Side"** is the tab's flagship one-click route into the comparison, and the IC workflow doc names it as the Step 2→3 handoff. Its no-ticks fallback was `window._fcTop5 = sorted.slice(0, 5)` — a blind slice of the take-ascending sort.
+
+Walked it cold at 1440×900, no storage, nothi
