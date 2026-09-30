@@ -67509,3 +67509,168 @@ Stalest task in the rotation (928 was T3, 927 T6+T1, 924 T5+T2; T4 had not been 
 ## Friction
 
 **The Reform Activity Heatmap dropped a jurisdiction and dressed the omission up as a ranking cut.** `renderReformRisk()`, `index.html:53649` — `heatCoun
+
+---
+## Cycle 930 Log — 2026-09-29 21:05
+- Test before: 500 PASS / 0 FAIL (harness, deployed site)
+- Test after: 499 PASS / 0 FAIL / 1 WARN (graded suite, LOCAL tree — unchanged from the
+  cycle-929 local baseline; the suite ran this cycle, the number is read from its own report)
+- JS errors: 0 page errors. 15 console 404s, all `/petroleum-fiscal-db/sw.js` — a service-worker
+  path that only resolves on GitHub Pages, not from a local root server. Local artifact.
+- Shipped: v999, pushed (839ddb0), mirror synced byte-identical.
+
+## Task — T2: "Is this one country attractive at $75/bbl, and can I defend that?"
+
+Rotation: 929 was T4, 928 T3, 927 T6+T1, 924 T5+T2. T2 and T5 were the stalest; picked T2.
+Walked cold at 1440x900 and 390x844 with `hasTouch`, both storages cleared and the page
+reloaded before the first click.
+
+First pass found nothing: all 185 countries were driven through the profile and every one
+rendered with no NaN, no undefined, no page errors and a body over 13,000 characters. The
+one hit on an `Infinity` grep was the operator **Infinity Energy** on Nicaragua's contract
+table — a real company name, not a division by zero. The example banner clears correctly
+when the analyst picks their own country. So the friction was semantic, not structural, and
+the walk moved to the second half of the task: *can I defend it*.
+
+## Friction
+
+**The Fiscal character verdict — the first sentence on the page — endorsed 41 jurisdictions
+for capital allocation on the strength of a statutory model.** `index.html:46771`, the
+`take <= 40` branch where `_hasPos648 && _vLower648 >= 1`. In green:
+
+> "Contractor-favorable — low government take, and N of the 21 production-weighted producers
+> take less at $75/bbl, **so this sits inside the band an IOC actually allocates capital
+> across.**"
+
+Counted live against `COUNTRY_DATA`, that branch fires for **48** countries and **41 of them
+hold no verified block-level production at all**. For **33 of the 48** N is exactly **1**, and
+the single producer beneath them is the **USA at 23.4%** in every case — the producing floor
+v663's own comment names.
+
+So the page told an analyst that:
+
+| country | contracts | facts | evidence | verdict it printed |
+|---|---|---|---|---|
+| Ascension Island | 1 | 2 | D, 0 of 4 model terms cited | green, "allocates capital across" |
+| Saint Helena | 1 | 2 | D, 0 of 4 model terms cited | green, same |
+| Puerto Rico | 1 | 2 | — | green, same |
+| Western Sahara | 1 | — | — | green, same |
+| Nepal | 2 | 6 | — | green, same |
+| Somalia | 60 | 246 | **D, 0% primary law, 0 of 5 cited** | green, same |
+
+Somalia carries that endorsement under a title that already reads **`⚠ speculative`**.
+
+**This is the defect v663 was written to fix, surviving one branch to the right.** v663
+rebuilt this chain precisely because "top tier for IOC capital allocation" was firing on take
+alone while 102 of the 108 regimes under 40% hold no production. It fixed the
+`_vLower648 === 0` case — *nothing producing sits below this country* — and stopped there.
+`_vLower648 === 1` is the same situation one hair over: the only producer beneath you is the
+Gulf of Mexico.
+
+**It also inverted the ordering against the branch v663 did fix**, and the two sit one
+dropdown apart:
+
+- **French Guiana** — 21.3%, 5 contracts → **yellow**: *"Read it as an evidence gap before
+  reading it as fiscal terms … Establish the terms against this jurisdiction's own petroleum
+  act before it goes on a capital-allocation list."*
+- **Saint Helena** — 25.6%, **1** contract, **2** facts → **green**: *"sits inside the band an
+  IOC actually allocates capital across."*
+
+Thinner evidence, more favourable verdict. The only thing that moved is that the USA sits
+below 25.6% but not below 21.3%.
+
+Compounding it, the same 41 were handed **"See all investible regimes →"** — the plain
+take ≤40% Screener, 108 countries, 102 with no verified production. v663 identified that exact
+route as *"a shortlist built from the same absence that produced this page's number"* and
+rerouted only its own branch. So the verdict and the button agreed with each other and both
+were wrong in the same direction.
+
+## Change
+
+The branch splits on **`_noProd663`** — the same quantity branch 1 already keys its
+statutory-model clause on, so **no new threshold was invented**. The 41 no-production
+jurisdictions now print in **yellow**:
+
+> "Low take (36.9%) on a statutory model, not on realised economics — ORCA holds no verified
+> block-level production for Somalia, so this figure is an average over 60 contracts and 246
+> facts. 6 of the 21 production-weighted producers take less at $75/bbl, the floor being USA
+> at 23.4% — but that places a modelled term inside a distribution of realised ones, which is
+> not the same as sitting inside the band an IOC allocates capital across. Establish the terms
+> against this jurisdiction's own petroleum act before it goes on a capital-allocation list."
+
+and their CTA is now **"See the 8 PRODUCING regimes under 40% →"**.
+
+Every figure is measured: `_posClause648`, the producer floor v663 computed, and `d.n` /
+`d.n_facts` as the evidence strip already prints them. The fact count is what separates
+Saint Helena (2) from Somalia (246) — both were previously green and indistinguishable.
+
+The **7** branch-3 countries that *do* carry production coverage — Mexico, Argentina, Canada,
+Colombia, Iraq, Australia, Ecuador — keep the green verdict **unchanged**; they are inside
+that band because they are in the set that defines it. Branch 1 (French Guiana) and branch 2
+(USA, "LOWEST comparable government take … defensible as such") are untouched.
+
+## Result
+
+An analyst screening a frontier jurisdiction at $75/bbl no longer reads a capital-allocation
+endorsement built on a statutory model. The first sentence now names the contract count and
+fact count behind the number and points at the country's own petroleum act, and the button
+beside it loads the 8 regimes ORCA can evidence against verified field production instead of
+the 102 it cannot. Saint Helena and French Guiana now read the same way, because they hold the
+same kind of evidence — the verdict is ordered on what ORCA can prove, not on where the Gulf
+of Mexico happens to fall.
+
+## Verified this cycle, not assumed
+
+| check | result |
+|---|---|
+| JS syntax gate (11 blocks) | PASS |
+| Graded suite, LOCAL tree (`TEST_URL` overridden) | 499 PASS / 0 FAIL / 1 WARN — unchanged |
+| All 185 countries driven through the profile | 0 NaN / 0 undefined / 0 page errors |
+| All 48 branch-3 countries re-walked after the fix | 41 switched to yellow, 7 producers still green |
+| Branch 1 + branch 2 controls (French Guiana, USA) | byte-identical verdicts |
+| `scrollWidth == clientWidth` | 1920 / 1440 / 1280 / 1024 / 768 / 390 — all equal |
+| New CTA height, `pointer: coarse` | 44px at both 768 and 390 |
+| Verdict block overflowing children | 0 at every width |
+| Mirror | byte-identical to `index.html` |
+
+## Carried forward, still open
+
+- **⚠ ESCALATE TO ZACH — seventh cycle carried, still not a UX item.** `petroleum_overnight`
+  emailed FAILED on 2026-09-23, 09-24, 09-25, 09-26 and 09-27; `CYCLE-STALE` fired 09-25,
+  09-26, 09-27. Five consecutive chain failures and a stale-cycle detector nobody is reading.
+  It is outside UX finalization scope, which is exactly why no cycle picks it up. It needs to
+  stop being logged and start being raised.
+- **(929) `_posClause648` is not number-agreed** — it renders "**1** of the 21
+  production-weighted producers **take** less". Pre-existing and shared by six branches
+  including the two left green this cycle, so it was left alone rather than widen this diff.
+  Cheap and safe for a later cycle.
+- **HARNESS: the graded suite's default `TEST_URL` is the DEPLOYED site**, so it cannot gate
+  the diff it is about to ship. Overridden by hand again this cycle.
+- **HARNESS: `claude -p` killed at 1800s, uncommitted work dies with it.** Not hit — committed
+  before the mirror and the push.
+- **The two suite copies have diverged** — the loop runs
+  `office/tools/petroleum/tests/runtime_comprehensive.js` while
+  `petroleum-fiscal-db/tests/runtime_comprehensive.js` is idle.
+- **(928) three of the four quickstart presets load a column the grid then sets aside** —
+  Atlantic Frontier Quartet (Guyana 0% coverage), North Sea Trio (Netherlands 0%), West Africa
+  Trio (Ghana 0%). Still the natural next T3 cycle.
+- **(928) `Rank among producers` reads "of 21 producers"** but `prod_coverage_pct > 0` returns
+  22. One country is dropped between the two counts. `getProducerPeers()` returns 21 and the
+  producer floor is USA at 23.4% — both confirmed live this cycle — so the 22 is the side that
+  needs explaining. Needs a look before anyone quotes a rank in a memo.
+- **(929) `United Arab Emirates` and `Congo` are not findable** in the Reform Risk lookup under
+  the names an analyst would use. Minor while the control is a dropdown; it bites the moment it
+  becomes type-to-search. (The Country Profile dropdown files them as `UAE`,
+  `UAE — Abu Dhabi`, `UAE — Dubai` and `Republic of the Congo`.)
+- Côte d'Ivoire requests two API slugs that do not exist (916) — reconfirmed in this cycle's
+  server log: `/api/v1/country/cote_divoire.json` and `cote-divoire.json`, both 404.
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at 768
+  and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- The Fiscal Reform History event-log browser lives in the off-tab-bar Vintage pane (`#t4`).
+- Side-by-Side carries two buttons whose output is byte-identical (7,691 chars).
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders in the
+  repo root, predating this session. Left in place again; deleting another session's files is
+  not this cycle's call. Worth someone confirming they can go.
