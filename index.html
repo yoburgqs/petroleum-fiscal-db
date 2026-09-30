@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1004</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1005</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23893,6 +23893,24 @@ function _rrStatuteMaxYear(legs) {
 function _rrStatuteTail(d, where) {
   var legs = _rrStatuteSources(d);
   if (!legs.length) {
+    // v1005 (T4): before this, all four jurisdictions with no `legislation` citation got the
+    // generic reading list -- including three that have a named primary instrument ON this
+    // platform. See _rrFallbackInstrument(). Only a jurisdiction where ORCA genuinely holds
+    // no primary instrument anywhere still reads the standing-start sentence.
+    var fb = (typeof _rrFallbackInstrument === 'function') ? _rrFallbackInstrument(d) : null;
+    var wh = (where === 'above' ? 'above' : 'below');
+    if (fb && fb.mode === 'own') {
+      return 'For reform exposure specifically this jurisdiction needs an external check \u2014 but not from a standing start. '
+           + 'ORCA holds no statute for it, but it did read its fiscal terms out of a named primary instrument, '
+           + 'and that instrument is the first document to check; it is printed ' + wh
+           + ', with IMF Article IV and operator annual reports after it.';
+    }
+    if (fb && fb.mode === 'parent') {
+      return 'For reform exposure specifically this jurisdiction needs an external check \u2014 but not from a standing start. '
+           + 'ORCA holds no source citation of its own for it, and the nearest instrument it does hold \u2014 the statute '
+           + _rrEsc(fb.parent) + '\u2019s terms were read from \u2014 is printed ' + wh
+           + '. Establish whether that act reaches this jurisdiction before anything else, then IMF Article IV and operator annual reports.';
+    }
     return 'For reform exposure specifically, an uncovered jurisdiction needs an external check '
          + '(national petroleum law, IMF Article IV, operator annual reports) before it goes in front of an IC.';
   }
@@ -23935,6 +23953,135 @@ function _rrStatuteBlock(d) {
     + verdict
     + '</div></div>';
 }
+// ── v1005 (T4): the three jurisdictions the statute block could not serve ────────────────
+// _rrStatuteSources() keeps only top_sources entries typed 'legislation'. 181 of 185 rows have
+// one. The v766 comment at the render site recorded the other four and left them with the
+// generic "go find a national petroleum law" sentence. Walked T4 cold at 1440x900 and 390x844
+// (hasTouch), picking every one of the 164 unscored jurisdictions in the lookup: 160 print a
+// named starting document, 4 print none. Read against country_data.json, three of those four
+// are NOT empty -- the card was discarding what ORCA holds:
+//
+//   Iraq-Kurdistan   signed_contract, B, 32 facts -- "Kurdistan Regional Government Model
+//                    Production Sharing Contract - Ministry of Natural Resources", live
+//                    gov.krd URL. KRG blocks license ON that model PSA, so it is the single
+//                    document a KRG reform check starts from -- and it was filtered out for
+//                    not being typed 'legislation'.
+//   Paraguay         government_filing, B, 25 facts -- "Paraguay Decree 19.080/1997 Hydrocarbon
+//                    Royalty 12pct". A national hydrocarbon decree, typed as a filing. Filtered out.
+//   UAE - Abu Dhabi  top_sources is EMPTY -- no source of any type. Its parent row, UAE, holds
+//                    an A-tier federal act with 328 facts and a live mof.gov.ae URL.
+//
+// Somalia is the only one of the four where ORCA genuinely holds no primary instrument (two
+// practitioner guides and nothing else), and it is the only one that still reads the generic
+// sentence. Nothing here awards a score: all four stay n/c, the 21-of-185 coverage count is
+// untouched, and each block says so on its own first line.
+//
+// The parent map is explicit and holds the two sub-national rows in this data, for the same
+// reason _RR_FILED_UNDER is explicit: a name-splitting heuristic would sweep in Guinea-Bissau
+// and Timor-Leste, which are sovereign states. UAE - Dubai is deliberately absent -- it holds
+// two A-tier statutes of its own and needs no fallback.
+var _RR_STATUTE_PARENT = {
+  'UAE — Abu Dhabi': {
+    parent: 'UAE',
+    // Printed as the reason the federal act may NOT be the authority, not as a claim that it is.
+    caution: 'Abu Dhabi licenses its upstream on emirate-level concession agreements granted through ADNOC, '
+           + 'not on the federal instrument named here, so confirm that act reaches this jurisdiction before relying on it.'
+  },
+  'Iraq-Kurdistan': {
+    parent: 'Iraq',
+    caution: 'KRG blocks are contracted on the Kurdistan Model PSA rather than the federal regime, '
+           + 'so a federal act is a starting point for the sovereign, not authority over KRG terms.'
+  }
+};
+var _RR_INSTRUMENT_KIND = {
+  signed_contract:   'signed model contract',
+  government_filing: 'government instrument'
+};
+// Returns null where the statute block already has something to print, or where ORCA holds
+// nothing at all. Self-retiring: the moment harvest files a 'legislation' source against one of
+// these rows, _rrStatuteSources() is non-empty and this never runs for it again.
+function _rrFallbackInstrument(d) {
+  if (!d) return null;
+  if (_rrStatuteSources(d).length) return null;
+  var own = ((d && d.top_sources) || []).filter(function (s) {
+    return s && s.name && _RR_INSTRUMENT_KIND[s.type];
+  }).map(function (s) {
+    return { name: s.name, url: s.url || '', tier: s.tier || '', n: s.n || 0,
+             ys: _rrStatuteYears(s.name), kind: _RR_INSTRUMENT_KIND[s.type] };
+  });
+  if (own.length) return { mode: 'own', legs: own };
+  var m = _RR_STATUTE_PARENT[d.country];
+  if (!m) return null;
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  var prow = cd.filter(function (x) { return x.country === m.parent; })[0] || null;
+  var plegs = _rrStatuteSources(prow);
+  if (!plegs.length) return null;
+  return { mode: 'parent', parent: m.parent, caution: m.caution, legs: plegs };
+}
+window._rrFallbackInstrument = _rrFallbackInstrument;
+
+// Same visual idiom as _rrStatuteBlock, and deliberately the same #rr-ext-check id at the call
+// site so the two integrations that key off it come along for free: _rrVerdictPayload() sweeps
+// that id into the "Copy verdict" clipboard table, and the lookup scrolls to it.
+function _rrFallbackBlock(d) {
+  var fb = _rrFallbackInstrument(d);
+  if (!fb) return '';
+  var esc   = _rrEsc((d && d.country) || 'this country');
+  var owner = fb.mode === 'parent' ? _rrEsc(fb.parent) : esc;
+  var maxY  = _rrStatuteMaxYear(fb.legs);
+  var rows  = fb.legs.map(function (s) {
+    var nm = _rrEsc(s.name), url = String(s.url || '');
+    var head = /^https?:\/\//.test(url)
+      ? '<a href="' + _rrEsc(url) + '" target="_blank" rel="noopener" '
+        + 'style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--accent);font-weight:700;text-decoration:none;font-size:11.5px;" '
+        + 'title="Open the source register ORCA cites for this instrument">' + nm + ' &nearr;</a>'
+      : '<span style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--text);font-weight:700;font-size:11.5px;">' + nm + '</span>';
+    return '<div style="margin-bottom:7px;">' + head
+      + '<div style="font-size:10.5px;color:var(--muted);line-height:1.5;">'
+      + (s.tier ? _rrEsc(s.tier) + '-tier ' : '') + _rrEsc(s.kind || 'legislation')
+      + (s.n ? ' &middot; ' + s.n.toLocaleString() + ' of ' + owner + '&rsquo;s verified facts were read from it' : '')
+      + (fb.mode === 'parent' ? ' &mdash; none of ' + esc + '&rsquo;s' : '')
+      + '</div></div>';
+  }).join('');
+
+  // The year verdict is the same reading _rrStatuteBlock gives, phrased for the owner of the doc.
+  var yr = maxY >= 2010
+    ? 'The most recent year it names is <strong style="color:var(--text);">' + maxY + '</strong> &mdash; <strong style="color:var(--text);">inside</strong> the 2010 scoring window, so check it for amendments made since.'
+    : maxY > 0
+    ? 'The most recent year it names is <strong style="color:var(--text);">' + maxY + '</strong> &mdash; <strong style="color:var(--text);">before</strong> the 2010 scoring window, so any amendment passed since is unrecorded on this platform. That is where the check starts.'
+    : 'It names no year, so ORCA cannot tell you which version it read. Establish which text is in force before anything else.';
+
+  var head = fb.mode === 'parent'
+    ? 'Start the external check here &mdash; the nearest instrument ORCA holds is ' + owner + '&rsquo;s'
+    : 'Start the external check here &mdash; the primary instrument ORCA read these terms from';
+
+  var body = fb.mode === 'parent'
+    ? '<strong style="color:var(--text);">ORCA holds no source citation of any kind against ' + esc + ' itself.</strong> '
+      + 'This is the statute the ' + owner + ' row was read from, shown because it is the nearest sourced instrument on the platform &mdash; not because it governs here. '
+      + _rrEsc(fb.caution || '') + ' It produces no reform count, no Reform Frequency Score and no premium &mdash; ' + esc + ' remains unscored. ' + yr
+    : '<strong style="color:var(--text);">This is a source citation, not a reform log.</strong> '
+      + 'It produces no reform count, no Reform Frequency Score and no premium &mdash; ' + esc + ' remains unscored. '
+      + 'ORCA holds no statute for ' + esc + '; this is the instrument its terms were read from instead, which for a jurisdiction licensed on one is the document a reform check starts from. ' + yr;
+
+  var btn = '';
+  if (fb.mode === 'parent') {
+    var jsP = String(fb.parent).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    btn = '<div style="margin-top:10px;"><button class="btn btn-sm btn-outline" style="min-height:28px;" '
+        + 'onclick="openReformRiskFor(\'' + jsP + '\')" '
+        + 'title="Open the ' + owner + ' card, where this statute is the sourced instrument and is shown with '
+        + owner + '&#39;s own take and predictability. ' + owner + ' carries no reform log either, and ' + esc + ' stays unscored.">'
+        + 'See ' + owner + ' on Reform Risk &rsaquo;</button></div>';
+  }
+
+  return '<div style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;background:var(--surface);">'
+    + '<div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;">' + head + '</div>'
+    + rows
+    + '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:4px;">' + body + '</div>'
+    + btn
+    + '</div>';
+}
+window._rrFallbackBlock = _rrFallbackBlock;
+
 window._rrStatuteSources = _rrStatuteSources;
 window._rrStatuteBlock = _rrStatuteBlock;
 window._rrStatuteTail = _rrStatuteTail;
@@ -44503,7 +44650,7 @@ function renderReformTimeline(country) {
             + '</div>'
           : '')
       + '<div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.6;">' + _rrStatuteTail(_cdRow) + '</div>'
-      + _rrStatuteBlock(_cdRow)
+      + (_rrStatuteSources(_cdRow).length ? _rrStatuteBlock(_cdRow) : _rrFallbackBlock(_cdRow))
       + '<div style="margin-top:12px;"><button class="btn btn-sm btn-outline" onclick="openReformRiskFor(\'' + _jsC0 + '\')" title="Open the Reform Risk tab with ' + _esc0 + ' selected in the country lookup">Check ' + _esc0 + ' on Reform Risk &rsaquo;</button></div>';
   }
 
@@ -53519,9 +53666,12 @@ function renderReformCountryVerdict() {
       // prohibition and no next step. The block is not reworded; it moves here and takes an id.
       // Iraq-Kurdistan, Paraguay, Somalia and UAE - Abu Dhabi hold no statute citation, so for
       // them nothing moves and the paragraph's generic external-check sentence stays the action.
-      + (_rrStatuteSources(d).length
-          ? '<div id="rr-ext-check" style="margin-bottom:12px;">' + _rrStatuteBlock(d) + '</div>'
-          : '')
+      // v1005 (T4): falls through to _rrFallbackBlock() for the rows with no 'legislation'
+      // citation, keeping the same id so the clipboard sweep and the scroll target still find it.
+      + (function () {
+          var _h = _rrStatuteSources(d).length ? _rrStatuteBlock(d) : _rrFallbackBlock(d);
+          return _h ? '<div id="rr-ext-check" style="margin-bottom:12px;">' + _h + '</div>' : '';
+        })()
       + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--muted);">n/a</div>'
