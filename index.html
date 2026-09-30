@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1002</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1004</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4206,6 +4206,10 @@ window.copyPlatformCitation = function(btn) {
       <button type="button" id="sc-dock-csv" class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export the ticked countries as CSV">⬇ CSV</button>
       <button type="button" id="sc-dock-xlsx" class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export the ticked countries as Excel">⬇ Excel</button>
       <button type="button" id="sc-dock-sbs" class="btn btn-sm btn-outline" onclick="scOpenSbs()" aria-label="Open the ticked countries in Side-by-Side">&#8652; Side-by-Side</button>
+      <!-- v1004 (T1): the dock carried three ways to save the shortlist as a file and no way to
+           send it. The toolbar's Copy Link is 300-700px above the row the tick happened on at
+           1440x900 and off-screen entirely on a phone, which is the reason this dock exists. -->
+      <button type="button" id="sc-dock-link" class="btn btn-sm btn-outline" onclick="copyScreenerLink()" aria-label="Copy a link that reopens this screen with the ticked countries already ticked" title="Copy a link that reopens this screen with these countries already ticked &mdash; the recipient lands on your shortlist, not on every row the screen returned.">&#128279; Link</button>
       <button type="button" class="btn btn-sm btn-outline" onclick="scClearSel()" aria-label="Clear the IC shortlist selection">Clear</button>
     </div>
   </div>
@@ -39180,6 +39184,25 @@ function _scSyncSelUI() {
         : 'Countries ticked for the IC shortlist. Copy, CSV and Excel carry only these.';
     }
   }
+  // v1004 (T1): Copy Link stops being the one control in this toolbar that ignores the ticks.
+  // Plain text button (no SVG), so the label is rebuilt rather than spliced.
+  var lb = document.getElementById('screener-copy-link-btn');
+  if (lb) {
+    if (!lb.dataset.allLabel) { lb.dataset.allLabel = lb.innerHTML; lb.dataset.allTitle = lb.title || ''; }
+    if (nIn) {
+      lb.innerHTML = '\uD83D\uDD17 Copy Link \u00b7 ' + nIn + ' ticked';
+      lb.title = 'Copy a link that reopens this screen AND re-ticks your ' + nIn + '-country IC '
+        + 'shortlist, so the recipient opens the list you picked rather than every row the screen '
+        + 'returned. Press Clear beside it to send the whole screen instead.'
+        + (window._scSelected.length > _SC_ROUTE_SEL_MAX
+            ? ' Over ' + _SC_ROUTE_SEL_MAX + ' ticks the shortlist is too long to travel in a URL — '
+              + 'the link will carry the screen only and the confirmation says so; use CSV or Excel.'
+            : '');
+    } else {
+      lb.innerHTML = lb.dataset.allLabel;
+      lb.title = lb.dataset.allTitle;
+    }
+  }
   var all = document.getElementById('sc-sel-all');
   if (all) {
     var trs = document.querySelectorAll('#tbl-screener tbody tr[data-country]');
@@ -39189,6 +39212,15 @@ function _scSyncSelUI() {
     all.indeterminate = on > 0 && on < vis;
   }
   _scDockSync();
+  // The address bar is the other copy route — a hand-copied URL, a bookmark and Back all read it.
+  // v902 made it track the thresholds; this makes it track the hand-pick for the same reason.
+  // Gated on the Screener pane being the one on screen: runScreener() also calls this function
+  // during _labelScreenerPresets()' load-time counting pass and from the Explorer, and writing
+  // '#/screener...' from there would overwrite a Browse filter link (#/explorer?mech=PSC).
+  var _scPane = document.getElementById('explorer-screen-mode');
+  if (typeof _explSyncRoute === 'function' && _scPane && _scPane.style.display !== 'none') {
+    try { _explSyncRoute('screen'); } catch (e) {}
+  }
 }
 window._scSyncSelUI = _scSyncSelUI;
 
@@ -66398,6 +66430,33 @@ window._scRouteSetPreset = _scRouteSetPreset;
 
 var _SC_ROUTE_DEFAULTS = { take: '100', npv: '-500', npv50: '-500', evid: '0' };
 
+/* ─── v1004 (T1) — the SHORTLIST travels with the link, not just the screen ────────────────
+   Walked T1 cold at 1440x900, storage cleared: Home -> the Screener card -> IOC Capital Screen
+   -> 15 rows -> tick the five the analyst actually wants on the list (Canada, USA, Brazil, the
+   United Kingdom, Indonesia) -> press the Screener's own "Copy Link", which sits in that same
+   toolbar row.
+
+   Every other artefact on the tab honours the hand-pick, and says so on its own face:
+       Copy for IC Memo   relabels to  "Copy 5 selected"
+       CSV                relabels to  "CSV (5)"
+       Excel              relabels to  "Excel (5)"
+       Side-by-Side       loads exactly those five
+   Copy Link, between them, read "Copy Link" whether five rows or none were ticked, published
+   "#/screener/iochurdle?t=65&n=0&n5=0&px=0" -- no selection leg at all -- and toasted "opens
+   this screen: 15 countries at $75/bbl". Opened cold in a second context that link returns all
+   FIFTEEN: Azerbaijan, Mexico, Argentina, Colombia, China, Australia, Ecuador, Angola, India
+   and Iraq back on a list the sender had just removed one by one, with the IC shortlist dock
+   hidden and nothing anywhere naming the ten additions.
+
+   v902 fixed the thresholds riding this link. The hand-pick is the last mile of T1 and it did
+   not ride: v781's own note says it best -- "the filters narrow the SCREEN, and an IC shortlist
+   is not a screen". So the one artefact a T1 analyst produces could be exported as a file but
+   not sent as a link, and the control that looked like it would send it sent the superset.
+
+   Capped at 25 names. Past that it is not a shortlist, the URL stops being paste-able, and
+   copyScreenerLink() says so rather than truncating the list silently. */
+var _SC_ROUTE_SEL_MAX = 25;
+
 // Serialise only what differs from a cold Screener. Returns '' or '?a=1&b=2'.
 function _scRouteQuery() {
   var q = [];
@@ -66430,6 +66489,11 @@ function _scRouteQuery() {
   }
   var iocOn = [].slice.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked'));
   if (iocOn.length) push('o', iocOn.map(function (c) { return c.value; }).join('|'));
+
+  // v1004 (T1) — the hand-pick travels too. See the _SC_ROUTE_SEL_MAX note below for why this
+  // leg exists and why it is capped.
+  var sel = (window._scSelected || []);
+  if (sel.length && sel.length <= _SC_ROUTE_SEL_MAX) push('s', sel.join('|'));
 
   return q.length ? '?' + q.join('&') : '';
 }
@@ -66516,7 +66580,16 @@ function _scRouteApplyQuery(qs) {
     });
     wrote = true;
   }
+  // v1004: restore the hand-picked shortlist BEFORE the re-run — the row renderer reads
+  // _scSelHas() for both the tick and the sc-row-sel class, so setting the state first paints
+  // the ticks in one pass instead of needing a second render.
+  if ('s' in params) {
+    var wantS = params.s ? params.s.split('|').filter(function (x) { return x; }) : [];
+    window._scSelected = wantS.slice(0, _SC_ROUTE_SEL_MAX);
+    wrote = true;
+  }
   if (wrote && typeof runScreener === 'function') runScreener();
+  if ('s' in params && typeof _scSyncSelUI === 'function') _scSyncSelUI();
   return wrote;
 }
 window._scRouteApplyQuery = _scRouteApplyQuery;
@@ -66568,8 +66641,24 @@ function copyScreenerLink() {
     var name = (typeof _activePresetName !== 'undefined' && _activePresetName) ? _activePresetName : '';
     var mod = (typeof _activePresetModified !== 'undefined' && _activePresetModified);
     var who = name ? (' \u00b7 ' + name + (mod ? ' (modified)' : '')) : '';
-    showCopyToast('Link copied \u2014 opens this screen: ' + n + ' countr' + (n === 1 ? 'y' : 'ies')
-      + ' at $' + deck + '/bbl' + who);
+    // v1004: with rows ticked, what the recipient opens is the SHORTLIST, not the screen behind
+    // it. Say which, and say it when the shortlist was too long to travel.
+    var selN = (window._scSelected || []).length;
+    var inN = (typeof _scSelOrdered === 'function' ? (_scSelOrdered() || []) : []).length;
+    if (selN > _SC_ROUTE_SEL_MAX) {
+      showCopyToast('Link copied \u2014 but ' + selN + ' ticks is too many to carry in a URL, so it '
+        + 'opens the screen (' + n + ' countries at $' + deck + '/bbl)' + who + ' with nothing ticked. '
+        + 'Use \u2193 Excel or \u2193 CSV to send the ' + selN + '-country list itself.');
+    } else if (selN) {
+      var outN = selN - inN;
+      showCopyToast('Link copied \u2014 opens your ' + selN + '-country IC shortlist ticked, on this '
+        + 'screen (' + n + ' countr' + (n === 1 ? 'y' : 'ies') + ' at $' + deck + '/bbl)' + who
+        + (outN ? ' \u2014 ' + outN + ' of the ticks sit outside this screen and will show as such '
+                  + 'for the recipient too' : ''));
+    } else {
+      showCopyToast('Link copied \u2014 opens this screen: ' + n + ' countr' + (n === 1 ? 'y' : 'ies')
+        + ' at $' + deck + '/bbl' + who);
+    }
   };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(done).catch(function () {
