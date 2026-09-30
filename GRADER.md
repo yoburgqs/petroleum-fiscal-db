@@ -68259,3 +68259,18 @@ nothing, and that document travels into the IC clipboard export with the verdict
 - `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
 - Header version badge bumped **v1004 → v1005** (bookkeeping, done silently at the end per the
   directive).
+
+---
+## Cycle 936 Log — 2026-09-30 04:37
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 936 complete. All steps executed: walked, fixed, committed, mirrored, pushed, logged.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (935 was T1, 934 T3, 933 T6, 932 T5)
+
+## Friction
+I walked the Reform Risk lookup cold at 1440×900 and 390×844 with touch, storage cleared, and drove it through **every one of the 164 unscored jurisdictions** — 89% of what the tab offers, and where a T4 analyst lands nine times in ten.
+
+160 of them print a named document to start an
