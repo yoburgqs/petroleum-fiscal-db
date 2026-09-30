@@ -67198,3 +67198,153 @@ is no longer told that a floor removing a quarter of their shortlist is doing no
 ### First — recovered work that was about to be lost (v995, T6)
 
 The tree held an uncommitted diff from cycle 926, which the harness killed at 1800s. I re-verified it against the shipped data rather than trusting its own comments, and that mattered: my first measurement pass had `_EV_ORDER` backwards. Redone against the real `['d','c','b','a']`, its three claims hold exactly — 80 of 185 countries are graded
+
+---
+## Cycle 928 Log — 2026-09-29 — v997
+
+- Test before: 500 PASS / 0 FAIL (carried from the harness prompt)
+- Test after: **499 PASS / 0 FAIL / 1 WARN**, LOCAL tree via
+  `TEST_URL=http://localhost:8973/index.html`, read from the suite's own report file
+  (`ORCA_REPORT_FILE=/tmp/rt928.txt`) — not assumed. Same 499/0/1 as cycles 923/924/927.
+- JS errors captured: 15, all one repeated 404 for `/petroleum-fiscal-db/sw.js` — the service
+  worker's absolute GitHub Pages path, which does not exist when the repo root is served
+  locally. Verified directly this cycle: that path returns **404 local, 200 deployed**.
+  Documented harness artifact, not a page defect, and not introduced by this cycle.
+- JS syntax gate: **PASS** (11 inline blocks), re-run after the version bump
+- `pixel_audit`, 10 tabs x 5 viewports, local tree: **PIXEL GATE PASS**. Its only two findings
+  are the carried pre-existing `summary "Reading this table — column definitions"` at 18px on
+  t0 at 768 and 390 — present at baseline, untouched by this cycle.
+- Viewports: zero horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768 / 390**, the last two
+  with `hasTouch`. Zero page errors at every width. No control added or resized, so the 24px
+  floor is untouched — re-measured all seven Side-by-Side controls under `hasTouch` anyway: none
+  under 24px.
+
+### Task — T3: "How do these three countries compare side by side?"
+
+Rotation: 927 was T6+T1, 924 T5+T2, 923 T4, 922 T3+T2. T3 was the stalest. Walked cold at
+1440x900 with `sessionStorage` and `localStorage` cleared and the page reloaded before the pass.
+
+### Friction — the opening example disowned a third of itself
+
+The walk never reached the quickstart buttons, because on a cold load it does not render them:
+`switchTab('t2')` seeds a demonstration set (`index.html` ~24175), and that seed had been
+`['Norway','United Kingdom','Netherlands']` — the "North Sea Trio" — from v430 through v996.
+
+ORCA holds **0% verified production** for the Netherlands (`prod_coverage_pct: 0`,
+`weighting: simple_avg`), so the grid then set that column aside from **all four** headline
+verdicts. Read off the rendered pane, not inferred:
+
+| verdict | what the analyst is told |
+|---|---|
+| Govt take | `Set aside — 1 of 3 columns cannot join that ordering: Netherlands` |
+| Contractor value | `Not in the value ordering — 1 of 3: Netherlands` |
+| Term consistency | `Netherlands ≤59 cannot be placed` |
+| Reform exposure | `no sourced log: Netherlands — an absence of coverage, not a clean record` |
+
+Measured: **18 set-aside phrases**, a **1,111-character** verdict strip, and **two** full-width
+amber blocks below the grid ("Mixed basis — the lowest line is not the winner" and "The lowest
+take printed in this grid is a proxy"). Norway's Predictability score is separately withdrawn
+(≤52, printed 76), so of the three seeded columns exactly **one** — the UK — survived intact.
+
+This is the first thing a first-time analyst ever sees the tab do. The correct reading of that
+screen is "the database cannot support a three-country comparison," which is false. The caveats
+are individually accurate; the defect is that the platform chose to demonstrate itself on a set
+it then had to disown.
+
+### Change — the example is UK · Norway · Nigeria
+
+Nigeria is the **measured** substitution, not a tidier caption:
+
+| requirement | Netherlands | Nigeria |
+|---|---|---|
+| `prod_coverage_pct` | 0% | **14.1%** — production-weighted, joins the same scale |
+| mechanic group | Concession (Group 1) | Concession 671 + PSC 163 — both **Group 1**, commensurable, no fee-basis re-basing |
+| sourced reform log | none | **present** — reform verdict now ranks 3 of 3 |
+
+Only **22 of 185** countries clear the production bar at all, which is why this is a narrow
+choice rather than a free one. Re-measured on the rendered pane after the swap:
+
+| | before | after |
+|---|---|---|
+| set-aside phrases | 18 | **0** |
+| amber ⚠ blocks | 2 | **1** (the Predictability withdrawal, pre-existing and set-independent) |
+| verdicts ranking all 3 columns | 0 of 4 | **4 of 4** |
+| take spread | 18.8pp (over 2 columns) | **31.9pp** (over 3) |
+| price-order stability | `order holds $50–$125` | `order holds $50–$125` |
+| take vs value agreement | `agrees with take order` | `agrees with take order` |
+
+`Data basis` now reads PROD-WTD / PROD-WTD / PROD-WTD, `Rank among producers` places all three
+(#9, #17, #21 of 21), and the strip states `All 3 columns are on one basis — nothing is set
+aside, the ordering above is the whole set.` The 31.9pp spread is the widest of any all-producer
+trio tested, so the example also now demonstrates the range the tool exists to show.
+
+**Six candidate sets were measured in the live page before choosing** — the incumbent,
+Angola/Nigeria/Brazil (1 set-aside, 5 amber), Norway/UK/Nigeria (0, 1), Norway/UK/Angola
+(0, 1, but only 18.8pp), Angola/Nigeria/Indonesia (1, 1) and Brazil/Angola/Kazakhstan (1, 5).
+
+There is **no third North Sea producer available** — Denmark, Ireland and the Netherlands are
+all 0% coverage — so keeping the example inside the North Sea and keeping it rankable are
+mutually exclusive. Rankable wins for the opening view.
+
+**The proxy machinery is not weakened and is not being hidden.** 163 of 185 countries are proxy
+columns, so an analyst meets it on their own first search. Verified this cycle: Clear still
+reveals all four quickstart presets, and the **North Sea Trio button still loads
+`["United Kingdom","Norway","Netherlands"]` verbatim with every caveat firing**, including the
+full `Set aside — 1 of 3` strip. The lesson is preserved where it is a genuine finding about a
+country the analyst chose, rather than a self-inflicted wound on the demo.
+
+Downstream consumers verified against the new seed: `Copy for IC Memo` emits 6,081 characters
+naming Nigeria and not the Netherlands, and still carries the standardized-profile assumptions
+and the Live-DCF divergence warning.
+
+Also corrected because this change falsified them, not as cycle work: the "Example loaded"
+banner (which named the Netherlands) and **FAQ A968**, which documented the North Sea Trio as
+the auto-loaded preset. No new FAQ was added.
+
+### Result
+
+An analyst opening Side-by-Side cold now gets a comparison that answers the question they
+opened it to answer — three countries ranked against each other on one basis across take,
+contractor value, term consistency and reform exposure — instead of a three-column set whose
+headline verdicts name two of them and whose ~700 words of withdrawal notices read as an
+admission that the database cannot compare countries.
+
+### Carried forward, still open
+
+- **HARNESS: `claude -p` killed at 1800s, uncommitted work dies with it.** Not hit this cycle
+  (tree was clean at start, and this cycle committed before the mirror/push). Still the
+  highest-value open item.
+- **HARNESS: the graded suite's default `TEST_URL` is the DEPLOYED site**, so it cannot gate the
+  diff it is about to ship, and times out at 45s when the network is slow — which is how the
+  prompt arrived reporting a number this cycle could not reproduce. Overridden by hand again.
+- **The two suite copies have diverged** — the loop runs
+  `office/tools/petroleum/tests/runtime_comprehensive.js` while
+  `petroleum-fiscal-db/tests/runtime_comprehensive.js` is idle.
+- **NEW (928): three of the four quickstart presets load a column the grid then sets aside** —
+  Atlantic Frontier Quartet (Guyana 0% coverage), North Sea Trio (Netherlands 0%), West Africa
+  Trio (Ghana 0%). Only USA vs Iraq is all-producer, and that one pairs Concession against a
+  TSC-dominant regime, which `MECHANIC_COMPARABILITY.md` Group 2 says is not commensurable. The
+  button tooltips promise "the standard IOC benchmark set" and give no warning before the click.
+  Deliberately not fixed this cycle — the seed was the worse moment because it is the cold path,
+  and the directive asks for one moment. This is the natural next T3 cycle.
+- **NEW (928): `Rank among producers` reads "of 21 producers"** but `prod_coverage_pct > 0`
+  returns **22** countries. One country is being dropped somewhere between the two counts.
+  Not chased this cycle; needs a look before anyone quotes a rank in a memo.
+- `petroleum_overnight` chain emailed FAILED on 2026-09-23/24/25/26/27 and CYCLE-STALE fired on
+  09-25/26/27. **Still not investigated** — outside UX finalization scope, but this is now five
+  consecutive failures plus a stale-cycle detector going unread, and it has been carried for
+  several cycles without anyone picking it up. It should be escalated to Zach rather than carried
+  a sixth time.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at 768
+  and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- Reform Risk decade heatmap caption reads "Top 20 of the 21".
+- The Fiscal Reform History event-log browser lives in the off-tab-bar Vintage pane (`#t4`).
+- Side-by-Side carries two buttons whose output is byte-identical (7,691 chars).
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in
+  the repo root. Left in place again: they predate this session and deleting another session's
+  files is not this cycle's call. Worth someone confirming they can go — 9.7 MB of noise in
+  `git status` every cycle.
