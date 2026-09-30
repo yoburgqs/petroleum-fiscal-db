@@ -68138,3 +68138,124 @@ saveable.
 Walked cold at 1440×900 and 390×844 with touch, storage cleared: Home → Screener card → IOC Capital Screen → 15 rows → tick the five countries you actually want on the list → press the Screener's own **Copy Link**, sitting in that same toolbar row.
 
 Every other control on that toolbar honours the hand-pick and says so on its face — C
+
+---
+## Cycle 936 Log — 2026-09-30 04:28
+- Test before: 494 PASS / 0 FAIL / 1 WARN / 12 JS errors (local tree, 02:51 report)
+- Test after: 494 PASS / 0 FAIL / 1 WARN / 12 JS errors (local tree, suite RAN this cycle)
+- JS errors: 12 — all one pre-existing sw.js 404 from serving the tree at root locally; unchanged by this diff
+- Summary: Cycle 936 complete — v1005 shipped, committed, mirrored, pushed.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (935 was T1, 934 T3, 933 T6, 932 T5)
+
+## Friction
+`_rrStatuteSources()` / `_rrStatuteTail()` (~line 23875 / 23893), rendered on the Reform Risk
+lookup card (~53523) and the Country Profile reform section (~44506).
+
+Walked T4 cold at **1440x900** and **390x844 `hasTouch:true`**, storage cleared: Home → Reform
+Risk → **Check one country**, then driven through **every one of the 164 unscored jurisdictions**
+in the lookup — 89% of what the tab offers, and the branch a T4 analyst lands on nine times in ten.
+
+160 of 164 print a named starting document. **4 print none** and close with the generic sentence:
+
+> *"For reform exposure specifically, an uncovered jurisdiction needs an external check
+> (national petroleum law, IMF Article IV, operator annual reports) before it goes in front of an IC."*
+
+v766's own note at the render site records those four and says the generic sentence "stays the
+action" for them. Read against `country_data.json`, **three of the four are not empty — the card
+was discarding a document ORCA already holds:**
+
+| jurisdiction | what `top_sources` actually holds | why it was dropped |
+|---|---|---|
+| **UAE — Abu Dhabi** | `top_sources` is **empty** — no source of any type. Parent row **UAE** holds A-tier `UAE Federal Decree-Law 7 of 2017`, **328 facts**, live `mof.gov.ae` URL | no parent fallback existed |
+| **Iraq-Kurdistan** | `signed_contract` B, **32 facts** — *Kurdistan Regional Government Model Production Sharing Contract — Ministry of Natural Resources*, live **`gov.krd`** URL | `_rrStatuteSources()` keeps only `type === 'legislation'` |
+| **Paraguay** | `government_filing` B, **25 facts** — *Paraguay Decree 19.080/1997 Hydrocarbon Royalty 12pct* | same type filter — a national hydrocarbon decree typed as a filing |
+| Somalia | two practitioner guides (EY/IHS, EY/KPMG) and nothing else | correctly generic — ORCA holds no primary instrument |
+
+Abu Dhabi is the worst of the four and the reason this was the cycle's fix: it is the largest
+Gulf upstream jurisdiction by reserves and the one a Middle East screen lands on, and its T4 card
+was a complete dead end — no reform log (expected, 164 of 185), no statute, no pointer to the
+federal act sitting **two rows up in the same dropdown**. The card told the analyst to go find a
+national petroleum law from a standing start while naming nothing, having nothing clickable, and
+holding the document one field away.
+
+Iraq-Kurdistan is worse in kind if not in size: the KRG Model PSA **is** the instrument KRG blocks
+are contracted on, so it is precisely the document a KRG reform check starts from — and it was
+filtered out for not being typed `legislation`.
+
+## Change
+- **`_rrFallbackInstrument(d)`** — runs only where `_rrStatuteSources()` is empty. Falls back in
+  two modes: `own` (a named `signed_contract` / `government_filing` on the row itself), then
+  `parent` (an explicit 2-entry `_RR_STATUTE_PARENT` map — the two sub-national rows in this data).
+  **Self-retiring**: the moment harvest files a `legislation` source against one of these rows, the
+  statute block takes over and the fallback never runs for it again.
+- **`_rrFallbackBlock(d)`** — same visual idiom as the statute block, and deliberately the **same
+  `#rr-ext-check` id** at the call site, so the two integrations keyed off that id come along for
+  free: `_rrVerdictPayload()` sweeps it into the **Copy-verdict clipboard table** (verified: the
+  Abu Dhabi payload now carries the Decree-Law), and the lookup's scroll target still resolves.
+- **`_rrStatuteTail()`** gains two branches so the closing sentence matches what is on screen
+  instead of contradicting it. Somalia — the only one where ORCA genuinely holds nothing — keeps
+  the original sentence verbatim.
+- **Nothing is scored.** All four stay `n/c`, `REFORM FREQUENCY SCORE` stays `n/a · not sourced`,
+  the 21-of-185 coverage count is untouched, and each block says so on its own first line. The
+  parent block states the limit rather than burying it: *"ORCA holds no source citation of any kind
+  against UAE — Abu Dhabi itself … shown because it is the nearest sourced instrument on the
+  platform — not because it governs here. Abu Dhabi licenses its upstream on emirate-level
+  concession agreements granted through ADNOC, not on the federal instrument named here, so confirm
+  that act reaches this jurisdiction before relying on it."*
+- `UAE — Dubai` is deliberately **absent** from the parent map — it holds two A-tier statutes of
+  its own and needs no fallback.
+
+## Result
+The analyst screening **Abu Dhabi** now leaves the Reform Risk card with a named A-tier federal act,
+a **live `mof.gov.ae` link**, an explicit warning that emirate-level concessions may sit outside it,
+and a **`See UAE on Reform Risk ›`** button — where an hour ago the card named no document, offered
+nothing clickable, and sent them to find a national petroleum law from scratch. **Iraq-Kurdistan**
+gets the **KRG Model PSA** with a live `gov.krd` link; **Paraguay** gets *Decree 19.080/1997* by
+name. Three of the four dead ends now start the external check from a document instead of from
+nothing, and that document travels into the IC clipboard export with the verdict.
+
+## Verify
+- **Playwright suite RAN this cycle**, `TEST_URL` pointed at the **local tree** (the graded suite
+  defaults to the deployed site and cannot gate the diff it is about to ship): **494 PASS / 0 FAIL / 1 WARN**, exit 0, report written 09:27:46Z and read back from the
+  suite's own file rather than assumed.
+  - The local-tree number is **not** the 500 PASS / 0 WARN / 0 JS errors the deployed site
+    reports, and that gap is not this diff. `index.html:49` registers the service worker at the
+    absolute path `/petroleum-fiscal-db/sw.js` — correct on GitHub Pages, a 404 when the tree is
+    served at the root locally. That one 404 is the single WARN and all 12 "JS errors", and it
+    takes the 6 SW-dependent checks with it. **The pre-change report from 02:51 reads
+    494 / 0 / 1 / 12 identically**, so the before and after are the same on this host: 0 FAIL
+    before, 0 FAIL after, no new console error, no new warn.
+- JS syntax gate: **PASS** — all 11 inline `<script>` blocks through `node --check`.
+- Cold walk at **1440x900** and **390x844 `hasTouch:true`**, storage cleared, all four countries
+  plus the Country Profile reform section. At 390: `scrollWidth` **390** = `clientWidth` **390**, no
+  sideways scroll; the new block measures 288px with `scrollWidth` 288 (no internal overflow);
+  **0 controls under 24px** — the statute link renders **63px**, the `See UAE` button **28px**.
+- Regressions checked: Oman, Qatar, UAE and UAE — Dubai still render the original
+  `STATUTE ORCA SOURCED THESE TERMS FROM` block unchanged; Nigeria (scored) untouched; **Somalia
+  unchanged and still `#rr-ext-check`-less**, which is the correct answer for it. Both render sites
+  honour `where` — "printed above" on the lookup card, "printed below" on Country Profile.
+- Paraguay has no URL on its source, so it renders as plain text rather than a dead link.
+
+## Notes for the next cycle
+- **Somalia is the one remaining true dead end** on T4 (practitioner guides only). Not fixable in
+  the UX — it needs a harvest pass, not a render change.
+- **`Paraguay Decree 19.080/1997` is typed `government_filing`, not `legislation`** — a data-typing
+  fault, not a UX one. The fallback now surfaces it either way, but the type is still wrong at
+  source. Counted across all 185 rows: `legislation` 200, `practitioner_guide` 224,
+  `government_filing` 2, `signed_contract` 2.
+- Carried forward unchanged: FC's own copy-link path still not walked for selection ticks (935);
+  the Screener count line's `block· Deepwater` join fault (935); the Home card at ~3077 saying
+  Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5 (934); `_posClause648` number
+  agreement (929); Côte d'Ivoire's two missing API slugs (916); `window._screenerExportBasis` does
+  not name the 105 withheld countries (913); Screener Advanced Filters checkboxes at 13px under
+  `pointer: coarse` (889); the `summary "Reading this table"` at 18px; Side-by-Side's two
+  byte-identical export buttons; the two diverged suite copies.
+  - **Resolved this cycle:** the 929 note "UAE/Congo not findable in the Reform Risk lookup" — walked
+    cold, the lookup holds all **185/185** `COUNTRY_DATA` names with zero missing and zero extra,
+    including `UAE`, `UAE — Abu Dhabi`, `UAE — Dubai`, `Republic of the Congo` and
+    `Democratic Republic of the Congo`. Drop it from the backlog.
+- `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
+- Header version badge bumped **v1004 → v1005** (bookkeeping, done silently at the end per the
+  directive).
