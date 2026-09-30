@@ -67365,3 +67365,132 @@ Rotation picked T3 as the stalest (927 was T6+T1, 924 T5+T2, 923 T4, 922 T3). Wa
 The walk never reached the quickstart buttons, because on a cold load the tab doesn't show them — it seeds a demo set. That seed had been **Norway / UK / Netherlands**, the "North Sea Trio," since v430.
 
 O
+
+---
+## Cycle 929 Log — 2026-09-29 — v998
+
+- Test before: 500 PASS / 0 FAIL (prompt figure, read against the DEPLOYED site)
+- Test after: **499 PASS / 0 FAIL / 1 WARN**, read from the suite's own report, run this
+  cycle against the LOCAL tree via `TEST_URL=http://localhost:8971/index.html`.
+  The WARN is `ConsoleErrors` on 15 `sw.js` 404s — the service worker's GitHub Pages path,
+  which does not exist when the repo root is served locally. Same local-serving artefact
+  recorded in cycle 927; 499 PASS + 1 WARN is the same 500 checks.
+- JS errors attributable to this change: 0
+- JS syntax gate: PASS (11 script blocks, `node --check`)
+
+## Task — T4: "What is my fiscal-stability and reform exposure here?"
+
+Rotation picked T4 as the stalest: 928 was T3, 927 T6+T1, 924 T5+T2, and T4 had not been
+walked since 923. Walked cold at 1440×900 and at 390×844 with `hasTouch`, both storages
+cleared and the page reloaded first. Path: Home → Reform Risk → read the tab the way an
+analyst with one country in mind reads it.
+
+Most of that walk is in good shape and I am recording it so the next cycle does not
+re-walk it. The `Check one country` lookup is the right control and it is honest: sampled
+20 of the 164 jurisdictions with no sourced reform log (Saudi Arabia, Qatar, Kuwait, Oman,
+Azerbaijan, Egypt, Malaysia, Vietnam, Gabon, Equatorial Guinea, Senegal, Mozambique,
+Argentina, Trinidad, Suriname, Namibia, Turkmenistan, Uganda, and two names that are filed
+differently) and every one returned a card that says plainly there is no score, refuses to
+read that as a clean record, and points at the named statute ORCA sourced the country's
+terms from as the first document for the external check. No empty cards, no page errors.
+
+## Friction
+
+**The Reform Activity Heatmap dropped a jurisdiction and presented it as a ranking cut.**
+`renderReformRisk()`, `index.html:53649` — `const heatCountries = reformCounts.slice(0, 20);`
+
+The universe is 21 jurisdictions with a sourced reform log. The grid printed 20 and
+disclosed the cut in its own caption as *"Top 20 of the 21"* — without naming which one.
+
+The one cut was **Guyana**, and not on a ranking. Guyana and Ghana both hold 0 fiscal law
+changes since 2010 and 0 at any date, so they tie on every key in the sort
+(`since2010`, `split.fiscal`, `total`) and separate only on the final
+`a.country.localeCompare(b.country)`. Ghana sorted 20th and stayed; Guyana sorted 21st and
+was cut by an alphabet. "Top 20" reads as a significance cut, so the analyst concludes the
+missing row is the least-reformed jurisdiction — while the row that was kept has the
+identical count to the row that was dropped.
+
+Three things compounded it, all inside one screen:
+
+- The **same panel's caption** spends a clause on Guyana's cells — *"Before v694 they were
+  counted as law changes here and Guyana — zero fiscal law changes on record at any date —
+  was painted orange in the 2020s"* — describing a row the grid no longer drew. An analyst
+  who reads that and goes looking for the row cannot find it.
+- Guyana **is** in the ranked table directly above (complete roster of 21 since v959) and in
+  the **QUIET SINCE 2010 (13)** card directly below. The scannable panel was the only place
+  on the tab where the country did not exist.
+- Each grid row is an `_rrOpenLocal()` link, so the cut also removed an **entry point** into
+  Guyana's reform verdict.
+
+Guyana is not a marginal row to lose: it is the frontier jurisdiction an IOC screening deck
+is most likely to carry right now, and its reform finding is a specific and slightly
+counter-intuitive one — a 100 that the tab itself marks *not a stability reading*, because
+the log holds three context events (2015 discovery, 2020 first production, 2022 terms
+review) and no fiscal law change at any date.
+
+## Change
+
+`heatCountries = reformCounts` — no slice. All 21 rows render. Guyana now has a grid row
+(all cells unlit, muted `·` context markers in the 2010s and 2020s, **Scored 0**) and its
+name is a working link into its verdict card. The caption now reads *"All 21 jurisdictions
+with a sourced reform log — the complete roster, the same rows and the same order as the
+ranked table above"* in place of *"Top 20 of the 21"*.
+
+This is the same fault v959 closed on the ranked table above it — that one was printing 15
+of 21 — which did not carry down to the grid beneath.
+
+## Result
+
+An analyst screening Guyana for reform exposure can find it in the decade grid and click
+straight through to its verdict. The grid's roster now matches the ranked table's and the
+QUIET card's rather than contradicting both, so "my country is not in the grid" once again
+means what the tab says it means everywhere else: no sourced reform log at all.
+
+## Verified this cycle, not assumed
+
+| check | result |
+|---|---|
+| JS syntax gate (11 blocks) | PASS |
+| Graded suite, LOCAL tree | 499 PASS / 0 FAIL / 1 WARN |
+| Heatmap roster vs ranked roster | 21 vs 21, set difference empty |
+| Guyana grid link clicked | lookup → `Guyana`, verdict card open, 0 page errors |
+| `scrollWidth == clientWidth` | 1920 / 1440 / 1280 / 1024 / 768 / 390 — all equal |
+| New link height, `pointer: coarse` | 25px (bar is 24px) |
+
+## Carried forward, still open
+
+- **ESCALATE TO ZACH — not a UX item, and now carried for six cycles.** `petroleum_overnight`
+  emailed FAILED on 2026-09-23, 09-24, 09-25, 09-26 and 09-27, and `CYCLE-STALE` fired on
+  09-25, 09-26 and 09-27. Five consecutive chain failures plus a stale-cycle detector going
+  unread. It is outside UX finalization scope, which is exactly why no cycle picks it up, and
+  it should stop being logged and start being raised.
+- **HARNESS: `claude -p` killed at 1800s, uncommitted work dies with it.** Not hit this
+  cycle — committed before the mirror and the push.
+- **HARNESS: the graded suite's default `TEST_URL` is the DEPLOYED site**, so it cannot gate
+  the diff it is about to ship. Overridden by hand again this cycle.
+- **The two suite copies have diverged** — the loop runs
+  `office/tools/petroleum/tests/runtime_comprehensive.js` (sha 045f00a6dddc) while
+  `petroleum-fiscal-db/tests/runtime_comprehensive.js` (sha e87e483cb5dd) is idle.
+- **(928) three of the four quickstart presets load a column the grid then sets aside** —
+  Atlantic Frontier Quartet (Guyana 0% coverage), North Sea Trio (Netherlands 0%), West
+  Africa Trio (Ghana 0%). The natural next T3 cycle.
+- **(928) `Rank among producers` reads "of 21 producers"** but `prod_coverage_pct > 0`
+  returns 22. One country is dropped between the two counts. Needs a look before anyone
+  quotes a rank in a memo. *(Note the shape it shares with this cycle's finding: a printed
+  roster count that is one short of the set it is drawn from.)*
+- **NEW (929): two country names are not findable under the names an analyst would look for** —
+  the Reform Risk lookup has no `United Arab Emirates` and no `Congo`. They are filed under
+  other strings. Minor while the control is a dropdown (the analyst scrolls and finds
+  whatever it is filed as), but it would bite the moment that control becomes type-to-search.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at 768
+  and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- Reform Risk decade heatmap caption reads "Top 20 of the 21". **CLOSED this cycle (v998).**
+- The Fiscal Reform History event-log browser lives in the off-tab-bar Vintage pane (`#t4`).
+- Side-by-Side carries two buttons whose output is byte-identical (7,691 chars).
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in
+  the repo root, predating this session. Left in place again; deleting another session's
+  files is not this cycle's call. Worth someone confirming they can go.
