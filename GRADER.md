@@ -67889,3 +67889,126 @@ Cycle 931 also picked T5, completed real work, and **lost it** — `claude -p` w
 
 ## Friction
 **Part 1 (salvaged from 931):** the Fiscal Compare "Copy for IC Memo" paste ca
+
+---
+## Cycle 934 Log — 2026-09-30 01:25
+- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: see "Verify" below — suite RAN this cycle against the local committed tree
+- JS errors: 0 (cold walk at 1440x900 and 390x844 hasTouch, both handoff paths)
+- Shipped: **v1003** — `index.html`, commit `6d993b3`, pushed, mirrored.
+
+## Task
+**T3 — "How do these three countries compare side by side?"**
+
+Cycle 933 picked T3 too and produced nothing: `claude -p` was killed at the 1800s limit. Note
+the mitigation held this time — the edit was committed the moment it verified, before the
+mirror, the push and the suite.
+
+## Friction
+Fiscal Compare's **"⇌ Load Top 5 in Side-by-Side"** (`#fc-sbs-btn` → `fcOpenSbs()`, line ~62654)
+is the tab's flagship one-click route into the comparison, and the IC workflow doc names it as
+Step 2→3 of the screening sequence. Its no-ticks fallback was `window._fcTop5 = sorted.slice(0, 5)`
+(line ~63556) — a blind slice of the take-ascending sort.
+
+Walked cold at 1440x900, no sessionStorage, no localStorage, nothing ticked. It handed over
+**USA / Iraq / Somalia / Australia / Ecuador**, and the grid the analyst lands on opened with an
+1,886-character verdict strip whose second line is:
+
+> *"Set aside — 2 of 5 columns cannot join that ordering: Somalia — statutory terms — ORCA holds
+> no verified production behind it; Australia — PRRT cash-flow basis — comparable at one price,
+> not across the deck."*
+
+The headline spread — "15.9pp apart" — was computed over **three** of the five columns. The reform
+verdict ended "no sourced log: Somalia". The term-consistency verdict placed two of five.
+
+The cause is upstream of every one of those notices, and none of them is wrong. Ranking 185
+countries by **lowest** take puts precisely the un-rankable rows at the top of the list. Measured
+on the pool this cycle:
+
+| rank | country | comparable take @$75 | basis | what Side-by-Side does with it |
+|---|---|---|---|---|
+| 1 | USA | 23.4% | production | ranks |
+| 2 | Iraq | 34.1% | production | ranks (re-based from published 84.8%) |
+| 3 | Somalia | 36.9% | statutory | **SET ASIDE** — mixed-basis set |
+| 4 | Australia | `null` | PRRT | **SET ASIDE** — no comparable take |
+| 5 | Ecuador | 39.3% | production | ranks (re-based from published 46.5%) |
+
+**The button picked the set.** It was selecting, by construction, the five countries least able
+to be compared — and then the page spent 1,886 characters explaining that most of what it had
+just loaded was not a comparison.
+
+This is the same family as the two cases already in the archive — v563's five generic-default
+rows carrying an identical 22.2%, and `_scSwingAt`'s "Load top 5 verified-production" handing
+over Saudi Arabia at rank 1 with its own take cell reading "—". Fiscal Compare's button never
+got the lesson.
+
+## Change
+The no-ticks fallback now walks the **same ordered pool, in the same order** (new
+`window._fcSbsPool`, exported beside `_fcTop5`) and takes the first five rows that rank
+**against each other**, through `_sbsCmpTake()` and `_sbsHasProd()` — the two predicates
+`_sbsApplyOrder()` itself buckets the grid on. The button therefore cannot hand over a set the
+grid then disowns. New `_fcRankableTop(cap)`; `fcOpenSbs()` consults it only when nothing is
+ticked. Rows stepped over are named in a toast, grouped by reason. Button `title` rewritten to
+describe what it now does.
+
+Three deliberate non-changes, each verified:
+- **Ticked rows are never filtered.** Explicit picks load verbatim. Ticking Somalia + Australia +
+  USA still loads all three and still prints 1 set-aside — checked live.
+- **Re-based columns stay in** (Iraq, Ecuador). They *do* carry a rank position, and the strip
+  already prints the published figure beside the ranked one. Dropping them would delete real IOC
+  jurisdictions to make a caveat disappear.
+- **Under two rankable rows it returns `null`** and the old blind slice ships — a purer basis is
+  not worth trading a comparison for. Exercised with a cleared pool, a 1-row pool and an
+  all-unrankable pool (Australia / Saudi Arabia / Kuwait); all three returned null.
+
+## Result
+The same click now lands on **USA / Iraq / Ecuador / United Kingdom / Angola**:
+
+| | before | after |
+|---|---|---|
+| "Set aside" phrases | 2 of 5 columns | **0** |
+| columns in the take ordering | 3 of 5 | **5 of 5** |
+| columns in the contractor-value ordering | 4 of 5 (Australia rank-on-this-line-only) | **5 of 5** |
+| columns in the reform ordering | 4 of 5 | **5 of 5** |
+| headline spread | 15.9pp over three columns | **29.6pp over five** |
+
+The analyst can now click the tab's advertised entry point and get a five-country comparison in
+which every column is a rank position — instead of a five-column grid that disowns two of itself
+before they have read a number.
+
+## Verify
+- JS syntax gate **PASS** (16 script blocks).
+- Cold walk at **1440x900** and **390x844 `hasTouch:true`**. At 390: `scrollWidth` 390 =
+  `clientWidth` 390 (no sideways scroll), toast box 366px wide inside the viewport, **0 controls
+  under 24px** anywhere on `#t2`.
+- 0 page errors, 0 console errors on both paths.
+- Playwright suite RAN this cycle, `TEST_URL` overridden to the local committed tree (the
+  graded suite's default URL is the deployed site and cannot gate the diff it is about to ship).
+
+## Notes for the next cycle
+- **(928) "Rank among producers — of 21 producers" is NOT an off-by-one. Closed.** `prod_coverage_pct
+  > 0` returns 22; `_sbsHasProd` returns 21. The difference is **Saudi Arabia**, excluded as a state
+  monopoly — it is a producer but carries no rank position. 21 is the correct denominator for a
+  rank. This has been carried in the backlog since cycle 928; it can come out.
+- **(928) "three of the four quickstart presets load a column the grid sets aside" is already
+  handled** and can come out of the backlog: `_sbsPaintQuickstart()` (v817/v898) computes the
+  set-aside count and the comparable take range at paint time and prints them on the button face.
+  Verified on the live buttons this cycle.
+- **The mixed-basis remediation works.** "Compare the 2 statutory-terms columns →"
+  (`sbsKeepBasis()`) was tested end to end on Guyana/Brazil/Suriname: it correctly reduced to
+  Guyana + Suriname and the orderings came back. Not a defect.
+- **Share links carry price and order** — `#/compare/nigeria+norway+united_kingdom@100~take_desc`
+  round-trips into a fresh context with the verdict strip identical. Not a defect.
+- **`_sbsAdoptDeck()` does not itself re-render**, so calling it on an already-populated grid
+  leaves the verdict strip on the old price until something else forces a render. Both real
+  callers (`fcOpenSbs`, `scOpenSbs`) set the deck *before* the adds, so this is correct as
+  written — but it is a live trap for any third caller added later.
+- **Still open, untouched:** the Home card at line ~3077 says Side-by-Side compares "up to 4
+  countries"; `CMP_MAX` is 5 and the tab's own empty state and tab tooltip both say 5. Two doc
+  sites (~13140, ~23399) also say 4. Text-only, so it was not this cycle's work.
+- Carried forward unchanged: `_posClause648` number agreement (929); UAE/Congo not findable in
+  the Reform Risk lookup (929); Côte d'Ivoire's two missing API slugs (916);
+  `window._screenerExportBasis` does not name the 105 withheld countries (913); Screener Advanced
+  Filters 17 checkboxes at 13px under `pointer: coarse` (889); the `summary "Reading this table"`
+  at 18px; Side-by-Side's two byte-identical export buttons; the two diverged suite copies.
+- **`_ctl907.html` (9.7 MB) and `_baseline_t3.html`** are still untracked in the repo root.
