@@ -67674,3 +67674,15 @@ of Mexico happens to fall.
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders in the
   repo root, predating this session. Left in place again; deleting another session's files is
   not this cycle's call. Worth someone confirming they can go.
+
+---
+## Cycle 930 Log — 2026-09-29 21:32
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 930 complete — shipped v999, pushed, mirror synced.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (929 was T4, 928 T3, 927 T6+T1; T2 and T5 were stalest.) Walked cold at 1440×900 and 390×844 with touch, both storages cleared and reloaded first.
+
+The structural pass found nothing: all 185 countries driven through the profile rendered with no NaN, no undefined, no page errors. The one `Infinity` grep hit was the operator **Infinity Energy** on Nicaragu
