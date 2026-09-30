@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v999</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1001</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -39484,10 +39484,45 @@ function _scReformExport(country) {
       ? lastScored.year + ' — ' + lastScored.event
         + (lastScored.take_change ? ' (' + lastScored.take_change + ' government take)' : ' (take move not quantified)')
       : null,
-    // NOT icColor: all 21 logged jurisdictions come back var(--orange), so a colour test
-    // cannot separate "nothing post-2010 is a fiscal change" from "raised take +15pp".
-    // This is the token family, which is what the verdict actually turns on.
-    clean: /NO LAW CHANGE/.test(tok),
+    // ── v1001 (T5): THIS FLAG WAS INVERTED ON THE ONLY TWO ROWS IT EVER FIRED ON ──────
+    // v907 reasoned that a colour test cannot separate the verdicts because all 21 logged
+    // jurisdictions return var(--orange). The first half is right and re-measured live this
+    // cycle. The conclusion drawn from it was not: `NO LAW CHANGE` is not the quiet verdict,
+    // it is one of the SIX orange ones, and _rrClassify()'s own v583 comment on the branch
+    // that sets it says so outright -- "the score of 100 is produced by exclusion, not by a
+    // clean legislative record. It must not render in the same green as Algeria." Its icRule
+    // adds "Do not read [the score] as a legislative track record ... renegotiation pressure,
+    // contract disputes and political risk are not in it."
+    //
+    // So the test returned true for exactly the two countries the classifier warns hardest
+    // about, and false for every genuinely quiet one. Measured across all 21 logged
+    // jurisdictions this cycle -- clean=true fired on 2 rows, and only these 2:
+    //     Ghana   NO LAW CHANGE  0 chg  clean=true   <- context events only, orange
+    //     Guyana  NO LAW CHANGE  0 chg  clean=true   <- context events only, orange
+    //     Algeria  PRE-2010      0 chg  clean=false  <- last take rise 2005, nothing since
+    // Guyana is the sharp end: its post-2010 log is Liza-1, first oil, and a 2022 government
+    // commission reviewing the Stabroek terms under renegotiation pressure. It was the one
+    // row an IC memo did NOT get a reform caveat on, while Algeria -- quiet for 21 years --
+    // did. Guyana also sits in the Atlantic Frontier Quartet quickstart preset, so this is on
+    // a default path, not an edge case.
+    //
+    // The green branch of _rrClassify() is the one that means what this flag is asking, and it
+    // has its own token: NO PREMIUM, whose rule reads "No reform-frequency premium indicated."
+    // No jurisdiction reaches it on today's data, which is the correct answer -- all 21 carry
+    // something an IC memo has to state -- and the flag now goes green by itself if one ever does.
+    clean: /NO PREMIUM/.test(tok),
+    // The qualifier the token cannot carry on its own. In a memo column headed "Reform verdict",
+    // the bare string "NO LAW CHANGE" asserts the opposite of the finding behind it, exactly as
+    // a bare "n/c" reads as "nothing to report". Same remedy, same voice: say it in the cell.
+    // Sourced from the classifier's own context-event count, not restated by hand.
+    qualifier: /NO LAW CHANGE/.test(tok)
+      ? (function(){
+          var _ctx = (typeof _rrContextInWindow === 'function') ? _rrContextInWindow(evs) : [];
+          return 'post-2010 record is ' + (_ctx.length ? _ctx.length + ' context event'
+                   + (_ctx.length === 1 ? '' : 's') : 'context events') + ' only (discovery, first oil, '
+                 + 'terms review) \u2014 score by exclusion, NOT a clean legislative record';
+        })()
+      : '',
     sourced: true,
     basis: plain(v.icLabel) + '. Reform Frequency Score ' + v.score + '/100, ' + plain(v.rankTxt)
       + '. ' + v.since2010 + ' sourced fiscal law change' + (v.since2010 === 1 ? '' : 's')
@@ -68888,6 +68923,85 @@ function copyFCForIC(btn) {
       headShort.splice(7, 0, 'Pub. NPV $M @$' + P);   // v977 (T5)
     }
   }
+  // ── v1000 (T5) ─ the two CITABILITY gates now travel with the flagship shortlist ────────
+  // Walked T5 cold at 1440x900, both storages cleared: Fiscal Compare auto-loads 185 rows, tick
+  // USA / Iraq / Somalia, press ⎘ Copy for IC Memo. Measured on the pasted artifact, not inferred:
+  // 7,109 characters, 14 columns, ~5,500 of it caption prose — and grepping the whole thing for
+  // /evidence|quality|reform|stability|terms cited|n\/c/i returns ZERO hits. Both signals are on
+  // screen in the row the analyst just ticked:
+  //     USA      Quality "B · 2 of 5 terms cited"   Reform "PRE-2010 · 0 chg since 2010"
+  //     Iraq     Quality "D · 1 of 3 terms cited"   Reform "SIZE UNKNOWN · 1 chg since 2010"
+  //     Somalia  Quality "D · 0 of 5 terms cited"   Reform "n/c"
+  // (v1001 corrected the USA line: v1000 recorded it as D · 1 of 3, which re-measuring against
+  // the live page this cycle disproved. A wrong number in a comment is how "stable but wrong"
+  // starts, so it is corrected rather than carried.)
+  // and neither reaches the memo. Somalia pastes as a clean citable 36.9% off a D-grade record
+  // with 0.0% primary law and no reform log at all.
+  //
+  // This is worse than a missing column, because this tab's own IC Memo Quick Rules panel — about
+  // 700px above the button — makes these two the gate on whether a figure may be cited:
+  //     · Reform verdict n/c → carry no premium of zero; check the national petroleum law
+  //       before the memo goes up
+  //     · "—" in any cell = not verified to Evidence A/B standard; do not cite in IC memo
+  // and the Methodology tab states it again ("treat a C as screening-only and do not put a D in a
+  // recommendation document"). The platform tells the analyst these two decide citability, then
+  // hands them an artifact that has dropped both.
+  //
+  // No new rule, no new threshold and no second grader: _scEvidExport() (v844) and
+  // _scReformExport() (v907) already exist and already fixed this exact defect on the SCREENER's
+  // paste — v844's own note reads "the EVIDENCE column the screen prints beside Govt Take, which
+  // the clipboard table dropped". It was never carried to Fiscal Compare, which is the tab the
+  // platform opens on and the paste an IC memo is actually built from. Same two functions, same
+  // strings, so one memo assembled from both tabs cannot show two vocabularies for one fact.
+  var _evAt = {}, _rfAt = {}, _nCD = 0, cdNames = [], _nRfLog = 0, _nRfNotClean = 0, rfNames = [];
+  for (var _qi = 0; _qi < _entries.length; _qi++) {
+    var _qc = _entries[_qi].c;
+    if (!byC[_qc]) continue;
+    var _qEv = (typeof _scEvidExport === 'function') ? _scEvidExport(cd[_qc] || {}) : null;
+    if (_qEv && _qEv.grade && _qEv.grade !== 'not graded') {
+      _evAt[_qc] = _qEv;
+      if (_qEv.grade === 'C' || _qEv.grade === 'D') {
+        _nCD++; if (cdNames.length < 8) cdNames.push(_qc + ' (' + _qEv.grade + ')');
+      }
+    }
+    var _qRf = (typeof _scReformExport === 'function') ? _scReformExport(_qc) : null;
+    if (_qRf) {
+      _rfAt[_qc] = _qRf;
+      if (_qRf.sourced) {
+        _nRfLog++;
+        // NOT green is the test, not "has a log": NO LAW CHANGE is the only verdict family that
+        // is genuinely quiet. Same clean/non-clean split _scReformExport() already computes.
+        if (!_qRf.clean) { _nRfNotClean++; if (rfNames.length < 8) rfNames.push(_qc + ' ' + _qRf.verdict); }
+      }
+    }
+  }
+  var _anyEv = false;
+  for (var _evk in _evAt) { if (Object.prototype.hasOwnProperty.call(_evAt, _evk)) { _anyEv = true; break; } }
+  // Same carry rule the Screener's reform column uses: where no row on this view has a sourced
+  // log, a column of "n/c" costs the memo a column and says nothing the note below cannot. The
+  // n/c coverage sentence is emitted either way, so the absence is never silent.
+  var _anyRf = _nRfLog > 0;
+  if (_anyEv) {
+    head.push('Evidence tier — grades the FACT BASE this row’s take was built from, NOT the model. '
+      + 'The worse of primary-law share (A ≥60% / B ≥40% / C ≥20%) and fact depth (A ≥150 facts / '
+      + 'B ≥50 / C ≥15), so 100% primary law on 4 facts grades D. Same grade as the Quality column on '
+      + 'screen, the Country Profile badge and the Screener export. Platform IC rule: treat a C as '
+      + 'screening-only, and do not put a D in a recommendation document without establishing the terms '
+      + 'from the country’s own petroleum act. A different question from Data basis, which is production '
+      + 'weighting rather than sourcing.');
+    headShort.push('Evi-dence');
+  }
+  if (_anyRf) {
+    head.push('Reform verdict — what this jurisdiction’s SOURCED fiscal-reform event log tells you to '
+      + 'carry, from the same classifier the Reform verdict column on screen, the Reform Risk tab and the '
+      + 'Country Profile sidebar print. Every token states its own unit: WACC +3–5pp / +5–8pp are '
+      + 'percentage points to add to the DISCOUNT RATE and are the only verdicts that change a model input; '
+      + 'TAKE +Npp is percentage points of GOVERNMENT TAKE already raised inside the 2010 window and is never '
+      + 'a WACC add; SIZE UNKNOWN means terms were rewritten in-window and the take effect was never '
+      + 'quantified. The chg count is a count and never reads how large a change was. n/c means ORCA holds '
+      + 'no sourced log at all — missing coverage, NOT a clean record and NOT a premium of zero.');
+    headShort.push('Reform ver-dict');
+  }
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
   var nEngOvr = 0, engOvrNames = [];   // v968 (T5)
@@ -68997,6 +69111,43 @@ function copyFCForIC(btn) {
         _row.splice(7, 0, '');
       }
     }
+    // v1000 (T5): appended, never spliced — the two reference columns above insert at indices 5
+    // and 7, so anything positional has to stay behind them.
+    if (_anyEv) {
+      var _evR = _evAt[c];
+      if (!_evR) { _row.push('—'); }
+      else {
+        // The Screener's cell, character for character (v844 + v912), so a memo assembled from
+        // both tabs cannot carry two spellings of one grade. A letter on its own in a memo table
+        // is a credential; C and D say what to DO in the cell.
+        var _evS = _evR.grade + ' · ' + Number(_evR.aPct || 0).toFixed(0) + '% primary law';
+        if (_evR.grade === 'C') _evS += ' — screening only';
+        if (_evR.grade === 'D') _evS += ' — not citable without the statute';
+        // The leg the letter does not cover. On screen this is the "N of M terms cited" chip on the
+        // Quality column — the thing that separates "the record is well sourced" from "the DCF that
+        // produced this row's model take ran mostly uncited terms".
+        if (typeof _orcaTermLegCells === 'function') {
+          var _tl = _orcaTermLegCells(c);
+          if (_tl && _tl[0] != null && _tl[1] != null) _evS += ' · ' + _tl[0] + ' of ' + _tl[1] + ' model terms cited';
+        }
+        _row.push(_evS);
+      }
+    }
+    if (_anyRf) {
+      var _rfR = _rfAt[c];
+      if (!_rfR) { _row.push('—'); }
+      else if (!_rfR.sourced) {
+        // Spelled out rather than a bare "n/c": a two-character cell under a column headed Reform
+        // is read in a memo as "nothing to report", which is the opposite of what it means.
+        _row.push('n/c — no sourced log; missing coverage, not a clean record');
+      } else {
+        // v1001 (T5): the qualifier travels with the verdict. NO LAW CHANGE reaching a memo
+        // unqualified was the defect that hid Guyana's 2022 Stabroek terms review.
+        _row.push(_rfR.verdict + ' · ' + _rfR.since2010 + ' chg since 2010'
+          + (_rfR.year ? ' · last ' + _rfR.year : '')
+          + (_rfR.qualifier ? ' · ' + _rfR.qualifier : ''));
+      }
+    }
     matrix.push(_row);
   }
   if (matrix.length < 2) { _icRefuse('No rows on screen to copy.'); return; }
@@ -69072,6 +69223,34 @@ function copyFCForIC(btn) {
     + '. Their two model columns are engine assumptions and may not be cited as the country\u2019s terms; '
     + 'a hard-coded override is not a citation. Their ORCA database columns are drawn from the contract '
     + 'record and are unaffected. See the Model basis column, which names the conflict per row. ';
+  // v1000 (T5): the two sentences this tab's own IC Memo Quick Rules panel already states, now in
+  // the artifact that leaves the tab. Placed with the engine-override note because all three answer
+  // the same question — whether a figure on this row may be cited — and read before the
+  // comparability notes below, which are about whether rows may be ranked against each other.
+  if (_nCD) warn += _nCD + ' of the ' + N + ' rows grade C or D on EVIDENCE — '
+    + cdNames.join(', ') + (_nCD > cdNames.length ? ' and ' + (_nCD - cdNames.length) + ' more' : '')
+    + '. The grade is the worse of primary-law share and fact depth, and it grades the fact base rather '
+    + 'than the model. This platform’s stated rule is that a C is screening-only and a D does not belong '
+    + 'in a recommendation document until the terms are established from the country’s own petroleum act. '
+    + 'See the Evidence tier column, which carries the rule per row. ';
+  if (_anyRf && _nRfNotClean) warn += _nRfNotClean + ' of the ' + N + ' rows carry a reform verdict that '
+    + 'is NOT a clean record — ' + rfNames.join(', ')
+    + (_nRfNotClean > rfNames.length ? ' and ' + (_nRfNotClean - rfNames.length) + ' more' : '')
+    + '. Read each token in its own unit: a WACC verdict is points on the discount rate, a TAKE verdict is '
+    + 'points of government take already raised inside the 2010 window, and SIZE UNKNOWN means the terms '
+    + 'were rewritten and the take effect was never quantified. Do not convert the change count into a '
+    + 'premium yourself — it is a count and is blind to magnitude. See the Reform verdict column. ';
+  if (_anyRf && (N - _nRfLog) > 0) warn += 'ORCA holds a sourced fiscal-reform event log for 21 of 185 '
+    + 'jurisdictions, and ' + (N - _nRfLog) + ' of these ' + N + ' rows ' + ((N - _nRfLog) === 1 ? 'is' : 'are')
+    + ' outside it, reading n/c. That is missing coverage, not a clean record and not a Reform Frequency '
+    + 'Score of 100: do not carry a reform premium of zero into the memo on that basis. Th'
+    + ((N - _nRfLog) === 1 ? 'at row needs' : 'ose rows need') + ' an external check — the national '
+    + 'petroleum law, IMF Article IV, or operator annual reports — before the premium is defensible. ';
+  if (!_anyRf) warn += 'NONE of the ' + N + ' rows has a sourced fiscal-reform event log: ORCA holds one for '
+    + '21 of 185 jurisdictions and this shortlist contains none of them, so no Reform verdict column is '
+    + 'carried. That is missing coverage, not a clean record — do not read the absence of the column as a '
+    + 'reform premium of zero. Each of these rows needs an external check (the national petroleum law, IMF '
+    + 'Article IV, operator annual reports) before an IC memo carries one. ';
   if (nMono) warn += nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
   // v596 (T5): the PROXY count, on this view, with the rule stated. The omission was biased —
   // low take and no production evidence are the same rows, so the head of an ascending shortlist
@@ -69162,6 +69341,12 @@ function copyFCForIC(btn) {
     return t;
   }
   var _iModel = head.indexOf('Model basis'), _iData = head.indexOf('Data basis');
+  // v1000 (T5): the two new columns hold verdict text, not figures, so they must be excluded from
+  // the right-align/nowrap numeric branch below — nowrap on a 60-character reform cell is what
+  // reintroduces the horizontal blowout v977 measured and fixed.
+  var _iEvid = _anyEv ? headShort.indexOf('Evi-dence') : -1;
+  var _iRfrm = _anyRf ? headShort.indexOf('Reform ver-dict') : -1;
+  function _isTextCol(ci) { return ci === _iModel || ci === _iData || ci === _iEvid || ci === _iRfrm; }
   var _htmlRows = matrix.slice(1).map(function(row) {
     // v777 (T5): the reference-only blend column is muted so it does not read as a second ranked take.
     return '<tr>' + row.map(function(c, ci) {
@@ -69170,7 +69355,7 @@ function copyFCForIC(btn) {
         var sh = _shortBasis(c);
         if (sh !== c) { nud = _mk(_noteKey(headShort[ci] + ' — ' + c)); cell = esc(sh); }
       }
-      var numeric = (ci > 3 && ci !== _iModel && ci !== _iData);
+      var numeric = (ci > 3 && !_isTextCol(ci));
       return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '')
         + (numeric ? 'text-align:right;white-space:nowrap;' : '')
         + (_anyFee && (ci === 5 || (_anyG1 && ci === 7)) ? 'color:#777;' : '')
@@ -69183,14 +69368,16 @@ function copyFCForIC(btn) {
   // class, not hand-tuned per column, so they hold when the two reference columns are absent.
   var _wt = matrix[0].map(function(c, ci) {
     return ci === 0 ? 4 : ci === 1 ? 10 : ci === 2 ? 8 : ci === 3 ? 11
-         : (ci === _iModel || ci === _iData) ? 9 : 6;
+         : (ci === _iModel || ci === _iData) ? 9
+         : (ci === _iEvid || ci === _iRfrm) ? 13   // v1000 (T5): verdict text, same class as a basis cell
+         : 6;
   });
   var _wtSum = _wt.reduce(function(a, b){ return a + b; }, 0);
   var _pct = _wt.map(function(w){ return (100 * w / _wtSum).toFixed(2) + '%'; });
   var _colGroup = '<colgroup>' + _pct.map(function(w){ return '<col style="width:' + w + '">'; }).join('') + '</colgroup>';
   var _htmlHead = '<tr>' + matrix[0].map(function(c, ci) {
     return '<th width="' + _pct[ci] + '" style="' + thS + 'width:' + _pct[ci] + ';'
-      + ((ci > 3 && ci !== _iModel && ci !== _iData) ? 'text-align:right;' : '')
+      + ((ci > 3 && !_isTextCol(ci)) ? 'text-align:right;' : '')
       + '">' + esc(headShort[ci]) + _mk(_colKey[ci]) + '</th>';
   }).join('') + '</tr>';
   var _noteHtml = _notes.map(function(n) {
