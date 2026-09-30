@@ -68027,3 +68027,99 @@ before they have read a number.
 Fiscal Compare's **"⇌ Load Top 5 in Side-by-Side"** is the tab's flagship one-click route into the comparison, and the IC workflow doc names it as the Step 2→3 handoff. Its no-ticks fallback was `window._fcTop5 = sorted.slice(0, 5)` — a blind slice of the take-ascending sort.
 
 Walked it cold at 1440×900, no storage, nothi
+
+---
+## Cycle 935 Log — 2026-09-30 02:52
+
+- Test before: 500 PASS / 0 FAIL (deployed baseline, as reported at cycle start)
+- Test after: 494 PASS / 0 FAIL / 1 WARN against the LOCAL committed tree
+- JS errors: 12 captured, all one repeated 404 for `/petroleum-fiscal-db/sw.js` — the deployed
+  service-worker path under a local server root. Not from this diff; 0 page errors and 0 console
+  errors on both cold walks.
+- JS syntax gate: **PASS** (11 script blocks)
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (934 was T3, 933 T6, 932 T5, 930 T2)
+
+## Friction
+Screener toolbar — `copyScreenerLink()` and `_scRouteQuery()` (~line 66400 / 66640).
+
+Walked cold at **1440x900** and **390x844 `hasTouch:true`**, storage cleared. Home → the Screener
+card → **IOC Capital Screen** → 15 rows → tick the five countries the analyst actually wants on the
+list → press the Screener's own **Copy Link**, which sits in that same toolbar row.
+
+Every other artefact on the tab honours the hand-pick, and says so on its own face:
+
+| control | with 5 ticked |
+|---|---|
+| Copy for IC Memo | `⎘ Copy 5 selected` |
+| CSV | `⬇ CSV (5)` |
+| Excel | `⬇ Excel (5)` |
+| Side-by-Side | loads exactly those five |
+| **Copy Link** | **`🔗 Copy Link`** — unchanged |
+
+Measured: the published hash was `#/screener/iochurdle?t=65&n=0&n5=0&px=0` — **no selection leg at
+all** — and the toast said *"opens this screen: 15 countries at $75/bbl"*. Opened cold in a second
+browser context that link returns all **fifteen**: Azerbaijan, Mexico, Argentina, Colombia, China,
+Australia, Ecuador, Angola, India and Iraq back on a list the sender had just removed one by one,
+with `#sc-sel-dock` hidden (`window._scSelected` empty) and nothing anywhere naming the ten
+additions.
+
+v902 made this link carry the *thresholds*. The hand-pick is the last mile of T1 and it did not
+ride — so the one artefact a T1 analyst produces could be saved as a file but not **sent**, and the
+control that looked like it would send it sent the superset. v781's own note in this file says it:
+*"the filters narrow the SCREEN, and an IC shortlist is not a screen."*
+
+## Change
+- `_scRouteQuery()` gains an **`s=`** leg carrying the ticked countries, capped at 25
+  (`_SC_ROUTE_SEL_MAX`) — past that it is not a shortlist and the URL stops being paste-able.
+- `_scRouteApplyQuery()` restores the ticks **before** the re-run, so the row renderer's own
+  `_scSelHas()` paints tick + `sc-row-sel` in one pass, then `_scSyncSelUI()` opens the dock.
+- `_scSyncSelUI()` relabels the button to **`🔗 Copy Link · N ticked`** and republishes the hash, so
+  the address bar, a bookmark and the Back button agree with Copy Link. Gated on
+  `#explorer-screen-mode` being visible, so it cannot overwrite a Browse filter link
+  (`#/explorer?mech=PSC`) — verified: switching to Browse still writes `#/explorer`.
+- The toast now names the shortlist, names ticks sitting **outside** the current screen, and over
+  the cap says the list is too long to travel and points at Excel/CSV rather than truncating
+  silently: *"Link copied — but 70 ticks is too many to carry in a URL … Use ↓ Excel or ↓ CSV."*
+- **`#sc-sel-dock` gains a `🔗 Link` button.** The dock carried three ways to save the shortlist as
+  a file and no way to send it, while the toolbar's Copy Link is 300–700px above the row the tick
+  happened on at 1440x900 and off-screen on a phone — which is the reason the dock exists at all.
+
+## Result
+The analyst ticks five countries, presses Copy Link, and the recipient opens **those five ticked** —
+measured on the arriving page: `_scSelected` = Canada · USA · Brazil · United Kingdom · Indonesia,
+`_scExportRows()` returns **5** (not 15), dock reads `5 ticked`, CSV button reads `⬇ CSV (5)`, with
+the 15-row screen still behind them for context. The IC shortlist is now sendable, not just
+saveable.
+
+## Verify
+- Cold walk at 1440x900 and 390x844 `hasTouch:true`. At 390: `scrollWidth` 390 = `clientWidth` 390
+  (no sideways scroll). New `#sc-dock-link` **44px** tall under `pointer: coarse`; relabelled
+  `#screener-copy-link-btn` 28px. No control added or touched this cycle is under 24px.
+- Regressions checked: cold Screener label restores to `🔗 Copy Link` with no ticks and the `s=` leg
+  disappears from the hash on `scClearSel()`; the over-cap path omits the leg instead of shipping a
+  4KB URL; Browse-mode hash unaffected.
+- Playwright suite **RAN this cycle** with `TEST_URL` pointed at the local committed tree (the
+  graded suite defaults to the deployed site and cannot gate the diff it is about to ship).
+
+## Notes for the next cycle
+- **Selection ticks are still not in the Fiscal Compare share link** — `fcOpenSbs()` reads ticks
+  (v797) and Side-by-Side's own `#/compare/...` hash carries countries + price + order (934), but FC's
+  own copy-link path was not walked this cycle. Same defect shape as the one fixed here; worth a
+  walk before assuming it is covered.
+- The Screener count line is a single run-on sentence of 400–500 characters at most settings, and it
+  has one cosmetic join fault: `"…within each block· Deepwater @$75/bbl"` — no space before the `·`,
+  and `contractor npv` is lower-case where every other clause is not. Text-only, so it was not this
+  cycle's work.
+- Carried forward unchanged: the Home card at ~3077 says Side-by-Side compares "up to 4 countries"
+  against `CMP_MAX` = 5, plus two doc sites (~13140, ~23399) — text-only (934);
+  `_posClause648` number agreement (929); UAE/Congo not findable in the Reform Risk lookup (929);
+  Côte d'Ivoire's two missing API slugs (916); `window._screenerExportBasis` does not name the 105
+  withheld countries (913); Screener Advanced Filters checkboxes at 13px under `pointer: coarse`
+  (889) — **17 such controls measured on `#explorer-screen-mode` at 390 this cycle**, all
+  pre-existing; the `summary "Reading this table"` at 18px; Side-by-Side's two byte-identical export
+  buttons; the two diverged suite copies.
+- `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
+- Header version badge was stale at **v1002** while v1003 had shipped; bumped to **v1004** with this
+  cycle (bookkeeping, done silently at the end per the directive).
