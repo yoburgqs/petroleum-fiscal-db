@@ -67874,3 +67874,18 @@ a clean reform record while its own event log carries a live terms review.
 - Side-by-Side carries two buttons whose output is byte-identical (7,691 chars).
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders in the repo
   root, predating this session. Left in place again; worth someone confirming they can go.
+
+---
+## Cycle 932 Log — 2026-09-29 23:47
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 932 complete. Everything is committed, pushed, and mirrored.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+
+Cycle 931 also picked T5, completed real work, and **lost it** — `claude -p` was killed at the 1800s limit before it could commit. I found the orphaned diff still on disk, verified it live rather than trusting it, salvaged it, and then found a second defect in it.
+
+## Friction
+**Part 1 (salvaged from 931):** the Fiscal Compare "Copy for IC Memo" paste ca
