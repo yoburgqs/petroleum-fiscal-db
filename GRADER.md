@@ -68440,3 +68440,20 @@ now opens the country they meant instead of offering them Ukraine.
   byte-identical export buttons; the two diverged suite copies.
 - `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
 - Header version badge bumped **v1005 → v1006** (bookkeeping, done silently at the end per the directive).
+
+---
+## Cycle 938 Log — 2026-09-30 07:00
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 937 complete — shipped, mirrored, pushed (`4e6bd1d`, log `97794d8`).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (936 was T4, 935 T1, 934 T3, 933 T6, 932 T5)
+
+## Friction
+Walked T2 cold at 1440×900 and 390×844 with touch, storage cleared, starting where the tab starts — the cold-load default, Indonesia. The Fiscal Predictability badge in the header strip reads:
+
+`≤32 · VERY LOW    ≥37.2pp obs    stored: 6̶2̶ ▲ withdrawn`
+
+Directly under it sits the
