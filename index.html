@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v998</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v999</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46768,14 +46768,51 @@ function loadCountryProfile(country) {
           + 'verified field production rather than statutory terms. Top tier for IOC capital allocation, '
           + 'and defensible as such.';
         charColor = 'var(--green)';
-      } else if (_hasPos648) {
+      } else if (_hasPos648 && !_noProd663) {
         charLabel = 'Contractor-favorable — low government take, and ' + _posClause648
-          + ', so this sits inside the band an IOC actually allocates capital across'
-          + (_noProd663
-              ? '. No verified block-level production is held here, so the take is a statutory model over '
-                + _nStr663 + ' — directional, not realised'
-              : '') + '.';
+          + ', so this sits inside the band an IOC actually allocates capital across.';
         charColor = 'var(--green)';
+      } else if (_hasPos648) {
+        // ── v999 (T2): the one branch of this chain v663 left on the green endorsement ─────
+        // v663 rebuilt the `take <= 40` chain because "top tier for IOC capital allocation" was
+        // firing on take alone, and 102 of the 108 regimes under 40% hold NO verified block-level
+        // production. It fixed the branch where _vLower648 === 0 — nothing producing sits below
+        // this country — and gave it a yellow evidence-gap verdict. It did not reach THIS branch,
+        // which is the same situation one hair to the right: _vLower648 >= 1.
+        //
+        // Counted live against COUNTRY_DATA, this branch fires for 48 countries and 41 of them
+        // hold no verified production at all. For 33 of the 48 _vLower648 is exactly 1, and the
+        // single producer beneath them is the USA at 23.4% in every case — the producing floor
+        // v663's own comment names. So the sentence was reading "1 of the 21 production-weighted
+        // producers take less at $75/bbl, SO THIS SITS INSIDE THE BAND AN IOC ACTUALLY ALLOCATES
+        // CAPITAL ACROSS", in green, on jurisdictions ORCA models rather than measures:
+        // Ascension Island and Saint Helena on 1 contract and 2 facts, Western Sahara and Puerto
+        // Rico on 1, Nepal on 2, Burundi on 4. Somalia carries it at Evidence D, 0% primary law
+        // and 0 of 5 model terms cited, under a title that already reads "⚠ speculative".
+        //
+        // It also inverted the ordering against the branch v663 DID fix. French Guiana (21.3%,
+        // 5 contracts) prints yellow, "Read it as an evidence gap before reading it as fiscal
+        // terms … Establish the terms against this jurisdiction's own petroleum act". Saint Helena
+        // (25.6%, 1 contract, 2 facts) printed GREEN. Thinner evidence, more favourable verdict,
+        // and the only thing that moved is that the USA sits below 25.6% but not below 21.3%.
+        //
+        // No new threshold: the split is _noProd663, the same quantity branch 1 already keys its
+        // statutory-model clause on, and every figure below is measured — _posClause648, the
+        // producer floor v663 computed, d.n and d.n_facts as the evidence strip prints them. The
+        // 7 branch-3 countries that DO carry production coverage (Mexico, Argentina, Canada,
+        // Colombia, Iraq, Australia, Ecuador) keep the green verdict above unchanged; they are
+        // legitimately inside that band because they are in the set that defines it.
+        var _nf999 = Number(d.n_facts || 0);
+        charLabel = 'Low take (' + take.toFixed(1) + '%) on a statutory model, not on realised '
+          + 'economics — ORCA holds no verified block-level production for ' + country
+          + ', so this figure is an average over ' + _nStr663 + ' and ' + _nf999.toLocaleString()
+          + ' fact' + (_nf999 === 1 ? '' : 's') + '. ' + _posClause648
+          + (_pFloor663 != null ? ', the floor being ' + _pFloorC663 + ' at ' + _pFloor663.toFixed(1) + '%' : '')
+          + ' — but that places a modelled term inside a distribution of realised ones, which is '
+          + 'not the same as sitting inside the band an IOC allocates capital across. Establish the '
+          + 'terms against this jurisdiction\u2019s own petroleum act before it goes on a '
+          + 'capital-allocation list.';
+        charColor = 'var(--yellow)';
       } else {
         _posInLabel648 = false;
         charLabel = 'Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation';
@@ -47038,7 +47075,11 @@ function loadCountryProfile(country) {
         + _vLower648 + ' / ' + _vRanked648 + ' producers take less</span>'
       : '';
     var _verdictCTA = '';
-    if (take <= 40 && _hasPos648 && _vLower648 === 0 && !_isProd663) {
+    // v999 (T2): the route travels with the verdict. This cohort now also covers the
+    // no-production branch above, which was being handed "See all investible regimes" — the
+    // plain take ≤40% Screener, 108 countries, 102 with no verified production. That is the
+    // shortlist v663 identified as built from the same absence that produced the number.
+    if (take <= 40 && _hasPos648 && !_isProd663 && (_vLower648 === 0 || _noProd663)) {
       // v663 (T2): the country sits below the entire producing floor, so "See all investible
       // regimes" — which loads the Screener at take ≤40% and returns 108 countries, 102 of them
       // with no verified production — hands the analyst a shortlist built from the same absence
