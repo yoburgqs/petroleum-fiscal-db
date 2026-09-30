@@ -43850,10 +43850,19 @@ function renderReformTimeline(country) {
       if (srcIdxN)  parts.push(srcIdxN + (srcIdxN === 1 ? ' opens a listing with no instrument in it' : ' open a listing with no instrument in it'));
       const _noAddr = sourcedCount - srcCitedN;
       if (_noAddr > 0) parts.push(_noAddr + (_noAddr === 1 ? ' carries no address at all' : ' carry no address at all'));
-      return ' <strong style="color:var(--red);">Not one of th'
-        + (sourcedCount === 1 ? 'at citation' : 'ose ' + sourcedCount + ' citations')
-        + ' can be opened from here'
-        + (parts.length ? ' \u2014 ' + parts.join('; ') : '')
+      // Singular gets its own subject -- "Not one of that citation" is not English, and the
+      // reason reads as a clause rather than a count of one.
+      const _one1002 = sourcedCount === 1;
+      const _why1002 = _one1002
+        ? (srcDeadN ? 'it returns nothing at the address on record'
+            : (srcIdxN ? 'it opens a listing with no instrument in it'
+                       : 'it carries no address at all'))
+        : parts.join('; ');
+      return ' <strong style="color:var(--red);">'
+        + (_one1002
+            ? 'That one citation cannot be opened from here'
+            : 'Not one of those ' + sourcedCount + ' citations can be opened from here')
+        + (_why1002 ? ' \u2014 ' + _why1002 : '')
         + '.</strong> <span style="color:var(--muted);font-weight:400;">The match is a record of '
         + 'what ORCA read when the rate was harvested, not something this page can let you check. '
         + 'Locate the instrument' + (sourcedCount === 1 ? '' : 's')
