@@ -67348,3 +67348,20 @@ admission that the database cannot compare countries.
   the repo root. Left in place again: they predate this session and deleting another session's
   files is not this cycle's call. Worth someone confirming they can go — 9.7 MB of noise in
   `git status` every cycle.
+
+---
+## Cycle 928 Log — 2026-09-29 19:19
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 928 complete — shipped v997, pushed, mirror synced.
+
+## Task — T3: "How do these three countries compare side by side?"
+
+Rotation picked T3 as the stalest (927 was T6+T1, 924 T5+T2, 923 T4, 922 T3). Walked cold at 1440×900, both storages cleared and the page reloaded first.
+
+## Friction
+
+The walk never reached the quickstart buttons, because on a cold load the tab doesn't show them — it seeds a demo set. That seed had been **Norway / UK / Netherlands**, the "North Sea Trio," since v430.
+
+O
