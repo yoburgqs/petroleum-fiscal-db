@@ -67793,10 +67793,40 @@ a clean reform record while its own event log carries a live terms review.
 
 ## Carried forward, still open
 
-- **⚠ ESCALATE TO ZACH — eighth cycle carried, still not a UX item.** `petroleum_overnight`
-  emailed FAILED on 2026-09-23, 09-24, 09-25, 09-26, 09-27; `CYCLE-STALE` fired 09-25, 09-26,
-  09-27. Outside UX finalization scope, which is exactly why no cycle picks it up. Being logged,
-  not raised.
+- **⚠ ESCALATED, AND THE CARRIED VERSION OF IT WAS PARTLY WRONG — diagnosed 2026-09-29 by
+  cycle 932.** Seven cycles carried this as "five consecutive chain failures, escalate". Measured
+  this cycle instead of re-copied, and it splits into one false alarm and one real decision:
+
+  **FALSE ALARM — "the chain has not run since 09-27 / runs = 0".** It could not have.
+  `last reboot` shows the machine **shut down Sun 2026-09-27 15:28 and rebooted Tue 2026-09-29
+  18:14** (`uptime` 5:19 at the time of writing). That window covers 02:00 on both 09-28 and
+  09-29, so `petroleum_overnight` had no 02:00 to fire at. `launchctl print` reporting
+  `runs = 0 / last exit code = (never exited)` is the *expected* reading for a
+  `StartCalendarInterval` job in a launchd session that began at 18:14 today — it is not
+  evidence of a defect, and a future cycle should not read it as one. The plist is intact
+  (02:00 daily, `RunAtLoad false`, correct venv python and working dir). `petroleum_absence`
+  reads the same way for the same reason. Expected next fire: 02:00 on 2026-09-30.
+  `petroleum_cycle` is a `StartInterval` job, which is why it alone shows a live pid — the
+  same asymmetry that makes calendar jobs look dead right after a boot.
+
+  **REAL, AND IT IS A DECISION FOR ZACH, NOT A BUG.** The 5 FAILED emails (09-23 → 09-27) are
+  genuine, and `~/logs/overnight_chain_last_failure.txt` names the cause exactly:
+  `6 ok, 1 failed` — `NO-DELTA harvest (exit 0) — contract_facts: 330,576 -> 330,576 (+0) —
+  harvest logged 10 harvest_log row(s), 550 records attempted, 0 new facts, status=completed`.
+  Under the verdict table in `~/CLAUDE.md`, *flat + rows written* is `NO-DELTA` = "ran, found
+  nothing new" — the documented **benign** verdict — yet the chain exits 1 and emails FAILED on
+  it. `~/CLAUDE.md` predicted this in writing: *"if it does persist, harvest eventually has
+  nothing left to process and will report NO-DELTA every night — an assertion that fires nightly
+  trains the reader to ignore it."* That has now happened, and it is why seven cycles learned to
+  carry the line instead of reading it. The open question `~/CLAUDE.md` already poses — whether a
+  nightly re-harvest of an exhausted contract list is the right job — is the actual decision, and
+  it is Zach's. Not actioned here: a UX cycle must not change the chain's failure semantics, and
+  must not kick off an 11-hour job that takes the DB writer lock.
+
+  **Also real, unexplained, and worth a look:** the 09-27 chain took **41,206s = 11.4 hours**
+  (02:00 → 13:32) against a documented ~57s normal for `audit`. `OUTAGE_2026-08-29.md` records
+  `audit` hanging 11,042s once before. Step timeouts exist; this still finished 6/7 OK, so
+  whatever is slow is not timing out.
 - **⚠ HARNESS — this is now costing whole cycles.** Cycle 931 completed real T5 work and lost
   it: `claude -p` is killed at 1800s and the uncommitted tree dies with it. This cycle recovered
   it only because the diff happened to still be on disk. Mitigation used here: **commit as soon
