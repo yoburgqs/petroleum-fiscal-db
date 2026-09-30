@@ -67686,3 +67686,145 @@ of Mexico happens to fall.
 **T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (929 was T4, 928 T3, 927 T6+T1; T2 and T5 were stalest.) Walked cold at 1440×900 and 390×844 with touch, both storages cleared and reloaded first.
 
 The structural pass found nothing: all 185 countries driven through the profile rendered with no NaN, no undefined, no page errors. The one `Infinity` grep hit was the operator **Infinity Energy** on Nicaragu
+
+---
+## Cycle 932 Log — 2026-09-29 23:1x
+
+- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- JS syntax gate: PASS (11 inline blocks, 0 failed) — run twice, after each edit
+- Shipped: **v1001**, pushed as `9f926c2`, mirror byte-identical
+
+### Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+(930 was T2, 929 T4, 928 T3, 927 T6+T1. Cycle 931 picked T5 and was killed at the
+1800s harness limit before it could commit, so T5 was still unshipped.)
+
+Walked cold at 1440×900, both storages cleared and reloaded, then the six widths
+down to 390×844 with `hasTouch: true`. Path: Fiscal Compare auto-loads 185 rows →
+tick a shortlist → `#fc-copy-ic-btn` → `copyFCForIC()`. The clipboard was captured
+by stubbing `navigator.clipboard.write` and reading the real Blobs, so every number
+below is measured off the actual pasted artifact, not inferred from the code.
+
+### Friction
+
+**Part 1 — salvage.** Cycle 931 had already found and fixed the first half; its work
+was sitting uncommitted in the tree, orphaned by the timeout. Re-verified before
+trusting it: the pasted memo carried **no citability signal at all** — grepping the
+whole artifact for `/evidence|quality|reform|terms cited|n\/c/i` returned **0 hits** —
+while the row the analyst had just ticked showed both signals on screen. Somalia
+pasted as a clean, citable 36.9% off a D-grade record with 0.0% primary law, 0 of 5
+model terms cited, and no reform log at all. This tab's own IC Memo Quick Rules panel,
+~700px above the button, makes those two the gate on whether a figure may be cited.
+
+**Part 2 — the defect that would have shipped inverted, in `_scReformExport()`
+(index.html:39487).** `clean: /NO LAW CHANGE/.test(tok)`. Measured across all 21
+logged jurisdictions, that returned `true` for exactly **two** countries — and they
+are the only two the classifier itself paints orange and warns hardest about:
+
+| country | token | icColor | old `clean` | in-window record |
+|---|---|---|---|---|
+| Ghana | `NO LAW CHANGE` | orange | **true** | 2 context events (first oil, TEN/ITLOS) |
+| Guyana | `NO LAW CHANGE` | orange | **true** | 3 context events incl. **2022 Stabroek terms review** |
+| Algeria | `↑ PRE-2010` | orange | false | nothing since 2005 |
+
+`_rrClassify()`'s own v583 comment on the branch that sets the token says it outright:
+*"the score of 100 is produced by exclusion, not by a clean legislative record. It must
+not render in the same green as Algeria."* Its `icRule` adds *"renegotiation pressure,
+contract disputes and political risk are not in it."*
+
+So the memo gave **no reform caveat to Guyana** — whose post-2010 log is Liza-1, first
+oil, and a 2022 government commission reviewing the Stabroek terms under renegotiation
+pressure — while flagging Algeria, quiet for 21 years. Guyana sits in the **Atlantic
+Frontier Quartet** quickstart preset, so this was a default path, not an edge case.
+The flag had been declared in v907 but never consumed by anything, so v1000 would
+have been the first code to ship it — inverted.
+
+v907's stated reason was that a colour test cannot separate the verdicts because all
+21 return `var(--orange)`. The measurement is correct and was reconfirmed live; the
+conclusion drawn from it was not. `NO LAW CHANGE` is not the quiet verdict — it is one
+of the six orange ones.
+
+### Change
+
+1. Evidence tier and Reform verdict now travel with the FC memo, via the existing
+   `_scEvidExport()` (v844) and `_scReformExport()` (v907) — the same functions and the
+   same strings the Screener paste already uses, so one memo assembled from both tabs
+   cannot carry two vocabularies for one fact. Both columns are appended, not spliced,
+   and are excluded from the right-align/nowrap numeric branch via `_isTextCol()`.
+2. `clean` now tests `NO PREMIUM` — the one verdict `_rrClassify()` paints green, whose
+   rule reads "No reform-frequency premium indicated." No jurisdiction reaches it on
+   today's data, which is the correct answer: all 21 carry something a memo must state.
+   The flag goes green by itself if one ever does.
+3. `NO LAW CHANGE` cells are now self-describing, the same remedy v1000 applied to a
+   bare `n/c`, sourced from the classifier's own context-event count rather than
+   restated by hand.
+4. Corrected a wrong number v1000 left in a comment (USA recorded as `D · 1 of 3`;
+   live it measures `B · 2 of 5`). A wrong number in a comment is how "stable but
+   wrong" starts.
+
+Measured after, on the real artifact:
+
+| | before | after |
+|---|---|---|
+| Citability signal hits in paste | **0** | 19 |
+| Columns | 14 | 16 |
+| `clean=true` rows across 21 jurisdictions | Ghana, Guyana | none |
+| green-verdict / `clean` mismatches | 2 | **0** |
+| Guyana's memo cell | `NO LAW CHANGE · 0 chg since 2010` | `NO LAW CHANGE · 0 chg since 2010 · post-2010 record is 3 context events only (discovery, first oil, terms review) — score by exclusion, NOT a clean legislative record` |
+| Warn sentence | omitted Ghana + Guyana | `3 of the 3 rows carry a reform verdict that is NOT a clean record — Ghana NO LAW CHANGE, Guyana NO LAW CHANGE, Algeria ↑ PRE-2010.` |
+| Somalia evidence cell | absent | `D · 0% primary law — not citable without the statute · 0 of 5 model terms cited` |
+
+### Result
+
+The analyst pasting a shortlist into an IC memo now gets the two gates that decide
+whether a figure may be cited in the artifact itself, agreeing with the row on screen
+rather than contradicting it — and Guyana can no longer reach an IC memo described as
+a clean reform record while its own event log carries a live terms review.
+
+### Step 5b — phone
+
+| check | result |
+|---|---|
+| `scrollWidth` vs `clientWidth` @ 1920 / 1440 / 1280 / 1024 / 768 / 390 | all equal — no sideways scroll |
+| 390×844 with `hasTouch: true`, walked to Fiscal Compare | 390 / 390 |
+| Pasted table at letter width (794px) | 778px wide, tallest row 187px — fits, no nowrap blowout |
+| Controls added or touched under `pointer: coarse` | none — this cycle changed clipboard content only, no DOM or CSS |
+| Page + console errors | 0 |
+
+## Carried forward, still open
+
+- **⚠ ESCALATE TO ZACH — eighth cycle carried, still not a UX item.** `petroleum_overnight`
+  emailed FAILED on 2026-09-23, 09-24, 09-25, 09-26, 09-27; `CYCLE-STALE` fired 09-25, 09-26,
+  09-27. Outside UX finalization scope, which is exactly why no cycle picks it up. Being logged,
+  not raised.
+- **⚠ HARNESS — this is now costing whole cycles.** Cycle 931 completed real T5 work and lost
+  it: `claude -p` is killed at 1800s and the uncommitted tree dies with it. This cycle recovered
+  it only because the diff happened to still be on disk. Mitigation used here: **commit as soon
+  as the edit verifies, before the mirror, the push and the suite** — do not hold a diff until
+  the end of a cycle.
+- **(932) `_scReformExport().clean` had no consumer between v907 and v1000.** A flag declared
+  with no reader stayed inverted for ~90 cycles. Worth a sweep for other unconsumed exported
+  fields before one of them ships the same way.
+- **(929) `_posClause648` is not number-agreed** — renders "**1** of the 21 production-weighted
+  producers **take** less". Cheap and safe for a later cycle.
+- **HARNESS: the graded suite's default `TEST_URL` is the DEPLOYED site**, so it cannot gate the
+  diff it is about to ship. Overridden by hand again this cycle.
+- **The two suite copies have diverged** — the loop runs
+  `office/tools/petroleum/tests/runtime_comprehensive.js` while
+  `petroleum-fiscal-db/tests/runtime_comprehensive.js` is idle.
+- **(928) three of the four quickstart presets load a column the grid then sets aside** —
+  Atlantic Frontier Quartet (Guyana 0% coverage), North Sea Trio (Netherlands 0%), West Africa
+  Trio (Ghana 0%). Still the natural next T3 cycle. Note this cycle touched Guyana and Ghana
+  from the reform side; the coverage half is untouched.
+- **(928) `Rank among producers` reads "of 21 producers"** but `prod_coverage_pct > 0` returns 22.
+- **(929) `United Arab Emirates` and `Congo` are not findable** in the Reform Risk lookup under
+  the names an analyst would use.
+- Côte d'Ivoire requests two API slugs that do not exist (916).
+- `window._screenerExportBasis` does not name the 105 withheld countries (913).
+- `Take spread across contracts` renders Guyana two ways (911).
+- Screener Advanced Filters: 17 checkboxes at 13px under `pointer: coarse` (889).
+- `summary "Reading this table — column definitions"` is 18px under `pointer: coarse` at 768
+  and 390 — the only remaining sub-24px `pixel_audit` finding, present at baseline.
+- Side-by-Side carries two buttons whose output is byte-identical (7,691 chars).
+- **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders in the repo
+  root, predating this session. Left in place again; worth someone confirming they can go.
