@@ -68123,3 +68123,18 @@ saveable.
 - `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
 - Header version badge was stale at **v1002** while v1003 had shipped; bumped to **v1004** with this
   cycle (bookkeeping, done silently at the end per the directive).
+
+---
+## Cycle 935 Log — 2026-09-30 03:02
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 935 complete — committed, mirrored, pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (934 was T3, 933 T6, 932 T5)
+
+## Friction
+Walked cold at 1440×900 and 390×844 with touch, storage cleared: Home → Screener card → IOC Capital Screen → 15 rows → tick the five countries you actually want on the list → press the Screener's own **Copy Link**, sitting in that same toolbar row.
+
+Every other control on that toolbar honours the hand-pick and says so on its face — C
