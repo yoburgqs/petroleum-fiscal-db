@@ -67494,3 +67494,18 @@ means what the tab says it means everywhere else: no sourced reform log at all.
 - **`_ctl907.html`** (9.7 MB) and **`_baseline_t3.html`** — untracked scratch renders still in
   the repo root, predating this session. Left in place again; deleting another session's
   files is not this cycle's call. Worth someone confirming they can go.
+
+---
+## Cycle 929 Log — 2026-09-29 20:21
+- Test before: 500 PASS / 0 FAIL
+- Test after: 500 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 929 complete — shipped v998, pushed, mirror synced.
+
+## Task — T4: "What is my fiscal-stability and reform exposure here?"
+
+Stalest task in the rotation (928 was T3, 927 T6+T1, 924 T5+T2; T4 had not been walked since 923). Walked cold at 1440×900 and 390×844 with `hasTouch`, both storages cleared and the page reloaded first.
+
+## Friction
+
+**The Reform Activity Heatmap dropped a jurisdiction and dressed the omission up as a ranking cut.** `renderReformRisk()`, `index.html:53649` — `heatCoun
