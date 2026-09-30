@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v992</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v997</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23163,9 +23163,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
 
     <div id="faq-A968" class="faq-item" style="margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">
-      <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A968-body">A968. The Side-by-Side tab loaded Norway, UK, and Netherlands automatically — is this a preset, and how do I use Side-by-Side for my own comparison? <span class="faq-chev" aria-hidden="true">▼</span></div>
+      <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A968-body">A968. The Side-by-Side tab loaded UK, Norway, and Nigeria automatically — is this a preset, and how do I use Side-by-Side for my own comparison? <span class="faq-chev" aria-hidden="true">▼</span></div>
       <div id="faq-A968-body" class="faq-a" style="display:none;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.7;">
-        <p>Yes — the <strong>North Sea Trio</strong> (Norway, United Kingdom, Netherlands) is a canonical preset loaded automatically when you first open the Side-by-Side tab. It is the most analytically useful starting comparison for European offshore IC work and serves as a calibration benchmark for any North Sea basin exploration.</p>
+        <p>Yes — <strong>UK · Norway · Nigeria</strong> is the opening example, loaded automatically when you first open the Side-by-Side tab. It was changed in v997: the previous example was the North Sea Trio (Norway, UK, Netherlands), and because ORCA holds <strong>0% verified production</strong> for the Netherlands, that column was set aside from all four headline verdicts — the take ordering, the contractor-value ordering, term consistency and reform exposure — so the opening view of the tab disowned a third of itself. All three countries in the current example are production-weighted (UK 37.6%, Norway 18.2%, Nigeria 14.1% coverage — only 22 of 185 countries clear that bar) and all are Group 1 mechanics (Concession/PSC), so all three rank against each other on one basis, with a 31.9pp take spread. <strong>The North Sea Trio is still available</strong> as a quickstart button on the empty state — click Clear to see it — and it remains the right starting point for European offshore IC work, with the Netherlands read as a statutory-basis proxy beside the ordering rather than as a rank position.</p>
         <p><strong>Why the North Sea Trio:</strong> Norway (68% take @$75/bbl, Concession+SPT+PRRT), UK (49%, Concession+RFCT+SC), and Netherlands (48%, Concession) represent the full range of North Sea fiscal philosophy from state-maximizing (Norway, backed by government SPT uplift that makes Norway NPV-positive despite 78% marginal rate) to commercially competitive (Netherlands, low-take, no windfall tax). Seeing all three side-by-side gives analysts an immediate feel for the fiscal spread in the world's most mature offshore basin.</p>
         <p><strong>IC use cases for the North Sea Trio:</strong></p>
         <ul>
@@ -23174,7 +23174,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>Farm-in pricing:</strong> North Sea historical take range (48–68%) provides the peer anchor for any farm-in valuation using ORCA fiscal data</li>
         </ul>
         <p><strong>How to add or replace countries:</strong> Use the country search box above the comparison table to add countries (up to 4 maximum). Type a country name, select from the dropdown, and it appears as an additional column. To remove a country, click the X on its column header. To replace the entire preset, remove each country individually and add your own selections.</p>
-        <p><strong>The "Example loaded" banner:</strong> The yellow banner reading "Example loaded: North Sea Trio — Norway, UK, Netherlands" appears on first tab visit to signal that this is a preset, not your own selection. Click the × to dismiss it. On subsequent visits within the same session, the banner does not reappear and your selections are preserved.</p>
+        <p><strong>The "Example loaded" banner:</strong> The amber banner reading "Example loaded: UK · Norway · Nigeria — three production-weighted producers, so all three rank against each other on one basis" appears on first tab visit to signal that this is a preset, not your own selection. Click the × to dismiss it. On subsequent visits within the same session, the banner does not reappear and your selections are preserved.</p>
         <p><strong>Side-by-Side is most useful when:</strong> You have 2–4 candidate countries at the same exploration stage and want to compare all fiscal metrics (take, NPV, IRR, Breakeven, Swing) at four price points ($50/$75/$100/$125) simultaneously. It is the fastest route to a side-by-side IC table for a regional allocation decision. For more than 4 countries, use Fiscal Compare with a region chip and export the filtered table instead.</p>
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform <span class="orca-cite-ver">v603</span> (Aug 2026). Cross-references: FAQ A958 (5-minute IC shortlist), FAQ A924 (two-country PSC vs. Concession comparison), FAQ A945 (Norway RFCT/SC/PRT stack), FAQ A966 (CP headline strip interpretation).</em></p>
       </div>
@@ -24173,7 +24173,36 @@ function switchTab(id, btn) {
         }
       }, 150);
     } else if (id === 't2') {
-      // Side-by-Side: auto-load North Sea trio (Norway · UK · Netherlands)
+      // Side-by-Side: auto-load the opening example (UK · Norway · Nigeria)
+      // v997 (T3): this was ['Norway','United Kingdom','Netherlands'] — the "North Sea Trio" —
+      // from v430 to v996. It is the FIRST thing a first-time analyst ever sees this tab do, and
+      // ORCA holds 0% verified production for the Netherlands, so the grid then disowned a third
+      // of its own demonstration. Measured on the rendered pane, cold, at 1440: the seeded set
+      // produced 18 set-aside phrases and a 1,111-character verdict strip in which Netherlands is
+      // excluded from ALL FOUR headline verdicts —
+      //     take        "Set aside — 1 of 3 columns cannot join that ordering"
+      //     value       "Not in the value ordering — 1 of 3"
+      //     consistency "Netherlands ≤59 cannot be placed"
+      //     reform      "no sourced log: Netherlands"
+      // — plus two full-width amber ⚠ blocks below the grid. With Norway's Predictability score
+      // also withdrawn, exactly ONE of the three seeded columns survived intact. An analyst with
+      // 20 minutes reads that and concludes the database cannot support a comparison.
+      // Nigeria replaces the Netherlands because it is the measured fix, not a tidier caption:
+      //   - prod_coverage_pct 14.1% (vs 0%), so it is production-weighted like UK and Norway and
+      //     joins the same scale. Only 22 of 185 countries clear that bar.
+      //   - Concession 671 + PSC 163 — both MECHANIC_COMPARABILITY Group 1, so the take is
+      //     commensurable with the two Concession columns. No fee-basis re-basing.
+      //   - it carries a sourced reform log, which the Netherlands does not, so the reform
+      //     verdict ranks 3 of 3 instead of 2 of 3.
+      // Re-measured after the swap: 0 set-aside phrases, all four verdicts rank all three
+      // columns, "order holds $50–$125", "agrees with take order", and a 31.9pp take spread —
+      // the widest of any all-producer trio, so the example now also demonstrates the range the
+      // tool exists to show. There is no third North Sea producer available: Denmark, Ireland and
+      // the Netherlands are all 0% coverage, so keeping the set inside the North Sea and keeping
+      // it rankable are mutually exclusive. Rankable wins for the opening example.
+      // The proxy-column machinery is NOT weakened and is NOT being hidden — 163 of 185
+      // countries are proxy columns, so an analyst meets it on their own first search. The
+      // "North Sea Trio" quickstart button still loads the old set verbatim on request.
       // v509: two guards. (a) Only seed when the grid is genuinely empty — a shared
       // #/compare/... link populates compareList BEFORE t2 is first activated, and the
       // unguarded seed spliced Norway + UK into the sender's comparison and pushed it to
@@ -24183,7 +24212,7 @@ function switchTab(id, btn) {
         if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length > 0) {
           if (compareList.length > 0) return;   // analyst / shared link already chose — do not seed
           _sbsSeeding = true;
-          ['Norway', 'United Kingdom', 'Netherlands'].forEach(function(c) {
+          ['Norway', 'United Kingdom', 'Nigeria'].forEach(function(c) {
             if (typeof addCompare === 'function') addCompare(c);
           });
           _sbsSeeding = false;
@@ -24206,7 +24235,7 @@ function switchTab(id, btn) {
             banner.id = 'sbs-example-banner';
             banner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
             banner.style.cssText = 'background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:block;line-height:1.55;';
-            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> North Sea Trio — Norway, UK, Netherlands. <strong style="color:var(--text);">Search for any country above and this example clears itself</strong> — your comparison starts fresh, with all 5 slots free. ';
+            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> UK · Norway · Nigeria — three production-weighted producers, so all three rank against each other on one basis. <strong style="color:var(--text);">Search for any country above and this example clears itself</strong> — your comparison starts fresh, with all 5 slots free. ';
             cmpOut.parentNode.insertBefore(banner, cmpOut);
           }
         }
