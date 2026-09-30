@@ -2440,6 +2440,69 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .dd-section, .card, #dd-profile-head, canvas { break-inside: avoid; page-break-inside: avoid; }
   h2, h3, .dd-section-hdr { break-after: avoid; page-break-after: avoid; }
 
+
+  /* ── v1007 (T5): the Screener PDF was a control panel with a table under it ──────────
+     Walked T5 cold — "give me something I can paste straight into an IC memo" — on the
+     surface v660 calls "the surface that BUILDS the IC shortlist": Screener, preset
+     "IOC Capital Screen", 15 of 185 countries, then the control the Methodology tab
+     tells the analyst to use ("Export shortlist ... for IC memo attachment") — Ctrl+P /
+     Save as PDF.
+
+     Measured at the A4 page box before this rule, on that exact screen:
+     the results table began at y=1084 of a 2313px document. FORTY-SEVEN PERCENT of the
+     printed exhibit sat above the 15 rows it exists to show, and almost none of it was
+     data. Page 1 of the IC attachment was, in order:
+
+       - the tab's screen help strip — "set thresholds ... adjust sliders directly ...
+         Use Reset All to clear filters" — instructions, on paper, for controls a reader
+         cannot touch;
+       - a live <select> printed as a form widget reading "Load a screen…", sitting
+         directly beneath the preset chip that names the screen that WAS loaded. The
+         exhibit contradicted itself in its first two lines;
+       - the PRICE DECK button row, $50 / $75 / $100 / $125;
+       - four <input type=range> sliders, printed as tracks and thumbs;
+       - "Set $0 ⟵ survives $50/bbl", "⇌ Load top 5 in Side-by-Side →",
+         "+ Include proxy-economics countries", "+ Put these 105 back in" — four buttons
+         inviting a committee reader to click paper.
+
+     The shortlist itself started on page 2.
+
+     v535 hid screen controls by NAME rather than with a blanket `button` rule — correct,
+     because country names inside the ranked tables are unclassed <button>s and a blanket
+     rule blanks them out of the printed table. But that list was written for Side-by-Side
+     and Country Profile (#cmp-*, #dd-*, #fc-*), and the Screener pane was never added to
+     it. So the one tab whose output is *defined* as an IC attachment was the one tab
+     printing its whole control surface.
+
+     Every control hidden here has its value restated in words that DO print, checked on
+     the shipped build:
+       #screener-preset-select  -> #screener-preset-label chip, "◆ IOC Capital Screen:
+                                   verified production · Take ≤65% · NPV ≥0 @$75 AND @$50"
+       #sc-deck-wrap            -> the count line ("· Deepwater @$75/bbl · 10% WACC") and
+                                   the table's own "GOVT TAKE @ $75/BBL" header
+       the four sliders         -> their own <label>s, which carry the live value and the
+                                   pass count: "Max Govt Take: 65% · 16 of 22 clear this"
+     Nothing that states a threshold, a basis or an exclusion is touched: the criteria
+     paragraph, the NOT ON THIS LIST / ALSO NOT ON IT / CLEARED THIS SCREEN chip blocks,
+     and the state-bearing checkboxes (comparable-take basis, verified-production first)
+     all still print — those are the assumptions the export has to carry.
+
+     Only pure actions go. A "+N more" expander stays: it is the sole line on paper that
+     tells the reader N countries are not listed. */
+  #explorer-screen-mode .screener-intro,
+  #explorer-screen-mode #screener-preset-select,
+  #explorer-screen-mode #screener-preset-clear-btn,
+  #explorer-screen-mode #sc-deck-wrap,
+  #explorer-screen-mode input[type="range"],
+  #explorer-screen-mode #sc-sbs-btn,
+  #explorer-screen-mode #screener-basis-action,
+  #explorer-screen-mode .slider-group > label > button,
+  #sc-prod-out button[onclick*="_scSetBasis"],
+  /* Explorer browse shares this pane. Its three <select>s and three checkboxes are left
+     alone — they report the filter and sort the printed ranking was produced under, which
+     is an assumption the export has to carry. This one is a download control. */
+  #irr-scatter-png-btn { display: none !important; }
+
   @page { size: A4 landscape; margin: 15mm; }
 }
 
@@ -2868,7 +2931,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1006</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1010</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3816,7 +3879,10 @@ window.copyPlatformCitation = function(btn) {
   <h2 class="page-title">Screener</h2>
 
   <!-- v481: Screener context intro strip — Browse has one (v473) but Screener jumped straight to sliders with no orientation for new analysts -->
-  <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.6;">
+  <!-- v1007 (T5): .screener-intro is a print hook, not a style hook — this strip is
+       orientation for someone holding a mouse, and on an IC-attachment PDF it is the
+       first thing the committee reads. See the v1007 block in @media print. -->
+  <div class="screener-intro" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.6;">
     <strong style="color:var(--text);">Screener</strong> — set thresholds to filter 185 countries by fiscal criteria. Load a <strong style="color:var(--text);">preset</strong> for a one-click IC screen, or adjust sliders directly. Results update automatically. Click any row to open its Country Profile. Export shortlist to XLSX for IC memo attachment. Switch to <strong style="color:var(--text);">Browse</strong> to see all countries ranked, or <strong style="color:var(--text);">Bubble Chart</strong> to visualize the take-vs-NPV landscape. Use <strong>Reset All</strong> to clear filters.
   </div>
 
@@ -40133,6 +40199,94 @@ function _scCopyColumns(rows, price) {
       return s;
     } });
   cols.push({ h: 'Data basis', f: function(r){ return r.Verified_Production === 'Yes' ? 'verified field production' : 'proxy economics'; } });
+  // ── v1008 (T5) ─ the shortlist has to fit the page it is pasted onto ───────────────────
+  // v977 measured and fixed exactly this on Fiscal Compare. It was never carried here, and
+  // this is the tab the block above calls "the surface that BUILDS the IC shortlist": the
+  // analyst screens down to 8-15 countries and THAT row set is the memo exhibit. Measured
+  // this cycle on the text/html flavour Word actually consumes, 8 rows ticked, pasted into a
+  // letter-portrait document (6.5in / 624px text column):
+  //     15 columns, natural table width 1221px = 1.96x the text column. Under Word's
+  //     AutoFit-to-window the header row is 99px tall, the tallest country row is 444px
+  //     (4.6in - half a page for ONE country), 112 cells overflow their box and overprint
+  //     their neighbours, and an 8-row shortlist runs to 3.99 letter pages.
+  //     Worst single cell: "Concession,PSC,RSC,Buy-back" - comma-joined with no spaces, so
+  //     it is one unbreakable 27-character token and spills 100px into the next column.
+  // Fiscal Compare, post-v977, pastes the same shape at 624px natural width, 4 overflow
+  // cells and 2.1 pages for five rows. The difference is not the column count - it is that
+  // three of these columns hold SENTENCES (predictability basis 176 chars, reform verdict
+  // 113, evidence 63) and a table cell is not where a sentence goes.
+  //
+  // Same remedy, same reasoning as v977: short scannable column labels, the full header and
+  // the per-row prose keyed out into notes underneath, proportional column widths declared so
+  // AutoFit cannot divide the text column into 15 equal 0.43in slivers. Nothing is dropped -
+  // every character that used to sit in a cell is still in the artifact, under the table where
+  // an IC exhibit puts its qualifications. text/plain is untouched: Excel has no page to
+  // overflow and wants the full strings in-cell.
+  //
+  // Labels are kept to words of six characters or fewer, hyphenated where they are longer, for
+  // the reason v977 recorded: a long word cannot be broken, so at column width it spills into
+  // its neighbour rather than wrapping. That is the overprinting mechanism, not the column count.
+  //
+  // The SCREEN APPLIED criteria block stays ABOVE the table, unlike v977's preamble. v907 put it
+  // there deliberately ("a pasted shortlist whose screen is not stated is a list, not a screen")
+  // and measured at 108px it is not what is costing the pages - the table is.
+  var _scShort = [
+    [/^# in screen/,            '#',                  null, false],
+    [/^Country$/,               'Country',            null, false],
+    [/^Region$/,                'Region',             null, false],
+    // Typography only: the value is a comma-joined list with no spaces, which Word cannot break.
+    // No note - "Concession, PSC" says nothing "Concession,PSC" did not.
+    [/^Mechanic$/,              'Mechanic',           function(v){ return v.replace(/,/g, ', '); }, false],
+    // The unit symbol is in the header, so it is not repeated 8 times down the column. That is
+    // ~7px per cell recovered on four columns, which is the difference between "32.7%" fitting
+    // its box and spilling into the Mechanic cell beside it. Fiscal Compare's exhibit already
+    // renders these as bare numbers under a unit-bearing header; this matches it.
+    [/^Govt take @\$/,          'Govt take % @$' + price, function(v){ return v.replace('%',''); }, false],
+    [/^Comparable take/,        'Comp. take % @$75',  function(v){ return v.replace('%',''); }, false],
+    // The unit is dropped from the LABEL here, not from the value: the full header says "($M)"
+    // while cpNpvFmt renders "$3.91B", and a header that contradicts its own column is worse
+    // than one that leaves the unit to the cell. The "($M)" wording survives in the keyed note.
+    [/^Contractor NPV @\$/,     'NPV @$' + price,     null, false],
+    [/^NPV @\$50/,              'NPV @$50',           null, false],
+    [/^% of \$/,                '% NPV kept @$50',    function(v){ return v.replace('%',''); }, false],
+    [/^Breakeven/,              'Break-even $/bbl',
+      function(v){ return /^n\/a/.test(v) ? 'n/a' : v.replace('not modelled', 'not mod-elled'); }, true],
+    [/^Price swing/,            'Price swing pp',     function(v){ return v.replace('pp',''); }, false],
+    // "≤40/100 · VERY LOW (ceiling) — carry this, not the stored 72 · MODERATE, which is
+    // withdrawn; this country's own contracts run 8.0–47.4% (39.4pp …)" -> "≤40 · VERY LOW".
+    // The ceiling and its band stay IN the cell, which is v879's rule: an editor who keeps the
+    // table and cuts the notes must not be able to send the withdrawn figure to committee.
+    [/^Fiscal predictability/,  'Pre-dicta-bility',
+      function(v){ return v.split(' \u2014 ')[0].replace('/100', ''); }, true],
+    [/^Reform record/,          'Reform ver-dict',
+      function(v){
+        if (/^n\/c/.test(v)) return 'n/c';
+        var ps = v.split(' \u00b7 '), chg = '';
+        for (var i = 1; i < ps.length; i++) if (/chg since 2010/.test(ps[i])) chg = ps[i].replace(' since 2010', '');
+        return (ps[0] + (chg ? ' \u00b7 ' + chg : '')).replace('UNKNOWN', 'UN-KNOWN');
+      }, true],
+    // Longhand -> shorthand only. "93% primary law" and "93% PL" are the same fact, and the two
+    // citability rules ("screening only", "not citable without the statute") are KEPT in the cell
+    // rather than keyed away, because they are the gate this tab's IC Memo Quick Rules panel
+    // makes them. So no note: nothing is lost to look up.
+    [/^Evidence$/,              'Evi-dence',
+      function(v){
+        if (!v || v === '\u2014') return v;
+        var pl = v.match(/(\d+)% primary law/), mt = v.match(/(\d+) of (\d+) model terms cited/);
+        var s = v.charAt(0) + (pl ? ' \u00b7 ' + pl[1] + '% PL' : '') + (mt ? ' \u00b7 ' + mt[1] + '/' + mt[2] + ' cited' : '');
+        if (/screening only/.test(v)) s += ' \u00b7 screen only';
+        if (/not citable/.test(v))    s += ' \u00b7 not cit-able';
+        return s;
+      }, false],
+    [/^Data basis$/,            'Data basis',
+      function(v){ return v === 'verified field production' ? 'verified pro-duction' : 'proxy'; }, false]
+  ];
+  cols.forEach(function(c) {
+    for (var i = 0; i < _scShort.length; i++) {
+      if (_scShort[i][0].test(c.h)) { c.s = _scShort[i][1]; c.c = _scShort[i][2]; c.n = _scShort[i][3]; return; }
+    }
+    c.s = c.h; c.c = null; c.n = false;
+  });
   return cols;
 }
 
@@ -40178,17 +40332,98 @@ function copyScreenerTable() {
     + '\n\n' + tailTxt;
 
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  var th  = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
-  var td  = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  // ── v1008 (T5) ─ see the measurement in _scCopyColumns() ───────────────────────────────
+  // 10pt with 4px/8px padding on 15 columns is what produced the 1221px natural width; the
+  // print sizes below match the ones v977 settled on for the same exhibit on Fiscal Compare,
+  // so a memo assembled from both tabs does not show two typographies for one kind of table.
+  var th  = 'border:1px solid #999;padding:3px 4px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:8.5pt;font-weight:bold;text-align:left;vertical-align:bottom;word-wrap:break-word;';
+  var td  = 'border:1px solid #999;padding:3px 4px;font-family:Calibri,Arial,sans-serif;font-size:8.5pt;word-wrap:break-word;';
   var tdL = td + 'font-weight:bold;';
+
+  // Keyed notes: the cell carries the figure, the sentence sits underneath. One key per DISTINCT
+  // note, so "n/c — no sourced log; missing coverage, not a clean record" on six rows keys once.
+  var _nLet = 'abcdefghijklmnopqrstuvwxyz';
+  var _notes = [], _noteAt = {};
+  function _noteKey(txt) {
+    if (_noteAt[txt]) return _noteAt[txt];
+    var k = _nLet.charAt(_notes.length) || ('n' + (_notes.length + 1));
+    _notes.push({ k: k, txt: txt }); _noteAt[txt] = k; return k;
+  }
+  function _mk(k) { return k ? '<sup style="font-size:7pt;">' + k + '</sup>' : ''; }
+  // The full header string becomes the note wherever the short label is not the whole of it.
+  var _colKey = cols.map(function(c){ return (c.s !== c.h) ? _noteKey(c.h) : ''; });
+  // Which columns hold text rather than a figure — these must NOT get nowrap/right-align, since
+  // nowrap on a verdict cell is precisely what reintroduces the horizontal blowout.
+  var _textCol = cols.map(function(c){ return /^(Country|Region|Mechanic|Fiscal predictability|Reform record|Evidence|Data basis)/.test(c.h); });
+  // Right-aligned but WRAPPING. Both of these columns can hold prose rather than a figure --
+  // "59.8 \u2190 cite this" and "\u2014 not mod-elled" -- and nowrap on a cell that has somewhere to
+  // wrap is what makes it spill into its neighbour instead. Measured: those two columns were
+  // 14 of the 46 remaining overflows and the two worst at +63px and +60px.
+  var _wrapNum = cols.map(function(c){ return /^(Comparable take|Breakeven)/.test(c.h); });
+  // Proportional widths, declared on the header cells and again as a colgroup, because Word's
+  // AutoFit-to-window otherwise divides the text column into 15 equal slivers. Weights are by
+  // content class, not hand-tuned per column, so they hold when the conditional columns are absent.
+  // Weights are the MEASURED minimum width of each column's widest unbreakable token at 8.5pt
+  // Calibri, plus 8px of padding and border -- not hand-tuned per column, so they hold when the
+  // conditional columns (rank, comparable take, downside NPV, breakeven, reform) are absent.
+  // Their sum slightly exceeds the 624px text column, so every column scales down a few percent
+  // and the two longest proper nouns ("Azerbaijan", "Concession,") fall back on word-wrap:
+  // break-word. A mid-word break is survivable in an exhibit; overprinting is not.
+  var _wt = cols.map(function(c, ci) {
+    if (/^# in screen/.test(c.h))        return 19;
+    if (/^Country$/.test(c.h))           return 62;
+    if (/^Region$/.test(c.h))            return 50;
+    if (/^Mechanic$/.test(c.h))          return 71;
+    if (/^Govt take @\$/.test(c.h))      return 33;
+    if (/^Comparable take/.test(c.h))    return 33;
+    if (/NPV @\$/.test(c.h))             return 47;   // 47 not 44: the floor rows render "≤$5.10B"
+    if (/^% of \$/.test(c.h))            return 30;
+    if (/^Breakeven/.test(c.h))          return 32;
+    if (/^Price swing/.test(c.h))        return 36;
+    if (/^Data basis$/.test(c.h))        return 45;
+    return _textCol[ci] ? 51 : 40;
+  });
+  var _wtSum = _wt.reduce(function(a, b){ return a + b; }, 0);
+  var _pct = _wt.map(function(w){ return (100 * w / _wtSum).toFixed(2) + '%'; });
+  var _colGroup = '<colgroup>' + _pct.map(function(w){ return '<col style="width:' + w + '">'; }).join('') + '</colgroup>';
+
+  var _htmlHead = '<tr>' + cols.map(function(c, ci) {
+    return '<th width="' + _pct[ci] + '" style="' + th + 'width:' + _pct[ci] + ';'
+      + (_textCol[ci] || ci === 0 ? '' : 'text-align:right;')
+      + '">' + esc(c.s) + _mk(_colKey[ci]) + '</th>';
+  }).join('') + '</tr>';
+
+  var _htmlRows = matrix.slice(1).map(function(row) {
+    return '<tr>' + row.map(function(v, ci) {
+      var cell = esc(v), nud = '';
+      if (cols[ci].c && v && v !== '\u2014') {
+        var sh = String(cols[ci].c(String(v)));
+        if (sh !== v) {
+          cell = esc(sh);
+          // Keyed only where the dropped text carries something the short form does not.
+          // Pure typography (comma spacing, "primary law" -> "PL") keys nothing: a note that
+          // restates its own cell costs the reader a lookup and returns no fact.
+          if (cols[ci].n) nud = _mk(_noteKey(cols[ci].s + ' \u2014 ' + v));
+        }
+      }
+      return '<td style="' + (ci === _cNameIdx ? tdL : td)
+        + (_textCol[ci] || ci === 0 ? '' : (_wrapNum[ci] ? 'text-align:right;' : 'text-align:right;white-space:nowrap;'))
+        + '">' + cell + nud + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+
+  var _noteHtml = _notes.map(function(n) {
+    return '<p style="font-size:8pt;color:#555;margin:0 0 3px;"><b>' + n.k + '</b>&nbsp; ' + esc(n.txt) + '</p>';
+  }).join('');
+
   var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
     + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
-    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;white-space:pre-wrap;">' + esc(critTxt) + '</p>'
-    + '<table style="border-collapse:collapse;">'
-    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
-    + '<tbody>' + matrix.slice(1).map(function(r){
-        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === _cNameIdx ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
-      }).join('') + '</tbody></table>'
+    + '<p style="font-size:8.5pt;color:#555;margin:0 0 6px;white-space:pre-wrap;">' + esc(critTxt) + '</p>'
+    + '<table width="100%" style="border-collapse:collapse;width:100%;table-layout:fixed;">'
+    + _colGroup
+    + '<thead>' + _htmlHead + '</thead>'
+    + '<tbody>' + _htmlRows + '</tbody></table>'
+    + (_noteHtml ? '<p style="font-size:8.5pt;font-weight:bold;margin:8px 0 3px;">Notes</p>' + _noteHtml : '')
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;white-space:pre-wrap;">' + esc(tailTxt) + '</p>'
     + '</div>';
 
@@ -56787,6 +57022,84 @@ function copyICSummary() {
 // + aria-hidden, reachable only by tests and screen readers. This exposes it.
 // Writes BOTH flavours: text/html (Word / Google Docs / Outlook / PowerPoint render a
 // formatted table) and text/plain TSV (Excel splits into columns).
+// ── v1008 (T5) — the four comparison verdicts arrived in the IC memo as one run-on line ──
+//
+// Walked T5 cold at 1440x900 and 390x844 (hasTouch), storage cleared, and pressed the control
+// the walk ends on: Side-by-Side -> "Copy for IC Memo", with the clipboard read back.
+//
+// v669 added the .cmp-notice sweep so the set-specific caveats travel with the exported table.
+// The FIRST node that sweep picks up is #cmp-verdict — the strip at the top of the tab that
+// carries the four orderings the analyst came here for. It is a flex column of five block rows,
+// and each row is itself a flex line of a heading, the reading it heads, and one or two short
+// qualifier pills. On screen the layout separates all three. The sweep read innerText and ran
+// .replace(/\s+/g,' ') over it, so every one of those boundaries — 12 rendered lines — collapsed
+// into a single 700-character note numbered "1.":
+//
+//   1. GOVT TAKE @$75, LOWEST FIRST: United Kingdom 49.2% > Norway 68.0% > Nigeria 81.1% 31.9pp
+//   apart order holds $50-$125 All 3 columns are on one basis ... CONTRACTOR VALUE @$75, LARGEST
+//   FIRST: ... TERM CONSISTENCY ... Norway <=52 and Nigeria <=46 (not ordered against each other)
+//   <= = ceiling, not a score REFORM EXPOSURE, HIGHEST FIRST: ...
+//
+// Two readings collide with no punctuation at every pill boundary. "Nigeria 81.1% 31.9pp apart"
+// is one take figure butted against the set's spread; "<= = ceiling, not a score REFORM EXPOSURE"
+// runs a caveat into the next heading. This is the artifact that leaves the building, and it
+// fires on EVERY Side-by-Side paste — #cmp-verdict is rendered for any set of 2+ countries, not
+// on an edge case.
+//
+// Fixed by reading a notice as the rows it is rendered as, rather than as one string: one row
+// per block-level child, and within a row heading + reading + " — " + pills joined on " · ".
+// A notice with no block children — #cmp-obs-notice, a single paragraph — still yields exactly
+// one row and its text is unchanged.
+function _cmpNoticeRows(el) {
+  function _clean(s) {
+    return String(s || '').replace(/[ⓘℹⒾ ]/g, '').replace(/[ \t ]+/g, ' ').trim();
+  }
+  // v845: a notice may carry an on-screen CONTROL (the basis-fix button). Its label instructs the
+  // tool, not the reader, so it does not belong in a pasted memo. v845 removed it by cloning the
+  // node — but a detached clone is not rendered, and innerText on an unrendered node returns
+  // textContent, which has no line breaks at all. Reading this notice line by line is the whole
+  // point here, so the control is dropped by VALUE off the rendered original instead: it is a
+  // flex child, so its label already occupies a line of its own.
+  var _drop = {}, _ui = el.querySelectorAll ? el.querySelectorAll('[data-cmp-uionly]') : [];
+  for (var u = 0; u < _ui.length; u++) {
+    var _lab = _clean(_ui[u].innerText || _ui[u].textContent);
+    if (_lab) _drop[_lab] = 1;
+  }
+  function _read(node) {
+    var out = [], raw = String(node.innerText || node.textContent || '').split('\n');
+    for (var i = 0; i < raw.length; i++) { var s = _clean(raw[i]); if (s && !_drop[s]) out.push(s); }
+    return out;
+  }
+  var kids = [], loose = false;
+  for (var q = 0; q < el.childNodes.length; q++) {
+    var nd = el.childNodes[q];
+    if (nd.nodeType === 3) { if (_clean(nd.nodeValue)) loose = true; continue; }
+    if (nd.nodeType !== 1) continue;
+    var disp = '';
+    try { disp = (getComputedStyle(nd) || {}).display || ''; } catch (x) {}
+    if (disp === 'none') continue;
+    if (/^(block|flex|grid|list-item|table)/.test(disp)) kids.push(nd);
+    else if (_clean(nd.innerText || nd.textContent)) loose = true;
+  }
+  // Split per row only when the notice is ENTIRELY made of block children. Anything loose at the
+  // top level means the split would drop text, so that notice stays one row, exactly as before.
+  var srcs = (kids.length && !loose) ? kids : [el];
+  var rows = [];
+  for (var r = 0; r < srcs.length; r++) {
+    var lines = _read(srcs[r]);
+    if (!lines.length) continue;
+    var head = lines.shift(), t = head;
+    if (/:$/.test(head) && lines.length) t += ' ' + lines.shift();
+    if (lines.length) t += ' — ' + lines.join(' · ');
+    // On screen these notices sit under the grid, so they say "the Price Swing row below".
+    // In the pasted artifact the notes come AFTER the table, so "below" points the wrong way.
+    // Drop the direction word rather than reverse it -- the row name alone is unambiguous.
+    t = t.replace(/\b(rows?) (?:below|above)\b/g, '$1').trim();
+    if (t) rows.push(t);
+  }
+  return rows;
+}
+
 function copyComparisonTable(btn) {
   var src = document.getElementById('cmp-data-table');
   if (!src || !src.rows || src.rows.length < 2) {
@@ -56819,11 +57132,48 @@ function copyComparisonTable(btn) {
         if (piece) pieces.push(piece);
       }
       if (!pieces.length) return '';
+      // \u2500\u2500 v1008 (T5): the separator rule could not tell two readings from one sentence \u2500\u2500\u2500\u2500
+      //
+      // v541 inserts " \u00b7 " between adjacent inline <span>s whose text would otherwise
+      // fuse into one token, because several cells on this grid put two INDEPENDENT readings
+      // side by side with only a CSS border between them. That is the right rule for those
+      // cells. It is the wrong rule for a cell whose spans are one English phrase split only
+      // so each part can be styled.
+      //
+      // The Evidence tier row is exactly that. v625 splits its second line into three spans
+      // so the limiting leg can be emphasised and the other stepped back:
+      //
+      //     <span>43% primary law</span><span> of </span><span>15,899 facts</span>
+      //
+      // On screen those read as one sentence -- "43% primary law of 15,899 facts" -- which is
+      // the whole point of v625: the percentage "never renders without the fact count it is a
+      // percentage OF". Walked for text, every boundary fuses on the lexical test, so the
+      // artifact that leaves the building carried
+      //
+      //     Evidence tier   B \u00b7 mixed sourcing \u00b7 43% primary law \u00b7 of \u00b7 15,899 facts
+      //
+      // A stray mid-dot on either side of the word "of", in both clipboard flavours, on the
+      // one row of the paste that says how much each column can be trusted. Measured across
+      // 12 country sets covering the fee-basis, proxy, state-monopoly, struck-band and
+      // 2-fact cohorts: 31 occurrences, every column that carries a fact count, and the only
+      // garbled string in any of this platform's six IC-memo paste artifacts.
+      //
+      // A closed list of connectives, not a general lowercase test. "bundled" is also a lone
+      // lowercase span on this grid (v966's withdrawn take-spread band) and it IS a separate
+      // reading -- it must keep its mid-dots. Every independent reading in this grid opens
+      // with a digit, a currency symbol, a capital, a \u2264 or a \u26a0; none of them is a bare
+      // function word. The suppression runs on BOTH sides of the connective, otherwise the
+      // dot simply moves along to "law of \u00b7 15,899 facts".
+      var GLUE = /^(of|on|in|at|to|and|or|across|per|vs|from|over|by|for|out|the|a|an)$/;
       var out = pieces[0];
+      var prevGlue = false;
       for (var m = 1; m < pieces.length; m++) {
         // Only separate where the two readings would otherwise collide into one token.
         var fuses = /[\w%)\]]$/.test(out) && /^[\w$]/.test(pieces[m]);
+        var isGlue = GLUE.test(pieces[m]);
+        if (isGlue || prevGlue) fuses = false;
         out += (fuses ? ' \u00b7 ' : ' ') + pieces[m];
+        prevGlue = isGlue;
       }
       return out;
     }
@@ -56947,28 +57297,14 @@ function copyComparisonTable(btn) {
   //
   // The static `assump` line above stays: it covers the profile and the two absent metrics,
   // which are true of every set. These are true of THIS set and are recomputed every render.
+  // v1008 (T5): each entry is now an ARRAY of the notice's rendered rows, not one flattened
+  // string. See _cmpNoticeRows() above for the walk that found the collapsed verdict strip.
   var _notes = [];
   try {
     var _nodes = document.querySelectorAll('#cmp-output .cmp-notice');
     for (var _n = 0; _n < _nodes.length; _n++) {
-      // v845 (T3): a notice may now carry an on-screen CONTROL (the basis-fix button). Its label
-      // is an instruction to the tool, not a note about the set, so it does not belong in a pasted
-      // memo. Read a clone with anything marked data-cmp-uionly removed; the prose stays.
-      var _src = _nodes[_n];
-      if (_src.querySelector('[data-cmp-uionly]')) {
-        _src = _src.cloneNode(true);
-        var _ui = _src.querySelectorAll('[data-cmp-uionly]');
-        for (var _u = 0; _u < _ui.length; _u++) _ui[_u].parentNode.removeChild(_ui[_u]);
-      }
-      var _t = (_src.innerText || _src.textContent || '')
-        .replace(/[\u24D8\u2139\u24BE\u200A]/g, '')
-        .replace(/\s+/g, ' ')
-        // On screen these notices sit under the grid, so they say "the Price Swing row below".
-        // In the pasted artifact the notes come AFTER the table, so "below" points the wrong way.
-        // Drop the direction word rather than reverse it -- the row name alone is unambiguous.
-        .replace(/\b(rows?) (?:below|above)\b/g, '$1')
-        .trim();
-      if (_t) _notes.push(_t);
+      var _rows = _cmpNoticeRows(_nodes[_n]);
+      if (_rows.length) _notes.push(_rows);
     }
   } catch (e) { _notes = []; }
   var _notesHead = 'Comparability notes for this set (' + countries.join(' / ') + ') \u2014 carried from the ORCA on-screen comparison:';
@@ -56978,7 +57314,7 @@ function copyComparisonTable(btn) {
     + matrix.map(function(r){ return r.join('\t'); }).join('\n')
     + (_notes.length
         ? '\n\n' + _notesHead + '\n'
-          + _notes.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n')
+          + _notes.map(function(rows, i){ return (i + 1) + '. ' + rows.join('\n   '); }).join('\n')
         : '')
     + '\n\n' + srcLine;
 
@@ -57012,7 +57348,7 @@ function copyComparisonTable(btn) {
     + (_notes.length
         ? '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">' + esc(_notesHead) + '</p>'
           + '<ul style="font-size:9pt;color:#333;margin:0 0 4px;padding-left:18px;">'
-          + _notes.map(function(t){ return '<li style="margin-bottom:3px;">' + esc(t) + '</li>'; }).join('')
+          + _notes.map(function(rows){ return '<li style="margin-bottom:3px;">' + rows.map(esc).join('<br>') + '</li>'; }).join('')
           + '</ul>'
         : '')
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
@@ -58629,6 +58965,32 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
       + _ur983.country + '\u2019s terms.']);
   }
 
+  // ── v1008 (T5): a preset names a jurisdiction. The artifact did not. ────────────────────
+  // Thirteen one-click buttons — Norway, Angola, Guyana, Kazakhstan … — load a named country's
+  // archetype, and v928 taught the SCREEN to state that provenance in full: the country, the
+  // instrument it was typed in from, and a term-by-term reconciliation against ORCA's own record.
+  // None of it reached the clipboard, because the only country hook here was _sbOrigin, which
+  // loadPreset() nulls by design (v607) — correctly, since a preset is not ORCA's record. Measured
+  // across all 13 presets: 0 named the country in the pasted table, while 10 of the 13 disagree
+  // with ORCA's record on at least one loaded term. So the memo exhibit left carrying Norway's
+  // regime under no country's name at all. Nothing is recomputed and no preset value is touched —
+  // this is the same _sbPresetReconcile() the banner reads, in text.
+  var _pz = (typeof _sbPresetForIC === 'function') ? _sbPresetForIC() : null;
+  if (_pz) {
+    rows.push(['Preset loaded', _pz.country + ' — a hand-built archetype typed in from '
+      + _pz.doc + '. Not ORCA’s record for ' + _pz.country + '.']);
+    if (_pz.rec.diffPlain.length) {
+      rows.push(['Term' + (_pz.rec.diffPlain.length === 1 ? '' : 's')
+        + ' that disagree with ORCA’s ' + _pz.country + ' record',
+        _pz.rec.diffPlain.join(' · ') + '. The take, NPV and IRR above are arithmetic on the '
+        + 'preset’s ' + (_pz.rec.diffPlain.length === 1 ? 'figure' : 'figures') + '.']);
+    }
+    if (_pz.edited.length) {
+      rows.push(['Edited after the preset loaded', _pz.edited.join(' · ')
+        + ' — your own assumption, not ' + _pz.doc + '.']);
+    }
+  }
+
   // The basis caveat leads the notes: it is the one that can make every figure above the wrong
   // country's. _sbICBasisClause() emits '; <clause>' or ''.
   var basis = _sbICBasisClause().replace(/^;\s*/, '');
@@ -58638,12 +59000,45 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
     + 'They are not held in the ORCA database and are recorded in no other export — they travel '
     + 'with this table, or the numbers above cannot be reproduced.');
 
+  // v1008 (T5): leads the notes where there is one, for the same reason the basis clause does —
+  // it decides what the whole exhibit is allowed to be called. Wording follows the on-screen
+  // banner so the paste and the screen cannot state different provenance.
+  if (_pz) {
+    var _pOne = function (k) { return k === 1; };
+    var _pn = 'Preset — these terms were loaded by the ' + _pz.country + ' button in the ORCA '
+      + 'Scenario Builder. It is a hand-built archetype typed in from ' + _pz.doc
+      + ', not ORCA’s record for ' + _pz.country + ': no fact in ORCA’s database stands behind '
+      + 'it, and the evidence letter ' + _pz.country + ' carries elsewhere on the platform grades '
+      + 'that country’s record, not this form.';
+    if (_pz.rec.diffPlain.length) {
+      _pn += ' ' + (_pz.rec.diffPlain.length === _pz.rec.n
+              ? (_pOne(_pz.rec.n) ? 'The one loaded term ORCA can be compared on disagrees'
+                                  : 'All ' + _pz.rec.n + ' loaded terms disagree')
+              : _pz.rec.diffPlain.length + ' of the ' + _pz.rec.n + ' loaded terms disagree')
+          + ' with what ORCA holds for ' + _pz.country + ' — see the row above. Neither figure is '
+          + 'automatically the right one: ORCA’s is averaged across the contracts it holds, the '
+          + 'preset is one published instrument. The run above is on the preset’s.';
+    } else if (_pz.rec.n) {
+      _pn += ' ' + (_pOne(_pz.rec.n) ? 'The one comparable term matches'
+                                     : 'All ' + _pz.rec.n + ' comparable terms match')
+          + ' what ORCA holds for ' + _pz.country + '.';
+    }
+    if (_pz.rec.none.length) {
+      _pn += ' ORCA holds no country-level ' + _pz.rec.none.join(', ') + ' for ' + _pz.country + '.';
+    }
+    notes.unshift(_pn);
+  }
+
+
   var o = window._sbOrigin;
-  var caption = (o && o.country ? o.country + ' — ' : '')
+  var caption = (o && o.country ? o.country + ' — '
+                : (_pz ? _pz.country + ' preset (archetype — not ORCA’s record) — ' : ''))
     + 'ORCA Scenario Builder — ' + mech + ', ' + ((profile && profile.name) || '') + ' profile, $'
     + price + '/bbl';
   var assump = 'Custom scenario: analyst-set fiscal terms run on one synthetic project'
-    + (o && o.country ? ', not ' + o.country + '’s published country average' : '')
+    + (o && o.country ? ', not ' + o.country + '’s published country average'
+      : (_pz ? ', loaded from the ' + _pz.country + ' preset — a hand-built archetype, not '
+             + 'ORCA’s record for ' + _pz.country : ''))
     + '. NPV is at 100% working interest — scale by your WI. The ' + notes.length + ' note'
     + (notes.length === 1 ? ' below this table qualifies the row it names and travels with it.'
                           : 's below this table qualify the rows they name and travel with it.');
@@ -60414,8 +60809,10 @@ function _sbPresetNum(v, unit) {
 }
 // Compares the values this preset is about to write into the form against the country-level
 // terms ORCA holds. Returns the lists rather than a verdict; the caller does the wording.
+// v1008 (T5): diffPlain carries the same finding without the <strong> markup, because the
+// clipboard artifact needs it as text. The banner keeps reading diff; nothing on screen moves.
 function _sbPresetReconcile(p) {
-  var out = { n: 0, diff: [], held: [], none: [] };
+  var out = { n: 0, diff: [], diffPlain: [], held: [], none: [] };
   if (!p || !p._country || typeof COUNTRY_DATA === 'undefined') return out;
   var d = COUNTRY_DATA.find(function (x) { return x.country === p._country; });
   if (!d) return out;
@@ -60430,6 +60827,8 @@ function _sbPresetReconcile(p) {
     if (Math.abs(Number(ov) - Number(pv)) > tol) {
       out.diff.push(f[2] + ' <strong>' + _sbPresetNum(pv, f[3]) + '</strong> here vs <strong>'
                   + _sbPresetNum(ov, f[3]) + '</strong> on record');
+      out.diffPlain.push(f[2] + ' ' + _sbPresetNum(pv, f[3]) + ' here vs '
+                  + _sbPresetNum(ov, f[3]) + ' on record');
     } else {
       out.held.push(f[2]);
     }
@@ -60553,7 +60952,68 @@ function loadPreset(name) {
   } else if (_ps) {
     _ps.style.display = 'none';
   }
+
+  // ── v1008 (T5): record the preset so the IC artifact can name the jurisdiction. ──────────
+  // loadPreset() nulls _sbOrigin on purpose (v607) — a preset is NOT ORCA's record and must not
+  // claim to be. But _sbBuildICTable()'s only country hook is _sbOrigin, so the consequence was
+  // that a table pasted from any of the 13 presets named no jurisdiction at all. This is the
+  // preset's OWN provenance, kept in its own slot, and it says "archetype, not ORCA's record"
+  // everywhere it surfaces.
+  if (p._country) {
+    var _pr = _sbPresetReconcile(p);
+    window._sbPresetRun = {
+      key: name, country: p._country, doc: p._doc, mech: p.mechanic,
+      profile: p.profile, price: String(p.price),
+      rec: { n: _pr.n, diffPlain: _pr.diffPlain.slice(), held: _pr.held.slice(), none: _pr.none.slice() },
+      fields: _sbPresetSnapshot(p.mechanic)
+    };
+  } else {
+    window._sbPresetRun = null;
+  }
 }
+
+// The fiscal inputs loadPreset() writes, per mechanic, with the label each one is reported under.
+// Used only to tell "as loaded" from "edited" — an overtyped field is the analyst's own stated
+// assumption, so the artifact must stop attributing it to the preset's instrument.
+var _SB_PRESET_FIELDS = {
+  'Concession':    [['sb-royalty','Royalty'], ['sb-cit','CIT'], ['sb-spt','Special tax'],
+                    ['sb-state-eq','State equity'], ['sb-windfall','Windfall tax'], ['sb-severance','Severance']],
+  'PSC':           [['sb-psc-royalty','Royalty'], ['sb-psc-cit','CIT'], ['sb-cr-cap','Cost recovery cap'],
+                    ['sb-ftp','FTP'], ['sb-po-govt','Profit oil (govt)']],
+  'TSC':           [['sb-fee','Service fee'], ['sb-tsc-cit','CIT'], ['sb-ept','EPT']],
+  'RSC':           [['sb-fee','Service fee'], ['sb-tsc-cit','CIT'], ['sb-ept','EPT']],
+  'PRRT':          [['sb-prrt-rate','PRRT rate'], ['sb-prrt-cit','CIT'], ['sb-prrt-royalty','Royalty'],
+                    ['sb-prrt-uplift','Uplift']],
+  'Buy-back':      [['sb-bb-fee','Fee'], ['sb-bb-cap','Cost recovery cap'], ['sb-bb-term','Term'], ['sb-bb-cit','CIT']],
+  'Revenue Share': [['sb-rs-govt','Government revenue share'], ['sb-rs-cit','CIT'], ['sb-rs-royalty','Royalty']],
+  'Gross Split':   [['sb-gs-cont','Contractor split'], ['sb-gs-cit','CIT'], ['sb-gs-dmo','DMO'],
+                    ['sb-gs-dmo-price','DMO price']]
+};
+function _sbPresetSnapshot(mech) {
+  var out = [];
+  ((_SB_PRESET_FIELDS[mech] || []).concat([['sb-price','Oil price'], ['sb-profile','Project profile']]))
+    .forEach(function (f) {
+      var el = document.getElementById(f[0]);
+      if (el) out.push({ id: f[0], label: f[1], val: String(el.value) });
+    });
+  return out;
+}
+// What the clipboard is allowed to say about the preset, at the moment the table is built.
+// Returns null wherever the preset no longer describes the run: a country pre-fill has taken
+// over (_sbOrigin re-armed), or the mechanic has been changed out from under it.
+function _sbPresetForIC() {
+  var P = window._sbPresetRun;
+  if (!P || !P.country || window._sbOrigin) return null;
+  var mEl = document.getElementById('sb-mechanic');
+  if (mEl && mEl.value !== P.mech) return null;
+  var edited = [];
+  (P.fields || []).forEach(function (f) {
+    var el = document.getElementById(f.id);
+    if (el && String(el.value) !== f.val) edited.push(f.label + ' ' + f.val + ' → ' + el.value);
+  });
+  return { country: P.country, doc: P.doc, rec: P.rec, edited: edited };
+}
+window._sbPresetForIC = _sbPresetForIC;
 
 // v883 (T2): the flat box's own tooltip, restored verbatim when the ladder is switched off.
 var _SB_PO_TITLE = "Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier.";
@@ -61828,6 +62288,8 @@ function renderProductionChart(country, profileKey) {
 // result.take, both already on screen, and the >=5pp emphasis bar is the one _cpCmpLine552 and
 // the CP regime-split block already use.
 window._sbOrigin = null;
+// v1008 (T5): the preset the Scenario Builder is currently running, or null.
+window._sbPresetRun = null;
 
 // Fingerprint of every Scenario Builder input, so the strip can tell "as loaded" from "edited".
 function _sbFormFingerprint() {
@@ -70425,6 +70887,15 @@ function exportFCResults() {
   // modelled -- and LNG still has 18.7 MMbbl/yr of production in year 25, so the profile is
   // truncated rather than depleted. State the modelled horizon, and say that it is fixed.
   var projLifeYrs = 25;
+  // v1009 (T5): the engine basis behind the "(database)" columns, read from the single constant
+  // v833 established rather than typed here. Fallback mirrors ENGINE_BASIS exactly so a missing
+  // global degrades to the right numbers instead of to the Scenario Builder project.
+  var _xlEB = (typeof ENGINE_BASIS !== 'undefined' && ENGINE_BASIS) ? ENGINE_BASIS : {
+    name: 'Deepwater', peakBblDay: 50000, rampYears: 3, plateauYears: 5, declineRate: 0.15,
+    totalProdMM: 241.9, capexAllInMM: 1000, capexDevMM: 800, sustainingMM: 150,
+    abandonmentMM: 50, opexBbl: 18, opexEscal: 0.02, discountRate: 0.10, years: 25,
+    source: 'tools/petroleum/dcf_profiles.py — PROFILES.deepwater'
+  };
   // v505: read the version off the header badge instead of hard-coding it — this sheet still
   // said v410 while the platform was on v504, so every exported IC workbook carried a stale
   // citation. Reading it from the DOM means it cannot drift again.
@@ -70448,17 +70919,89 @@ function exportFCResults() {
   ].concat(_xlScopeRows, [
     // v602 (T5): the profile is now named, and every figure below is read from FC_PROFILES —
     // the table runFiscalCompare() actually passes to the DCF functions.
-    ['Profile assumptions — ' + profileName + ' (the profile selected when this sheet was exported):'],
-    ['  Peak rate (bopd)', profileObj.peakBblDay],
-    ['  Capex ($M)', profileObj.capexMM],
-    ['  Opex ($/bbl)', profileObj.opexBbl],
-    ['  Ramp-up (yr)', profileObj.rampYears],
-    ['  Plateau (yr)', profileObj.plateauYears],
-    ['  Decline rate (%/yr, post-plateau)', +(profileObj.declineRate*100).toFixed(1)],
-    ['  Modelled horizon (yr)', projLifeYrs],
-    ['  Discount rate (%)', +(profileObj.discountRate*100).toFixed(0)],
-    ['  Oil price ($/bbl)', +fcPrice],
-    ['  Working interest', '100% — scale contractor NPV by your actual WI'],
+    //
+    // ── v1009 (T5) — this sheet's ONLY assumptions block described the columns it forbids
+    // citing. ────────────────────────────────────────────────────────────────────────────────
+    // v602 was right for v602: the block below IS the basis of the three "(model...)" columns,
+    // read from FC_PROFILES. But v833 then established that the eight "(database)" columns —
+    // the ones "Which columns to cite" below names, and the only ones this sheet permits in a
+    // memo — were computed offline by petroleum_dcf.py on dcf_profiles.py PROFILES.deepwater
+    // (= ENGINE_BASIS): $1.0B all-in, $18/bbl escalating 2%/yr real, 5yr plateau, 15% decline,
+    // 241.9 MMbbl. FC_PROFILES.deepwater is a DIFFERENT project — $1.2B, $15/bbl flat, 8yr
+    // plateau, 12% decline, 294.0 MMbbl — and both are named "Deepwater".
+    //
+    // v834 derived seven exported artifacts from ENGINE_BASIS. This workbook was the eighth and
+    // was never reached, so the one file the Quick Start calls "Export XLSX for IC attachment"
+    // headed the wrong project "Profile assumptions" at the top of its Methodology sheet, and
+    // the basis of the cited columns appeared nowhere in it. The Screener workbook (Screen &
+    // Basis) and the Explorer workbook (Filters & Assumptions) both state ENGINE_BASIS
+    // correctly, so this file was the outlier.
+    //
+    // Worse than a stale literal, because it MOVED: profileObj is FC_PROFILES[fcProfileKey], so
+    // with the selector on Giant the stated basis for the cited figures read $2,000M / $10 and
+    // on LNG $3,000M / $20 — a basis that changes with a control that does not touch the
+    // numbers it claims to describe. Both blocks are now derived at call time and each one
+    // names the columns it governs.
+    //
+    // ── v1010 (T5) — every labelled row now names which of the two bases it belongs to.
+    // ────────────────────────────────────────────────────────────────────────────────────────
+    // v1010 note: v1009 (above) put the right two blocks on this sheet but labelled their rows
+    // identically. Measured on the built workbook, all seven profiles: EIGHT byte-identical
+    // labels in column A, 17-23 rows apart, carrying different values in column B. On Giant,
+    // "Plateau (yr)" read 5 at row 10 and 10 at row 33; "Peak rate (bopd)" read 50000 and
+    // 150000; "Decline rate (%/yr, post-plateau)" 15 and 10.
+    //
+    // That is the one artifact an IC reviewer interrogates a pasted number with. Asked "what
+    // plateau is that on?", the analyst searches the sheet for Plateau, gets two hits with the
+    // same label and two different answers, and has to scroll up 20+ rows to a heading to break
+    // the tie -- a heading v1009 had also stopped calling "Profile assumptions". The row could
+    // not be read on its own, which is the only way a found row ever is read.
+    //
+    // Fix: the cited rows carry a leading "Cited basis" tag, the model-only rows a trailing
+    // "model-only (<profile>)" tag. Zero duplicate labels remain, and either row answers the
+    // question without its heading.
+    ['CITED FIGURES — the basis behind every "(database)" column, which is what this sheet tells you to cite:'],
+    ['  ORCA standardized ' + _xlEB.name + ' reference project — source: ' + _xlEB.source + '.'],
+    ['  FIXED basis. It does NOT move with the Fiscal Compare profile selector: the database'],
+    ['    figures were computed once, offline, on this project and are not recomputed on screen.'],
+    ['  Cited basis — peak rate (bopd)', _xlEB.peakBblDay],
+    ['  Cited basis — ramp-up (yr)', _xlEB.rampYears],
+    ['  Cited basis — plateau (yr)', _xlEB.plateauYears],
+    ['  Cited basis — decline rate (%/yr, post-plateau)', +(_xlEB.declineRate*100).toFixed(1)],
+    ['  Cited basis — total production recovered (MMbbl)', _xlEB.totalProdMM],
+    ['  Cited basis — capex, all-in ($M)', _xlEB.capexAllInMM],
+    ['      of which development ($M)', _xlEB.capexDevMM],
+    ['      of which sustaining ($M)', _xlEB.sustainingMM],
+    ['      of which abandonment ($M)', _xlEB.abandonmentMM],
+    ['  Cited basis — opex ($/bbl, escalating ' + (_xlEB.opexEscal*100).toFixed(0) + '%/yr real)', _xlEB.opexBbl],
+    ['  Cited basis — modelled horizon (yr)', _xlEB.years],
+    ['  Cited basis — discount rate (%)', +(_xlEB.discountRate*100).toFixed(0)],
+    ['  Cited basis — oil price ($/bbl)', +fcPrice],
+    ['  Cited basis — working interest', '100% — scale contractor NPV by your actual WI'],
+    ['  Rebuild a cited NPV on THESE numbers, not on the profile block below. The two projects are'],
+    ['    both named "' + _xlEB.name + '" and are not the same project: on 179 of the 182 non-monopoly'],
+    ['    countries they return contractor NPVs more than $250M apart at the same price.'],
+    [''],
+    // The heading names the profile, so a reader scanning headings sees which one produced the
+    // model columns without reading into the block. FCExportMeth's meth-names-profile-<key>
+    // assertion reads exactly this line, for every option in #fc-profile.
+    // v1010: the heading leads with "Profile assumptions" again and names the profile at
+    // character 22, so a reader scanning column A finds the assumptions block by the word they
+    // are looking for. The DO-NOT-CITE warning v1009 added is kept, after the name rather than
+    // in front of it. FCExportMeth's meth-names-profile-<key> assertion reads this line.
+    ['Profile assumptions — ' + profileName + ' — DO NOT CITE: basis of the three "(model...)" columns and nothing else.'],
+    ['  This block DOES move with the Fiscal Compare profile selector. It governs the three'],
+    ['    "(model...)" columns at the right of the sheet. It produced no figure cited above.'],
+    ['  Peak rate (bopd) — model-only (' + profileName + ')', profileObj.peakBblDay],
+    ['  Capex ($M) — model-only (' + profileName + ')', profileObj.capexMM],
+    ['  Opex ($/bbl, flat) — model-only (' + profileName + ')', profileObj.opexBbl],
+    ['  Ramp-up (yr) — model-only (' + profileName + ')', profileObj.rampYears],
+    ['  Plateau (yr) — model-only (' + profileName + ')', profileObj.plateauYears],
+    ['  Decline rate (%/yr, post-plateau) — model-only (' + profileName + ')', +(profileObj.declineRate*100).toFixed(1)],
+    ['  Modelled horizon (yr) — model-only (' + profileName + ')', projLifeYrs],
+    ['  Discount rate (%) — model-only (' + profileName + ')', +(profileObj.discountRate*100).toFixed(0)],
+    ['  Oil price ($/bbl) — model-only (' + profileName + ')', +fcPrice],
+    ['  Working interest — model-only (' + profileName + ')', '100% — scale contractor NPV by your actual WI'],
     ['  Note: the modelled horizon is fixed at 25 years for ALL seven profiles. Profiles differ by'],
     ['    ramp, plateau and decline inside that window, not by its length. A profile still producing'],
     ['    in year 25 is truncated at the horizon, not depleted.'],
@@ -71122,6 +71665,9 @@ function openScenarioBuilder() {
   // v607 (T2): and drop the country provenance with it. ddOpenScenarioBuilder() calls this
   // first and re-arms _sbOrigin afterwards, so a header-opened scenario carries no country claim.
   window._sbOrigin = null;
+  // v1008 (T5): and the preset provenance with it. ddOpenScenarioBuilder() calls this
+  // first, so a country pre-fill cannot inherit the last preset's country name either.
+  window._sbPresetRun = null;
   // v883 (T2): and no ladder either. ddOpenScenarioBuilder() calls this first and re-arms
   // afterwards, so only a country pre-fill can leave one armed.
   if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
