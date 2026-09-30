@@ -68274,3 +68274,169 @@ nothing, and that document travels into the IC clipboard export with the verdict
 I walked the Reform Risk lookup cold at 1440×900 and 390×844 with touch, storage cleared, and drove it through **every one of the 164 unscored jurisdictions** — 89% of what the tab offers, and where a T4 analyst lands nine times in ten.
 
 160 of them print a named document to start an
+
+---
+## Cycle 937 Log — 2026-09-30 06:52
+- Test before: **494 PASS / 0 FAIL / 1 WARN / 12 JS errors** (local tree, suite RAN this cycle, 11:49:48Z)
+- Test after:  **494 PASS / 0 FAIL / 1 WARN / 12 JS errors** (local tree, suite RAN this cycle, 11:42:32Z)
+- JS errors: 12 — all one pre-existing `sw.js` 404 from serving the tree at root locally. Unchanged by this diff; both sides measured on this host this cycle.
+- Summary: v1006 shipped, committed `4e6bd1d`, mirrored, pushed.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(936 was T4, 935 T1, 934 T3, 933 T6, 932 T5)
+
+## Friction
+`_cpApplyObsSpread()`'s one-term branch (`index.html` ~68703) and the `#cp-fp-cohort` span it
+never touched (rendered at ~47854 from `_fpCohortLine()`, ~27146).
+
+Walked T2 cold at **1440×900** and **390×844 `hasTouch:true`**, storage cleared, starting where the
+tab starts — the cold-load default, Indonesia. v930 flips the Fiscal Predictability badge in the
+header strip to the ceiling and keeps the stored score beside it, struck through:
+
+    ≤32 · VERY LOW     ≥37.2pp obs     stored: 6̶2̶ ▲ withdrawn
+
+Directly beneath it sits the only paragraph on the page that tells the analyst **how to rank that
+number against other countries** — and on this branch it was never told:
+
+> *"118th of 132 one-term regimes — a cohort the spread penalty never touches, which is why this
+> score is shown UNGRADED rather than banded. Every one of the 86 scores that would fall in HIGH
+> sits in this cohort … A one-term score above a measured one is not the steadier regime."*
+
+Every clause of it is withdrawn by the two lines above it:
+
+| clause | what the same strip says |
+|---|---|
+| rank **118th of 132** | `_fpCohortStats()` sorts the one-term cohort on the printed **62** — the number this function has just struck through. At the ceiling Indonesia is not 118th. |
+| *"a cohort the spread penalty never touches"* | the basis **this page's own contract table refuted**: 42.5–79.7% across Indonesia's 50 largest contracts, **≥37.2pp** |
+| *"shown UNGRADED rather than banded"* | the badge two lines up reads **VERY LOW** — a band |
+| *"a one-term score above a measured one …"* | inverts at the ceiling: at ≤32 Indonesia is **not above** the measured cohort — their ceiling is Turkmenistan 74 |
+
+**Measured live across all 185 Country Profile loads this cycle, not asserted: 36 countries take
+this path and all 36 printed a rank off the refuted score.**
+
+| country | printed | ceiling | rank it printed |
+|---|---|---|---|
+| Uzbekistan | 89 · HIGH | ≤49 · LOW | 46th of 132 |
+| Netherlands | 84 · HIGH | ≤59 · LOW | 73rd of 132 |
+| Albania / Lebanon | 81 · HIGH | ≤49 · LOW | 78th / 79th |
+| Thailand | 80 · HIGH | ≤51 · LOW | 81st of 132 |
+| Papua New Guinea | 78 · HIGH | ≤66 · MODERATE | 82nd of 132 |
+| Namibia | 77 · HIGH | ≤60 · MODERATE | 83rd of 132 |
+| Norway | 76 · HIGH | ≤52 · LOW | 84th of 132 |
+| Libya | 74 · MODERATE | ≤60 · MODERATE | 87th of 132 |
+| Colombia | 72 · MODERATE | ≤40 · VERY LOW | 93rd of 132 |
+| **Indonesia** | 62 · MODERATE | **≤32 · VERY LOW** | **118th of 132** |
+| Angola | 62 · MODERATE | ≤26 · VERY LOW | 109th of 132 |
+| USA | 91 · HIGH | ≤82 · HIGH | 28th of 132 |
+
+(+ Azerbaijan, Benin, Brunei, Côte d'Ivoire, Cuba, DR Congo, Ecuador, Equatorial Guinea, Georgia,
+Guinea, Laos, Madagascar, Malaysia, Mongolia, Myanmar, Senegal, Sierra Leone, South Sudan,
+Sri Lanka, Suriname, Tanzania, Togo, Vietnam — 36 in total.)
+
+Indonesia is the **cold-load default** and Norway, Angola and Libya are **quick-load benchmark
+buttons**, so this was the first predictability paragraph most T2 walks on this tab ever read. It is
+also the one figure on the strip shaped like something you paste into a memo: *"Indonesia ranks
+118th of 132 on fiscal predictability"* — a league-table rank of a **withdrawn** number, inside a
+cohort the country's own contract file says it is not in.
+
+## Change
+- **`_cpApplyObsSpread()`'s one-term branch now replaces `#cp-fp-cohort`** with the withdrawal,
+  gated on `_fpObsCeiling().material` — the **same gate, same object and same wording** v982 uses on
+  the Reform Risk card's `#rr-fp-cohort`, and v874 uses on **this very element** for the measured
+  cohort. The repair existed twice and had never reached this branch.
+- Two closing branches, decided by `bound < _fpCohortStats().measuredTop.s`:
+  - **below the measured ceiling** (34 of 36) — *"At ≤32 · VERY LOW the spread term IS charged, on
+    the same footing as the 28 countries ORCA can measure, and 32 falls below their own ceiling
+    (Turkmenistan 74). So the usual reading here — a one-term score above a measured one is not the
+    steadier regime — does not arise: at its ceiling Indonesia is not above one."*
+  - **at or above it** (USA ≤82, Turkmenistan 74) — *"Rank it on ≤82 · HIGH, the bound the spread
+    term puts on it, and not on the printed 91."*
+- **Nothing recomputed, nothing hidden, no badge touched.** Verified: badge text byte-identical on
+  all 185 before and after. The 5 **immaterial** corrections (Algeria, Mozambique, Niger,
+  Philippines, Venezuela) keep their rank paragraph, because their badge keeps the printed score the
+  rank was computed from — a 1-point correction dressed like Uzbekistan's 40-point one is what
+  trains an analyst to skip the line.
+
+### Also shipped — an inherited uncommitted block, stated plainly
+The working tree already carried a **complete, uncommitted `v1006 (T2)`** change from an interrupted
+earlier run of this cycle (files timestamped 05:36; nothing committed). It is a curated **38-entry
+alias table** so a shared `#/profile/<slug>` deep link resolves the names people actually type.
+I did not author it, it is squarely T2, and it is in both suite runs above — so it ships, and it is
+named here rather than folded into my own work.
+
+**Verified against `HEAD` this cycle** rather than taken on trust: `#/profile/uk` resolved to
+**nothing** and `_slugNear846()` offered exactly one suggestion — **UKRAINE**. A wrong suggestion is
+worse than none: Ukraine renders a complete, confident profile and nothing downstream would tell the
+analyst they are defending the wrong country. Also null at HEAD with **no suggestion at all**:
+`holland`, `ivory_coast`, `east_timor`, `emirates`, `drc`, `britain`, `america`, `png`, `ksa`, `krg`,
+`gb`, `zaire`. `persia` offered Peru; `burma` offered Burkina Faso and Burundi.
+
+All now resolve. The three safety rules were checked live, not read: the table is consulted **last**
+(after every mechanical match in `fromSlug()` fails), **no alias shadows a real country slug** (0),
+**no alias targets a country this build does not hold** (0), and **all 185 canonical slugs still
+roundtrip** (0 failures). Ambiguous names are deliberately absent — `congo` still resolves to null
+and offers **both** Congos; `korea` resolves to null and offers South Korea. End-to-end at 1440 and
+390: `#/profile/uk` → United Kingdom, `#/profile/drc` → DR Congo, `#/profile/burma` → Myanmar,
+`#/profile/congo` and `#/profile/xyzzy` → v846 not-found notice, 0 page errors.
+
+## Result
+On **36 of 185** Country Profiles — including the cold-load default and three of the nine quick-load
+benchmarks — the analyst can no longer read or paste a league-table rank computed from a number the
+same strip calls **withdrawn**, and the paragraph no longer says **UNGRADED** two lines under a badge
+reading **VERY LOW**. Where the two numbers disagreed, the page now says which one to rank on and why,
+in the same words the Reform Risk card and the IC-memo clipboard already used — so three surfaces
+carry one rank instead of two ranks and a contradiction. And a profile link a colleague types by hand
+now opens the country they meant instead of offering them Ukraine.
+
+## Verify
+- **Playwright suite RAN this cycle, both sides, on this host, `TEST_URL` pointed at the LOCAL tree**
+  (the graded suite defaults to the deployed site and cannot gate the diff it is about to ship):
+  - **before** (pre-change tree served on :8098) — `494 PASS / 0 FAIL / 1 WARN / 12 JS errors`, report written 11:49:48Z
+  - **after**  (working tree served on :8099) — `494 PASS / 0 FAIL / 1 WARN / 12 JS errors`, report written 11:42:32Z
+  - Both read back **from the suite's own report file**, not assumed. The 1 WARN and all 12 "JS errors"
+    are the single pre-existing `sw.js` 404 (`index.html:49` registers the SW at the absolute path
+    `/petroleum-fiscal-db/sw.js` — correct on GitHub Pages, a 404 at the local root). Identical both sides.
+- **JS syntax gate: PASS** — all 11 inline `<script>` blocks through `node --check`.
+- **All 185 re-measured after the change:** 36 of 36 withdrawn, **0** still asserting a one-term rank
+  with a material ceiling, **0** cohort lines lost entirely, **36** changed and no others, and badge
+  text unchanged on all 185.
+- **Regression — Reform Risk untouched and now consistent:** Indonesia and Norway print the v982
+  withdrawal, Nigeria the v874 measured withdrawal, Venezuela its rank intact. Country Profile now
+  matches all four.
+- **Regression — measured cohort untouched:** Nigeria `≤46 · LOW` and Brazil `≤59 · LOW` keep the
+  v874 wording verbatim; Turkmenistan (cohort top, no ceiling) keeps the full measured paragraph.
+- **Mobile 390×844 `hasTouch:true`, storage cleared:** `scrollWidth` **390** = `clientWidth` **390**
+  on Indonesia, Norway and USA — no sideways scroll. New block **310px** wide, `scrollWidth` 308 =
+  `clientWidth` 308 (no internal overflow). **0 page errors.** No control added or touched: the only
+  sub-24px node inside it is an inline `<strong>` in a paragraph, the same shape the paragraph it
+  replaced already had.
+- **CP handler audit:** all 91 `onclick` / `onkeydown` / `onchange` attributes inside `#dd-content`
+  and the three DCF containers resolve to real functions and real element ids — 0 missing.
+- **185-country render sweep:** 0 page errors, 0 occurrences of `undefined` / `NaN` / `Infinity` /
+  `[object` in rendered text.
+
+## Notes for the next cycle
+- **`Bahrain` / `Kuwait` / `Saudi Arabia` carry `be_75 = 1.0`** in `country_data.json` — the DCF
+  solver floor, not a breakeven. Country Profile already suppresses it correctly and says why
+  ("state monopoly … the stored value of $1/bbl is the DCF solver floor"), and so do FC, Explorer and
+  the Screener. The **data** is still wrong at source; the UX is not. Not a render fix.
+- **Breakeven coverage is 68 of 185 in `country_data.json`** (117 `null`), and 65 of the 68 cluster
+  at 27–34. The page's bounded-breakeven treatment (v642) handles the 117 correctly. Worth knowing
+  that the column carries almost no discriminating information even where it is populated.
+- **Indonesia still prints three different government profit-oil shares** on one page (71.2% in the
+  summary and XLSX, 64.4% in Key Fiscal Parameters, 60–88% in the R-factor ladder). The page raises
+  this itself in a ⚠ block and tells the analyst to reconcile against Indonesia's petroleum act. It
+  is a data-reconciliation job, not a UX one — but it is the largest un-retired contradiction a T2
+  walk hits on the default country.
+- Carried forward unchanged: **Somalia** is the one remaining true T4 dead end (practitioner guides
+  only — needs harvest, not render); `Paraguay Decree 19.080/1997` is typed `government_filing`, not
+  `legislation` (936); FC's own copy-link path still not walked for selection ticks (935); the
+  Screener count line's `block· Deepwater` join fault (935); the Home card at ~3077 saying
+  Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5 (934); `_posClause648` number
+  agreement (929); Côte d'Ivoire's two missing API slugs (916); `window._screenerExportBasis` does
+  not name the 105 withheld countries (913); Screener Advanced Filters checkboxes at 13px under
+  `pointer: coarse` (889); the `summary "Reading this table"` at 18px; Side-by-Side's two
+  byte-identical export buttons; the two diverged suite copies.
+- `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are still untracked in the repo root.
+- Header version badge bumped **v1005 → v1006** (bookkeeping, done silently at the end per the directive).
