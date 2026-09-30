@@ -2868,7 +2868,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1005</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1006</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -55567,6 +55567,99 @@ function _slugKey846(s) {
     .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 }
 
+/* ── v1006 (T2) — A SHARED PROFILE LINK THAT NAMES THE COUNTRY THE WAY PEOPLE NAME IT ────────
+
+   Walked T2 cold ("is this country attractive at $75, and can I defend that?") at 1440x900 and
+   390x844 hasTouch, storage cleared. The defence is not finished when the analyst reads the
+   number -- it is finished when a colleague can open the same profile. That is the Copy link
+   button on Country Profile, which writes "#/profile/<slug>", and the RECEIVING end of that link
+   had never been walked. (Cycle 935 logged the Fiscal Compare copy-link path as unwalked; this is
+   the Country Profile one.)
+
+   The mechanical half is sound and stays untouched: all 185 slugs are unique, all 185 roundtrip,
+   the 6 awkward names (Cote d'Ivoire, Guinea-Bissau, Iraq-Kurdistan, Timor-Leste, UAE - Abu Dhabi,
+   UAE - Dubai) roundtrip, and v846's not-found banner renders fully visible at the top of the
+   viewport on BOTH viewports and correctly says not to read a take figure off the page.
+
+   What fails is the name a human types. fromSlug() matches slugs mechanically -- exact, accent-
+   folded, separator-collapsed -- so it only ever resolves ORCA's own spelling. _slugNear846()
+   then scores candidates on substring containment plus SHARED LEADING CHARACTERS, with no notion
+   of what a country is also called. Measured over 30 spellings a colleague would plausibly put in
+   a link, 9 stranded with no suggestion at all and three were actively misdirected:
+
+       #/profile/uk       -> "No country named uk", closest name offered: UKRAINE
+       #/profile/persia   -> offered Peru
+       #/profile/burma    -> offered Burkina Faso, Burundi
+       #/profile/holland, ivory_coast, emirates, drc, britain, america,
+         east_timor, swaziland, macedonia                        -> offered nothing
+
+   "uk" is the worst of these and is the reason this is a cycle. United Kingdom is a North Sea
+   screening country an analyst reaches for constantly; ORCA holds it; and the platform answered a
+   link naming it by offering one click into UKRAINE's fiscal terms. A wrong suggestion is worse
+   than no suggestion -- Ukraine renders a complete, confident profile, and nothing downstream
+   would tell the analyst they are defending the wrong country. ('ukraine' starts with 'uk', which
+   scores 60 + 2 shared characters; 'united_kingdom' shares no prefix and contains no 'uk'
+   substring, so it scored 0 and was filtered out entirely.)
+
+   This adds the one thing the resolver had no way to know: an explicit, curated table of what
+   these countries are ALSO called -- abbreviations, exonyms and former names. It is deliberately
+   small and hand-checked rather than fuzzy, because a fuzzy alias is how "uk" became Ukraine.
+
+   Three rules hold it safe:
+     1. It is consulted LAST, only after every mechanical match in fromSlug() has failed, so it
+        can never override ORCA's own spelling of any of the 185.
+     2. An alias is discarded if its key is already a real country slug, so a future country
+        addition silently wins over an alias instead of being shadowed by it.
+     3. An alias is discarded if its target is not actually in COUNTRY_DATA, so the table cannot
+        route to a country this build does not hold.
+
+   AMBIGUOUS NAMES ARE DELIBERATELY ABSENT. "congo" is not here: ORCA holds both Republic of the
+   Congo and Democratic Republic of the Congo, _slugNear846 already offers both, and choosing one
+   silently is exactly the failure this fixes. Same for bare "korea".                            */
+var _CP_ALIAS1006 = {
+  // United Kingdom — the measured Ukraine misdirect
+  uk: 'United Kingdom', gb: 'United Kingdom', britain: 'United Kingdom',
+  great_britain: 'United Kingdom', united_kingdom_of_great_britain_and_northern_ireland: 'United Kingdom',
+  // United States
+  us: 'USA', america: 'USA', united_states: 'USA', united_states_of_america: 'USA',
+  // exonyms and former names
+  holland: 'Netherlands', the_netherlands: 'Netherlands',
+  ivory_coast: "Cote d'Ivoire",
+  burma: 'Myanmar',
+  persia: 'Iran',
+  east_timor: 'Timor-Leste',
+  czechia: 'Czech Republic',
+  turkiye: 'Turkey',
+  russian_federation: 'Russia',
+  viet_nam: 'Vietnam',
+  cabo_verde: 'Cape Verde',
+  // abbreviations analysts actually type
+  uae_dubai_emirate: 'UAE — Dubai',
+  emirates: 'UAE', united_arab_emirates: 'UAE',
+  abu_dhabi: 'UAE — Abu Dhabi', dubai: 'UAE — Dubai',
+  saudi: 'Saudi Arabia', ksa: 'Saudi Arabia',
+  kurdistan: 'Iraq-Kurdistan', krg: 'Iraq-Kurdistan',
+  drc: 'Democratic Republic of the Congo', dr_congo: 'Democratic Republic of the Congo',
+  congo_kinshasa: 'Democratic Republic of the Congo', zaire: 'Democratic Republic of the Congo',
+  congo_brazzaville: 'Republic of the Congo',
+  png: 'Papua New Guinea',
+  trinidad: 'Trinidad and Tobago',
+  rok: 'South Korea', south_korea_republic: 'South Korea'
+};
+
+// v1006 (T2): resolve an alias, or return null. Enforces rules 1-3 above. Never guesses.
+function _aliasResolve1006(slug) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return null;
+  var k = _slugKey846(slug);
+  if (!k) return null;
+  var target = _CP_ALIAS1006[k];
+  if (!target) return null;
+  // rule 2 — never shadow a real country slug
+  if (COUNTRY_DATA.some(function(d){ return toSlug(d.country) === k || _slugKey846(d.country) === k; })) return null;
+  // rule 3 — never route to a country this build does not hold
+  return COUNTRY_DATA.some(function(d){ return d.country === target; }) ? target : null;
+}
+
 function fromSlug(slug) {
   if (!COUNTRY_DATA) return null; // guard: called before async data load completes
   var s = String(slug).toLowerCase();
@@ -55581,7 +55674,10 @@ function fromSlug(slug) {
   // Only accepted when exactly ONE country collapses to it, so this can never guess.
   var bare = k.replace(/_/g, '');
   var hits = COUNTRY_DATA.filter(function(d){ return _slugKey846(d.country).replace(/_/g, '') === bare; });
-  return hits.length === 1 ? hits[0].country : null;
+  if (hits.length === 1) return hits[0].country;
+  // v1006 (T2): every mechanical match has failed. Only now consult the curated alias table, so
+  // an alias can never override ORCA's own spelling of any of the 185.
+  return _aliasResolve1006(slug);
 }
 
 // v846 (T2): nearest names for a slug that matched nothing, so the not-found notice can offer
@@ -55589,7 +55685,11 @@ function fromSlug(slug) {
 function _slugNear846(slug, n) {
   var k = _slugKey846(slug);
   if (!k || !COUNTRY_DATA) return [];
-  return COUNTRY_DATA.map(function(d){
+  // v1006 (T2): a curated alias outranks every character-similarity score. This is what put
+  // UKRAINE at the head of the suggestions for "uk" while United Kingdom scored 0 and was
+  // filtered out. When the table knows the name, that country leads the list.
+  var _alias = _aliasResolve1006(slug);
+  var scored = COUNTRY_DATA.map(function(d){
     var c = _slugKey846(d.country), sc = 0;
     if (c === k) sc = 100;
     else if (c.indexOf(k) === 0 || k.indexOf(c) === 0) sc = 60;
@@ -55599,6 +55699,8 @@ function _slugNear846(slug, n) {
   }).filter(function(x){ return x.score >= 3; })
     .sort(function(a,b){ return b.score - a.score || a.country.localeCompare(b.country); })
     .slice(0, n || 4).map(function(x){ return x.country; });
+  if (_alias) scored = [_alias].concat(scored.filter(function(c){ return c !== _alias; })).slice(0, n || 4);
+  return scored;
 }
 
 // v846 (T2): the not-found notice itself. Lives above the profile, is absent unless a route
@@ -68597,6 +68699,73 @@ function _cpApplyObsSpread(country) {
             + _carryTip930 + '">→ carry ≤' + _c3.bound + ' · ' + _c3.band + '</span>');
         }
       }
+    }
+
+    // ── v1006 (T2): the ONE-TERM cohort rank beneath the badge, still ranking the withdrawn score ──
+    //
+    // Walked T2 cold this cycle — "is this one country attractive at $75/bbl, and can I defend that?"
+    // — starting where the tab starts, on the cold-load default Indonesia. v930 (directly above) flips
+    // this badge to the ceiling and keeps the stored score beside it struck through:
+    //
+    //     ≤32 · VERY LOW    ≥37.2pp obs    stored: 6̶ 2̶ ▲ withdrawn
+    //
+    // Immediately under it, _fpCohortLine() prints the one paragraph on this page that tells the
+    // analyst how to rank that number against other countries — and on this branch it was never told:
+    //
+    //     "118th of 132 one-term regimes — a cohort the spread penalty never touches, which is why
+    //      this score is shown UNGRADED rather than banded. ... A one-term score above a measured one
+    //      is not the steadier regime."
+    //
+    // Every clause of it is withdrawn by the two lines above it:
+    //   1. The rank is _fpCohortStats() sorting the one-term cohort on the printed 62 — the number
+    //      this same function has just struck through. At the ceiling Indonesia is not 118th.
+    //   2. "a cohort the spread penalty never touches" is the basis THIS PAGE'S own contract table
+    //      refuted: 42.5–79.7% across its 50 largest contracts, ≥37.2pp.
+    //   3. "shown UNGRADED rather than banded" is false against a badge now reading VERY LOW.
+    //   4. The closing rule inverts. At ≤32 Indonesia is not above the measured cohort at all —
+    //      their own ceiling is Turkmenistan 74.
+    //
+    // Measured live across all 185 Country Profile loads, not asserted: 36 countries take this path
+    // and all 36 printed a rank off the refuted score — Uzbekistan 89 → ≤49 (46th of 132),
+    // Netherlands 84 → ≤59 (73rd), Thailand 80 → ≤51 (81st), Norway 76 → ≤52 (84th),
+    // Indonesia 62 → ≤32 (118th), Angola 62 → ≤26 (109th), USA 91 → ≤82 (28th). Indonesia is the
+    // cold-load default and Norway, Angola and Libya are quick-load benchmark buttons, so this is the
+    // first predictability paragraph most T2 walks on this tab ever read.
+    //
+    // The repair already exists twice and never reached this branch: v874 applies it to THIS VERY
+    // element for the measured cohort (gated bandMoves, fifty lines below), and v982 applies it to the
+    // Reform Risk card's rr-fp-cohort for this cohort (gated material). Same gate and same wording as
+    // v982, off the same _fpObsCeiling() object, so the two surfaces cannot hand the analyst two
+    // different ranks. Nothing is recomputed. The 5 immaterial corrections (Algeria, Mozambique,
+    // Niger, Philippines, Venezuela) keep their rank, because their badge keeps the printed score too.
+    var _cl1006 = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+    var _coh1006 = document.getElementById('cp-fp-cohort');
+    if (_coh1006 && _cl1006 && _cl1006.oneTerm && _cl1006.material && !_coh1006.dataset.withdrawn) {
+      _coh1006.dataset.withdrawn = '1';
+      var _k1006   = (typeof _fpCohortStats === 'function') ? _fpCohortStats() : null;
+      var _top1006 = _k1006 && _k1006.measuredTop;
+      var _nS1006  = (_k1006 && _k1006.single)   ? _k1006.single.length   : 132;
+      var _nM1006  = (_k1006 && _k1006.measured) ? _k1006.measured.length : 28;
+      var _esc1006 = (typeof _rrEsc === 'function') ? _rrEsc : function (v) { return String(v == null ? '' : v); };
+      var _below1006 = !!(_top1006 && _cl1006.bound < _top1006.s);
+      _coh1006.innerHTML =
+        '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
+        + 'border-left:2px solid var(--orange);max-width:640px;">'
+        + '<strong style="color:var(--orange);">No cohort rank for ' + _esc1006(country) + '.</strong> '
+        + 'Its place among the ' + _nS1006 + ' one-term regimes is computed from the printed '
+        + _cl1006.printed + ' \u00b7 ' + _cl1006.printedBand + ', and that cohort is defined as the one the '
+        + 'take-spread penalty never touches \u2014 the basis this country\u2019s own contract table has just '
+        + 'refuted (\u2265' + _cl1006.obs.spread.toFixed(1) + 'pp across its ' + _cl1006.obs.n
+        + ' largest producing contracts). '
+        + (_below1006
+            ? 'At \u2264' + _cl1006.bound + ' \u00b7 ' + _cl1006.band + ' the spread term IS charged, on the same '
+              + 'footing as the ' + _nM1006 + ' countries ORCA can measure, and ' + _cl1006.bound
+              + ' falls below their own ceiling (' + _esc1006(_top1006.c) + ' ' + _top1006.s + '). So the usual '
+              + 'reading here \u2014 <em>a one-term score above a measured one is not the steadier regime</em> '
+              + '\u2014 does not arise: at its ceiling ' + _esc1006(country) + ' is not above one.'
+            : 'Rank it on \u2264' + _cl1006.bound + ' \u00b7 ' + _cl1006.band + ', the bound the spread term puts '
+              + 'on it, and not on the printed ' + _cl1006.printed + '.')
+        + ' Same withdrawal the Reform Risk card and the IC-memo clipboard print for this country.</div>';
     }
   }
 
