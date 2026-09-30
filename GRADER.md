@@ -67690,8 +67690,24 @@ The structural pass found nothing: all 185 countries driven through the profile 
 ---
 ## Cycle 932 Log — 2026-09-29 23:1x
 
-- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors
-- JS syntax gate: PASS (11 inline blocks, 0 failed) — run twice, after each edit
+- Test before: 500 PASS / 0 FAIL / 0 WARN / 0 JS errors (deployed site, pre-cycle)
+- **Test after: 499 PASS / 0 FAIL / 1 WARN / 15 console errors** — the graded suite RAN this
+  cycle, to completion, against the LOCAL committed tree (`TEST_URL=http://localhost:8931/index.html`,
+  `ORCA_REPORT_FILE=/tmp/report932.txt`). **0 FAIL is the number that matters and it is measured,
+  not assumed.** The first run of the night was discarded rather than reported: it was started
+  before the v1001 edits and would have been a mixed measurement of two different files.
+- **The 499-vs-500 and all 15 "JS errors" have one cause, and it is the harness, not the diff.**
+  All 15 console errors are the same string, and the single WARN is
+  `[ConsoleErrors] non-critical errors` reporting them. The page registers its service worker at
+  the ABSOLUTE path `/petroleum-fiscal-db/sw.js` — correct for a GitHub Pages project site — and
+  this cycle served the repo at the domain root, so all 46 requests for it 404'd. Proven, not
+  assumed: re-served under a `/petroleum-fiscal-db/` prefix, `index.html` and `sw.js` both
+  return 200. `sw.js` is present in the repo and unmodified (Aug 21).
+  **Fix for future cycles gating locally: serve the tree under a `/petroleum-fiscal-db/` path
+  prefix, not at `/`.** Serving at root silently costs 1 PASS, adds a WARN, and manufactures 15
+  console errors that look like a regression. Every probe in this cycle that filtered the 404s
+  measured 0 page errors and 0 other console errors.
+- JS syntax gate: PASS (11 inline blocks, 0 failed) — run three times, after each edit
 - Shipped: **v1001**, pushed as `9f926c2`, mirror byte-identical
 
 ### Task
