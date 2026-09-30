@@ -68457,3 +68457,117 @@ Walked T2 cold at 1440×900 and 390×844 with touch, storage cleared, starting w
 `≤32 · VERY LOW    ≥37.2pp obs    stored: 6̶2̶ ▲ withdrawn`
 
 Directly under it sits the
+
+---
+## Cycle 939 Log — 2026-09-30 15:2x
+
+- **Test before: 481 PASS / 14 FAIL / 0 WARN / 0 JS errors** — measured, not carried forward.
+  The prompt handed this cycle "479 PASS / 42 FAIL"; re-run against this tree the real number was
+  481/14, and **all 14 FAILs were one defect** in one function.
+- **Test after: 495 PASS / 0 FAIL / 0 WARN / 0 JS errors** — the suite RAN, to completion, against
+  the LOCAL tree, and the number is read from the suite's own report (`/tmp/report939_final.txt`
+  says `PASS: 495 / FAIL: 0`), not from the console tail.
+- Served under `http://127.0.0.1:8942/petroleum-fiscal-db/index.html`. Cycle 932's note is right and
+  was honoured: serving at `/` 404s `sw.js` 46 times and manufactures 15 console errors.
+- JS syntax gate: PASS (11 inline blocks, 0 failed) — run after each edit, 4 times.
+- Shipped **v1010** as `34972fe`; mirror byte-identical.
+
+### Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+Most recent cycle was T2; 936 T4, 935 T1, 934 T3, 933 T6. T5 was last taken at 932, so it is the
+oldest in the rotation.
+
+### Friction
+Cold load at 1440×900, both storages cleared and reloaded, then Fiscal Compare reached the way a
+first-time analyst reaches it — by clicking the tab, not by calling the renderer. (Worth recording:
+on a genuinely cold load `#fc-profile` is not visible and `#fc-results` has **0** rows; the tab click
+hydrates 189.) `exportFCResults()` was captured by stubbing `XLSX.writeFile` and reading the real
+`Methodology` sheet, so every figure below is off the built artifact.
+
+The sheet carried **eight byte-identical labels in column A, 17–23 rows apart, with different values
+in column B.** On Giant:
+
+| row | column A | column B |
+|---|---|---|
+| 8 | `Peak rate (bopd)` | 50000 |
+| 29 | `Peak rate (bopd)` | **150000** |
+| 10 | `Plateau (yr)` | 5 |
+| 33 | `Plateau (yr)` | **10** |
+| 11 | `Decline rate (%/yr, post-plateau)` | 15 |
+| 34 | `Decline rate (%/yr, post-plateau)` | **10** |
+
+plus `Ramp-up (yr)` (3 / 4), `Modelled horizon (yr)`, `Discount rate (%)`, `Oil price ($/bbl)` and
+`Working interest`. All seven profiles, every export.
+
+This is the one file an IC reviewer interrogates a pasted number with. Asked *"what plateau is that
+on?"*, the analyst searches the sheet for Plateau, gets two hits with the same label and two
+different answers, and cannot tell which governs the column being defended without scrolling 20+
+rows up to a heading — a heading that no longer said `Profile assumptions` either. It had been
+replaced with `DO-NOT-CITE columns — …`, with the profile name buried at character ~120 of a 158-char
+single cell. **A found row could not be read on its own, which is the only way a found row is ever
+read.**
+
+### Cause, stated because it matters for how the next cycle treats an inherited tree
+The tree arrived with **492 uncommitted insertions in `index.html`** — cycle 1009's T5 work,
+orphaned by a harness timeout, exactly as 931's was before 932 salvaged it. Its substance is right
+and was **re-verified against the code before being trusted, not read off its own comment**:
+
+- `ENGINE_BASIS` (index.html:57679) — 50k bopd, $1,000M all-in, $18/bbl escalating 2%/yr, 5yr
+  plateau, 15% decline, 241.9 MMbbl, `dcf_profiles.py — PROFILES.deepwater`.
+- `FC_PROFILES.deepwater` (index.html:63031) — 50k bopd, $1,200M, $15/bbl flat, 8yr plateau, 12%
+  decline.
+
+Two different projects, both named `Deepwater`, confirmed present and divergent. v1009's diagnosis
+holds: the sheet's only assumptions block described the three `(model...)` columns it forbids citing,
+not the eight `(database)` columns it instructs the reader to cite, and it **moved with the profile
+selector** — on Giant the stated basis for the cited figures read $2,000M/$10. v1009 put the right
+two blocks on the sheet. It gave their rows the same labels.
+
+So this cycle did not revert it and did not re-diagnose it. It finished it.
+
+### Change — `exportFCResults()`, index.html:70945–71002
+- Cited rows lead with a tag: `Cited basis — plateau (yr)` → 5.
+- Model-only rows carry a trailing tag: `Plateau (yr) — model-only (Giant)` → 10.
+- The second heading leads with `Profile assumptions — Giant — DO NOT CITE: basis of the three
+  "(model...)" columns and nothing else.` The word a reader scans column A for is back at the front;
+  the profile name is at character 22; v1009's warning is kept, after the name instead of ahead of it.
+
+### Result
+**Duplicate labels 8 → 0, measured on all seven profiles** (`deepwater shallow onshore lng marginal
+giant north_sea`, dup=0 each, 153 rows each, 0 page errors). Either row now answers which basis it
+is on without its heading, so an analyst challenged on a pasted contractor NPV can search the sheet
+for the parameter and get **one** answer. `FCExportMeth` 7 PASS / 14 FAIL → **21 PASS / 0 FAIL**.
+
+### Verification
+- **Six viewports, storage cleared, tabs t0–t3:** `scrollWidth` = `clientWidth` at 1920, 1440, 1280,
+  1024, 768 and **390×844 `hasTouch:true`** — 390/390 on all four tabs. **0 page errors at every
+  width.** No DOM node and no control was added or touched — the edit is inside an XLSX row-array
+  builder — so the 24px `pointer: coarse` rule is not engaged by this change.
+- Workbook opens and parses on all seven profiles; `Methodology` present in `wb.SheetNames`.
+
+### Notes for the next cycle
+- **An inherited uncommitted `index.html` is now a twice-seen pattern** (931→932, 1009→939). Both
+  times the orphaned work was substantively right and mechanically unfinished. The lesson is not
+  "trust it" or "revert it" — it is that **the suite is what tells you which**. 14 FAILs pointed
+  straight at the one function.
+- **The office copy of the suite is still the diverged one.** `petroleum-fiscal-db/tests/` has
+  `FCExportMeth`; `office/tools/petroleum/tests/runtime_comprehensive.js` is modified in the working
+  tree and is what `autonomous_cycle.py` reads. Until they are the same object, a gate can be green
+  in one place and red in the other — which is how a 14-FAIL tree reached this cycle described as
+  "479 PASS / 42 FAIL", a third number matching neither copy.
+- `_ctl907.html` (9.7 MB) and `_baseline_t3.html` (9.8 MB) are **still untracked in the repo root**,
+  now carried forward for a fourth cycle. Probe debris, not deliverables.
+- Carried forward unchanged: Indonesia's three different government profit-oil shares on one page
+  (data reconciliation, not render); `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source;
+  breakeven populated on only 68 of 185 with 65 clustered at 27–34; Somalia the one true T4 dead
+  end; `Paraguay Decree 19.080/1997` typed `government_filing`; FC's copy-link path not walked for
+  selection ticks; the Screener count line's `block· Deepwater` join fault; the Home card at ~3077
+  saying Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5; `_posClause648` number
+  agreement; Côte d'Ivoire's two missing API slugs; `window._screenerExportBasis` not naming the 105
+  withheld countries; Screener Advanced Filters checkboxes at 13px under `pointer: coarse`;
+  `summary "Reading this table"` at 18px; Side-by-Side's two byte-identical export buttons.
+- Header badge bumped **v1007 → v1010** (bookkeeping, last). Recorded because it was briefly done
+  wrong: a blanket `sed s/v1007/v1010/g` also rewrote three *historical* `v1007 (T5)` comment
+  attributions on the Screener print work. Restored individually; `grep -n v1007` now returns
+  exactly those three comments and nothing else. Bump the badge by its `id="hdr-version"` line, not
+  by a global replace.
