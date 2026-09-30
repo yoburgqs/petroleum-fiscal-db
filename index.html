@@ -42614,6 +42614,29 @@ function renderReformTimeline(country) {
     let supersedeRows = [];
     let srcNamedCount = 0;    // v956: rows carrying a named citation at all — the denominator
     let citedLinkCount = 0;   // rows that render a clickable citation at all -- the denominator
+    // ── v1002 (T6): the same measurement, scoped to the rows the VERDICT SENTENCE vouches for ──
+    // citedLinkCount counts every row that renders a link, including the country-level bulk
+    // harvest and the shared regional instrument. Both of those are excluded from sourcedCount by
+    // v569 and v588 on the explicit ground that they are not citations for a parameter -- and then
+    // silently re-admitted as the denominator of "N of those M citations cannot be opened from
+    // here", a clause attached to a sentence whose subject is the INDEPENDENTLY SOURCED rows.
+    //
+    // Measured on the shipped build across all 185 profiles: on 103 countries not one of the
+    // independently sourced rows behind that sentence has a citation that can be opened -- every
+    // one is either a dead address or a listing with no instrument in it -- and 61 of those 103
+    // still lead the sentence with a green tick. On 15 of them the count also understates the
+    // breakage, because a bulk row pads M: Colombia reads "3 of those 4 citations cannot be
+    // opened from here" when all 3 of the parameters it just ticked are unretrievable and the
+    // 4th is the EY/IHS harvest this same page calls self-agreement, not corroboration. Peru
+    // reads "2 of those 3" with all 3 unretrievable. An analyst subtracting reads one good
+    // citation out of every one of those sentences. There is none.
+    //
+    // These three count only rows that incremented sourcedCount, so the clause's denominator is
+    // the same set as its subject. Nothing is lost: _deadNote641 and _idxNote971 below still
+    // report over every row, bulk included.
+    let srcCitedN = 0;   // v1002: independently sourced rows that render a link at all
+    let srcDeadN  = 0;   // v1002: ...of which the address returns nothing
+    let srcIdxN   = 0;   // v1002: ...of which the address opens a listing, not the instrument
     // v601 (T2): rows that carry NO source of any kind. Until now they rendered a bare numeric
     // value, an em-dash in the Statutory column, and a badge reading "Contract DB average" -- a
     // phrase that names a method, not an absence -- at exactly the same visual weight as an A-tier
@@ -42860,6 +42883,7 @@ function renderReformTimeline(country) {
           uL: unsourcedLabels.length, uZ: unsourcedZeroLabels.length, bL: bulkLabels.length,
           sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
           idx: idxLinkCount, iL: idxLinkLabels.length,   // v971
+          sC: srcCitedN, sD: srcDeadN, sI: srcIdxN,   // v1002 (T6)
           spR: supersedeRows.length, sNC: srcNamedCount,   // v956
           tC: Array.from(_termsCited),
           tO: Array.from(_termsCiteOpen)   // v990 (T6)
@@ -42875,6 +42899,7 @@ function renderReformTimeline(country) {
         let isDivergent = false;
         let isUnsourcedConflict = false;   // v601 (T2)
         let engConflict767 = null;         // v767 (T6): {v, matchesStat} on a SOURCED row the engine overrides
+        let _rowSourced = false;           // v1002 (T6): this row incremented sourcedCount
         if (srcMeta) {
           // Detect D-confidence: explicit 'd' confidence level OR self-referential petroleum-facts.db URL
           const rawConf = (srcMeta.confidence || 'c').toLowerCase();
@@ -42958,6 +42983,7 @@ function renderReformTimeline(country) {
               + _fmtPct(srcVal) + '</span> ' + _sharedChip(_shareOf.length, sTip);
           } else if (srcVal != null) {
             sourcedCount++;
+            _rowSourced = true;   // v1002 (T6)
             // v755 (T6): the document, not just the tally. srcLabel is already the human-readable
             // instrument name this row prints in its Source cell.
             sourcedSrcs.push({ label: label, name: String(srcLabel || srcMeta.source || '') });
@@ -43007,6 +43033,7 @@ function renderReformTimeline(country) {
             badgeHtml = `<span class="source-badge conf-d" title="${dTooltip}">${dIcon}Estimated default · D</span>`;
           } else if (srcMeta.url) {
             citedLinkCount++;
+            if (_rowSourced) srcCitedN++;   // v1002 (T6)
             // v641 (T6): the arrow is a promise that a click reaches the clause. Where the
             // measurement says it does not, the promise is withdrawn rather than kept and broken:
             // the ↗ comes off, a LINK DEAD chip goes on, and the tier letter is left untouched --
@@ -43024,7 +43051,7 @@ function renderReformTimeline(country) {
             // neither dead nor the bulk publication's front page, so the three are exclusive.
             const _srcIdx971 = (!_isDeadUrl && !_idxOnly) ? _citeIndexOnly(srcMeta.url) : '';
             if (_isDeadUrl || _idxOnly) {
-              if (_isDeadUrl) { deadLinkCount++; deadLinkLabels.push(label); }
+              if (_isDeadUrl) { deadLinkCount++; deadLinkLabels.push(label); if (_rowSourced) srcDeadN++; /* v1002 */ }
               // v850 (T6): the click. Until now this anchor still pointed at the address the
               // page had just finished saying returns nothing, so the analyst's one affordance
               // opened a 404 in a new tab. It now runs the search the note asks for, against the
@@ -43090,6 +43117,7 @@ function renderReformTimeline(country) {
               // until now only appeared on dead rows is offered here too, so the analyst has the
               // title search without having to construct it.
               idxLinkCount++; idxLinkLabels.push(label);
+              if (_rowSourced) srcIdxN++;   // v1002 (T6)
               const _iTitle971 = _srcTitleSplit(srcLabel).title;
               const _iTip971 = _esc(label + ': the address ORCA has on record for this citation — '
                 + srcMeta.url + ' — resolves, but it opens ' + _srcIdx971 + ', not '
@@ -43292,6 +43320,9 @@ function renderReformTimeline(country) {
           sharedLabels.length        = _snap742.sL;
           deadLinkLabels.length      = _snap742.dL;
           idxLinkCount               = _snap742.idx;   // v971
+          srcCitedN                  = _snap742.sC;    // v1002 (T6)
+          srcDeadN                   = _snap742.sD;    // v1002 (T6)
+          srcIdxN                    = _snap742.sI;    // v1002 (T6)
           idxLinkLabels.length       = _snap742.iL;    // v971
           modelConflicts.length      = _snap742.mC;
           supersedeRows.length       = _snap742.spR;   // v956
@@ -43765,14 +43796,17 @@ function renderReformTimeline(country) {
         + 'annotation stripped off.'
         + '</div>'
       : '';
-    const _idxScope971 = idxLinkCount > 0
+    // v1002 (T6): denominator re-scoped from citedLinkCount to sourcedCount. This clause hangs
+    // off a sentence whose subject is the independently sourced parameters, so the set it counts
+    // over has to be that same set — not every row that happens to render a link.
+    const _idxScope971 = srcIdxN > 0
       ? ' <strong style="color:var(--orange);">'
-        + (_allIdx971
-            ? (citedLinkCount === 1
+        + (srcIdxN >= sourcedCount
+            ? (sourcedCount === 1
                 ? 'That citation opens a listing, not the instrument.'
-                : (citedLinkCount === 2 ? 'Both' : 'All ' + citedLinkCount)
+                : (sourcedCount === 2 ? 'Both' : 'All ' + sourcedCount)
                   + ' of those citations open a listing, not the instrument.')
-            : idxLinkCount + ' of those ' + citedLinkCount + ' citations open a listing, not the instrument.')
+            : srcIdxN + ' of those ' + sourcedCount + ' citations open a listing, not the instrument.')
         + '</strong>'
       : '';
     // Scopes the tick sentence itself, in the same place and the same voice as v625's _scope625.
@@ -43788,15 +43822,47 @@ function renderReformTimeline(country) {
             : supersedeRows.length + ' of those citations predate')
         + ' a fiscal reform ORCA logs for ' + _esc(country) + '.</strong>'
       : '';
-    const _citeScope641 = deadLinkCount > 0
+    // v1002 (T6): same re-scope as _idxScope971. Before this, a bulk-harvest row with a live
+    // link could pad the denominator of a clause about the sourced rows, so Colombia — all three
+    // of its sourced citations dead — read "3 of those 4 citations cannot be opened from here".
+    const _citeScope641 = srcDeadN > 0
       ? ' <strong style="color:var(--red);">'
-        + (_allDead
-            ? (citedLinkCount === 1
+        + (srcDeadN >= sourcedCount
+            ? (sourcedCount === 1
                 ? 'That one citation cannot be opened from here.'
-                : 'None of those ' + citedLinkCount + ' citations can be opened from here.')
-            : deadLinkCount + ' of those ' + citedLinkCount + ' citations cannot be opened from here.')
+                : 'None of those ' + sourcedCount + ' citations can be opened from here.')
+            : srcDeadN + ' of those ' + sourcedCount + ' citations cannot be opened from here.')
         + '</strong>'
       : '';
+    // ── v1002 (T6): WITHDRAW THE TICK WHERE NOTHING BEHIND IT CAN BE OPENED ──────────────
+    // srcCitedN/srcDeadN/srcIdxN are the sourced-row subsets; what is left over is the number of
+    // sourced citations an analyst can actually click through to and read the rate off.
+    const _srcOpenN1002 = Math.max(0, srcCitedN - srcDeadN - srcIdxN);
+    const _srcNoneOpen1002 = sourcedCount > 0 && _srcOpenN1002 === 0;
+    // Where that is zero, the two clauses above are replaced by one that says it outright. Split
+    // across "N of M dead" and "N of M listings" — in different colours, in a paragraph — the
+    // reader adds them and still comes away believing one citation held up. On the 103 countries
+    // measured, none did.
+    const _noOpenScope1002 = (function() {
+      if (!_srcNoneOpen1002) return '';
+      const parts = [];
+      if (srcDeadN) parts.push(srcDeadN + (srcDeadN === 1 ? ' returns nothing at the address on record' : ' return nothing at the addresses on record'));
+      if (srcIdxN)  parts.push(srcIdxN + (srcIdxN === 1 ? ' opens a listing with no instrument in it' : ' open a listing with no instrument in it'));
+      const _noAddr = sourcedCount - srcCitedN;
+      if (_noAddr > 0) parts.push(_noAddr + (_noAddr === 1 ? ' carries no address at all' : ' carry no address at all'));
+      return ' <strong style="color:var(--red);">Not one of th'
+        + (sourcedCount === 1 ? 'at citation' : 'ose ' + sourcedCount + ' citations')
+        + ' can be opened from here'
+        + (parts.length ? ' \u2014 ' + parts.join('; ') : '')
+        + '.</strong> <span style="color:var(--muted);font-weight:400;">The match is a record of '
+        + 'what ORCA read when the rate was harvested, not something this page can let you check. '
+        + 'Locate the instrument' + (sourcedCount === 1 ? '' : 's')
+        + ' by name before ' + (sourcedCount === 1 ? 'this figure goes' : 'these figures go')
+        + ' in an IC memo.</span>';
+    })();
+    // One clause or the other, never both — _noOpenScope1002 already states everything the two
+    // scoped clauses would have, and states it as one fact instead of two partial ones.
+    const _retrScope1002 = _srcNoneOpen1002 ? _noOpenScope1002 : (_citeScope641 + _idxScope971);
     // ── v755 (T6): how many DOCUMENTS are under the count, stated where the count is made ────
     // The tick sentence is the most defensible-sounding line on the platform's deepest
     // provenance surface, and it is a row count. An analyst reads "All 4 independently sourced
@@ -43865,19 +43931,24 @@ function renderReformTimeline(country) {
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
         + _concScope755
-        + _citeScope641
-        + _idxScope971
+        + _retrScope1002
         + _supScope956
         + _scope625
         + '</div>'
       : (sourcedCount > 0
-        ? '<div style="margin-top:8px;font-size:11px;color:' + (_missInvented.length ? 'var(--orange)' : 'var(--muted)') + ';">'
-          + (_missInvented.length ? '\u26a0 ' : '\u2713 ')
+        // v1002 (T6): the leading glyph is the loudest thing in this sentence and it was a
+        // \u2713 on every profile where the columns agreed, whether or not a single one of the
+        // documents behind them could still be fetched. 61 of the 185 profiles led with that
+        // tick over a citation set of which not one opens. The tick is a claim the page cannot
+        // support there, so it is withdrawn -- same treatment v641 gave the \u2197 on a dead row.
+        // No value, tier letter, take, NPV or grade changes; the match itself is still stated.
+        ? '<div style="margin-top:8px;font-size:11px;color:' + ((_srcNoneOpen1002 || _missInvented.length) ? 'var(--orange)' : 'var(--muted)') + ';">'
+          + ((_srcNoneOpen1002 || _missInvented.length) ? '\u26a0 ' : '\u2713 ')
           + (sourcedCount === 1
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
                 + (offRows.length ? ' the model reads' : '') + ' match')
-          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _idxScope971 + _supScope956 + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _retrScope1002 + _supScope956 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
