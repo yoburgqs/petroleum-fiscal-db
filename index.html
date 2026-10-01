@@ -2983,7 +2983,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1025</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1026</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -27900,11 +27900,99 @@ function renderExplorer() {
   const npvKey  = 'npv_'  + price;
   const irrKey  = 'irr_'  + price;
 
+  // ── v1026 (T1): the LAST ranking surface still ordering on the published fee blend ────────
+  // T1 is "which countries should even be on my screening list?", and Browse is the tab whose
+  // own intro says "all 185 countries displayed" — the widest list on the platform, with Govt
+  // Take as the first entry in its Sort menu.
+  //
+  // Every other surface that ranks on take already carries the Group-2 correction the platform
+  // comparability rules (2026-08-26) require: the Screener tests its ceiling on it (v554), leads
+  // the cell with it while the take sort is live (v685), tiers on it (v890) and reconciles it on
+  // the cold view too; Fiscal Compare builds its # column on the citable like-for-like take;
+  // Side-by-Side re-bases its ordering and says so; the IC-memo clipboard carries both figures.
+  // This comparator was still `a[takeKey]` — the published all-contract blend.
+  //
+  // Measured on the shipped data at $75/bbl, sorting Browse by Govt Take, all 185 rows:
+  //     country        published   comparable   rank(pub)   rank(cmp)   Δ
+  //     Iraq               84.8%        34.1%         180         102   −78
+  //     South Sudan        53.3%        49.0%         131         122    −9
+  //     Ecuador            46.5%        39.3%         117         110    −7
+  //     Mexico             32.2%        29.7%          99          95    −4
+  //     Azerbaijan/Iran/Qatar/Oman/Malaysia/India        1–2 places each
+  // 10 countries diverge; Iraq is the one that decides something. On the published blend it sits
+  // 180th of 185 — among the five harshest regimes on earth — because 68% of its contracts are
+  // TSC fee-basis, where the contractor is paid a fixed $/bbl remuneration and keeps no price
+  // upside, so that take% measures contract structure and not how hard the terms are. On its 195
+  // PSC/Concession contracts government take is 34.1%, which is mid-table. An analyst building a
+  // screening list by sorting this column top-down and drawing a line reads Iraq out of the
+  // universe entirely — the exact failure v603 fixed on the Home page, where its own comment
+  // records "the front page was dropping the second-largest oil producer in OPEC from the answer
+  // to 'which countries should even be on my screening list?'".
+  //
+  // Scope is the take ORDERING and the two cells that state it. No new control, no new threshold,
+  // no recomputation: the carried value is _scFeeCmpAt(d, price).cmp, the same call the Screener's
+  // _scPass() and Side-by-Side already make, and it is carried only where .diverges is true —
+  // which is the 0.1pp test, so a row whose two figures print the same is untouched. Every other
+  // sort, and the published figure everywhere it is displayed, coloured and exported, is
+  // byte-identical to before.
+  const _explFeeCmpOf = (d) => (typeof _scFeeCmpAt === 'function')
+    ? _scFeeCmpAt(d, price) : { head: d[takeKey], cmp: d[takeKey], diverges: false, n2: 0, n1: null };
+  // The Explorer has no "screen on comparable take" checkbox, so unlike the Screener there is
+  // exactly one state in which this column does the ranking: its own sort being the live one.
+  const _explTakeLeadCmp = (sort === 'take' || !sort);
+  const _explTakeSortVal = (d) => {
+    const fc = _explFeeCmpOf(d);
+    return (fc.diverges && fc.cmp != null) ? fc.cmp : (d[takeKey] ?? 999);
+  };
+  // The GOVT TAKE cell. Identical to makeTakeCellWithEvidence() — same evidence dot, same grade
+  // colour, same floor "≥" marker — unless this row's two figures diverge, which is 10 of 185.
+  // Layout follows the Screener's v685/v890 precedent exactly rather than inventing a second one:
+  // the figure the row IS ORDERED ON leads and carries the take colour, and the one being set
+  // aside is named directly beneath it. On a non-take sort the published figure leads (nothing
+  // is being ranked on the correction) and the sub-line still renders, because v890 established
+  // that the reconciliation belongs on the resting view too — a bare 84.8% with nothing beside
+  // it is the state that loses the analyst.
+  const _explTakeCell = (d, take, floorTip) => {
+    const fc = _explFeeCmpOf(d);
+    if (take == null || !fc.diverges || fc.cmp == null) return makeTakeCellWithEvidence(take, d, floorTip);
+    const base = `${d.country}: ${Number(fc.n2).toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure the platform comparability rules permit comparing against other countries. `;
+    const lead = _explTakeLeadCmp
+      ? `<span class="take-val ${takeClass(fc.cmp)}" style="cursor:help;" title="${(base + 'This column is doing the ranking, so the row is placed on ' + fc.cmp.toFixed(1) + '% and leads with it; the published blend is named beneath. Sort by any other column to lead with the published figure again.').replace(/"/g,'&quot;')}">${fc.cmp.toFixed(1)}%</span>`
+      : `<span style="font-weight:600">${fmtTake(fc.head)}</span>`;
+    const subTxt = _explTakeLeadCmp ? `published ${fc.head.toFixed(1)}%` : `PSC/Conc ${fc.cmp.toFixed(1)}%`;
+    const subTip = (base + (_explTakeLeadCmp
+      ? 'The published figure is what this table shows and exports everywhere else on the platform.'
+      : 'Sort this table by Govt Take and the row is ranked on ' + fc.cmp.toFixed(1) + '%, not on the blend above.')).replace(/"/g,'&quot;');
+    const sub = `<div style="font-size:10px;font-weight:700;color:${_explTakeLeadCmp ? 'var(--muted)' : 'var(--accent)'};line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${subTip}">${subTxt}</div>`;
+    const _ge = floorTip ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${floorTip}">&ge;</span>` : '';
+    return `<td class="num" style="position:relative;" title="${buildEvidenceTooltip(d).replace(/"/g,'&quot;')}">
+      ${_ge}${lead}
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${_evidenceGrade(d).color};margin-left:4px;vertical-align:middle;"></span>${sub}
+    </td>`;
+  };
+  // The TIER cell is the take bucket, so it follows the take cell. It is also the only column on
+  // the row that is a WORD, which is what an eye scanning 185 rows for a shortlist actually reads:
+  // leaving "NOC/Concession" on Iraq beside a 34.1% that ranks it mid-table contradicts the figure
+  // in one word. Same two states as the Screener — bucket on the ranked figure while the take sort
+  // leads with it, otherwise keep the published pill and add the PSC/Conc reading beneath, but only
+  // where the two actually land in different buckets.
+  const _explTierCell = (d, take, isFloor, floorTip) => {
+    const fc = _explFeeCmpOf(d);
+    if (isFloor || !fc.diverges || fc.cmp == null) return tierCellHtml(take, isFloor, floorTip, '');
+    if (_explTakeLeadCmp) {
+      return tierCellHtml(fc.cmp, false, floorTip,
+        `Tier on the comparable take (${fc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${fc.head.toFixed(1)}% blend the tier is ${tierLabel(fc.head)}.`.replace(/"/g,'&quot;'));
+    }
+    if (tierLabel(fc.cmp) === tierLabel(fc.head)) return tierCellHtml(take, false, floorTip, '');
+    const tip = (`${d.country}: on its PSC/Concession contracts alone government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl, which is a ${tierLabel(fc.cmp)} regime. The pill above reads ${tierLabel(fc.head)} because it is bucketed on the published ${fc.head.toFixed(1)}%, and that figure blends ${Number(fc.n2).toLocaleString()} fee-basis contracts whose take% measures contract structure rather than fiscal terms. Use the ${tierLabel(fc.cmp)} reading when deciding whether this country belongs on a screening list.`).replace(/"/g,'&quot;');
+    return tierCellHtml(take, false, floorTip, '')
+      + `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:3px;cursor:help;" title="${tip}">PSC/Conc: ${tierLabel(fc.cmp)}</div>`;
+  };
   // sort — the metric comparator is unchanged; v578 only decides what it is applied WITHIN.
   const _explMetricCmp = (a, b) => {
     let va, vb;
     switch(sort) {
-      case 'take':    va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999; break;
+      case 'take':    va = _explTakeSortVal(a); vb = _explTakeSortVal(b); break;
       // v851 (T6): was `irr`, ranking on AVG(per-contract IRR). 'irr' is kept as an alias so a
       // share link saved before v851 still sorts on something, rather than silently falling
       // through `default` to take and showing the analyst a different table than their URL says.
@@ -27924,7 +28012,7 @@ function renderExplorer() {
       case 'stability': va = _fpSortVal(a); vb = _fpSortVal(b); break;
       case 'evidence': va = _evidenceSortVal(a); vb = _evidenceSortVal(b); break;
       case 'country':  va = a.country; vb = b.country; break;
-      default: va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999;
+      default: va = _explTakeSortVal(a); vb = _explTakeSortVal(b);   // v1026 (T1): default IS take
     }
     return va < vb ? -1 : va > vb ? 1 : 0;
   };
@@ -28129,7 +28217,7 @@ function renderExplorer() {
         return d.n;
       })()} ↗</td>
       <td>${mechs}</td>
-      ${makeTakeCellWithEvidence(take, d, _explRowFloor ? _explFloorTip : null)}
+      ${_explTakeCell(d, take, _explRowFloor ? _explFloorTip : null)}
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="expl-terms-slot" data-tc-country="${String(d.country).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="margin-top:2px;"></div></td>
       <td class="num expl-sm-off">${makeTakeSparkline(d, price)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
@@ -28236,7 +28324,7 @@ function renderExplorer() {
         }
         return '—';
       })()}</td>
-      <td>${tierCellHtml(take, _explRowFloor, _explFloorTip, '')}</td>
+      <td>${_explTierCell(d, take, _explRowFloor, _explFloorTip)}</td>
     </tr>`;
   }).join('');
   const _explPL = {'50':'$50','75':'$75','100':'$100','125':'$125'};
@@ -28308,6 +28396,14 @@ function renderExplorer() {
   const _explEvidNote = (sort === 'evidence')
     ? `<div style="margin-top:5px;line-height:1.55;">Ranked on the <strong style="color:var(--text);">evidence grade</strong> — primary-law share and fact depth over each country&rsquo;s whole fact base, most of which is contract metadata the DCF never reads. <strong style="color:var(--orange);">That is not the same question as whether the terms behind the take were cited.</strong> The <strong style="color:var(--text);">N of M terms cited</strong> chip under each grade counts only the fiscal terms this row&rsquo;s model runs, and the two orderings invert: Kazakhstan ranks third-weakest here and cites 4 of 5; Canada closes the producer block as best-evidenced and cites 2 of 4. Click any chip for that country&rsquo;s Evidence Chain.<span id="expl-terms-note-n"></span></div>`
     : '';
+  // v1026 (T1): the ordering states its own basis, because the correction MOVES rows and an
+  // unexplained placing is what makes an analyst stop trusting a list. Counted off the rendered
+  // set rather than asserted, and silent when the live view holds none of the affected rows.
+  const _explCmpRows = (sort === 'take' || !sort)
+    ? data.filter(d => _explFeeCmpOf(d).diverges).map(d => d.country) : [];
+  const _explCmpNote = _explCmpRows.length
+    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on the <strong style="color:var(--text);">comparable take</strong> &mdash; each country&rsquo;s PSC/Concession contracts alone &mdash; for <strong style="color:var(--text);">${_explCmpRows.length}</strong> row${_explCmpRows.length === 1 ? '' : 's'} whose published headline blends fee-basis contracts (TSC / RSC / Buy-back: the contractor is paid a fixed $/bbl remuneration and keeps no price upside, so that take% measures contract structure rather than how hard the terms are, and <strong style="color:var(--orange);">is not rankable against the other rows</strong>). Each leads with the figure it is placed on and names the published blend beneath it: ${_explCmpRows.slice(0, 4).join(', ')}${_explCmpRows.length > 4 ? ` and ${_explCmpRows.length - 4} more` : ''}. Sort by any other column to lead with the published figure.</div>`
+    : '';
   const _explOrderPair = _EXPL_SORT_ORDER[sort] || null;
   const _explOrderNote = _explOrderPair
     ? `<div style="margin-top:4px;line-height:1.55;">Ordered <strong style="color:var(--text);">${_explOrderPair[_explDir === -1 ? 1 : 0]}</strong>`
@@ -28318,6 +28414,7 @@ function renderExplorer() {
     + _explBeNote
     + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`)
     + _explOrderNote
+    + _explCmpNote
     + _explEvidNote
     + _explStabNote;
   // Update sort indicator on column headers
@@ -50974,6 +51071,25 @@ function exportExplorer() {
     'Govt Take @$75 (%)': d.take_75 !== null ? +d.take_75.toFixed(1) : null,
     'Govt Take @$100 (%)': d.take_100 !== null ? +d.take_100.toFixed(1) : null,
     'Govt Take @$125 (%)': d.take_125 !== null ? +d.take_125.toFixed(1) : null,
+    // v1026 (T1): the Rank column above is now built on the comparable take wherever the two
+    // diverge, so the workbook has to carry the figure that rank was built on. Without these two
+    // the file shows Iraq at Rank 6 beside a single take column reading 84.8% — a placing that
+    // reconciles against nothing in the file, which is worse than the wrong order it replaced.
+    // Same column names and same source call (_scFeeCmpAt) as the Screener export's
+    // GovtTake_75_Comparable / FeeBasis_Blend, so the two workbooks stay one vocabulary.
+    [`Govt Take @$${price} — comparable, PSC/Concession only (%)`]: (function(){
+      const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, price) : null;
+      return (fc && fc.diverges && fc.cmp != null) ? +fc.cmp.toFixed(1) : null;
+    })(),
+    FeeBasis_Blend: (function(){
+      const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, price) : null;
+      if (!fc || !fc.diverges) return 'No';
+      return 'Yes — ' + Number(fc.n2).toLocaleString() + ' fee-basis contract'
+        + (fc.n2 === 1 ? '' : 's') + ' (TSC/RSC/Buy-back, '
+        + 'fixed $/bbl remuneration, no price upside) are in the published blend, so that figure '
+        + 'measures contract structure rather than fiscal terms and is NOT rankable across '
+        + 'countries. Rank and cite the comparable column.';
+    })(),
     // v584: NPV and IRR were hardcoded to $75 while the table showed the active price. At the
     // $100 radio the file disagreed with the screen and labelled the disagreement "$75".
     [`Contractor NPV @$${price} ($M)`]: d[npvKey] !== null && d[npvKey] !== undefined ? +d[npvKey].toFixed(1) : null,
