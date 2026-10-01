@@ -69442,3 +69442,142 @@ the screen.
 **Task.** T1 — "Which countries should even be on my screening list?" Stalest in rotation (954 was T5; T1 last ran at 948).
 
 **Friction.** Walked cold with storage cleared: Home → `open the screen →` → Screener. The happy path is genuinely finished — 15 countries, the screen named, every exclusion already explained. So I kept narrowing the way an analyst 
+
+---
+
+## Cycle 957 — T3
+
+**Task.** T3 — "How do these three countries compare side by side?" Stalest in the rotation by a
+long way: T1 ran at 955, T5 at 954, T4 at 952, T2 at 950, T6 at 893 — T3 had not been picked since
+**cycle 848**.
+
+**Friction.** Walked cold at 1440 with `sessionStorage` and `localStorage` cleared. The tab seeds
+itself with UK · Norway · Nigeria, so the T3 question is already on screen before the analyst types
+anything — which is the right design and meant the walk went straight to the verdict strip above
+the grid. Four orderings there, read in sequence. Three of them police their own unrankable members
+with care. The fourth does not:
+
+```
+REFORM EXPOSURE, HIGHEST FIRST:
+United Kingdom WACC +3–5pp (5 changes since 2010, last change 2024)
+  › Nigeria SIZE UNKNOWN (2 changes since 2010, last change 2022)
+  › Norway TAKE NET 0pp (2 changes since 2010, last change 2022)
+```
+
+`SIZE UNKNOWN` is this platform's own token for *"terms rewritten in-window, take effect never
+quantified."* There is no magnitude behind it. So the `›` on either side of Nigeria is an assertion
+ORCA cannot source: it says Nigeria is more reform-exposed than a net-zero Norway and less exposed
+than a UK carrying a quantified 3–5pp WACC premium, when the honest reading is that nobody measured
+it and it could be either.
+
+The cause is `_sbsPaintVerdictRr()` joining the whole of `scored` with one separator. The band order
+comes from `_fcReformCmp()` / `_fcReformRank()`, where `unsized` is **band 2**, sitting between band
+1 (*take already raised inside the window*) and band 3 (*in-window rise offset by an in-window cut*).
+That placement is correct for a **table sort** — every one of 185 Fiscal Compare rows has to land
+somewhere, and the FC cell prints the verdict token right beside the row so the reader can see
+exactly what the position is worth. It is wrong for a **sentence**, which carries no such annotation
+and reads as a finding.
+
+Measured cold on the live build, on sets the tab offers through its **own quickstart buttons**:
+
+| set | strip printed | what was actually sourced |
+|---|---|---|
+| Atlantic Frontier Quartet | Brazil › **Angola › Nigeria** › Guyana | positions 2 and 3 fell out of the A–Z tiebreak |
+| West Africa Trio | **Angola › Nigeria** › Ghana | positions 1 and 2, likewise |
+| Iraq / Mexico / Angola | **Angola › Mexico › Iraq** | all three unsized — the entire sentence was invented |
+| Angola / Norway | Angola › Norway | the only comparison in a two-country set, unsourced |
+
+**5 of the 21 reform-scored countries are unsized, and they are Angola, India, Iraq, Mexico and
+Nigeria** — four of them core IOC screening destinations. So this was not a corner case; most real
+screening sets contain one, and the tab's own default set contains one.
+
+What made it the worst moment rather than a merely wrong one: the strip is the fiscal-stability
+input to the memo, it sits in the largest type on the tab above the grid, and `#cmp-verdict` carries
+`class="cmp-notice"` — so `copyComparisonTable()` lifted the invented order **verbatim into the
+IC-memo clipboard paste**. The analyst did not have to retype it to carry it into a deck.
+
+And the platform already knew how to say this. The term-consistency line immediately above printed
+`Brazil ≤59, Nigeria ≤46, Angola ≤26 cannot be placed against each other`; the take line printed
+`nothing is set aside`; `nolog` was already its own trailing clause rather than a chain position.
+The reform line was the single ordering on this tab asserting a rank it had no basis for.
+
+**Change.** Band-2 columns are lifted out of the chain into their own clause, on its own line
+(`flex-basis:100%`, so following the chain at any width cannot be read as ranking below it),
+unordered internally and explicitly not placed against the chain head:
+
+> **Not placed in the order above — in-window rewrite, size never quantified:**
+> Angola `SIZE UNKNOWN` (2 changes since 2010, last change 2020) · Nigeria `SIZE UNKNOWN` (2 changes
+> since 2010, last change 2022) — *no magnitude is on record, so these cannot be placed against each
+> other, or against Brazil above — any of them could be the most exposed column in the set. Size them
+> from the Reform Risk event log before this goes in a memo.*
+
+Where **every** scored column is unsized the strip no longer prints a chain at all:
+
+> **No exposure order established — all 3 scored columns were rewritten in-window with the take
+> effect never quantified:** Angola · Mexico · Iraq — *no magnitude is on record, so these cannot be
+> placed against each other, and nothing in this set establishes which of them is the most exposed.*
+
+The `scored.length === 1` wording was wrong once unsized columns are excluded — a lone unsized column
+*does* have a sourced log — so it now reads "the only column in this set **whose exposure ORCA can
+size**", not "with a sourced log". `_fcReformRank` / `_fcReformCmp` are **unchanged**: Fiscal
+Compare's Reform sort still needs a total order over 185 rows, and the two surfaces still read the
+same `_rrClassify()` token, so they cannot disagree about any column's *verdict* — only this sentence
+stops claiming a *rank* it cannot source.
+
+**Result.** An analyst holding Angola against Nigeria, or Iraq against Mexico, no longer reads a
+confident exposure ranking off the strip and pastes it into an IC memo. The strip now separates the
+columns the platform can size from the ones it cannot, states that an unsized column could be the
+worst in the set rather than burying it mid-chain, and names where to go to size it. The corrected
+clause rides into the clipboard paste on the same `.cmp-notice` path the invented order used to.
+
+### Verification — every number read, not assumed
+
+| gate | expected | measured this cycle |
+|---|---|---|
+| JS syntax gate | PASS | **PASS — 11/11 script blocks** via `node --check` |
+| Playwright runtime suite | ran, green | **543 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own `/tmp/runtime_test_report.txt` (2026-10-01T11:10:07Z) |
+| pixel audit | gate pass | **PIXEL GATE PASS** — only the pre-existing `summary "Reading this table"` 18px finding at 768 and 390 |
+| 390×844 `hasTouch` scrollWidth | ≤ clientWidth | **390 == 390** on all seven sets walked, including the three-unsized and two-country branches |
+| controls <24px in the strip at `pointer: coarse` | 0 | **0** |
+| console + page errors | 0 | **0** at both 1440 and 390 |
+| IC-memo clipboard | carries the corrected clause | confirmed by reading `navigator.clipboard.readText()` after `#cmp-copy-table-btn` on the Atlantic Frontier Quartet |
+
+### Notes for the next cycle
+
+- **The band-2 question exists on other surfaces and was deliberately left alone.** `_fcReformCmp`
+  is also the comparator behind the Fiscal Compare `Reform ▼` sort button and behind
+  `_icReformLine()`. A sort has to place every row and the FC cell prints the token beside it, so the
+  reader can see the position is unearned — that is a different situation from a sentence and does not
+  obviously need the same treatment. Worth a deliberate look rather than a reflex change.
+- **Band 4, `↑ PRE-2010`, is the next candidate of the same shape** and was *not* touched. Seven
+  countries carry it (Algeria, Canada, Colombia, Kazakhstan, Libya, USA, Venezuela). Unlike band 2 it
+  at least carries a *direction* — a take rise is on record, just outside the 2010 window — so it is
+  weaker than the band-2 case, not identical. Recording it so the next cycle neither re-discovers it
+  as new nor assumes this cycle already settled it.
+- Found while walking, not acted on: the `# Contracts` row of the STRUCTURE block prints bare
+  integers — `4211`, `7643`, `834` — while the `NPV weighting` row four rows above prints the same
+  figures as `all 4,211` / `all 7,643` / `all 834`, and the `Fiscal Mechanics` row below prints
+  `Concession (4,211)`. Three thousand-separator conventions for one number on one screen. Cosmetic,
+  but it is the same number disagreeing with itself twice.
+- Found while walking, not acted on: the cold default seed is **UK · Norway · Nigeria**, but the
+  example banner's own quickstart button labelled **North Sea Trio** loads **Norway · UK ·
+  Netherlands** — and Netherlands is `nolog`, so that button is the one path on the tab guaranteed to
+  produce a column with no reform reading. The banner text names the seed correctly; the comment
+  above it explains the swap. Not a defect, recorded so it is not re-litigated.
+- Carried forward, re-confirmed still live: the **`EXPL-NO-IRR` gate blind spot** (reads headers and
+  sort keys only); **serve `~`, not the repo**, or `/petroleum-fiscal-db/sw.js` 404s fifteen times;
+  the SbS breakeven basis paragraph mixing contract-row and country denominators; SbS's four export
+  controls in two duplicate pairs at 390px; the FC **Reform verdict** bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; the CP headline's take rank counting 1 = lowest beside an NPV
+  rank counting 1 = highest; Indonesia's three government profit-oil shares on one page;
+  `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source; breakeven on only 67 of 185; Somalia the
+  one true T4 dead end; `Paraguay Decree 19.080/1997` typed `government_filing`; the Screener count
+  line's `block· Deepwater` join fault; the Home card saying SbS compares "up to 4 countries" against
+  `CMP_MAX` = 5; `_posClause648` number agreement; Côte d'Ivoire's two missing API slugs;
+  `window._screenerExportBasis` not naming the 105 withheld countries; `summary "Reading this table"`
+  at 18px; `norway+united-kingdom+netherlands` ordering only UK › Norway; the Home hurdle stat's
+  "list below" that is on the Screener, not on Home.
+- **Probe debris, eleventh cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` are
+  still untracked in the repo root (~29 MB). This cycle's `_pre1019.html` went to `/tmp/c957/`.
+  Still flagged to Zach rather than deleted — standing rule is to ask before deleting files the
+  session did not create.
