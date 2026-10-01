@@ -25,15 +25,15 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v611.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, contractor NPV and breakeven across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v611.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
-<meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
+<meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take and contractor NPV, model custom DCF scenarios.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yoburgqs.github.io/petroleum-fiscal-db/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
-<meta name="twitter:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
+<meta name="twitter:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take and contractor NPV, model custom DCF scenarios.">
 <link rel="canonical" href="https://yoburgqs.github.io/petroleum-fiscal-db/">
 <meta name="theme-color" content="#F7F5F0">
 <meta name="color-scheme" content="light">
@@ -1452,7 +1452,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   }
   /* Specific chart containers need explicit height on mobile so Chart.js can read it */
   .dd-price-chart-wrap { height: 180px !important; }
-  #irr-scatter-canvas { min-height: 120px; }
+  #value-scatter-canvas { min-height: 120px; }
   #explorer-bubble-canvas { min-height: 200px; }
   #vintage-trend-chart { min-height: 180px; }
   #exposure-donut-chart { min-height: 150px; }
@@ -2517,7 +2517,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* Explorer browse shares this pane. Its three <select>s and three checkboxes are left
      alone — they report the filter and sort the printed ranking was produced under, which
      is an assumption the export has to carry. This one is a download control. */
-  #irr-scatter-png-btn { display: none !important; }
+  #value-scatter-png-btn { display: none !important; }
 
   @page { size: A4 landscape; margin: 15mm; }
 }
@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1016</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1017</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2975,7 +2975,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
   <!-- v277 Issue 6: Explorer promoted to primary nav — tab-btn-texplorer now visible. Tab before Screener so test harness still finds it first (browse-mode). -->
   <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Browse all 185 countries in map and table views">Explorer</button>
-  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" aria-label="Screener — filter all 185 countries by take, IRR, NPV, breakeven, mechanic, and region" onclick="_scTabEnter(this);" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region — opens in Screener mode">Screener</button>
+  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" aria-label="Screener — filter all 185 countries by take, NPV, downside NPV, breakeven, evidence, mechanic and region" onclick="_scTabEnter(this);" title="Filter 185 countries by take, contractor NPV, the $50 downside, breakeven, evidence grade, mechanic and region — opens in Screener mode. There is no IRR axis: country IRR is an arithmetic mean of per-contract IRRs and was withdrawn at v517.">Screener</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 5 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" onclick="switchTab('tbreakevenmap',this)" title="Interactive world map of oil price breakeven by country">Breakeven Map</button>
@@ -3124,15 +3124,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Fiscal Compare</div><div style="font-size:11px;color:var(--muted);">Run any production profile through 185 countries simultaneously</div></div>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a ranked table of every country by government take, NPV, IRR, and breakeven price — <strong>results auto-load</strong> on tab click. Sortable, exportable to Excel, with one-click drill-down to any country.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a ranked table of every country by government take, contractor NPV and breakeven price — <strong>results auto-load</strong> on tab click. Sortable, with one-click drill-down to any country. Tick the rows you want and <strong>&#9112; Copy for IC Memo</strong> pastes them into Word as a formatted table carrying the basis; <strong>Export XLSX</strong> for the IC attachment. No IRR column &mdash; see the IC Memo Quick Rules on that tab.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t7',document.getElementById('tab-btn-t7'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Country Profile</div><div style="font-size:11px;color:var(--muted);">Full fiscal deep-dive for any single country</div></div>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: every sourced fiscal parameter (royalty, CIT, profit oil splits), price sensitivity curve, IRR, breakeven, reform history timeline, and regional peer comparison. <strong>Indonesia auto-loads on first visit</strong> — use the dropdown to switch country.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: every sourced fiscal parameter (royalty, CIT, profit oil splits), price sensitivity curve, breakeven, reform history timeline, and regional peer comparison &mdash; plus <strong>Copy for IC Memo</strong>, which pastes the whole country as a Metric/Value table with every caveat as a numbered note. <strong>Indonesia auto-loads on first visit</strong> — use the dropdown to switch country.</div>
     </div>
-    <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-tscreener'));setTimeout(function(){if(typeof switchExplorerMode==='function')switchExplorerMode('screen');},80);" title="Open Screener — filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region. Opens in Screener mode.">
+    <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-tscreener'));setTimeout(function(){if(typeof switchExplorerMode==='function')switchExplorerMode('screen');},80);" title="Open Screener — filter 185 countries by take, contractor NPV, the $50 downside, breakeven, evidence grade, mechanic and region. Opens in Screener mode.">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Screener</div><div style="font-size:11px;color:var(--muted);">Ranked shortlist with presets: IOC Capital Screen, Low Take · Positive NPV, Frontier, Downside Resilience</div></div>
       </div>
@@ -3271,8 +3271,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           PSC mechanic + Swing &gt;15pp &rarr; note cost recovery cap in IC — govt take rises steeply once cost bank is depleted<br>
           Reform verdict <strong>n/c</strong> &rarr; no sourced reform log; carry no premium of zero &mdash; check the national petroleum law before the memo goes up<br>
           Reform verdict <strong>WACC +3&ndash;5pp</strong> or <strong>+5&ndash;8pp</strong> &rarr; the only verdicts that change a model input; <strong>TAKE +Npp</strong> is take already taken, never a WACC add<br>
-          IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries<br>
-          Take &gt;65% + IRR not shown &rarr; do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission<br>
+          <strong>No IRR anywhere on this platform</strong> &rarr; ORCA does not report country IRR &mdash; the stored figure is an arithmetic mean of per-contract IRRs, not a project return. Never write one into the memo from this tool. Screen on take, contractor NPV and the $50 downside instead<br>
+          Take &gt;65% &rarr; do not assume the project clears hurdle on take alone &mdash; run Scenario Builder at your own capex, opex and WI to get a project IRR and a hurdle test before IC submission<br>
           &ldquo;&mdash;&rdquo; in any cell = data not yet verified to Evidence A/B standard; do not cite in IC memo<br>
           Export XLSX &rarr; carries the Evidence <strong>grade</strong> (A/B/C/D) with both legs that set it &mdash; primary-law share and fact count &mdash; <strong>and, since v912, the second leg the grade does not cover: how many of the fiscal terms each row&rsquo;s model actually ran carry a citation, and which ones do not.</strong> 59 of 185 countries grade A or B on half or fewer of their model terms and 19 cite none, so the workbook now carries both readings rather than the one that reads better. It does not export a combined A/B%: that number reads 80%+ on 67 countries graded C or D here.
         </div>
@@ -3686,7 +3686,7 @@ window.copyPlatformCitation = function(btn) {
   </script>
   <div id="fc-results" class="empty-state">
     <div style="margin-bottom:10px;">Loading fiscal terms for all 185 countries&hellip; Results appear automatically. If nothing loads within 5 seconds, click <strong>Run Compare</strong> above.</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Start with <strong>Deepwater $75/bbl</strong> — the IOC standard benchmarking basis (185 countries ranked by govt take, NPV, IRR, and breakeven in one table). Switch to <strong>Onshore $50/bbl</strong> to screen low-cost continental plays. Use <strong>Giant $100/bbl</strong> to identify regimes viable only at elevated prices.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Start with <strong>Deepwater $75/bbl</strong> — the IOC standard benchmarking basis (185 countries ranked by govt take, contractor NPV and breakeven in one table). Switch to <strong>Onshore $50/bbl</strong> to screen low-cost continental plays. Use <strong>Giant $100/bbl</strong> to identify regimes viable only at elevated prices.</div>
     <button id="fc-quickstart-deepwater" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;" title="Load Deepwater profile at $75/bbl and run Fiscal Compare — the standard IOC benchmarking basis">Run Deepwater $75</button>
     <button id="fc-quickstart-onshore" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;margin-right:8px;" title="Load Onshore profile at $50/bbl — screens low-breakeven regimes for unconventional plays">Onshore $50</button>
     <button id="fc-quickstart-giant" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;" title="Load Giant field profile at $100/bbl — identifies regimes sustainable only at elevated prices ($2B capex, 150k bbl/d, $10/bbl opex)">Giant $100</button>
@@ -3728,7 +3728,7 @@ window.copyPlatformCitation = function(btn) {
 
   <!-- v473: Browse mode context strip — first-time analyst orientation. Screener has preset controls for context; Browse had nothing. -->
   <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.6;">
-    <strong style="color:var(--text);">Browse</strong> — all 185 countries displayed. Use the Mechanic and Region chips to filter, or press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-family:monospace;font-size:10px;">Ctrl+K</kbd> to jump directly to any country. Click any country row to open its Country Profile. Switch to <strong>Screener</strong> to rank countries by take, IRR, NPV, and breakeven against your criteria, or <strong>Bubble Chart</strong> to visualize the take-vs-NPV landscape.
+    <strong style="color:var(--text);">Browse</strong> — all 185 countries displayed. Use the Mechanic and Region chips to filter, or press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-family:monospace;font-size:10px;">Ctrl+K</kbd> to jump directly to any country. Click any country row to open its Country Profile. Switch to <strong>Screener</strong> to rank countries by take, contractor NPV, the $50 downside and breakeven against your criteria, or <strong>Bubble Chart</strong> to visualize the take-vs-NPV landscape.
   </div>
 
   <!-- v101: Event delegation complete — all inline onclick removed from Explorer chip rows and mode toggle buttons -->
@@ -3869,27 +3869,27 @@ window.copyPlatformCitation = function(btn) {
     <strong>Swing</strong> (take@$125 − take@$50): <span style="color:var(--green)">&#9632;</span> &lt;10pp (royalty-stable) &nbsp; <span style="color:var(--yellow)">&#9632;</span> 10–20pp (moderate) &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;20pp (profit-progressive) &nbsp;|&nbsp;
     <strong>Stability</strong> (Fiscal Predictability, 0&ndash;100 &mdash; <em>not</em> the diamond reform-event score on the Reform Risk tab): a coloured bar and a band are drawn only where ORCA measured a take spread across the country&rsquo;s own contracts &mdash; <span style="color:var(--green)">&#9632;</span> &ge;75 HIGH &nbsp; <span style="color:var(--yellow)">&#9632;</span> 60&ndash;74 MODERATE &nbsp; <span style="color:var(--orange)">&#9632;</span> 45&ndash;59 LOW &nbsp; <span style="color:var(--red)">&#9632;</span> &lt;45 VERY LOW. A row showing a bare number with <strong>UNGRADED &middot; one term</strong> was never charged the spread penalty, so its higher number is not the steadier regime. <strong style="color:var(--orange);">Where ORCA&rsquo;s own contract file refutes that one-term basis</strong> the row resolves as you scroll it into view and prints the ceiling instead &mdash; <strong style="color:var(--orange);">&le;52 &middot; LOW &#9650;</strong> beside the struck-through stored score and the observed spread (<strong>&ge;29.6pp obs</strong>). Carry the ceiling, not the stored score; it is the same number Country Profile, Side-by-Side and Reform Risk print. <strong style="color:var(--orange);">Since v900 the ranking carries it too</strong> &mdash; a row is ordered on the ceiling wherever one supersedes its score, so the order and the printed number can no longer disagree. Measured rows carry one as well: Nigeria ranks on &le;46, not on the 73 this column stores. The measured / one-term / no-distribution blocks are unchanged &mdash; click the header to reverse the direction. &nbsp;|&nbsp;
     <strong>Evidence A/B/C</strong>: hover any badge for source detail &nbsp;|&nbsp;
-    <strong>IRR / Breakeven dash (—)</strong>: country lacks sufficient cost data for computation, or value &ge;500% (unbounded) &mdash; not a data error
+    <strong>Breakeven dash (—)</strong>: ORCA models no breakeven for that country &mdash; 67 of 185 carry one &mdash; not a data error. There is no IRR column on this table and the scatter below no longer plots one: country IRR is an arithmetic mean of per-contract IRRs, not a project return. Run Scenario Builder on your own capex and opex for a project IRR.
   </div>
 
   <details id="explorer-analytics-details" style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
     <summary style="padding:10px 16px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;user-select:none;">
-      Analytics Charts <span style="font-weight:400;opacity:.6;font-size:11px;">IRR vs Take · Historical Trend ▸</span>
+      Analytics Charts <span style="font-weight:400;opacity:.6;font-size:11px;">Contractor value vs take · Historical Trend ▸</span>
     </summary>
     <div style="padding:0 16px 16px;">
       <div style="margin-top:16px;background:var(--surface);border-radius:8px;padding:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-weight:600;color:var(--text);font-size:13px;">IRR vs Govt Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
-          <button id="irr-scatter-png-btn" style="padding:5px 12px;background:var(--surface2);color:var(--accent);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download IRR scatter chart as PNG">↓ PNG</button>
+          <div style="font-weight:600;color:var(--text);font-size:13px;">Contractor NPV vs Govt Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
+          <button id="value-scatter-png-btn" style="padding:5px 12px;background:var(--surface2);color:var(--accent);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download this chart &mdash; Contractor NPV vs Govt Take &mdash; as a PNG. The caption carries the price deck, the standardized project both axes are computed on, the range across the 185 countries plotted, and the note that the y-axis is the CITABLE database NPV. Saves as ORCA_contractor-npv-vs-take_$&lt;price&gt;.png.">↓ PNG</button>
         </div>
-        <canvas id="irr-scatter-canvas" aria-label="IRR vs Government Take scatter chart for 124 countries with verified cost data at $75/bbl Deepwater profile." role="img" style="width:100%;display:block;cursor:crosshair;"></canvas>
-        <div id="irr-scatter-tooltip" style="position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
+        <canvas id="value-scatter-canvas" aria-label="Contractor NPV versus government take scatter chart, all 185 countries, at the selected price deck on the ORCA standardized Deepwater basis. Bubble size is contract count; colour is fiscal mechanic. Click a bubble to open that country's profile." role="img" style="width:100%;display:block;cursor:crosshair;"></canvas>
+        <div id="value-scatter-tooltip" style="position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
         <div style="margin-top:8px;font-size:11px;color:var(--muted);">
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:4px;"></span>Concession
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin:0 4px 0 12px;"></span>PSC
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin:0 4px 0 12px;"></span>TSC/RSC
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin:0 4px 0 12px;"></span>Mixed
-          <span style="margin-left:16px;">Coverage: 124/185 countries &bull; &ge;500% excluded</span>
+          <span style="margin-left:16px;">Coverage: <strong style="color:var(--text);">185/185 countries</strong> &bull; nothing excluded &bull; y-axis is the <strong style="color:var(--text);">citable</strong> database NPV, not a model figure</span>
         </div>
       </div>
       <div id="explorer-vintage-trend" style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;">
@@ -24301,7 +24301,7 @@ function switchTab(id, btn) {
   if (typeof _orcaStampPrintHeader === 'function') _orcaStampPrintHeader();
   if (id === 'texplorer') {
     switchExplorerMode('browse');
-    setTimeout(renderIRRScatter, 100);
+    setTimeout(renderValueScatter, 100);
   }
   if (id === 'treformrisk') {
     if (typeof renderReformRisk === 'function') renderReformRisk();
@@ -28273,7 +28273,7 @@ function renderExplorer() {
     }
   });
   _syncExplorerDownsideControls();   // v851 (T6): chip label carries the live count, not a literal
-  setTimeout(renderIRRScatter, 50);
+  setTimeout(renderValueScatter, 50);
   if (typeof _expApplyObsSpread === 'function') _expApplyObsSpread();
   // v905 (T6): hydrate the model-terms leg on the Evidence column. Debounced for the same reason
   // v730 debounced the Screener's — a price-deck, region or sort change re-renders every row.
@@ -28600,8 +28600,8 @@ function openContractDrilldown(country) {
 }
 
 // ─── v42: IRR vs Take Scatter Chart ──────────────────────────────────────────
-function renderIRRScatter() {
-  const canvas = document.getElementById('irr-scatter-canvas');
+function renderValueScatter() {
+  const canvas = document.getElementById('value-scatter-canvas');
   if (!canvas) return;
   // v936 (T1): COUNTRY_DATA is declared `= null` and filled by an async fetch, so on a cold load
   // this ran against null and threw before the chart could ever draw. Not-yet-loaded is the same
@@ -28609,8 +28609,30 @@ function renderIRRScatter() {
   if (!COUNTRY_DATA || !COUNTRY_DATA.length) return;
   const price = getPriceKey();
   const takeKey = 'take_' + price;
-  const irrKey = 'irr_' + price;
-  const filtered = COUNTRY_DATA.filter(d => d[takeKey] !== null && d[irrKey] !== null && d[irrKey] > 0 && d[irrKey] < 500);
+  // ── v1017 (T5): the y-axis was irr_<price> ────────────────────────────────────────────────
+  // This was the last live country-level IRR OUTPUT on the platform. irr_75 is an unweighted
+  // arithmetic mean of a country's per-contract IRRs — not a project return — and it has been
+  // withdrawn everywhere else: the Fiscal Compare column (v525), the Screener axis and its
+  // null-handling control (v515/v517), the Explorer column, sort key and "Has IRR Data" chip
+  // (v851), the Breakeven CSV column (v1016), and every clipboard artifact, each of which spends
+  // a paragraph saying why. The runtime suite even gates it — EXPL-NO-IRR asserts the Explorer
+  // "may not regrow a country-level IRR" — but that check reads table headers, sort keys and
+  // chips, and this chart is a <canvas> under the table, so it sat inside the gated tab and
+  // passed. An analyst reading it on screen got no caveat at all: just "Norway, IRR 141.2%".
+  //
+  // Worse than uncitable, the old filter `> 0 && < 500` was ONE-SIDED CENSORSHIP. At $75 it
+  // dropped 47 of the 165 countries that carry a figure — every one of them for computing a
+  // number too large or too negative to look like data — and plotted the surviving 118 as
+  // though they were the universe. That is the same suppression the Breakeven CSV footer was
+  // rewritten to condemn one cycle ago.
+  //
+  // The y-axis is now npv_<price>: contractor NPV in $M, the column Fiscal Compare marks
+  // "db · citable", the Country Profile headlines and the IC-memo clipboard pastes carry.
+  // Populated for 185 of 185 countries at every price deck, so nothing is filtered and the
+  // chart is no longer a censored sample. Same question — where does take leave value — on a
+  // number the analyst can put in the memo.
+  const npvKey = 'npv_' + price;
+  const filtered = COUNTRY_DATA.filter(d => d[takeKey] !== null && d[npvKey] !== null);
   if (!filtered.length) return;
 
   canvas.width = (canvas.offsetWidth || 800) * (window.devicePixelRatio || 1);
@@ -28621,7 +28643,8 @@ function renderIRRScatter() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  const pad = {l:48, r:16, t:12, b:36};
+  // v1017: 48 -> 58. The y labels were "400%"; they are now "$5.0B" and were colliding with the axis.
+  const pad = {l:58, r:16, t:12, b:36};
   const plotW = CW - pad.l - pad.r;
   const plotH = CH - pad.t - pad.b;
 
@@ -28636,9 +28659,17 @@ function renderIRRScatter() {
   ctx.stroke();
 
   const takeMin = 0, takeMax = 100;
-  const irrValues = filtered.map(d => d[irrKey]);
-  const irrMax = Math.min(Math.max(...irrValues) * 1.1, 400);
-  const irrMin = 0;
+  // v1017: the NPV axis is rounded UP to a round $M figure so the top gridline is a readable
+  // number and the tallest bubble is never clipped by the plot edge. No ceiling is applied —
+  // every country is on the chart.
+  const npvValues = filtered.map(d => d[npvKey]);
+  const npvPeak = Math.max(...npvValues, 1);
+  // Nice 1 / 2 / 2.5 / 5 x 10^k tick step, chosen so four gridlines land on round $ figures
+  // rather than on peak/4 (which printed "$1.4B  $2.8B  $4.1B  $5.5B").
+  const _mag = Math.pow(10, Math.floor(Math.log10(npvPeak / 4)));
+  const npvStep = [1, 2, 2.5, 5, 10].map(m => m * _mag).find(v => v * 4 >= npvPeak) || _mag * 10;
+  const npvMax = npvStep * 4;
+  const npvMin = 0;
 
   [20,40,60,80,100].forEach(t => {
     const x = pad.l + (t - takeMin) / (takeMax - takeMin) * plotW;
@@ -28648,20 +28679,21 @@ function renderIRRScatter() {
     ctx.fillText(t + '%', x, pad.t + plotH + 14);
   });
 
-  const irrTicks = [0, 50, 100, 150, 200, 250, 300, 350, 400].filter(v => v <= irrMax);
-  irrTicks.forEach(v => {
-    const y = pad.t + plotH - (v - irrMin) / (irrMax - irrMin) * plotH;
+  const npvTicks = [0, 1, 2, 3, 4].map(i => i * npvStep);
+  npvTicks.forEach(v => {
+    const y = pad.t + plotH - (v - npvMin) / (npvMax - npvMin) * plotH;
     ctx.strokeStyle = '#EDE9E3'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + plotW, y); ctx.stroke();
     ctx.fillStyle = '#6B6560'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText(v + '%', pad.l - 4, y + 3);
+    ctx.fillText(v === 0 ? '$0' : (v >= 1000 ? '$' + (v / 1000).toFixed(v % 1000 ? 1 : 0) + 'B'
+                                             : '$' + Math.round(v) + 'M'), pad.l - 4, y + 3);
   });
 
   ctx.fillStyle = '#6B6560'; ctx.font = '11px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('Govt Take @$' + (price || 75) + '/bbl (%)', pad.l + plotW/2, CH - 2);
   ctx.save(); ctx.translate(12, pad.t + plotH/2); ctx.rotate(-Math.PI/2);
-  ctx.fillText('Contractor IRR (%)', 0, 0); ctx.restore();
+  ctx.fillText('Contractor NPV ($M) — citable', 0, 0); ctx.restore();
 
   const mechColor = m => {
     if (m.includes('TSC') || m.includes('RSC')) return '#15803D';
@@ -28672,9 +28704,9 @@ function renderIRRScatter() {
   };
 
   const maxN = Math.max(...filtered.map(d => d.n));
-  window._irrScatterData = filtered.map(d => {
+  window._valueScatterData = filtered.map(d => {
     const x = pad.l + (d[takeKey] - takeMin) / (takeMax - takeMin) * plotW;
-    const y = pad.t + plotH - Math.min((d[irrKey] - irrMin) / (irrMax - irrMin), 1) * plotH;
+    const y = pad.t + plotH - Math.min((d[npvKey] - npvMin) / (npvMax - npvMin), 1) * plotH;
     const r = Math.max(4, Math.min(16, 4 + (d.n / maxN) * 12));
     const col = mechColor(d.mechanics);
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
@@ -28685,20 +28717,21 @@ function renderIRRScatter() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const canvas = document.getElementById('irr-scatter-canvas');
-  const tooltip = document.getElementById('irr-scatter-tooltip');
+  const canvas = document.getElementById('value-scatter-canvas');
+  const tooltip = document.getElementById('value-scatter-tooltip');
   if (!canvas || !tooltip) return;
   canvas.addEventListener('mousemove', function(e) {
-    if (!window._irrScatterData) return;
+    if (!window._valueScatterData) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     let hit = null;
-    for (const pt of window._irrScatterData) {
+    for (const pt of window._valueScatterData) {
       if (Math.hypot(mx - pt.x, my - pt.y) <= pt.r + 2) { hit = pt; break; }
     }
     if (hit) {
       const price = getPriceKey();
-      tooltip.innerHTML = `<strong>${hit.d.country}</strong><br>Take: ${hit.d['take_'+price].toFixed(1)}% &nbsp; IRR: ${hit.d['irr_'+price].toFixed(1)}% &nbsp; n=${hit.d.n}`;
+      const _tv = hit.d['npv_' + price];
+      tooltip.innerHTML = `<strong>${hit.d.country}</strong><br>Take: ${hit.d['take_'+price].toFixed(1)}% &nbsp; NPV: ${_tv >= 1000 ? '$' + (_tv/1000).toFixed(2) + 'B' : '$' + Math.round(_tv) + 'M'} &nbsp; n=${hit.d.n}`;
       tooltip.style.display = 'block';
       tooltip.style.left = (e.clientX + 12) + 'px';
       tooltip.style.top = (e.clientY - 28) + 'px';
@@ -28710,10 +28743,10 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   canvas.addEventListener('mouseleave', function() { if (tooltip) tooltip.style.display = 'none'; });
   canvas.addEventListener('click', function(e) {
-    if (!window._irrScatterData) return;
+    if (!window._valueScatterData) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    for (const pt of window._irrScatterData) {
+    for (const pt of window._valueScatterData) {
       if (Math.hypot(mx - pt.x, my - pt.y) <= pt.r + 2) {
         openCountryProfileFromFC(pt.d.country);
         break;
@@ -28722,7 +28755,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-window.addEventListener('resize', function() { setTimeout(renderIRRScatter, 100); });
+window.addEventListener('resize', function() { setTimeout(renderValueScatter, 100); });
 
 // ─── v41: Filter chip state ───────────────────────────────────────────────────
 const explorerChipFilters = { mechanic: 'all', region: 'all' };
@@ -55952,70 +55985,63 @@ function downloadBubblePng() {
 /* Every figure in this caption is counted off COUNTRY_DATA at export time against the
    renderer's own filter (0 < irr < 500), so the band cannot claim a coverage the chart
    does not have — the failure mode v947 found on the Sample Analyses region cards. */
-function _irrPngCaptionLines() {
+function _valuePngCaptionLines() {
+  // v1017 (T5): was the IRR caption. It opened with "NOT A PROJECT RETURN — DO NOT READ A POINT
+  // AGAINST A HURDLE RATE" and then spent two further paragraphs explaining that the omission was
+  // one-sided — four paragraphs of reasons not to use the chart it was captioning. The chart now
+  // plots the citable contractor NPV over all 185 countries, so the caption states a basis
+  // instead of a disclaimer.
   var lines = [];
   var P = parseInt((typeof getPriceKey === 'function') ? (getPriceKey() || '75') : '75', 10) || 75;
   var CD = window.COUNTRY_DATA || [];
-  var count = function(price) {
-    var ik = 'irr_' + price, tk = 'take_' + price;
-    var o = { plotted: [], ge500: 0, nonpos: 0, none: 0 };
-    for (var i = 0; i < CD.length; i++) {
-      var v = CD[i][ik];
-      if (v == null) { o.none++; continue; }
-      if (v >= 500) { o.ge500++; continue; }
-      if (v <= 0) { o.nonpos++; continue; }
-      if (CD[i][tk] == null) { o.none++; continue; }
-      o.plotted.push(v);
-    }
-    o.plotted.sort(function(a, b) { return a - b; });
-    return o;
-  };
-  var c = count(P);
-  var n = c.plotted.length, T = CD.length;
-  var med = n ? c.plotted[Math.floor(n / 2)] : null;
-  var over100 = 0;
-  for (var q = 0; q < n; q++) if (c.plotted[q] > 100) over100++;
-  var deck = [50, 75, 100, 125].map(function(pp) { return '$' + pp + ' → ' + count(pp).plotted.length; }).join(', ');
+  var nk = 'npv_' + P, tk = 'take_' + P;
+  var pts = [], T = CD.length, miss = 0;
+  for (var i = 0; i < CD.length; i++) {
+    if (CD[i][nk] == null || CD[i][tk] == null) { miss++; continue; }
+    pts.push({ c: CD[i].country, v: CD[i][nk], t: CD[i][tk] });
+  }
+  var n = pts.length;
+  pts.sort(function(a, b) { return b.v - a.v; });
+  var fmt = function(v) { return v >= 1000 ? '$' + (v / 1000).toFixed(2) + 'B' : '$' + Math.round(v) + 'M'; };
 
-  lines.push({ bold: true, text: 'IRR vs Govt Take @$' + P + '/bbl — ' + n + ' of ' + T
-    + ' countries plotted. Bubble size = contract count; colour = fiscal mechanic.' });
+  lines.push({ bold: true, text: 'Contractor NPV vs Govt Take @$' + P + '/bbl — ' + n + ' of ' + T
+    + ' countries plotted' + (miss ? ' (' + miss + ' hold no figure)' : ', nothing excluded')
+    + '. Bubble size = contract count; colour = fiscal mechanic.' });
   lines.push({ legend: [
     { c: '#96570A', t: 'Concession' }, { c: '#7C3AED', t: 'PSC' },
     { c: '#15803D', t: 'TSC / RSC' }, { c: '#6B6560', t: 'Mixed' }
   ] });
-  lines.push({ bold: true, text: 'NOT A PROJECT RETURN — DO NOT READ A POINT AGAINST A HURDLE RATE. '
-    + 'Each y-value is an unweighted arithmetic mean of that country’s per-contract IRRs, not the IRR of any '
-    + 'project. ORCA does not report IRR at country level and carries it in no other export or clipboard artifact: '
-    + 'the same figure was withdrawn from the Breakeven CSV for this reason. '
-    + over100 + ' of the ' + n + ' points above sit over 100%'
-    + (med != null ? ', median ' + med.toFixed(1) + '%' : '')
-    + '. For a project IRR, open Scenario Builder and enter your own capex, opex and working interest.' });
-  lines.push({ text: (T - n) + ' of ' + T + ' countries are absent and the omission is ONE-SIDED: '
-    + c.ge500 + ' compute ≥500% and fall off the top of the axis, ' + c.nonpos + ' compute zero or negative, and '
-    + c.none + ' hold no figure at all. Point count moves with the price deck (' + deck
-    + ') because a higher price pushes more countries through the 500% ceiling — a chart drawn at a higher price '
-    + 'is not a smaller sample of the same universe, it is a more censored one, and it reads tighter and lower '
-    + 'than the data behind it.' });
-  lines.push({ bold: true, text: 'Basis — both axes are stored ORCA figures on one standardized project: '
+  if (n) lines.push({ text: 'Range on this deck: ' + pts[0].c + ' ' + fmt(pts[0].v)
+    + ' at ' + pts[0].t.toFixed(1) + '% take, down to ' + pts[n - 1].c + ' ' + fmt(pts[n - 1].v)
+    + ' at ' + pts[n - 1].t.toFixed(1) + '% take. The y-axis is the ORCA contract-database contractor '
+    + 'NPV — the column Fiscal Compare marks "db · citable", the Country Profile headlines and the '
+    + 'IC-memo clipboard pastes carry. It is a FIXED basis and does not move with any profile selector.' });
+  lines.push({ bold: true, text: 'NO IRR AXIS — WITHDRAWN, NOT MISSING. Until v1017 the y-axis was '
+    + 'country IRR. That figure is an unweighted arithmetic mean of a country\u2019s per-contract IRRs, not '
+    + 'the return of any project, and ORCA reports it in no table, export or clipboard artifact. The old '
+    + 'chart also dropped every country computing over 500% or at or below zero, so it censored exactly '
+    + 'the values that would have looked wrong and plotted the rest as the universe. For a project IRR, '
+    + 'open Scenario Builder and enter your own capex, opex and working interest.' });
+  lines.push({ bold: true, text: 'Basis \u2014 both axes are stored ORCA figures on one standardized project: '
     + ((typeof _sbsBasisTerms === 'function') ? _sbsBasisTerms() : 'ORCA standardized reference project')
-    + '. Government take is weighted by verified field production where ORCA holds it and is a simple average of '
-    + 'statutory terms where it does not; this chart does not distinguish the two. Take% for the fee-basis '
-    + 'mechanics in the key above (TSC / RSC) is a structural artefact of the contract form and is not rankable '
-    + 'against Concession or PSC on the x-axis.' });
+    + '. NPV is at 100% working interest \u2014 scale by your WI. Government take is weighted by verified field '
+    + 'production where ORCA holds it and is a simple average of statutory terms where it does not; this chart '
+    + 'does not distinguish the two. Take% for the fee-basis mechanics in the key above (TSC / RSC) is a '
+    + 'structural artefact of the contract form and is not rankable against Concession or PSC on the x-axis.' });
   lines.push(_orcaPngSourceLine());
   return lines;
 }
 
-function downloadIRRScatterPng() {
-  var canvas = document.getElementById('irr-scatter-canvas');
+function downloadValueScatterPng() {
+  var canvas = document.getElementById('value-scatter-canvas');
   if (!canvas || !canvas.width) {
-    _icRefuse('IRR scatter chart not rendered yet — switch to Browse mode first.');
+    _icRefuse('Value scatter chart not rendered yet — switch to Browse mode first.');
     return;
   }
   var P = (typeof getPriceKey === 'function') ? (getPriceKey() || '75') : '75';
   var n = _orcaSaveCaptionedPng(canvas,
-    'ORCA_irr-vs-take_$' + P + '_' + _orcaPngDateStamp() + '.png',
-    _irrPngCaptionLines());
+    'ORCA_contractor-npv-vs-take_$' + P + '_' + _orcaPngDateStamp() + '.png',
+    _valuePngCaptionLines());
   if (n && typeof showCopyToast === 'function') showCopyToast('Saved ' + n);
 }
 
@@ -73897,9 +73923,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (fcStability) fcStability.addEventListener('change', function() {
     renderFCResults(window._fcLastResults, window._fcLastPrice);
   });
-  // IRR scatter PNG
-  var irrPng = document.getElementById('irr-scatter-png-btn');
-  if (irrPng) irrPng.addEventListener('click', function() { downloadIRRScatterPng(); });
+  // v1017 (T5): contractor-NPV-vs-take scatter PNG (was the IRR scatter)
+  var irrPng = document.getElementById('value-scatter-png-btn');
+  if (irrPng) irrPng.addEventListener('click', function() { downloadValueScatterPng(); });
   // Explorer Excel export and copy link
   var explorerExcel = document.getElementById('explorer-excel-btn');
   if (explorerExcel) explorerExcel.addEventListener('click', function() { exportExplorer(); });
