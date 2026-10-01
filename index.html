@@ -1689,6 +1689,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      the strip's scrollWidth and report to pixel_audit as clipped text. Vertical only. */
   .fc-dd-reform { position: relative; }
   .fc-dd-reform::after { content: ""; position: absolute; inset: -10px 0; }
+  /* v1011 (T1): the Country Profile verdict box's floor bound markers. They are title-only
+     glyphs carrying the "why this is a bound" sentence, 8x12px with a mouse, and the
+     directive's floor is 24px under a thumb. Grown with the v713 invisible band rather than
+     padding or min-height: these sit inline inside a running sentence, so a min-height would
+     shove the verdict's line boxes, and any HORIZONTAL reach would raise the parent's
+     scrollWidth and report to pixel_audit as clipped text. Vertical only -> 32px tall.
+     The sentence beside them states the bound in full, so the title is supplementary. */
+  .cp-floor-bound { position: relative; }
+  .cp-floor-bound::after { content: ""; position: absolute; inset: -10px 0; }
   /* v710 (T2): the Peer Comparison / Similar Fiscal Profile fee-basis marks. They are
      title-only glyphs, 7x12px with a mouse, and the directive's floor is 24px under a
      thumb. Given the box height and the same invisible hit area the chips use, so the
@@ -2931,7 +2940,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1010</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1011</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -46171,10 +46180,57 @@ function loadCountryProfile(country) {
           + '" onclick="event.stopPropagation();_cpWhyToggle(this)">' + _whyLbl798 + ' \u203a</button>'
           + '<span class="cp-why-body" hidden>' + cpBandNpvNote(d, _band734) + '</span>'
         : '';
-      msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
-          + _cmpBasisNote552 + _cashBasisNote979 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(cpPair75(_dn786, npv))
-          + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
-          + _baseClause589 + (_band734 ? '' : _dependClause589)
+      // ── v1011 (T1): the 45 floor-record countries got an unqualified WACC pass ──────────
+      // Walked T1 cold: Screener -> the block below its "TAKE IS A FLOOR, NOT A MEASUREMENT"
+      // divider -> click F1 (Vanuatu). The Screener prints that row as >=5.0% take and <=$5.10B
+      // NPV and its divider says in as many words "do not carry this block into a shortlist".
+      // The profile the click lands on dropped BOTH bound markers and asserted "Clears the 10%
+      // WACC at $75 ($5.10B) and at the $50/bbl downside ($2.37B)" behind a green tick, under the
+      // most attractive tier label the scale has -- an affirmative pass computed on two UPPER
+      // bounds. Vanuatu, the Bahamas and Montenegro are the top THREE contractor NPVs in the
+      // whole database and all three are floor rows, so this was the verdict on the three most
+      // attractive-looking countries in the tool, and the drilldown contradicted the shortlist
+      // that sent the analyst there.
+      // The platform already fixed this defect twice one tab over: v743 gave the Screener the
+      // >= / <= markers and the divider, and v890 made its tier pill read "at best" (its comment
+      // names Vanuatu as the thinnest record drawing the most attractive label). The Country
+      // Profile verdict box was never brought along. Reuses _scTakeIsFloor() and _scFloorWhy() --
+      // the same helpers and the same sentence, so the two tabs cannot drift -- and introduces no
+      // new threshold. Non-floor countries render byte-identically to before.
+      var _floor1011 = (typeof _scTakeIsFloor === 'function') && _scTakeIsFloor(d);
+      var _fTip1011 = _floor1011
+        ? (d.country + ': ' + (typeof _scFloorWhy === 'function' ? _scFloorWhy() : '')
+           + ' Record on file: ' + Number(d.n_facts || 0).toLocaleString()
+           + ' fiscal facts, royalty and income tax only.').replace(/"/g, '&quot;')
+        : '';
+      // Bound glyph, same accent treatment the Screener's floor cells use.
+      var _bnd1011 = function (g) {
+        return _floor1011
+          ? '<span class="cp-floor-bound" style="color:var(--accent);font-weight:700;cursor:help;" title="' + _fTip1011 + '">' + g + '</span>'
+          : '';
+      };
+      // A withdrawn pass does not render as a green tick. Neutral treatment, and a half-filled
+      // glyph for "bounded on one side only" rather than the pass/fail marks either verdict uses.
+      if (_floor1011) {
+        icon = '\u25D0';
+        col = 'var(--muted)';
+        bg = 'rgba(107,101,96,.04)';
+        border = 'rgba(107,101,96,.15)';
+      }
+      msg = '<strong>' + _bnd1011('&ge;') + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
+          + (_floor1011 ? ' at best' : '')
+          + _cmpBasisNote552 + _cashBasisNote979 + '. '
+          + (_floor1011 ? 'Would clear' : 'Clears') + ' the 10% WACC at $75 ('
+          + _bnd1011('&le;') + cpNpvFmt(cpPair75(_dn786, npv))
+          + ') and at the $50/bbl downside (' + _bnd1011('&le;') + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
+          + (_floor1011
+              ? ' \u2014 but both are UPPER bounds, not results: ORCA holds no petroleum rent instrument here beyond'
+                + ' royalty and income tax, and any instrument that exists in law and is not yet in the record moves'
+                + ' take up and NPV down. <strong>Not a pass that can be defended \u2014 establish the terms against'
+                // No trailing period: _defendInstr734 below opens with '. ', exactly as it does
+                // after _baseClause589 on the non-floor path.
+                + ' this jurisdiction\u2019s own petroleum act before it goes on a screening list</strong>'
+              : _baseClause589 + (_band734 ? '' : _dependClause589))
           // The contract count travels with the instruction, so "defend on the take" is
           // self-calibrating: Norway reads n=7,643, Vanuatu reads n=7. Same figure the
           // headline strip already prints as a chip; no new threshold, no new judgement.

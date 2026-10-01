@@ -1849,18 +1849,59 @@ async function testFCExportMethodology(page) {
         exportFCResults();
         const c = window.__cap;
         if (!c) return { err: 'exportFCResults wrote no workbook' };
-        const grab = s => {
-          const row = c.meth.find(x => x[0] && String(x[0]).trim().startsWith(s));
+        // v1009 (T5): the sheet now carries TWO assumptions blocks, because one of them was
+        // describing the columns the sheet forbids citing. `grab` took the FIRST row matching a
+        // prefix, so every assertion below silently re-pointed at the new CITED FIGURES block
+        // (ENGINE_BASIS) the moment it was added. Read each block by its own heading instead.
+        // The model-block assertions are unchanged in intent -- FC_PROFILES still has to match
+        // the block it actually governs -- and the cited block gets its own checks.
+        const _hdrIdx = t => c.meth.findIndex(x => x[0] && String(x[0]).startsWith(t));
+        const _iCite  = _hdrIdx('CITED FIGURES');
+        // v1011: anchor the model block on 'Profile assumptions', which is what the heading
+        // actually says. v1009 wrote this anchor as 'DO-NOT-CITE columns'; v1010 then moved the
+        // profile name back to the front of that heading to kill the sheet's duplicate labels,
+        // and the anchor stopped matching. _iModel went to -1, _modelRows went empty and
+        // _citeRows swallowed the whole sheet, so all SIX assertions failed on all SEVEN
+        // profiles -- 42 FAIL -- with nothing wrong in the workbook. Require index > _iCite so
+        // the two blocks can never resolve to the same row.
+        const _iModel = c.meth.findIndex((x, i) =>
+          i > _iCite && x[0] && /^Profile assumptions\b/.test(String(x[0])));
+        const _slice = (from, to) => (from < 0 ? [] : c.meth.slice(from, to < 0 ? c.meth.length : to));
+        // Model block runs from its heading to the next blank-then-heading; bounded by the
+        // 'Evidence tier definitions:' section that has always followed the assumptions.
+        const _iEvid = _hdrIdx('Evidence tier definitions');
+        const _citeRows  = _slice(_iCite, _iModel);
+        const _modelRows = _slice(_iModel, _iEvid);
+        const _pick = (rows, s) => {
+          const row = rows.find(x => x[0] && String(x[0]).trim().startsWith(s));
+          return row ? row[1] : null;
+        };
+        const _pickCite = (rows, param) => {
+          const row = rows.find(x => x[0] && /^\s*Cited basis\b/.test(String(x[0]))
+                                  && String(x[0]).toLowerCase().indexOf(param) >= 0);
           return row ? row[1] : null;
         };
         const e = FC_PROFILES[k];
+        const EB = (typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS : null;
         return {
           name: c.name,
           engine: e ? [e.peakBblDay, e.capexMM, e.opexBbl] : null,
-          sheet: [grab('Peak rate'), grab('Capex'), grab('Opex')],
-          horizon: grab('Modelled horizon'),
-          header: (c.meth.find(x => x[0] && String(x[0]).startsWith('Profile assumptions')) || [])[0] || '',
-          profName: e ? e.name : k
+          // the MODEL block — the one FC_PROFILES governs
+          sheet: [_pick(_modelRows, 'Peak rate'), _pick(_modelRows, 'Capex'), _pick(_modelRows, 'Opex')],
+          horizon: _pick(_modelRows, 'Modelled horizon'),
+          header: (c.meth[_iModel] || [])[0] || '',
+          profName: e ? e.name : k,
+          // the CITED block — must be ENGINE_BASIS, and must NOT move with the profile
+          bothBlocksPresent: _iCite >= 0 && _iModel >= 0 && _iCite < _iModel,
+          // Read the cited rows by their 'Cited basis' tag plus the parameter name. v1010 gave
+          // every cited row that leading tag, so prefix anchors like 'Peak rate' no longer
+          // match here -- and matching on the tag rather than on the separator means a future
+          // relabel of the dash cannot silently re-point these at the model block again.
+          citeTriple: [_pickCite(_citeRows, 'peak rate'), _pickCite(_citeRows, 'capex, all-in'),
+                       _pickCite(_citeRows, 'opex')],
+          engineBasisTriple: EB ? [EB.peakBblDay, EB.capexAllInMM, EB.opexBbl] : null,
+          citeSaysFixed: _citeRows.some(x => x[0] && /does NOT move with the Fiscal Compare profile selector/.test(String(x[0]))),
+          modelSaysScoped: _modelRows.some(x => x[0] && /DOES move with the Fiscal Compare profile selector/.test(String(x[0])))
         };
       }, key);
 
@@ -1882,6 +1923,34 @@ async function testFCExportMethodology(page) {
       // The sheet must name the profile, not print the raw select key.
       if (r.header.indexOf(r.profName) >= 0) p(S, `meth-names-profile-${key}`, r.profName);
       else f(S, `meth-names-profile-${key}`, `Header does not name '${r.profName}': ${r.header}`);
+
+      // ── v1009 (T5) — the cited-figure basis must be in the file, must be ENGINE_BASIS, and
+      // must NOT follow the profile selector. Until v1009 the sheet's only assumptions block
+      // was FC_PROFILES[key] under the heading "Profile assumptions", which is the basis of the
+      // three "(model...)" columns the same sheet says DO NOT CITE. The basis of the eight
+      // "(database)" columns it mandates was absent, and the stated basis moved with a control
+      // that does not touch those columns: on Giant it read $2,000M/$10 against figures computed
+      // on $1,000M/$18. Assert per profile, because that is the axis the defect lived on.
+      if (r.bothBlocksPresent) p(S, `meth-two-blocks-${key}`, 'CITED FIGURES precedes DO-NOT-CITE columns');
+      else f(S, `meth-two-blocks-${key}`, 'Methodology does not carry both scoped assumption blocks in order');
+
+      if (!r.engineBasisTriple) {
+        f(S, `meth-cites-engine-basis-${key}`, 'ENGINE_BASIS is not defined on the page');
+      } else if (String(r.citeTriple) === String(r.engineBasisTriple)) {
+        p(S, `meth-cites-engine-basis-${key}`,
+          `cited basis ${r.citeTriple[0]} bopd / $${r.citeTriple[1]}M all-in / $${r.citeTriple[2]} opex`);
+      } else {
+        f(S, `meth-cites-engine-basis-${key}`,
+          `CITED FIGURES block says [${r.citeTriple}] but ENGINE_BASIS is [${r.engineBasisTriple}]`);
+      }
+
+      // The whole point: this block is invariant across every profile the selector offers.
+      if (String(r.citeTriple) === String(r.engineBasisTriple) && r.citeSaysFixed && r.modelSaysScoped) {
+        p(S, `meth-scoping-stated-${key}`, 'each block states whether it follows the profile selector');
+      } else if (!r.citeSaysFixed || !r.modelSaysScoped) {
+        f(S, `meth-scoping-stated-${key}`,
+          `scope lines missing (cite fixed: ${r.citeSaysFixed}, model scoped: ${r.modelSaysScoped})`);
+      }
     }
     await page.evaluate(() => { if (window.__origWriteFile) XLSX.writeFile = window.__origWriteFile; });
   } catch (e) {
@@ -3067,6 +3136,107 @@ async function testScreenerLinkFidelity(page) {
 // This asserts the invariant rather than the literal figures: the two chips must carry the same
 // basis marker as each other, the $75 figure must not sit below the $50 figure, and where the
 // chips are rebased the band pill (which still ranks the blend) must say "blend".
+// ── v1011 (T1) — the Country Profile verdict box must not hand a floor record a pass ─────────
+// 45 of 185 countries have no petroleum rent instrument in ORCA at all, so their govt take is a
+// LOWER bound and the contractor NPV beside it an UPPER bound. Vanuatu, the Bahamas and
+// Montenegro are the three highest contractor NPVs in the whole database and all three are in
+// that set, so this is the verdict on the most attractive-looking countries in the tool. The
+// Screener has refused to rank them unqualified since v743; the Country Profile drilldown the
+// Screener links INTO asserted "Clears the 10% WACC at $75" behind a green tick until v1011.
+// Both directions are asserted: a non-floor country must still render the old verdict byte for
+// byte, so a future change cannot buy the floor case by degrading all 140 others.
+async function testCPFloorVerdict(page) {
+  const S = 'CPFloorVerdict';
+  try {
+    await switchTab(page, 't7');
+    await page.waitForTimeout(1200);
+
+    // Ask the page who is in the set, so a data refresh cannot make this test lie.
+    const plan = await page.evaluate(() => {
+      if (typeof COUNTRY_DATA === 'undefined' || typeof _scTakeIsFloor !== 'function') return null;
+      const byNpv = a => a.filter(d => d.npv_75 != null).sort((x, y) => y.npv_75 - x.npv_75);
+      const floor = byNpv(COUNTRY_DATA.filter(_scTakeIsFloor)).map(d => d.country);
+      const norm  = byNpv(COUNTRY_DATA.filter(d => !_scTakeIsFloor(d))).map(d => d.country);
+      return { nFloor: floor.length, floor: floor.slice(0, 3), norm: norm.slice(0, 2) };
+    });
+    if (!plan) { f(S, 'page exposes _scTakeIsFloor', 'helper or COUNTRY_DATA missing'); return; }
+
+    if (plan.nFloor > 0) p(S, 'the floor set is non-empty', `${plan.nFloor} countries`);
+    else { w(S, 'the floor set is non-empty', 'no floor countries — nothing to assert'); return; }
+
+    const read = async (country) => {
+      await page.evaluate(async (c) => {
+        loadCountryProfile(c);
+        await new Promise(r => setTimeout(r, 100));
+      }, country);
+      await page.waitForTimeout(1600);
+      return page.evaluate(() => {
+        const t7 = document.getElementById('t7');
+        const txt = (t7 ? t7.textContent : '').replace(/\s+/g, ' ');
+        const i = txt.indexOf('govt take @$75');
+        const marks = [...document.querySelectorAll('#t7 .cp-floor-bound')];
+        return {
+          verdict: i >= 0 ? txt.slice(Math.max(0, i - 40), i + 620) : '',
+          nMarks: marks.length,
+          glyphs: marks.map(m => m.textContent.trim()).join(''),
+          title: marks.length ? (marks[0].getAttribute('title') || '') : ''
+        };
+      });
+    };
+
+    for (const c of plan.floor) {
+      const r = await read(c);
+      if (!r.verdict) { f(S, `floor verdict renders — ${c}`, 'no "govt take @$75" line on the page'); continue; }
+
+      // Three bound markers: >= on the take, <= on each of the two NPVs.
+      if (r.nMarks === 3 && r.glyphs === '\u2265\u2264\u2264')
+        p(S, `floor bounds marked — ${c}`, `3 markers, ${r.glyphs}`);
+      else
+        f(S, `floor bounds marked — ${c}`, `${r.nMarks} markers, glyphs "${r.glyphs}" (want 3, >=<=<=)`);
+
+      // The pass must be withdrawn, not merely annotated.
+      if (/Would clear the 10% WACC/.test(r.verdict) && !/(^|[^d] )Clears the 10% WACC/.test(r.verdict))
+        p(S, `pass is conditional — ${c}`, 'reads "Would clear", not "Clears"');
+      else
+        f(S, `pass is conditional — ${c}`, `verdict: ${r.verdict.slice(0, 200)}`);
+
+      if (/both are UPPER bounds, not results/.test(r.verdict))
+        p(S, `verdict states the bound direction — ${c}`, 'names them UPPER bounds');
+      else
+        f(S, `verdict states the bound direction — ${c}`, 'no UPPER-bounds sentence');
+
+      if (/ at best\b/.test(r.verdict))
+        p(S, `tier label qualified — ${c}`, 'tier reads "at best"');
+      else
+        f(S, `tier label qualified — ${c}`, `tier not qualified: ${r.verdict.slice(0, 160)}`);
+
+      if (/not a pass that can be defended/i.test(r.verdict) && /before it goes on a screening list/.test(r.verdict))
+        p(S, `verdict gives the next action — ${c}`, 'says establish terms before shortlisting');
+      else
+        f(S, `verdict gives the next action — ${c}`, 'no shortlist instruction');
+
+      // The marker's title must carry the shared sentence, so this tab and the Screener cannot
+      // drift about WHY the figure is a bound.
+      if (r.title.indexOf(c) === 0 && /LOWER bound/.test(r.title) && /UPPER bound/.test(r.title))
+        p(S, `bound marker explains itself — ${c}`, 'title names the country and both bounds');
+      else
+        f(S, `bound marker explains itself — ${c}`, `title: ${r.title.slice(0, 160)}`);
+    }
+
+    // A non-floor country must be untouched: no markers, and the unconditional verdict intact.
+    for (const c of plan.norm) {
+      const r = await read(c);
+      if (r.nMarks === 0 && /Clears the 10% WACC/.test(r.verdict) && !/UPPER bounds, not results/.test(r.verdict))
+        p(S, `non-floor verdict unchanged — ${c}`, 'no bound markers, reads "Clears"');
+      else
+        f(S, `non-floor verdict unchanged — ${c}`,
+          `${r.nMarks} markers; verdict: ${r.verdict.slice(0, 200)}`);
+    }
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testCPNpvPairBasis(page) {
   const S = 'CPNpvPair';
   try {
@@ -4134,6 +4304,89 @@ async function testSbsShareOrder(page) {
     else
       f(S, 'a default basket deck writes the legacy bare hash unchanged', `expected bare, got ${bare}`);
 
+    // ---- v935: a set handed over FROM a screen ranks at the price that screen was run at ----
+    // scOpenSbs() and fcOpenSbs() replace the whole comparison with the output of a run the
+    // analyst just priced, but neither carried that price across, so a $100 screen opened a
+    // Side-by-Side whose verdict strip read "Govt take @$75, lowest first:" — the first line on
+    // the page, quoting numbers from a deck the analyst never chose. Distinct from the v934 case
+    // above, which must keep PRESERVING: the basket edits an existing comparison, these two
+    // replace it. Both directions are asserted so a future fix cannot collapse them into one.
+    await page.goto('about:blank');
+    await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1800);
+    const scHand = await page.evaluate(async () => {
+      document.getElementById('tab-btn-tscreener').click();
+      await new Promise(r => setTimeout(r, 900));
+      const d = [...document.querySelectorAll('#texplorer button')].filter(b => b.textContent.trim() === '$100')[0];
+      if (d) d.click();
+      await new Promise(r => setTimeout(r, 700));
+      applyScreenerPreset('iochurdle');
+      await new Promise(r => setTimeout(r, 900));
+      const deck = typeof getPriceKey === 'function' ? getPriceKey() : null;
+      scOpenSbs();
+      await new Promise(r => setTimeout(r, 1500));
+      return { deck, price: cmpRankPrice, hash: location.hash, n: compareList.length,
+               pctl: String((document.getElementById('cmp-rankprice') || {}).value),
+               strip: (document.getElementById('t2') || document.body).textContent
+                        .replace(/\s+/g, ' ').indexOf('Govt take @$100') };
+    });
+    if (scHand.deck === '100' && String(scHand.price) === '100' && scHand.pctl === '100')
+      p(S, 'screener handover ranks at the deck the screen was run at', `deck $${scHand.deck} -> cmpRankPrice $${scHand.price}`);
+    else
+      f(S, 'screener handover ranks at the deck the screen was run at', `deck $${scHand.deck}, cmpRankPrice $${scHand.price}, control "${scHand.pctl}"`);
+
+    if (scHand.strip >= 0)
+      p(S, 'screener handover: the verdict strip names the analyst\'s deck', 'reads "Govt take @$100"');
+    else
+      f(S, 'screener handover: the verdict strip names the analyst\'s deck', 'no "Govt take @$100" on the page');
+
+    if (/@100$/.test(scHand.hash) && scHand.n >= 2)
+      p(S, 'screener handover writes a hash that reproduces the deck', scHand.hash);
+    else
+      f(S, 'screener handover writes a hash that reproduces the deck', `${scHand.hash} (${scHand.n} columns)`);
+
+    // The default deck must stay byte-identical: $75 adopts to 75, which is already the value,
+    // so the bare legacy hash is unchanged and nothing downstream sees a transition.
+    await page.goto('about:blank');
+    await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1800);
+    const scBare = await page.evaluate(async () => {
+      document.getElementById('tab-btn-tscreener').click();
+      await new Promise(r => setTimeout(r, 900));
+      applyScreenerPreset('iochurdle');
+      await new Promise(r => setTimeout(r, 900));
+      scOpenSbs();
+      await new Promise(r => setTimeout(r, 1500));
+      return { price: cmpRankPrice, hash: location.hash };
+    });
+    if (String(scBare.price) === '75' && scBare.hash.indexOf('@') === -1)
+      p(S, 'a default screener deck writes the legacy bare hash unchanged', scBare.hash);
+    else
+      f(S, 'a default screener deck writes the legacy bare hash unchanged', `$${scBare.price}, ${scBare.hash}`);
+
+    // The Fiscal Compare door reads window._fcLastPrice — the price of the RUN, not the current
+    // state of #fc-price, which can be moved without re-running. Same distinction _cpFcRunPrice887()
+    // already depends on.
+    await page.goto('about:blank');
+    await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1800);
+    await switchTab(page, 't0');
+    await page.waitForTimeout(600);
+    const fcHand = await page.evaluate(async () => {
+      const s = document.getElementById('fc-price');
+      if (s) { s.value = '125'; s.dispatchEvent(new Event('change', { bubbles: true })); }
+      if (typeof runFiscalCompare === 'function') runFiscalCompare();
+      await new Promise(r => setTimeout(r, 2200));
+      const run = window._fcLastPrice;
+      fcOpenSbs();
+      await new Promise(r => setTimeout(r, 1500));
+      return { run, price: cmpRankPrice, hash: location.hash, n: compareList.length };
+    });
+    if (String(fcHand.run) === '125' && String(fcHand.price) === '125' && fcHand.n >= 2)
+      p(S, 'Fiscal Compare handover ranks at the price the run used', `run $${fcHand.run} -> cmpRankPrice $${fcHand.price}`);
+    else
+      f(S, 'Fiscal Compare handover ranks at the price the run used', `run $${fcHand.run}, cmpRankPrice $${fcHand.price}, ${fcHand.n} columns`);
+
   } catch (e) {
     f(S, 'exception', e.message);
   }
@@ -4446,6 +4699,7 @@ async function testConsoleErrors() {
     await testScreenerICCeilingCount(page);
     await testScreenerSbSBasisLabel(page);
     await testCPNpvPairBasis(page);
+    await testCPFloorVerdict(page);   // v1011 (T1)
     await testHomeICScreenAgreement(page);
     await testICSourcingTier(page);
     await testIOC(page);
