@@ -68975,3 +68975,162 @@ have entered by clicking a table row to be told at all.
 **Friction:** The walk an analyst with a house deck actually does:
 
 - Fiscal Compare → price **$100/bbl** → Run Comp
+
+---
+## Cycle 952 — 2026-10-01 — T4 (v1016)
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" Stalest in rotation
+(950 T2, 949 T3, 948/947 T1, 946 T5, 945/944 T4, and the orphaned v1015 was T6). Walked cold at
+1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded first, on a server rooted at
+`~` so `sw.js` resolves.
+
+Housekeeping first, stated because it changes what the log means: **v1015 was found staged and
+uncommitted** — the previous cycle's T6 edit (Side-by-Side evidence grade in the column headers +
+the "Evidence floor" strip line) with the version badge already bumped and no commit. It was
+verified rather than trusted — syntax gate PASS, UK B / Norway A / Nigeria C rendering in the
+headers, the floor line firing on Nigeria, 390px clean, `.cmp-hdr-ev` and `.cmp-vd-ev-go` both
+24px under a thumb, 0 page errors — and committed as its own commit before this cycle's work.
+
+**Friction.** The route this task actually takes is: Country Profile → *Fiscal Reform History*.
+That section renders a `_cpVerdict` card (Reform Frequency Score, Since 2010, Direction, IC
+action) and, under it, a timeline built by `buildReformEventHtml()` at index.html:45050.
+
+That builder still ran the two-way test **v585 replaced on the Reform Risk tab** and nowhere else:
+
+```
+const dir = r.take_change && r.take_change.startsWith('+') ? 'hostile' :
+            r.take_change && r.take_change.startsWith('-') ? 'friendly' : 'neutral';
+...
+${r.take_change ? `<span class="reform-take reform-${dir}">${r.take_change} take</span>` : ''}
+```
+
+No `take_change` → **no chip at all**. Measured against the shipped `reform_history.json`:
+**46 of the 83 sourced events carry no `take_change`, and they appear on 20 of the 21 covered
+profiles.** Those 46 are two findings that mean opposite things and rendered identically:
+
+| | n | what it is | what the profile showed |
+|---|---|---|---|
+| unmeasured | 35 | a sourced **fiscal law change** whose take effect ORCA never quantified — Nigeria's 2021 PIA, Mexico's 1938 PEMEX nationalisation, Norway's 1972 Petroleum Tax Act | nothing |
+| context | 11 | **changed no fiscal terms** and scores nothing — a discovery, a first-oil date, armed conflict, a blockade lifted, a terms review that concluded without renegotiation | nothing |
+
+Per-profile: Nigeria 5 of its 6 events unmarked, Mexico 3 of 3, Kazakhstan 4 of 5, Angola 3 of 5.
+**Ghana and Guyana are 3 of 3 context** — their entire "Fiscal Reform History" was non-reforms
+presented as reform history, under that heading, with no marker. ORCA holds **zero** fiscal law
+changes for Guyana at any date, and the card *directly above* the timeline says so (100/100,
+"Since 2010: 0 law changes"); the timeline under it listed three dated entries and left the
+analyst to reconcile the two. Libya was worse in a second way: 1955 / 2004 / 2011 / 2020 under a
+score of 100, with nothing saying that two predate the 2010 window and the other two changed no
+terms — this timeline has never drawn the window the score is defined on.
+
+Same defect in the artifact that leaves the tool. `_rrVerdictPayload()` builds the Reform Risk
+clipboard's event table with a column headed **"Counts in Reform Frequency Score"**, and the value
+was read off the **group header** — one of two strings for a whole timeline:
+
+```
+var scored = /before the window/i.test(tx(h)) ? 'No — pre-2010, ...' : 'Yes — in the 2010 scoring window';
+```
+
+`_rrScores()` is `year >= 2010 **AND** fiscal_change !== false`; that test was the first half only,
+so every in-window row was stamped **Yes**, including the ones the score deliberately excludes.
+9 rows across 5 jurisdictions, and on three of them **every** in-window row:
+
+| | rows stamped Yes | real score | score rebuilt offline from the pasted table |
+|---|---|---|---|
+| Guyana | 3 of 3 | **100** | 100 − 15×3 = **55** |
+| Ghana | 2 of 2 | **100** | **70** |
+| Libya | 2 of 2 | **100** | **70** |
+| Australia | 1 of 3 | 70 | 55 |
+| Iraq | 1 of 2 | 85 | 70 |
+
+Guyana is the expensive one: its verdict class is `NO LAW CHANGE`, and **three** counted changes is
+exactly this tab's own stated bar ("3 or more law changes since 2010 → add 3–5pp WACC premium").
+The paste manufactured a discount-rate premium the platform explicitly withholds, on the one
+frontier play an IC is most likely to be screening, inside the committee document. The comment
+above `_rrFiledUnderBlock()` has named this exact stamp as false since v945 without it being fixed.
+
+**Change.**
+
+- `tag()` lifted out of `_rrEventLogHtml()` into a shared **`_rrTakeChip(e)`**, and
+  `buildReformEventHtml()` now calls it. Both reform timelines print the same three-way chip from
+  `_rrEventDir()`: `+12pp take` / `-12pp take`, orange `fiscal change · take move not quantified`,
+  grey `discovery — no change to fiscal terms` (the row's own `context_kind`). Shared, not copied,
+  so the card and the profile cannot fork again.
+- Each Country Profile timeline row now carries its scoring state from `_rrScores()` —
+  `COUNTS IN SCORE` (orange) / `IN WINDOW · NOT SCORED` / `PRE-2010 · NOT SCORED` — so the 2010
+  window the score is defined on is on the timeline for the first time. Per row rather than by
+  regrouping, because v450's "latest 4 open, older collapsed" ordering is what makes this sidebar
+  section scannable. Nothing moves; no figure is recomputed.
+- The collapse control reads **"Show N older sourced events"**, not "older reforms" — on Libya and
+  Ghana the collapsed rows are not reforms.
+- `row()` in `_rrEventLogHtml()` stamps each `.reform-event` with `data-rr-scores` /
+  `data-rr-ctx` from `_rrScores()`, and the clipboard sweep reads that stamp instead of
+  re-deriving from the group header. Three values now, not two, the middle one being
+  *"No — inside the window, but this event changed no fiscal terms, so it does not score."*
+  The group-header test is kept only as a fallback for a timeline rendered without the attribute.
+- The pasted event table's heading carries the count the score is actually defined on and the
+  arithmetic: *"Sourced fiscal-reform events — 3 on record · 0 counted in the Reform Frequency
+  Score (100 − 15 × 0 = 100)"*. The tile above and the table below can no longer be read into
+  different scores.
+
+**Result.** An analyst reading a country's Fiscal Reform History can now tell a fiscal law change
+from a discovery, and a counted change from one outside the 2010 window, without leaving the page
+— so Guyana's and Ghana's reform history reads as the empty record it is, Libya's 100 reads as the
+window artefact it is, and Nigeria's PIA reads as a law change whose size ORCA never measured
+rather than as a blank. And the table they paste into the IC memo states which rows the score
+counted and reproduces the score from them, instead of implying a 3–5pp WACC premium on a
+jurisdiction the platform grades 100/100.
+
+### Verification (every probe run this cycle, nothing assumed)
+
+| probe | expected | got |
+|---|---|---|
+| CP Guyana timeline | 3 context chips, none scored | `terms review…` / `production milestone…` / `discovery…`, all **IN WINDOW · NOT SCORED** |
+| CP Nigeria | PIA marked a fiscal change, 2 counted | 2022 + 2021 `fiscal change · take move not quantified` **COUNTS IN SCORE**; 2003 `-15pp take`, 1993/1990/1969 **PRE-2010 · NOT SCORED** |
+| CP Libya | nothing counts toward its 100 | 2020/2011 context **IN WINDOW · NOT SCORED**; 2004/1971/1955 **PRE-2010 · NOT SCORED** |
+| CP Norway | the two in-window moves count | 2022 `+12pp take` / 2020 `-12pp take` **COUNTS IN SCORE**; 1992/1972 pre-2010 |
+| CP Ghana | 2016/2011 in-window context, 2007 pre | as expected |
+| collapse label | "older sourced events" | `▸ Show 2 older sourced events` (Nigeria), `1` (Libya) |
+| clipboard Guyana | 0 counted, arithmetic matches the tile | head `3 on record · 0 counted … (100 − 15 × 0 = 100)`; tile `100/100`; all 3 rows **No — inside the window, but this event changed no fiscal terms** |
+| clipboard Ghana / Libya | 0 counted | `0 counted … = 100` on both, tiles 100/100 |
+| clipboard Australia / Iraq | 2 and 1 counted | `= 70` / `= 85`, tiles 70/100 and 85/100 |
+| clipboard Norway / UK | 2 and 5 counted | `= 70` / `= 25`, tiles 70/100 and 25/100 |
+| mobile 390×844 `hasTouch`, CP Libya/Nigeria/Guyana | no sideways scroll, no sub-24px control | `scrollWidth 390 = clientWidth` on all three, **0** sub-24px controls in `#t7`, marks 10px tall with right edge ≤334 < 390 |
+| mobile Reform Risk, Libya selected | same | `scrollWidth 390 = clientWidth`, **0** sub-24px controls in `#treformrisk` |
+| `#reference-panel` right offset | never negative | `0px` |
+| JS syntax gate | PASS | **PASS (11 blocks)** |
+| Playwright runtime suite | ran, green | **542 PASS / 0 FAIL / 0 WARN / 0 JS errors — read from /tmp/runtime_test_report.txt written 2026-10-01T06:34:45Z** |
+
+### Notes for the next cycle
+
+- **Serve `~`, not the repo** (carried forward, still true): `index.html:49` registers the service
+  worker at `/petroleum-fiscal-db/sw.js`, so serving the repo root 404s it fifteen times and flips
+  `[ConsoleErrors]` to WARN for no real reason.
+- **Found while walking, not acted on.** The Fiscal Compare *Reform verdict* column prints a bare
+  lowercase **`n/c`** on 164 of 189 rows — 87% of the main screening table — with its qualifier
+  only in the tooltip. Every other surface states it in the cell: Side-by-Side prints
+  `n/c / no sourced reform log`, the IOC Portfolio `n/c · no sourced log`, the Explorer Stability
+  column `n/c · monopoly`. "n/c" in financial shorthand reads *no change*, which is the opposite of
+  what it means here (*not covered*). The sort already handles it correctly — `n/c` sorts last and
+  the Reform sort auto-ticks `◆ Reform-scored only`, verified this cycle: 21 rows, six verdict
+  dividers, UK and Brazil above the line.
+- Also walked and found sound this cycle, recorded so it is not re-walked: the Reform Risk
+  per-country lookup on all 21 scored jurisdictions plus Oman/Somalia/Qatar/Malaysia/Egypt (the
+  no-log branch states coverage, prints the Fiscal Predictability fallback and names the statute to
+  start the external check from); `⚙ Model this premium in Scenario Builder` on UK and Brazil
+  (opens the builder on that country's terms, sets `sb-discount` to 13, re-runs, and the discount
+  note names the reform verdict behind the 13%); the FC Reform sort bands and dividers; the CP
+  headline Stability line on both branches.
+- `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain untracked probe debris in the repo
+  root (~29 MB, eighth cycle). `_pre1016.html` was written to `/tmp` instead. Still flagged to Zach
+  rather than deleted — standing rule is to ask before deleting files the session did not create.
+- Carried forward unchanged: `window._fcNavList` is never invalidated, so an Explorer row click can
+  print `↩ Back to FC`; the CP headline's take rank counts 1 = lowest take and says so nowhere while
+  the NPV rank 6px away counts 1 = highest and prints `(highest first)`; Indonesia's three different
+  government profit-oil shares on one page; `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at
+  source; breakeven on only 68 of 185; Somalia the one true T4 dead end; `Paraguay Decree
+  19.080/1997` typed `government_filing`; the Screener count line's `block· Deepwater` join fault;
+  the Home card at ~3077 saying Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5;
+  `_posClause648` number agreement; Côte d'Ivoire's two missing API slugs;
+  `window._screenerExportBasis` not naming the 105 withheld countries; `summary "Reading this
+  table"` at 18px; Side-by-Side's two byte-identical export buttons;
+  `norway+united-kingdom+netherlands` ordering only UK › Norway.
