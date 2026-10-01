@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1017</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1018</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23432,17 +23432,17 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- v300: Above/Below threshold counter — live count of countries above and below the price marker -->
   <div id="be-threshold-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-      <div><span style="color:var(--green);font-weight:700;font-size:16px;" id="be-below-count">—</span> <span style="color:var(--muted);">countries viable below <span id="be-threshold-price-below">$75</span></span></div>
-      <div><span style="color:var(--red);font-weight:700;font-size:16px;" id="be-above-count">—</span> <span style="color:var(--muted);">countries need above <span id="be-threshold-price-above">$75</span></span></div>
+      <div><span style="color:var(--green);font-weight:700;font-size:16px;" id="be-below-count">—</span> <span style="color:var(--muted);">countries viable below <span id="be-threshold-price-below">$30</span></span></div>
+      <div><span style="color:var(--red);font-weight:700;font-size:16px;" id="be-above-count">—</span> <span style="color:var(--muted);">countries need above <span id="be-threshold-price-above">$30</span></span></div>
       <div style="margin-left:auto;font-size:11px;color:var(--muted);" id="be-thr-denom">of 65 countries with a modelled breakeven</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
       <span>Price marker:</span>
-      <input type="range" id="be-price-marker" min="30" max="120" value="75" step="5" aria-label="Current oil price marker for breakeven map in dollars per barrel — use arrow keys to adjust in $5 increments" title="Drag or use ← → arrow keys to adjust in $5 steps. Countries below this price are viable." style="width:120px;accent-color:var(--accent);">
-      <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$75</span>
-      <span style="font-size:10px;color:var(--muted);opacity:.7;" title="Use arrow keys to adjust in $5 increments">← →</span>
+      <input type="range" id="be-price-marker" min="19" max="35" value="30" step="1" aria-label="Oil price threshold marker for the breakeven map, in dollars per barrel — use arrow keys to adjust in $1 increments" title="Drag or use ← → arrow keys to adjust in $1 steps. Countries at or below the marker are viable at that price." style="width:120px;accent-color:var(--accent);">
+      <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$30</span>
+      <span style="font-size:10px;color:var(--muted);opacity:.7;" title="Use arrow keys to adjust in $1 increments">← →</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;font-size:11px;flex-wrap:wrap;">
       <span style="display:inline-block;width:12px;height:12px;background:var(--green);border-radius:2px;"></span><span id="be-legend-t1" style="color:var(--muted);">&lt;$40</span>
@@ -36541,6 +36541,66 @@ function _scAllMechanics() {
 }
 window._scAllMechanics = _scAllMechanics;
 
+// ── v1018 (T1) — RELAX ONE FILTER, KEEP THE REST ────────────────────────────────────────────
+// The zero-result panel used to offer exactly one action: "Reset All Filters", which throws away
+// the entire screen the analyst just built to undo whichever single constraint went one notch too
+// far. _scAllMechanics() has been the one exception since v802 -- this is that same idea for
+// every other leg, driven off the key the predicate already skips by.
+// Each case writes the CONTROL rather than a parallel flag, for the v668 reason: runScreener()
+// reads the control, the active-filter badge counts it, resetScreenerAll() restores it and the
+// export criteria report it.
+var _SC_LEG_RELAX = {
+  take:       { btn: 'Remove the take ceiling',           toast: 'Take ceiling removed' },
+  npv75:      { btn: 'Remove the $75 NPV floor',          toast: '$75 NPV floor removed' },
+  npv50:      { btn: 'Remove the $50 downside floor',     toast: '$50 downside floor removed' },
+  evid:       { btn: 'Remove the evidence floor',         toast: 'Evidence floor removed' },
+  facts:      { btn: 'Remove the fact-count floor',       toast: 'Fact-count floor removed' },
+  retention:  { btn: 'Remove the retention floor',        toast: 'Downside-retention floor removed' },
+  proxy:      { btn: 'Put the proxy-economics countries back', toast: 'Proxy-economics countries back in the screen' },
+  floor:      { btn: 'Put the floor-take countries back', toast: 'Floor-take countries back in the screen' },
+  mech:       { btn: 'Select every fiscal mechanic',      toast: 'All fiscal mechanics selected' },
+  ioc:        { btn: 'Clear the operator filter',         toast: 'Operator filter cleared' },
+  region:     { btn: 'Clear the region filter',           toast: 'Region filter cleared' },
+  reform:     { btn: 'Clear the reform-record filter',    toast: 'Reform-record filter cleared' },
+  countryset: { btn: 'Drop the named country list',       toast: 'Named country list dropped' },
+  rfactor:    { btn: 'Drop the R-factor requirement',     toast: 'R-factor requirement dropped' }
+};
+function _scRelaxLeg(key) {
+  if (!_SC_LEG_RELAX.hasOwnProperty(key)) return;
+  if (key === 'mech') { _scAllMechanics(); return; }   // already does panel-open + toast
+  var setSl = function (id, v) {
+    var el = document.getElementById(id); if (!el) return;
+    el.value = v;
+    var lbl = document.getElementById('sv-' + id.replace('sl-', ''));
+    if (lbl) lbl.textContent = v;
+  };
+  var box = function (id, state) { var b = document.getElementById(id); if (b) b.checked = state; };
+  var sel = function (id) { var e = document.getElementById(id); if (e) e.value = ''; };
+  // Legs that live inside the collapsed Advanced Filters block open it on the way out, so the
+  // analyst can see the control they were just told decided their result set.
+  var inAdvanced = false;
+  switch (key) {
+    case 'take':       setSl('sl-take', 100); break;
+    case 'npv75':      setSl('sl-npv', -500); break;
+    case 'npv50':      setSl('sl-npv50', -500); break;
+    case 'evid':       setSl('sl-evid', 0); break;
+    case 'facts':      _screenerMinFacts = 0; break;
+    case 'retention':  _screenerMinRetention = null; break;
+    case 'proxy':      box('sc-proxy-keep', true);  inAdvanced = true; break;
+    case 'floor':      box('sc-floor-keep', true);  inAdvanced = true; break;
+    case 'ioc':        [].forEach.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]'), function (cb) { cb.checked = false; }); inAdvanced = true; break;
+    case 'region':     sel('sc-region'); inAdvanced = true; break;
+    case 'reform':     sel('sc-reform'); inAdvanced = true; break;
+    case 'countryset': _screenerCountrySet = null; _screenerSetLabel = null; _screenerSetOnCmp = false; break;
+    case 'rfactor':    _screenerRfactorOnly = false; break;
+    default: return;
+  }
+  if (inAdvanced) { var det = document.getElementById('screener-advanced-details'); if (det) det.open = true; }
+  if (typeof runScreener === 'function') runScreener();
+  if (typeof showCopyToast === 'function') showCopyToast(_SC_LEG_RELAX[key].toast);
+}
+window._scRelaxLeg = _scRelaxLeg;
+
 // v668 (T1) — drive the data-basis filter from the count bar.
 // Deliberately writes #sc-proxy-keep rather than holding its own flag: runScreener() reads that
 // checkbox (`includeProxy`), the active-filter badge counts it, resetScreenerAll() restores it and
@@ -37155,6 +37215,12 @@ function runScreener() {
   // v706 (T1): third argument names ONE leg to skip, so the marginal effect of that leg can be
   // measured by re-running this exact predicate rather than by a parallel re-implementation of
   // it. Used below to detect a floor that is set but cannot remove anything.
+  // v1018 (T1): `ignoreLeg` now accepts an ARRAY as well as a single key, and every leg of the
+  // screen is skippable rather than the three v706/v969 happened to need. That is what makes the
+  // zero-result panel below able to MEASURE which filter is blocking the analyst -- re-run this
+  // exact predicate with one leg lifted and count what comes back -- instead of listing every
+  // active filter in source order and letting them guess.
+  const _skip = (ig, k) => !!ig && (typeof ig === 'string' ? ig === k : ig.indexOf(k) !== -1);
   const _scPass = (d, useCmp, ignoreLeg) => {
     const take = d[takeKey];
     const npv  = d[npvKey];
@@ -37163,14 +37229,14 @@ function runScreener() {
     // v554 — test the ceiling against the comparable (Group-1) take where the published figure is
     // a fee-basis blend. See _scFeeCmpAt(). Everything else about the row is unchanged.
     const _fc = (useCmp && takeCeilingActive) ? _scFeeCmpAt(d, price) : null;
-    if (((_fc && _fc.diverges) ? _fc.cmp : take) > maxTake) return false;
-    if (_screenerRfactorOnly && !d.has_r_factor_tiers) return false;
+    if (!_skip(ignoreLeg, 'take') && ((_fc && _fc.diverges) ? _fc.cmp : take) > maxTake) return false;
+    if (!_skip(ignoreLeg, 'rfactor') && _screenerRfactorOnly && !d.has_r_factor_tiers) return false;
     // v530: explicit country set (Atlantic Frontier). Applied before every threshold leg so a
     // named basin returns the countries it names.
-    if (_screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1) return false;
+    if (!_skip(ignoreLeg, 'countryset') && _screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1) return false;
     // v662 (T4): reform record. Every mode is scoped to the jurisdictions ORCA holds a sourced
     // reform log for, so an unscored country is dropped rather than passed as stable.
-    if (reformSet && !reformSet.has(d.country)) return false;
+    if (!_skip(ignoreLeg, 'reform') && reformSet && !reformSet.has(d.country)) return false;
 
     // v513 — a country with no modelled breakeven is UNTESTED, not passing.
     // Previously `be == null` fell straight through this check, so a $50 ceiling let all
@@ -37181,13 +37247,13 @@ function runScreener() {
     // analyst would use ($34-$120 = 87 inert positions), and below $27 it failed every country that
     // HAD a breakeven while keeping all 120 that did not. Downside screening now runs on Min NPV @$50.
 
-    if (ignoreLeg !== 'npv75' && npv !== null && npv !== undefined && npv < minNPV) return false;
+    if (!_skip(ignoreLeg, 'npv75') && npv !== null && npv !== undefined && npv < minNPV) return false;
 
     // v517 — the $50/bbl downside leg replaces the IRR criterion. npv_50 is modelled for 185/185
     // countries, so unlike IRR (165 non-null, 124 displayable) and breakeven (68) there is no
     // untested/passing ambiguity to disclose: if the floor is above its neutral position, every row
     // still in the list was measured against it.
-    if (ignoreLeg !== 'npv50' && minNPV50 > -500) {
+    if (!_skip(ignoreLeg, 'npv50') && minNPV50 > -500) {
       const npv50 = d.npv_50;
       if (npv50 === null || npv50 === undefined) return false;
       if (npv50 < minNPV50) return false;
@@ -37206,16 +37272,16 @@ function runScreener() {
     // Venezuela at 125%, worth more at $50 oil than at $125 — ranked top, green, "top of the
     // range". A position with no price gearing has nothing for a price break to erode; it is
     // not a resilient regime, and it is no longer counted as one. See _scRetentionPasses().
-    if (_screenerMinRetention !== null) {
+    if (!_skip(ignoreLeg, 'retention') && _screenerMinRetention !== null) {
       if (!_scRetentionPasses(d, _scRetRefDeck(), _screenerMinRetention)) return false;
     }
 
     // v517 — data-basis filter. The page has ranked by verified field production since v507 and drawn
     // a divider at the boundary, but never let the analyst screen on it. "Only the countries anyone
     // has actually drilled" is the single most useful narrowing available for T1.
-    if (!includeProxy && !_dqTier(d).hasProduction) return false;
+    if (!_skip(ignoreLeg, 'proxy') && !includeProxy && !_dqTier(d).hasProduction) return false;
     // v743 (T1): floor-take basis filter. See _scTakeIsFloor().
-    if (!includeFloor && _scTakeIsFloor(d)) return false;
+    if (!_skip(ignoreLeg, 'floor') && !includeFloor && _scTakeIsFloor(d)) return false;
 
     // mechanic: country passes if ANY of its mechanics is in the checked set.
     // v802 (T1): the `checkedMechs.length > 0` guard is REMOVED. With every box unticked the
@@ -37234,7 +37300,7 @@ function runScreener() {
     // can now only remove countries, and the zero-result state below names this cause first and
     // offers the one-click way back.
     const dMechs = d.mechanics.split(',').map(m => m.trim());
-    if (!dMechs.some(m => checkedMechs.includes(m))) return false;
+    if (!_skip(ignoreLeg, 'mech') && !dMechs.some(m => checkedMechs.includes(m))) return false;
 
     // v537 (T1) — breakeven coverage. This replaces the four-way cost-band radio, whose every
     // real option was inert or actively wrong:
@@ -37267,7 +37333,7 @@ function runScreener() {
     // 59-63% of their facts from the bulk tables, while Senegal (67.2% primary legislation, 2nd
     // highest in the dataset) and Liberia (64.4%, zero bulk) were rejected. Now gates on tier A —
     // facts read out of the primary legal instrument — which has a real gradient across the set.
-    if (minEvid > 0 && (d.a_pct || 0) < minEvid) return false;
+    if (!_skip(ignoreLeg, 'evid') && minEvid > 0 && (d.a_pct || 0) < minEvid) return false;
     // Fact-depth leg. A-share on its own rewards thin coverage: the median fact count among the
     // 52 countries at A>=70% is 39.5, against 159 across all 185, because a jurisdiction whose
     // entire record is 12 facts from one model petroleum act scores 100% A.
@@ -37277,11 +37343,11 @@ function runScreener() {
     // Indonesia and Iraq -- i.e. the strictest evidence screen on the platform returned the worst
     // evidence in it, and the Evidence column graded 25 of its own survivors D. The floor is only
     // applied when a share is actually being asked for, so the rest state is unchanged.
-    if (evidDepthOn && minEvid > 0 && (d.n_facts || 0) < SC_EVID_MIN_FACTS) return false;
-    if (_screenerMinFacts > 0 && (d.n_facts || 0) < _screenerMinFacts) return false;
+    if (!_skip(ignoreLeg, 'evid') && evidDepthOn && minEvid > 0 && (d.n_facts || 0) < SC_EVID_MIN_FACTS) return false;
+    if (!_skip(ignoreLeg, 'facts') && _screenerMinFacts > 0 && (d.n_facts || 0) < _screenerMinFacts) return false;
 
     // IOC operator presence filter
-    if (iocCountries !== null && !iocCountries.has(d.country)) return false;
+    if (!_skip(ignoreLeg, 'ioc') && iocCountries !== null && !iocCountries.has(d.country)) return false;
 
     // v660 (T1): the water-depth leg is gone with its control. See the DOM note in
     // #screener-advanced-details. DEPTH_PROFILE named 40 of 185 countries, so each of its three
@@ -37291,7 +37357,7 @@ function runScreener() {
     // v969 (T1): skippable, so the region control's own option counts can be MEASURED against
     // this predicate with only the region leg lifted, rather than re-implemented beside it.
     // Same mechanism v706 established for the two NPV floors.
-    if (ignoreLeg !== 'region' && scRegion && !_regionMatch(d.region, scRegion)) return false;
+    if (!_skip(ignoreLeg, 'region') && scRegion && !_regionMatch(d.region, scRegion)) return false;
     return true;
   };
   let data = COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn));
@@ -38170,22 +38236,25 @@ function runScreener() {
   if (_scTblEl) _scTblEl.classList.toggle('sc-empty', data.length === 0);
   if (data.length === 0) {
     // v474: Diagnose which filter is most likely causing zero results — helps analyst know what to relax
+    // v1018 (T1): each hint now carries the predicate key of the leg it describes, so the panel
+    // can MEASURE that leg instead of listing it. See the leave-one-out pass below.
     var _diagHints = [];
+    var _diagPush = function (k, h) { _diagHints.push({ k: k, h: h }); };
     var _diagTake = +document.getElementById('sl-take').value;
     var _diagNPV50 = +document.getElementById('sl-npv50').value;
     var _diagNPV = +document.getElementById('sl-npv').value;
     var _totalMechs = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
     var _checkedMechsCount = document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked').length;
-    if (_diagNPV50 > -500) _diagHints.push('Min NPV @$50 &ge;$' + _diagNPV50 + 'M — only ' + COUNTRY_DATA.filter(function(x){return x.npv_50!=null&&x.npv_50>=_diagNPV50;}).length + ' of ' + COUNTRY_DATA.length + ' countries clear this downside floor');
-    if (!includeFloor) _diagHints.push('Measured take only \u2014 that removes the ' + _scFloorCount() + ' of ' + COUNTRY_DATA.length + ' countries whose take is royalty and income tax alone on under ' + SC_EVID_MIN_FACTS + ' facts');
-    if (!includeProxy) _diagHints.push('Verified field production only — that is ' + COUNTRY_DATA.filter(function(x){return _dqTier(x).hasProduction;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
-    if (_diagTake < 60) _diagHints.push('Max take &le;' + _diagTake + '% — few countries qualify at this threshold');
-    if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagHints.push('Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
-    if (minEvid > 0) _diagHints.push('Min primary-source evidence &ge;' + minEvid + '% (tier A)'
+    if (_diagNPV50 > -500) _diagPush('npv50', 'Min NPV @$50 &ge;$' + _diagNPV50 + 'M — only ' + COUNTRY_DATA.filter(function(x){return x.npv_50!=null&&x.npv_50>=_diagNPV50;}).length + ' of ' + COUNTRY_DATA.length + ' countries clear this downside floor');
+    if (!includeFloor) _diagPush('floor', 'Measured take only \u2014 that removes the ' + _scFloorCount() + ' of ' + COUNTRY_DATA.length + ' countries whose take is royalty and income tax alone on under ' + SC_EVID_MIN_FACTS + ' facts');
+    if (!includeProxy) _diagPush('proxy', 'Verified field production only — that is ' + COUNTRY_DATA.filter(function(x){return _dqTier(x).hasProduction;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    if (_diagTake < 100) _diagPush('take', 'Max take &le;' + _diagTake + '% on the comparable basis');
+    if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagPush('mech', 'Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
+    if (minEvid > 0) _diagPush('evid', 'Min primary-source evidence &ge;' + minEvid + '% (tier A)'
       + (evidDepthOn ? ' on &ge;' + SC_EVID_MIN_FACTS + ' facts' : '')
       + ' — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (!evidDepthOn || (x.n_facts||0)>=SC_EVID_MIN_FACTS);}).length + ' of ' + COUNTRY_DATA.length + ' countries clear that'
       + (evidDepthOn ? ' (' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (x.n_facts||0)<SC_EVID_MIN_FACTS;}).length + ' more hold the share on a record thinner than ' + SC_EVID_MIN_FACTS + ' facts)' : ''));
-    if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    if (_screenerMinFacts > 0) _diagPush('facts', 'At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     // v896 (T1): counted through the shared predicate so the hint agrees with the screen, and
     // it now names the deck the screen actually discriminates at. The retention denominator
     // grows with the price deck, so this floor tightens as the deck rises -- 24 countries clear
@@ -38198,7 +38267,7 @@ function runScreener() {
       var _dByDeck = ['75','100','125'].map(function(k){
         return '$' + k + ': ' + COUNTRY_DATA.filter(function(x){return _scRetentionPasses(x,k,_screenerMinRetention);}).length;
       }).join(' \u00b7 ');
-      _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $' + _dRef
+      _diagPush('retention', 'Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $' + _dRef
         + ' NPV at $50/bbl \u2014 that is ' + _dPass + ' of ' + COUNTRY_DATA.length + ' countries before any other filter'
         + (_dInv > 0 ? ', after excluding ' + _dInv + ' whose ratio is inverted (no lower at $50 than at $' + _dRef + ', so nothing for a price break to erode)' : '')
         + '. This floor tightens as the price deck rises, because the denominator is that deck\u2019s NPV \u2014 countries clearing it by deck: ' + _dByDeck
@@ -38206,8 +38275,19 @@ function runScreener() {
         + 'style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);color:var(--accent);border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;min-height:24px;" '
         + 'title="Re-run this same screen at the $75/bbl deck, where the retention floor is measured against a smaller denominator. Every other filter is left exactly as it is.">Re-run at $75</button>');
     }
-    if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
-    if (reformSet) _diagHints.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
+    // v1018 (T1): `_diagNPV` was read at the top of this block and then never used -- the $75
+    // contractor-NPV floor, one of the four sliders on the front of the panel, was the only one
+    // that could empty the screen without the panel ever naming it. Same for the operator filter
+    // and the R-factor requirement, both of which a preset can set.
+    if (_diagNPV > -500) _diagPush('npv75', 'Min Contractor NPV &ge;$' + _diagNPV + 'M at $' + price + '/bbl \u2014 only '
+      + COUNTRY_DATA.filter(function(x){return x[npvKey]!=null&&x[npvKey]>=_diagNPV;}).length + ' of ' + COUNTRY_DATA.length + ' countries clear that floor');
+    if (checkedIOCs.length > 0) _diagPush('ioc', 'Operator presence: ' + checkedIOCs.join(', ') + ' \u2014 that is '
+      + (iocCountries ? iocCountries.size : 0) + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    if (_screenerRfactorOnly) _diagPush('rfactor', 'R-factor PSC tiers required \u2014 that is '
+      + COUNTRY_DATA.filter(function(x){return x.has_r_factor_tiers;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    if (_screenerCountrySet) _diagPush('countryset', 'Named country list: ' + _screenerCountrySet.join(', '));
+    if (scRegionActive) _diagPush('region', 'Region filter: ' + scRegionActive + ' only');
+    if (reformSet) _diagPush('reform', 'Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
       + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
       + _scReformScoredCount() + ' jurisdictions');
     // v802 (T1): the empty mechanic set leads the list, because it is decisive on its own --
@@ -38217,11 +38297,106 @@ function runScreener() {
     // The restore is inline rather than a pointer back to the collapsed Advanced Filters panel:
     // the group that caused this is inside a <details> the analyst may never have opened, and
     // Reset All below would also discard the take, NPV and evidence settings they do want.
-    if (_checkedMechsCount === 0) _diagHints.unshift('No fiscal mechanic is selected \u2014 all ' + _totalMechs
-      + ' boxes under Advanced Filters are unticked, and a country has to match at least one to pass. '
-      + '<button onclick="_scAllMechanics()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);color:var(--accent);border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;min-height:24px;" '
-      + 'title="Re-tick all ' + _totalMechs + ' fiscal mechanics and re-run. Every other filter on this panel is left exactly as it is.">Select all ' + _totalMechs + ' mechanics</button>');
-    var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:min(420px,100%);margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
+    if (_checkedMechsCount === 0) _diagPush('mech', 'No fiscal mechanic is selected \u2014 all ' + _totalMechs
+      + ' boxes under Advanced Filters are unticked, and a country has to match at least one to pass.');
+    // ── v1018 (T1) — LEAVE-ONE-OUT: measure which filter is blocking, do not list them all ──────
+    // Until now this panel pushed one bullet per active filter, in the source order of the
+    // if-blocks above, each reporting how many countries that filter passes ON ITS OWN. On a
+    // real empty screen (IOC Capital Screen + take ≤40% + region Africa) that put
+    // "Min NPV @$50 ≥$0M — only 183 of 185 clear this downside floor" at the TOP, where it
+    // removes two countries out of 185 and is the least binding thing on the board, and left
+    // "Region filter: Africa only" at the BOTTOM carrying no number at all, where it was the
+    // constraint that took the set from eight countries to none. The analyst was handed a
+    // ranked-looking list whose order was arbitrary and whose numbers answered a question they
+    // had not asked, and whose only button — Reset All Filters — discards the entire screen.
+    //
+    // Each bullet now reports the one number that decides what to do next: how many countries
+    // come back if THAT filter alone is lifted and every other one is left exactly as it is.
+    // Measured by re-running _scPass() with that leg skipped, so it cannot drift from the screen.
+    // Sorted by it, so the filter to relax is the first line. And each one carries the button
+    // that lifts it, so acting on the answer costs one click instead of rebuilding the screen.
+    (function () {
+      if (!_diagHints.length) return;
+      var _looCache = {};
+      var _loo = function (k) {
+        if (!_looCache.hasOwnProperty(k)) _looCache[k] = COUNTRY_DATA.filter(function (d) { return _scPass(d, feeCmpOn, k); }).length;
+        return _looCache[k];
+      };
+      _diagHints.forEach(function (e) { e.n = _loo(e.k); });
+      // A filter that rejects no country cannot be why the screen is empty, and listing it is
+      // the same fault this rewrite exists to remove. Measured, not assumed: lift EVERY leg to
+      // get the universe the predicate can reach at all (rows with a null take are not a
+      // filter decision and stay out of it), then lift every leg EXCEPT this one. The
+      // difference is what this filter costs on its own. A $0M NPV floor that 185 of 185 rows
+      // clear scores zero here and is dropped off the panel.
+      var _allLegs = Object.keys(_SC_LEG_RELAX);
+      var _univ = COUNTRY_DATA.filter(function (d) { return _scPass(d, feeCmpOn, _allLegs); }).length;
+      _diagHints.forEach(function (e) {
+        var _others = _allLegs.filter(function (k) { return k !== e.k; });
+        e.solo = _univ - COUNTRY_DATA.filter(function (d) { return _scPass(d, feeCmpOn, _others); }).length;
+      });
+      var _live = _diagHints.filter(function (e) { return e.solo > 0; });
+      if (_live.length) _diagHints = _live;
+      // Primary sort: what comes back if this one is lifted — the number that decides the next
+      // click. Tie-broken by what the filter costs on its own, so an over-constrained screen
+      // where every lift returns 0 still leads with the heaviest constraint rather than with
+      // whichever if-block happened to run first.
+      _diagHints.sort(function (a, b) { return (b.n - a.n) || (b.solo - a.solo); });
+    })();
+    var _looTop = _diagHints.length ? _diagHints[0].n : 0;
+    // Every single lift still returns nothing: the screen is over-constrained in at least two
+    // places, and saying "relax this one" about any of them would be false. Find the cheapest
+    // PAIR through the same predicate and name it. Small search — at most a few dozen active
+    // legs squared — and only ever reached on a screen that is already showing zero rows.
+    var _diagPair = null;
+    if (_looTop === 0 && _diagHints.length > 1) {
+      for (var _i = 0; _i < _diagHints.length; _i++) {
+        for (var _j = _i + 1; _j < _diagHints.length; _j++) {
+          if (_diagHints[_i].k === _diagHints[_j].k) continue;
+          var _pn = COUNTRY_DATA.filter(function (d) { return _scPass(d, feeCmpOn, [_diagHints[_i].k, _diagHints[_j].k]); }).length;
+          if (_pn > 0 && (!_diagPair || _pn > _diagPair.n)) _diagPair = { a: _diagHints[_i], b: _diagHints[_j], n: _pn };
+        }
+      }
+    }
+    // The button renders whether or not lifting this leg alone returns anything. On an
+    // over-constrained screen every count is 0 and suppressing the buttons would leave the
+    // analyst with a diagnosis and no way to act on it; the count is simply omitted there.
+    var _relaxBtn = function (k, n) {
+      var meta = _SC_LEG_RELAX[k];
+      if (!meta) return '';
+      return ' <button onclick="_scRelaxLeg(\'' + k + '\')" '
+        + 'style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);color:var(--accent);border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;min-height:24px;line-height:1.5;" '
+        + 'title="' + meta.btn + ' and re-run. Every other filter on this panel is left exactly as it is — this is not Reset All.">'
+        + meta.btn + (n > 0 ? ' → ' + n : '') + '</button>';
+    };
+    var _looWord = function (n) {
+      return n === 0 ? '<span style="color:var(--muted);">still 0 on its own</span>'
+        : '<strong style="color:var(--text);">' + n + ' countr' + (n === 1 ? 'y' : 'ies') + ' come' + (n === 1 ? 's' : '') + ' back</strong> if only this is lifted';
+    };
+    var _diagStr = _diagHints.length > 0
+      ? '<div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:left;max-width:min(520px,100%);margin-left:auto;margin-right:auto;">'
+        + '<strong style="color:var(--text);">' + (_looTop > 0
+            ? 'Relax one of these — the number is what comes back if you lift that filter and nothing else:'
+            : 'No single filter is responsible. Lifting any one of these on its own still returns nothing:')
+          + '</strong>'
+        + '<ul style="margin:6px 0 0 16px;padding:0;">'
+        + _diagHints.map(function (e) {
+            return '<li style="margin-bottom:5px;">' + _looWord(e.n) + ' — ' + e.h + _relaxBtn(e.k, e.n) + '</li>';
+          }).join('')
+        + '</ul>'
+        + (_diagPair
+            ? '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">Two will. The pair that returns the most is <strong style="color:var(--text);">'
+              + (_SC_LEG_RELAX[_diagPair.a.k] ? _SC_LEG_RELAX[_diagPair.a.k].btn.toLowerCase() : _diagPair.a.k)
+              + '</strong> together with <strong style="color:var(--text);">'
+              + (_SC_LEG_RELAX[_diagPair.b.k] ? _SC_LEG_RELAX[_diagPair.b.k].btn.toLowerCase() : _diagPair.b.k)
+              + '</strong> — ' + _diagPair.n + ' countr' + (_diagPair.n === 1 ? 'y' : 'ies') + '. Lift them in either order:'
+              + _relaxBtn(_diagPair.a.k, 0) + _relaxBtn(_diagPair.b.k, 0)
+              + '</div>'
+            : (_looTop === 0
+                ? '<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">No pair of these returns anything either — this screen needs rebuilding rather than loosening.</div>'
+                : ''))
+        + '</div>'
+      : '';
     // v802 (T1): the panel has to fit the phone, and it did not.
     // This <td> is colspan=12 inside the horizontally-scrolling .tbl-wrap. The 12 <th> cells hold
     // the table open at 881px whether or not it has any rows, so `text-align:center` centred the
@@ -38240,9 +38415,13 @@ function runScreener() {
       // mechanic filters". The IRR slider was deleted at v517 so the first clause pointed at a
       // control that does not exist, and the third is the exact wrong instruction in the state
       // this panel most often reaches -- unticking MORE mechanics can only make it worse.
-      + (_checkedMechsCount === 0
-          ? 'Nothing can pass while the mechanic list is empty \u2014 start with the button below.'
-          : 'Try relaxing your criteria \u2014 raise the government take ceiling, lower the NPV floors, or re-tick a fiscal mechanic.')
+      // v1018 (T1): was a fixed sentence naming three controls ("raise the take ceiling, lower
+      // the NPV floors, or re-tick a fiscal mechanic") regardless of which of them were even
+      // set. The list below names the filter that is actually blocking, measured; this line
+      // no longer guesses ahead of it.
+      + (_diagHints.length
+          ? 'Every filter you set is listed below, ordered by how much each one is costing you.'
+          : 'Try relaxing your criteria \u2014 raise the government take ceiling or lower the NPV floors.')
       + _diagStr
       + '<br><button onclick="resetScreenerAll()" style="margin-top:12px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset All Filters</button>'
       + '</div></td></tr>';
@@ -72839,6 +73018,53 @@ async function renderBreakevenMap() {
       _upd('be-chip-rest', '\u00b7 Requires complete royalty + cost data \u00b7 The other '
         + (_nAll - _nHave) + ' carry no modelled cost structure');
       _upd('be-thr-denom', 'of ' + _nHave + ' countries with a modelled breakeven');
+
+      // ── v1018 (T1) — "which countries should even be on my screening list?" ──────────────
+      // v579 derived the colour bands from the data so the legend would describe the map that is
+      // actually drawn. #be-price-marker never got that treatment. It was still min=30 max=120
+      // step=5, typed against the retired $40–$85 colour scale, while the bands below it had long
+      // since re-fitted to a $27–$30 spread. Measured cold at 1440, all nineteen reachable
+      // positions:
+      //     $30            -> 54 viable / 13 need above, 11 countries outlined on the map
+      //     $35 … $120     -> 67 / 0, nothing outlined — EIGHTEEN identical positions
+      // So the control the Home card advertises as this tab's whole purpose ("Drag a price slider
+      // to see which countries break even") was inert across 95% of its travel, and the band that
+      // holds 54 of the 67 modelled breakevens — everything under $30 — could not be reached at
+      // all, because min sat ABOVE it. The analyst drags the full width of the track, watches not
+      // one counter and not one outline move, and concludes either that the map is broken or that
+      // every country on earth clears any price they care about. Both readings are wrong and both
+      // are the control's fault.
+      // The range is now computed from the distribution it marks, exactly as the bands are: one
+      // dollar per step across [floor(lo)−1, ceil(hi)+1], opening on the median so the cold view
+      // is already a split instead of a vacuous 67/0. Reach above the top breakeven is not lost
+      // information — #be-hdr-coverage states the full span in a computed sentence, which is a
+      // place a constant cannot silently drift away from. Colours, counts, the CSV and the map
+      // geometry are untouched; what changes is that every position of the slider now moves them.
+      var _mk = document.getElementById('be-price-marker');
+      if (_mk) {
+        var _mLo = Math.max(1, Math.floor(_beHave[0]) - 1);
+        var _mHi = Math.ceil(_beHave[_nHave - 1]) + 1;
+        if (_mHi - _mLo >= 2) {
+          var _mMed = Math.round(_beHave[Math.floor(_nHave / 2)]);
+          if (_mMed < _mLo) _mMed = _mLo;
+          if (_mMed > _mHi) _mMed = _mHi;
+          _mk.min = String(_mLo);
+          _mk.max = String(_mHi);
+          _mk.step = '1';
+          _mk.value = String(_mMed);
+          _mk.setAttribute('aria-label', 'Oil price threshold marker for the breakeven map, in dollars '
+            + 'per barrel. Range $' + _mLo + ' to $' + _mHi + ', the span of every modelled breakeven. '
+            + 'Arrow keys adjust by $1.');
+          _mk.setAttribute('title', 'Drag or use ← → to adjust in $1 steps. Countries at or below '
+            + 'the marker are viable at that price. The track spans the ' + _nHave + ' modelled breakevens '
+            + '($' + _rLo + '–$' + _rHi + '), so every position changes the count — at any price '
+            + 'above $' + _rHi + ' all ' + _nHave + ' of them clear.');
+          _upd('be-price-label', '$' + _mMed);
+          _upd('be-threshold-price-below', '$' + _mMed);
+          _upd('be-threshold-price-above', '$' + _mMed);
+          window._beMarkerInit = _mMed;
+        }
+      }
     }
   })();
 
@@ -73195,7 +73421,9 @@ async function renderBreakevenMap() {
       document.getElementById('be-threshold-price-above').textContent = '$' + price;
     }
   }
-  updateBEThresholdSummary(75);
+  // v1018 (T1): read the marker the computed-range block above actually left on screen.
+  // This was the constant 75, which disagreed with the slider the moment the range re-fitted.
+  updateBEThresholdSummary(parseInt((priceSlider && priceSlider.value) || window._beMarkerInit || 30, 10));
 
   priceSlider?.addEventListener('input', function() {
     document.getElementById('be-price-label').textContent = '$' + this.value;
