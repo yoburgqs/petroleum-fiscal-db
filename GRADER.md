@@ -68723,3 +68723,110 @@ real**. Recording this so no future cycle spends itself on them:
 **Task:** T1 — "Which countries should even be on my screening list?"
 
 **Friction.** Walked T1 cold: Screener → the block under its "TAKE IS A FLOOR, NOT A MEASUREMENT" divider (45 countries) → click into a profile. The Screener is careful with that set — `≥` on take, `≤` on NPV, grouped below its own divider, labelled "not defensible as a screening shortlist on their own." The Country Profile verdict box those rows link into dropped every qualifier
+
+---
+## Cycle 949 — v1012 (T3): Side-by-Side hid the bigger of the two comparisons a mixed-basis set supports
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Rotation: 940 was T1, 939 T5,
+938 T6; T3 was stalest. Walked cold at 1440x900 and at 390x844 `hasTouch`, both storages cleared and
+the page reloaded before each pass.
+
+### What the walk cleared before it found anything
+
+Most of T3 is finished-grade and was left alone. Measured live, not assumed:
+
+| path | result |
+|---|---|
+| cold load of the tab | seeded UK/Norway/Nigeria example, labelled as an example, clears itself on first search |
+| fuzzy country search | `UAE` disambiguates to 3 entries; `Ivory Coast` → "Showing results for cote d'ivoire"; `Congo` offers both Congos; `Kazakstan` → "Did you mean? Kazakhstan" |
+| Share Link round-trip | `#/compare/oman+malaysia+guyana@100~take_desc` reopens in a **fresh context** on the right tab, right three columns, rank price `$100` and order `take_desc` both restored |
+| mobile 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth`; **zero** controls under 24px on the whole tab |
+| page errors | 0 across every probe |
+
+### Friction (the one worst moment)
+
+Built a five-column set an analyst plausibly builds — **Kazakhstan, Oman, Guyana, UAE,
+Cote d'Ivoire**. v626's data-basis gate fires (2 production-weighted against 3 statutory-terms),
+and the strip orders **two** of the five, printing *"Set aside — 3 of 5 columns cannot join that
+ordering"*.
+
+Those three statutory columns order perfectly well against each other — **Guyana 54.1% › Cote
+d'Ivoire 56.6% › UAE 74.6%**, confirmed by loading them alone. And `sbsKeepBasis()`, written at
+**v845** for exactly this purpose, already delivers that set in one click.
+
+It was never offered. The v845 guard read:
+
+```js
+if (!_cmpBasisGate || _vdRanked.length >= 2) return '';
+```
+
+— treating the existence of *any* ordering as "not stuck". So the rescue fired only in the
+degenerate `NOTHING RANKS HERE` case (one ranked column). The far commoner partial case — where
+the **majority** of the analyst's columns are excluded and a **larger** ordering is sitting in the
+same set — got three paragraphs of explanation and no exit. The analyst's move is to *remove*
+columns in order to get *more* comparison, which nobody guesses in a 20-minute screening window.
+They take the 2-column answer into the memo and never learn the 3-column one exists.
+
+### Change
+
+- Guard is now `if (!_cmpBasisGate) return '';`
+- New branch for the ordering-exists case: where the other basis group ranks **strictly more**
+  columns than the strip is currently ordering, the verdict strip prints
+  *"A larger comparison is available in this set: Guyana + Cote d'Ivoire + UAE — 3 statutory-terms
+  columns that rank against each other, against the 2 ordered above. The ordering on screen is
+  correct; it is just the smaller of the two this set supports."* with the existing
+  **`Compare the 3 statutory-terms columns →`** button beside it.
+- `_grp()` now returns `rankNames`, so the sentence names the columns that actually rank rather
+  than the whole basis group. `_btn` and `_wrap` hoisted above both branches; the v845 text and
+  the `!_ok.length` "neither side reaches two" text are byte-unchanged.
+- Deliberately silent where switching sides buys nothing.
+
+### Result
+
+From a mixed-basis set the analyst reaches the largest ordering their own column selection
+supports in one click, instead of reading three notices about what cannot be done and leaving with
+the smaller answer.
+
+### Verification (all run this cycle, nothing assumed)
+
+| probe | expected | got |
+|---|---|---|
+| `kazakhstan+oman+guyana+uae+cote-divoire` (2 prod / 3 stat) | offer | **"A larger comparison…" + button** |
+| same set, different add order | offer, same content | same |
+| `kazakhstan+oman+guyana+uae` (2 / 2) | silent | silent |
+| `norway+united-kingdom+guyana` (2 prod / 1 stat) | silent | silent |
+| `kazakhstan+guyana+uae+cote-divoire` (1 / 3) | v845 path unchanged | `NOTHING RANKS HERE` + v845 wording |
+| `norway+united-kingdom+netherlands` (all prod, gate off) | silent | silent |
+| `guyana+uae+cote-divoire` (all stat, gate off) | silent | silent |
+| click-through | set replaced, hash rewritten, offer retracted | `3/5 countries`, `#/compare/guyana+cote_divoire+uae`, all three ordered, offer gone |
+| mobile 390x844 `hasTouch` | no sideways scroll, button ≥ 24px | `scrollWidth` 390 = `clientWidth`, button **26px**, zero sub-24px controls |
+| JS syntax gate | PASS | **PASS (11 blocks)** |
+| Playwright runtime suite | ran, green | **542 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
+
+- Test before: 542 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 542 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Version badge bumped v1011 → v1012 silently at the end, one occurrence.
+
+### Notes for the next cycle
+
+- **Serve the parent directory, not the repo, when testing locally.** `index.html:49` registers the
+  service worker at the absolute path `/petroleum-fiscal-db/sw.js`. Served as
+  `http://localhost:PORT/index.html` that 404s fifteen times and flips `[ConsoleErrors]` from PASS
+  to WARN — **541 PASS / 1 WARN / 15 "JS errors"** that look like a regression and are not. Serving
+  `~` and loading `http://localhost:PORT/petroleum-fiscal-db/` gives the real 542/0/0. The first run
+  this cycle hit it.
+- `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` are still untracked probe debris in the repo
+  root (~29 MB, sixth cycle). `_pre1012.html` was written to `/tmp` instead. Still flagged to Zach
+  rather than deleted — the standing rule is to ask before deleting files the session did not create.
+- The office and canonical copies of `runtime_comprehensive.js` are **still hash-identical**
+  (`50544b42bb1591273264f5421c64b8cc`) — no test change this cycle.
+- Carried forward unchanged: Indonesia's three different government profit-oil shares on one page;
+  `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source; breakeven on only 68 of 185; Somalia
+  the one true T4 dead end; `Paraguay Decree 19.080/1997` typed `government_filing`; the Screener
+  count line's `block· Deepwater` join fault; the Home card at ~3077 saying Side-by-Side compares
+  "up to 4 countries" against `CMP_MAX` = 5; `_posClause648` number agreement; Côte d'Ivoire's two
+  missing API slugs; `window._screenerExportBasis` not naming the 105 withheld countries;
+  `summary "Reading this table"` at 18px; Side-by-Side's two byte-identical export buttons.
+- Noticed but not acted on: `norway+united-kingdom+netherlands` (the tab's own North Sea Trio
+  preset, all production-weighted, gate off) orders only **UK › Norway** — Netherlands is dropped
+  from the take ordering for a non-basis reason. Worth a walk; not this cycle's worst moment.
