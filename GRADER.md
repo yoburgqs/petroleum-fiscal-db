@@ -69931,3 +69931,16 @@ a $1.2B/$15 project that produced none of the numbers on the page.
   remain untracked in the repo root (~29 MB). This cycle's probes went to `/tmp/c960/`. Still
   flagged rather than deleted — standing rule is to ask before deleting files the session did
   not create.
+
+---
+## Cycle 962 Log — 2026-10-01 12:42
+- Test before: 543 PASS / 0 FAIL
+- Test after: 543 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 960 complete and pushed (v1021).
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" Stalest in rotation (959 T2, 957 T3, 955 T1, 954 T5, 952 T4, 951 T6). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared.
+
+## Friction
+Methodology → **Data Coverage At a Glance** (`#meth-coverage-summary`, `_methPaintCoverage()` at `index.html:53085`) — the panel whose own first line says its job is *"What data is available for each country — and what is not"*, a
