@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1015</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1016</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -45048,15 +45048,34 @@ function renderReformTimeline(country) {
   // v450: Sort reforms by year descending (most recent first) for analyst scannability
   const reformsSorted = reforms.slice().sort(function(a,b){ return (b.year||0)-(a.year||0); });
   const REFORM_SHOW_LIMIT = 4; // show latest 4 open; collapse older events
+  // v1016 (T4): was its own two-way test on take_change with no chip where there was none --
+  // see the note above _rrTakeChip() for what that hid on 20 of the 21 covered profiles. Now
+  // the same builder the Reform Risk card's log uses, so every row states which of the three
+  // things it is, plus the 2010 window this timeline has never shown. The Reform Frequency
+  // Score in the card directly above is defined on that window, and until now a pre-2010 entry
+  // and an in-window one read identically here: Libya's four entries (1955, 2004, 2011, 2020)
+  // sat under a score of 100 with nothing saying that two of them predate the window and the
+  // other two changed no terms. Stated per row rather than by regrouping, because v450's
+  // "latest 4 open, older collapsed" ordering is what makes this sidebar section scannable.
   function buildReformEventHtml(r, slug) {
-    const dir = r.take_change && r.take_change.startsWith('+') ? 'hostile' :
-                r.take_change && r.take_change.startsWith('-') ? 'friendly' : 'neutral';
+    const _d = (typeof _rrEventDir === 'function') ? _rrEventDir(r) : 'unmeasured';
+    const dir = (_d === 'hostile' || _d === 'friendly') ? _d : 'neutral';
+    const _chip = (typeof _rrTakeChip === 'function')
+      ? _rrTakeChip(r)
+      : (r.take_change ? `<span class="reform-take reform-${dir}">${r.take_change} take</span>` : '');
+    const _cEsc = (typeof _rrEsc === 'function') ? _rrEsc(country) : country;
+    const _scores = (typeof _rrScores === 'function') ? _rrScores(r) : null;
+    const _pre = (r.year || 0) < 2010;
+    const _mkSty = 'font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;margin-left:6px;';
+    const _win = _scores === null ? '' : (_scores
+      ? `<span class="reform-score-mark" style="${_mkSty}color:var(--orange);" title="Counted in ${_cEsc}&rsquo;s Reform Frequency Score: a sourced fiscal law change dated 2010 or later. The score is 100 &minus; 15 per counted change &mdash; it is a count, and never reads how large the change was.">COUNTS IN SCORE</span>`
+      : `<span class="reform-score-mark" style="${_mkSty}color:var(--muted);" title="${_pre ? 'On the record, but before the 2010 scoring window, so it is not counted in the Reform Frequency Score above and carries no frequency premium.' : 'Inside the 2010 window, but this event changed no fiscal terms, so it is not counted in the Reform Frequency Score above.'}">${_pre ? 'PRE-2010 &middot; NOT SCORED' : 'IN WINDOW &middot; NOT SCORED'}</span>`);
     return `<div class="reform-event reform-${dir}">
       <div class="reform-year">${r.year}</div>
       <div class="reform-body">
         <div class="reform-event-name">${r.event}</div>
         ${r.mechanic_to ? `<span class="reform-mechanic">${r.mechanic_to}</span>` : ''}
-        ${r.take_change ? `<span class="reform-take reform-${dir}">${r.take_change} take</span>` : ''}
+        ${_chip}${_win}
         <div class="reform-notes">${r.notes}</div>
         <div id="reform-src-${slug}-${r.year}"></div>
       </div>
@@ -45113,7 +45132,7 @@ function renderReformTimeline(country) {
   const olderReforms = reformsSorted.slice(REFORM_SHOW_LIMIT);
   visibleReforms.forEach(r => { html += buildReformEventHtml(r, rfSlug); });
   if (olderReforms.length) {
-    html += `<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;list-style:none;user-select:none;">▸ Show ${olderReforms.length} older reform${olderReforms.length!==1?'s':''}</summary><div class="reform-timeline" style="margin-top:8px;">`;
+    html += `<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;list-style:none;user-select:none;">▸ Show ${olderReforms.length} older sourced event${olderReforms.length!==1?'s':''}</summary><div class="reform-timeline" style="margin-top:8px;">`;
     olderReforms.forEach(r => { html += buildReformEventHtml(r, rfSlug); });
     html += '</div></details>';
   }
@@ -53077,6 +53096,41 @@ function _rrVerdictHead(title, mb) {
 // against the rupture in the event log" -- pointed at evidence the page did not carry.
 // The log now renders inside the verdict card, split at the 2010 boundary the score is defined
 // on, because that split is the thing three of the four verdict types turn on.
+// ── v1016 (T4): one chip builder for both reform timelines ───────────────────────────────
+// This was tag(), local to _rrEventLogHtml(), which renders the Reform Risk card's event log.
+// The Country Profile has a SECOND timeline, under its own "Fiscal Reform History" heading,
+// built by buildReformEventHtml() -- and that one still ran the two-way test v585 replaced
+// here: take_change starts '+' -> hostile, '-' -> friendly, and NO CHIP AT ALL otherwise.
+// 46 of the 83 sourced events carry no take_change, so on 20 of the 21 covered profiles those
+// rows rendered with nothing in the take slot. The 46 are two different findings that are
+// indistinguishable without it:
+//   35 are sourced FISCAL LAW CHANGES whose take effect ORCA never quantified -- Nigeria's 2021
+//      Petroleum Industry Act, Mexico's 1938 PEMEX nationalisation, Norway's 1972 Petroleum Tax
+//      Act. Nigeria printed 5 of its 6 events this way, Mexico 3 of 3, Kazakhstan 4 of 5.
+//   11 CHANGED NO FISCAL TERMS and score nothing -- a discovery, a first-oil date, armed
+//      conflict, a blockade lifted, a terms review that concluded without renegotiation.
+//      Ghana and Guyana are 3 of 3 context, so their whole "Fiscal Reform History" was
+//      non-reforms presented as reform history, unmarked. ORCA holds zero fiscal law changes
+//      for Guyana at any date and the verdict card directly above the timeline says exactly
+//      that (score 100/100, "Since 2010: 0 law changes"); the timeline below it listed three
+//      dated entries and left the analyst to reconcile the two.
+// Shared rather than copied, so the card and the profile cannot fork again.
+function _rrTakeChip(e) {
+  var d = (typeof _rrEventDir === 'function') ? _rrEventDir(e) : 'unmeasured';
+  if (d === 'hostile' || d === 'friendly') {
+    return '<span class="reform-take reform-' + d + '">' + _rrEsc(e.take_change) + ' take</span>';
+  }
+  if (d === 'unmeasured') {
+    return '<span class="reform-take" style="background:rgba(176,104,0,.12);color:var(--orange);" '
+      + 'title="A sourced fiscal law change whose take impact ORCA has not quantified. Direction unknown \u2014 not neutral, and not zero.">'
+      + 'fiscal change \u00b7 take move not quantified</span>';
+  }
+  return '<span class="reform-take" style="background:var(--surface2);color:var(--muted);" '
+    + 'title="Sourced event that changed no fiscal terms. It stays in the log but does not score.">'
+    + _rrEsc(String(e.context_kind || 'no change to fiscal terms')) + '</span>';
+}
+window._rrTakeChip = _rrTakeChip;
+
 function _rrEventLogHtml(c, events) {
   if (!events || !events.length) return '';
   var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -53084,25 +53138,16 @@ function _rrEventLogHtml(c, events) {
   var inWin = sorted.filter(function(e) { return (e.year || 0) >= 2010; });
   var preWin = sorted.filter(function(e) { return (e.year || 0) < 2010; });
 
-  function tag(e) {
-    var d = _rrEventDir(e);
-    if (d === 'hostile' || d === 'friendly') {
-      return '<span class="reform-take reform-' + d + '">' + _rrEsc(e.take_change) + ' take</span>';
-    }
-    if (d === 'unmeasured') {
-      return '<span class="reform-take" style="background:rgba(176,104,0,.12);color:var(--orange);" '
-        + 'title="A sourced fiscal law change whose take impact ORCA has not quantified. Direction unknown — not neutral, and not zero.">'
-        + 'fiscal change · take move not quantified</span>';
-    }
-    return '<span class="reform-take" style="background:var(--surface2);color:var(--muted);" '
-      + 'title="Sourced event that changed no fiscal terms. It stays in the log but does not score.">'
-      + _rrEsc(String(e.context_kind || 'no change to fiscal terms')) + '</span>';
-  }
+  var tag = _rrTakeChip;
 
   function row(e) {
     var d = _rrEventDir(e);
     var cls = (d === 'hostile' || d === 'friendly') ? ' reform-' + d : '';
-    return '<div class="reform-event' + cls + '">'
+    // v1016 (T4): the per-event scoring verdict, stamped on the row from _rrScores() so the
+    // clipboard can read it instead of re-deriving it from the group header. See the note above
+    // the event sweep in _rrVerdictPayload() for what that re-derivation got wrong.
+    return '<div class="reform-event' + cls + '" data-rr-scores="' + (_rrScores(e) ? '1' : '0')
+      + '" data-rr-ctx="' + (((e.year || 0) >= 2010 && !_rrIsFiscalChange(e)) ? '1' : '0') + '">'
       + '<div class="reform-year">' + _rrEsc(e.year) + '</div>'
       + '<div class="reform-body">'
       + '<div class="reform-event-name">' + _rrEsc(e.event) + '</div>'
@@ -53680,11 +53725,54 @@ function _rrVerdictPayload() {
   // The event log, carrying the 2010 split as a column. The split is what the score is defined
   // on and what three of the four verdict types turn on, so a paste that flattened it would
   // let an analyst rebuild the wrong count offline -- the same defect v583 fixed in the CSV.
+  //
+  // ── v1016 (T4): it flattened it. The column is headed "Counts in Reform Frequency Score"
+  // and the value was read off the GROUP HEADER -- one of two strings for a whole timeline --
+  // so every event dated 2010 or later was stamped "Yes", including the ones the score
+  // deliberately does not count. _rrScores() is `year >= 2010 AND fiscal_change !== false`;
+  // this test was the first half only. The platform states the other half everywhere else:
+  // discoveries, first-oil dates, armed conflict and a terms review that concluded without
+  // renegotiation stay in the log and do NOT score. The screen says so twice on this very card
+  // -- in the group sub-header ("0 fiscal law changes scored, 3 context events not scored") and
+  // in each row's own grey chip -- and the comment above _rrFiledUnderBlock() has named this
+  // exact stamp as false since v945 without the stamp being fixed.
+  //
+  // Measured against the shipped reform_history.json: 9 rows across 5 of the 21 covered
+  // jurisdictions were mis-stamped, and on three of them EVERY in-window row was, because
+  // their window holds no scoring change at all:
+  //   Guyana   3 of 3 rows stamped Yes · score 100 · rebuilt offline from the paste: 100-15x3 = 55
+  //   Ghana    2 of 2 rows stamped Yes · score 100 · rebuilt: 70
+  //   Libya    2 of 2 rows stamped Yes · score 100 · rebuilt: 70
+  //   Australia 1 of 3, Iraq 1 of 2
+  // Guyana is the costly one. Its verdict class is NO LAW CHANGE -- zero fiscal law changes on
+  // record at any date -- and three counted changes is exactly this tab's own stated bar
+  // ("3 or more law changes since 2010 -> add 3-5pp WACC premium"). So the pasted table
+  // manufactured a discount-rate premium the platform explicitly withholds, on the one
+  // frontier play an IC is most likely to be screening, inside the committee document.
+  //
+  // Fixed at the source rather than by a second copy of the rule: row() now stamps each
+  // .reform-event with _rrScores(), and this sweep reads that stamp. The group-header test is
+  // kept only as a fallback for a timeline rendered without the attribute, so nothing that
+  // reuses .reform-timeline loses its column.
   var events = [];
+  var nScored = 0;
   [].slice.call(root.querySelectorAll('.reform-timeline')).forEach(function (tl) {
     var h = tl.previousElementSibling;
-    var scored = /before the window/i.test(tx(h)) ? 'No — pre-2010, not counted in the score' : 'Yes — in the 2010 scoring window';
+    var groupPre = /before the window/i.test(tx(h));
     [].slice.call(tl.querySelectorAll('.reform-event')).forEach(function (ev) {
+      var mark = ev.getAttribute('data-rr-scores');
+      var scored;
+      if (mark === '1') {
+        scored = 'Yes — fiscal law change inside the 2010 scoring window';
+        nScored++;
+      } else if (mark === '0') {
+        scored = (ev.getAttribute('data-rr-ctx') === '1')
+          ? 'No — inside the window, but this event changed no fiscal terms, so it does not score'
+          : 'No — pre-2010, not counted in the score';
+      } else {
+        scored = groupPre ? 'No — pre-2010, not counted in the score' : 'Yes — in the 2010 scoring window';
+        if (!groupPre) nScored++;
+      }
       events.push([
         tx(ev.querySelector('.reform-year')),
         tx(ev.querySelector('.reform-event-name')),
@@ -53697,7 +53785,7 @@ function _rrVerdictPayload() {
     });
   });
 
-  return { title: title, prose: prose, metrics: metrics, events: events };
+  return { title: title, prose: prose, metrics: metrics, events: events, nScored: nScored };
 }
 
 function copyReformVerdict() {
@@ -53718,8 +53806,15 @@ function copyReformVerdict() {
   if (P.metrics.length) {
     tsv += '\n' + MH.join('\t') + '\n' + P.metrics.map(function (r) { return r.join('\t'); }).join('\n') + '\n';
   }
+  // v1016 (T4): the heading used to print the row count alone, directly above a column that
+  // said "Yes" on rows the score does not count. The count the score is actually defined on,
+  // and the arithmetic, now sit on the heading, so the figure in the tile above cannot be
+  // rebuilt wrongly from the table below it.
+  var _evHead = 'Sourced fiscal-reform events — ' + P.events.length + ' on record · '
+    + P.nScored + ' counted in the Reform Frequency Score (100 − 15 × ' + P.nScored + ' = '
+    + Math.max(0, 100 - 15 * P.nScored) + ')';
   if (P.events.length) {
-    tsv += '\nSourced fiscal-reform events — ' + P.events.length + '\n'
+    tsv += '\n' + _evHead + '\n'
         + EH.join('\t') + '\n' + P.events.map(function (r) { return r.join('\t'); }).join('\n') + '\n';
   }
   tsv += '\n' + stamp;
@@ -53744,7 +53839,7 @@ function copyReformVerdict() {
   if (P.metrics.length) html += tbl(MH, P.metrics);
   if (P.events.length) {
     html += '<p style="font-size:10pt;font-weight:bold;margin:10px 0 4px;">'
-      + _e('Sourced fiscal-reform events — ' + P.events.length) + '</p>' + tbl(EH, P.events);
+      + _e(_evHead) + '</p>' + tbl(EH, P.events);
   }
   html += '<p style="font-size:8pt;color:#555;margin:8px 0 0;">' + _e(stamp) + '</p></div>';
 
