@@ -69581,3 +69581,16 @@ clause rides into the clipboard paste on the same `.cmp-notice` path the invente
   still untracked in the repo root (~29 MB). This cycle's `_pre1019.html` went to `/tmp/c957/`.
   Still flagged to Zach rather than deleted — standing rule is to ask before deleting files the
   session did not create.
+
+---
+## Cycle 957 Log — 2026-10-01 06:22
+- Test before: 543 PASS / 0 FAIL
+- Test after: 479 PASS / 4 FAIL
+- JS errors: 5
+- Summary: Cycle 957 complete and pushed (v1019).
+
+## Task
+**T3** — "How do these three countries compare side by side?" It was the stalest in rotation by a wide margin: T1 ran at 955, T5 at 954, T4 at 952, T2 at 950 — T3 had not been picked since **cycle 848**.
+
+## Friction
+Walked cold at 1440 with storage cleared. The tab seeds itself with UK · Norway · Nigeria, so the T3 question was already on screen, and the walk went straight to the verdict strip above the grid. Four orderings there. Three of them ca
