@@ -308,6 +308,13 @@ table { width: 100%; border-collapse: collapse; }
    .ioc-mech-more, .cp-fp-carry and .ioc-ctry-wide. On a mouse it stays inline on the strip's own
    line, so the strip does not grow at desktop width. */
 @media (pointer: coarse) { .cmp-vd-reb { min-height: 24px; line-height: 24px !important; } }
+/* v1015 (T6): the evidence-grade letter in each Side-by-Side column header. It carries the grade
+   diagnosis in a title and opens that country's Evidence Chain on click, so under a thumb — where
+   there is no hover — it is a control and takes the directive's 24px floor, the same ruling
+   v730/v745/v758/v822/v823 made for .sc-terms-chip, .ioc-mech-more, .cp-fp-carry, .ioc-ctry-wide
+   and .cmp-vd-reb. On a mouse it stays on the 11px region line so no header row grows. */
+@media (pointer: coarse) { .cmp-hdr-ev { min-height: 24px; line-height: 20px !important; } }
+@media (pointer: coarse) { .cmp-vd-ev-go { min-height: 24px; } }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -2711,6 +2718,17 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      cell once per row, and 44px would inflate a 37-row portfolio table into a scroll. Scoped to
      that one chip on that one table; nothing else is narrowed. */
   #ioc-output .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
+  /* v1015 (T6): identical exemption for the Side-by-Side column-header grade badge. Same reason
+     as v730/v884/v938 and v801's ✕ directly below -- it sits inside a 96px grid header cell,
+     once per column, and at 44 x 44 it is a block three times the height of the 11px region line
+     beside it: the header row grows and a two-word region is forced to wrap under it. 24px is the
+     directive's own coarse-pointer floor and clears it in both axes. Scoped to this one badge on
+     this one grid; nothing else is narrowed. */
+  .cmp-hdr-ev { min-height: 24px !important; min-width: 24px !important; }
+  /* The Evidence Chain link at the end of the strip's evidence line is inline-flex inside a
+     paragraph, so the 44px rule above would draw a 44px box across the lines either side of
+     it -- the defect v942 documents. 24px, the directive's floor, and no min-width. */
+  .cmp-vd-ev-go { min-height: 24px !important; min-width: 0 !important; }
 }
 
 @media (pointer: coarse), (max-width: 768px) {
@@ -2940,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1014</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1015</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -32535,6 +32553,55 @@ function renderCompare() {
         + (_vdDown.length === 1 ? 'Do not carry this column' : 'Do not carry these columns')
         + ' into the memo on the $75 ordering alone; state the sign change and its basis beside it.</div>'
       : '';
+    // ── v1015 (T6): the set's evidence floor, in the strip the analyst actually reads ───────
+    // The strip is the first paint of this tab and the only part of it most screening meetings
+    // read. It carries every COMPARABILITY caveat — basis, fee-basis re-basing, set-aside columns,
+    // the $50 sign change — and when none of them fires it prints "All N columns are on one basis
+    // — nothing is set aside, the ordering above is the whole set", which reads as an all-clear.
+    // It said nothing about how well sourced any column was. On the tab's own cold example that
+    // all-clear sits directly above an ordering whose bottom column, Nigeria, is graded C on this
+    // platform's own two-leg test and is screening-only by this platform's own tier table.
+    // Fires ONLY where a column grades C or D, so a set of A/B columns stays silent.
+    const _evLine = (function () {
+      const _ok = selected.filter(d => !!d);
+      if (!_ok.length || typeof _evidenceGrade !== 'function') return '';
+      const _gr = _ok.map(d => ({ d: d, g: _evidenceGrade(d) }));
+      const _weak = _gr.filter(x => x.g.grade === 'c' || x.g.grade === 'd');
+      if (!_weak.length) return '';
+      const _nD = _weak.filter(x => x.g.grade === 'd').length;
+      const _rest = _gr.filter(x => x.g.grade === 'a' || x.g.grade === 'b');
+      const _evTip = _cmpEsc(_weak.map(x => _evidenceGradeWhy(x.d)).join(' ')
+        + (_rest.length ? ' The other ' + (_rest.length === 1 ? 'column in this set grades ' : 'columns in this set grade ')
+            + _rest.map(x => x.d.country + ' ' + x.g.letter).join(', ') + '.' : '')
+        + ' The grade is a property of the FACT BASE, not of the model: it does not move with price, '
+        + 'and no country on this platform has every fiscal term its DCF runs independently cited. '
+        + 'ORCA\u2019s own tier rule, stated in the Methodology tab: treat a C as screening-only, and do '
+        + 'not put a D in a recommendation document without establishing the terms from that '
+        + 'country\u2019s own petroleum act. The take, NPV, spread and swing rows below print to the same '
+        + 'precision on every column whatever its grade, so the orderings in this strip cannot '
+        + 'express it. The letter in each column header opens that country\u2019s term-by-term Evidence '
+        + 'Chain; the Evidence tier, Model terms cited, Fiscal facts held and Reform record rows for '
+        + 'the whole set are behind the \u201cShow evidence rows\u201d toggle in the grid below, and they '
+        + 'travel into Copy for IC Memo and Export PDF whether that toggle is open or shut.');
+      return '<div class="cmp-vd-ev" title="' + _evTip + '" style="font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:' + (_nD ? 'var(--negative)' : 'var(--orange)') + ';">'
+        + (_nD ? '\u25bc' : '\u26a0') + ' Evidence floor \u2014 ' + _weak.length + ' of ' + _ok.length
+        + (_ok.length === 1 ? ' column is' : ' columns ' + (_weak.length === 1 ? 'is' : 'are')) + ' graded '
+        + (_nD && _nD < _weak.length ? 'C or D' : _nD ? 'D' : 'C') + ':</strong> '
+        + _weak.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.d.country) + '</strong> '
+            + x.g.letter + ' \u00b7 ' + x.g.label + ' (' + x.g.aPct.toFixed(0) + '% primary law of '
+            + Number(x.g.nFacts).toLocaleString() + ' facts)').join('; ')
+        + '. ' + (_nD ? 'A D does not go into a recommendation document' : 'A C is screening-only')
+        + ' on ORCA\u2019s own tier rule, and no ordering above can show you that. '
+        + '<span class="cmp-vd-ev-go" role="button" tabindex="0"'
+        + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\''
+        + _cmpEsc(String(_weak[0].d.country).replace(/\\/g, '\\\\').replace(/'/g, "\\'")) + '\');"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_fcOpenTermChain(\''
+        + _cmpEsc(String(_weak[0].d.country).replace(/\\/g, '\\\\').replace(/'/g, "\\'")) + '\');}"'
+        + ' style="color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;display:inline-flex;align-items:center;">'
+        + 'Open ' + _cmpEsc(_weak[0].d.country) + '\u2019s Evidence Chain \u2192</span>'
+        + '</div>';
+    })();
     // ── v845 (T3): the way out of "NOTHING RANKS HERE". ──────────────────────────────────────
     //
     // Walked T3 cold at 1440x900, no storage, and built the comparison an analyst actually builds:
@@ -32647,6 +32714,7 @@ function renderCompare() {
       + _rebLine
       + _valLine
       + _dsLine
+      + _evLine
       // v772 (T3): filled by _sbsPaintVerdictFp() once the per-country spread fetches land.
       + '<div id="cmp-verdict-fp" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
       // v924 (T3): filled by _sbsPaintVerdictRr(). See the block above that function for why
@@ -32675,7 +32743,39 @@ function renderCompare() {
               : '. ' + _cont.parent + '\u2019s figures already include this subdivision\u2019s barrels and terms, so the two columns are not independent observations and the gap between them is a within-country split rather than a country-against-country one.')
           + ' Drop one side of the pair before carrying the ordering into an IC memo.')}" style="display:inline-block;color:var(--orange);background:rgba(194,65,12,.10);border-radius:3px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:4px;cursor:help;white-space:nowrap;">within ${_cmpEsc(_cont.parent)}</span>`
       : '';
-    html += `<div class="cmp-hdr" data-cmp-country="${_cmpEsc(d.country)}">${d.country}${d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active">◆</span>' : ''}${specBadge}${_contBadge}<br><span style="color:var(--muted);font-size:11px;">${d.region}</span></div>`;
+    // ── v1015 (T6): the evidence grade, on the one row of this grid that is always on screen ──
+    // v723 collapsed the five evidence-DEPTH rows by default and that ruling is right — it is
+    // what puts Govt Take @$75 above the fold. But it left this tab as the ONLY country surface
+    // on the platform with no evidence signal in its default state: Fiscal Compare prints the
+    // letter in its Quality column, Explorer and Screener in their Evidence columns, IOC Portfolio
+    // in its Evidence cell, Country Profile in its headline badge. Here the letter lives in a row
+    // behind "▸ Show 4 more evidence rows" — and this is the tab whose output goes straight into
+    // the memo, with Copy for IC Memo and Export PDF on it.
+    //
+    // Measured on the tab's own cold-load example (United Kingdom / Norway / Nigeria), storage
+    // cleared: the default grid prints 24 rows of take, NPV, spread, swing and structure and not
+    // one character about sourcing. Nigeria reads C · secondary-led, 31% primary law of 8,203
+    // facts — which this platform's own Methodology tier table calls screening-only — and the
+    // only thing on screen was a 26px grey disclosure the analyst has no reason to open.
+    //
+    // The letter now sits in the column header beside the region, from the same _evidenceGrade()
+    // every other surface uses, and clicking it opens that country's per-term Evidence Chain via
+    // the same _fcOpenTermChain() the other five surfaces route through. Nothing is un-collapsed:
+    // the four rows stay shut, the toggle is unchanged, and no take, NPV or spread figure moves.
+    const _evG = (typeof _evidenceGrade === 'function') ? _evidenceGrade(d) : null;
+    const _evJs = String(d.country).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const _evBadge = !_evG ? '' : `<span class="cmp-hdr-ev" role="button" tabindex="0"
+        onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain('${_cmpEsc(_evJs)}');"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();_fcOpenTermChain('${_cmpEsc(_evJs)}');}"
+        aria-label="${_cmpEsc(d.country + ' evidence grade ' + _evG.letter + ' — ' + _evG.label + '. Opens its term-by-term Evidence Chain.')}"
+        title="${_cmpEsc(_evidenceGradeWhy(d)
+          + (_evG.grade === 'c' ? ' ORCA’s own tier rule: treat a C as screening-only.'
+            : _evG.grade === 'd' ? ' ORCA’s own tier rule: do not put a D in a recommendation document without establishing the terms from this country’s petroleum act.'
+            : '')
+          + ' The same letter the Fiscal Compare Quality column, Explorer, Screener, IOC Portfolio and the Country Profile badge print, and the same one in the Evidence tier row behind the “Show evidence rows” toggle below. It grades the FACT BASE, not the model — click to open '
+          + d.country + '’s term-by-term Evidence Chain, which names each fiscal term the DCF ran, its ORCA value, the statutory value and the source.')}"
+        style="display:inline-flex;align-items:center;justify-content:center;color:${_evG.color};border:1px solid ${_evG.color};border-radius:3px;font-size:9px;font-weight:700;line-height:1;padding:1px 4px;margin-left:5px;cursor:pointer;vertical-align:middle;">${_evG.letter}</span>`;
+    html += `<div class="cmp-hdr" data-cmp-country="${_cmpEsc(d.country)}">${d.country}${d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active">◆</span>' : ''}${specBadge}${_contBadge}<br><span style="color:var(--muted);font-size:11px;">${d.region}</span>${_evBadge}</div>`;
   });
   // ── v723 (T3): the eight-row provenance preamble. ───────────────────────────────────────────
   // v511 put the basis rows at the head of the grid so "the basis of a column is read before its
