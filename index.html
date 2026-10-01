@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1019</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1020</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -45629,6 +45629,50 @@ function cpBuildBeCallout(d) {
         + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">The stored value of $1/bbl is the DCF solver floor, not a breakeven. It is suppressed here for the same reason Fiscal Compare, the Explorer and the Screener all render it as an em dash.</div>'
         + '</div></div>';
     }
+    // ── v1020 (T2) — the bound the rest of this page already prints, in the card built for it ──
+    // Walked T2 cold at 1440: Country Profile auto-loads Indonesia, and the one card headed
+    // BREAKEVEN PRICE rendered as a zero-height empty div. Four smaller slots on the SAME screen
+    // were meanwhile printing "< $50/bbl bounded" off cpBeBound(): the header BE chip
+    // (#cp-be-head), the headline meta (#cp-be-meta), the regime param tile (#cp-be-param) and the
+    // Data Completeness row (#cp-be-complete). So the page HAD a reading, in four places, and
+    // withheld it from the 28px slot an analyst asking "is it attractive at $75" actually looks at.
+    // Measured over all 185 countries: 67 solved, 3 state monopolies (own card above), and
+    // **115 boundable** — and ZERO where this empty branch is the correct answer. It fired on 115
+    // of 185 profiles, including the cold default, and was wrong every single time.
+    // Same cpBeBound() object the other four slots read, so they cannot disagree about the range;
+    // this card adds the $75 verdict in words, which none of them state.
+    var _bd = (typeof window.cpBeBound === 'function') ? window.cpBeBound(d) : null;
+    if (_bd) {
+      var _q = function (x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); };
+      // Clears the base case iff contractor NPV is already positive at $75 — i.e. the bracket's
+      // upper edge is at or below 75. '< $50' -> hi 50; '$50-$75' -> hi 75; '> $125' -> hi null.
+      var _clears = (_bd.hi != null && _bd.hi <= 75);
+      var _verdict = _clears
+        ? (_bd.hi <= 50
+            ? 'Attractive at $75/bbl \u2014 contractor NPV stays positive all the way down to $50, the lowest price ORCA models on this page.'
+            : 'Attractive at $75/bbl, but not robust \u2014 contractor NPV turns negative between $' + _bd.lo + ' and $' + _bd.hi + ', so an entry here does not survive a price break below the base case.')
+        : (_bd.lo != null && _bd.lo >= 125
+            ? 'Not attractive at $75/bbl \u2014 contractor NPV is negative at every price ORCA models on this page, up to $125/bbl.'
+            : 'Not attractive at $75/bbl \u2014 contractor NPV does not turn positive until somewhere between $' + _bd.lo + ' and $' + _bd.hi + '/bbl.');
+      return '<div id="cp-be-callout" title="' + _q(_bd.tip) + '" style="background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
+        + '<div style="min-width:0;">'
+        + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Breakeven Price</div>'
+        + '<div style="font-size:28px;font-weight:700;color:var(--accent);line-height:1.15;">' + _bd.txt
+        + ' <span style="font-size:10px;font-weight:600;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 5px;vertical-align:middle;white-space:nowrap;">BOUNDED</span></div>'
+        + '<div style="font-size:11px;color:var(--muted);">bracketed from four NPVs \u2014 not solved</div>'
+        + '</div>'
+        + '<div style="border-left:1px solid var(--border);padding-left:20px;min-width:0;flex:1 1 260px;">'
+        + '<div style="font-size:12px;color:var(--text);">' + _verdict + '</div>'
+        + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">ORCA carries no solved breakeven for '
+        + _q(d.country || 'this country') + '. NPV = 0 sits ' + _q(_bd.sense || ('bounded ' + _bd.txt))
+        + ', read off the four contractor NPVs printed on this page.' + (_bd.split ? '' : ' Hover for the four figures and the basis.')
+        + '</div>'
+        + (_bd.split && window._cpBeSplitTag
+            ? '<div style="font-size:11px;color:var(--accent);margin-top:4px;">Two bases disagree on this range' + window._cpBeSplitTag(_bd) + ' \u2014 state which one you are on.</div>'
+            : '')
+        + '<div style="font-size:10px;color:var(--muted);margin-top:6px;">It is a bound, not a price. For a breakeven on your own capex, opex and production profile, use Scenario Builder.</div>'
+        + '</div></div>';
+    }
     // Empty but PRESENT, so the async resolver has somewhere to write.
     return '<div id="cp-be-callout"></div>';
   }
@@ -65804,7 +65848,94 @@ function openFCDrilldown(country) {
   if (!d) return;
   // MC from COUNTRY_DATA: take_50=p10 (low), take_75=p50 (base), take_125=p90 (high)
   const mc = (d && d.take_50 != null) ? {p10: d.take_50, p50: d.take_75, p90: d.take_125} : null;
-  const tier = getTierInfo(r.liveTake);
+  // ── v1020 (T6) — the drawer's verdict pill was graded off a number the drawer itself says not to cite ──
+  // Walked T6 cold at 1440x900 and 390x844 hasTouch, both storages cleared and reloaded, over the real
+  // /petroleum-fiscal-db/ path. T6 is "where did this number come from and how solid is the evidence?",
+  // and the Fiscal Compare row drawer is where that question gets answered: it carries the Src grade, the
+  // "N of M model terms cited" chip, the 4-price table, the MATERIAL DIFFERENCE note and the IC citation.
+  // All of those are excellent. The one thing in the drawer that is not a number is the tier pill beside
+  // the country name -- the only WORD in the header, and therefore the thing an eye scanning for a verdict
+  // actually reads.
+  //
+  // It was `getTierInfo(r.liveTake)`. `r.liveTake` is THIS SCREEN's model take, which on a generic-default
+  // row is the mechanic constant -- 22.2% for every one of the 116 Concession rows that print "22.2%
+  // default" in the take cell. So the pill graded the placeholder.
+  //
+  // Measured on the shipped build, cold default view, 185 rows at $75/Deepwater, against the same
+  // comparable/citable basis the table's own tier DIVIDERS (v580, v675) and the # rank (v580) already use:
+  //
+  //   34 of 185 drawers carry a tier pill that contradicts the take the same drawer tells you to cite.
+  //   10 of those read the green "A Investor-Friendly" pill. 8 of the 10 are NOC-dominated:
+  //
+  //     Bahrain        pill A Investor-Friendly   citable take 100.0%  -- state monopoly, no contractor access
+  //     Kuwait         pill A Investor-Friendly   citable take 100.0%  -- state monopoly
+  //     Saudi Arabia   pill A Investor-Friendly   citable take 100.0%  -- state monopoly
+  //     Oman           pill A Investor-Friendly   comparable take 75.6%
+  //     Venezuela      pill A Investor-Friendly   citable take 74.9%
+  //     UAE            pill A Investor-Friendly   citable take 74.6%
+  //     UAE-Abu Dhabi  pill A Investor-Friendly   citable take 74.6%
+  //     Qatar          pill A Investor-Friendly   comparable take 74.5%
+  //
+  //   and on own-terms rows it was wrong in both directions, so this is not a thumb on the scale:
+  //     Nigeria 81.1% read Moderate · Turkmenistan 87.2% / Uzbekistan 85.6% / Bolivia 72.1% read High-Take ·
+  //     Norway 68.0% / Kazakhstan 69.9% / India 63.2% / China 61.0% read Moderate · Libya 71.1% read NOC.
+  //
+  // This exact defect was found and fixed ONCE ALREADY, in the XLSX export, and the fix note is still on
+  // line ~71407 in its own words: "v529: Tier is now graded off the citable database take. Graded off
+  // liveTake it read 'Inv-Friendly' on all 153 generic-default rows, including the three 100%-take
+  // monopolies." v529 fixed the spreadsheet and left the screen the spreadsheet is exported FROM. The
+  // drawer's own MATERIAL DIFFERENCE paragraph confesses it in its last clause -- "and the tier badge in
+  // the header is derived from it" -- which is a disclosure at the bottom of a long block, not a fix.
+  //
+  // That is the give-up point in this walk: an analyst opening Saudi Arabia to check provenance reads a
+  // green Investor-Friendly verdict on a jurisdiction with no contractor access at all.
+  //
+  // The pill is now graded on exactly what the dividers and the rank are graded on -- the comparable take
+  // where _scFeeCmpAt() diverges, the citable database take otherwise, at the drawer's own active price --
+  // and state monopolies get their own reading instead of being bucketed as NOC. Nothing is deleted: where
+  // the model take would have graded differently, the pill says so on its face, so the model figure is
+  // still reachable and is visibly not what the verdict is on. No take, NPV, rank, sort, divider, export
+  // or evidence grade changes; only the word in the pill, on the 34 rows where it was wrong.
+  const _ddTierBasis = (function () {
+    var p = parseFloat((document.getElementById('fc-price') || {}).value);
+    if ([50, 75, 100, 125].indexOf(p) < 0) p = 75;
+    var db = p === 50 ? d.take_50 : p === 100 ? d.take_100 : p === 125 ? d.take_125 : d.take_75;
+    var st = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, String(p)) : null;
+    var cmp = (st && st.diverges && st.cmp != null) ? Number(st.cmp) : null;
+    var v = cmp != null ? cmp : (db == null ? null : Number(db));
+    return { price: p, value: v, db: (db == null ? null : Number(db)), cmp: cmp };
+  })();
+  // Fall back to the old basis only if the database holds no take at all for this country at this price --
+  // an assertion is not allowed to report a verdict it cannot prove, and a blank pill answers nothing.
+  var tier = (_ddTierBasis.value != null) ? getTierInfo(_ddTierBasis.value) : getTierInfo(r.liveTake);
+  var _ddTierMono = (_ddTierBasis.value != null) && isStateMonopoly(_ddTierBasis.value);
+  if (_ddTierMono) tier = { label: 'MONO', symbol: '\u25c6', cls: 'tier-noc', title: 'State Monopoly' };
+  var _ddTierTip = (function () {
+    if (_ddTierBasis.value == null) {
+      return 'ORCA holds no database take for ' + country + ' at $' + _ddTierBasis.price + '/bbl, so this '
+        + 'tier is graded on the model take in the header -- directional only, not citable.';
+    }
+    var t = 'Graded on the ' + (_ddTierBasis.cmp != null ? 'COMPARABLE' : 'CITABLE DATABASE')
+      + ' take at $' + _ddTierBasis.price + '/bbl (' + _ddTierBasis.value.toFixed(1) + '%) -- the same basis '
+      + 'the # rank, the tier dividers in the table behind this drawer, and the XLSX Tier column are built '
+      + 'from, so the verdict you read and the number you cite are the same number. ';
+    if (_ddTierBasis.cmp != null) {
+      t += 'This country blends fee-basis contracts, so the published ' + (_ddTierBasis.db != null ? _ddTierBasis.db.toFixed(1) + '%' : 'blend')
+        + ' is not comparable across countries and is not what this pill reads. ';
+    }
+    if (_ddTierMono) {
+      t += 'At ' + _ddTierBasis.value.toFixed(1) + '% there is no contractor position to rank: this is a '
+        + 'state monopoly, not a fiscal tier. ';
+    }
+    var _mt = (r.liveTake != null) ? getTierInfo(r.liveTake) : null;
+    if (_mt && _mt.title && _mt.title !== tier.title) {
+      t += 'The model take in this drawer (' + r.liveTake.toFixed(1) + '%'
+        + (r.termsBasis === 'default' ? ', the generic ' + r.mechanic + ' default shared with every other default-terms row' : '')
+        + ') would grade ' + _mt.title + '. It is not what this pill reads, because it is not a figure this '
+        + 'page lets you cite.';
+    }
+    return t;
+  })();
   const cEsc = d.country.replace(/'/g, "\\'");
   const slug = country.replace(/[^a-zA-Z0-9]/g, '_');
   const canvasId = 'drawer-waterfall-' + slug;
@@ -65913,7 +66044,7 @@ function openFCDrilldown(country) {
   // v465: Show profile + price context so analyst knows what produced these NPV/IRR figures
   html += '<span style="font-size:10px;color:var(--accent);font-weight:700;border:1px solid var(--accent);border-radius:3px;padding:1px 7px;white-space:nowrap;opacity:.85;" title="DCF computed using the \'' + _ddProfileName + '\' production profile at $' + _ddPrice + '/bbl. Change profile or price in the controls above and click Run Compare to update.">' + _ddProfileName + ' · $' + _ddPrice + '/bbl</span>';
   if (_fcDrillMechTag) html += _fcDrillMechTag;
-  html += '<span class="tier ' + tier.cls + '">' + tier.symbol + ' ' + tier.title + '</span>';
+  html += '<span class="tier ' + tier.cls + '" style="cursor:help;" title="' + _ddTierTip.replace(/"/g, '&quot;') + '">' + tier.symbol + ' ' + tier.title + '</span>';
   if (_fcDrillGlobalRank) html += _fcDrillGlobalRank;
   html += '<span class="count-badge">' + d.n + ' contracts</span>';
   if (_fcDrillRegionRank) html += _fcDrillRegionRank;
