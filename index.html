@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1018</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1019</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34580,6 +34580,32 @@ function _sbsPaintVerdictRr() {
 
   scored.sort(function (a, b) { return _fcReformCmp({ country: a.country }, { country: b.country }); });
 
+  // ── v1019 (T3): SIZE UNKNOWN columns are lifted OUT of the ordered chain ─────────────
+  // _fcReformCmp places the `unsized` band between "take already raised inside the window" and
+  // "net zero". That is the right answer for a TABLE SORT — every row has to land somewhere, and
+  // the Fiscal Compare cell prints the verdict token beside the row so the reader can see what
+  // the position is worth. It is the wrong answer for a SENTENCE. This strip renders its columns
+  // as a strict `A › B › C` chain under the heading "Reform exposure, highest first", and
+  // SIZE UNKNOWN means, in this platform's own words, "terms rewritten in-window, take effect
+  // never quantified". There is no magnitude to rank, so every `›` touching an unsized column was
+  // an ordering ORCA cannot source. Measured cold on the live build, on sets this tab offers by
+  // its own quickstart buttons:
+  //   Atlantic Frontier Quartet  Brazil › Angola › Nigeria › Guyana  — positions 2 and 3 were
+  //                                                                   decided by the A–Z tiebreak
+  //   West Africa Trio           Angola › Nigeria › Ghana            — likewise positions 1 and 2
+  //   Iraq / Mexico / Angola     Angola › Mexico › Iraq              — ALL THREE unsized, so the
+  //                                                                   whole sentence was invented
+  // 5 of the 21 reform-scored countries are unsized — Angola, India, Iraq, Mexico, Nigeria — and
+  // four of those are core IOC screening destinations, so most real sets contain one.
+  // The rest of this strip already polices exactly this failure: the take line states "nothing is
+  // set aside", the term-consistency line says "not ordered against each other", and `nolog` is
+  // already a separate trailing clause rather than a chain position. The reform line was the one
+  // ordering on this tab that asserted a rank it could not source.
+  // _fcReformRank / _fcReformCmp are UNCHANGED — Fiscal Compare's Reform sort still needs a total
+  // order over all 185 rows. Only this sentence stops claiming one.
+  var rank    = scored.filter(function (e) { return e.rk.band !== 2; });
+  var unsized = scored.filter(function (e) { return e.rk.band === 2; });
+
   // Each column states its own verdict token and the count/date behind it, because the token is
   // the finding and the count is blind to magnitude — the distinction the Reform Risk tab spends
   // four paragraphs on. No column is reduced to a bare number here.
@@ -34601,17 +34627,43 @@ function _sbsPaintVerdictRr() {
       + (v.since2010 === 1 ? '' : 's') + ' since 2010' + esc(last) + ')</span>';
   };
 
-  var body;
-  if (scored.length >= 2) {
+  var body = '';
+  if (rank.length >= 2) {
     body = '<span style="font-size:12px;">'
-      + scored.map(seg).join(' <span style="color:var(--muted);">›</span> ') + '</span>';
-  } else if (scored.length === 1) {
-    body = '<span style="font-size:12px;">' + seg(scored[0])
-      + '<span style="color:var(--muted);font-size:11px;"> — the only column in this set with a '
-      + 'sourced log, so there is no order to read</span></span>';
-  } else {
+      + rank.map(seg).join(' <span style="color:var(--muted);">›</span> ') + '</span>';
+  } else if (rank.length === 1) {
+    body = '<span style="font-size:12px;">' + seg(rank[0])
+      + '<span style="color:var(--muted);font-size:11px;"> — the only column in this set whose '
+      + 'exposure ORCA can size, so there is no order to read</span></span>';
+  } else if (!unsized.length) {
     body = '<span style="font-size:12px;color:var(--muted);">no order established — ORCA holds no '
       + 'sourced reform log for any column in this set</span>';
+  }
+  // The unsized clause. `flex-basis:100%` puts it on its own line of the strip at every width, so
+  // sitting after the chain cannot be read as sitting below it in rank.
+  if (unsized.length) {
+    var many = unsized.length > 1;
+    var lead = rank.length
+      ? 'Not placed in the order above — in-window rewrite, size never quantified:'
+      : 'No exposure order established — '
+        + (many ? 'all ' + unsized.length + ' scored columns were' : 'the one scored column was')
+        + ' rewritten in-window with the take effect never quantified:';
+    var tail = 'no magnitude is on record, so '
+      + (many && rank.length
+          ? 'these cannot be placed against each other, or against ' + esc(rank[0].country)
+            + ' above — any of them could be the most exposed column in the set'
+         : many
+          ? 'these cannot be placed against each other, and nothing in this set establishes which '
+            + 'of them is the most exposed'
+         : rank.length
+          ? 'this column cannot be placed against ' + esc(rank[0].country)
+            + ' above — it could be the more exposed of the two'
+          : 'this column carries no exposure reading at all')
+      + '. Size ' + (many ? 'them' : 'it') + ' from the Reform Risk event log before this goes in a memo.';
+    body += '<span style="font-size:12px;flex-basis:100%;">'
+      + '<span style="color:var(--orange);font-weight:700;">' + lead + '</span> '
+      + unsized.map(seg).join(' <span style="color:var(--muted);">·</span> ')
+      + '<span style="color:var(--muted);font-size:11px;"> — ' + tail + '</span></span>';
   }
   if (nolog.length) {
     body += '<span style="font-size:11px;color:var(--muted);">no sourced log: '
