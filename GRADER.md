@@ -69594,3 +69594,132 @@ clause rides into the clipboard paste on the same `.cmp-notice` path the invente
 
 ## Friction
 Walked cold at 1440 with storage cleared. The tab seeds itself with UK · Norway · Nigeria, so the T3 question was already on screen, and the walk went straight to the verdict strip above the grid. Four orderings there. Three of them ca
+
+---
+## Cycle 958 Log — 2026-10-01 14:05 — v1020
+
+**Task.** **T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest in
+rotation: 957 T3, 955 T1, 954 T5, 952 T4, 951 T6, **950 T2**. (Cycle 957's note that T6 last ran at
+893 is wrong — cycle 951's own log at GRADER.md:68965 is a T6 cycle. T2 is the stalest either way.)
+
+Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and the page reloaded first,
+served from `~` so `sw.js` resolves rather than 404ing fifteen times.
+
+**Friction.** Country Profile auto-loads **Indonesia** as the PSC benchmark, so the T2 question was
+already on screen. The walk went to the one card built to answer it — the card headed **BREAKEVEN
+PRICE**. It rendered as a **zero-height empty div**.
+
+The builder is `cpBuildBeCallout()`, and the branch is the one commented *"Empty but PRESENT, so the
+async resolver has somewhere to write"*. Four smaller slots on the **same screen** were meanwhile
+printing a reading off `cpBeBound()`:
+
+| slot | Indonesia, cold |
+|---|---|
+| `#cp-be-head` (header chip) | `BE: < $50/bbl bounded` |
+| `#cp-be-meta` (headline meta) | `Breakeven: < $50/bbl bounded` |
+| `#cp-be-param` (regime param tile) | `< $50/bbl bounded` |
+| `#cp-be-complete` (Data Completeness) | `◖ Breakeven (< $50/bbl, bounded)` |
+| **`#cp-be-callout` (the 28px card)** | **(empty)** |
+
+So the platform **had** the answer, printed it in four places at 10–11px, and withheld it from the
+28px slot named for the question.
+
+Measured across all 185 countries, not sampled:
+
+| state | countries | card before |
+|---|---|---|
+| solved breakeven | 67 | renders, correct |
+| state monopoly | 3 | renders its own explicit "not modelled" card |
+| **boundable by `cpBeBound()`** | **115** | **empty div** |
+| genuinely nothing to say | **0** | — |
+
+**There is no country for which the empty branch is the right answer.** It fired on 115 of 185
+profiles — 62% — and was wrong on every one, including the cold default.
+
+The reason it survived is the comment: it was holding the slot for `_cpApplyBe()` to write into. That
+write cannot arrive. **0 of 239 `api/v1/country/*.json` files carry `avg_breakeven_usd`** (checked
+every file). Norway's and the UK's $29 and $20 come from bundled `be_75`, not from the API the v564
+comment describes. The blank was **permanent**, not transient.
+
+Why this is the worst moment in a T2 walk rather than a merely cosmetic one: breakeven *is* the
+downside case. An analyst with 20 minutes reads an empty card as "ORCA has no breakeven for
+Indonesia", and either leaves the price-resilience line out of the IC memo or goes to find the number
+elsewhere. The page knew the answer was below $50/bbl — i.e. the entry clears the $75 base case with
+more than $25/bbl of headroom, which is the *favourable* reading. The blank card cost the analyst the
+strongest defensible point on the screen.
+
+**Change.** The bounded branch now renders the card. It reads the **same `cpBeBound()` object** the
+other four slots read — same `txt`, same `tip` — so the five surfaces cannot disagree about the
+range, and it adds the one thing none of them states: a **$75 verdict in words**. Indonesia:
+
+> **BREAKEVEN PRICE**
+> **< $50/bbl**  `BOUNDED`
+> bracketed from four NPVs — not solved
+> │ **Attractive at $75/bbl** — contractor NPV stays positive all the way down to $50, the lowest
+> │ price ORCA models on this page.
+> │ ORCA carries no solved breakeven for Indonesia. NPV = 0 sits below the lowest price ORCA models
+> │ on this page, read off the four contractor NPVs printed on this page. Hover for the four figures.
+> │ It is a bound, not a price. For a breakeven on your own capex, opex and production profile, use
+> │ Scenario Builder.
+
+Amber left border and the `BOUNDED` tag keep it visually distinct from the solved green/yellow/
+orange/red tiers, so a bound is never mistaken for a solved price. Malaysia's two-basis split rides
+in through the existing `_cpBeSplitTag()`. The **solved** and **state-monopoly** branches are
+untouched; the empty-div return is kept as the unreachable fallback.
+
+The verdict is derived from the bracket's upper edge (`hi != null && hi <= 75`), not from a
+hand-written per-country string, so it stays correct if the underlying NPVs change.
+
+**Result.** An analyst asking whether Indonesia, Nigeria, Angola, Brazil, Guyana, Iraq, Egypt, Ghana
+or 107 other countries is attractive at $75/bbl now reads the answer off the card named for the
+question — with the bound, the basis, the caveat that it is bracketed rather than solved, and where
+to go for a project-specific figure. Previously they read a blank space and concluded the number did
+not exist.
+
+### Verification — every number read this cycle, none assumed
+
+| gate | expected | measured |
+|---|---|---|
+| JS syntax gate | PASS | **PASS — 11/11 script blocks** (`node --check`), re-run on the final file after the version bump |
+| Playwright runtime suite | ran, green | **543 PASS / 0 FAIL / 0 WARN / 0 JS errors**, read from the suite's own report (`14:02:14Z`). **Baseline measured first on the unedited file: 543 / 0 / 0 / 0** (`13:49:28Z`), same run config — so the number is a comparison, not an assumption. |
+| pixel audit | gate pass | **PIXEL GATE PASS — no surface got worse than baseline.** The two `small-touch-target` findings are the carried-forward `summary "Reading this table"` 18px rows on Fiscal Compare at 768 and 390; neither is on Country Profile and neither is new. |
+| 390×844 `hasTouch` scrollWidth | ≤ clientWidth | **390 == 390** on Indonesia, Malaysia, Norway, Saudi Arabia, Brazil — bounded, split, solved and monopoly branches all covered. overflowRight 0 on all five. |
+| controls <24px in the card at `pointer: coarse` | 0 | **0** — the card adds no interactive control; the `BOUNDED` tag is a span |
+| console + page errors | 0 | **0** at 1440 and at 390 |
+| card non-empty, all countries | 185/185 | **185/185**, 0 empty, 115 bounded, all 115 carrying both a verdict sentence and the shared `BOUNDED, NOT SOLVED` tip |
+| all five bracket branches | correct verdict | **exercised synthetically** — `< $50` → "stays positive down to $50"; `$50–$75` → "attractive but not robust"; `$75–$100` and `$100–$125` → "not attractive, turns positive between…"; `> $125` → "negative at every price ORCA models" |
+
+Honest limitation: with current data **all 115 bounded countries clear $75** (114 at `< $50/bbl`,
+Malaysia at `$50–$75/bbl`), so the "Not attractive at $75/bbl" wording is **not reachable on live
+data** and was proven only against synthetic records. It is defensive, same as the solved branch's
+four tiers, of which the v564 comment records only one being reachable.
+
+### Notes for the next cycle
+
+- **`_cpApplyBe()`'s API path is dead code as far as breakeven goes.** 0 of 239 `api/v1/country/*.json`
+  carry `avg_breakeven_usd`, so every comment on this page describing Norway's breakeven as
+  "arriving from api/v1/country/norway.json" (v512, v564, v895) describes a path that no longer
+  fires — Norway's $29 is bundled in `COUNTRY_DATA.be_75`. The repaint logic is harmless and still
+  correct if the API ever carries the field again, but **the comments are now wrong about where the
+  number comes from**, and a future cycle reading them will reason from a false premise. Not changed
+  this cycle because it is comment-only and the directive bans text-only cycles; worth folding into
+  the next cycle that touches this region for a real reason.
+- Carried forward from 957 and re-confirmed still live: the band-4 `↑ PRE-2010` question on 7
+  countries; `_fcReformCmp` on the FC sort; the `# Contracts` row's three thousand-separator
+  conventions for one number (`4211` vs `all 4,211` vs `Concession (4,211)`); the `North Sea Trio`
+  quickstart loading a `nolog` column.
+- Found while walking, not acted on: the Indonesia regime block prints Gross Split avg NPV as
+  **`-$215M`** in the table and **`-$216M`** in the sentence immediately below it — the same number,
+  two roundings, 40px apart. Cosmetic, one line to fix, but it is a figure disagreeing with itself on
+  one screen and so is the same *class* of defect as this cycle's.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS breakeven
+  basis paragraph denominators; SbS four export controls duplicated at 390px; FC Reform verdict bare
+  `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; CP headline take rank vs NPV rank
+  counting in opposite directions; Indonesia's three government profit-oil shares; `be_75 = 1.0` at
+  source for Bahrain/Kuwait/Saudi Arabia; Somalia the one true T4 dead end; Paraguay decree typed
+  `government_filing`; Screener `block· Deepwater` join fault; Home card "up to 4 countries" vs
+  `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs; `_screenerExportBasis` not naming the 105
+  withheld countries; the Home hurdle stat's "list below".
+- **Probe debris, twelfth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain
+  untracked in the repo root (~29 MB). This cycle's probes went to `/tmp/c958/`. Still flagged rather
+  than deleted — standing rule is to ask before deleting files the session did not create.
