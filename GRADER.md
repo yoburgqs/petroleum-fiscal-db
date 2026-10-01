@@ -69944,3 +69944,176 @@ a $1.2B/$15 project that produced none of the numbers on the page.
 
 ## Friction
 Methodology → **Data Coverage At a Glance** (`#meth-coverage-summary`, `_methPaintCoverage()` at `index.html:53085`) — the panel whose own first line says its job is *"What data is available for each country — and what is not"*, a
+
+---
+## Cycle 963 Log — 2026-10-01 18:40 — v1023
+- Test before: 543 PASS / 0 FAIL (live-URL baseline carried in from cycle 962)
+- Test after: **545 PASS / 0 FAIL / 1 WARN**, read from the suite's own
+  `ORCA_REPORT_FILE` (`/tmp/c963/report.txt`), run against the LOCAL tree at
+  `http://127.0.0.1:8911/index.html`. The suite RAN this cycle; this is not a
+  carried-forward number. +3 are this cycle's new guards. The 1 WARN is
+  `[ConsoleErrors]` on `sw.js` 404, which is an artefact of serving the repo
+  locally and is present in every local run — so the local baseline was
+  542 PASS + 1 WARN, and 542 + 3 = 545 reconciles exactly.
+- JS syntax gate: PASS (11 inline `<script>` blocks extracted, `node --check`).
+- Pixel gate: **PASS** — no surface worse than `~/logs/pixel_audit/baseline.json`.
+  2 findings, both carried forward and both on Fiscal Compare, not Reform Risk:
+  the `summary "Reading this table — column definitions"` 18px row at 768 and 390.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" Stalest in
+rotation (962 T6, 960 T6, 959 T2, 957 T3, 955 T1, 954 T5, 952 T4). Walked cold
+at 1440×900 and at 390×844 `hasTouch: true`, storage cleared: Home → Reform Risk,
+then the per-country lookup on Russia / Somalia / Nigeria / Qatar / Chad, then
+Country Profile's own reform timeline.
+
+## Friction
+**Reform Risk → "Most Frequently Reformed Regimes"** — the tab's flagship
+ranking, and the one the platform's own IC guidance in Sample Analyses tells the
+analyst to read as a membership test. Measured on the live DOM:
+
+| measurement | before | after |
+|---|---|---|
+| `<th>` in `thead` | 6 | 6 |
+| `<td>` per `tbody` row, all 21 rows | **5** | **6** |
+| rows carrying a take% in the last column | **0 of 21** | **21 of 21** |
+| `⊘ cmp` fee-basis markers in the table | **0** | **4** |
+| `.reform-take` chips foster-parented out of a table | **42** | **0** |
+
+Three things the analyst actually saw:
+
+1. **`TAKE @ $75` was blank on every row of all 21.** This is the column whose
+   own header tooltip spends a paragraph documenting the fee-basis correction —
+   "4 of the 21 rows are corrected: Iraq 84.8% blend → 34.1% comparable,
+   Ecuador 46.5% → 39.3%, Mexico 32.2% → 29.7%, India 61.9% → 63.2%." None of
+   those four corrections, and no take figure at all, was on screen.
+2. **21 identical orange lines sat ABOVE the table header**, each reading
+   `fiscal change · take move not quantified`. These were the cells' own
+   contents: the builder returned a `<span>`, the span was emitted directly
+   inside `<tbody>`/`<tr>` rather than wrapped in a `<td>`, and the HTML parser
+   foster-parents non-table content out of a table and inserts it immediately
+   *before* the table. At 1440 they stacked as a wall of text at y≈1418 that
+   reads like a rendering crash.
+3. **All three stability cards** — `QUIET SINCE 2010 (13)`, the near-bar 6, the
+   Active 2 — printed that same chip in the flex slot opposite each country
+   button, where the take% belongs. So **Iraq**, the single headline fee-basis
+   case on this platform (`MECHANIC_COMPARABILITY.md` Group 2: 415 of 610
+   contracts are TSC, so the 84.8% blend is a structural artefact and not a
+   fiscal measure), rendered as a *sentence about its reform size* instead of a
+   number. That is worse than a blank: it is a confident-looking false statement
+   in the slot an analyst reads for the figure.
+
+### Cause — a duplicate global function declaration, not a data problem
+Two `function _rrTakeChip` declarations at global scope **in the same inline
+`<script>` block**:
+
+- `index.html:53565` — `_rrTakeChip(country, take75, forCell, takeColor)`,
+  the Take @ $75 cell/chip builder, added by **v988 (T4)**, whose commit message
+  was *"Reform Risk take figure moved to the comparable basis; Iraq stops reading
+  as the harshest regime in the set when it is among the softest."*
+- `index.html:53662` — `_rrTakeChip(e)`, the single-event chip builder, added by
+  **v1016 (T4, cycle 952)** to share one chip builder between the Reform Risk
+  event log and the Country Profile timeline.
+
+Function declarations hoist and **the last one wins**. v1016 therefore deleted
+v988's builder outright and took all four of its call sites with it
+(`55297` ranked-table cell, `55555`/`55604`/`55660` the three cards). A T4 cycle
+silently reverted the previous T4 cycle's headline fix, four cycles later.
+Introduced 2026-10-01 01:35; live for **10 cycles and 5 `index.html` commits**.
+
+### Why 543 PASS / 0 FAIL never saw it
+Nothing in the suite asserted that a `tbody` row has as many cells as its header
+has columns. An entire missing column — on the tab's flagship table — was not a
+thing the suite could express, let alone fail on. Every per-check assertion on
+this tab reads text with regexes, and the text it looked for was all still there.
+
+## Change
+`index.html` — 5 behavioural lines, no layout or prose edits:
+- `function _rrTakeChip(e)` → **`function _rrEventTakeChip(e)`** (`53662`)
+- `window._rrTakeChip` → `window._rrEventTakeChip` (`53676`)
+- `var tag = _rrTakeChip` → `_rrEventTakeChip` inside `_rrEventLogHtml()` (`53685`)
+- `buildReformEventHtml()`'s guard + call → `_rrEventTakeChip` (`45397`–`45398`)
+- version badge `v1021` → `v1023` (`2961`, the one live display site)
+
+`_rrTakeChip` is once again the country-level take builder. A dated block above
+the renamed function records the collision and says not to re-use the bare name.
+Also audited every other duplicated global `function` name in the file: only
+`_rrEsc` and `_esc594` repeat, and both pairs are byte-equivalent HTML escapers,
+so `_rrTakeChip` was the sole divergent-signature collision.
+
+`tools/petroleum/tests/runtime_comprehensive.js` — three guards in
+`testReformRisk()`, so this class of defect cannot ship silently again:
+1. **`table cells match header columns`** — for all 3 tables on the tab, every
+   `tbody` row's cell count must equal the header's column count. Colspan-aware
+   on *both* axes, so the ranked table's two full-width divider rows and the
+   heatmap's banded two-row `<thead>` are counted correctly rather than
+   whitelisted. Also fails if fewer than 3 tables are found.
+2. **`no foster-parented take chips`** — zero `.reform-take` outside a
+   `.reform-event` row. That is the signature of a chip the parser moved out of
+   a table, and it is cheap to detect and impossible to argue with.
+3. **`ranked table Take @ $75 populated`** — all 21 rows carry a take%, and
+   exactly 4 carry a `cmp` marker. A populated column and a *correct* column are
+   different claims, so both are asserted.
+
+All three were calibrated against the live DOM and then run against the
+**pre-fix** build, where they report 21 short rows and 42 orphan chips. They are
+not assertions that happened to be true.
+
+## Result
+The analyst who opens Reform Risk to ask "who do I discount, and at what take?"
+now reads a complete table instead of a column of blanks under a populated
+header. Concretely:
+
+- `United Kingdom 49.2% · Brazil 55.6% · Nigeria 81.1% · Angola 53.0%` …
+  21 of 21 rows, where before there were none.
+- The four fee-basis corrections the header tooltip promises are on screen and
+  marked `⊘ cmp`, so **Iraq reads `34.1% ⊘ cmp`**, not `84.8%` and not a
+  sentence — the Group 2 comparability rule is visible at the decision point
+  again, which is the whole purpose of v988.
+- The 21-line wall of `fiscal change · take move not quantified` above the table
+  header is gone, so the tab no longer looks broken on arrival.
+- v1016's own fix is confirmed intact rather than assumed: Nigeria's Country
+  Profile timeline still renders 6 events with 6 chips and **0 orphaned**, and
+  the lookup event log is unchanged (Venezuela 4 events split at the 2010
+  window; Saudi Arabia's no-coverage verdict intact).
+- Mobile: `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390,
+  no take cell under 24px under `pointer: coarse`, 0 page errors at any width.
+
+### Notes for the next cycle
+- **The suite now has one structural assertion, on one tab.** The same
+  `<td>`-vs-`<th>` guard would apply to Fiscal Compare, Screener, Explorer, IOC
+  Portfolio and Side-by-Side, none of which have it. That is the obvious
+  generalisation and it is cheap; it was left out of this cycle to keep the
+  change to one surface.
+- **A duplicate-declaration check belongs in the syntax gate.** `node --check`
+  passes on a redeclared function by design — it is legal JavaScript. The scan
+  that found this (`^function\s+(\w+)` at column 0, counted) takes milliseconds
+  and would have caught it the cycle it shipped.
+- Carried forward from 960/962 and still live: the FAQ bank still quotes the
+  retired `$1.2B / $15-flat` deck as the basis of the platform's figures
+  (`index.html:6117` and `:6234`, the second a suggested IC disclosure string);
+  `index.html:5508` and `:3837` still carry a typed "65 of 185" breakeven count
+  against a live 67.
+- Carried forward from 958/959: Indonesia's Gross Split avg NPV printing
+  `-$215M` in the table and `-$216M` in the sentence 40px below; `_cpApplyBe()`
+  comments describing an API path that no longer fires; the band-4
+  `↑ PRE-2010` question on 7 countries; `_fcReformCmp` on the FC sort; the
+  `# Contracts` row's three thousand-separator conventions; the `North Sea Trio`
+  quickstart loading a `nolog` column.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the
+  repo; SbS breakeven basis paragraph denominators; SbS four export controls
+  duplicated at 390px; FC Reform verdict bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; CP headline take rank vs NPV rank
+  counting in opposite directions; Indonesia's three government profit-oil
+  shares; `be_75 = 1.0` at source for Bahrain/Kuwait/Saudi Arabia; Somalia the
+  one true T4 dead end; Paraguay decree typed `government_filing`; Screener
+  `block· Deepwater` join fault; Home card "up to 4 countries" vs `CMP_MAX` 5;
+  Côte d'Ivoire's two missing API slugs; `_screenerExportBasis` not naming the
+  105 withheld countries; the Home hurdle stat's "list below".
+- **Probe debris, fourteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html` remain untracked in the repo root (~29 MB). This cycle's probes
+  went to `/tmp/c963/` and the one copy it made inside the repo
+  (`_c963pre.html`, needed so the pre-fix build could resolve its relative data
+  fetches) was deleted immediately after use. The three older files are still
+  flagged rather than deleted — standing rule is to ask before deleting files
+  the session did not create.
