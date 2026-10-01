@@ -68571,3 +68571,142 @@ for the parameter and get **one** answer. `FCExportMeth` 7 PASS / 14 FAIL → **
   attributions on the Screener print work. Restored individually; `grep -n v1007` now returns
   exactly those three comments and nothing else. Bump the badge by its `id="hdr-version"` line, not
   by a global replace.
+
+---
+
+## Cycle 940 — T1, the Country Profile handed the three most attractive-looking countries an undefendable WACC pass (v1011)
+
+**Task — T1:** "Which countries should even be on my screening list?"
+
+This cycle inherited an uncommitted `index.html` with its badge already at v1011 and an
+uncommitted `tests/` carrying a matching new group. That is the **third** consecutive cycle to
+start this way (931→932, 1009→939, now 1011→940). The established lesson held: the suite is what
+tells you whether orphaned work is right. This one was both substantively right *and* mechanically
+complete — unlike the previous two, which each needed finishing — so the cycle's job was to prove
+it rather than repair it, and then to keep walking T1 for anything worse.
+
+### Friction
+
+Walked T1 cold (storage cleared): Screener → the block below its "TAKE IS A FLOOR, NOT A
+MEASUREMENT" divider (45 countries, table row 142) → click into a profile.
+
+The Screener is careful about this set. It prints `≥` on take and `≤` on NPV, groups the rows
+under their own divider, and states "not defensible as a screening shortlist on their own". The
+Country Profile verdict box those rows link into dropped every qualifier and asserted, behind a
+green tick and under the most favourable tier label on the scale:
+
+> ● 5.0% govt take @$75 — investor-friendly tier (≤40%). **Clears** the 10% WACC at $75 ($5.10B)
+> and at the $50/bbl downside ($2.37B)
+
+An affirmative pass computed on two **upper bounds**. Vanuatu, the Bahamas and Montenegro are the
+top three contractor NPVs in the entire database and all three are floor rows — so this was the
+verdict on the three most attractive-looking countries in the tool, and the drilldown contradicted
+the shortlist that sent the analyst there. The box's own `title` already said *"do not read a
+larger NPV as a better project: the top of that ranking is Vanuatu, the Bahamas and Montenegro"*.
+The visible sentence said the opposite of its own tooltip.
+
+The platform had already fixed this one tab over, twice — **v743** gave the Screener its bound
+markers and divider, **v890** made its tier pill read "at best". The Country Profile was never
+brought along.
+
+### Change — `loadCountryProfile()`, index.html:46183–46233
+
+- `≥` on the take and `≤` on both NPVs, as `.cp-floor-bound` markers carrying the shared
+  explanation. The new CSS rule reuses the **v713/v710 invisible vertical band** (`inset: -10px 0`)
+  so the 12px glyph reaches **32px** under a thumb with no horizontal reach — a horizontal band
+  would raise the parent's `scrollWidth` and report to pixel_audit as clipped text.
+- Tier label reads "investor-friendly tier (≤40%) **at best**".
+- "Clears the 10% WACC" → "**Would clear**", followed by the reason: both figures are upper bounds,
+  ORCA holds no rent instrument beyond royalty and income tax, and anything in law but not yet in
+  the record moves take up and NPV down.
+- Green tick ● → neutral half-filled ◐, because a withdrawn pass is not a pass.
+- Next action stated: establish the terms against the jurisdiction's own petroleum act before it
+  goes on a screening list.
+
+Reuses `_scTakeIsFloor()` and `_scFloorWhy()` — the Screener's own helpers and its own sentence —
+so the two tabs cannot drift. No new threshold.
+
+Rendered, measured this cycle:
+
+| | verdict line |
+|---|---|
+| Vanuatu (floor) | `◐ ≥5.0% govt take @$75 — investor-friendly tier (≤40%) at best. Would clear the 10% WACC at $75 (≤$5.10B) and at the $50/bbl downside (≤$2.37B) — but…` |
+| Norway (non-floor) | `● 68.0% govt take @$75 — high-take tier (61–75%). Clears the 10% WACC at $75 ($826M)…` — unchanged |
+
+### Result
+
+An analyst drilling into any of the 45 floor countries now reads a **bounded, withdrawn verdict
+with a next action**, instead of an affirmative pass they would have carried into a screening
+meeting and could not have defended under challenge.
+
+### Verification — all run this cycle against the local tree, none assumed
+
+- **Suite 541 PASS / 0 FAIL / 1 WARN**, `TEST_URL` pointed at `localhost` so the gate read the
+  working tree and not the deployed site. New `CPFloorVerdict` group **21/21**, including a
+  non-floor regression guard (Greenland, Faroe Islands: 0 markers, "Clears" intact). The floor set
+  was read from the page's own `COUNTRY_DATA` — 45 countries — so a data refresh cannot make the
+  test lie.
+- 16 inline `<script>` blocks parse, 0 failures.
+- **Six viewports, storage cleared:** `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 /
+  768 and **390×844 `hasTouch`**. **0 page errors at every width.**
+- Bound markers measure **32px** effective height under `pointer: coarse` (directive floor 24px).
+- **v449/v451 lock checked explicitly**, because this change reassigns `icon`/`col`/`bg`/`border`:
+  the locked CP *headline* tier colouring lives at index.html:46501, outside this diff's hunks.
+  The reassignment is scoped to the *verdict box* ("One-line IC read"), a different element.
+  Confirmed untouched.
+- The WARN is 15 identical `404 when fetching the script` console entries from a mid-suite
+  navigation (service-worker registration absent under `python -m http.server`). A separate cold
+  load with request logging showed **no 4xx and no page errors**, so it is a local-serving
+  artifact, not a code defect.
+
+### Two backlog items corrected by measurement, not carried forward again
+
+The cycle kept walking T1 after the verdict box and found that two long-carried items are **not
+real**. Recording this so no future cycle spends itself on them:
+
+1. **"Screener Advanced Filters checkboxes at 13px under `pointer: coarse`"** — carried forward for
+   several cycles. The `input` is 13×13, but every one of them is wrapped in a `<label>` measuring
+   **28px** tall × 110px wide, so the tap target already clears the 24px floor and the label text
+   toggles the box. Measured at 390×844 `hasTouch`. **Nothing to fix** — "fixing" it would have
+   been inventing work, and growing the input would have shoved the filter grid for no gain.
+2. **Screener row-select checkboxes** — already **24×24** with `aria-label`s (`Add Canada to the IC
+   shortlist`). The v612 mobile layer covered them.
+
+### Also checked in the same walk, all clean
+
+- **All 11 Screener presets deliver exactly the count they advertise** (`→ 15 of 185` etc.):
+  15/143/34/22/11/5/35/70/6/56/24, rendered row counts identical to the promised ones. The label is
+  what a T1 analyst picks on, so a drifted count would be a serious defect. None drifted.
+- **Rank-block divider arithmetic is correct**: 22 verified + 118 proxy + 45 floor = 185, and the
+  proxy divider's "163 countries with no verified field production" matches 118 + 45.
+- `_screenerExportBasis` is already hardened by v718 / v560 / v662 / v706 — it names preset drift,
+  geographic scope, reform-log coverage, and reports non-binding legs as having removed 0 rows.
+
+### Notes for the next cycle
+
+- **The office suite copy is no longer diverged.** `petroleum-fiscal-db/tests/` and
+  `office/tools/petroleum/tests/runtime_comprehensive.js` are now **hash-identical**
+  (`50544b42bb1591273264f5421c64b8cc`). The office copy had been 120 lines behind, and its only 2
+  unique lines were the *superseded* pre-v1011 `FCExportMeth` anchoring. This is what produced the
+  third, unmatched "479 PASS / 42 FAIL" figure the last two cycles flagged: `autonomous_cycle.py`
+  reads the office copy, which was green on tests the canonical copy had already changed. A gate
+  cannot be trusted while two copies of it exist — keep these two in sync in the same commit.
+- **A probe that switches tab and loads a profile in the same tick will lie.** `switchTab('t7')`
+  triggers its own default profile render that lands *after* a `loadCountryProfile()` called in the
+  same evaluate, so the first country measured reads as unstyled. This cycle hit it: Vanuatu showed
+  0 bound markers at all six viewports while the suite reported 3. The suite was right. Switch,
+  settle ~1.5s, *then* load. Worth knowing before anyone "fixes" a non-bug on a probe's word.
+- `_ctl907.html` (9.7 MB), `_baseline_t3.html` (9.8 MB) and now `_pre1011.html` are **untracked
+  probe debris in the repo root**, ~29 MB across a fifth cycle. Not deleted here: the standing rule
+  is to ask before deleting files this session did not create. Flagged to Zach instead.
+- Carried forward unchanged: Indonesia's three different government profit-oil shares on one page
+  (data reconciliation, not render); `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source;
+  breakeven populated on only 68 of 185 with 65 clustered at 27–34; Somalia the one true T4 dead
+  end; `Paraguay Decree 19.080/1997` typed `government_filing`; FC's copy-link path not walked for
+  selection ticks; the Screener count line's `block· Deepwater` join fault; the Home card at ~3077
+  saying Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5; `_posClause648` number
+  agreement; Côte d'Ivoire's two missing API slugs; `window._screenerExportBasis` not naming the 105
+  withheld countries; `summary "Reading this table"` at 18px; Side-by-Side's two byte-identical
+  export buttons.
+- Header badge was already at **v1011** in the inherited tree; verified it is the only `v1011`
+  occurrence outside this cycle's own code comments, so no global replace was run.
