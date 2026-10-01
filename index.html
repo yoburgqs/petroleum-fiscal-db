@@ -2983,7 +2983,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1024</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1025</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -3482,6 +3482,36 @@ window._orcaStampCitations = function() {
     for (i = 0; i < ns.length; i++) ns[i].textContent = c.contracts;
     var ks = document.getElementsByClassName('orca-cite-k');
     for (i = 0; i < ks.length; i++) ks[i].textContent = c.countries;
+  }
+  /* v1025 (T5): two more derived stamps, for the same reason the version is derived.
+     The IC Memo Checklist — the one block on this platform whose stated job is to tell the
+     analyst what to disclose — was the surface this mechanism missed. It hard-coded v346
+     TWICE, once as the labelled "short form for footnotes", against a live build 678
+     releases later, in an item whose own text reads "An undated fiscal data citation is not
+     IC-quality". The 28 strings this stamper was built to fix were 73 versions behind; this
+     one was the worst of them and was not in the sweep.
+     - orca-cite-date: the retrieval date, same idiom as _fcCiteBasisText and the Screener
+       assumptions block (new Date().toISOString().slice(0,10)), so the checklist can tell an
+       analyst to date a citation without itself carrying a frozen month.
+     - orca-cite-basis: ENGINE_BASIS.short, the canonical one-liner v834 introduced precisely
+       so "the assumptions that travel with a pasted figure are the assumptions that produced
+       it". The checklist instructed the analyst to disclose "$1.2B · $15/bbl opex" — the
+       Scenario Builder's DIFFERENT project — as the basis of the stored figures. */
+  var ds = document.getElementsByClassName('orca-cite-date');
+  if (ds.length) {
+    var dstr = new Date().toISOString().slice(0, 10);
+    for (i = 0; i < ds.length; i++) ds[i].textContent = dstr;
+  }
+  var bs = document.getElementsByClassName('orca-cite-basis');
+  if (bs.length) {
+    // ENGINE_BASIS is a `const` in a LATER script block, so a bare typeof on it throws
+    // ReferenceError while it is still in TDZ rather than returning 'undefined' — the same
+    // trap v452 hit. This function runs on DOMContentLoaded (after that block evaluates) and
+    // again on the COUNTRY_DATA poll, so the catch is the belt and the second call is the
+    // braces: if the first pass is early the markup keeps its literal and the retry stamps it.
+    var bstr = '';
+    try { bstr = (ENGINE_BASIS && ENGINE_BASIS.short) || ''; } catch (e) { bstr = ''; }
+    if (bstr) for (i = 0; i < bs.length; i++) bs[i].textContent = bstr;
   }
 };
 /* Copies the citation AS RENDERED. The previous handler wrote a frozen literal, so the
@@ -5449,11 +5479,11 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- v298: IC Memo Checklist — practical pre-submission quality gate for analysts using ORCA data -->
   <div class="dd-section" id="meth-ic-checklist" style="margin-top:16px;">
     <div class="dd-section-hdr">IC Memo Checklist — ORCA Fiscal Data Quality Gate</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">Before submitting an IC memo that includes ORCA fiscal data, verify each item below. This checklist covers the six most common errors in petroleum fiscal presentations (see FAQ A220).</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">Before submitting an IC memo that includes ORCA fiscal data, verify each of the nine items below. They cover the most common errors in petroleum fiscal presentations (see FAQ A220). <span style="color:var(--accent);">Every figure in this checklist is read live from this session</span> — the build number, the retrieval date and the project basis — so what it tells you to disclose is what actually produced the numbers you just exported.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
         <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Production Profile Stated</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;">All take% figures cite the profile used: <em>Deepwater · $1.2B · 50k bbl/d · $15/bbl opex</em> (or your project-specific parameters). Never present take% without stating the production basis.</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">All take%, NPV and breakeven figures cite the project they were computed on. For anything ranked, exported or cited here that is ORCA’s standardized <strong>Deepwater</strong> reference project: <em><span class="orca-cite-basis">50k bbl/d peak · 5yr plateau · $1.0B all-in capex · $18/bbl opex escalating 2%/yr · 25yr life · 10% WACC</span></em>, 100% WI, pre-financing. <strong style="color:var(--orange);">Do not disclose the $1.2B capex / $15/bbl flat-opex deck as the basis of these figures.</strong> That is the <em>Live DCF / Scenario Builder</em> panel’s project — same name, 8yr plateau, 12% decline, 294.0 MMbbl — and it returns a materially different NPV at the same price. If you ran Scenario Builder at your own capex and opex, disclose those instead. Never present take% without stating the production basis.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
         <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Oil Price Basis Stated</div>
@@ -5461,7 +5491,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
         <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Source and Version Cited</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;"><em>ORCA v346 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</em> — or the field-specific model with its date. An undated fiscal data citation is not IC-quality. Short form for footnotes: ORCA v346 (Aug 2026).</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;"><em>ORCA <span class="orca-cite-ver">v346</span>, retrieved <span class="orca-cite-date">—</span>, yoburgqs.github.io/petroleum-fiscal-db/</em> — or the field-specific model with its date. An undated fiscal data citation is not IC-quality, and nor is one naming a build that did not produce your numbers: ORCA’s published figures move between builds (v534 reversed the sign of the vs-median verdict for the UK, Angola, Brazil and Australia; v552/v553 changed Iraq’s citable take from 84.8% to a comparable 34.1%), so a reader who reopens the tool against a stale footnote cannot tell a data revision from an error. Short form for footnotes: <strong>ORCA <span class="orca-cite-ver">v346</span> (<span class="orca-cite-date">—</span>)</strong>. Both strings above are stamped from this session; <em>&#9112; Copy cite basis</em> on Fiscal Compare writes the same build with the full project basis attached.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
         <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Fiscal Mechanic Identified</div>
@@ -5469,15 +5499,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
         <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Evidence Tier Noted (if C/D)</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If ORCA's Country Profile shows C-tier or D-tier confidence for a key parameter, add a disclaimer: <em>"Note: take figure is directional; primary legislation verification recommended prior to FID."</em> A/B-tier parameters need no disclaimer.</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If ORCA's Country Profile shows C-tier or D-tier confidence for a key parameter, add a disclaimer: <em>"Note: take figure is directional; primary legislation verification recommended prior to FID."</em> <strong style="color:var(--orange);">An A or a B is not a clean bill of health.</strong> The letter grades the <em>record</em> — primary-law share and fact count — not whether the documents can be retrieved, and not whether the fiscal terms the model actually ran carry a citation. 59 of 185 countries grade A or B over half or fewer of their model terms and 19 cite none; a country can also grade B while the instruments it cites return 404, which the Country Profile states per country. Read the Evidence Chain row before quoting the letter as verification.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
         <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Price Sensitivity Presented</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;">For any PSC, PRRT, or R-factor regime, present take at $50, $75, and $100. A single-price take% for a profit-sensitive regime is incomplete. Use ORCA's Country Profile price curve or Fiscal Compare at multiple prices.</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">For any PSC, PRRT, or R-factor regime, present take at <strong>$50 / $75 / $100 / $125</strong> — the four prices ORCA stores, and the four every <em>Copy for IC Memo</em> paste already carries for take and for contractor NPV. A single-price take% for a profit-sensitive regime is incomplete. Use ORCA’s Country Profile price curve, or the Country Profile paste, which emits the four-price table and the $50→$125 swing in one step.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--yellow);">
-        <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;">&#9745; Stability Risk Disclosed</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If Stability Score ≤2 (Reform Risk tab), include a 1-sentence reform risk disclosure. If Stability Score ≥4, no disclosure required. Score 3: use judgment based on reform direction and magnitude.</div>
+        <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;">&#9745; Reform Exposure Disclosed</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">Open <strong>Reform Risk</strong>, look the country up, and <strong>quote the IC action it returns</strong> — that one line is the disclosure, and <em>&#9112; Copy for IC Memo</em> on the card pastes it with the sourced event log behind it. Do not derive the disclosure from a score. <strong style="color:var(--orange);">There is no 1–5 stability rating to threshold against</strong> — the diamond score this item used to key on was retired at v744. What the tab prints is a <strong>Reform Frequency Score out of 100</strong>, and it is a <em>count</em> of fiscal law changes since 2010 (100 − 15 × changes), never a magnitude: a +15pp windfall tax moves it exactly as far as a 1pp administrative tweak. A high score is therefore not evidence of stability. <strong>A score of 100 usually means ORCA holds no sourced reform log at all</strong> — it has one for 21 of 185 jurisdictions, so for the other 164 the correct memo line is that the record is unchecked, not that the premium is zero. The separate <em>Fiscal Predictability</em> figure is also out of 100 and is often printed as a <em>ceiling</em> (“≤46 · LOW”); carry the ceiling and its band, not the number it supersedes.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--yellow);">
         <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;">&#9745; NPV Presented Alongside Take%</div>
@@ -52031,17 +52061,231 @@ function copyIOCPortfolio() {
     + '\n\n' + srcLine;
 
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  var th  = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
-  var td  = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  // v1025 (T5): 9pt and 4px side padding, not 10pt/8px. Measured: at 10pt with 8px padding a
+  // 43px-wide figure column has a 26px content box, so every one of the 33 "100.0%" cells
+  // overflowed its border. The exhibit metric is page fit, not screen comfort.
+  var th  = 'border:1px solid #999;padding:3px 2px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;';
+  var td  = 'border:1px solid #999;padding:3px 2px;font-family:Calibri,Arial,sans-serif;font-size:9pt;';
   var tdL = td + 'font-weight:bold;';
+  // ── v1025 (T5) ─ the v977 exhibit treatment, carried to the LAST paste that never got it ──
+  // Walked T5 cold at 1440x900, storage cleared: IOC Portfolio -> operator loads -> "Copy for
+  // IC Memo" -> paste into letter-portrait Word (6.5in / 624px text column). Measured on the
+  // text/html flavour Word actually consumes, against the two pastes that DO carry the v977
+  // treatment, same measurement harness:
+  //
+  //                            IOC (here)   Fiscal Compare   Screener
+  //   rows                             33             185        185
+  //   natural table width          1131px           624px      624px
+  //   ...as a multiple of 6.5in     1.81x              1x         1x
+  //   tallest row                   924px           247px       94px
+  //   overflowing cells               115             122          0
+  //   preamble chars above table    3,982              65        416
+  //   letter pages (AutoFit)         27.5            22.9       20.9
+  //
+  // 33 rows pasted LONGER than Fiscal Compare's 185. Three prose columns sat in the cells:
+  // Mechanic basis to 424 chars, Take basis to 348, Take comparability to 428 — 1,339
+  // characters of sentences on the Philippines row alone, which is why that one row is 924px
+  // (9.6in) tall and cannot fit on any page it lands on. And the exhibit did not begin until
+  // page 4.6, because 3,982 characters of preamble were above it.
+  //
+  // Same remedy and same reasoning as v977: figures in the cells, qualifications in keyed
+  // notes underneath, table above the preamble, proportional colgroup so Word's
+  // AutoFit-to-window cannot divide 13 columns equally at 0.5in. text/plain is untouched —
+  // Excel has no page to overflow and wants the full strings in-cell.
+  //
+  // Nothing is dropped. Every figure the prose recited stays readable: the ±pp and the
+  // country-wide % that "Take basis" spelled out are already their own columns; the fee-basis
+  // counts and the "Rank on X%" Group-2 correction (MECHANIC_COMPARABILITY, 2026-08-26) stay
+  // IN the cell, because that is the number the analyst ranks on; the primary-law share and
+  // fact count stay in the Evid. basis cell. Only the sentences move.
+  // 'Mech. basis' is NOT a column here. It holds one of two things -- "fiscal mechanic modelled
+  // by ORCA" on 31 of 33 rows, or a 424-character exception -- so in the pasted exhibit it
+  // becomes a mark on the Mechanic cell it qualifies, which is what an exhibit does with an
+  // exception flag. That also closes the width budget: 13 columns of this content do not fit a
+  // 6.5in text column at any readable size, 12 do. text/plain still carries it as a column,
+  // because Excel has no page to fit and v977 already accepts the two flavours diverging.
+  var _iocDrop = { 3: 1 };
+  var _iocCols = matrix[0].map(function(c, i){ return i; }).filter(function(i){ return !_iocDrop[i]; });
+  var headShortIoc = ['Country','Region','Mech-anic','Mech. basis','Govt take %',
+    'Ctry-wide take %','Take gap pp','NPV $M','Con-tracts','Evi-dence','Evid. basis',
+    'Take basis','Compar-ability'];
+  // Labels are kept to words of six characters or fewer, hyphen-broken where longer, for the
+  // reason v977 recorded: a long word cannot be broken, so at column width it spills into the
+  // next cell instead of wrapping. That is the mechanism behind the overprinting.
+  var _iocPoss2 = function(t){ return String(t).replace(/^.*[’']s?\s+/, ''); };
+  function _iocShMech(t) {
+    t = String(t || ''); if (!t) return '';
+    if (/^fiscal mechanic modelled by ORCA/.test(t)) return 'ORCA mech-anic';
+    if (/^NOT A FISCAL MECHANIC/.test(t)) {
+      var m = t.match(/resolved on (.+?) model\./);
+      if (m) return 'NOT a mech-anic; priced on the ' + _iocPoss2(m[1]) + ' model';
+      return 'NOT a mech-anic; model un-attri-buted';
+    }
+    return t;
+  }
+  function _iocShEvid(t) {
+    t = String(t || ''); if (!t) return '';
+    var m = t.match(/^([\d.]+%) primary law on ([\d,]+) facts/);
+    return m ? m[1] + ' of ' + m[2] : t;
+  }
+  // The note for an Evid. basis cell is its verdict class, not its row: the share and the count
+  // are in the cell and the country is in column 1, so generalising the DIRECTIONAL sentence
+  // keys 33 distinct strings down to the five sourcing verdicts ORCA actually issues.
+  function _iocEvidNote(t) {
+    var tail = String(t || '').replace(/^[\d.]+% primary law on [\d,]+ facts — /, '')
+                 .replace(/verify against .+? own petroleum act/,
+                          'verify against that country’s own petroleum act');
+    return 'Evid. basis — the cell is the primary-law share of the fact count shown, and the '
+      + 'sourcing verdict on that base is: ' + tail.charAt(0).toUpperCase() + tail.slice(1);
+  }
+  function _iocShTakeBasis(t) {
+    t = String(t || ''); if (!t) return '';
+    if (/^COUNTRY AVERAGE/.test(t)) return 'COUNTRY aver-age';
+    if (/own contracts in ORCA/.test(t)) return 'own con-tracts';
+    return t;
+  }
+  function _iocTakeBasisNote(t) {
+    t = String(t || '');
+    if (/^COUNTRY AVERAGE/.test(t)) {
+      return 'Take basis, COUNTRY aver-age — ORCA holds no ' + st.operator + ' contract terms for '
+        + 'this country, so the take column on the row already IS the country-wide figure and the '
+        + 'two take columns agree by construction. The row describes the jurisdiction, not this '
+        + 'operator’s position in it.';
+    }
+    if (/to check it against/.test(t)) {
+      return 'Take basis, own con-tracts (unchecked) — this operator’s own contracts in ORCA, '
+        + 'and ORCA holds no country-wide take for the country to check the figure against.';
+    }
+    if (/matches the country-wide figure/.test(t)) {
+      return 'Take basis, own con-tracts (agrees) — this operator’s own contracts in ORCA, '
+        + 'matching the country-wide figure to one decimal place.';
+    }
+    return 'Take basis, own con-tracts — this operator’s own contracts in ORCA, NOT the '
+      + 'jurisdiction’s. The gap against the figure the Country Profile, Fiscal Compare, the '
+      + 'Explorer, the Screener and the JSON API all print is the "Ctry-wide take %" and "Take gap '
+      + 'pp" columns on the same row. Neither is wrong: cite the row where the memo names '
+      + st.operator + ', cite the country-wide column where it screens the jurisdiction, and say '
+      + 'which one you used.';
+  }
+  function _iocShCmp(t) {
+    t = String(t || ''); if (!t) return '';
+    if (/^State monopoly at /.test(t)) return 'State mono-poly';
+    if (/^NOT rankable/.test(t)) {
+      var f = t.match(/— ([\d,]+) of ([\d,]+) contracts/);
+      var r = t.match(/Rank on ([\d.]+%)/);
+      return 'NOT rank-able' + (f ? '; fee ' + f[1] + '/' + f[2] : '')
+           + (r ? '; rank on ' + r[1] : '');
+    }
+    if (t === 'comparable') return 'compar-able';   // one unbreakable 10-char token otherwise
+    return t;
+  }
+  function _iocCmpNote(t) {
+    t = String(t || '');
+    if (/^State monopoly at /.test(t)) {
+      return 'Compar-ability, State mono-poly — government take is at or above 99.5% at $50, $75, '
+        + '$100 and $125/bbl alike. There is no contractor position, so the row is not comparable '
+        + 'with contractor-participation regimes and not rankable against them, and its NPV cell '
+        + 'is withheld: the $0M the DCF returns is a 100% take leaving nothing to discount, not a '
+        + 'position valued at zero. Do not sum or average that cell with the modelled NPVs.';
+    }
+    return 'Compar-ability, NOT rank-able as published — the fee count in the cell is the share of '
+      + 'the country’s contracts that are fee-basis (TSC / RSC / Buy-back), where the contractor '
+      + 'is paid a fixed $/bbl fee and keeps no price upside, so the published take% measures '
+      + 'contract structure rather than how hard the terms are. "Rank on" is the figure to use: the '
+      + 'take on that country’s PSC/Concession contracts only.';
+  }
+  // The withheld-NPV cell is a 37-character sentence sitting in a right-aligned nowrap figure
+  // column: measured 202px of content in a 52px cell, the single widest overflow left after the
+  // prose came out of the basis columns. It becomes a token here. Nothing is lost -- note
+  // 'State mono-poly' on the same row already says why there is no NPV, and text/plain is
+  // untouched.
+  function _iocShNpv(t) {
+    return /^not reported/.test(String(t)) ? 'n/a' : t;
+  }
+  // 'Concession,PSC' has no break opportunity at a comma, so it needed 95px in a 66px cell.
+  function _iocShMechName(t) {
+    return String(t || '').replace(/,(\S)/g, ', $1')
+      .replace(/[A-Za-z]{9,}/g, function(w) {            // soft-hyphen, invisible unless it breaks
+        return w.slice(0, 5) + '\u00ad' + w.slice(5);
+      });
+  }
+  var _iocProse = { 2: [_iocShMechName, null], 3: [_iocShMech, null],
+                    7: [_iocShNpv, function(){ return 'NPV $M — "n/a" is the state-monopoly '
+                          + 'cell: government take leaves no contractor position to value, so ORCA '
+                          + 'reports no NPV rather than the $0M the DCF returns. See the '
+                          + 'Compar-ability note on the same row.'; }],
+                    10: [_iocShEvid, _iocEvidNote],
+                    11: [_iocShTakeBasis, _iocTakeBasisNote], 12: [_iocShCmp, _iocCmpNote] };
+  var _iocNotes = [], _iocNoteAt = {}, _iocLet = 'abcdefghijklmnopqrstuvwxyz';
+  function _iocNoteKey(txt) {
+    if (_iocNoteAt[txt]) return _iocNoteAt[txt];
+    var k = _iocLet.charAt(_iocNotes.length) || ('n' + (_iocNotes.length + 1));
+    _iocNotes.push({ k: k, txt: txt }); _iocNoteAt[txt] = k; return k;
+  }
+  function _iocMk(k) { return k ? '<sup style="font-size:7pt;">' + k + '</sup>' : ''; }
+  var _iocHdrKey = matrix[0].map(function(c, ci) {
+    return (!_iocDrop[ci] && headShortIoc[ci] !== c) ? _iocNoteKey(c) : '';
+  });
+  // Proportional widths declared on the header cells AND as a colgroup, because Word's
+  // AutoFit-to-window otherwise divides the text column equally — 13 columns at 0.5in, which is
+  // what put a government take on top of its neighbouring Mechanic cell. Weights are by content
+  // class, not hand-tuned: name, region, label, prose, figure.
+  // Weights are the widths the content actually needs at 9pt, measured on the longest
+  // UNBREAKABLE token in each column ('Philippines' 71px, 'CIS/FSU' 48, 'Contract' 52,
+  // '-$1,797M' 41, 'COUNTRY' 50), not hand-tuned per column. Declared sum fits 624px once the
+  // 12 x 11px of padding and borders is taken out.
+  var _iocWtAll = { 0:73, 1:49, 2:65, 4:41, 5:41, 6:31, 7:53, 8:37, 9:41, 10:51, 11:60, 12:49 };
+  var _iocWt = _iocCols.map(function(i){ return _iocWtAll[i] || 30; });
+  var _iocWtSum = _iocWt.reduce(function(a, b){ return a + b; }, 0);
+  var _iocPct = _iocWt.map(function(w){ return (100 * w / _iocWtSum).toFixed(2) + '%'; });
+  function _iocNumeric(ci) { return ci >= 4 && ci <= 8; }
+  var _iocHeadHtml = '<tr>' + _iocCols.map(function(ci, k) {
+    return '<th width="' + _iocPct[k] + '" style="' + th + 'width:' + _iocPct[k] + ';'
+      + (_iocNumeric(ci) ? 'text-align:right;' : '')
+      + '">' + esc(headShortIoc[ci]) + _iocMk(_iocHdrKey[ci]) + '</th>';
+  }).join('') + '</tr>';
+  var _iocBodyHtml = matrix.slice(1).map(function(r) {
+    return '<tr>' + _iocCols.map(function(ci) {
+      var c = r[ci], cell = esc(c), nud = '';
+      var pr = _iocProse[ci];
+      if (pr && c) {
+        var sh = pr[0](c);
+        if (sh !== c) {
+          cell = esc(sh);
+          // A cell shortened only by inserting a hyphen or a space says nothing a note could
+          // add, so it keys none: strip the soft breaks and compare.
+          if (String(sh).replace(/[-\s\u00ad]/g, '') !== String(c).replace(/[-\s\u00ad]/g, '')) {
+            nud = _iocMk(_iocNoteKey(pr[1] ? pr[1](c) : (headShortIoc[ci] + ' — ' + c)));
+          }
+        }
+      }
+      // The dropped Mechanic-basis column rides as a mark on the Mechanic cell (ci 2).
+      if (ci === 2) {
+        var mb = r[3];
+        if (mb && !/^fiscal mechanic modelled by ORCA/.test(mb)) {   // the exception, not the default
+          nud += _iocMk(_iocNoteKey('Mech-anic — ' + _iocShMech(mb) + '. ' + mb));
+        }
+      }
+      return '<td style="' + (ci === 0 ? tdL : td)
+        + (_iocNumeric(ci) ? 'text-align:right;white-space:nowrap;' : '')
+        + '">' + cell + nud + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  var _iocNoteHtml = _iocNotes.map(function(n) {
+    return '<p style="font-size:8pt;color:#555;margin:0 0 3px;"><b>' + n.k + '</b>&nbsp; '
+      + esc(n.txt) + '</p>';
+  }).join('');
+  // Table first. Until v1025 the 3,982-character preamble sat above it, so the exhibit itself
+  // did not start until page 4.6 of the pasted memo.
   var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
-    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
-    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;">' + esc(assump) + '</p>'
-    + '<table style="border-collapse:collapse;">'
-    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
-    + '<tbody>' + matrix.slice(1).map(function(r){
-        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
-      }).join('') + '</tbody></table>'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 4px;">' + esc(caption) + '</p>'
+    + '<table width="100%" style="border-collapse:collapse;width:100%;table-layout:fixed;">'
+    + '<colgroup>' + _iocPct.map(function(w){ return '<col style="width:' + w + '">'; }).join('') + '</colgroup>'
+    + '<thead>' + _iocHeadHtml + '</thead>'
+    + '<tbody>' + _iocBodyHtml + '</tbody></table>'
+    + '<p style="font-size:8.5pt;font-weight:bold;margin:8px 0 3px;">Notes</p>'
+    + _iocNoteHtml
+    + '<p style="font-size:8pt;color:#555;margin:6px 0 3px;">' + esc(assump) + '</p>'
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
 
