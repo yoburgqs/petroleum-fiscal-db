@@ -1204,9 +1204,34 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   margin: -24px -24px 14px; padding: 20px 24px 10px;
   background: var(--surface); border-bottom: 1px solid var(--border);
 }
-/* the inputs panel's own sticky Run DCF bar has to clear it, or it docks underneath */
-#sb-run-dcf-sticky { position: sticky; top: calc(var(--sb-hdr-h, 0px) - 24px); z-index: 10; }
-@media (max-width: 768px) { #sb-run-dcf-sticky { top: calc(var(--sb-hdr-h, 0px) - 16px); } }
+/* the inputs panel's own sticky Run DCF bar has to clear it, or it docks underneath.
+   v1024 (T2): it now has to clear the pinned pre-fill banner too, hence --sb-pf-h. */
+#sb-run-dcf-sticky { position: sticky; top: calc(var(--sb-hdr-h, 0px) + var(--sb-pf-h, 0px) - 24px); z-index: 10; }
+@media (max-width: 768px) { #sb-run-dcf-sticky { top: calc(var(--sb-hdr-h, 0px) + var(--sb-pf-h, 0px) - 16px); } }
+
+/* v1024 (T2) — the pre-fill caveat is pinned, because the thing that put the answer on screen
+   scrolled the caveat off it. ddOpenScenarioBuilder() shows this banner, then auto-runs the DCF
+   100ms later (setTimeout(runCustomScenario, 100)); runCustomScenario() ends with
+   output.scrollIntoView(), which leaves #scenario-modal-inner at scrollTop 278 on desktop and
+   2218 at 390px. Measured on every country tried: the banner ends up 27px above the content area
+   on desktop and 1869px above it on a phone, so it is never on screen on this route.
+   v827 pinned the HEADER for exactly this reason and stopped there — the title and the close
+   button survived the auto-scroll and the caveat did not. The caveat is the only statement of
+   which terms are this country's and which are platform defaults (v607's own note: 120 of 185
+   countries load nothing country-specific at all), so it is the one line that qualifies every
+   figure the auto-scroll just put in front of the analyst.
+   loadPreset() ends with an explicit _pb.scrollIntoView(), so the PRESET route always showed it;
+   the Country Profile route — per v827, the profile's ONLY route to a project IRR — never did.
+   Pin it rather than drop the auto-scroll, for the reason v827 gave: the auto-scroll is what
+   puts the answer up. Same offset idiom as #sb-run-dcf-sticky, z-index between the header (30)
+   and the grid's own sticky bar (10). */
+#sb-prefill-banner { position: sticky; top: calc(var(--sb-hdr-h, 0px) - 24px); z-index: 20; }
+@media (max-width: 768px) { #sb-prefill-banner { top: calc(var(--sb-hdr-h, 0px) - 16px); } }
+/* Clamped to 3 lines so pinning costs ~9% of the dialog rather than 20% at 390px (measured:
+   146px of a 715px modal on the longest banner). The toggle appears only when text is cut. */
+#sb-prefill-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+#sb-prefill-banner.sb-pf-open #sb-prefill-text { display: block; -webkit-line-clamp: none; overflow: visible; }
+#sb-prefill-banner.sb-pf-clamped #sb-prefill-more { display: inline-flex !important; align-items: center; }
 #scenario-modal-close-btn {
   flex: 0 0 auto; min-width: 32px; min-height: 32px; line-height: 1;
   border: 1px solid var(--border) !important; border-radius: 6px;
@@ -2958,7 +2983,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1023</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1024</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23523,8 +23548,11 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div id="sb-prefill-banner" style="display:none;flex-wrap:wrap;background:rgba(176,104,0,0.07);border:1px solid rgba(176,104,0,0.25);border-radius:5px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--accent-dim);align-items:center;gap:8px;">
       <span style="font-size:14px;"></span>
       <span id="sb-prefill-text" style="flex:1 1 220px;min-width:0;line-height:1.55;">Parameters pre-filled from Country Profile</span>
+      <!-- v1024 (T2): the banner is pinned now, so it is clamped to 3 lines to pay for the pin.
+           This reveals the rest; it is shown only when the text is actually cut. -->
+      <button id="sb-prefill-more" onclick="_sbPrefillToggle()" aria-expanded="false" style="display:none;flex:0 0 auto;background:transparent;border:1px solid currentColor;border-radius:4px;color:inherit;font-size:11px;font-weight:700;padding:3px 9px;min-height:24px;cursor:pointer;white-space:nowrap;" title="Show the rest of this note">more</button>
       <button id="sb-preset-swap" style="display:none;flex:0 0 auto;margin-left:auto;background:transparent;border:1px solid currentColor;border-radius:4px;color:inherit;font-size:11px;font-weight:700;padding:4px 9px;min-height:28px;cursor:pointer;white-space:nowrap;">Use ORCA&rsquo;s record</button>
-      <button onclick="(function(){document.getElementById('sb-prefill-banner').style.display='none';})()" style="flex:0 0 auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px;min-height:24px;min-width:24px;" title="Dismiss" aria-label="Dismiss pre-fill notification">&times;</button>
+      <button onclick="_sbPrefillDismiss()" style="flex:0 0 auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px;min-height:24px;min-width:24px;" title="Dismiss" aria-label="Dismiss pre-fill notification">&times;</button>
     </div>
 
     <div class="scenario-builder-grid">
@@ -61707,6 +61735,7 @@ function loadPreset(name) {
   window._sbOrigin = null;
   var _sbPfB = document.getElementById('sb-prefill-banner');
   if (_sbPfB) _sbPfB.style.display = 'none';   // v928 (T6): re-shown, with the preset's basis, at the end of this function
+  if (typeof _sbPrefillSync === 'function') _sbPrefillSync();   // v1024 (T2): publish --sb-pf-h: 0px while hidden
   if (typeof _sbRenderDiscountNote === 'function') _sbRenderDiscountNote();   // v953 (T4): the reform offer belonged to the dropped country
   // v883 (T2): drop any armed R-factor ladder with it, for the same reason.
   if (typeof _sbDisarmTiers === 'function') _sbDisarmTiers();
@@ -61786,9 +61815,13 @@ function loadPreset(name) {
     _pt.innerHTML = _h;
     var _warn = _r.diff.length > 0;
     _pb.style.borderColor = _warn ? 'var(--yellow)' : 'rgba(176,104,0,0.25)';
-    _pb.style.background  = _warn ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    // v1024 (T2): opaque base under the tint — this banner is sticky, see #sb-prefill-banner.
+    var _pfTint = _warn ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    _pb.style.backgroundColor = 'var(--surface)';
+    _pb.style.backgroundImage = 'linear-gradient(' + _pfTint + ',' + _pfTint + ')';
     _pb.style.color       = 'var(--accent-dim)';
     _pb.style.display     = 'flex';
+    _sbPrefillSync();
     if (_ps) {
       _ps.innerHTML = 'Use ' + _c + '\u2019s ORCA record';
       _ps.title = 'Reload this form from the fiscal terms ORCA actually holds for ' + p._country
@@ -63500,9 +63533,15 @@ function ddOpenScenarioBuilder(country) {
                   + country + '.');
         })();
     _sbBanner.style.borderColor = _sbMono ? 'var(--red)' : _sbBasis === 'default' ? 'var(--yellow)' : 'rgba(176,104,0,0.25)';
-    _sbBanner.style.background  = _sbMono ? 'rgba(185,28,28,0.07)' : _sbBasis === 'default' ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    // v1024 (T2): tint OVER an opaque base. The banner is sticky now, so the results scroll
+    // underneath it, and a 7% wash over moving text was unreadable. Keeps the three-state
+    // colour coding and stays theme-correct, which a pre-blended hex would not.
+    var _sbTint = _sbMono ? 'rgba(185,28,28,0.07)' : _sbBasis === 'default' ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    _sbBanner.style.backgroundColor = 'var(--surface)';
+    _sbBanner.style.backgroundImage = 'linear-gradient(' + _sbTint + ',' + _sbTint + ')';
     _sbBanner.style.color       = _sbMono ? 'var(--red)' : 'var(--accent-dim)';
     _sbBanner.style.display = 'flex';
+    _sbPrefillSync();
     // v928 (T6): this path IS the record, so the "use the record instead" control retires here.
     var _sbSwapBtn = document.getElementById('sb-preset-swap');
     if (_sbSwapBtn) _sbSwapBtn.style.display = 'none';
@@ -72695,9 +72734,62 @@ function _sbPinHeader() {
   var px = Math.round(h.getBoundingClientRect().height);
   if (px > 0) inner.style.setProperty('--sb-hdr-h', px + 'px');
 }
+// ── v1024 (T2): the pinned pre-fill caveat ────────────────────────────────────────────────
+// Why this exists: ddOpenScenarioBuilder() shows #sb-prefill-banner, then auto-runs the DCF
+// 100ms later, and runCustomScenario() scrollIntoView()s the results. Measured on Ghana, Chad
+// and Malta, desktop and 390px: that leaves the banner 27px above the modal's content area on
+// desktop and 1869px above it on a phone — i.e. the caveat is shown and then immediately
+// scrolled off, on every run, on the Country Profile route. The banner is now sticky (CSS), and
+// this publishes its height so the inputs panel's own sticky Run DCF bar docks BELOW it instead
+// of behind it. Same contract as _sbPinHeader()/--sb-hdr-h.
+function _sbPrefillSync() {
+  var b = document.getElementById('sb-prefill-banner');
+  var t = document.getElementById('sb-prefill-text');
+  var m = document.getElementById('sb-prefill-more');
+  var inner = document.getElementById('scenario-modal-inner');
+  if (!b || !inner) return;
+  var shown = b.style.display !== 'none' && b.offsetParent !== null;
+  if (!shown) {
+    // A hidden banner must publish zero, or Run DCF docks against a bar that is not there.
+    inner.style.setProperty('--sb-pf-h', '0px');
+    b.classList.remove('sb-pf-clamped', 'sb-pf-open');
+    return;
+  }
+  // Re-clamp on every (re)show: the previous country's note may have been expanded.
+  b.classList.remove('sb-pf-open');
+  if (m) { m.textContent = 'more'; m.setAttribute('aria-expanded', 'false'); }
+  // scrollHeight exceeds clientHeight only while -webkit-line-clamp is actually cutting text,
+  // so the control appears for a 7-line note on a phone and not for a 2-line one on desktop.
+  var clamped = !!t && (t.scrollHeight > t.clientHeight + 1);
+  b.classList.toggle('sb-pf-clamped', clamped);
+  // +12 for the banner's own margin-bottom, which content would otherwise scroll through.
+  var px = Math.round(b.getBoundingClientRect().height);
+  inner.style.setProperty('--sb-pf-h', (px > 0 ? px + 12 : 0) + 'px');
+}
+function _sbPrefillToggle() {
+  var b = document.getElementById('sb-prefill-banner');
+  var m = document.getElementById('sb-prefill-more');
+  if (!b) return;
+  var open = b.classList.toggle('sb-pf-open');
+  if (m) {
+    m.textContent = open ? 'less' : 'more';
+    m.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  // Expanding changes the pinned height, so Run DCF has to move with it.
+  var inner = document.getElementById('scenario-modal-inner');
+  if (inner) {
+    var px = Math.round(b.getBoundingClientRect().height);
+    inner.style.setProperty('--sb-pf-h', (px > 0 ? px + 12 : 0) + 'px');
+  }
+}
+function _sbPrefillDismiss() {
+  var b = document.getElementById('sb-prefill-banner');
+  if (b) b.style.display = 'none';
+  _sbPrefillSync();
+}
 window.addEventListener('resize', function () {
   var m = document.getElementById('scenario-modal');
-  if (m && m.classList.contains('open')) _sbPinHeader();
+  if (m && m.classList.contains('open')) { _sbPinHeader(); _sbPrefillSync(); }
 });
 
 function openScenarioBuilder() {
@@ -72709,6 +72801,7 @@ function openScenarioBuilder() {
   // v363: hide pre-fill banner when opening fresh from header (not from Country Profile)
   var banner = document.getElementById('sb-prefill-banner');
   if (banner) banner.style.display = 'none';
+  if (typeof _sbPrefillSync === 'function') _sbPrefillSync();   // v1024 (T2): a header-opened SB pins nothing
   // v607 (T2): and drop the country provenance with it. ddOpenScenarioBuilder() calls this
   // first and re-arms _sbOrigin afterwards, so a header-opened scenario carries no country claim.
   window._sbOrigin = null;
