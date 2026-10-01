@@ -69723,3 +69723,16 @@ four tiers, of which the v564 comment records only one being reachable.
 - **Probe debris, twelfth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain
   untracked in the repo root (~29 MB). This cycle's probes went to `/tmp/c958/`. Still flagged rather
   than deleted — standing rule is to ask before deleting files the session did not create.
+
+---
+## Cycle 959 Log — 2026-10-01 09:13
+- Test before: 543 PASS / 0 FAIL
+- Test after: 543 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 958 complete and pushed (v1020).
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest in rotation (957 T3, 955 T1, 954 T5, 952 T4, 951 T6, 950 T2). Cycle 957's note that T6 last ran at 893 was wrong — cycle 951's own log is a T6 cycle; T2 is stalest either way.
+
+## Friction
+Country Profile auto-loads Indonesia, so the T2 question was already on screen. The one card headed **BREAKEVEN PRICE** rendered as a zero-height empty div — `cpBuildBeCallout()`
