@@ -68710,3 +68710,16 @@ real**. Recording this so no future cycle spends itself on them:
   export buttons.
 - Header badge was already at **v1011** in the inherited tree; verified it is the only `v1011`
   occurrence outside this cycle's own code comments, so no global replace was run.
+
+---
+## Cycle 948 Log — 2026-09-30 19:50
+- Test before: 479 PASS / 42 FAIL
+- Test after: 542 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed.
+
+## Cycle 940 — T1
+
+**Task:** T1 — "Which countries should even be on my screening list?"
+
+**Friction.** Walked T1 cold: Screener → the block under its "TAKE IS A FLOOR, NOT A MEASUREMENT" divider (45 countries) → click into a profile. The Screener is careful with that set — `≥` on take, `≤` on NPV, grouped below its own divider, labelled "not defensible as a screening shortlist on their own." The Country Profile verdict box those rows link into dropped every qualifier
