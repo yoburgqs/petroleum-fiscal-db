@@ -69147,3 +69147,135 @@ jurisdiction the platform grades 100/100.
 **Task.** T4 — "What is my fiscal-stability and reform exposure here?" Stalest in rotation (950 T2, 949 T3, 948/947 T1, 946 T5, 945/944 T4, orphaned v1015 T6). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded, served from `~` so `sw.js` resolves.
 
 **Housekeeping, stated because it changes the record.** v1015 was found **s
+
+---
+## Cycle 954 Log — 2026-10-01 — v1017
+
+**Task.** T5 — "Give me something I can paste straight into an IC memo." Stalest in rotation
+(952 T4, 951 T6, 950 T2, 949 T3, 948/947 T1, 946 T5). Walked cold at 1440×900 and 390×844
+`hasTouch`, both storages cleared and reloaded, served from `~` so `sw.js` resolves.
+
+**What was walked and found sound**, recorded so it is not re-walked. Every clipboard and file
+artifact on the platform was exercised and its payload read against the screen it came from:
+
+| surface | result |
+|---|---|
+| FC `⎘ Copy for IC Memo`, 3 ticked rows | TSV + HTML both carry the full basis; `#` is the placing in 185, not 1–3; hard-coded engine overrides, evidence tiers, reform verdicts and the fee-basis correction all travel. Cell values match the screen exactly. |
+| FC bulk-copy arm (`_icArmBulkCopy`) | arms at "⚠ Copy all 185 rows — confirm", confirms on the second click, clipboard untouched on the first |
+| Screener `⎘ Copy for IC Memo`, 4 ticked | Canada/USA/Azerbaijan/Mexico take, NPV, downside, swing, predictability ceilings and reform verdicts all byte-match the rendered cells |
+| Country Profile `Copy for IC Memo` (Norway) | 17-row Metric/Value table + 6 numbered notes, each keyed to the row it qualifies |
+| Scenario Builder `⎘ Copy for IC Memo` | 16 metrics + 2 notes, IRR explicitly withheld with the reason |
+| IOC Portfolio `⎘ Copy for IC Memo` (Shell) | 33 rows, operator-vs-country take gap reconciled in-table, monopoly rows withheld not zeroed |
+| Side-by-Side `⎘ Copy for IC Memo` | full basis, per-row comparability notices |
+| 6 file exports (FC xlsx, Explorer xlsx, Screener csv+xlsx, Breakeven csv, Vintage csv) | all download, all parse, all carry an assumptions block or sheet |
+| SbS + CP print→PDF | 5 and 17 pages, header/footer basis strip on every page |
+| mobile 390 | every IC control ≥24px (44px on all but two), no horizontal scroll |
+
+That is directive finalization item 5 — *"every export opens, parses, and carries the assumptions
+behind its numbers"* — holding across nine surfaces. The friction was not in what the exports say.
+
+**Friction.** `Explorer → Analytics Charts → "IRR vs Govt Take"` (`renderIRRScatter`,
+`index.html:28603`). The y-axis was `irr_<price>` — an unweighted arithmetic mean of a country's
+per-contract IRRs, median 333%. That figure is withdrawn **everywhere else**: the Fiscal Compare
+column (v525), the Screener axis and its null control (v515/v517), the Explorer column, sort key
+and "Has IRR Data" chip (v851), the Breakeven CSV column (v1016), and every clipboard artifact,
+each of which spends a paragraph on why. The runtime suite even *gates* it — `EXPL-NO-IRR` asserts
+the Explorer "may not regrow a country-level IRR" — but that check reads table headers, sort keys
+and chips, and this is a `<canvas>` under the table. It sat inside the gated tab and passed.
+
+On screen the analyst got no caveat of any kind: a tooltip reading `Norway · Take 68.0% · IRR
+141.2%`, a legend claiming `Coverage: 124/185` (the true figure at $75 was **118**), and a `↓ PNG`
+button beside it. The PNG caption had been hardened to open "NOT A PROJECT RETURN — DO NOT READ A
+POINT AGAINST A HURDLE RATE", but that only reaches an analyst who downloads it; the one reading
+the chart on screen carried the number away clean.
+
+And the filter `> 0 && < 500` was **one-sided censorship**. At $75 it dropped 47 of the 165
+countries carrying a figure — every one for computing a number too large or too negative to look
+like data — and plotted the surviving 118 as the universe. That is precisely the suppression the
+Breakeven CSV footer was rewritten to condemn one cycle earlier.
+
+Compounding it, the **IC Memo Quick Rules** block on Fiscal Compare — the one place on the platform
+that tells the analyst what to put in a memo — keyed two of its eight rules to that cell:
+*"IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries"* and
+*"Take >65% + IRR not shown → do not assume the project clears hurdle"*. The second now fires on
+all 185 rows or none, so it is not a rule.
+
+**Change.**
+- y-axis is now `npv_<price>` — contractor NPV in $M, the column Fiscal Compare marks
+  `db · citable`, the Country Profile headlines and every IC-memo paste carry. **185 of 185
+  countries, no filter, nothing censored** (was 118 of 185 with 47 silently dropped).
+- Nice 1 / 2 / 2.5 / 5 × 10^k tick step so gridlines read `$0 / $2B / $4B / $6B / $8B` rather
+  than `peak/4`. Axis label `Contractor NPV ($M) — citable`. Left pad 48 → 58 so `$5.0B` clears
+  the axis. Tooltip prints NPV, not IRR.
+- Legend reads `Coverage: 185/185 countries · nothing excluded · y-axis is the citable database
+  NPV, not a model figure`.
+- PNG caption was four paragraphs of reasons not to use the chart it captioned; it now states a
+  basis and the live range (`Vanuatu $5.10B at 5.0% take → Saudi Arabia $0M at 100.0% take`) and
+  keeps one paragraph headed `NO IRR AXIS — WITHDRAWN, NOT MISSING`. File is
+  `ORCA_contractor-npv-vs-take_$<price>.png`.
+- ids and functions renamed `irr-scatter-*` → `value-scatter-*`, `renderIRRScatter` →
+  `renderValueScatter`, `downloadIRRScatterPng` → `downloadValueScatterPng`.
+- Orientation layer corrected where it still sold the deleted column: the IC Memo Quick Rules
+  pair above, both Home cards (which now name `⎘ Copy for IC Memo`, the fastest route to a memo
+  table, which no Home card mentioned), the Screener tab `title` + `aria-label`, the Screener
+  Home-card title, the Fiscal Compare intro strip, the Explorer prose and its dash legend, and
+  the three `<meta>` descriptions.
+
+**Result.** The analyst who opens Analytics Charts now reads a take-vs-value frontier across every
+country in the database, on the one figure they are permitted to cite, and the `↓ PNG` drops into
+an IC memo with its basis, its range and its working-interest caveat attached. The last on-screen
+place that still handed them an IRR to carry is gone. The IC Memo Quick Rules no longer send them
+looking for a column deleted 400+ cycles ago.
+
+**Verify.**
+
+| check | expected | measured |
+|---|---|---|
+| scatter points at $75 | all 185 | **185** (was 118) |
+| any `IRR` text anywhere in `#texplorer` | none | **none** |
+| tooltip | prints NPV | `Libya · Take: 71.1% · NPV: $1.21B · n=301` |
+| PNG export | downloads, captioned | `ORCA_contractor-npv-vs-take_$75_2026-10-01.png` |
+| mobile Home / FC / Explorer | `scrollWidth == clientWidth` | **390 = 390** on all three |
+| sub-24px controls in `#texplorer` | 0 | **0**; canvas right edge 343 < 390 |
+| JS syntax gate | PASS | **PASS (11 blocks)** |
+| Playwright runtime suite | ran, green | **542 PASS / 0 FAIL / 0 WARN / 0 JS errors — read from `/tmp/runtime_test_report.txt` written 2026-10-01T07:48:50Z** |
+
+### Notes for the next cycle
+
+- **The `EXPL-NO-IRR` gate has a blind spot and this cycle did not close it.** It asserts the
+  Explorer may not regrow a country-level IRR, but it only reads table headers, sort keys and the
+  `chip-has-irr` id. A canvas, a card, a tooltip or a PNG on that tab is invisible to it — which is
+  how this chart survived six cycles of IRR withdrawal inside the very tab being gated. Worth
+  widening to "no `/\bIRR\b/` in the rendered text of `#texplorer` except where it names the
+  withdrawal", which is now true and would have caught this.
+- **Serve `~`, not the repo** (carried forward, still true): `index.html:49` registers the service
+  worker at `/petroleum-fiscal-db/sw.js`, so serving the repo root 404s it fifteen times and flips
+  `[ConsoleErrors]` to WARN for no real reason.
+- Found while walking, not acted on: the **Side-by-Side basis paragraph** says breakeven "is not
+  reported … at $75/bbl the DCF engine now returns a usable breakeven for 44 of 71,576 contract
+  rows", while the Country Profile headlines `$29/bbl` for Norway, the Explorer column is headed
+  `BREAKEVEN (67/185 COUNTRIES)` and the Breakeven CSV ships 67 country figures spanning
+  $20.3–$34.0. Two different denominators (contract rows vs countries) in one sentence, and one
+  tab withholding a number three others headline. The withholding is defensible — the canonical
+  IC screening sets (Guyana / Angola / Brazil / Nigeria) carry no breakeven at all — but the
+  sentence does not say that, and the analyst who read Norway's profile first will think the tab
+  is broken.
+- Also found: Side-by-Side carries **four** export controls at 390px — `⬇ Export PDF` and
+  `⬇ Save as PDF`, `⎘ Copy for IC Memo` and `⎘ Copy Table for IC Memo` — two pairs that do the same
+  thing under different labels (eighth cycle this has been noted for the copy pair; the PDF pair
+  is new). On a phone they occupy two full rows and the analyst cannot tell the pairs apart.
+- `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain untracked probe debris in the repo
+  root (~29 MB, ninth cycle). `_pre1017.html` was written to `/tmp` instead. Still flagged to Zach
+  rather than deleted — standing rule is to ask before deleting files the session did not create.
+- Carried forward unchanged: the FC **Reform verdict** column prints a bare lowercase `n/c` on 164
+  of 189 rows with its qualifier only in the tooltip, while every other surface states it in the
+  cell; `window._fcNavList` is never invalidated, so an Explorer row click can print `↩ Back to FC`;
+  the CP headline's take rank counts 1 = lowest take and says so nowhere while the NPV rank 6px
+  away counts 1 = highest and prints `(highest first)`; Indonesia's three different government
+  profit-oil shares on one page; `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source;
+  breakeven on only 67 of 185; Somalia the one true T4 dead end; `Paraguay Decree 19.080/1997`
+  typed `government_filing`; the Screener count line's `block· Deepwater` join fault; the Home card
+  at ~3077 saying Side-by-Side compares "up to 4 countries" against `CMP_MAX` = 5; `_posClause648`
+  number agreement; Côte d'Ivoire's two missing API slugs; `window._screenerExportBasis` not naming
+  the 105 withheld countries; `summary "Reading this table"` at 18px (the one sub-24px control left
+  on Fiscal Compare at 390); `norway+united-kingdom+netherlands` ordering only UK › Norway.
