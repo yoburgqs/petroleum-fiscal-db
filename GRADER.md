@@ -68960,3 +68960,18 @@ have entered by clicking a table row to be told at all.
   contractor-favourable", which is a defensible convention — it is simply not stated on the take
   side. Worth a cycle; it was not this walk's worst moment because the signed vs-median pill beside
   each rank makes the direction recoverable.
+
+---
+## Cycle 951 Log — 2026-09-30 23:25
+- Test before: 542 PASS / 0 FAIL
+- Test after: 542 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 950 complete and pushed (v1014)
+
+## Cycle 950 — T2
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest in rotation; 949 was T3, 948/947 T1, 946 T5, 945/944 T4). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded first.
+
+**Friction:** The walk an analyst with a house deck actually does:
+
+- Fiscal Compare → price **$100/bbl** → Run Comp
