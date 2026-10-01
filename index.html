@@ -2940,7 +2940,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1012</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1014</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4670,10 +4670,16 @@ window.copyPlatformCitation = function(btn) {
          were false: there is no price control on this page, and it set none. It now names the one
          price it can actually put the screen on; the basis strip below says why that matters. -->
     <button id="cp-run-fc-btn" onclick="_cpReRankAtBase()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:4px 10px;min-height:24px;font-weight:600;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at">&#9654; Re-run FC at $75</button>
-    <!-- v889 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
-         Fiscal Compare run was at a price other than the $75 this profile is computed at. -->
-    <div id="cp-price-basis" style="flex-basis:100%;display:none;"></div>
   </div>
+  <!-- v889 (T2): price-basis reconciliation. Filled by _cpPriceBasisUpdate() only when the last
+       Fiscal Compare run was at a price other than the $75 this profile is computed at.
+       v1014 (T2): LIFTED OUT of #fc-nav-bar. It used to be a flex child of that bar, which is
+       display:none unless window._fcNavList holds the country on screen -- and that list is
+       populated in exactly one function, openCountryProfileFromFC(). So the warning fired only
+       when the analyst arrived by clicking a row or a drawer's "Full Profile", and was silently
+       suppressed on the plainest route of all: Country Profile tab -> dropdown. It now sits
+       outside the bar and renders on the mismatch itself, whatever route got here. -->
+  <div id="cp-price-basis" style="display:none;"></div>
 
   <div id="cp-empty-state">
     <div style="text-align:center;padding:56px 24px 40px;max-width:560px;margin:0 auto;">
@@ -24256,6 +24262,9 @@ function switchTab(id, btn) {
     if (!window._paneLeave) window._paneLeave = {};
     window._paneLeave[_fromId] = { y: window.pageYOffset || 0, mode: _fromId === 'texplorer' ? (window._explorerMode || 'browse') : null };
   }
+  // v1013 (T6): which pane this Country Profile visit arrived FROM. _cpBackLabel() needs the
+  // origin, not just the Explorer's last mode -- see the walk note above _CP_ORIGIN_LBL.
+  if (_paneChanged && id === 't7') window._cpOrigin = { pane: _fromId, btnId: _fromBtnId };
   // v790 (T4): arriving on Reform Risk by its tab button leaves nothing to go back to.
   // openReformRiskFor() re-arms the return after this call; see _rrBackToOrigin().
   if (_paneChanged && id === 'treformrisk') window._rrReturn = null;
@@ -24264,6 +24273,10 @@ function switchTab(id, btn) {
   panel.classList.add('active');
   if (_paneChanged && (window.pageYOffset || 0) > 0) window.scrollTo(0, 0);
   if (id === 't7' && typeof _cpBackLabel === 'function') document.querySelectorAll('.cp-back-list').forEach(function (b) { b.textContent = _cpBackLabel(); });
+  // v1014 (T2): re-check the price basis on ENTRY to the tab, not only when a profile renders.
+  // Leaving a loaded profile to run Fiscal Compare at $100 and coming back re-renders nothing,
+  // so without this the strip would still be showing the basis from before that run.
+  if (id === 't7' && typeof _fcNavBarUpdate === 'function') _fcNavBarUpdate();
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
   window._prevTab = window._activeTab;
   window._activeTab = id;
@@ -67087,7 +67100,63 @@ function openCountryProfileFromFC(country) {
 // 185-row Browse table, not their list. It now returns to the mode the Explorer was left in, at
 // the offset it was left at, and says which one it is going to. switchTab resets scroll on entry,
 // so without this restore the round trip would land at the top of the Screener's sliders.
+/* ── v1013 (T6): the provenance round trip was one-way from three of the six origins ──────
+   Walked T6 cold at 1440x900 and 390x844 hasTouch, both storages cleared and reloaded first.
+
+   "Where did this number come from" is answered on the Country Profile, by the per-term Evidence
+   Chain, and every surface that prints a take reaches it: Fiscal Compare, Explorer, Screener and
+   IOC Portfolio via the Quality column's "N of M terms cited" chip (_fcOpenTermChain), Side-by-
+   Side via the same chip rendered as a bare "3 of 4 →", the Breakeven Map by clicking a country
+   polygon. Measured across all six, the chips agree with each other and with the profile
+   (USA 2/5, Iraq 1/3, Australia 2/4, UK 2/5 on every surface that prints them) and the chain
+   itself is in good shape. Getting there is solved. Getting BACK was not.
+
+   The Country Profile has exactly one return control, the .cp-back-list button, and its label came
+   from _cpBackLabel(), which read ONLY window._paneLeave.texplorer -- the Explorer's last mode.
+   It therefore answered "Explorer" or "Screener" and nothing else, whatever pane the analyst had
+   actually come from. Measured on the shipped build, clicking the provenance route from each
+   origin and reading the control that comes back:
+
+     origin                        control says    goes to        correct
+     Fiscal Compare                ↩ Back to FC    Fiscal Compare  yes (fc-nav-bar, shown)
+     Explorer                      ← Explorer      Explorer        yes
+     Screener                      ← Screener      Screener        yes (v769/v795)
+     Side-by-Side                  ← Explorer      Explorer        NO
+     IOC Portfolio                 ← Explorer      Explorer        NO
+     Breakeven Map                 ← Explorer      Explorer        NO
+
+   On those last three the fc-nav-bar is display:none (it needs an FC result list), so the mislabelled
+   button is the ONLY return affordance on the page. The analyst is not merely told the wrong
+   destination -- they are taken to it: a 185-row Explorer table they never opened.
+
+   This matters for T6 specifically because checking provenance is not one click. An analyst
+   vetting a three-country Side-by-Side set checks all three, and each check is: chip → profile →
+   "← Explorer" → wrong tab → hunt the tab bar → Side-by-Side. The comparison itself survives
+   (compareList is untouched), so nothing is lost -- which is exactly why this reads as the tool
+   misdirecting them rather than as a bug they can see. That is the give-up point in this walk.
+
+   Nothing is removed and the Explorer/Screener path is byte-for-byte unchanged: both the label and
+   the return fall through to the original logic whenever the origin is the Explorer or is unknown,
+   so the v769 mode restore and the v795 drill-row flash are untouched. thome and t0 are
+   deliberately NOT in the map -- a cold deep link to #/profile/<slug> leaves Home as the pane
+   switched away from, and labelling that "← Home" would be a wrong answer on the commonest entry
+   path of all, a shared link; and Fiscal Compare already gets a correct "↩ Back to FC" from the
+   nav bar, so adding "← Fiscal Compare" beside the existing "Fiscal Compare" button would print
+   the same destination twice. */
+var _CP_ORIGIN_LBL = {
+  t2: 'Side-by-Side',
+  t5: 'IOC Portfolio',
+  tbreakevenmap: 'Breakeven Map',
+  treformrisk: 'Reform Risk'
+};
+function _cpOriginPane() {
+  var o = window._cpOrigin;
+  if (!o || !o.pane || !_CP_ORIGIN_LBL[o.pane]) return null;
+  return document.getElementById(o.pane) ? o.pane : null;
+}
 function _cpBackLabel() {
+  var pane = _cpOriginPane();
+  if (pane) return '← ' + _CP_ORIGIN_LBL[pane];
   var l = (window._paneLeave || {}).texplorer;
   return (l && l.mode === 'screen') ? '← Screener' : '← Explorer';
 }
@@ -67107,6 +67176,17 @@ function _scNoteDrill(tr) {
   } catch (e) { window._scDrill = null; }
 }
 function _cpBackToList() {
+  // v1013 (T6): return to the pane this visit actually came from, when that is one of the three
+  // origins the Explorer/Screener label could never describe. Falls through otherwise.
+  var _oPane = _cpOriginPane();
+  if (_oPane) {
+    var _oBtnId = (window._cpOrigin || {}).btnId;
+    switchTab(_oPane, (_oBtnId && document.getElementById(_oBtnId)) || _tabBtnFor(_oPane));
+    var _oLeave = (window._paneLeave || {})[_oPane];
+    var _oY = _oLeave ? _oLeave.y : 0;
+    if (_oY > 0) setTimeout(function () { if (window._activeTab === _oPane) window.scrollTo(0, _oY); }, 150);
+    return;
+  }
   var l = (window._paneLeave || {}).texplorer;
   var screen = !!(l && l.mode === 'screen');
   switchTab('texplorer', document.getElementById(screen ? 'tab-btn-tscreener' : 'tab-btn-texplorer'));
@@ -67519,11 +67599,37 @@ function _cpReRankAtBase() {
 }
 window._cpReRankAtBase = _cpReRankAtBase;
 
+/* ── v1014 (T2): the warning now fires on the mismatch, not on the entry route ──────────
+   v889 built this strip for the walk FC -> $100 -> Run Compare -> row -> Full Profile, and on that
+   route it works. But it was parked INSIDE #fc-nav-bar, and _fcNavBarUpdate() hides that bar —
+   and called _cpPriceBasisUpdate(null) to blank the strip — whenever window._fcNavList does not
+   contain the country on screen. That list is written in one place, openCountryProfileFromFC().
+   So on the commonest T2 route there is no warning at all:
+
+     Fiscal Compare → price $100/bbl → Run Compare   (Indonesia: 66.4% take · $1.27B NPV)
+     → "Country Profile" tab → dropdown → Indonesia  (59.5% take · $745M NPV)
+
+   Measured on the shipped build at that point: window._fcLastPrice === 100, #fc-nav-bar hidden,
+   #cp-price-basis display:none, innerHTML empty. 6.9pp and $525M apart, nothing on screen naming
+   either price as the other's basis. Same silence from the Home card, the CP quick-load benchmark
+   buttons, a shared #/profile/ link, and from changing country in the dropdown.
+   The strip is now a sibling of the bar and resolves the country from #dd-country-select when it
+   is handed none. Where the bar is hidden it also carries its own re-rank control, because
+   #cp-run-fc-btn — the one action that puts the two surfaces on one price — is a child of the
+   hidden bar and went with it. */
 function _cpPriceBasisUpdate(country) {
   var el = document.getElementById('cp-price-basis');
   var btn = document.getElementById('cp-run-fc-btn');
   var p = _cpFcRunPrice887();
   var off = (p != null && p !== _CP_BASE_PRICE_887);
+  // The bar is the only thing that prints a $p-ordered rank next to this strip, and the only
+  // thing that already carries a re-rank button. Read its state, then say the true thing.
+  var _bar1014 = document.getElementById('fc-nav-bar');
+  var _barOn1014 = !!(_bar1014 && _bar1014.offsetParent !== null);
+  if (!country) {
+    var _dd1014 = document.getElementById('dd-country-select');
+    country = (_dd1014 && _dd1014.value) ? _dd1014.value : null;
+  }
   if (btn) {
     btn.innerHTML = off ? '&#9654; Re-rank all 185 at $75' : '&#9654; Re-run FC at $75';
     btn.title = off
@@ -67583,8 +67689,18 @@ function _cpPriceBasisUpdate(country) {
             ? country + ' is a state monopoly — it carries no contractor take or NPV at any price, '
               + 'so there is nothing here that moves between $' + p + ' and $75.'
             : country + ' carries no $' + p + ' figure to compare against.') + '</div>')
-    + '<div style="margin-top:3px;opacity:.9;">The rank beside it is the $' + p + ' ordering. '
+    + '<div style="margin-top:3px;opacity:.9;">' + (_barOn1014
+        ? 'The rank beside it is the $' + p + ' ordering. '
+        : 'The ranking you ran in Fiscal Compare is ordered at $' + p + '. ')
     + 'Everything below — tier, NPV rank, peers, IC line — is $75.</div>'
+    + (_barOn1014 ? ''
+        : '<div style="margin-top:6px;"><button type="button" onclick="_cpReRankAtBase()" '
+          + 'style="background:rgba(194,65,12,.12);border:1px solid var(--orange);border-radius:4px;'
+          + 'color:var(--orange);font-size:11px;font-weight:700;cursor:pointer;padding:4px 10px;'
+          + 'min-height:24px;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl '
+          + '— the price this profile is computed at — so the screen and this page sit on one price '
+          + 'basis. The profile cannot be re-based to $' + p + '; the ranking is what moves.">'
+          + '&#9654; Re-rank all 185 at $75</button></div>')
     + '</div>';
 }
 window._cpPriceBasisUpdate = _cpPriceBasisUpdate;
@@ -67603,6 +67719,9 @@ function _fcNavBarUpdate() {
   var idx = window._fcNavIdx != null ? window._fcNavIdx : -1;
   if (!bar || !list.length || idx < 0) {
     if (bar) bar.style.display = 'none';
+    // v1014 (T2): null no longer means "blank the strip" — _cpPriceBasisUpdate() resolves the
+    // country from #dd-country-select. There is no FC-ordered rank to reconcile against on this
+    // branch, but the price mismatch is just as real, so the strip still has to be said.
     _cpPriceBasisUpdate(null);
     return;
   }
