@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1021</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1023</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -45383,7 +45383,7 @@ function renderReformTimeline(country) {
   const reformsSorted = reforms.slice().sort(function(a,b){ return (b.year||0)-(a.year||0); });
   const REFORM_SHOW_LIMIT = 4; // show latest 4 open; collapse older events
   // v1016 (T4): was its own two-way test on take_change with no chip where there was none --
-  // see the note above _rrTakeChip() for what that hid on 20 of the 21 covered profiles. Now
+  // see the note above _rrEventTakeChip() for what that hid on 20 of the 21 covered profiles. Now
   // the same builder the Reform Risk card's log uses, so every row states which of the three
   // things it is, plus the 2010 window this timeline has never shown. The Reform Frequency
   // Score in the card directly above is defined on that window, and until now a pre-2010 entry
@@ -45394,8 +45394,8 @@ function renderReformTimeline(country) {
   function buildReformEventHtml(r, slug) {
     const _d = (typeof _rrEventDir === 'function') ? _rrEventDir(r) : 'unmeasured';
     const dir = (_d === 'hostile' || _d === 'friendly') ? _d : 'neutral';
-    const _chip = (typeof _rrTakeChip === 'function')
-      ? _rrTakeChip(r)
+    const _chip = (typeof _rrEventTakeChip === 'function')
+      ? _rrEventTakeChip(r)
       : (r.take_change ? `<span class="reform-take reform-${dir}">${r.take_change} take</span>` : '');
     const _cEsc = (typeof _rrEsc === 'function') ? _rrEsc(country) : country;
     const _scores = (typeof _rrScores === 'function') ? _rrScores(r) : null;
@@ -53640,6 +53640,26 @@ function _rrVerdictHead(title, mb) {
 // against the rupture in the event log" -- pointed at evidence the page did not carry.
 // The log now renders inside the verdict card, split at the 2010 boundary the score is defined
 // on, because that split is the thing three of the four verdict types turn on.
+// ── v1023 (T4): RENAMED from _rrTakeChip, which already existed ─────────────────────────
+// v1016 declared this as `function _rrTakeChip(e)`. A DIFFERENT `function _rrTakeChip(
+// country, take75, forCell, takeColor)` -- the Take @ $75 cell/chip builder, 97 lines up --
+// was already declared at global scope in this same inline script. Function declarations
+// hoist and the LAST one wins, so v1016 silently deleted the take builder and took all four
+// of its call sites with it. Shipped in v1016 (cycle 952 -- itself a T4 cycle) and live through
+// 10 cycles and 5 index.html commits. What the analyst saw on the Reform Risk tab throughout:
+//   * the ranked table rendered 6 <th> and 5 <td> on all 21 rows -- TAKE @ $75 empty on
+//     every row of the tab's flagship ranking, the column its own header tooltip spends a
+//     paragraph on (Iraq 84.8% blend -> 34.1% comparable, Ecuador, Mexico, India);
+//   * the 21 <span>s this function returned landed directly inside <tbody>, so the HTML
+//     parser foster-parented them OUT of the table and stacked them ABOVE its header as 21
+//     identical orange lines reading "fiscal change . take move not quantified";
+//   * all three stability cards (Quiet 13 / near-bar 6 / Active 2) printed that same chip
+//     where each country's take% belongs -- so Iraq, the headline fee-basis correction on
+//     this platform, read as a sentence about its reform size instead of a number.
+// The suite stayed green at 543/0 throughout: nothing asserted that a table's <td> count
+// matches its <th> count, so a whole missing column is invisible to it. A guard for that is
+// now in runtime_comprehensive.js. Do not re-use the bare name `_rrTakeChip` for an
+// event-level helper -- it is the country-level take builder and has been since v988.
 // ── v1016 (T4): one chip builder for both reform timelines ───────────────────────────────
 // This was tag(), local to _rrEventLogHtml(), which renders the Reform Risk card's event log.
 // The Country Profile has a SECOND timeline, under its own "Fiscal Reform History" heading,
@@ -53659,7 +53679,7 @@ function _rrVerdictHead(title, mb) {
 //      that (score 100/100, "Since 2010: 0 law changes"); the timeline below it listed three
 //      dated entries and left the analyst to reconcile the two.
 // Shared rather than copied, so the card and the profile cannot fork again.
-function _rrTakeChip(e) {
+function _rrEventTakeChip(e) {
   var d = (typeof _rrEventDir === 'function') ? _rrEventDir(e) : 'unmeasured';
   if (d === 'hostile' || d === 'friendly') {
     return '<span class="reform-take reform-' + d + '">' + _rrEsc(e.take_change) + ' take</span>';
@@ -53673,7 +53693,7 @@ function _rrTakeChip(e) {
     + 'title="Sourced event that changed no fiscal terms. It stays in the log but does not score.">'
     + _rrEsc(String(e.context_kind || 'no change to fiscal terms')) + '</span>';
 }
-window._rrTakeChip = _rrTakeChip;
+window._rrEventTakeChip = _rrEventTakeChip;
 
 function _rrEventLogHtml(c, events) {
   if (!events || !events.length) return '';
@@ -53682,7 +53702,7 @@ function _rrEventLogHtml(c, events) {
   var inWin = sorted.filter(function(e) { return (e.year || 0) >= 2010; });
   var preWin = sorted.filter(function(e) { return (e.year || 0) < 2010; });
 
-  var tag = _rrTakeChip;
+  var tag = _rrEventTakeChip;
 
   function row(e) {
     var d = _rrEventDir(e);
