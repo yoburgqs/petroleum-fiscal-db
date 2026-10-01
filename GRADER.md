@@ -69134,3 +69134,16 @@ jurisdiction the platform grades 100/100.
   `window._screenerExportBasis` not naming the 105 withheld countries; `summary "Reading this
   table"` at 18px; Side-by-Side's two byte-identical export buttons;
   `norway+united-kingdom+netherlands` ordering only UK › Norway.
+
+---
+## Cycle 953 Log — 2026-10-01 01:45
+- Test before: 542 PASS / 0 FAIL
+- Test after: 542 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 952 complete and pushed (v1016)
+
+## Cycle 952 — T4
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" Stalest in rotation (950 T2, 949 T3, 948/947 T1, 946 T5, 945/944 T4, orphaned v1015 T6). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded, served from `~` so `sw.js` resolves.
+
+**Housekeeping, stated because it changes the record.** v1015 was found **s
