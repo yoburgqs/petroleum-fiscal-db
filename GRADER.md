@@ -69736,3 +69736,198 @@ four tiers, of which the v564 comment records only one being reachable.
 
 ## Friction
 Country Profile auto-loads Indonesia, so the T2 question was already on screen. The one card headed **BREAKEVEN PRICE** rendered as a zero-height empty div — `cpBuildBeCallout()`
+
+---
+## Cycle 960 Log — 2026-10-01 17:05
+
+- Test before: 543 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 540 PASS / 0 FAIL / 2 WARN / 15 console errors (local serve)
+- JS errors: 0 page errors; the 15 console entries are all one line — the service worker 404 on `/petroleum-fiscal-db/sw.js`, which does not exist on a root-served localhost tree. Present identically in the before run.
+- Version: v1020 → v1021
+- Summary: Methodology → Data Coverage At a Glance advertised 165/185 coverage for a metric
+  this platform publishes nowhere, and three of six tile bodies contradicted the headline
+  painted 20px above them.
+
+## Task
+
+**T6** — "Where did this number come from and how solid is the evidence?" Stalest in the
+rotation: 959 T2, 957 T3, 955 T1, 954 T5, 952 T4, **951 T6**.
+
+Walked cold at 1440×900 and at 390×844 `hasTouch`, storage cleared before each pass. Started
+where a T6 walk starts when the analyst does not already know the answer: the Methodology tab,
+and specifically **Data Coverage At a Glance**, whose own first line states its job as *"What
+data is available for each country — and what is not. Understanding coverage is essential
+before using ORCA data in IC submissions."* It is where the Coverage Summary jump link lands.
+
+Walked and cleared first, so they are not this cycle's finding: the Country Profile Evidence
+Chain (per-term ORCA value / statutory value / instrument / tier / dead-link marker / reform
+recency), the `N of M terms cited` chip on FC / Explorer / Screener / Side-by-Side / IOC, the
+NPV route to `cost-profile-<slug>` (v990), the Breakeven Map's four computed coverage literals
+(v918/v963 — re-measured live this cycle at 67 of 185 and `$20.3–$34`, both correct), and the
+reform event log (measured: **all 83 events across the 21 covered jurisdictions carry a
+`source` in `api/v1/country/<slug>.json`** — 0 uncited, and the dead-link builder reaches them
+via `_rrSrcBadge`, v945).
+
+## Friction
+
+`#meth-coverage-summary`, `_methPaintCoverage()` at index.html:53085.
+
+**v838 painted the six tile HEADLINES and left every tile BODY as hardcoded HTML.** Two years
+of drift then accumulated in the bodies, under headlines that had been corrected. Measured on
+the shipped build, not inferred:
+
+| tile | headline (painted) | body (typed) | truth |
+|---|---|---|---|
+| **IRR (In DB)** | `165/185`, 89%-filled **yellow** coverage bar | "165 countries have bounded IRR in the database (≤500%)… **Shown in UI: 124**" | shown in UI: **0** |
+| BREAKEVEN PRICE | `68/185` | "**68** countries have… **Remaining 117** are excluded" | **67** print; 68 is `be_75` raw |
+| NPV | `185/185` | "using the standardized DCF model (**$1.2B capex / 50k bbl/d / $15/bbl opex**)" | `ENGINE_BASIS` — **$1.0B all-in, $18/bbl escalating** |
+| GOVERNMENT TAKE / PRICE SWING / STABILITY | correct | correct | — |
+
+**The worst moment is the IRR tile, and it is not a drift error — it is the platform
+advertising a number it withdrew on purpose.**
+
+`irr_75` is `AVG(irr_pct)` across every contract in a country. Measured live this cycle over
+`COUNTRY_DATA`: 165 of 185 carry one, **median 333.1%**, only **9 below 100%**, top **996.5%**.
+It is an arithmetic mean of a heavy-tailed distribution and it is not monotonic in price,
+because the 999 sentinel drops a different subset of contracts at each price point. It was
+therefore removed surface by surface — Country Profile v516, the Screener "Min IRR threshold"
+slider v517, Fiscal Compare v525, both IOC Portfolio tables v787, the Breakeven CSV v847, and
+finally the Explorer table and its XLSX v851. Every surface that used to show it now says so in
+words: the Screener tab button ("There is no IRR axis… withdrawn at v517"), the Explorer sort
+tooltip ("this slot was IRR until v851; that figure was an arithmetic mean of per-contract
+IRRs, not a project return"), the IOC Portfolio note ("IRR is not shown"). **The Methodology tab
+itself says it**, in the "Why does IRR show —" FAQ at index.html:5508: *"ORCA no longer displays
+a country-level IRR anywhere."*
+
+That paragraph is ~500 lines BELOW the coverage grid. The grid, at the top of the same page, on
+the same build, told the analyst the opposite — a green-family coverage tile, a fraction, and an
+explicit **"Shown in UI: 124"**.
+
+This is the give-up point in a T6 walk, and it fails in the expensive direction. The analyst
+reads "available for 165 of 185, shown for 124", goes looking for an IRR column, finds none on
+any of the ten tabs, and either concludes the tool is broken — or does the thing the tile is
+effectively instructing them to do: takes `irr_75` out of `api/v1/country/<slug>.json`, where
+it is still published, and puts Afghanistan **464.3%** or Algeria **349.4%** into an IC memo as
+a project return. That is precisely the outcome six surfaces were stripped to prevent, and the
+one panel built to say what is trustworthy was routing them to it. Same error shape as the
+STABILITY tile v838 fixed — absence or withdrawal read as availability — one tile over, missed.
+
+## Change
+
+`_methPaintCoverage()` now paints the tile BODIES from the same data as the headlines, and the
+IRR tile stops being a coverage tile at all. On screen:
+
+**IRR tile.** Headline is no longer a fraction. It reads **`NOT PUBLISHED`** in orange; the
+label reads **`COUNTRY IRR — WITHDRAWN`**; the bar is flat `var(--border)` with no fill, so it
+cannot be read as 89% coverage from across the room. The body now says, with the figures
+computed live rather than typed:
+
+> **No tab, table, chart, CSV or XLSX on this platform shows a country-level IRR.** The figure
+> is still in the database and in `api/v1/country/{slug}.json` as `irr_75` — 165 of 185
+> countries, median 333%, only 9 below 100% — and it is `AVG(irr_pct)` across every contract in
+> the country: an arithmetic mean of a heavy-tailed distribution, not a return on any project.
+> Do not cite it. The downside axis that replaced it is **contractor NPV at $50/bbl**, modelled
+> for 185 of 185 and still positive on 180. For a real project IRR, open a country and use
+> **Model in Scenario Builder** with your own capex, opex, profile and discount rate.
+> **Screen on the $50 downside →**
+
+That last item is a real control, not a sentence: it switches to the Screener and applies the
+**Downside Resilience** preset. Verified by click — lands on `texplorer` in screen mode with the
+preset chip reading *"◆ Downside Resilience: retains ≥50% of $75 contractor NPV at $50/bbl"*
+and **24 countries** matching. Same pattern, same 24px floor, as the STABILITY tile's
+"Open Reform Risk →" (v838).
+
+**BREAKEVEN tile.** The count now comes from `cpBeFor()` — the resolver that decides what any
+surface actually prints — instead of `be_75` raw. `be_75` raw admits the three 100%-take state
+monopolies whose stored `$1.0` is the DCF solver floor that `formatBreakeven()`/`_beIsTested()`
+refuse to print anywhere (Bahrain, Kuwait, Saudi Arabia) and misses the two the platform does
+print from `api/v1` (Norway $20.3, United Kingdom $29). 68 − 3 + 2 = **67**, which is what the
+Breakeven Map, the Explorer column and the CSV all show. The body is painted from the same
+count, so the headline and the sentence under it cannot disagree again, and it names the
+mechanism rather than asserting a false identity.
+
+**NPV tile.** Basis painted from `ENGINE_BASIS` — *50k bbl/d peak · 5yr plateau · $1.0B all-in
+capex · $18/bbl opex escalating 2%/yr · 25yr life · 10% WACC, 100% WI* — with the distinction
+v833/v834 established stated inline, and a **"How take is calculated →"** control that scrolls
+and flashes `#meth-calc`, the section that carries the full deck. The Methodology page-sub
+(`#meth-sub-basis`) carried the same `$1.2B / $15` literal as "the Deepwater basis" and is
+painted from `ENGINE_BASIS` too, so the page no longer opens by contradicting its own
+engine-basis section.
+
+**Coverage notes.** Derived: the 20 countries holding no `irr_75` are listed from the data
+rather than typed, and breakeven absence is stated from the painted count. Removed from an
+analyst-facing panel: *"do not rerun rebuild_country_data.py as it regresses breakeven from 68
+to 20 due to add_breakeven_prices.py sentinel behavior"* — a build instruction for whoever
+maintains the pipeline, which already lives in the repo docs and told an IC analyst nothing.
+
+**One structural change, because the count moves during a session.** `_methPaintCoverage()` ran
+once at startup (index.html:74191). `cpBeFor()` reads `window._cpBeResolved`, which **grows as
+`api/v1` country files are read** (v512/v895 — Norway and the UK publish a breakeven the bundle
+does not carry). A startup-only paint froze at 65 while the Breakeven Map, computed on tab
+entry, read 67 — the same defect in a different place. The panel is now repainted on
+`switchTab('tmethodology')`, so it reports what the build currently resolves. Verified both
+orders: cold → Methodology reads 67/185; Methodology → Breakeven Map → Fiscal Compare →
+Methodology reads 67/185 against the map's "Coverage: 67 of 185".
+
+Nothing is deleted from the data. `irr_75` stays in the DB, the API and `COUNTRY_DATA`; the tile
+now names it and says what it is. No take, NPV, breakeven, grade, rank, sort, filter or export
+value changes.
+
+## Result
+
+An analyst asking "what can I actually rely on here, and where did it come from?" now reads a
+coverage panel that describes this build. Specifically:
+
+- They are told, at the top of the Methodology page rather than 500 lines down, that **country
+  IRR is not published**, what the stored `irr_75` is, that it must not be cited, and — in one
+  click — are put on the axis that replaced it with 24 countries already screened.
+- The breakeven count on this panel is the same 67 as the Breakeven Map, the Explorer column and
+  the CSV, and stays the same after the session resolves Norway and the UK.
+- The NPV basis they would paste into an IC memo footnote is the deck the stored NPVs were
+  actually computed on, with a route to the full deck on the same page.
+
+Previously they read 165/185 for a metric with zero surfaces, 68 for a breakeven set of 67, and
+a $1.2B/$15 project that produced none of the numbers on the page.
+
+### Verification — measured this cycle, nothing carried forward
+
+| gate | expected | measured |
+|---|---|---|
+| JS syntax gate | PASS | **PASS — 16/16 script blocks**, re-checked after the version bump |
+| Playwright runtime suite | ran this cycle | **RAN this cycle. After: 540 PASS / 0 FAIL / 2 WARN. Before, measured on the UNEDITED file under the identical local config: 540 PASS / 0 FAIL / 2 WARN.** The two PASS sets and the two WARN sets are byte-identical (`diff` of 540 test identifiers each: no difference). The delta against the 543/0/0/0 figure quoted at cycle start is the serve config, not this change — localhost is root-served so `/petroleum-fiscal-db/sw.js` 404s, which is the sole console entry and the `[ConsoleErrors]` WARN; the `[BreakevenMap] price slider` WARN is likewise in both runs. |
+| pixel audit | no surface worse than baseline | **PIXEL GATE PASS — no surface got worse than baseline** (`~/logs/pixel_audit/baseline.json`, 2026-09-08). 2 findings, both carried forward: the Fiscal Compare `summary "Reading this table — column definitions"` 18px row at 768 and at 390. Neither is on Methodology; neither is new. |
+| 390×844 `hasTouch` scrollWidth | ≤ clientWidth | **390 == 390** on the Methodology tab |
+| controls added, height under `pointer: coarse` | ≥24px | **44px** at 390 (`Screen on the $50 downside →`, `How take is calculated →`); 24px at 1440 |
+| console + page errors | 0 | **0** at 1440 and at 390 |
+| `Screen on the $50 downside →` actually applies the preset | yes | **yes** — `texplorer`, screen mode, preset chip + **24 countries match** |
+| `How take is calculated →` reaches `#meth-calc` | yes | **yes** — scrolls and flashes |
+| Methodology BE count == Breakeven Map BE count | equal | **67 == 67**, cold and after three tab switches |
+
+### Notes for the next cycle
+
+- **The FAQ bank still quotes the retired `$1.2B / $15-flat` deck as the basis of the platform's
+  figures**, including two suggested IC disclosure strings an analyst is told to paste
+  (index.html:6117 and :6234 — the second one for IRR). The directive bans new FAQs; it does not
+  ban correcting an existing one that states a false basis for a citable number. This is the
+  same error v833/v834/v841/v949/this cycle have now fixed on every non-FAQ surface. Not touched
+  this cycle to keep the change to one panel; it is the strongest remaining T6 target.
+- `index.html:5508` (the IRR FAQ) and `:3837` (`#expl-be-check-n`) still carry a typed
+  "65 of 185" breakeven count against a live 67.
+- Carried forward from 958/959 and still live: the Indonesia regime block printing Gross Split
+  avg NPV as `-$215M` in the table and `-$216M` in the sentence 40px below it; the `_cpApplyBe()`
+  comments describing an API path that no longer fires; the band-4 `↑ PRE-2010` question on 7
+  countries; `_fcReformCmp` on the FC sort; the `# Contracts` row's three thousand-separator
+  conventions; the `North Sea Trio` quickstart loading a `nolog` column.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS
+  breakeven basis paragraph denominators; SbS four export controls duplicated at 390px; FC Reform
+  verdict bare `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; CP headline take
+  rank vs NPV rank counting in opposite directions; Indonesia's three government profit-oil
+  shares; `be_75 = 1.0` at source for Bahrain/Kuwait/Saudi Arabia; Somalia the one true T4 dead
+  end; Paraguay decree typed `government_filing`; Screener `block· Deepwater` join fault; Home
+  card "up to 4 countries" vs `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs;
+  `_screenerExportBasis` not naming the 105 withheld countries; the Home hurdle stat's
+  "list below".
+- **Probe debris, thirteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`
+  remain untracked in the repo root (~29 MB). This cycle's probes went to `/tmp/c960/`. Still
+  flagged rather than deleted — standing rule is to ask before deleting files the session did
+  not create.
