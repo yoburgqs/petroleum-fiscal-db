@@ -69292,3 +69292,140 @@ looking for a column deleted 400+ cycles ago.
 **Task.** T5 — "Give me something I can paste straight into an IC memo." Stalest in rotation (952 T4, 951 T6, 950 T2, 949 T3, 948/947 T1, 946 T5).
 
 **Friction.** I walked every clipboard and file artifact on the platform first and found them genuinely finished — nine surfaces (FC, Screener, Country Profile, Scenario Builder, IOC Portfolio, Side-by-Side pa
+
+---
+## Cycle 955 Log — 2026-10-01 — v1018
+- Test before: 543 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 543 PASS / 0 FAIL / 0 WARN / 0 JS errors — **read from the suite's own report**,
+  `/tmp/c955/report.txt`, written by this cycle's run against the local tree. The suite RAN.
+- JS syntax gate: PASS (11 blocks). Pixel gate: PASS.
+
+## Cycle 955 — T1
+
+**Task.** T1 — "Which countries should even be on my screening list?" Stalest in rotation
+(954 T5, 952 T4, 951 T6, 950 T2, 949 T3, 948/947 T1).
+
+**Friction.** Walked cold — storage cleared, reload, Home → `open the screen →` → Screener. The
+happy path is in good shape: the Home CTA lands on the IOC Capital Screen with 15 countries, the
+count line names the screen, and the NOT-ON-THIS-LIST / ALSO-NOT-ON-IT / HELD-BACK-ON-DATA-BASIS
+panels already explain every exclusion. So I kept narrowing, the way an analyst with a mandate
+does, and hit the wall at the **zero-result state**.
+
+`runScreener()`, the `data.length === 0` branch (~line 38180). It pushed one bullet per active
+filter in the source order of its own `if`-blocks, each reporting how many countries that filter
+passes **on its own**. On the screen I had built — IOC Capital Screen + take ≤40% + region Africa
+— that produced, in order:
+
+| what the panel said | what was true |
+|---|---|
+| **1st:** `Min NPV @$50 ≥$0M — only 183 of 185 countries clear this downside floor` | removes **2** countries of 185. Lifting it alone returns **0**. The least binding thing on the board, listed first. |
+| 2nd | `Verified field production only` — lifting it alone returns **21** |
+| 3rd | `Max take ≤40%` — lifting it alone returns **3** |
+| **last, with no number at all** | `Region filter: Africa only` — the constraint that took the set from 8 countries to none |
+
+So the one line an analyst reads first pointed at the filter that was costing them nothing, and
+the decisive one sat at the bottom as a bare label. Every number on the panel answered a question
+nobody asked — "how many countries pass this filter in isolation" — rather than the only one that
+decides the next click: *which one do I relax?*
+
+And the single action offered was **Reset All Filters** — throw away the entire screen to undo one
+slider. `_scAllMechanics()` (v802) had been the lone exception to that for one leg since v802.
+
+Three further holes found in the same block:
+- `_diagNPV` was read at the top and **never used**. The $75 contractor-NPV floor, one of the four
+  sliders on the front of the panel, was the only one that could empty the screen without the
+  panel ever naming it. Same for the operator filter, the R-factor requirement and the named
+  country list.
+- `if (_diagTake < 60)` — so the IOC Capital Screen's own 65% ceiling, the most common ceiling on
+  the platform, was never reported as a cause.
+- The lead sentence, *"raise the government take ceiling, lower the NPV floors, or re-tick a
+  fiscal mechanic"*, was fixed text naming three controls regardless of whether any of them were
+  set.
+
+**Change.**
+1. **`ignoreLeg` now accepts an array as well as a key, and every leg of `_scPass()` is skippable**
+   — fourteen, up from the three v706/v969 happened to need (`npv75`, `npv50`, `region`). This is
+   what lets the panel measure through the real predicate rather than a re-implementation of it.
+2. **Leave-one-out.** Each bullet leads with *"N countries come back if only this is lifted"*,
+   computed as `COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, leg)).length`. **The list is sorted
+   by that number**, so the filter to relax is the first line.
+3. **Every bullet carries the button that lifts it** — `_scRelaxLeg(key)` + the `_SC_LEG_RELAX`
+   registry, generalising `_scAllMechanics()` to all fourteen legs. Each case writes the *control*,
+   not a parallel flag (the v668 rule), and legs living inside the collapsed Advanced Filters block
+   open it on the way out. The title on every one of them says *"this is not Reset All."*
+4. **Inert filters are dropped from the panel.** Measured, not assumed: lift every leg to get the
+   universe the predicate can reach, then lift every leg *except* this one; the difference is what
+   this filter costs alone. A `$0M` NPV floor that 185 of 185 rows clear scores zero and is removed
+   — which is the same fault this rewrite exists to fix, so it could not be left in.
+5. **Over-constrained screens get the truth and still get an action.** When no single lift returns
+   anything the heading changes to *"No single filter is responsible"*, the buttons render without
+   counts, and a leave-two-out pass names the best pair: *"Two will. The pair that returns the most
+   is remove the take ceiling together with clear the region filter — 22 countries."*
+6. The four unreported legs are now reported, the take ceiling at any setting, and the guessing
+   lead sentence is gone.
+
+**Result.** On that walk the analyst now reads, in this order:
+
+```
+Relax one of these — the number is what comes back if you lift that filter and nothing else:
+  21 countries come back if only this is lifted — Verified field production only   [Put the proxy-economics countries back → 21]
+   8 countries come back if only this is lifted — Region filter: Africa only       [Clear the region filter → 8]
+   3 countries come back if only this is lifted — Max take ≤40%                    [Remove the take ceiling → 3]
+  still 0 on its own — Min NPV @$50 ≥$0M                                           [Remove the $50 downside floor]
+```
+
+One click on any of them returns a populated screen with every other filter still standing. Before
+this cycle the same state offered a misordered list of standalone counts and a button that deleted
+the screen.
+
+### Verification
+
+| check | expected | measured |
+|---|---|---|
+| defect walk (IOC + take ≤40 + Africa) | decisive filter ranked first, with a number | region 8 / take 3 ranked above the $50 floor's 0 |
+| relax button keeps the rest of the screen | yes | after click: 21 rows, `region=Africa`, `take=40`, `npv50=0` all intact |
+| inert filter suppressed | `$75 NPV ≥$0M (185 of 185)` dropped | dropped |
+| over-constrained (`take ≤11 · evid ≥80 · Middle East`) | names a pair | "take ceiling + region filter — 22 countries" |
+| empty mechanic set | still leads, still one click | `Select every fiscal mechanic → 185`, click → 187 rows |
+| preset counts unchanged | all ten | 15/143/34/22/11/5/35/70/6/56/24 — byte-identical to pre-change |
+| mobile 390x844 `hasTouch` | `scrollWidth == clientWidth` | **390 == 390** on both panel states |
+| controls under 24px in the panel | 0 | 0 — buttons measure 25px, Reset All 36px |
+| JS syntax gate | PASS | **PASS (11 blocks)** |
+| Playwright runtime suite | ran, green | **543 PASS / 0 FAIL / 0 WARN / 0 JS errors**, from `/tmp/c955/report.txt` |
+| pixel audit | gate pass | **PIXEL GATE PASS** — only the pre-existing `summary "Reading this table"` 18px finding |
+
+### Notes for the next cycle
+
+- **`white-space:nowrap` was removed from the relax buttons** before they shipped. At 390px
+  "Put the proxy-economics countries back → 21" is 261px wide; nowrap on a 43-character label
+  inside a `colspan=12` cell is a horizontal-scroll generator, and this panel is the one place on
+  the Screener where a control legitimately carries a sentence.
+- **The `ignoreLeg` array mechanism is now general.** Anything that wants to ask "what is this one
+  filter costing" — the count line, the export basis, the Advanced Filters option labels — can do
+  it through `_scPass()` instead of re-implementing a leg beside it. `_scLabelRegionLive()` already
+  does this for region; the other thirteen are now available on the same terms.
+- Found while walking, not acted on: **clicking the `CONTRACTOR NPV` header sorts low→high on the
+  first click**, putting Nigeria at $302M at rank 1. This is deliberate (v858 — the default order
+  already *is* NPV high→low, so the only thing a click on that column can mean is "reverse it"),
+  and the count line names the direction. Verified intentional, left alone. Recording it so the
+  next cycle does not re-discover it as a bug.
+- Found while walking, not acted on: the Home hurdle stat's third paragraph ends *"So the list
+  below includes Iraq (published 84.8%, comparable 34.1%)"* — but there is no list below it on
+  **Home**. The list is on the Screener, one click away through the CTA six lines up.
+- `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain untracked probe debris in the repo
+  root (~29 MB, tenth cycle). This cycle's `_pre1018.html` went to `/tmp`. Still flagged to Zach
+  rather than deleted — standing rule is to ask before deleting files the session did not create.
+- Carried forward, re-confirmed still live: the **`EXPL-NO-IRR` gate blind spot** (reads headers
+  and sort keys only, so a canvas/card/tooltip on `#texplorer` is invisible to it); **serve `~`,
+  not the repo**, or the `/petroleum-fiscal-db/sw.js` registration 404s fifteen times; the
+  Side-by-Side breakeven basis paragraph mixing contract-row and country denominators; SbS's four
+  export controls in two duplicate pairs at 390px; the FC **Reform verdict** bare `n/c` on 164 of
+  189 rows; `window._fcNavList` never invalidated; the CP headline's take rank counting 1 = lowest
+  beside an NPV rank counting 1 = highest; Indonesia's three government profit-oil shares on one
+  page; `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source; breakeven on only 67 of 185;
+  Somalia the one true T4 dead end; `Paraguay Decree 19.080/1997` typed `government_filing`; the
+  Screener count line's `block· Deepwater` join fault; the Home card saying SbS compares "up to 4
+  countries" against `CMP_MAX` = 5; `_posClause648` number agreement; Côte d'Ivoire's two missing
+  API slugs; `window._screenerExportBasis` not naming the 105 withheld countries;
+  `summary "Reading this table"` at 18px; `norway+united-kingdom+netherlands` ordering only
+  UK › Norway.
