@@ -68830,3 +68830,14 @@ the smaller answer.
 - Noticed but not acted on: `norway+united-kingdom+netherlands` (the tab's own North Sea Trio
   preset, all production-weighted, gate off) orders only **UK › Norway** — Netherlands is dropped
   from the take ordering for a non-basis reason. Worth a walk; not this cycle's worst moment.
+
+---
+## Cycle 949 Log — 2026-09-30 21:02
+- Test before: 542 PASS / 0 FAIL
+- Test after: 542 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 949 complete and pushed (v1012).
+
+**Task:** T3 — "How do these three countries compare side by side?"
+
+**Friction:** I built a five-country set an analyst plausibly builds — Kazakhstan, Oman, Guyana, UAE, Côte d'Ivoire. The data-basis gate fires (2 production-weighted vs 3 statutory-terms), so the verdict strip ordered **two** of the five and printed "Set aside — 3 of 5 columns cannot join that ordering." Those three statutory columns order fine against each other (Guyana 54.1% › Côte d'Iv
