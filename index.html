@@ -2958,7 +2958,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1020</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1021</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4753,7 +4753,7 @@ window.copyPlatformCitation = function(btn) {
     <h2 class="page-title" style="margin-bottom:0;">Methodology</h2>
     <button onclick="window.print()" class="no-print" style="font-size:11px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;white-space:nowrap;" aria-label="Print or save this Methodology document as PDF">Print / Save PDF</button>
   </div>
-  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions ($1.2B capex / 50k bbl/d peak / $15/bbl opex / 10% WACC for the Deepwater basis; 6 additional profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = the EY / KPMG / IHS country-level tax and fiscal guides, assigned to a whole country and <em>not</em> an operator filing; C-tier = industry reference; D-tier = directional proxy &mdash; excluded from most computed outputs; the per-country letter is graded on the tier-A share and the fact count, never on A+B), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 974 analyst FAQs (A1&ndash;A974) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
+  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions (<span id="meth-sub-basis">the ORCA Deepwater engine profile</span>; the Scenario Builder carries 6 additional what-if profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = the EY / KPMG / IHS country-level tax and fiscal guides, assigned to a whole country and <em>not</em> an operator filing; C-tier = industry reference; D-tier = directional proxy &mdash; excluded from most computed outputs; the per-country letter is graded on the tier-A share and the fact count, never on A+B), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 974 analyst FAQs (A1&ndash;A974) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
 
   <!-- Platform Provenance -->
   <div class="dd-section" id="meth-provenance">
@@ -4977,19 +4977,19 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
         <div id="meth-cov-npv-n" style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">NPV</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Contractor NPV computed for all 185 countries at all price points using the standardized DCF model ($1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC).</div>
+        <div id="meth-cov-npv-note" style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Contractor NPV computed for all 185 countries at all price points. Loading basis&hellip;</div>
         <div id="meth-cov-npv-bar" style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
         <div id="meth-cov-irr-n" style="font-size:24px;font-weight:800;color:var(--accent);">165/185</div>
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">IRR (In DB)</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">165 countries have bounded IRR in the database (≤500%). 20 non-computable (very low-take or high-royalty regimes produce unbounded IRR at $75/bbl). Shown in UI: 124 (41 excluded as ≥500% in display).</div>
+        <div id="meth-cov-irr-lbl" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">IRR</div>
+        <div id="meth-cov-irr-note" style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Country-level IRR is not displayed anywhere on this platform. Loading&hellip;</div>
         <div id="meth-cov-irr-bar" style="margin-top:6px;height:4px;background:var(--yellow);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
         <div id="meth-cov-be-n" style="font-size:24px;font-weight:800;color:var(--accent);">65/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Breakeven Price</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">68 countries have A/B-tier royalty AND cost data required to compute breakeven. Remaining 117 are excluded to prevent spurious precision from C-tier cost assumptions.</div>
+        <div id="meth-cov-be-note" style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Breakeven requires royalty AND cost data of sufficient tier. Loading coverage&hellip;</div>
         <div id="meth-cov-be-bar" style="margin-top:6px;height:4px;background:var(--orange);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
@@ -5006,7 +5006,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
     <div style="padding:8px 12px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">
-      <strong style="color:var(--accent);">Coverage notes:</strong> The 20 non-computable IRR countries are Armenia, Bahamas, Belgium, Bosnia, Bulgaria, China, Croatia, Faroe Islands, Greenland, Iran, Kyrgyzstan, Lithuania, Moldova, Montenegro, Romania, Serbia, Sweden, Tajikistan, Ukraine, and Vanuatu — all have sentinel values (999) confirming non-computability. Breakeven coverage of 68 is stable; do not rerun rebuild_country_data.py as it regresses breakeven from 68 to 20 due to add_breakeven_prices.py sentinel behavior. Country Profile shows full sourced fiscal facts for each country regardless of IRR/breakeven coverage.
+      <span id="meth-cov-notes"><strong style="color:var(--accent);">Coverage notes:</strong> Loading…</span>
     </div>
   </div>
 
@@ -24319,6 +24319,14 @@ function switchTab(id, btn) {
         }
       }, 500);
     }
+  }
+  // v1021 (T6): the coverage grid is repainted on ENTRY, not once at startup. Its breakeven
+  // count comes from cpBeFor(), and window._cpBeResolved grows during the session as api/v1
+  // country files are read (v512/v895 — Norway and the UK publish a breakeven the bundle does
+  // not carry). A startup-only paint therefore froze at 65 while the Breakeven Map header,
+  // computed on entry, read 67. Same panel, same build, two numbers for one quantity.
+  if (id === 'tmethodology' && typeof _methPaintCoverage === 'function') {
+    try { _methPaintCoverage(); } catch (e) { /* non-critical */ }
   }
   if (id === 'tbreakevenmap') {
     if (window._beMapRendered && !document.querySelector('#breakeven-map-svg path')) {
@@ -44316,7 +44324,7 @@ function renderReformTimeline(country) {
         // The absence claimed here is an absence of SOURCING, not of any number at all: for
         // origin 'contract' a figure does exist, it just carries no citation. Saying "not a
         // contract average either" and then naming one would contradict itself in one sentence.
-        const tip = _esc(t.label + ': ORCA holds no sourced fact for this term — not primary law, '
+        const tip = _esc(t.label + ': ORCA holds no fact for this term at all — not primary law, '
           + 'not a secondary guide, not the bulk harvest. Nothing on record cites it for ' + country
           + '. This platform’s ' + t.mech + ' model needs the term, so where this page runs the regime '
           + (t.origin === 'tiers'
@@ -44344,8 +44352,15 @@ function renderReformTimeline(country) {
     const _regimeMech   = _missTerms.length ? _missTerms[0].mech : null;
     // Scopes the tick sentence itself, which is the string that misleads: "All 2 independently
     // sourced parameters match" is true and reads as a whole-regime pass.
+    // v1021 (T6): the same substitution as the regime note below, in the sentence appended to the
+    // verdict line itself. This said "a verdict on {held} of the {total} terms", where held is
+    // _termsTotal - _missTerms.length -- the count ORCA has a VALUE for. The verdict it is scoping
+    // is the statutory-match statement, and that statement is about sourcedCount, never about the
+    // held rows. Where the two differ the sentence credited the verdict with terms it never
+    // examined: the Netherlands holds 2 of 4 and cites 1, and this read "a verdict on 2 of the 4".
+    // 34 profiles reach a verdict branch with sourcedCount < held and were overstated here.
     const _scope625 = _missTerms.length
-      ? ' That is a verdict on ' + (_termsTotal - _missTerms.length) + ' of the ' + _termsTotal
+      ? ' That is a verdict on ' + sourcedCount + ' of the ' + _termsTotal
         + ' terms this ' + _esc(_regimeMech) + ' model needs.'
       : '';
     // Every substitute is named, grouped by where it actually came from. Four origins, four
@@ -44379,15 +44394,70 @@ function renderReformTimeline(country) {
         + (_missInvented.length ? 'rgba(194,65,12,.28)' : 'var(--border)') + ';border-left:3px solid '
         + (_missInvented.length ? 'var(--orange)' : 'var(--muted)')
         + ';border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
+        // ── v1021 (T6): THE WORST FINDING CONTRADICTED ITS OWN SEVERITY CHIP ───────────────
+        // This paragraph is the body of finding "N model terms ORCA holds no value for" — the
+        // chip at line ~44919, which is keyed on _missTerms.length and says "holds no value".
+        // The paragraph then opened by claiming ORCA "has a SOURCED value for" the complement,
+        // _termsTotal - _missTerms.length. That expression counts terms ORCA holds A VALUE for.
+        // It says nothing about whether any of them is sourced: a term whose only record is an
+        // uncited contract average, or the bulk harvest, is counted in it exactly like a term
+        // read out of the gazette. sourcedCount, final since the row loop, is the real figure.
+        //
+        // Measured over all 185 profiles on the shipped build: 168 print this paragraph, and on
+        // 53 of them the claimed count EXCEEDS the number of terms that carry an independent
+        // citation. On 19 it claims a positive sourced count on a page whose own verdict line,
+        // two rows up, reads "⚠ No parameter on this table is independently sourced":
+        //
+        //   Somalia   paragraph: "sourced value for 4 of the 5"      actually sourced: 0
+        //   Paraguay  paragraph: "sourced value for 3 of the 4"      actually sourced: 0
+        //   Tuvalu, Tonga, Nauru, Palau, Kiribati, Samoa, Micronesia, Marshall Islands,
+        //   Cook Islands, New Caledonia, French Polynesia, French Guiana, Guadeloupe, Mayotte,
+        //   Reunion, Saint Helena, Ascension Island — all "2 of 4" against 0.
+        //
+        // Somalia is the whole defect in one screen. The Evidence Quality strip says "0 of 5
+        // model terms cited". The verdict line says not one parameter is independently sourced.
+        // Finding 1 says three of the four rows the model reads carry no source at all. Finding
+        // 2 — bolded, the only sentence in the stack with a numerator — said ORCA has a sourced
+        // value for four of five. An analyst either believes the bold and writes an uncited
+        // regime into an IC memo as 80% sourced, or sees the page contradict itself at the exact
+        // point they came to check it and stops trusting the other eleven tabs too. That is the
+        // give-up point in a T6 walk, and it is the page's own loudest line causing it.
+        //
+        // Second false claim, same paragraph, wider: "The tick above covers the N rows ORCA
+        // happens to hold". There is frequently no tick above. The ✓ is withdrawn whenever a
+        // statutory figure diverges (first verdict branch), whenever no citation resolves
+        // (v1002), and whenever sourcedCount is 0 — and the sentence pointed at it regardless.
+        // Measured: 132 of the 168 say "the tick above" with no tick on screen. Rewritten to
+        // name the count instead of a glyph, so it cannot go stale against the verdict branch
+        // above it. _srcNoneOpen1002 is defined ~290 lines below here and deliberately not used.
+        //
+        // No value, tier letter, take, NPV, breakeven or grade changes. What changes is which
+        // number this paragraph prints and what it claims about it.
         + '<strong style="color:var(--text);">' + (_missInvented.length ? '⚠ ' : '')
-        + 'ORCA has a sourced value for ' + (_termsTotal - _missTerms.length) + ' of the ' + _termsTotal
+        + 'ORCA holds no value at all for ' + _missTerms.length + ' of the ' + _termsTotal
         + ' fiscal terms its ' + _esc(_regimeMech) + ' model needs for ' + _esc(country) + '.</strong> '
         + _esc(_missTerms.map(function(t) { return t.label; }).join(', ')) + ' '
-        + (_missTerms.length === 1 ? 'carries' : 'carry') + ' no sourced value on record — no statute, '
+        + (_missTerms.length === 1 ? 'carries' : 'carry') + ' no value on record — no statute, '
         + 'no guide, no bulk harvest. '
         + _subSentence625
-        + 'The tick above covers the ' + _heldRows + ' row' + _pl(_heldRows)
-        + ' ORCA happens to hold, not the regime. '
+        // The absence above is an absence of any value. Sourcing is the narrower question, and
+        // it is stated separately rather than conflated with it, because on 19 countries the two
+        // answers are "4 of 5 held" and "0 of 5 cited" and only one of those belongs in a memo.
+        + (sourcedCount === 0
+            ? 'And the ' + _heldRows + ' term' + _pl(_heldRows) + ' ORCA does hold a value for '
+              + (_heldRows === 1 ? 'is' : 'are') + ' no better evidenced: not one of them carries an '
+              + 'independent citation either, so nothing above this note is a verdict on the regime — '
+              + 'every term this model runs on is uncited. '
+            : 'Of the ' + _termsTotal + ' terms, ' + sourcedCount + ' carr'
+              + (sourcedCount === 1 ? 'ies' : 'y') + ' an independent citation, and the match '
+              + 'statement above is a verdict on '
+              + (sourcedCount === 1 ? 'that one term' : 'those ' + sourcedCount + ' terms')
+              // Only contrast with the held count where the two actually differ. Where every term
+              // ORCA holds is also cited (France: 4 needed, 2 held, 2 cited) the clause would read
+              // "a verdict on those 2 terms — not on the 2 values ORCA holds", which is vacuous.
+              + (sourcedCount < _heldRows
+                  ? ' — not on all ' + _heldRows + ' values ORCA holds, and not on the regime. '
+                  : ' — not on the regime. '))
         + '<strong style="color:var(--text);">Establish ' + (_missTerms.length === 1 ? 'it' : 'these')
         + ' from ' + _esc(country) + '’s own petroleum act before an IC memo.</strong></div>'
       : '';
@@ -53016,7 +53086,8 @@ window._rrOpenLocal = _rrOpenLocal;
 //     that error: it carries a reform premium of zero into an IC memo on 164 countries nobody
 //     has researched.
 //   * BREAKEVEN PRICE read "65/185" while its own body text said 68 and "Remaining 117"
-//     (117 + 68 = 185). The data says 68.
+//     (117 + 68 = 185). The data says 68.   [v1021: 68 is be_75 RAW. The count the platform
+//     actually prints is 67 -- see the v1021 note below.]
 //
 // The other four tiles were correct. They are painted anyway, from the same predicate their own
 // label states, so the panel can no longer drift from the file it describes.
@@ -53030,8 +53101,14 @@ function _methPaintCoverage() {
   var cov = {
     take:  count(function(r) { return num(r.take_75); }),
     npv:   count(function(r) { return num(r.npv_75); }),
-    irr:   count(function(r) { return num(r.irr_75); }),          // tile label is "IRR (In DB)"
-    be:    count(function(r) { return num(r.be_75) && r.be_75 > 0 && r.be_75 < 900; }),
+    irr:   count(function(r) { return num(r.irr_75); }),          // kept for the IRR tile's prose
+    // v1021 (T6): the breakeven tile used to count be_75 raw. That predicate admits the three
+    // state-monopoly $1.0 floor artifacts formatBreakeven()/_beIsTested() refuse to print
+    // anywhere (Bahrain, Kuwait, Saudi Arabia) and misses the two the platform does print
+    // from elsewhere (Norway $20.3, United Kingdom $29). Count what the platform renders.
+    be:    (typeof cpBeFor === 'function')
+             ? count(function(r) { return cpBeFor(r) != null; })
+             : count(function(r) { return num(r.be_75) && r.be_75 > 0 && r.be_75 < 900; }),
     swing: count(function(r) { return num(r.swing); }),
     stab:  (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY)
              ? Object.keys(REFORM_HISTORY).filter(function(k) {
@@ -53041,6 +53118,7 @@ function _methPaintCoverage() {
   };
 
   Object.keys(cov).forEach(function(key) {
+    if (key === 'irr') return;             // v1021 (T6): not a coverage axis — painted below
     var n = cov[key];
     var el = document.getElementById('meth-cov-' + key + '-n');
     if (el) el.textContent = n + '/' + total;
@@ -53057,6 +53135,164 @@ function _methPaintCoverage() {
         + '%, var(--border) ' + (pct * 100).toFixed(1) + '%)';
     }
   });
+
+  // ── v1021 (T6) — the coverage grid stopped describing the platform it is on ─────────────
+  // v838 painted the six HEADLINE counts and left every tile BODY as hardcoded HTML, so three
+  // bodies now contradict the number printed 20px above them, and one tile advertises a metric
+  // this platform deliberately does not publish. Measured on the shipped build:
+  //
+  //   IRR tile        headline "165/185" over a 89%-filled YELLOW coverage bar, body "Shown in
+  //                   UI: 124 (41 excluded as >=500% in display)". Nothing on this platform
+  //                   shows a country IRR. It was withdrawn surface by surface -- Country
+  //                   Profile v516, the Screener "Min IRR" slider v517, Fiscal Compare v525,
+  //                   both IOC Portfolio tables v787, the Breakeven CSV v847, the Explorer table
+  //                   and its XLSX v851 -- because irr_75 is AVG(irr_pct) over every contract in
+  //                   the country: measured here, 165 countries, median 333.1%, only 9 below
+  //                   100%, top 996.5%. The Methodology tab says exactly that 500 lines further
+  //                   down, in the "Why does IRR show --" FAQ. This tile said the opposite, at
+  //                   the TOP of the same page, which is where the Coverage Summary jump link
+  //                   lands. An analyst on a T6 walk reads "available for 165 of 185, shown for
+  //                   124", goes looking, finds no IRR anywhere, and either gives up or pulls
+  //                   irr_75 out of api/v1/country/<slug>.json -- which is the one outcome the
+  //                   withdrawal existed to prevent, and the grid was routing them to it.
+  //   BREAKEVEN tile  headline painted 68/185, body still typed "68 countries ... Remaining 117"
+  //                   (117 + 68 = 185, so the body was self-consistent and both legs wrong).
+  //                   68 is be_75 raw: it counts the three 100%-take state monopolies whose
+  //                   stored $1.0 is the DCF floor artifact every renderer refuses to print
+  //                   (Bahrain, Kuwait, Saudi Arabia) and misses the two the platform does print
+  //                   (Norway $20.3, United Kingdom $29). The Breakeven Map, the Explorer column
+  //                   and the CSV all say 67. Counted from cpBeFor() now -- the resolver that
+  //                   decides what actually renders -- so the panel cannot disagree with them.
+  //   NPV tile        body named "$1.2B capex / 50k bbl/d / $15/bbl opex" as the basis of all 185
+  //                   stored NPVs. That is DCF_PROFILES.deepwater, the Live DCF / Scenario
+  //                   Builder what-if project. v833/v834/v841/v949 corrected this literal on
+  //                   every screen and in all seven exports; the Methodology coverage grid was
+  //                   missed, and it is the page an IC reader is sent to. Painted from
+  //                   ENGINE_BASIS, like everything else that has to name its own assumptions.
+  //
+  // Nothing is deleted: irr_75 stays in the DB, the API and COUNTRY_DATA, and the tile now says
+  // so and says what it is. No take, NPV, breakeven, grade, sort or filter changes.
+  var _c21Link = function(label, title) {
+    return '<span class="meth-cov-act" role="button" tabindex="0" title="' + title
+      + '" style="color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap;'
+      + 'display:inline-block;min-height:24px;line-height:24px;">' + label + '</span>';
+  };
+  var _c21Wire = function(host, fn) {
+    if (!host) return;
+    var el = host.querySelector('.meth-cov-act');
+    if (!el) return;
+    var go = function(e) { if (e) e.preventDefault(); try { fn(); } catch (err) {} };
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') go(e); });
+  };
+
+  // ---- IRR: not a coverage axis. Say what is held, and route to what replaced it. ----
+  var _irrN  = document.getElementById('meth-cov-irr-n');
+  var _irrLb = document.getElementById('meth-cov-irr-lbl');
+  var _irrBar= document.getElementById('meth-cov-irr-bar');
+  var _irrNt = document.getElementById('meth-cov-irr-note');
+  if (_irrN) {
+    _irrN.textContent = 'NOT PUBLISHED';
+    _irrN.style.fontSize = '14px';
+    _irrN.style.letterSpacing = '.04em';
+    _irrN.style.color = 'var(--orange)';
+  }
+  if (_irrLb) _irrLb.textContent = 'Country IRR — withdrawn';
+  if (_irrBar) {
+    _irrBar.style.background = 'var(--border)';
+    _irrBar.style.backgroundImage = 'none';
+  }
+  if (_irrNt) {
+    var _iv = rows.map(function(r) { return r.irr_75; })
+                  .filter(num).sort(function(a, b) { return a - b; });
+    var _iMed = _iv.length ? _iv[Math.floor(_iv.length / 2)] : null;
+    var _iLo  = _iv.filter(function(v) { return v < 100; }).length;
+    var _dnMod = count(function(r) { return num(r.npv_50); });
+    var _dnPos = count(function(r) { return num(r.npv_50) && r.npv_50 > 0; });
+    _irrNt.innerHTML =
+      '<strong style="color:var(--orange);">No tab, table, chart, CSV or XLSX on this platform '
+      + 'shows a country-level IRR.</strong> The figure is still in the database and in '
+      + '<code>api/v1/country/{slug}.json</code> as <code>irr_75</code> — ' + cov.irr
+      + ' of ' + total + ' countries'
+      + (_iMed == null ? '' : ', median ' + _iMed.toFixed(0) + '%, only ' + _iLo + ' below 100%')
+      + ' — and it is <code>AVG(irr_pct)</code> across every contract in the country: an '
+      + 'arithmetic mean of a heavy-tailed distribution, not a return on any project. Do not cite '
+      + 'it. The downside axis that replaced it is <strong>contractor NPV at $50/bbl</strong>, '
+      + 'modelled for ' + _dnMod + ' of ' + total + ' and still positive on ' + _dnPos
+      + '. For a real project IRR, open a country and use <strong>Model in Scenario '
+      + 'Builder</strong> with your own capex, opex, profile and discount rate. '
+      + _c21Link('Screen on the $50 downside →',
+          'Opens the Screener with the Downside Resilience preset applied — the countries '
+          + 'that keep at least half their $75 contractor NPV at $50/bbl. This is the axis that '
+          + 'replaced the withdrawn IRR screen.');
+    _c21Wire(_irrNt, function() {
+      var btn = document.getElementById('tab-btn-tscreener');
+      switchTab('texplorer', btn);
+      setTimeout(function() {
+        if (typeof switchExplorerMode === 'function') switchExplorerMode('screen');
+        setTimeout(function() {
+          if (typeof applyScreenerPreset === 'function') applyScreenerPreset('downsideresilience');
+        }, 90);
+      }, 80);
+    });
+  }
+
+  // ---- NPV: the basis is the one the stored figures were computed on. ----
+  var _npvNt = document.getElementById('meth-cov-npv-note');
+  if (_npvNt) {
+    var _ebS = (typeof ENGINE_BASIS !== 'undefined' && ENGINE_BASIS.short)
+      ? ENGINE_BASIS.short : null;
+    _npvNt.innerHTML = 'Contractor NPV computed for all ' + cov.npv + ' countries at all 13 price '
+      + 'points on the ORCA <strong>Deepwater engine profile</strong>'
+      + (_ebS ? ' — ' + _ebS : '') + ', 100% WI. '
+      + '<span style="opacity:.85;">Not the $1.2B / $15-flat project the in-page Live DCF and '
+      + 'Scenario Builder run — that one recovers 294.0 MMbbl and is a what-if tool, not the '
+      + 'source of any figure ranked, exported or cited here.</span> '
+      + _c21Link('How take is calculated →',
+          'Opens the full engine-basis section on this page — production profile, capex '
+          + 'split, opex escalation, project life and discount rate.');
+    _c21Wire(_npvNt, function() {
+      var el = document.getElementById('meth-calc');
+      if (!el) return;
+      if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.style.transition = 'background-color .4s';
+      var _pv = el.style.backgroundColor;
+      el.style.backgroundColor = 'rgba(176,104,0,.10)';
+      setTimeout(function() { el.style.backgroundColor = _pv || ''; }, 1400);
+    });
+  }
+  var _subB = document.getElementById('meth-sub-basis');
+  if (_subB && typeof ENGINE_BASIS !== 'undefined' && ENGINE_BASIS.short) {
+    _subB.textContent = 'the ORCA Deepwater engine profile — ' + ENGINE_BASIS.short;
+  }
+
+  // ---- Breakeven: one count, the one that renders. ----
+  var _beNt = document.getElementById('meth-cov-be-note');
+  if (_beNt) {
+    _beNt.innerHTML = cov.be + ' of ' + total + ' countries print a breakeven on this build — '
+      + 'read through the same resolver as the Breakeven Map, the Explorer column and the CSV, '
+      + 'so this panel cannot disagree with them. It can rise by up to 2 inside a session: '
+      + 'Norway and the United Kingdom publish a breakeven only in <code>api/v1</code>, adopted '
+      + 'the moment any surface reads their country file. The other ' + (total - cov.be)
+      + ' have no modelled cost structure — that is <strong>absence of data, not a low '
+      + 'breakeven</strong>. Held back on purpose: C-tier cost assumptions, which would give '
+      + 'spurious precision, and the three 100%-take state monopolies whose stored $1.0 is a '
+      + 'DCF solver floor, not a price.';
+  }
+
+  // ---- Coverage notes: derived, and without the build instruction that was sitting in it. ----
+  var _cNotes = document.getElementById('meth-cov-notes');
+  if (_cNotes) {
+    var _sent = rows.filter(function(r) { return !num(r.irr_75); })
+                    .map(function(r) { return r.country; }).sort();
+    _cNotes.innerHTML = '<strong style="color:var(--accent);">Coverage notes:</strong> '
+      + _sent.length + ' countries hold no <code>irr_75</code> at all — they carry the 999 '
+      + 'sentinel, which confirms non-computability rather than a missing harvest'
+      + (_sent.length ? ': ' + _sent.join(', ') + '. ' : '. ')
+      + 'Breakeven is absent for ' + (total - cov.be) + ' of ' + total + '. Neither gap touches '
+      + 'provenance: Country Profile shows the full sourced fact base, the per-term Evidence '
+      + 'Chain and the reform log for every country, whatever its breakeven or IRR coverage.';
+  }
 
   var note = document.getElementById('meth-cov-stab-note');
   if (note) {
