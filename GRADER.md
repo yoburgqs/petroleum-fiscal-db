@@ -70117,3 +70117,16 @@ header. Concretely:
   fetches) was deleted immediately after use. The three older files are still
   flagged rather than deleted — standing rule is to ask before deleting files
   the session did not create.
+
+---
+## Cycle 963 Log — 2026-10-01 13:47
+- Test before: 543 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Both repos: `petroleum-fiscal-db` at `ad4e645`, `office` at `4c92701cc`.
+
+## Cycle 963 — v1023
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 962 and 960 were T6, last T4 was 952).
+
+**Friction.** On a cold load, the Reform Risk tab's flagship ranking — *Most Frequently Reformed Regimes* — rendered **6 column headers and 5 cells on every one of its 21 rows**. `TAKE @ $75` was blank on all of them, and that is the column who
