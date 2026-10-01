@@ -2940,7 +2940,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1011</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1012</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -32543,8 +32543,24 @@ function renderCompare() {
     // construction, so _cmpRankTake's OTHER null branches (state monopoly, PRRT, fee-blended with
     // no Group-1 take) are re-run against it, and the offer is made only where two columns survive.
     // Where neither basis reaches two, there is no button — it says which side needs one more.
+    // ── v1012 (T3): the same exit, for the commoner case where the gate left an ordering
+    // standing but took the MAJORITY of the analyst's columns out of it. ──────────────────
+    //
+    // v845 above offered the rescue only when _vdRanked.length < 2 — the "NOTHING RANKS HERE"
+    // dead end. Walked T3 cold with five columns an analyst plausibly builds (Kazakhstan, Oman,
+    // Guyana, UAE, Cote d'Ivoire): the strip orders TWO of them and prints "Set aside — 3 of 5
+    // columns cannot join that ordering". Those three order perfectly well against each other
+    // — Guyana 54.1% › Cote d'Ivoire 56.6% › UAE 74.6% — and sbsKeepBasis() was already written
+    // to deliver exactly that set. Nothing on screen offered it, because an ordering existed and
+    // the guard read the existence of ANY ordering as "not stuck". So the analyst takes the
+    // 2-column answer into the memo and never learns that a 3-column ordering of the countries
+    // they actually chose was one click away.
+    //
+    // Offered only where the other basis orders STRICTLY MORE columns than the strip is already
+    // showing, so a 2-vs-2 split — where switching sides buys nothing — stays silent, and so does
+    // every set that orders all of its columns (the gate is off there by construction).
     const _basisFix = (function () {
-      if (!_cmpBasisGate || _vdRanked.length >= 2) return '';
+      if (!_cmpBasisGate) return '';
       const _rankNoGate = (d) => {
         const v = d ? d.take_75 : null;
         if (v == null || isStateMonopoly(v)) return null;
@@ -32555,8 +32571,9 @@ function renderCompare() {
       };
       const _grp = (names, label, why) => {
         const set = selected.filter(d => d && names.indexOf(d.country) >= 0);
+        const hits = set.filter(d => _rankNoGate(d) != null);
         return { label: label, why: why, names: names,
-                 ranks: set.filter(d => _rankNoGate(d) != null).length };
+                 rankNames: hits.map(d => d.country), ranks: hits.length };
       };
       const _cands = [
         _grp(_cmpProdNames, 'production-weighted',
@@ -32567,6 +32584,32 @@ function renderCompare() {
       const _ok = _cands.filter(g => g.ranks >= 2);
       const _wrap = (inner) => '<div style="font-size:11px;color:var(--muted);line-height:1.55;display:flex;'
         + 'flex-wrap:wrap;align-items:center;gap:8px;">' + inner + '</div>';
+      const _btn = (g) => '<button type="button" data-cmp-uionly="1" data-keep="' + _cmpEsc(JSON.stringify(g.names))
+        + '" onclick="sbsKeepBasis(JSON.parse(this.dataset.keep))"'
+        + ' title="' + _cmpEsc('Replaces this comparison with ' + g.names.join(', ')
+            + ' \u2014 the ' + g.names.length + ' ' + g.label + ' columns in the set, ' + g.why
+            + '. They rank against each other, so the take, contractor-value and predictability '
+            + 'orderings come back. Nothing is deleted: re-add the other columns from the search box above.')
+        + '" style="display:inline-flex;align-items:center;min-height:26px;font-size:11px;font-weight:700;'
+        + 'color:var(--accent);background:var(--surface2);border:1px solid var(--accent);border-radius:4px;'
+        + 'padding:2px 10px;cursor:pointer;white-space:nowrap;">Compare the ' + g.names.length + ' '
+        + g.label + ' columns \u2192</button>';
+      // v1012: an ordering exists, but the other basis orders more of the analyst's columns.
+      const _ordered = _vdRanked.length;
+      if (_ordered >= 2) {
+        const _rankedNow = _vdRanked.map(x => x.c);
+        const _bigger = _ok.filter(g => g.ranks > _ordered
+          && g.names.some(n => _rankedNow.indexOf(n) < 0));
+        if (!_bigger.length) return '';
+        const _bg = _bigger[0];
+        return _wrap('<span><strong style="color:var(--text);">A larger comparison is available in this set:</strong> '
+          + _cmpEsc(_bg.rankNames.join(' + ')) + ' \u2014 ' + _bg.ranks + ' ' + _bg.label
+          + ' columns that rank against each other, against the ' + _ordered + ' ordered above. '
+          + 'The ordering on screen is correct; it is just the smaller of the two this set supports. '
+          + 'Restrict the comparison to one basis and all ' + _bg.ranks + ' order \u2014 nothing is deleted, '
+          + 'and the columns you drop can be re-added from the search box above.</span>'
+          + _btn(_bg));
+      }
       if (!_ok.length) {
         const _short = _cmpProdNames.length >= _cmpStatNames.length
           ? { label: 'production-weighted', have: _cmpProdNames } : { label: 'statutory-terms', have: _cmpStatNames };
@@ -32577,16 +32620,6 @@ function renderCompare() {
           + '), and neither side reaches two rankable columns. Add a second '
           + _short.label + ' country, or drop the odd column out — ORCA orders columns within one basis, never across the two.</span>');
       }
-      const _btn = (g) => '<button type="button" data-cmp-uionly="1" data-keep="' + _cmpEsc(JSON.stringify(g.names))
-        + '" onclick="sbsKeepBasis(JSON.parse(this.dataset.keep))"'
-        + ' title="' + _cmpEsc('Replaces this comparison with ' + g.names.join(', ')
-            + ' — the ' + g.names.length + ' ' + g.label + ' columns in the set, ' + g.why
-            + '. They rank against each other, so the take, contractor-value and predictability '
-            + 'orderings come back. Nothing is deleted: re-add the other columns from the search box above.')
-        + '" style="display:inline-flex;align-items:center;min-height:26px;font-size:11px;font-weight:700;'
-        + 'color:var(--accent);background:var(--surface2);border:1px solid var(--accent);border-radius:4px;'
-        + 'padding:2px 10px;cursor:pointer;white-space:nowrap;">Compare the ' + g.names.length + ' '
-        + g.label + ' columns \u2192</button>';
       return _wrap('<span><strong style="color:var(--text);">A comparison is available in this set:</strong> '
         + _ok.map(g => _cmpEsc(g.names.join(' + ')) + ' rank against each other').join(', and ')
         + '. Restrict the comparison to one basis and the orderings come back \u2014 nothing is deleted, '
