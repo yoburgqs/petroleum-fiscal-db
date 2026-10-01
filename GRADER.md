@@ -68841,3 +68841,122 @@ the smaller answer.
 **Task:** T3 — "How do these three countries compare side by side?"
 
 **Friction:** I built a five-country set an analyst plausibly builds — Kazakhstan, Oman, Guyana, UAE, Côte d'Ivoire. The data-basis gate fires (2 production-weighted vs 3 statutory-terms), so the verdict strip ordered **two** of the five and printed "Set aside — 3 of 5 columns cannot join that ordering." Those three statutory columns order fine against each other (Guyana 54.1% › Côte d'Iv
+
+---
+## Cycle 950 Log — 2026-09-30 23:1x
+
+- Test before: 542 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 542 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RUN this cycle against the local
+  tree, number read from `/tmp/runtime_test_report.txt`, not assumed)
+- JS syntax gate: PASS (11 blocks)
+- Version badge v1013 → v1014, bumped silently at the end, one occurrence.
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* Rotation:
+949 was T3, 948 T1, 947 T1, 946 T5, 945/944 T4 — T2 was the stalest. Walked cold at 1440×900 and
+390×844 `hasTouch`, both storages cleared and the page reloaded before the walk.
+
+**Friction.** The walk that breaks is the one an analyst with a house deck actually does:
+
+```
+Fiscal Compare → price $100/bbl → Run Compare   (Indonesia row: 66.4% take · $1.09B NPV)
+→ "Country Profile" tab → dropdown → Indonesia  (59.5% take · $745M NPV)
+```
+
+6.9pp and $343M apart, and everything below that headline — the 41–60% tier band, the NPV rank
+inside the band, the peer set, the fiscal-character verdict, the IC MEMO line — is $75. Nothing on
+screen named either price as the other's basis.
+
+The reconciliation for exactly this already exists. v889 built `#cp-price-basis` after walking
+`FC → $100 → Run → row → Full Profile`, and on *that* route it works. But it was written as a flex
+child of `#fc-nav-bar`, and `_fcNavBarUpdate()` sets that bar to `display:none` — and called
+`_cpPriceBasisUpdate(null)` to blank the strip — whenever `window._fcNavList` does not contain the
+country on screen. That list is populated in exactly one function, `openCountryProfileFromFC()`.
+
+So the warning was coupled to the entry route, not to the mismatch:
+
+| route into the Country Profile | `_fcNavList` | warning |
+|---|---|---|
+| FC row → drawer → "Full Profile →" | populated | **shown** |
+| Explorer row / Screener row / breakeven map polygon / IOC table | populated from FC results | **shown** |
+| **"Country Profile" tab button** | empty | **silent** |
+| **Home card → Country Profile** | empty | **silent** |
+| **CP quick-load benchmark buttons** (Norway, Iraq, Angola, …) | empty | **silent** |
+| **changing country in `#dd-country-select`** | empty | **silent** |
+| **shared `#/profile/<slug>` link** | empty | **silent** |
+
+Measured on the shipped build at the end of that walk: `window._fcLastPrice === 100`,
+`#fc-nav-bar` `offsetParent === null`, `#cp-price-basis` `display:none`, `innerHTML` empty string.
+`#cp-run-fc-btn` had been relabelled "▶ Re-rank all 185 at $75" correctly — and was invisible,
+because it is a child of the same hidden bar. The one control that puts the two surfaces on one
+price basis went down with the warning that explains why you would want it.
+
+**Change.**
+
+- `#cp-price-basis` lifted out of `#fc-nav-bar` to a sibling of it, so hiding the navigation widget
+  no longer hides the reconciliation.
+- `_cpPriceBasisUpdate(country)` resolves the country from `#dd-country-select` when handed none.
+  `_cpPriceBasisUpdate(null)` on the bar-hidden branch therefore no longer means "blank it" — the
+  price mismatch is just as real on that branch and is now stated.
+- Where the bar is hidden, the strip carries its own `▶ Re-rank all 185 at $75` button
+  (`_cpReRankAtBase()`, 24px min-height), and the trailing sentence drops the "The rank beside it
+  is the $100 ordering" clause — there is no rank beside it on that branch — for "The ranking you
+  ran in Fiscal Compare is ordered at $100." Where the bar IS visible the render is byte-identical
+  to v889: original wording, no second button.
+- `switchTab('t7', …)` now calls `_fcNavBarUpdate()` on tab entry. Leaving an already-rendered
+  profile, running FC at $100, and coming back re-renders nothing, so without this the strip would
+  still be reporting the basis from before that run.
+
+**Result.** An analyst who ranked 185 countries at their own deck and drilled in to defend the
+screen is now told, on every route into the profile, that the page they are reading is $75 — with
+that country's own take and NPV at the price they ranked at, the signed gap to the figure printed
+below, and one click that re-bases the ranking so the two surfaces agree. Previously they had to
+have entered by clicking a table row to be told at all.
+
+### Verification (every probe run this cycle, nothing assumed)
+
+| probe | expected | got |
+|---|---|---|
+| cold CP, no FC run | silent | `pbVisible false`, innerHTML empty |
+| FC $100 → CP **tab** → dropdown Indonesia | warning + own button | `⚠ Ranked at $100/bbl — this profile reads $75/bbl · Indonesia at $100: 66.4% take (+6.9pp vs the 59.5% below) · $1.09B NPV (+$343M vs $745M)` + `▶ Re-rank all 185 at $75` |
+| dropdown → Norway (same state) | follows the country | `72.4% take (+4.4pp vs 68.0%) · $1.27B NPV (+$444M vs $826M)` |
+| FC $125 → CP tab → Nigeria | warning | `86.8% take (+5.7pp vs 81.1%) · $584M NPV (+$282M vs $302M)` |
+| Explorer row (bar visible) | v889 wording, **no** duplicate button | `"The rank beside it is the $100 ordering"`, 0 buttons in strip |
+| click the strip's re-rank button | FC re-runs at $75, warning retracts | `_activeTab t0`, `_fcLastPrice 75`, `fc-price "75"`, 189 rows; back on CP `pbVisible false` |
+| mobile 390×844 `hasTouch` | no sideways scroll, button ≥24px | `scrollWidth 390 = clientWidth`, button **24px**, strip right edge 376 < 390, **0** sub-24px controls in `#t7` |
+| `#reference-panel` right offset | never negative | `0px` |
+| JS syntax gate | PASS | **PASS (11 blocks)** |
+| Playwright runtime suite | ran, green | **542 PASS / 0 FAIL / 0 WARN / 0 JS errors** |
+
+### Notes for the next cycle
+
+- **Serve `~`, not the repo.** `index.html:49` registers the service worker at the absolute path
+  `/petroleum-fiscal-db/sw.js`; serving the repo root 404s it fifteen times and flips
+  `[ConsoleErrors]` to WARN (541/1/15) for no real reason. `python3 -m http.server` from `~` and
+  load `http://localhost:PORT/petroleum-fiscal-db/`.
+- **Found while walking, not acted on — `window._fcNavList` is never invalidated.** It is written
+  only in `openCountryProfileFromFC()`, from the Fiscal Compare result set, and it is read by the
+  nav bar to print `↩ Back to FC` and `#N of 185`. Two consequences seen this cycle: (1) clicking an
+  **Explorer** row shows `↩ Back to FC` and an FC-ordered position, because the FC list from an
+  earlier run is still in the global — the analyst never came from FC; (2) the list survives an FC
+  re-run at a different price, so the `#N of 185` can belong to an ordering that no longer exists.
+  Neither is the worst moment in a T2 walk, but both are in the same widget.
+- `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html` remain untracked probe debris in the repo
+  root (~29 MB, seventh cycle). `_pre1014.html` was written to `/tmp` instead. Still flagged to Zach
+  rather than deleted — standing rule is to ask before deleting files the session did not create.
+- Office and canonical copies of `runtime_comprehensive.js` unchanged this cycle.
+- Carried forward unchanged: Indonesia's three different government profit-oil shares on one page;
+  `Bahrain`/`Kuwait`/`Saudi Arabia` `be_75 = 1.0` at source (suppressed on every surface checked);
+  breakeven on only 68 of 185; Somalia the one true T4 dead end;
+  `Paraguay Decree 19.080/1997` typed `government_filing`; the Screener count line's
+  `block· Deepwater` join fault; the Home card at ~3077 saying Side-by-Side compares "up to 4
+  countries" against `CMP_MAX` = 5; `_posClause648` number agreement; Côte d'Ivoire's two missing
+  API slugs; `window._screenerExportBasis` not naming the 105 withheld countries;
+  `summary "Reading this table"` at 18px; Side-by-Side's two byte-identical export buttons;
+  `norway+united-kingdom+netherlands` ordering only UK › Norway.
+- Also noticed, not acted on: the CP headline's take rank counts **1 = lowest take** and says so
+  nowhere on screen, while the NPV rank 6px away counts **1 = highest** and prints `(highest first)`,
+  and the Scenario Builder's own placing prints `(1=highest)`. Indonesia reads `#13 of 21 producers`
+  (take) beside `#17 of 21 producers` (NPV) on two opposite scales. Both are "1 = most
+  contractor-favourable", which is a defensible convention — it is simply not stated on the take
+  side. Worth a cycle; it was not this walk's worst moment because the signed vs-median pill beside
+  each rank makes the direction recoverable.
