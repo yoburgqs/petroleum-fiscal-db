@@ -69279,3 +69279,16 @@ looking for a column deleted 400+ cycles ago.
   number agreement; Côte d'Ivoire's two missing API slugs; `window._screenerExportBasis` not naming
   the 105 withheld countries; `summary "Reading this table"` at 18px (the one sub-24px control left
   on Fiscal Compare at 390); `norway+united-kingdom+netherlands` ordering only UK › Norway.
+
+---
+## Cycle 954 Log — 2026-10-01 02:59
+- Test before: 542 PASS / 0 FAIL
+- Test after: 542 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 954 complete and pushed (v1017)
+
+## Cycle 954 — T5
+
+**Task.** T5 — "Give me something I can paste straight into an IC memo." Stalest in rotation (952 T4, 951 T6, 950 T2, 949 T3, 948/947 T1, 946 T5).
+
+**Friction.** I walked every clipboard and file artifact on the platform first and found them genuinely finished — nine surfaces (FC, Screener, Country Profile, Scenario Builder, IOC Portfolio, Side-by-Side pa
