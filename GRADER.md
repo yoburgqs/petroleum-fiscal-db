@@ -69429,3 +69429,16 @@ the screen.
   API slugs; `window._screenerExportBasis` not naming the 105 withheld countries;
   `summary "Reading this table"` at 18px; `norway+united-kingdom+netherlands` ordering only
   UK › Norway.
+
+---
+## Cycle 956 Log — 2026-10-01 05:17
+- Test before: 543 PASS / 0 FAIL
+- Test after: 543 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive — user impact) | **Task:** Cycle 955 complete and pushed (v1018)
+
+## Cycle 955 — T1
+
+**Task.** T1 — "Which countries should even be on my screening list?" Stalest in rotation (954 was T5; T1 last ran at 948).
+
+**Friction.** Walked cold with storage cleared: Home → `open the screen →` → Screener. The happy path is genuinely finished — 15 countries, the screen named, every exclusion already explained. So I kept narrowing the way an analyst 
