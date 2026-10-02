@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1040</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1041</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -56972,8 +56972,18 @@ function renderReformRisk() {
     + 'ORCA has not quantified their take impact, so they are shown as unknown rather than folded into a majority.'
     + '</div></div>';
 
+  // v1041 (T4): the button said nothing about what the file counts, and the file's own column
+  // headed "Counts In Reform Frequency Score" said Yes on every fiscal law change at any date --
+  // 72 rows where 27 score. The column is fixed; this states the split BEFORE the click, because
+  // the row count is the number an analyst reaches for and it is not the reform count.
+  var _xpAll = (window._ALL_REFORMS && window._ALL_REFORMS.length) ? window._ALL_REFORMS : [];
+  var _xpN = _xpAll.length;
+  var _xpScore = _xpAll.filter(function(e) { return _rrScores(e); }).length;
   var exportBar = '<div style="text-align:right;margin-top:14px;">'
-    + '<button class="btn btn-sm btn-outline" onclick="exportReformRiskCSV()" title="Export full reform history dataset to CSV">&#8659; Export Reform Data (CSV)</button>'
+    + '<button class="btn btn-sm btn-outline" onclick="exportReformRiskCSV()" title="Export every sourced reform event ORCA holds as CSV &mdash; the full log, not the filtered screen. One row per event, country A&ndash;Z then year ascending, with mechanic after the reform, take move, direction, the named citation and its A/B confidence, a resolvable URL where one is held, and the notes. Two separate Yes/No columns, because they are two different tests and only one of them is the score: &lsquo;Fiscal Law Change&rsquo; drops the context events (discoveries, first oil, conflict, a review that reopened nothing) but keeps every pre-2010 law change, and &lsquo;Counts In Reform Frequency Score (2010+)&rsquo; is the test the score actually runs. Filter on the second one. The preamble reconciles the two per country and names the jurisdictions where the difference turns into a WACC premium ORCA never gave you.">&#8659; Export Reform Data (CSV)'
+    + (_xpN ? '<span style="display:block;font-size:10px;font-weight:400;opacity:.7;">'
+        + _xpN + ' events · ' + _xpScore + ' score — filter the 2010+ column, not the row count</span>' : '')
+    + '</button>'
     + '</div>';
 
   // Section 5: Regional Reform Tilt (new in Cycle 33)
@@ -57260,10 +57270,24 @@ function exportReformRiskCSV() {
   var NOSRC = 'NOT RECORDED — no citation held for this event';
   // v583 (T4): the workbook must carry the same fiscal/context split the screen now shows,
   // or an analyst filtering the CSV rebuilds the old count offline.
+  // ── v1041 (T4) ───────────────────────────────────────────────────────────────────────────
+  // The column headed "Counts In Reform Frequency Score" was computed as
+  // `e.fiscal_change === false ? 'No' : 'Yes'` -- the fiscal/context test ONLY. It never
+  // applied the other half of _rrScores(), `year >= 2010`, which is the window the entire tab
+  // and its WACC-premium rule are written on. So it read Yes on 72 of 83 rows where only 27
+  // score, and the preamble told the analyst in as many words to "filter on Counts In Reform
+  // Frequency Score = Yes before counting reforms". Followed, that instruction contradicts the
+  // screen it was exported from: the on-screen event log stamps Algeria 1963/1971/1986/2005
+  // PRE-2010 - NOT SCORED and publishes Algeria at 100/100 with no premium, while the file
+  // marked all four Yes -- a count of 4 that rebuilds to a score of 40 and a 3-5pp WACC
+  // premium on a jurisdiction the platform says carries none. Same for Libya 3, Colombia 3,
+  // USA 2. The scoring test now has its own column, the old column keeps its real meaning
+  // under its real name, and the preamble reconciles the two per country.
   var rows = [['Country','Year','Event','Mechanic After Reform','Take Change','Direction',
-               'Counts In Reform Frequency Score','Context Kind',
+               'Fiscal Law Change','Counts In Reform Frequency Score (2010+)','Context Kind',
                'Source','Source Confidence','Source URL','Notes']];
-  var nSourced = 0, nUrl = 0, nTake = 0, nCtx = 0, confN = { A: 0, B: 0 };
+  var nSourced = 0, nUrl = 0, nTake = 0, nCtx = 0, nScore = 0, confN = { A: 0, B: 0 };
+  var perC = {};
   var yrLo = null, yrHi = null;
   var countries = {};
   recs.forEach(function(e) {
@@ -57274,6 +57298,13 @@ function exportReformRiskCSV() {
     if (e.source_url) nUrl++;
     if (e.take_change) nTake++;
     if (e.fiscal_change === false) nCtx++;
+    // v1041 (T4): the two tests kept apart, and tallied per country for the reconciliation line.
+    var _isFiscal = e.fiscal_change !== false;
+    var _isScored = (typeof _rrScores === 'function') ? !!_rrScores(e) : (_isFiscal && (e.year || 0) >= 2010);
+    if (_isScored) nScore++;
+    if (!perC[e.country]) perC[e.country] = { f: 0, s: 0 };
+    if (_isFiscal) perC[e.country].f++;
+    if (_isScored) perC[e.country].s++;
     var conf = e.source ? String(e.confidence || 'B').toUpperCase() : '';
     if (conf === 'A' || conf === 'B') confN[conf]++;
     rows.push([
@@ -57289,7 +57320,8 @@ function exportReformRiskCSV() {
       ({ hostile: 'Raised take', friendly: 'Cut take',
          unmeasured: 'Fiscal change, size not recorded',
          context: 'Changed no fiscal terms' })[e.direction || ((typeof _rrEventDir === 'function') ? _rrEventDir(e) : '')] || '',
-      (e.fiscal_change === false ? 'No' : 'Yes'),
+      (_isFiscal ? 'Yes' : 'No'),
+      (_isScored ? 'Yes' : 'No'),
       e.context_kind || '',
       e.source || NOSRC,
       conf,
@@ -57302,19 +57334,55 @@ function exportReformRiskCSV() {
 
   // v613 (T5): every figure in this block is counted off the rows actually written above, not
   // asserted from the database. The Breakeven CSV (v608) sets the house rule.
+  // v1041 (T4): same rule for the reconciliation — both strings are built from perC, which was
+  // tallied inside the row loop, so the preamble cannot name a country the file does not contain.
+  var _cNames = Object.keys(perC).sort(function(a, b) {
+    if (perC[b].f !== perC[a].f) return perC[b].f - perC[a].f;
+    return String(a).localeCompare(String(b));
+  });
+  var _recTxt = _cNames.filter(function(c) { return perC[c].f > 0; })
+    .map(function(c) { return c + ' ' + perC[c].f + '/' + perC[c].s; }).join('; ');
+  // A sourced log holding nothing but context events is a third state, and it must not be read
+  // off this line as absence of coverage -- it is coverage that found no law change.
+  var _noLaw = _cNames.filter(function(c) { return perC[c].f === 0; });
+  var _noLawTxt = !_noLaw.length ? ''
+    : ' ' + (_noLaw.length > 1 ? _noLaw.slice(0, -1).join(', ') + ' and ' + _noLaw[_noLaw.length - 1]
+                               : _noLaw[0])
+      + (_noLaw.length > 1 ? ' carry a sourced log but no fiscal law change at any date, so they appear in neither count — that is coverage that found nothing, not missing coverage.'
+                           : ' carries a sourced log but no fiscal law change at any date, so it appears in neither count — that is coverage that found nothing, not missing coverage.');
+  var _zeroList = _cNames.filter(function(c) { return perC[c].s === 0 && perC[c].f > 0; });
+  var _zeroN = _zeroList.length;
+  var _zeroParts = _zeroList.map(function(c, i) {
+    return (i === 0 ? perC[c].f + ' reforms behind ' : perC[c].f + ' behind ') + c;
+  });
+  var _zeroTxt = _zeroParts.length > 1
+    ? _zeroParts.slice(0, -1).join(', ') + ' and ' + _zeroParts[_zeroParts.length - 1]
+    : (_zeroParts[0] || '');
   var pre = [
     'ORCA Reform History — ' + N + ' events across ' + nC + ' countries, ' + yrLo + '–' + yrHi,
     'THIS IS THE FULL LOG, NOT THE FILTERED VIEW. The country / direction / decade filters on the '
       + 'Reform Risk tab do not narrow this file — it always exports every event ORCA holds, so a '
       + 'filtered screen and this file will not agree on a count. Rows are country A–Z, then year '
       + 'ascending. Row order is not a ranking.',
-    (nCtx
-      ? 'ONLY ' + (N - nCtx) + ' OF THESE ' + N + ' ROWS SCORE. ' + nCtx + ' are context events — discoveries, '
-        + 'first oil, conflict, a terms review that concluded without renegotiation, one non-petroleum tax — '
-        + 'that changed no fiscal terms and do NOT feed the Reform Frequency Score. Filter on '
-        + '"Counts In Reform Frequency Score" = Yes before counting reforms, or you will overstate '
-        + 'this government’s record against the contractor.'
-      : 'All ' + N + ' rows are fiscal law changes that feed the Reform Frequency Score.'),
+    'ONLY ' + nScore + ' OF THESE ' + N + ' ROWS FEED THE REFORM FREQUENCY SCORE. The score is '
+      + '100 − 15 × sourced fiscal law changes dated 2010 OR LATER, so a row scores only if it is a '
+      + 'fiscal law change AND its year is 2010 or after. The column "Counts In Reform Frequency '
+      + 'Score (2010+)" is exactly that test, row by row — the same verdict the on-screen event log '
+      + 'stamps on each event as COUNTS IN SCORE or PRE-2010 · NOT SCORED. Filter on THAT column '
+      + '= Yes before counting reforms.',
+    'DO NOT COUNT ON "Fiscal Law Change" OR ON "Year" ALONE. "Fiscal Law Change" = Yes on '
+      + (N - nCtx) + ' rows: it drops the ' + nCtx + ' context events (discoveries, first oil, conflict, '
+      + 'a terms review that concluded without renegotiation, one non-petroleum tax) but KEEPS every '
+      + 'pre-2010 law change, which scores nothing. Counting on it returns ' + (N - nCtx) + ' reforms '
+      + 'against the ' + nScore + ' this platform publishes'
+      + (_zeroTxt ? ' — and it puts ' + _zeroTxt + ', '
+          + (_zeroN === 1 ? 'a jurisdiction' : 'all ' + _zeroN + ' of which are jurisdictions')
+          + ' ORCA publishes at a Reform Frequency Score of 100 with no premium at all. That is where '
+          + 'an offline recount turns into a WACC premium this platform never gave you' : '')
+      + '. Year alone is not the test either: a 2010-or-later context event still does not score.',
+    'PER-COUNTRY RECONCILIATION — fiscal law changes / of those, scoring (2010+): ' + _recTxt
+      + '. These are counted off the rows written below, and the right-hand number is the one behind '
+      + 'each country’s Reform Frequency Score on the Reform Risk tab.' + _noLawTxt,
     '"Take Change" is populated on ' + nTake + ' of ' + N + ' rows. A blank means the size of the fiscal '
       + 'change was not recorded — it does NOT mean zero, and must not be summed or averaged as if it were. '
       + 'The Direction column still states which way the change went on those rows.',
