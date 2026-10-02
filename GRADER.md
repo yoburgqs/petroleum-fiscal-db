@@ -70455,3 +70455,108 @@ card now says so outright instead of looking like every other profile.
 **Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" — stalest in rotation (v1023 T4 · v1024 T2 · v1025 T5 · v1026 T1 · v1027 T3 · v1028 T6 · v1029 T4).
 
 **Friction.** The card headed **BREAKEVEN PRICE** answers T2 in the analyst's own word — "Attractive at $75/bbl" — in a 28px slot. That sentence is a four-state sw
+
+---
+
+## Cycle 972 — T1 — v1032 — 2026-10-02
+
+**Task:** T1, "Which countries should even be on my screening list?" — stalest in rotation
+(v1026 T1 · v1027 T3 · v1028 T6 · v1029 T4 · v1030 T2 · v1031 T5).
+
+**Friction.** `#screener-count` — written at the single assembly point in the Screener render —
+is the element that tells the analyst WHAT their shortlist is and WHY each row is in it. It was
+assembled as ONE run-on string: `_universeLead` plus up to nine em-dash clauses welded together
+inside a single 13px `<span>`. Measured on the shipped build at 390x844 with `hasTouch`, after
+the pane auto-scrolls results into view:
+
+| preset | chars | rendered lines | height |
+|---|---|---|---|
+| Stable Fiscal Record | 1,566 | 32 unbroken | **624px — 74% of an 844px viewport** |
+| IOC Capital Screen | 745 | 16 unbroken | 312px |
+| Frontier Markets | 740 | 15 unbroken | 293px |
+
+all of it above the first country row. The clauses are load-bearing, not decoration: on Stable
+Fiscal Record they carry *"the other 164 countries are NOT screened out on their reform record —
+ORCA holds none for them, which is not a clean record"*, *"2 raised take inside the window
+(Ecuador TAKE +5pp, Russia TAKE +15pp)"* and *"Iraq — admitted, the published blend would have
+excluded it"* — three statements an IC memo must not get wrong — at positions 4, 6 and 8 of a
+single sentence. An analyst with 20 minutes does not read 32 lines of 11px prose; they scroll
+past the block to the shortlist, which is exactly what they must not do.
+
+**Change.** The clauses stop being one paragraph and become one line each. Nothing is reworded
+and no clause builder is touched — every clause already arrives self-labelling ("take ceiling
+≤70% tested on…", "reform record: …", "scope: …", "verified field production only; …"). The
+leading em dash, which was only the inline joiner, is stripped. Under `pointer: coarse` **and**
+`max-width: 720px` — deliberately the same scope as the v612 mobile layer, so a mouse sees no
+change at all — the clause lines collapse behind a 30px toggle that *names how many there are*
+("⚠ 3 caveats on this screen"). Desktop hides nothing: `.sc-notes-body` is `display:block` and
+`.sc-notes-toggle` is `display:none` there.
+
+The deck suffix moves onto the lead line, where it belongs — it describes the whole screen, not
+whichever filter happened to be last — and is deliberately **not** inside the collapsible region,
+because the production profile behind every NPV must not be one tap away on the device where a
+number is most likely to be misread. It also gains a leading NBSP: it carried `margin-left:8px`
+and no text separator, so whatever preceded it welded on. The page printed
+`…proxy-economics countries excluded· Deepwater @$75/bbl`, and on the cold view
+`…npv high→low within each block· Deepwater`, where "block · Deepwater" reads as naming a block.
+8px of margin is not a separator — it vanishes from `innerText`, every copy path and every
+screen reader. This is the `block· Deepwater` join fault carried on the notes list since cycle
+~958; it is now fixed at the source rather than per-clause.
+
+**Result.** On a phone the analyst reaches the shortlist immediately — the Stable Fiscal Record
+count block drops **624px → 115px** — and can still open every caveat, now *knowing there are
+three* rather than discovering them inside a paragraph. On a desktop the same screen reads as
+three findable labelled blocks instead of eight unbroken lines, so an analyst checking one axis
+(reform coverage, take basis, scope) can find that axis.
+
+### Verification — all run this cycle, none assumed
+- JS syntax gate: **PASS** (11 inline script blocks extracted, `node --check`).
+- Runtime suite: **RUN**, local tree — 545 PASS / 0 FAIL / 1 WARN. An identical run on `HEAD`
+  *before* the change produced a report identical test-for-test (only the timestamp differs), so
+  the change is suite-neutral. The 1 WARN and the 546→545 delta against the live-site baseline
+  are the local server's `sw.js` 404, not this edit. Stated rather than hidden.
+- 390x844 `hasTouch`: all 8 tabs `scrollWidth 390 == clientWidth`; zero controls under 24px in
+  the touched region; toggle measures 30px; opens and closes; `aria-expanded` tracks.
+- Zero page errors and zero console errors (other than the pre-existing local `sw.js` 404) at
+  both 1440 and 390.
+- Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical.
+- Version badge bumped v1030 → **v1032** silently at the end (v1031 was the orphan committed
+  at the top of this cycle).
+
+### Notes for the next cycle
+- **Committed an orphan first:** v1031 (T5) was sitting uncommitted in the tree from a cycle
+  killed by the 1800s subprocess timeout. It fixed the CP regime table formatting NPV with its
+  own inline `Math.abs(Math.round(v))` while the strip, tooltip and the sentence ~40px below all
+  used `fmtNpvShared()` — the two round opposite ways on a negative `.5` mean, which is why
+  Indonesia Gross Split printed **-$215M** in the table and **-$216M** in the prose. That is the
+  carried-forward Indonesia item from cycles 958/959: **now resolved.** The local formatter also
+  never switched to B at ≥1000 ($2,030M vs $2.03B); that is resolved with it.
+- **Seen while walking, not fixed:** India is the one fee-basis row whose comparable take moves
+  *up* (published 61.9% → screened 63.2%); every other corrected row moves down
+  (Azerbaijan 60.8→59.8, Mexico 32.2→29.7, Ecuador 46.5→39.3, Iraq 84.8→34.1). Both sides clear
+  the ≤65% ceiling so nothing is mis-screened today, but if the correction is "set aside
+  fee-basis contracts", whose take is ~99%, the mean cannot rise. Worth one cycle on
+  `_scFeeCmpAt()` to establish whether the two figures are weighted differently (production-weighted
+  vs simple mean), because the direction is an assertion about the method, not about India.
+- Carried forward from 964/963 and still live: the FAQ bank quoting the retired `$1.2B / $15-flat`
+  deck (`index.html:6117`, `:6234`); the typed "65 of 185" breakeven count at `:5508` and `:3837`
+  against a live 67; `cpBeBound()`'s tooltip saying "117 of 185" against a live 118; the solved
+  arm's `ctxStmt` ladder with three unreachable rungs.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS breakeven
+  basis paragraph denominators; FC Reform verdict bare `n/c` on 164 of 189 rows; `window._fcNavList`
+  never invalidated; CP headline take rank vs NPV rank counting in opposite directions; Indonesia's
+  three government profit-oil shares; `be_75 = 1.0` at source for Bahrain/Kuwait/Saudi Arabia;
+  Somalia the one true T4 dead end; Paraguay decree typed `government_filing`; Screener
+  `_screenerExportBasis` not naming the 105 withheld countries; Home card "up to 4 countries" vs
+  `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs; the Home hurdle stat's "list below".
+  The `block· Deepwater` join fault comes OFF this list — fixed above.
+- **Probe debris, seventeenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+  `_base970.html` remain untracked in the repo root (~38 MB). This cycle's probes went to
+  `/tmp/c972/` and nothing was written inside the repo. Still only flagged, not deleted — standing
+  rule is to ask before deleting files the session did not create. **Recommend Zach authorise
+  deletion or that they be added to `.gitignore`.**
+- **Infrastructure, still worth Zach's attention:** this cycle again began by committing someone
+  else's orphaned work. Cycles 969, 970, and whichever produced v1031 all died on the 1800s
+  `claude -p` timeout in `autonomous_cycle.py:231` — the same interval as the cycle itself, so a
+  cycle that runs long is killed rather than finishing late. The loop recovers only because the
+  next cycle spends its first minutes committing the previous one's work.
