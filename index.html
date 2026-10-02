@@ -2999,7 +2999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1027</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1030</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -45963,6 +45963,37 @@ window.cpBeBandNote     = cpBeBandNote;
 // was ABSENT while the Fiscal Mechanics tile three inches below it read "$29/bbl". Same
 // sync-vs-async contradiction v512 fixed for the other four slots and missed here. Both paths now
 // call this.
+// ── v1030 (T2): how many countries land on each state of the bounded-breakeven verdict ──────
+// Added because the verdict sentence in cpBuildBeCallout() was a four-state switch in which one
+// state fires on 114 of the 115 countries that reach it, and the card said nothing about that.
+// Counted at render time over COUNTRY_DATA rather than typed, for the reason the typed "117 of
+// 185" in cpBeBound()'s own tooltip and the typed "65 of 185" elsewhere on this page have both
+// drifted off the live figures: a constant written into a string stops tracking the database.
+// Classification below MUST mirror the branch order in cpBuildBeCallout() exactly — if one moves,
+// the other is wrong. Cached: the loop calls cpBeBound() once per country.
+var _cpBoundVerdictBaseCache = null;
+function cpBoundVerdictBase() {
+  if (_cpBoundVerdictBaseCache) return _cpBoundVerdictBaseCache;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return null;
+  if (typeof window.cpBeBound !== 'function') return null;   // defined far below this point
+  var o = { bound: 0, attr50: 0, attrNotRobust: 0, notAttr: 0, notAttrHi: 0, solved: 0, mono: 0 };
+  COUNTRY_DATA.forEach(function(d) {
+    if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)
+        && d.be_75 != null && d.be_75 <= 1) { o.mono++; return; }
+    var bv = (typeof cpBeFor === 'function') ? cpBeFor(d) : null;
+    if (bv != null && bv < 500) { o.solved++; return; }
+    var b = window.cpBeBound(d);
+    if (!b) return;
+    o.bound++;
+    if (b.hi != null && b.hi <= 75) { if (b.hi <= 50) o.attr50++; else o.attrNotRobust++; }
+    else if (b.lo != null && b.lo >= 125) o.notAttrHi++;
+    else o.notAttr++;
+  });
+  _cpBoundVerdictBaseCache = o;
+  return o;
+}
+window.cpBoundVerdictBase = cpBoundVerdictBase;
+
 function cpBuildBeCallout(d) {
   if (!d) return '';
   var bv = cpBeFor(d);
@@ -46000,13 +46031,85 @@ function cpBuildBeCallout(d) {
       // Clears the base case iff contractor NPV is already positive at $75 — i.e. the bracket's
       // upper edge is at or below 75. '< $50' -> hi 50; '$50-$75' -> hi 75; '> $125' -> hi null.
       var _clears = (_bd.hi != null && _bd.hi <= 75);
-      var _verdict = _clears
-        ? (_bd.hi <= 50
-            ? 'Attractive at $75/bbl \u2014 contractor NPV stays positive all the way down to $50, the lowest price ORCA models on this page.'
-            : 'Attractive at $75/bbl, but not robust \u2014 contractor NPV turns negative between $' + _bd.lo + ' and $' + _bd.hi + ', so an entry here does not survive a price break below the base case.')
-        : (_bd.lo != null && _bd.lo >= 125
-            ? 'Not attractive at $75/bbl \u2014 contractor NPV is negative at every price ORCA models on this page, up to $125/bbl.'
-            : 'Not attractive at $75/bbl \u2014 contractor NPV does not turn positive until somewhere between $' + _bd.lo + ' and $' + _bd.hi + '/bbl.');
+      // ── v1030 (T2): the word "Attractive" was a constant, in the slot that answers T2 ────────
+      // This is a four-state switch with ONE reachable state. Measured over all 185 countries at
+      // render time, not typed: 3 state monopolies take the card above, 67 are solved and take the
+      // card below, and 115 reach here — of which **114 print the identical sentence** and 1
+      // (Yemen) prints the second. Neither "Not attractive" branch fires on any country in the
+      // database. So the one card headed BREAKEVEN PRICE, the 28px slot an analyst asking "is this
+      // country attractive at $75" actually reads, answered with a sentence that is true of 114 of
+      // the 115 countries it can be shown for, and led with the exact word they came for.
+      //
+      // Both neighbouring surfaces had already learned this and this branch, added later at v1020,
+      // reintroduced it:
+      //   - the headline strip (v589, ~line 46939) deliberately refuses to let the same NPV>0 pass
+      //     read as a verdict — "but so do 181 of 182 non-monopoly regimes here";
+      //   - the SOLVED arm of this very function (~60 lines below) retired its own
+      //     Resilient/Moderate/Elevated/Vulnerable ladder for being "one reachable state ... a
+      //     property of the whole set", and cpBeBandNote() ends "breakeven does not separate them.
+      //     Use government take and the $50 downside NPV to discriminate."
+      // The pass is kept — it is true — but it is now stated WITH its base rate, and the card
+      // hands the analyst the two readings on this page that do vary. Same instruction the solved
+      // arm gives, so the two arms of one function can no longer contradict each other.
+      var _vb = (typeof cpBoundVerdictBase === 'function') ? cpBoundVerdictBase() : null;
+      var _fb1030 = (typeof cpFloorBase === 'function') ? cpFloorBase() : null;
+      // Tier scale is the platform's own — v449 CP headline colours / FC "Tier" legend. No new threshold.
+      var _tk1030 = (d.take_75 != null) ? d.take_75 : null;
+      var _tier1030 = _tk1030 == null ? '' : (_tk1030 <= 40 ? 'investor-friendly tier, \u226440%'
+                    : _tk1030 <= 60 ? 'moderate tier, 41\u201360%'
+                    : _tk1030 <= 75 ? 'high-take tier, 61\u201375%' : 'NOC-dominated tier, >75%');
+      var _dn1030 = (typeof cpDownside50 === 'function') ? cpDownside50(d) : null;
+      var _nf1030 = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(v) { return '$' + Math.round(v) + 'M'; };
+      // What to look at instead. Only names figures that are actually on this page for this country.
+      var _useInstead = '';
+      if (_tk1030 != null) {
+        _useInstead = ' This bound does not separate ' + _q(d.country || 'this country')
+          + ' from the field. What does, on this page: government take '
+          + _tk1030.toFixed(1) + '% (' + _tier1030 + ')'
+          + ((_dn1030 && _dn1030.v != null)
+              ? ' and the $50 downside NPV of ' + _nf1030(_dn1030.v)
+                + ' read against the regimes in its own take band.'
+              : '.');
+      }
+      var _verdict;
+      if (_clears && _bd.hi <= 50) {
+        // The 114-of-115 case. Lead with the shared pass, not with "Attractive".
+        _verdict = 'Clears $75 and the $50 downside \u2014 and so does nearly every regime here.'
+          + (_fb1030 && _fb1030.n
+              ? ' ' + _fb1030.nPass + ' of ' + _fb1030.n + ' non-monopoly countries pass the same test'
+              : '')
+          + (_vb && _vb.bound
+              ? (_fb1030 && _fb1030.n ? ', and ' : ' ') + _vb.attr50 + ' of the ' + _vb.bound
+                + ' ORCA can only bracket land on this identical \u201c' + _q(_bd.txt) + '\u201d reading.'
+              : '.')
+          + _useInstead;
+      } else if (_clears) {
+        // Rare and therefore the finding — say that it is rare rather than leaving it to look routine.
+        _verdict = 'Attractive at $75/bbl, but NOT robust \u2014 contractor NPV turns negative between $'
+          + _bd.lo + ' and $' + _bd.hi + ', so an entry here does not survive a price break below the base case.'
+          + ((_vb && _vb.bound && _vb.attrNotRobust)
+              ? ' That is the finding on this card: ' + _q(d.country || 'this country') + ' is '
+                + (_vb.attrNotRobust === 1 ? 'the only one' : 'one of ' + _vb.attrNotRobust)
+                + ' of the ' + _vb.bound + ' bracketed countries whose $50 leg fails'
+                + (_fb1030 && _fb1030.nFail
+                    ? (_fb1030.nFail === 1
+                        ? ', and the only one of all ' + _fb1030.n + ' non-monopoly regimes in the database.'
+                        : ', and one of only ' + _fb1030.nFail + ' of ' + _fb1030.n
+                          + ' non-monopoly regimes in the database.')
+                    : '.')
+              : '');
+      } else if (_bd.lo != null && _bd.lo >= 125) {
+        _verdict = 'Not attractive at $75/bbl \u2014 contractor NPV is negative at every price ORCA models on this page, up to $125/bbl.'
+          + ((_vb && _vb.bound && _vb.notAttr + _vb.notAttrHi > 0)
+              ? ' ' + (_vb.notAttr + _vb.notAttrHi) + ' of the ' + _vb.bound
+                + ' bracketed countries read this way, so it is a per-country finding, not a property of the set.' : '');
+      } else {
+        _verdict = 'Not attractive at $75/bbl \u2014 contractor NPV does not turn positive until somewhere between $'
+          + _bd.lo + ' and $' + _bd.hi + '/bbl.'
+          + ((_vb && _vb.bound && _vb.notAttr + _vb.notAttrHi > 0)
+              ? ' ' + (_vb.notAttr + _vb.notAttrHi) + ' of the ' + _vb.bound
+                + ' bracketed countries read this way, so it is a per-country finding, not a property of the set.' : '');
+      }
       return '<div id="cp-be-callout" title="' + _q(_bd.tip) + '" style="background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
         + '<div style="min-width:0;">'
         + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Breakeven Price</div>'
