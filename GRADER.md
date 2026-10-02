@@ -70311,3 +70311,134 @@ where that number actually goes.
 **Task:** T3 — "How do these three countries compare side by side?" Stalest in rotation; last T3 was cycle 957.
 
 **Housekeeping first:** three cycles' work was sitting uncommitted in the working tree (v1024 T2, v1025 T5, v1026 T1). I committed each with its own message before starting. That also corrects the rotation record — the most recent task before this cycle was T1, not T
+
+---
+## Cycle 971 — 2026-10-01 — T2 (v1030)
+
+**Housekeeping first.** Cycles 969 and 970 both died on the 1800s subprocess timeout in
+`autonomous_cycle.py` (traceback in `cycle_log.txt`), leaving a complete, syntax-clean v1029
+(T4) uncommitted in the working tree. Verified and committed it under its own message before
+starting. Rotation record, by version: v1023 T4 · v1024 T2 · v1025 T5 · v1026 T1 · v1027 T3 ·
+v1028 T6 · v1029 T4 — so **T2 was stalest** and is this cycle.
+
+**Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" Walked cold
+at 1440x900 and 390x844 `hasTouch`, both storages cleared and reloaded, served from `~` so
+`sw.js` resolves. Cold default is Indonesia.
+
+### Friction
+The one card headed **BREAKEVEN PRICE** (`#cp-be-callout`, the bounded arm of
+`cpBuildBeCallout()`, `index.html` ~45990) answers T2 in the analyst's own word — *"Attractive
+at $75/bbl"* — in a 28px slot. That sentence is a four-state switch with **one reachable
+state**. Counted at render time over all 185 countries, not read off the changelog:
+
+| | |
+|---|---|
+| state monopolies → the card above | 3 |
+| solved breakeven → the card below | 67 |
+| **reach the bounded arm** | **115** |
+| → "Attractive at $75/bbl — NPV stays positive down to $50" | **114** |
+| → "Attractive at $75/bbl, but not robust" | 1 (Yemen) |
+| → either "Not attractive" branch | **0** |
+
+114 of the 115 profiles on which this card can appear printed the identical sentence, led by
+the exact word the analyst came for. Across the database `cpFloorBase()` measures **181 of 182**
+non-monopoly regimes passing the same NPV>0-at-$75-and-$50 test.
+
+Both neighbouring surfaces had already learned this, and the bounded arm — added later, at
+v1020 — reintroduced it in the most quotable slot on the page:
+
+- the **headline strip** (v589, ~`index.html:46939`) exists specifically to stop this pass
+  reading as a verdict: *"Clears the 10% WACC at $75 ($745M) and at the $50/bbl downside
+  ($334M) — but so do 181 of 182 non-monopoly regimes here."*
+- the **solved arm of this very function**, ~60 lines below, retired its own
+  Resilient/Moderate/Elevated/Vulnerable ladder because it had "exactly one reachable state and
+  read as a per-country finding when it was a property of the whole set", and `cpBeBandNote()`
+  closes *"breakeven does not separate them. Use government take and the $50 downside NPV to
+  discriminate."*
+
+So the two arms of a single function were handing the analyst opposite instructions, and the
+arm that fires on 115 of 185 profiles — including the cold default — was the wrong one.
+
+### Change
+New **`cpBoundVerdictBase()`** counts the four verdict states over `COUNTRY_DATA` at render
+time and caches. Its classification mirrors the branch order in `cpBuildBeCallout()` exactly,
+and this is **counted rather than typed** for a reason already on the carry-forward list: the
+"117 of 185" inside `cpBeBound()`'s own tooltip and the "65 of 185" at `index.html:5508`/`:3837`
+are both typed constants that have drifted off the live database.
+
+The mass case no longer leads with "Attractive". Indonesia, cold, now renders:
+
+> Clears $75 and the $50 downside — and so does nearly every regime here. 181 of 182
+> non-monopoly countries pass the same test, and 114 of the 115 ORCA can only bracket land on
+> this identical "< $50/bbl" reading. This bound does not separate Indonesia from the field.
+> What does, on this page: government take 59.5% (moderate tier, 41–60%) and the $50 downside
+> NPV of $334M read against the regimes in its own take band.
+
+The rare states get the inverse treatment, because there the card *is* the finding. Yemen now
+closes: *"That is the finding on this card: Yemen is the only one of the 115 bracketed
+countries whose $50 leg fails, and the only one of all 182 non-monopoly regimes in the
+database."* Both "Not attractive" branches gained the same base-rate clause so they stay
+honest if the data moves them off zero.
+
+Tier vocabulary is the platform's own (v449 CP headline colours / the FC "Tier" legend) and
+the `$50` figure comes from `cpDownside50()`, the same call the headline uses — so no new
+threshold and no new number enters the platform.
+
+### Result
+An analyst with 20 minutes can no longer paste *"Attractive at $75/bbl"* into an IC memo as a
+finding about the country in front of them — the card states the pass is shared by 181 of 182
+regimes, and hands over, in the same sentence, the two readings on the page that actually vary
+between countries. On the one country where the breakeven bound genuinely discriminates, the
+card now says so outright instead of looking like every other profile.
+
+### Verification
+- Syntax gate **PASS**.
+- Runtime suite **RAN** this cycle against the local tree (graded copy,
+  `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL` pointed at the local
+  server): **546 PASS / 0 FAIL / 0 WARN / 0 JS errors** — unchanged, no regression.
+- `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390; **0** controls under
+  24px inside the card under `pointer: coarse`; **0** page errors at any width. The card grows
+  108px → 347px between 1920 and 390 and wraps with zero overflowing children.
+- All four bounded states plus both neighbouring arms rendered and read back from the DOM:
+  Indonesia / Guyana / Namibia / Angola (mass case), Yemen (rare case), Norway (solved arm),
+  Saudi Arabia (monopoly arm).
+- Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical.
+- Version badge bumped v1027 → **v1030** silently at the end. It had been left at v1027 because
+  the cycles that shipped v1028 and v1029 both died before their bump step.
+
+### Notes for the next cycle
+- **Typed constant found while measuring, not fixed this cycle:** `cpBeBound()`'s tooltip says
+  "117 of 185 countries have none on file". Live the figure is **118** (185 − 67 solved). Small,
+  and it is a tooltip string, so it was left rather than bundled into a T2 behavioural change.
+- **Same family, worth a cycle on its own:** the solved arm's `ctxStmt` ladder still has three
+  unreachable rungs (`bv < 70` / `< 85` / `>= 85`). All 67 solved values sit $27–$34, so only the
+  `bv < 50` rung ever fires — the comment above it says as much and leaves the dead branches in
+  place. Harmless today; it is the same defect this cycle fixed, one arm over.
+- Carried forward from 964/963 and still live: the FAQ bank quoting the retired `$1.2B / $15-flat`
+  deck (`index.html:6117`, `:6234`); the typed "65 of 185" breakeven count at `:5508` and `:3837`
+  against a live 67.
+- Carried forward from 958/959: Indonesia's Gross Split avg NPV printing `-$215M` in the regime
+  table and `-$216M` in the sentence ~40px above it — **re-confirmed on screen this cycle**, both
+  figures are still there; `_cpApplyBe()` comments describing an API path that no longer fires;
+  the band-4 `↑ PRE-2010` question on 7 countries; `_fcReformCmp` on the FC sort; the
+  `# Contracts` row's three thousand-separator conventions.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS
+  breakeven basis paragraph denominators; FC Reform verdict bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; CP headline take rank vs NPV rank counting in opposite
+  directions; Indonesia's three government profit-oil shares (the page flags this itself);
+  `be_75 = 1.0` at source for Bahrain/Kuwait/Saudi Arabia; Somalia the one true T4 dead end;
+  Paraguay decree typed `government_filing`; Screener `block· Deepwater` join fault; Home card
+  "up to 4 countries" vs `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs;
+  `_screenerExportBasis` not naming the 105 withheld countries; the Home hurdle stat's
+  "list below".
+- **Infrastructure, worth Zach's attention:** cycles 969 and 970 both produced nothing because
+  the `claude -p` subprocess hit the 1800s timeout in `autonomous_cycle.py:231` — the same
+  interval as the cycle itself, so a cycle that runs long is killed rather than finishing late,
+  and its work is left orphaned in the tree for the next cycle to find. That has now happened
+  to v1028, v1029 and (earlier) v1024-v1026. The loop recovers, but only because each following
+  cycle spends its first minutes committing someone else's work.
+- **Probe debris, sixteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`
+  and now `_base970.html` are untracked in the repo root (~38 MB). This cycle's probes went to
+  `/tmp/c971/` and nothing was written inside the repo. Still only flagged, not deleted —
+  standing rule is to ask before deleting files the session did not create. **Recommend Zach
+  authorise deletion or that they be added to `.gitignore`.**
