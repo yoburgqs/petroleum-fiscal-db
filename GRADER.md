@@ -71104,3 +71104,18 @@ one) or run the local suite past its own deadline, as this cycle did.
 `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
 This cycle's probes and its pre-edit snapshot went to `/tmp/c980/`; nothing was written inside
 the repo. Still only flagged — **recommend Zach authorise deletion or a `.gitignore` entry.**
+
+---
+## Cycle 982 Log — 2026-10-02 13:12
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 980 complete — shipped, verified, pushed (`335da68` + `aeda4f7`, v1039).
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest in rotation; last cycle was T1). Walked cold at 1440×900 and at 360/390/430×844 with `hasTouch`, both storages cleared, served from the repo tree.
+
+## Friction
+**The grid printed every number whole on a phone and sliced every caption that says the numbers may not be compared.**
+
+`.compare-grid`'s ≤600px rule (`index.html:2745`) floors coun
