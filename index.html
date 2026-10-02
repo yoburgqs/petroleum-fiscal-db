@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1039</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1040</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -5075,7 +5075,7 @@ window.copyPlatformCitation = function(btn) {
     </p>
     <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
       <span style="font-size:11px;font-weight:700;color:var(--accent);">Does govt take include income tax for concession regimes?</span>
-      <span style="font-size:12px;color:var(--muted);margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 68.0% includes SPT (56%) + ordinary CIT (22%). UK's 51.4% includes RFCT (40%) + EPL (32%) − RFES. USA's 23.4% includes federal income tax.</span>
+      <span style="font-size:12px;color:var(--muted);margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 68.0% includes SPT (56%) + ordinary CIT (22%). UK's 49.2% includes RFCT (40%) + EPL (32%) − RFES. USA's 23.4% includes federal income tax.</span>
     </div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Formula (all mechanics)</p>
     <pre style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px;color:#6B6560;overflow:auto;margin:0 0 18px;">govt_take_pct = (royalties + income_tax + resource_rent_tax + profit_oil_state_share
@@ -6258,7 +6258,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </ol>
         <strong style="color:var(--text);">Countries where bonus / WPT materially affects bid economics:</strong>
         <ul style="margin:6px 0 6px 18px;list-style:disc;line-height:1.7;">
-          <li><strong>United Kingdom:</strong> EPL 25% (from Jan 2025, down from 35% peak) applies above a low profit threshold — effectively raises government take by 8–15pp at $80–100/bbl for a profitable producing field. Platform take (51.4%) does not include EPL at elevated prices. For UK late-life field economics, adjust upward by 10pp in your $100/bbl scenario.</li>
+          <li><strong>United Kingdom:</strong> EPL 25% (from Jan 2025, down from 35% peak) applies above a low profit threshold — effectively raises government take by 8–15pp at $80–100/bbl for a profitable producing field. Platform take (49.2%) does not include EPL at elevated prices. For UK late-life field economics, adjust upward by 10pp in your $100/bbl scenario.</li>
           <li><strong>Nigeria:</strong> Nigeria's NDDC (Niger Delta Development Commission) levy (3% of after-tax profits) and NNPC training levy (not in platform) add approximately 1–2pp above statutory take for shallow offshore JV operators. Deep offshore PSC operators post-PIA: check NUPRC block terms for bonus and community development levy amounts.</li>
           <li><strong>Algeria:</strong> Sonatrach TFP (Taxe sur les Profits Pétroliers — hydrocarbon windfall tax) applies when oil price exceeds $30/bbl above a reference. At $100/bbl, effective TFP can add 5–10pp to the platform's Algeria take figure (67.8%).</li>
           <li><strong>Ecuador:</strong> Windfall profit tax on excess revenues (oil price above a threshold set by MoF annually). At $90+/bbl, effective contractor share of uplift is approximately 25% — meaning 75% of price increase above the threshold goes to government.</li>
@@ -53339,11 +53339,45 @@ function renderSampleAnalyses() {
             `<span style="color:${deltaColor(dlt)}">${dlt!=null?'+'+dlt.toFixed(1)+'pp':'—'}</span>`];
   }).filter(Boolean);
   const nsCountries = northSea.filter(c => cd.find(x => x.country === c));
+  /* ── v1040 (T6): the Sample Analyses narrative had drifted off the table under it ─────────
+     Walked T6 cold at 1440x900 and 390x844 hasTouch, both storages cleared, served from the
+     repo tree. Every card on this tab is a HARD-CODED headline and paragraph sitting directly
+     on top of a table built live from COUNTRY_DATA, and nothing ever reconciled the two.
+     Measured on the shipped build against the shipped country_data.json:
+
+       card                     prose says            its own table prints     drift
+       North Sea Neighbors      UK 51.4% take         49.2%                    2.2pp
+       North Sea Neighbors      "~16 percentage pts"  68.0 - 49.2 = 18.8pp     2.8pp
+       North Sea Fiscal Lscape  UK (51.4%)            49.2%                    2.2pp
+       North Sea Fiscal Lscape  "~16pp take diff"     18.8pp                   2.8pp
+       Norway SPT Structure     "Why 67.9% ..."       68.0% in its OWN live     0.1pp
+                                 and "Norway's 67.9%"  stat box, same card
+       West Africa PSC Bloc     Ghana "(42%)"         52.6%                    10.6pp
+       Indonesia Two Regimes    "extracts 7.3pp more" MECHANIC_BREAKDOWN delta  varies
+
+     Ghana is the one that ends the walk. 42% is Ghana's take at $50/bbl; the table it labels
+     is the $75 column, which reads 52.6%. So the sentence that tells the analyst WHY Ghana is
+     the most IOC-friendly regime in the bloc states a figure 10.6pp below the number printed
+     two lines beneath it, on a different price deck, with no deck named. T6 is "where did this
+     number come from and how solid is the evidence" — and on this tab the answer was that the
+     platform gives two different answers in one card and does not say which is current. An
+     analyst who pastes the narrative into an IC memo publishes a take ORCA's own table refutes.
+
+     Nothing is deleted and no table changes. Every take figure in the prose is now read from
+     the same row object the table cell beside it reads, and names its price deck, so the
+     sentence cannot outlive the data it describes. */
+  const _saNor   = cd.find(x => x.country === 'Norway');
+  const _saUK    = cd.find(x => x.country === 'United Kingdom');
+  const _saPct   = d => (d && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : 'not modelled';
+  const _saNorT  = _saPct(_saNor);
+  const _saUKT   = _saPct(_saUK);
+  const _saNSGap = (_saNor && _saUK && _saNor.take_75 != null && _saUK.take_75 != null)
+                 ? (_saNor.take_75 - _saUK.take_75).toFixed(1) + 'pp' : null;
   const card2 = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--purple);">
       <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">North Sea Neighbors</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture ~16 percentage points more than the UK?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway: 56% Special Petroleum Tax + 22% ordinary CIT = 78% headline marginal rate, 67.9% effective take. UK: EPL (35%) + RFCT (40%) − RFES relief = 51.4% effective take. Same basin, very different fiscal architecture.</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture ${_saNSGap || 'more'} more government take than the UK at $75/bbl?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway: 56% Special Petroleum Tax + 22% ordinary CIT = 78% headline marginal rate, <strong style="color:var(--text);">${_saNorT}</strong> effective take at $75/bbl. UK: EPL (35%) + RFCT (40%) − RFES relief = <strong style="color:var(--text);">${_saUKT}</strong>. Same basin, very different fiscal architecture. Both figures are the @$75 column of the table below, read from the same record — not a separate estimate.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
       <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
@@ -53359,11 +53393,13 @@ function renderSampleAnalyses() {
             `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`];
   }).filter(Boolean);
   const waCountries = wafrica.filter(c => cd.find(x => x.country === c));
+  const _saGh  = cd.find(x => x.country === 'Ghana');
+  const _saGhT = _saPct(_saGh);
   const card3 = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--yellow);">
       <div style="font-size:10px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">West Africa PSC Bloc</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Angola's 2023 Sonangol reform increased First Tranche Petroleum (FTP) from 10% to 20% on new deepwater blocks, raising effective take ~5pp. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc. Nigeria PIA 2021 restructured royalty tiers and deepwater incentives.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Angola's 2023 Sonangol reform increased First Tranche Petroleum (FTP) from 10% to 20% on new deepwater blocks, raising effective take ~5pp. Ghana's Jubilee terms (<strong style="color:var(--text);">${_saGhT}</strong> at $75/bbl, the lowest in the table below) remain the most IOC-friendly in the bloc. Nigeria PIA 2021 restructured royalty tiers and deepwater incentives.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
       <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
@@ -53555,11 +53591,14 @@ function renderSampleAnalyses() {
      `<span style="color:var(--red)">-$${Math.abs(gsEntry.npv||-216)}M</span>`,
      '<span style="color:var(--muted);font-size:10px">Gross revenue split, no cost recovery</span>'],
   ];
+  const _saGsGap = (pscEntry.take != null && gsEntry.take != null)
+                 ? Math.abs(gsEntry.take - pscEntry.take).toFixed(1) + 'pp'
+                 : ((65.3 - 58.0).toFixed(1) + 'pp');
   const cardB = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--accent);">
       <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Indonesia: Two Fiscal Regimes</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">When Indonesia introduced Gross Split PSCs in 2017, did IOCs get better or worse terms?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Gross Split (Permen ESDM No. 08/2017) eliminates cost recovery in exchange for a simpler gross revenue split. Result: government extracts 7.3pp more at $75/bbl and contractor NPV turns negative. IOCs strongly prefer traditional PSC — adoption has been slow.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Gross Split (Permen ESDM No. 08/2017) eliminates cost recovery in exchange for a simpler gross revenue split. Result: government extracts <strong style="color:var(--text);">${_saGsGap}</strong> more at $75/bbl — the gap between the two Govt Take cells below — and contractor NPV turns negative. IOCs strongly prefer traditional PSC — adoption has been slow.</div>
       ${tbl([{label:'Regime'},{label:'Contracts',align:'right'},{label:'Share',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Contractor NPV',align:'right'},{label:'Structure',align:'right'}], regimeRows)}
       <button style="${outlineBtnStyle}" onclick="(function(){const ddSel=document.getElementById('dd-country-select');if(ddSel){ddSel.value='Indonesia';loadCountryProfile('Indonesia');}const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));if(cpBtn)switchTab('t7',cpBtn);})()">Open Indonesia Profile</button>
     </div>`;
@@ -54023,8 +54062,8 @@ function renderSampleAnalyses() {
   const cardQ = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--purple);">
       <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">North Sea Fiscal Landscape</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Norway vs UK: the highest-take accessible concession markets. Same basin, ~16pp take difference.</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway (67.9%): 56% Special Petroleum Tax + 22% ordinary CIT = 78% marginal rate, but investment uplift (SDFI carry, exploration refund) makes it more attractive than headline take suggests. UK (51.4%): Ring-fence CIT (40%) + Energy Profits Levy (35%) − RFES (29% investment allowance). Both are concession regimes where the IOC owns production and pays royalties/taxes from profit.</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Norway vs UK: the highest-take accessible concession markets. Same basin, ${_saNSGap || 'a wide'} take difference at $75/bbl.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway (<strong style="color:var(--text);">${_saNorT}</strong> @$75): 56% Special Petroleum Tax + 22% ordinary CIT = 78% marginal rate, but investment uplift (SDFI carry, exploration refund) makes it more attractive than headline take suggests. UK (<strong style="color:var(--text);">${_saUKT}</strong> @$75): Ring-fence CIT (40%) + Energy Profits Levy (35%) − RFES (29% investment allowance). Both are concession regimes where the IOC owns production and pays royalties/taxes from profit.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsEuropeRows)}
       <button style="${outlineBtnStyle}" onclick="(function(){['Norway','United Kingdom'].forEach(c=>addCompare(c));const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load Norway vs UK in Side-by-Side</button>
     </div>`;
@@ -54034,9 +54073,9 @@ function renderSampleAnalyses() {
   const ukD = cd.find(x => x.country === 'United Kingdom');
   const cardR = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--purple);">
-      <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Norway SPT Structure — Why 67.9% Doesn't Deter IOCs</div>
+      <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Norway SPT Structure — Why ${_saNorT} Doesn't Deter IOCs</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Marginal rate is 78% — but Norway's exploration refund and uplift make early-phase risk acceptable.</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">The Special Petroleum Tax (56%) is levied on ring-fenced upstream income after an uplift deduction (currently 17.69% of capex per year for 4 years = 70.76% total uplift). Exploration costs qualify for immediate cash refund (78% of loss = tax value) — the Norwegian state effectively co-funds exploration downside. This asymmetric risk-sharing is why Norway's 67.9% take still attracts Equinor, Shell, BP, and Aker BP as active operators.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">The Special Petroleum Tax (56%) is levied on ring-fenced upstream income after an uplift deduction (currently 17.69% of capex per year for 4 years = 70.76% total uplift). Exploration costs qualify for immediate cash refund (78% of loss = tax value) — the Norwegian state effectively co-funds exploration downside. This asymmetric risk-sharing is why Norway's <strong style="color:var(--text);">${_saNorT}</strong> take at $75/bbl — the figure in the Govt Take box below, not a separate estimate — still attracts Equinor, Shell, BP, and Aker BP as active operators.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
         <div style="background:var(--surface);border-radius:6px;padding:10px 12px;">
           <div style="font-size:10px;color:var(--purple);font-weight:700;text-transform:uppercase;margin-bottom:4px;">Norway Key Rates</div>
