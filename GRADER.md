@@ -70937,3 +70937,170 @@ flagged — **recommend Zach authorise deletion or a `.gitignore` entry.**
 
 ## Task
 **T1 — "Which countries should even be on my screening list?"** (stalest in rotation: v1032 T1 · 1033 T3 · 1034 T6 · 1035 T4 · 1036 T2 · 1037 T5). Walked cold at 1440×900 and 390×844 with both storages cleared, served from the repo tree: Home → Screener, the 185-row default view, all 11 presets at all 4 price decks (44 combinations), sortable headers, the Advanced panel's five filter groups, the fee-basis com
+
+---
+## Cycle 980 Log — 2026-10-02
+- Test before: 546 PASS / 0 FAIL / 0 WARN / 0 JS errors (cycle 979's run, against the LIVE site)
+- Test after: **545 PASS / 0 FAIL / 1 WARN** — the graded suite
+  (`office/tools/petroleum/tests/runtime_comprehensive.js`) RAN THIS CYCLE, to completion, against
+  the LOCAL tree (`TEST_URL=http://localhost:8099/`), and the numbers are read from its own report
+  file, not assumed. 95 minutes wall-clock; report at `/tmp/c980/report_after.txt`.
+  - **0 FAIL** is the number that matters, and it is 0.
+  - The 1 WARN is `[ConsoleErrors] non-critical errors: A bad HTTP response code (404)`. All 15
+    logged JS errors are the same one event: the page registers its service worker at the GitHub
+    Pages path `/petroleum-fiscal-db/sw.js`, which does not exist when the repo is served from
+    `localhost:8099/`. The local server's own access log confirms it —
+    `"GET /petroleum-fiscal-db/sw.js HTTP/1.1" 404`. **This is a serving artefact, not a
+    regression:** the identical console error was observed on the UNMODIFIED v1038 build in this
+    cycle's very first probe, before any edit. It does not occur on the deployed URL.
+  - 545 against a 546 baseline is a LOCAL-vs-LIVE difference, not a lost check: no before-run was
+    taken against localhost this cycle, so the one-check delta is not attributed. Nothing in the
+    run FAILED, and every section covering the code this cycle touched — `[Comparison]`,
+    `[SbSChartBasis]`, `[CPNpvPair]`, `[CP-FPCEIL]`, `[CP-VPRED]`, `[ScreenerSbSBasis]`,
+    `[SBS-ShareOrder]` — passed.
+- JS syntax gate: **PASS** — all 11 inline `<script>` blocks extracted and `node --check`ed.
+- Walk probes: 0 page errors and 0 console errors (other than the `sw.js` 404) across every probe
+  in this cycle's walk.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest in rotation: v1033 T3 ·
+1034 T6 · 1035 T4 · 1036 T2 · 1037 T5 · 1038 T1). Walked cold at 1440x900 and at 360 / 390 / 430
+x844 with `hasTouch: true`, both storages cleared, served from the repo tree over http.
+Covered: Home → Side-by-Side; the seeded UK/Norway/Nigeria example; `#cmp-search` across 14
+inputs (aliases, fuzzy "did you mean", no-match, multi-hit); add / remove / Clear / the
+6th-country refusal; the Explorer "+" → compare basket → "Compare →" hand-off;
+`shareComparison()` round-trip; eight malformed `#/compare/...` hashes; all four price decks
+against all four column orders; the mixed-basis and re-based sets (Guyana/Suriname/Brazil,
+USA/Mexico/Argentina, Iraq-blended); both charts; the evidence drawer; the grade-badge drill to
+the Evidence Chain and the return; the print/PDF path at Letter; and `Copy for IC Memo`.
+
+## Friction
+**The grid printed every number whole on a phone and sliced every caption that says the numbers
+may not be compared.**
+
+`.compare-grid` resolves its template from the ≤600px rule at `index.html:2745` —
+`100px repeat(var(--cmp-n), minmax(72px, 1fr))` — and every cell inside it carries
+`padding: 9px 14px` from the base rule at `:466`. At four or more columns the 72px floor binds,
+so each country column holds **44px of usable text** against content that measures 65–79px.
+`overflow` on the cells is `visible`, so nothing is hidden by its own box: the text spills into
+the NEXT country's cell and is painted over by that cell's opaque background. The clip edge
+therefore lands exactly on a column boundary and reads as deliberate typography.
+
+Measured on the shipped v1038 build, counting `scrollWidth > clientWidth` over every
+`.cmp-cell` / `.cmp-hdr`:
+
+| viewport | 2 cols | 3 cols | 4 cols | 5 cols |
+|---|---|---|---|---|
+| 360px |  0 |  6 | 35 | 40 |
+| 390px |  0 |  0 | 35 | 40 |
+| 430px |  0 |  0 |  7 | 40 |
+
+What it cut, in an Angola / Nigeria / Ghana / Iraq set at 390px:
+
+| intended | printed |
+|---|---|
+| Nigeria `highest of 3 · comparable basis` | `highest of 3 · comparabl` |
+| Iraq `lowest of 3 · on PSC/Conc` | `lowest of 3 · on PSC/Con` |
+| Angola `≥45.2pp observed` | `≥45.2pp observe` |
+| Ghana `not ranked · statutory terms` | `not  ranke  statut  term` |
+| Take basis `price-linked — but not comparable here` | cut |
+| Take basis `statutory terms, not production-weighted` | cut |
+
+The headline figures — 86.9% / 60.2% / 84.7% — are all 56px or narrower and all rendered whole.
+So the one row that decides whether these columns may be ranked at all, and the re-basis and
+set-aside captions the last forty cycles were spent writing, were the only things on the screen
+not legible. On a desktop the columns are 239px and none of it happens, which is why it survived
+twenty cycles of desktop walking. The page never scrolled sideways and no console error fired —
+the suite, `documentElement.scrollWidth` and the under-24px sweep were all green over it, because
+none of them measures a cell against its own contents.
+
+## Change
+`index.html:2745` (≤600px) — country-column floor **72px → 104px**, cell side padding
+**14px → 7px**. `index.html:1495` (≤768px) — floor **84px → 112px**, side padding
+**14px → 9px**. Nothing above 768px is touched: the desktop template still resolves to
+`200px 239.594px ...` at 1440, and the print layout at Letter is byte-identical
+(`200px 114.797px × 5`, verified before and after).
+
+The fix is only a number because **v712** already did the hard part — it gave this grid
+`overflow-x: auto` with a sticky Metric column, scroll snapping, a right-edge inset fade, the
+`#cmp-scroll-hint` line and the floating `#cmp-colbar`. A column has not needed to fit the
+viewport since. The floor was simply never raised to match, so the grid kept squeezing columns it
+no longer had to squeeze.
+
+## Result
+An analyst reading a four- or five-country comparison on a phone now reads the qualifier, not
+just the number: `highest of 3 · comparable basis`, `lowest of 3 · on PSC/Conc`,
+`not ranked · statutory terms` and `price-linked — but not comparable here` all render whole. The
+grid consumes the extra width itself — `#cmp-scroll-hint` reads *"2 of 4 columns are off the
+right edge — Nigeria and Ghana. Swipe the table sideways to read them; the Metric column stays
+put"*, clears once the last column is on screen, and `#cmp-colbar` tracks the sideways scroll to
+within 1px.
+
+Re-measured across 24 viewport × column-count combinations (360 / 390 / 430 / 600 / 768 at 2–5
+columns, and 1024 / 1280 / 1440 / 1920 at 5):
+
+- clipped cells: **0** everywhere (was 35–40 at 4–5 columns below 600px)
+- `documentElement.scrollWidth === clientWidth`: holds at every width
+- controls under 24px under `pointer: coarse`: **0** on this tab
+- page / console errors: **0**
+
+**Walked and found already handled — recorded so the next cycle does not fix them twice.**
+Each of these looked like the finding until it was traced:
+- A share link that names a slug ORCA cannot resolve, names more than `CMP_MAX`, or repeats a
+  country does NOT silently drop columns: `_miss925` / `_sbsReportRouteMiss925()` raises a red
+  notice above the grid naming each failed token, its reason, and "did you mean" buttons that
+  add the near match. Verified at 1s / 2.5s / 5s / 8s after a cold load on four malformed
+  hashes — it survives the second `parseAndNavigate` pass and the t2 activation seed. The
+  all-unresolved case says "None of the 2 names in this link produced a column … it is ORCA's
+  own default example set", which is the `#/compare/zzz+qqq` behaviour.
+- `#cmp-search` resolves `UK` → United Kingdom (not Ukraine), `UAE`/`Abu Dhabi`, `Kurdistan`,
+  `Ivory Coast`, `Trinidad`, and fuzzes `Nigera` → Nigeria and `Brasil` → Brazil. Enter adds.
+- The 6th add at the cap does not fail silently: the dropdown becomes "Comparison is full — 5 of
+  5 slots used. Not added: Brazil" with a ✕ beside each loaded country.
+- `Copy for IC Memo` on an empty comparison refuses with "Load at least 2 countries … nothing
+  was copied, so your clipboard still holds what was in it before."
+- The two charts already mark statutory-basis columns as dashed lines with hollow markers and
+  say so in the subtitle, so they do not invite the comparison the grid forbids.
+- The column grade badge (`cmp-hdr-ev`) drills to that country's Evidence Chain, and v1013's
+  `_cpOriginPane()` brings the "← Side-by-Side" return back correctly.
+- Print force-opens the evidence drawer and the absent-countries note, and the Letter PDF fits
+  the full 5-column grid without clipping.
+
+**Found but not fixed this cycle — smaller than the above, recorded for a later walk:**
+- `shareComparison()` on an empty comparison is a bare `if (!compareList.length) return;` at
+  `:57338` — no toast, no refusal, nothing. Its neighbour `Copy for IC Memo` refuses in a full
+  sentence. One of the two buttons explains itself and the other looks broken.
+- The country NAME in a Side-by-Side column header is inert text. Everywhere else in ORCA a
+  country name is a button to its Country Profile; here only the grade badge routes.
+
+**Carried forward from 979 and earlier, still live:** `be-legend-n` typed "65 of 185" under the
+Screener table against a live 67, and `be-legend-noprod` "63"; Colombia's 90.1% rate on 23.6%
+exposure; Scenario Builder still renders `_sbReturnReading`'s own 100% rate cutoff; the
+`INDEX ONLY` rows' two back-to-back arrows 4px apart; Somalia with no independently sourced
+parameter; `_scFeeCmpAt()` India direction; the FAQ bank's retired `$1.2B / $15-flat` deck
+(`:6117`, `:6234`); `cpBeBound()`'s "117 of 185" against a live 118; `EXPL-NO-IRR` gate blind
+spot; FC Reform verdict bare `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; CP
+headline take rank vs NPV rank counting in opposite directions; `be_75 = 1.0` at source for
+Bahrain/Kuwait/Saudi Arabia; Paraguay decree typed `government_filing`; Screener
+`_screenerExportBasis` not naming the 105 withheld countries; Home card "up to 4 countries" vs
+`CMP_MAX` 5; Cote d'Ivoire's two missing API slugs.
+
+**Loop health, flagged again:** `claude -p` timeout at `autonomous_cycle.py:231` is 1800s, equal
+to the cycle interval. Also still true: the graded suite copy
+(`office/tools/petroleum/tests/runtime_comprehensive.js`) has DIVERGED from the repo copy
+(`petroleum-fiscal-db/tests/runtime_comprehensive.js`) — edits to the repo copy do not affect the
+graded number. **New this cycle, and it interacts badly with that 1800s timeout:** the graded
+suite against a local `python3 -m http.server` took **95 minutes** to complete 546 checks — ~200
+page loads of a 10.1 MB index.html through a single-threaded server, which is the bottleneck, not
+the product (machine load averaged 1.5 throughout). That is 3.2x the cycle interval and 3.2x the
+`claude -p` timeout, so **any cycle that gates the LOCAL tree with the full suite cannot finish
+inside its own window.** Two fixes, either sufficient: serve with something concurrent
+(`python3 -m http.server --threads`, `caddy file-server`, `npx serve`), or give the suite a
+single-context warm-cache mode so index.html is fetched once rather than per check. Until one is
+done, a cycle must either gate against the LIVE site (which tests the PREVIOUS push, not this
+one) or run the local suite past its own deadline, as this cycle did.
+
+**Probe debris, twenty-first cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+`_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+This cycle's probes and its pre-edit snapshot went to `/tmp/c980/`; nothing was written inside
+the repo. Still only flagged — **recommend Zach authorise deletion or a `.gitignore` entry.**
