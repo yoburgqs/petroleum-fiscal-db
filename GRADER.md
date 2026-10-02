@@ -70834,3 +70834,96 @@ denominator is on screen.
 **Task.** T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* — stalest in rotation (v1030 T2 · v1031 T5 · v1032 T1 · v1033 T3 · v1034 T6 · v1035 T4). Walked cold at 1440×900 via the Country Profile tab and the dropdown.
 
 **Friction.** The Live DCF panel's middle tile is the only return figure on the Country Profile. It has two modes — quote the rate, or suppress it and lead with the 15% IOC hurdle test — and the mo
+
+---
+## Cycle 979 — T1 — v1038 — 2026-10-02
+
+**Task.** T1, *"Which countries should even be on my screening list?"* — stalest in rotation
+(v1032 T1 · v1033 T3 · v1034 T6 · v1035 T4 · v1036 T2 · v1037 T5). Walked cold at 1440×900 and
+390×844, both storages cleared, served from the repo tree over http: Home → Screener, the 185-row
+default view, all 11 presets at all 4 price decks (44 combinations), the sortable headers, the
+Advanced panel's mechanic / IOC / region / reform / data-basis filters, the fee-basis
+comparable-take cells, the zero-result diagnostic, the deck-delta strip and its three action
+buttons, Reset All at a non-default deck, and the Copy Link round-trip.
+
+**Friction.** The Screener's **Fiscal Mechanic (9 boxes) and IOC Operator (8 boxes)** groups are
+the last controls on this tab under a thumb — **17 of them, 13×13px** at 390×844 with
+`hasTouch: true` — and they are the controls that answer the second half of T1: which mechanics,
+and whose acreage, belong on the list. Mis-hitting "PSC" for "TSC" returns a different shortlist,
+and the two sit 4px apart.
+
+They were left that way on purpose, four times, on an assumption nobody measured. v640: *"would
+grow every checkbox in the Screener's collapsed mechanic/IOC grids."* v681: the same sentence.
+v743: *"the mechanic and IOC grids in the same panel hold dozens of boxes, and widening those is
+how a 390px column starts scrolling."* v870 and v883: *"same narrow id scope."* Every one of those
+cycles sized a neighbouring Screener checkbox to 24px and stepped around these two groups.
+
+Measured at 390×844, `hasTouch`, Advanced panel opened:
+
+| | page sw / cw | mech group sw / cw | IOC group sw / cw | <24px on tab |
+|---|---|---|---|---|
+| 13px boxes (shipped) | 390 / 390 | 336 / 336 | 184 / 184 | **17** |
+| 24px boxes (this cycle) | 390 / 390 | 336 / 336 | 184 / 184 | **0** |
+
+No sideways scroll appears, neither group overflows its own box, zero elements inside
+`#screener-advanced-details` extend past the viewport, and the furthest-right label moves *in*
+from x=360 to x=321 — the boxes grow, the wrapped text stops reaching as far. The cost is
+vertical and invisible on arrival: the mechanic block grows 96px → 154px and the IOC block
+259px → 307px, both inside the `<details>` that v371/v373 keeps collapsed by default, so the cold
+Screener is the same height it was.
+
+**Change.** `#sc-mech-checks input[type=checkbox], #sc-ioc-checks input[type=checkbox]` are
+24×24 inside the v612 layer's `pointer: coarse` block, keyed off pointer type exactly like the
+four rules above them (`#sc-proxy-keep`, `#sc-floor-keep`, `#bubble-verified-only`,
+`#sb-use-tiers`). Verified at three viewports: **390 coarse** → 24×24, 0 controls under 24px;
+**768 coarse** → 24×24, 0 under 24px; **1440 mouse** → still 13×13 and the desktop under-24px
+count unchanged at 209, i.e. the dense desktop panel is byte-identical. Boxes still toggle; 0
+page errors at all three.
+
+**Result.** An analyst narrowing the screen on a phone can hit "PSC" without hitting "TSC", and
+criterion 3 of the finalization list — *zero controls under 24px under `pointer: coarse`* — now
+holds on the Screener tab.
+
+**Walked and found already handled — recorded so the next cycle does not fix them twice.**
+Each of these looked like the finding until it was traced:
+- Downside Resilience's menu caption reads "$75" at the $50 deck and follows the deck at $100 /
+  $125 because `_scCaptionDeck()` resolves its token off `_scRetRefDeck()`, not the raw deck
+  (v954). Correct, and the $125 shortlist is 0 rather than 1 because the inverted Venezuela row
+  is excluded (v896).
+- Two-Price Return Screen at the $50 deck collapses both legs onto `npv_50`; the count line says
+  so in full ("the $1200M floor at $50/bbl removed 0 rows and cannot remove any") and both slider
+  labels say "not binding" (v706).
+- The shared link loses the preset name only when a probe calls `applyScreenerPreset()` directly.
+  Through the menu's own `onchange` it carries `#/screener/<preset>` and the chip comes back
+  (v902). Probe artifact, not a defect.
+- Reset All deliberately keeps a non-$75 price deck. The deck is an assumption, not a filter, and
+  the count line and both column sub-heads name it on every render.
+- Region filter covers all 185: Asia 26 · Europe 33 · Africa 54 · Latin America 31 · CIS/FSU 5 ·
+  Oceania 16 · Middle East 17 · North America 3. No country is filed under a region the select
+  cannot express (the cycle-344 class is closed).
+- Header sorting rewrites the count line's ranking clause and keeps the data-basis dividers, and
+  the take cell leads with whichever basis the active sort or ceiling is measured on.
+
+**Carried forward from 978 and earlier, still live:** `be-legend-n` typed "65 of 185" under the
+Screener table against a live 67, and `be-legend-noprod` "63"; Colombia's 90.1% rate on 23.6%
+exposure; Scenario Builder still renders `_sbReturnReading`'s own 100% rate cutoff; the
+`INDEX ONLY` rows' two back-to-back arrows 4px apart; Somalia with no independently sourced
+parameter; `_scFeeCmpAt()` India direction; the FAQ bank's retired `$1.2B / $15-flat` deck
+(`:6117`, `:6234`); `cpBeBound()`'s "117 of 185" against a live 118; `EXPL-NO-IRR` gate blind
+spot; FC Reform verdict bare `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; CP
+headline take rank vs NPV rank counting in opposite directions; `be_75 = 1.0` at source for
+Bahrain/Kuwait/Saudi Arabia; Paraguay decree typed `government_filing`; Screener
+`_screenerExportBasis` not naming the 105 withheld countries; Home card "up to 4 countries" vs
+`CMP_MAX` 5; Cote d'Ivoire's two missing API slugs.
+
+**Loop health, flagged again:** `claude -p` timeout at `autonomous_cycle.py:231` is 1800s, equal
+to the cycle interval, so cycles 969/970/974/975/975b died there and were committed by their
+successors. Raising it to 2700s or decoupling it from the interval remains the highest-value
+change available to the loop itself. Also still true: the graded suite copy
+(`office/tools/petroleum/tests/runtime_comprehensive.js`, sha 39c026c9bc32) has DIVERGED from the
+repo copy (sha bd4cb3290984) — edits to the repo copy do not affect the graded number.
+
+**Probe debris, twentieth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+`_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB). This cycle's probes
+and its pre-edit snapshot went to `/tmp/c979/`; nothing was written inside the repo. Still only
+flagged — **recommend Zach authorise deletion or a `.gitignore` entry.**
