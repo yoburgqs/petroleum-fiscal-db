@@ -3089,7 +3089,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1035</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1036</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -61723,10 +61723,44 @@ function _execLiveDCF(country, profileKey, price) {
     const _m703 = v => v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'B' : '$' + Math.round(v) + 'M';
     const _sgn703 = v => (v < 0 ? '−' : '+') + _m703(Math.abs(v));
     const _inflated703 = (_r703.state === 'inflated' || _r703.state === 'unbounded');
+    // ── v1036 (T2): the suppression decided on the rate, not on the rate's base ──────────
+    //
+    // `_sbReturnReading` sets `inflated` on `R.irr >= 100` — a bare cutoff on the rate. But
+    // the reason the rate is unusable is stated in v703's own note above: cost recovery (or,
+    // in a Concession, early revenue against uplift) covers most of the capex as it is spent,
+    // so the contractor's at-risk base is a fraction of the project and the rate is struck on
+    // that fraction. That is `R.atRisk` against the profile's capex — a number this block has
+    // had in `_capexMM703` since v703 and never tested.
+    //
+    // Swept across all 185 countries on each one's own default panel profile at $75:
+    //   suppressed (`inflated`)   n=117   exposure  9.6%–21.7% of capex   rate 100.2%–297.2%
+    //   quoted as the headline    n= 66   exposure 16.8%–43.6% of capex   rate  12.1%– 98.7%
+    // The two ranges overlap, and 21 of the 66 quoted rates stand on an exposure base inside
+    // the band the page refuses to quote on at all. The pair that shows it is not a rounding
+    // argument:
+    //   Suriname   REFUSED   100.2%   $205M of $1,200M ever at risk  (17.1%)
+    //   Liberia    QUOTED     94.9%   $201M of $1,200M ever at risk  (16.8%)
+    // Liberia's rate stands on a THINNER base than Suriname's and is the tile's 20px green
+    // headline, under the label "Contractor IRR — this scenario", while Suriname's is pushed
+    // into the note as the thing not to quote. Same structure, opposite claim, decided by six
+    // points of a rate that neither country's IC would accept. Guyana (91.0% on 17.5%) is the
+    // one an analyst is most likely to hit: a frontier screening favourite whose most
+    // attractive-looking number is a return on a sixth of the project, repaid by year 3.
+    //
+    // So the test moves onto the base. The cut is NOT a new judgement — it is the ceiling of
+    // the exposure range the page already declines to quote a rate on (21.7%, rounded up to
+    // 22). It is named and in one place so it can be moved on review.
+    const _IRR_THIN_BASE_MAX_PCT = 22;
+    const _expo703 = (_capexMM703 && _capexMM703 > 0 && _r703.atRisk > 0)
+      ? (_r703.atRisk / _capexMM703) * 100 : null;
+    const _thinBase703 = _r703.state === 'computed' && _expo703 !== null
+                         && _expo703 < _IRR_THIN_BASE_MAX_PCT;
     // The rate is unusable in three structurally different ways, and in all three the hurdle
     // test is the figure that answers the question. `uneconomic` is included deliberately:
     // its "no IRR" is a finding, but a NEGATIVE NPV at 15% states the size of the miss.
-    const _noRate703 = _inflated703 || _r703.state === 'no-capital-at-risk' || _r703.state === 'uneconomic';
+    // v1036 adds the fourth: a rate whose base is a fraction of the project's capital.
+    const _noRate703 = _inflated703 || _r703.state === 'no-capital-at-risk'
+                       || _r703.state === 'uneconomic' || _thinBase703;
     const _useHurdle703 = _noRate703 && _r703.npv15 !== null;
     const _clears703 = _r703.npv15 !== null && _r703.npv15 > 0;
 
@@ -61768,8 +61802,28 @@ function _execLiveDCF(country, profileKey, price) {
           + ' is ever at risk &mdash; cost recovery reimburses the rest as it is spent'
           + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
           + '. The rate is a return on that exposure, not on the project.';
+      } else if (_thinBase703) {
+        // v1036 (T2): deliberately NOT the _inflated703 wording. That sentence names cost
+        // recovery as the mechanism, which is right for the PSC and TSC rows but wrong for
+        // Norway — a Concession with no cost recovery at all, whose at-risk base is thin
+        // because revenue arrives against uplift and SPT deductions, not because anything is
+        // reimbursed. This states the exposure and leaves the mechanism to the waterfall.
+        _body703 = 'IRR is <strong style="color:var(--text);">' + _r703.value + '</strong> and is not quoted: only '
+          + '<strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong> of '
+          + _m703(_capexMM703) + ' capex &mdash; ' + _expo703.toFixed(1) + '% of the project &mdash; is ever '
+          + 'net negative for the contractor'
+          + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
+          + '. The rate is a return on that exposure, not on the project.';
       } else {
+        // v1036 (T2): the base, not just the dollar figure. This branch printed "$523M at
+        // risk · payback year 5" and never said against what, so on all 66 quoted rates the
+        // analyst had no way to see what the rate was struck on. The 44 that keep the rate
+        // after the thin-base test now carry the share too, so the figure is readable as a
+        // return on a stated fraction of the project rather than as a project return.
         _body703 = _m703(_r703.atRisk) + ' at risk'
+          + (_expo703 !== null && _capexMM703
+               ? ' of ' + _m703(_capexMM703) + ' capex (' + _expo703.toFixed(1) + '% of the project)'
+               : '')
           + (_r703.payback ? ' &middot; payback year ' + _r703.payback : ' &middot; never repaid')
           + ' &middot; 25yr project.';
       }
