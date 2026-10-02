@@ -1707,6 +1707,36 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     min-width: 24px; min-height: 24px; width: 24px; height: 24px;
     flex: 0 0 auto; margin-right: 4px;
   }
+  /* v1038 (T1) — the Screener's Fiscal Mechanic and IOC Operator boxes join them, and the
+     reason they were held back turns out not to be true.
+
+     Four cycles sized a Screener checkbox individually and each one wrote down why it would
+     not touch these two groups: v640 ("would grow every checkbox in the Screener's collapsed
+     mechanic/IOC grids"), v681 (same sentence), v743 ("the mechanic and IOC grids in the same
+     panel hold dozens of boxes, and widening those is how a 390px column starts scrolling"),
+     v870/v883 ("same narrow id scope"). So the 9 Fiscal Mechanic boxes and the 8 IOC Operator
+     boxes are the only controls left under a thumb on this tab: 17 of them, 13x13 each, and
+     they are the controls that answer the second half of T1 — which mechanics and whose
+     acreage belong on the list.
+
+     Measured at 390x844, hasTouch, the Advanced panel opened, before and after:
+
+                             page scrollWidth   mech group sw/cw   IOC group sw/cw   <24px
+         13px boxes (shipped)   390 / 390 cw        336 / 336         184 / 184        17
+         24px boxes             390 / 390 cw        336 / 336         184 / 184         0
+
+     No sideways scroll appears, neither group overflows its own box, and the furthest-right
+     label lands at x=321 of 390 (it was 360 before — the boxes grow, the wrapped text does
+     not reach as far). The mechanic block grows 96px -> 154px tall and the IOC block
+     259px -> 307px, both INSIDE #screener-advanced-details, which v371/v373 keeps collapsed
+     by default — so the cold Screener is the same height it was.
+
+     It sits in the v612 layer's pointer: coarse block, keyed off pointer type exactly like
+     the four rules above it, so a mouse-driven panel at any width is byte-identical. */
+  #sc-mech-checks input[type=checkbox], #sc-ioc-checks input[type=checkbox] {
+    min-width: 24px; min-height: 24px; width: 24px; height: 24px;
+    flex: 0 0 auto;
+  }
   /* Inline chips and pills sit inside running text; give them a hit area
      without letting them shove the line box around. */
   .chip, .tag, .source-badge, .reform-mechanic, .reform-take {
@@ -3089,7 +3119,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1037</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1038</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
