@@ -70573,3 +70573,105 @@ three findable labelled blocks instead of eight unbroken lines, so an analyst ch
 **Task.** T1, *"Which countries should even be on my screening list?"* — stalest in rotation (T1 last seen v1026; T2 was last cycle, T5 was the orphan).
 
 **Friction.** `#screener-count` is the element that tells the analyst what their shortlist *is* and why each row is in it. It was built as one run-on string — the headline plus up to nine em-dash clauses welded together inside a single 13px span. Measured cold at 390×844 with `hasTouch`
+
+---
+## Cycle 975 — T6 — v1034 — 2026-10-02
+
+**Task.** T6, *"Where did this number come from and how solid is the evidence?"* — stalest in
+rotation (T6 last walked ~cycle 925; T4 at 952, T2 at 971, T1 at 972, T3 was the v1033 orphan).
+
+**Friction.** Walked cold at 1440x900 and 390x844 with `hasTouch`, both storages cleared, served
+from the local tree on :8975 so the change under test was the one being measured.
+
+The T6 path itself is in good shape and I checked it before looking further: all four provenance
+jump affordances above the chain (`cp-take-source`, `cp-ic-ev-pill`, `cp-terms-chip`,
+`cp-cite-open-chip`) land the Evidence Chain 47px below the viewport top on desktop and 51px on a
+phone, and all 185 countries render a chain with rows — no dead ends, no missing-slug failures.
+
+The friction is in the sentence directly under the chain, which is the line that answers "how
+solid is the evidence". It claims: *"ORCA's take%, NPV and IRR are built from the contract terms in
+the ORCA Value column, not from the statute."* `_engScope767` (`index.html:45340`) is the only
+place the verdict corrects that claim where the engine actually ran a different rate — and it
+filtered `modelConflicts` on `.sourced`.
+
+Conflicts are pushed from two sites. The v767 arm (`:44542`) sets `sourced: true`. The v601
+unsourced arm (`:44579`) never sets the field at all, so every conflict sitting on an **uncited**
+row read as falsy and was dropped. Measured over all 185 profiles: **56 countries render a
+"DCF USES" annotation in the table; the clause fired on 6.** The 50 it skipped are the unsourced
+ones — the cases where there is not even a cited rate to fall back on. Norway prints State
+Participation **0% with no citation** while the DCF runs **33.4%**, a 33.4pp gap on the largest
+single driver of Norwegian government take.
+
+Four of those 50 — **China, India, Kazakhstan, Norway** — carry no sourced divergence and so reach
+the no-divergence arm, which led with a green **✓** *"All N independently sourced parameters the
+model reads match the rate stated in the cited source"* — rendered 135px above this page's own
+findings index naming *"the DCF ran 1 rate this table does not print"* as the **worst** finding on
+the profile. The page contradicted itself within one screen, tick first.
+
+**Change.**
+- The `.sourced` filter is dropped. The clause now names the term and the rate on **55 of 56**.
+  Somalia is the 56th and is correctly excluded: no parameter on its table is independently
+  sourced, so it takes the "⚠ No parameter on this table is independently sourced" arm and there
+  is no ORCA-Value claim to correct. Needed no new wording — an unsourced conflict has no cited
+  rate, so `matchesStat` is falsy, "(the cited rate)" never prints, and "which neither column
+  above prints" is literally true of it.
+- `modelConflicts.length` joins the v1002 glyph test, so those four profiles now lead with an
+  amber ⚠ instead of a green ✓. Total ticks across the platform 40 → 36.
+- Norway now reads: *"⚠ All 3 independently sourced parameters the model reads match the rate
+  stated in the cited source. **Not for State Participation: the DCF runs 33.4%, which neither
+  column above prints — see the red note below.**"*
+
+No value, tier letter, take, NPV, IRR or grade changes. The match the tick asserted is still
+asserted; what it can no longer also mean is that the figure above was built from the rows ticked.
+
+**Result.** An analyst who reads the verdict line and stops — which is what a tick is for — is no
+longer told the provenance checks out on a profile whose headline take was built on a rate that
+appears in neither column of the table they are reading. On 49 further countries the sentence now
+names which term and what rate, at the point of verification, before the figure goes in an IC memo.
+
+**Verification.**
+- JS syntax gate **PASS** (11 blocks).
+- Graded suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **actually run this
+  cycle** against the local tree: **545 PASS / 0 FAIL / 1 WARN**. The single WARN is
+  `[ConsoleErrors]` on `sw.js` 404s under `python -m http.server`, and the same console 404s
+  appear in a probe taken *before* any edit — a local-serving artifact, not the change. The
+  546/0/0 baseline is measured against the deployed site, where that check passes.
+- 390x844 `hasTouch`: `scrollWidth - clientWidth = 0` on all three profiles walked
+  (Norway, Somalia, Nigeria). No control added or touched, so the 24px floor is unaffected.
+- Re-audited all 185 profiles after the edit: 0 remaining cases of a tick above a DCF-USES
+  annotation, 0 countries without a verdict sentence.
+
+### Notes for the next cycle
+- **Committed an orphan first, again:** v1033 (T3) was uncommitted in the tree from cycle 974,
+  killed by the 1800s `claude -p` timeout at `autonomous_cycle.py:231`. It clamps the SbS verdict
+  strip's long basis notes to 54px on phones with a toggle, after measuring the strip at
+  584–1029px against an 844px viewport. It is committed as `c068381` with its own
+  Task/Friction/Change/Result. **Four consecutive cycles (969, 970, 974, and whichever produced
+  v1031) have now died on that timeout** — it equals the cycle interval, so a cycle that runs long
+  is killed rather than finishing late, and the loop only recovers because the next cycle spends
+  its first minutes committing the previous one's work. Worth raising to 2700s or decoupling it
+  from the interval.
+- **Seen while walking, not fixed:** the `INDEX ONLY` rows render two affordances back to back —
+  `· A ↗⌕ find document ↗` (Libya, all five rows). Checked the code: deliberate per v971, the
+  first arrow opens the index page and the second searches for the instrument. Not a bug, but on
+  a thumb the two arrows are 4px apart and mean different things; worth one cycle on spacing.
+- **Still live, unchanged:** Somalia is the one profile with no independently sourced parameter at
+  all, so the whole verdict apparatus reduces to a single sentence there.
+- Carried forward from 972/964/963 and still live: `_scFeeCmpAt()` India direction (published
+  61.9% → screened 63.2%, the only fee-basis row that moves up); the FAQ bank quoting the retired
+  `$1.2B / $15-flat` deck (`:6117`, `:6234`); the typed "65 of 185" breakeven count at `:5508` and
+  `:3837` against a live 67; `cpBeBound()`'s "117 of 185" against a live 118; the solved arm's
+  `ctxStmt` ladder with three unreachable rungs.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS breakeven
+  basis paragraph denominators; FC Reform verdict bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; CP headline take rank vs NPV rank counting in opposite
+  directions; Indonesia's three government profit-oil shares; `be_75 = 1.0` at source for
+  Bahrain/Kuwait/Saudi Arabia; Paraguay decree typed `government_filing`; Screener
+  `_screenerExportBasis` not naming the 105 withheld countries; Home card "up to 4 countries" vs
+  `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs (note: its Evidence Chain *does* render, so
+  this is not a T6 dead end); the Home hurdle stat's "list below".
+- **Probe debris, eighteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+  `_base970.html` still untracked in the repo root (~38 MB). This cycle's probes went to
+  `/tmp/c975/` and nothing was written inside the repo. Still only flagged, not deleted — standing
+  rule is to ask before deleting files the session did not create. **Recommend Zach authorise
+  deletion or that they be added to `.gitignore`.**
