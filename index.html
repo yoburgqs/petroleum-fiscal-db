@@ -3089,7 +3089,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1036</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1037</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -58634,6 +58634,14 @@ function fcCopyDrilldownICTable(slug) {
           return '<td style="' + _td + (ci === 0 ? 'font-weight:bold;' : '') + '">' + _e(c == null ? '—' : c) + '</td>';
         }).join('') + '</tr>';
       }).join('')
+    // v1037 (T5): breakeven is one figure for the country, not a per-price row, so it is stated
+    // once here instead of occupying a column that was "—" in three of its four cells. Inside the
+    // table on purpose — the exhibit is what survives when the memo is cut down.
+    + (P.foot || []).map(function(f){
+        return '<tr><td style="' + _td + 'font-weight:bold;">' + _e(f[0]) + '</td>'
+             + '<td style="' + _td + '" colspan="' + Math.max(1, P.header.length - 1) + '">'
+             + _e(f[1]) + '</td></tr>';
+      }).join('')
     + '</tbody></table>';
 
   var _tail = (P.tail || []).filter(function(t){ return !!t; });
@@ -58652,7 +58660,9 @@ function fcCopyDrilldownICTable(slug) {
   html += '</div>';
 
   var okMsg = 'Copied as a table — ' + P.body.length + ' price rows × ' + P.header.length
-            + ' columns, with the basis lines beneath it. Pastes as a formatted table into '
+            + ' columns'
+            + ((P.foot && P.foot.length) ? ', the breakeven stated once beneath them' : '')
+            + ', with the basis lines under the table. Pastes as a formatted table into '
             + 'Word/Docs/Outlook, as columns into Excel.';
   function _restore(label) {
     var t = document.getElementById(P.btnId);
@@ -67908,16 +67918,15 @@ function openFCDrilldown(country) {
          'Comparable take% (' + _ddFeeN1 + ' PSC/Concession contracts) — CITE THIS',
          'Published take% (all ' + d.n + ' contracts, blends ' + _ddFeeNames + ' fee-basis — not comparable across countries)',
          'Δ vs $50 (comparable)',
-         'Contractor NPV ($M, all contracts)',
-         'Breakeven ($/bbl)']
-      : ['Price', 'Govt Take% (database)', 'Δ vs $50', 'Contractor NPV ($M)', 'Breakeven ($/bbl)'];
+         'Contractor NPV ($M, all contracts)']
+      : ['Price', 'Govt Take% (database)', 'Δ vs $50', 'Contractor NPV ($M)'];
     var _icBody = [];
     var _icTail = [];
+    var _icFoot = [];
     var _take50b = _ddFee ? (d.g1 ? d.g1.t50 : null) : d.take_50;
-    var _be75 = d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '—';
-    [['$50',d.take_50,d.npv_50,'—',50],['$75',d.take_75,d.npv_75,_be75,75],['$100',d.take_100,d.npv_100,'—',100],['$125',d.take_125,d.npv_125,'—',125]].forEach(function(p){
+    [['$50',d.take_50,d.npv_50,50],['$75',d.take_75,d.npv_75,75],['$100',d.take_100,d.npv_100,100],['$125',d.take_125,d.npv_125,125]].forEach(function(p){
       var priceStr = p[0];
-      var _cmpV = (_ddFee && d.g1 && d.g1['t' + p[4]] != null) ? d.g1['t' + p[4]] : null;
+      var _cmpV = (_ddFee && d.g1 && d.g1['t' + p[3]] != null) ? d.g1['t' + p[3]] : null;
       var _lead = _ddFee ? _cmpV : p[1];
       var takeStr = _lead!=null ? _lead.toFixed(1)+'%' : '—';
       var delta = (_lead!=null && _take50b!=null) ? (_lead-_take50b) : null;
@@ -67925,9 +67934,89 @@ function openFCDrilldown(country) {
       var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '—';
       var _cells = [priceStr, takeStr];
       if (_ddFee) _cells.push(p[1]!=null ? p[1].toFixed(1)+'%' : '—');
-      _cells.push(deltaStr, npvStr, p[3]);
+      _cells.push(deltaStr, npvStr);
       _icBody.push(_cells);
     });
+    // ── v1037 (T5) ─ the breakeven cell of this exhibit, resolved the way the screen resolves it ──
+    //
+    // Walked T5 cold at 1440x900, both storages cleared: Fiscal Compare auto-loads 185 rows, click
+    // a row, press "Copy 4-price as IC table", read the pasted artifact. The Breakeven column was
+    // built by ONE expression -- `d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '—'` -- parked in
+    // the $75 row of a four-row price matrix. Measured against the live page, not inferred, that
+    // expression disagreed with the platform on 120 of the 185 countries, in three distinct ways:
+    //
+    //   1. WRONG NUMBER (3 countries). Bahrain, Kuwait and Saudi Arabia carry be_75 = 1.0 in the
+    //      bundled table. _beIsTested() calls 0 < v <= 1 "the floor artifact, not a breakeven" and
+    //      every screen on the platform refuses it, so the Fiscal Compare cell for Saudi Arabia
+    //      reads "—". The clipboard's own test was the weaker `!= null`, so the memo received
+    //          Breakeven ($/bbl)    1 $/bbl
+    //      for the three countries whose take is 100% -- state monopolies with no contractor
+    //      position to break even at all. A $1/bbl breakeven for Saudi Arabia, in an IC exhibit,
+    //      from the control whose label is "IC table".
+    //   2. BLANK WHERE THE SCREEN HAS A NUMBER (2 countries). Norway and the United Kingdom hold no
+    //      be_75 in the bundle; ORCA's own api/v1/country files publish 28.7 and 20.3, and v895
+    //      routed that through cpBeFor() into the Fiscal Compare cell, the drawer chip and the IC
+    //      Citation button. This paste read the raw field, so the analyst read "$29" in the cell,
+    //      clicked that row, and the memo got "—" -- the exact v895 contradiction, one surface later.
+    //   3. BLANK WHERE A DEFENSIBLE BOUND EXISTS (115 countries). cpBeBound() brackets NPV = 0 off
+    //      the four contractor NPVs already in the table above: 114 bound < $50/bbl, and Malaysia
+    //      brackets $50–$75 on the published blend while its PSC/Concession basis bounds < $50 --
+    //      the one country where the answer is conditional. The Country Profile prints all of it.
+    //      This exhibit printed none of it.
+    //
+    // And the column was dead by construction anyway: breakeven is one figure for the country, not
+    // a function of the price deck, so three of its four cells were always "—". This tab's own IC
+    // Memo Quick Rules read '"—" in any cell = not verified to Evidence A/B standard; do not cite
+    // in IC memo', so the exhibit shipped three "do not cite" markers in a column that had nothing
+    // to say in those rows.
+    // So the column is gone from the matrix and the figure is stated ONCE, in a footer row INSIDE
+    // the table -- inside, because v752's rule holds here too: an IC memo gets cut down and the
+    // table is what survives. Nothing is recomputed: cpBeFor() then cpBeBound() then the monopoly
+    // test, in that order, which is the order the Country Profile reads them in.
+    var _beSolved = (typeof cpBeFor === 'function') ? cpBeFor(d) : null;
+    var _beMono   = (typeof isStateMonopoly === 'function') && isStateMonopoly(d.take_75);
+    var _beBnd    = (_beSolved == null && !_beMono && typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+    var _beFmtN   = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(x){ return '$' + Math.round(x) + 'M'; };
+    var _beLabel  = 'Breakeven — one figure for ' + country + ', not a per-price row';
+    var _beVal, _beNote = '';
+    if (_beSolved != null) {
+      _beVal = '$' + _beSolved.toFixed(0) + '/bbl — SOLVED. Averaged over the same contract set as the '
+             + 'take column above. Citable.';
+    } else if (_beMono) {
+      _beVal = 'not applicable — ' + country + ' is a state monopoly in the database (take ≥ 99.5%). '
+             + 'There is no contractor position to break even.';
+      _beNote = 'NOTE: breakeven — ORCA’s bundled table carries 1.0 for ' + country + '. That is the '
+              + 'zero-floor artifact, not a $1/bbl breakeven, and every screen on the platform refuses '
+              + 'it. If a breakeven of 1 reaches you from the XLSX or the API for this country, it is '
+              + 'that artifact. Do not cite a breakeven for ' + country + '.';
+    } else if (_beBnd) {
+      _beVal = _beBnd.txt + ' — BOUNDED, NOT SOLVED. Do not cite as a breakeven price.';
+      _beNote = 'NOTE: breakeven — ORCA carries no solved breakeven for ' + country
+              + '; 118 of 185 countries have none on file. ' + _beBnd.txt + ' is arithmetic on the four '
+              + (_beBnd.cmp
+                  ? 'PSC/Concession contractor NPVs on the line beneath this table — not the '
+                    + 'all-contract NPV column in it — ('
+                  : 'contractor NPVs in the table above (')
+              + _beFmtN(_beBnd.v[0]) + ' @ $50 · '
+              + _beFmtN(_beBnd.v[1]) + ' @ $75 · ' + _beFmtN(_beBnd.v[2]) + ' @ $100 · '
+              + _beFmtN(_beBnd.v[3]) + ' @ $125) on the standardized ' + _profileLabel + ' profile: NPV = 0 '
+              + 'therefore sits ' + String(_beBnd.sense).replace(' on this page', '') + '. It is a bound, '
+              + 'not a price, and it is only as good as that one standardized profile. For a breakeven on '
+              + 'your own capex, opex and production profile, use the ORCA Scenario Builder.';
+      if (_beBnd.split && _beBnd.blendTxt) {
+        _beVal += ' Two bases bound it differently — see the note.';
+        _beNote += ' The two bases do NOT agree here: read on ' + country + '’s '
+                 + (_beBnd.n1 != null ? Number(_beBnd.n1).toLocaleString() + ' ' : '')
+                 + 'PSC/Concession contracts the bound is ' + _beBnd.txt + ', and on the all-contract '
+                 + 'blend — the figure Fiscal Compare, the XLSX and the API publish — it is '
+                 + _beBnd.blendTxt + ', because averaging in the fee-basis contracts flips the sign of '
+                 + 'the $50 NPV. State which basis you are on in the memo.';
+      }
+    } else {
+      _beVal = 'not on file — and not boundable from the four modelled prices above. Do not state a '
+             + 'breakeven for ' + country + '.';
+    }
+    _icFoot.push([_beLabel, _beVal]);
     // v961 (T5): all four prices, not just $75. The NPV column in the rows above is the all-contract
     // blend at every price; this line is the like-for-like population the ⚖ take column is on, so it
     // has to span the same four columns or the table has a comparable take with no comparable value
@@ -67955,9 +68044,14 @@ function openFCDrilldown(country) {
     // v596 (T5): the production-data basis travels with the matrix. The take rows above are
     // a simple average of statutory terms for 163 of the 185 countries and said so nowhere.
     if (typeof _icProdBasisNote === 'function') _icTail.push(_icProdBasisNote(d));
+    if (_beNote) _icTail.push(_beNote);                      // v1037 (T5)
     _icTail.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
+    // v1037 (T5): the footer row is part of the table in both flavours, so the figure survives a
+    // memo that gets cut down to the exhibit. Padded to the header width in TSV so Excel keeps it
+    // in the Price/label column rather than shifting the sheet.
     var _tsv = [_contextHeader, _icHdr.join('\t')]
       .concat(_icBody.map(function(_r){ return _r.join('\t'); }))
+      .concat(_icFoot.map(function(_f){ return _f[0] + '\t' + _f[1]; }))
       .concat(_icTail).join('\n');
     var _copyBtnId = 'fc-drilldown-copy-'+slug;
     // Stashed rather than serialised into the onclick attribute: the HTML flavour carries
@@ -67965,7 +68059,7 @@ function openFCDrilldown(country) {
     // reason window.__CP_IC_TBL exists on the twin.
     window.__FC_IC_TBL = window.__FC_IC_TBL || {};
     window.__FC_IC_TBL[slug] = { title:_contextHeader, country:country, header:_icHdr,
-                                 body:_icBody, tail:_icTail, tsv:_tsv, btnId:_copyBtnId };
+                                 body:_icBody, foot:_icFoot, tail:_icTail, tsv:_tsv, btnId:_copyBtnId };
     html += '<div style="text-align:right;margin-bottom:10px;"><button id="'+_copyBtnId+'" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="fcCopyDrilldownICTable(\''+slug+'\')" title="Copy the 4-price matrix (Take / Δvs$50 / Contractor NPV / Breakeven) to the clipboard as a real table — pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. No IRR column: the country-level IRR is a mean of per-contract IRRs and is not a project return; the pasted table says so and routes you to Scenario Builder.">Copy 4-price as IC table</button></div>';
   })();
   // v523 (T5): this callout used to grade the country against a 15% IOC hurdle using d.irr_75.
@@ -70223,6 +70317,11 @@ function cpBeBound(d) {
 
   return {
     txt: b.txt, lo: b.lo, hi: b.hi, tip: tip, survives50: b.survives50,
+    // v1037 (T5): the four contractor NPVs the bound was read off, on whichever basis won above.
+    // tip has always quoted them; nothing but tip could reach them, so the Fiscal Compare IC paste
+    // had to re-derive the basis choice to show its own arithmetic. Additive — no existing reader
+    // of this object changes behaviour.
+    v: b.v, sense: b.sense,
     // v951: present only where the two bases genuinely bound differently.
     split: split,
     cmp: !!cmp,
