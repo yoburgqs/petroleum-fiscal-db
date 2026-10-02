@@ -284,6 +284,13 @@ table { width: 100%; border-collapse: collapse; }
      v1028 (T6): and on the second country table on the same tab, which never had the chip. */
   #ioc-output .ioc-terms-chip,
   #exposure-country-table .ioc-terms-chip { min-height: 24px; }
+  /* v1029 (T4): the reform verdict chip. Same element, same call and same reasoning as v906's
+     #tbl-screener .sc-reform-chip rule — it carries its IC action in a title, and under a thumb
+     there is no hover, so it is a target. It measured 15-17px on BOTH of this tab's country
+     tables, including the operator table that has carried it since v906. On a mouse both stay
+     on the 10px line so neither table grows. */
+  #ioc-output .ioc-reform-chip > span,
+  #exposure-country-table .ioc-reform-chip > span { min-height: 24px; display: flex; align-items: center; justify-content: flex-start; }
 }
 /* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
    title, so under a thumb — where there is no hover — it is treated as a control and takes the
@@ -2747,6 +2754,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* v1028 (T6): same exemption, same reason, for the Country Breakdown table's copy of it. */
   #ioc-output .ioc-terms-chip,
   #exposure-country-table .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
+  /* v1029 (T4): identical exemption for the reform verdict chip on the same two tables. Same
+     reason as v730/v884/v938 — it is in a table cell once per row across 37 and 33 rows, and
+     44px would inflate both into a scroll. 24px is the directive's own coarse-pointer floor. */
+  #ioc-output .ioc-reform-chip > span,
+  #exposure-country-table .ioc-reform-chip > span { min-height: 24px !important; min-width: 0 !important; }
   /* v1015 (T6): identical exemption for the Side-by-Side column-header grade badge. Same reason
      as v730/v884/v938 and v801's ✕ directly below -- it sits inside a 96px grid header cell,
      once per column, and at 44 x 44 it is a block three times the height of the 11px region line
@@ -4674,8 +4686,8 @@ window.copyPlatformCitation = function(btn) {
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Country Breakdown</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-sm btn-outline" id="ioc-copy-ic-btn" title="Copy this operator's country breakdown to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the per-row basis (this operator's own contracts vs. the country average used where ORCA holds none for them), the NPV profile, and the fee-basis comparability warning." aria-label="Copy IOC portfolio breakdown for IC memo">&#9112; Copy for IC Memo</button>
-          <button class="btn btn-sm btn-outline" id="ioc-export-btn" title="Download this operator's country breakdown as an Excel workbook &mdash; one Portfolio sheet plus a Basis &amp; Assumptions sheet naming the profile behind every NPV, which rows are the operator's own contracts, and which take figures may not be ranked against the others." aria-label="Export IOC portfolio breakdown to Excel XLSX">&#11015; XLSX</button>
+          <button class="btn btn-sm btn-outline" id="ioc-copy-ic-btn" title="Copy this operator's country breakdown to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the per-row basis (this operator's own contracts vs. the country average used where ORCA holds none for them), the NPV profile, and the fee-basis comparability warning. Since v1029 it also carries each jurisdiction's reform verdict and the portfolio roll-up of it &mdash; which countries carry a WACC premium, and how many have no sourced reform log at all." aria-label="Copy IOC portfolio breakdown for IC memo">&#9112; Copy for IC Memo</button>
+          <button class="btn btn-sm btn-outline" id="ioc-export-btn" title="Download this operator's country breakdown as an Excel workbook &mdash; one Portfolio sheet plus a Basis &amp; Assumptions sheet naming the profile behind every NPV, which rows are the operator's own contracts, and which take figures may not be ranked against the others. The Basis sheet also carries the portfolio reform roll-up: the jurisdictions carrying a WACC premium, those whose take was raised inside the 2010 window, and the count with no sourced reform log." aria-label="Export IOC portfolio breakdown to Excel XLSX">&#11015; XLSX</button>
         </div>
       </div>
       <div id="exposure-country-table"></div>
@@ -42529,8 +42541,11 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       const _hasR = _cd && _cd.has_r_factor_tiers && r.mechanic==='PSC';
       // v880 (T4): renders on every row, four states, from _rrClassify(). See _iocReformChip.
       const _iocReformTagAgg = _iocReformChip(r.country);
+      // v1029 (T4): wrapped so the coarse-pointer floor can reach it, the same way v906 wrapped
+      // the Screener's copy in .sc-reform-chip. Mouse rendering is unchanged.
+      const _iocReformTagAggW = _iocReformTagAgg ? `<span class="ioc-reform-chip">${_iocReformTagAgg}</span>` : '';
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
-      <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagAgg}</td>
+      <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagAggW}</td>
       ${_iocMechCell(r, _hasR)}
       <td class="num">${r.n}</td>
       ${_iocTakeCell(r)}
@@ -42669,8 +42684,11 @@ window.loadIOC = function(operator) {
       const _hasR2 = _cd2 && _cd2.has_r_factor_tiers && r.mechanic==='PSC';
       // v880 (T4): renders on every row, four states, from _rrClassify(). See _iocReformChip.
       const _iocReformTag = _iocReformChip(r.country);
+      // v1029 (T4): wrapped so the coarse-pointer floor can reach it, the same way v906 wrapped
+      // the Screener's copy in .sc-reform-chip. Mouse rendering is unchanged.
+      const _iocReformTagW = _iocReformTag ? `<span class="ioc-reform-chip">${_iocReformTag}</span>` : '';
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
-      <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTag}</td>
+      <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagW}</td>
       ${_iocMechCell(r, _hasR2)}
       <td class="num">${r.n}</td>
       ${_iocTakeCell(r)}
@@ -51432,6 +51450,57 @@ function _iocMechModelledSafe(m) {
 function _iocResolvedModelSafe(c) {
   return (typeof window._iocResolvedModel === 'function') ? window._iocResolvedModel(c) : null;
 }
+// ── v1029 (T4): THE REFORM VERDICT REACHED ONE OF THIS TAB'S TWO COUNTRY TABLES ────────────
+// Walked T4 cold at 1440x900 and 390x844 hasTouch, both storages cleared, on the tab's own
+// seeded operator (Shell). The IOC Portfolio renders two country tables on one scroll, and
+// 31 of their countries are the same countries:
+//
+//   #ioc-output            37 rows   reform verdict on 37 / 37   ("United Kingdom  WACC +3-5pp . 5 chg . 2024")
+//   #exposure-country-table 33 rows  reform verdict on  0 / 33   (bare "United Kingdom")
+//
+// The lower table is the one that leaves the building. It carries the two export controls,
+// and the Methodology tab names it as the fiscal exposure annex to attach to an IC memo. The
+// section heading directly above it reads, in its own words: "flag for reform risk and
+// price-stress analysis in the IC memo" — an instruction with no reform data anywhere under
+// it. Its Key Metrics card beside it prints five tiles (avg take, median take, country count,
+// avg NPV, contract-weighted take) and a state-heavy / IOC-friendly split, and carries no
+// reform reading either. So the analyst asking T4 of a portfolio had to either scroll ~1,800px
+// back up to a DIFFERENT table built on a different basis (legal entities, 31 countries), or
+// leave for the Reform Risk tab and look up 33 countries one at a time through a single-country
+// dropdown.
+//
+// What was silently missing is the only verdict class this platform says changes a model input.
+// Measured over Shell's own 33-country exposure set, via _fcReformRank():
+//
+//   WACC +3-5pp     2   United Kingdom, Brazil        <- a premium this annex never mentioned
+//   TAKE +5pp       1   Australia
+//   TAKE +15pp      1   Russia
+//   TAKE NET 0pp    1   Norway
+//   SIZE UNKNOWN    4   Iraq, Nigeria, India, Mexico
+//   up PRE-2010     4   Kazakhstan, Colombia, Canada, USA
+//   n/c            20   no sourced log — missing coverage, NOT a clean record
+//
+// This is the same asymmetry v1028 closed on the Evidence column of this same table one cycle
+// ago: a shared reading had reached one of the two tables and not the other.
+//
+// No new rule, no new threshold, no second copy of anything. _rrRowChip() was generalised at
+// v906 precisely so a second table could render this without one, and its context sentence is
+// an argument for exactly this reason. The verdict, its colour and its year still come from
+// _rrClassify() / _rrTokenTier() / _rrScores(), so this cell cannot disagree with the operator
+// table above it, the Fiscal Compare Reform verdict column, the Country Profile reform sidebar
+// or the Reform Risk card. Reached through window.* because _rrRowChip is not visible from this
+// scope — the v1028 trap, where a bare `typeof fn === 'function'` guard on an out-of-scope name
+// returns 'undefined' and the call no-ops in silence instead of failing.
+//
+// No take, NPV, grade, contract count, row, order or existing export column changes.
+function _iocExpReformChip(country) {
+  if (typeof window._rrRowChip !== 'function') return '';
+  return window._rrRowChip(country,
+    'Jurisdiction-level: it is a property of the country, not of this operator’s position in it. '
+    + 'The operator table at the top of this tab prints the same verdict for this country, and it '
+    + 'travels into the ⌘ Copy for IC Memo paste and the XLSX this table’s own buttons produce.');
+}
+
 function renderIOCExposure(operatorName) {
   const output = document.getElementById('ioc-exposure-output');
   if (!operatorName || !output) return;
@@ -51710,7 +51779,7 @@ function renderIOCExposure(operatorName) {
               + (d.mechanicCount > 1 ? `, spanning ${d.mechanicCount} fiscal mechanics; take and NPV are weighted by contract count across them` : '')
               + '.';
           return `<tr title="${why.replace(/"/g,'&quot;')}">
-          <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
+          <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}${_iocExpReformChip(d.country) ? `<span class="ioc-reform-chip">${_iocExpReformChip(d.country)}</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${_iocMechModelledSafe(d.mechanic) ? '' : `<div style="font-size:10px;line-height:1.4;color:#C2410C;font-weight:600;" title="${(('"'+d.mechanic+'" is the instrument type on the contract record, not one of the eight fiscal mechanics ORCA models, so no model of that name produced the take or NPV on this row. ') + (_iocResolvedModelSafe(d.country) ? ('They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country) + ' model.') : ('ORCA cannot resolve which model ' + d.country + ' was run on.'))).replace(/"/g,'&quot;')}">not a fiscal mechanic${_iocResolvedModelSafe(d.country) ? ` \u00b7 <span style="color:var(--muted);font-weight:400;">on ${_iocResolvedModelSafe(d.country)}</span>` : ''}</div>`}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%${_iocNoPosition(d) ? `<div class="ioc-no-position" title="${_iocNoPositionWhy(d.country, d.take75).replace(/"/g,'&quot;')}">no contractor position</div>` : ''}${_iocExpCtryWide(d, isCtry, operatorName)}</td>
@@ -51929,6 +51998,34 @@ function _iocExpRows() {
       // the clipboard. A badge visible only while the analyst is on the page is not evidence in
       // an IC memo; this is the same failure v605 fixed for the Country Profile citation.
       'Evidence grade': cd ? _evidenceGrade(cd).letter : 'no record',
+      // ── v1029 (T4): the reform verdict, carried into the artifact ─────────────────────────
+      // The screen cell was added this cycle; stopping there would have left the annex an IC
+      // reader actually holds saying nothing about reform exposure, which is the failure mode
+      // v605 (Country Profile citation), v653 (this sheet's own evidence grade) and v822 (the
+      // country-wide take) each fixed on a different column of a different surface. Straight
+      // from _rrClassify() — the same call the cell, the operator table, Fiscal Compare, the
+      // Country Profile sidebar and the Reform Risk card all make.
+      'Reform verdict': (function(){
+        var v = (typeof window._rrClassify === 'function') ? window._rrClassify(d.country) : null;
+        return v ? _icPlain(v.icToken).replace(/\s+/g, ' ').trim() : 'n/c — no sourced reform log';
+      })(),
+      'Reform basis': (function(){
+        var v = (typeof window._rrClassify === 'function') ? window._rrClassify(d.country) : null;
+        if (!v) {
+          return 'NO SOURCED LOG. ORCA holds a sourced fiscal-reform event log for 21 of 185 '
+            + 'jurisdictions and ' + d.country + ' is one of the 164 without one. This is NOT a '
+            + 'Reform Frequency Score of 100 and it is NOT a clean record — it is missing coverage. '
+            + 'Do not carry a zero reform-frequency premium for this row into an IC memo; it needs '
+            + 'an external check (' + d.country + "'s own petroleum act, IMF Article IV, operator "
+            + 'annual reports) first. The ORCA Reform Risk tab names the statute ORCA read this '
+            + "country's fiscal terms out of, which is where that check starts.";
+        }
+        return 'Reform Frequency Score ' + v.score + '/100, ' + _icPlain(v.rankTxt) + '. '
+          + v.since2010 + ' sourced fiscal law change' + (v.since2010 === 1 ? '' : 's')
+          + ' since 2010. ' + _icPlain(v.icLabel) + '. ' + _icPlain(v.icRule)
+          + ' Jurisdiction-level: a property of ' + d.country + ', not of ' + st.operator
+          + "'s position in it.";
+      })(),
       'Evidence basis': cd
         ? (function(g) { return g.aPct.toFixed(1) + '% primary law on '
             + Number(g.nFacts).toLocaleString() + ' facts — ' + g.label
@@ -52144,6 +52241,68 @@ function _iocExpBasisLines() {
     })();
     L.push('');
   })();
+  // ── v1029 (T4): the portfolio reform roll-up, in the annex that goes to the IC ───────────
+  // The per-row 'Reform verdict' column added this cycle is 33 cells an IC reader has to scan.
+  // The decision is a count and two names: how many of this operator's jurisdictions carry the
+  // only verdict class ORCA says changes a model input, and which ones. Banded off
+  // _fcReformRank() — the same severity order the Fiscal Compare Reform sort uses — so the
+  // annex and the screen cannot band a country differently.
+  (function() {
+    if (typeof window._fcReformRank !== 'function') return;
+    var seen = {}, uniq = [];
+    rows.forEach(function(r) { if (!seen[r.Country]) { seen[r.Country] = 1; uniq.push(r.Country); } });
+    var byBand = {};
+    uniq.forEach(function(c) {
+      var rk = window._fcReformRank(c);
+      var k = rk.scored ? rk.token : 'n/c';
+      (byBand[k] = byBand[k] || []).push(c);
+    });
+    var wacc = [], raised = [];
+    Object.keys(byBand).forEach(function(k) {
+      if (k.indexOf('WACC') === 0) wacc = wacc.concat(byBand[k]);
+      else if (/^TAKE \+/.test(k)) raised = raised.concat(byBand[k]);
+    });
+    var nc = (byBand['n/c'] || []);
+    L.push('REFORM EXPOSURE ACROSS THIS PORTFOLIO');
+    L.push(uniq.length + ' jurisdiction(s) on this sheet. Counted over COUNTRIES, not contracts: '
+      + 'reform exposure is a property of the jurisdiction, so two contracts in one country are '
+      + 'one reading. Every figure here comes from the per-row "Reform verdict" column.');
+    L.push(wacc.length
+      ? 'CARRIES A WACC PREMIUM — ' + wacc.length + ' of ' + uniq.length + ': ' + wacc.join(', ')
+        + '. This is the only verdict class ORCA says changes a model input. If the memo runs one '
+        + 'discount rate across the whole portfolio, '
+        + (wacc.length === 1 ? 'this jurisdiction is' : 'these jurisdictions are')
+        + ' the exception to state.'
+      : 'No jurisdiction on this sheet carries a WACC-premium verdict (3+ sourced fiscal law '
+        + 'changes since 2010, or a Reform Frequency Score at or below 20). That is a finding '
+        + 'about the ' + (uniq.length - nc.length) + ' scored row(s) only — see the coverage line below.');
+    if (raised.length) {
+      L.push('TAKE ALREADY RAISED INSIDE THE 2010 WINDOW — ' + raised.length + ': ' + raised.join(', ')
+        + '. Below the 3-change frequency bar, so the Reform Frequency Score does not flag '
+        + (raised.length === 1 ? 'it' : 'them') + ', but government take has measurably gone up on '
+        + (raised.length === 1 ? 'this jurisdiction' : 'these jurisdictions') + ' since 2010. The '
+        + 'score is a count and never reads how large a change was. Size the premium against the '
+        + 'move the "Reform basis" column names, not against the count.');
+    }
+    L.push(nc.length
+      ? 'NO SOURCED LOG — ' + nc.length + ' of ' + uniq.length + ' (' + nc.join(', ') + '). '
+        + 'ORCA carries a sourced fiscal-reform event log for 21 of 185 jurisdictions. These rows '
+        + 'are NOT a Reform Frequency Score of 100 and NOT a clean record: they are missing '
+        + 'coverage, and a zero reform-frequency premium is not defensible on this basis. '
+        + (nc.length >= uniq.length / 2
+            ? 'More than half this portfolio is unscored, so the counts above describe the '
+              + (uniq.length - nc.length) + ' scored jurisdiction(s) and are not a portfolio-wide '
+              + 'reform finding. '
+            : '')
+        + 'Each needs an external check against its own petroleum act before a premium — or the '
+        + 'absence of one — goes into an IC memo.'
+      : 'Every jurisdiction on this sheet carries a sourced fiscal-reform event log, so the counts '
+        + 'above are a portfolio-wide reading with no coverage gap behind them.');
+    L.push('Reform history is a record of what a government has already done to fiscal terms. It is '
+      + 'not a forecast. The full event log, with the statute behind each change, is on the ORCA '
+      + 'Reform Risk tab and in its CSV export.');
+    L.push('');
+  })();
   L.push('NPV BASIS');
   L.push('Contractor NPV is on the ' + _icEngineBasis()
          + ' It is a jurisdiction comparison, not a valuation of '
@@ -52268,6 +52427,39 @@ function copyIOCPortfolio() {
     assump += ' ' + feeRows.length + ' row(s) — ' + feeRows.map(function(r){ return r.Country; }).join(', ')
       + ' — blend fee-basis contracts (TSC / RSC / Buy-back), where the contractor is paid a fixed $/bbl fee and keeps no price upside, so take% measures contract structure rather than how hard the terms are. Do not rank them against the other rows as published; the Take comparability column carries the PSC/Concession-only take to use instead.';
   }
+  // v1029 (T4): the reform headline in the paragraph above the table, because a pasted Word
+  // table is read top-down and the WACC premium is the one line that changes a model input.
+  // Same _fcReformRank() bands as the per-row column and the XLSX Basis sheet.
+  (function() {
+    if (typeof window._fcReformRank !== 'function') return;
+    var seen = {}, uniq = [];
+    rows.forEach(function(r) { if (!seen[r.Country]) { seen[r.Country] = 1; uniq.push(r.Country); } });
+    var wacc = [], raised = [], nc = [];
+    uniq.forEach(function(c) {
+      var rk = window._fcReformRank(c);
+      if (!rk.scored) { nc.push(c); return; }
+      if (String(rk.token).indexOf('WACC') === 0) wacc.push(c);
+      else if (/^TAKE \+/.test(String(rk.token))) raised.push(c);
+    });
+    assump += ' REFORM EXPOSURE: '
+      + (wacc.length
+          ? wacc.length + ' of ' + uniq.length + ' jurisdictions carry a WACC-premium reform verdict ('
+            + wacc.join(', ') + ') — the only verdict class ORCA says changes a model input, so a '
+            + 'single portfolio discount rate has to state '
+            + (wacc.length === 1 ? 'that exception' : 'those exceptions') + '. '
+          : 'no jurisdiction here carries a WACC-premium reform verdict. ')
+      + (raised.length
+          ? raised.length + ' had government take raised inside the 2010 window without reaching the '
+            + '3-change bar (' + raised.join(', ') + ') — the score is a count and is blind to how '
+            + 'large a change was, so size the premium off the "Reform basis" column. '
+          : '')
+      + (nc.length
+          ? nc.length + ' of ' + uniq.length + ' have NO sourced reform log; ORCA covers 21 of 185 '
+            + 'jurisdictions. Those rows are missing coverage, not a clean record, and will not '
+            + 'support a zero reform premium without an external check.'
+          : 'Every jurisdiction here carries a sourced reform log, so this is a portfolio-wide '
+            + 'reading with no coverage gap behind it.');
+  })();
   var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), '
               + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
               + ' — yoburgqs.github.io/petroleum-fiscal-db/';
@@ -52276,7 +52468,11 @@ function copyIOCPortfolio() {
   // the far right, because the whole point is that the two are read against each other. The
   // header is spelled out on the column face — an IC reader holding only this pasted table has
   // no tooltip, no hover and no tab to go back to.
-  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Country-wide take @$75 (%)','Take gap (pp)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
+  // v1029 (T4): 'Reform verdict' sits beside the evidence pair rather than at the far right —
+  // both are readings about how much weight the row's figures carry, and an IC reader holding
+  // only the pasted table has no tooltip and no tab to go back to. 'Reform basis' follows it
+  // for the same reason 'Evidence basis' follows the grade.
+  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Country-wide take @$75 (%)','Take gap (pp)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Reform verdict','Reform basis','Take basis','Take comparability'];
   var matrix = [cols].concat(rows.map(function(r){
     return cols.map(function(c){
       if (c === 'Take gap (pp)') {
