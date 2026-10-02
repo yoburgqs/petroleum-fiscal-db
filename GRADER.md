@@ -71483,3 +71483,24 @@ pre-push build, and it is reported here as such rather than as this change's res
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
   This cycle wrote every probe and its pre-edit snapshot to `/tmp/c985/`; nothing landed in the
   repo. Recommend Zach authorise deletion or a `.gitignore` entry.
+
+### Cycle 985 addendum — run 2 final observed state
+
+Run 2 was stopped, not completed. Last observed: **375 PASS / 0 FAIL** at
+`[Comparison] hash #/compare/`, ~70 minutes after launch, having crawled the
+reload-heavy `[Comparison]` block at roughly 2.5 checks/minute with system load
+at 1.4 — blocked on page loads of the 10.1 MB local `index.html`, not on CPU.
+It was killed so it would not contend with cycle 986's own gate.
+
+So, stated exactly: this change's full-suite evidence is **run 1's 518 PASS /
+3 FAIL** (all three failures accounted for above, two of them the gate correctly
+rejecting the old convention) plus **run 2's three targeted `[SB-PROVENANCE]`
+rank assertions PASSing and 375 PASS / 0 FAIL through two thirds of the suite**.
+No total is claimed for run 2, because none was obtained.
+
+The slow local gate is now the loop's largest measurement problem: it is the
+only configuration that tests the LOCAL tree, `autonomous_cycle.py`'s own
+`run_playwright()` tests the LIVE site, and a gate that takes 70+ minutes
+inside a 30-minute cycle cannot be the thing that blocks a push.
+`ThreadingHTTPServer` removed the serialisation cycle 983 diagnosed but did not
+remove the per-load cost of a 10.1 MB single-file page reloaded ~200 times.
