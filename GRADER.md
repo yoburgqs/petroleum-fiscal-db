@@ -70927,3 +70927,13 @@ repo copy (sha bd4cb3290984) — edits to the repo copy do not affect the graded
 `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB). This cycle's probes
 and its pre-edit snapshot went to `/tmp/c979/`; nothing was written inside the repo. Still only
 flagged — **recommend Zach authorise deletion or a `.gitignore` entry.**
+
+---
+## Cycle 979 Log — 2026-10-02 09:00
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 979 complete — shipped, verified, pushed (`2d4ff1b` + `6ec17fd`, v1038).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest in rotation: v1032 T1 · 1033 T3 · 1034 T6 · 1035 T4 · 1036 T2 · 1037 T5). Walked cold at 1440×900 and 390×844 with both storages cleared, served from the repo tree: Home → Screener, the 185-row default view, all 11 presets at all 4 price decks (44 combinations), sortable headers, the Advanced panel's five filter groups, the fee-basis com
