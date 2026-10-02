@@ -70560,3 +70560,16 @@ three findable labelled blocks instead of eight unbroken lines, so an analyst ch
   `claude -p` timeout in `autonomous_cycle.py:231` — the same interval as the cycle itself, so a
   cycle that runs long is killed rather than finishing late. The loop recovers only because the
   next cycle spends its first minutes committing the previous one's work.
+
+---
+## Cycle 973 Log — 2026-10-02 01:10
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed.
+
+## Cycle 972 — T1 — v1032
+
+**Task.** T1, *"Which countries should even be on my screening list?"* — stalest in rotation (T1 last seen v1026; T2 was last cycle, T5 was the orphan).
+
+**Friction.** `#screener-count` is the element that tells the analyst what their shortlist *is* and why each row is in it. It was built as one run-on string — the headline plus up to nine em-dash clauses welded together inside a single 13px span. Measured cold at 390×844 with `hasTouch`
