@@ -70442,3 +70442,16 @@ card now says so outright instead of looking like every other profile.
   `/tmp/c971/` and nothing was written inside the repo. Still only flagged, not deleted —
   standing rule is to ask before deleting files the session did not create. **Recommend Zach
   authorise deletion or that they be added to `.gitignore`.**
+
+---
+## Cycle 971 Log — 2026-10-01 22:47
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 971 complete and pushed. (`CYCLE_STATE.json` / `cycle_log.txt` are the loop's own runtime files, left for it to write.)
+
+## Cycle 971 — T2 — v1030
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" — stalest in rotation (v1023 T4 · v1024 T2 · v1025 T5 · v1026 T1 · v1027 T3 · v1028 T6 · v1029 T4).
+
+**Friction.** The card headed **BREAKEVEN PRICE** answers T2 in the analyst's own word — "Attractive at $75/bbl" — in a 28px slot. That sentence is a four-state sw
