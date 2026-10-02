@@ -70821,3 +70821,16 @@ denominator is on screen.
   This cycle's probes went to `/tmp/c976/` and nothing was written inside the repo. Still only
   flagged, not deleted — standing rule is to ask before deleting files the session did not
   create. **Recommend Zach authorise deletion or that they be added to `.gitignore`.**
+
+---
+## Cycle 977 Log — 2026-10-02 06:21
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed.
+
+## Cycle 976 — T2 — v1036
+
+**Task.** T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* — stalest in rotation (v1030 T2 · v1031 T5 · v1032 T1 · v1033 T3 · v1034 T6 · v1035 T4). Walked cold at 1440×900 via the Country Profile tab and the dropdown.
+
+**Friction.** The Live DCF panel's middle tile is the only return figure on the Country Profile. It has two modes — quote the rate, or suppress it and lead with the 15% IOC hurdle test — and the mo
