@@ -70130,3 +70130,171 @@ header. Concretely:
 **Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 962 and 960 were T6, last T4 was 952).
 
 **Friction.** On a cold load, the Reform Risk tab's flagship ranking — *Most Frequently Reformed Regimes* — rendered **6 column headers and 5 cells on every one of its 21 rows**. `TAKE @ $75` was blank on all of them, and that is the column who
+
+---
+## Cycle 964 Log — 2026-10-01 — v1027
+- Test before: 546 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: **546 PASS / 0 FAIL / 0 WARN / 0 JS errors** — the suite RAN this cycle,
+  against the local tree at `TEST_URL=http://localhost:8899/petroleum-fiscal-db/index.html`,
+  and the number is read from its own report, not carried forward.
+- Version: v1026 → v1027
+- Syntax gate: PASS. The duplicate top-level declaration scan carried forward from 963 was
+  run and is now a standing check in this cycle's gate: 727 top-level functions, 2 duplicate
+  names (`_rrEsc`, `_esc594`), both pre-existing and both functionally identical HTML
+  escapers — benign, not worth a cycle, recorded so it is not re-found a fifteenth time.
+
+### Housekeeping done first
+Three cycles' work was sitting **uncommitted or orphaned** in the working tree. Committed
+before any new work, each with its own message rather than swept into this cycle:
+`v1024` (T2, pinned Scenario Builder pre-fill caveat), `v1025` (T5, IOC Portfolio IC paste),
+and `v1026` (T1, Browse take ordering moved onto the comparable PSC/Concession basis — the
+last ranking surface still ordering on the published fee blend; Iraq moved from 180th of 185
+on an 84.8% blend to 102nd on its 34.1% PSC/Concession take). That also corrects the
+rotation record: the most recent task before this cycle was **T1**, not T4.
+
+## Task
+**T3** — "How do these three countries compare side by side?" Stalest in rotation
+(963 T4, v1024 T2, v1025 T5, v1026 T1; last T3 was **957**). Walked cold at 1440×900 and at
+390×844 `hasTouch`, storage cleared before each pass.
+
+## What was checked and found sound
+Recorded because a T3 walk that only reports its one finding invites the next cycle to
+re-walk the same ground:
+- **Cold load of the tab.** The v997 auto-example (UK · Norway · Nigeria) loads, all three
+  production-weighted and Group 1, ordering on one basis. Correct.
+- **The four quickstart presets.** First hypothesis was that they advertise sets which
+  disown themselves — v817's own comment says "no preset said that a column gets SET ASIDE".
+  **Hypothesis was wrong:** v817/v898 shipped `_sbsPaintQuickstart()`, both call sites are
+  wired (`renderCompare`'s Clear path and the post-data-load painter), and the faces render
+  live counts — "53–81% take @ $75 · 1 of 4 set aside", and for USA vs Iraq
+  "23–34% take @ $75 · Iraq re-based 85→34%". Note for the record: USA vs Iraq ranks **2 of
+  2**, not 1 of 2 — Side-by-Side *re-bases* a Group-2 column rather than setting it aside.
+- **Mobile at 390.** No horizontal scroll, no control under 24px. The "four export controls
+  duplicated at 390px" carried forward from earlier cycles is not a defect: the only repeats
+  are Share Link (toolbar + bottom action bar) and PNG (one per chart, two charts).
+- The mixed-basis set (Guyana/Brazil/Angola) and the all-proxy take ordering are both
+  thoroughly caveated and were left alone.
+
+## Friction
+Side-by-Side → **Suriname, Namibia, Senegal** — three Atlantic frontier regimes, an ordinary
+2026 screening trio and exactly the sort of set this tab exists for. 40px apart the verdict
+strip (`#cmp-verdict`, the `_valLine` IIFE at `index.html:~32571`) read:
+
+```
+GOVT TAKE @$75, LOWEST FIRST: Namibia 37.0% › Suriname 54.2% › Senegal 56.9%
+  [Nothing is set aside because every ranked column is on the weaker basis — all 3 are
+   statutory-terms proxies … a ranking of legal regimes, not of realised economics …]
+CONTRACTOR VALUE @$75, LARGEST FIRST: Namibia $2.67B › Senegal $1.09B › Suriname $1.01B
+  [$1.66B apart]  [⚠ disagrees with take order]          ← and nothing else
+```
+
+The take line carries `_vdBasisClear`, whose own words are *"A set does not become comparable
+by being uniformly weak."* **The value line never got that clause.** Namibia's $2.67B is the
+largest and most quotable number in the view, 2.6× the column beside it, and nothing on that
+line said it is the standardized profile run over statutory terms rather than a result from
+Namibia's own fields.
+
+Value is the **worse** half of the pair to leave unstated, not the lesser one. Measured on the
+shipped `country_data.json`, state monopolies excluded:
+
+| | no production | has production |
+|---|---|---|
+| countries | 161 | 21 |
+| median contractor NPV @$75 | **$3.2B** | **$1.3B** |
+| mean | $2.77B | $1.74B |
+
+and **all 20 of the twenty largest contractor NPVs in the database are statutory-basis
+columns** — Vanuatu $5.10B, Bahamas $4.67B, Montenegro $4.63B, Greenland, Faroe Islands,
+Moldova, Romania, Sweden … The 2.4× median ratio is the same figure `_cmpNpvBasisFlag`'s cell
+tooltip already quotes, so this is the platform's own number, not a new one.
+
+Two existing gates miss this case **by construction**, and both limits are correct for what
+they do:
+- `_cmpNpvBasisFlag` (~`index.html:31059`) is deliberately scoped to sets that MIX the two
+  bases — its own comment says "an all-frontier set and an all-producer set are unchanged".
+  Right for a per-cell marker: on an all-proxy set there is no column to contrast against.
+- `_valAside` is scoped the same way, because `_cmpBasisGate` is false on an all-proxy set,
+  so no statutory column is dropped from `_vdVal` and `_vdValOut` is empty.
+
+So the gap is not a bug in either gate. It is that the all-proxy insight reached the **take**
+verdict line in a later generation and never reached the **value** verdict line beside it.
+
+## Change
+New `_valBasisClear` in the value block, appended after `_valAside`. On an all-proxy set the
+contractor-value ordering now carries an orange-ruled clause stating that all N NPVs are
+statutory-terms proxies, that each is the standardized Deepwater profile run across that
+country's statutory terms with production ignored, that the ordering says which regime leaves
+the contractor most *on paper* rather than which country is worth most, and that the basis
+inflates this row harder than it moves take — with the top-20 and median figures, and the
+leading column named explicitly ("$2.67B on Namibia is therefore not evidence that it beats a
+production-weighted country that prints less — it is not on the same basis as one").
+
+Guards mirror `_vdBasisClear`: fires only where `_vdVal.length >= 2`, `_vdValOut` is empty,
+and **every** ranked value column fails `_cmpHasProd`. Verified by rendered output:
+
+| set | clause fires |
+|---|---|
+| Suriname / Namibia / Senegal (all proxy, 3 col) | **yes** |
+| Namibia / Senegal (all proxy, 2 col) | **yes** |
+| Guyana / Brazil / Angola (mixed) | no — `_valAside` already speaks |
+| UK / Norway / Nigeria (all producers) | no |
+
+No new threshold, no new figure, no recomputation: `_cmpHasProd` is the same predicate
+`_cmpRankNpv` and `_vdValWhy` already use. One defect in the first draft of the clause was
+caught by reading the rendered output rather than the source — it inlined
+`_cmpEngBasisAttr()`, which is a *tooltip-attribute* string, producing "standardized
+standardized Deepwater engine profile that produced these figures (…)" with a swallowed
+parenthetical. Replaced with a plain inline phrase and re-verified on screen.
+
+## Result
+An analyst comparing three frontier countries — the commonest all-proxy T3 set there is — is
+now told, **on the line they quote**, that the value ordering ranks legal regimes rather than
+realised economics, and that this is the row the proxy basis inflates most. Previously that
+set produced a bare `Namibia $2.67B · largest · $1.66B apart` with a full basis warning on the
+take line directly above it and silence on the value line, which reads as the strongest
+possible endorsement of the weakest evidence. The clause is inside `#cmp-verdict`, so it also
+travels into the **Copy for IC Memo** paste (verified present, 9,153-char paste) — which is
+where that number actually goes.
+
+### Verification
+- Syntax gate PASS; duplicate-declaration scan unchanged.
+- Runtime suite **ran**: 546 PASS / 0 FAIL / 0 WARN / 0 JS errors.
+- `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390; no control under
+  24px under `pointer: coarse`; 0 page errors at any width.
+- Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical.
+
+### Notes for the next cycle
+- **Generalisation available, deliberately not taken this cycle:** the PREDICTABILITY ordering
+  in the same strip is the third line, and it was not audited for the same all-proxy gap. On
+  the Suriname/Namibia/Senegal set it reads "no order established — Namibia ≤60, Suriname ≤59,
+  Senegal ≤57 cannot be placed against each other", which is already honest, so the gap may
+  not exist there — but it was not checked, and this log should not imply it was.
+- **The REFORM EXPOSURE line on the same set** reads "no order established — ORCA holds no
+  sourced reform log for any column in this set" and names the absence as "an absence of
+  coverage, not a clean record". That is correct and is noted here only so it is not
+  re-flagged.
+- Carried forward from 963 and still live: the FAQ bank still quotes the retired
+  `$1.2B / $15-flat` deck as the basis of the platform's figures (`index.html:6117`, `:6234`,
+  the second a suggested IC disclosure string); `index.html:5508` and `:3837` still carry a
+  typed "65 of 185" breakeven count against a live 67.
+- Carried forward from 958/959: Indonesia's Gross Split avg NPV printing `-$215M` in the table
+  and `-$216M` in the sentence 40px below; `_cpApplyBe()` comments describing an API path that
+  no longer fires; the band-4 `↑ PRE-2010` question on 7 countries; `_fcReformCmp` on the FC
+  sort; the `# Contracts` row's three thousand-separator conventions.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS
+  breakeven basis paragraph denominators; FC Reform verdict bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; CP headline take rank vs NPV rank counting in opposite
+  directions; Indonesia's three government profit-oil shares; `be_75 = 1.0` at source for
+  Bahrain/Kuwait/Saudi Arabia; Somalia the one true T4 dead end; Paraguay decree typed
+  `government_filing`; Screener `block· Deepwater` join fault; Home card "up to 4 countries"
+  vs `CMP_MAX` 5; Côte d'Ivoire's two missing API slugs; `_screenerExportBasis` not naming the
+  105 withheld countries; the Home hurdle stat's "list below".
+- **Resolved from the carried-forward list this cycle:** the `North Sea Trio` quickstart and
+  the "SbS four export controls duplicated at 390px" item — both re-checked against rendered
+  output and neither is a defect. Removed from the carry-forward rather than copied again.
+- **Probe debris, fifteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html` remain untracked in the repo root (~29 MB). This cycle's probes went to
+  `/tmp/c964/` and nothing was written inside the repo. The three older files are still only
+  flagged, not deleted — standing rule is to ask before deleting files the session did not
+  create. **They have now been carried for fifteen cycles; recommend Zach authorise deletion
+  or they be added to `.gitignore`.**
