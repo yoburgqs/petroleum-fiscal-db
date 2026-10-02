@@ -3066,7 +3066,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1033</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1034</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -45337,8 +45337,28 @@ function renderReformTimeline(country) {
     })();
     // v767 (T6): scopes the two verdict lines in place, where the false claim is made — "built from
     // the ORCA Value column" and "All N match" — rather than only in the note further down.
+    // ── v1034 (T6): the filter was `.sourced`, and that dropped the worse half of the cases ────
+    // This clause corrects one specific false sentence: "ORCA's take%, NPV and IRR are built from
+    // the contract terms in the ORCA Value column." Where the engine ran a rate the table does not
+    // print, that sentence is wrong about that term, and this is the only place the verdict says so.
+    // It was scoped to rows whose conflict sat on a CITED row. But a conflict is pushed from two
+    // places: the v767 arm above, which sets `sourced: true`, and the v601 arm, which never sets
+    // the field at all — so every conflict on an UNSOURCED row read as falsy and was skipped.
+    // Measured cold over all 185 profiles at 1440x900: 56 countries render a "DCF USES" annotation
+    // in the table, and the clause fired on 6 of them. The 50 it skipped are the unsourced ones,
+    // where there is not even a cited rate to fall back on — Norway's State Participation prints 0%
+    // with no citation while the engine runs 33.4%, a 33.4pp gap on the single largest driver of
+    // Norwegian government take. Nothing about being uncited makes the divergence smaller.
+    // Four of those 50 — China, India, Kazakhstan, Norway — reach the no-divergence arm and so led
+    // with a green ✓ "All N independently sourced parameters the model reads match the rate stated
+    // in the cited source", 135px above this page's own findings index calling "the DCF ran 1 rate
+    // this table does not print" its WORST finding. The glyph is withdrawn below for exactly that
+    // case, the same way v1002 withdrew it where no citation could be opened.
+    // The wording needs no special case: an unsourced conflict has no cited rate, so `matchesStat`
+    // is falsy, "(the cited rate)" never prints, and "which neither column above prints" is true of
+    // it — the Statutory cell reads NO SOURCE and the ORCA Value cell holds the contract average.
     const _engScope767 = (function() {
-      const s = modelConflicts.filter(function(c) { return c.sourced; });
+      const s = modelConflicts.slice();
       if (!s.length) return '';
       const allNeither = s.every(function(c) { return !c.matchesStat; });
       return ' <strong style="color:var(--red);">Not for '
@@ -45372,8 +45392,13 @@ function renderReformTimeline(country) {
         // tick over a citation set of which not one opens. The tick is a claim the page cannot
         // support there, so it is withdrawn -- same treatment v641 gave the \u2197 on a dead row.
         // No value, tier letter, take, NPV or grade changes; the match itself is still stated.
-        ? '<div style="margin-top:8px;font-size:11px;color:' + ((_srcNoneOpen1002 || _missInvented.length) ? 'var(--orange)' : 'var(--muted)') + ';">'
-          + ((_srcNoneOpen1002 || _missInvented.length) ? '\u26a0 ' : '\u2713 ')
+        // v1034 (T6): modelConflicts.length joins that test. A \u2713 here is read as "the provenance
+        // checks out", and on China, India, Kazakhstan and Norway it sat directly above this
+        // page's own findings index naming "the DCF ran 1 rate this table does not print" as the
+        // WORST finding on the profile. The match the tick states is still true and still stated;
+        // what it cannot also mean is that the number above was built from the rows ticked.
+        ? '<div style="margin-top:8px;font-size:11px;color:' + ((_srcNoneOpen1002 || _missInvented.length || modelConflicts.length) ? 'var(--orange)' : 'var(--muted)') + ';">'
+          + ((_srcNoneOpen1002 || _missInvented.length || modelConflicts.length) ? '\u26a0 ' : '\u2713 ')
           + (sourcedCount === 1
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
