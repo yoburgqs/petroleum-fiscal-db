@@ -71268,3 +71268,13 @@ the Norway SPT card and the two reference blocks state one number per country in
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
   This cycle wrote every probe and its pre-edit snapshot to `/tmp/c983/`; nothing landed inside
   the repo. Recommend Zach authorise deletion or a `.gitignore` entry.
+
+---
+## Cycle 983 Log — 2026-10-02 14:39
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 983 shipped and pushed. Summary:
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in rotation (1034 T6 · 1035 T4 · 1036 T2 · 1037 T5 · 1038 T1 · 1039 T3). Walked cold at 1440×900 and 390×844 with touch, both storages cleared: Home sourcing strip → Fiscal Compare Quality chips → Country Profile Evidence Chain (USA, Somalia) → dead-citation handling → Breakeven Map → Reform Risk citations → all 8 exports downloaded and parsed → API Explorer → Sample 
