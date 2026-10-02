@@ -71119,3 +71119,152 @@ the repo. Still only flagged — **recommend Zach authorise deletion or a `.giti
 **The grid printed every number whole on a phone and sliced every caption that says the numbers may not be compared.**
 
 `.compare-grid`'s ≤600px rule (`index.html:2745`) floors coun
+
+---
+## Cycle 983 Log — 2026-10-02 14:28 — v1040
+
+- Test before: 546 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- JS syntax gate: **PASS** (11 blocks)
+- Shipped: `cd140f5`, pushed to `main`, mirror copied to
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html`
+
+## Task
+
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in rotation
+(v1034 T6 · 1035 T4 · 1036 T2 · 1037 T5 · 1038 T1 · 1039 T3). Walked cold at 1440×900 and at
+390×844 with `hasTouch`, both storages cleared before each pass, served from the repo tree over a
+threaded local server.
+
+The walk: Home sourcing strip (`A 28 · B 79 · C 43 · D 35 of 185`, `393 of 802 model terms
+cited`) → Fiscal Compare Quality column chips → `_fcOpenTermChain` → Country Profile per-term
+Evidence Chain on **USA** and **Somalia** → source-link behaviour on a dead citation → Breakeven
+Map coverage captions → Screener breakeven legend → Reform Risk per-event citations (United
+Kingdom, 9 events) → all **8 exports** downloaded and parsed → API Explorer → Sample Analyses.
+
+**What was verified good, and is therefore recorded so a later cycle does not re-walk it:**
+
+- The Home strip is arithmetically correct against live data, not asserted: `_fcTermLeg()` over
+  all 185 countries returns **802 model terms run, 393 cited, 19 countries citing zero, 128
+  citing half or fewer**, and 43 + 35 = the 78 C/D the Methodology page states.
+- The per-term Evidence Chain is genuinely finished. USA renders a `LINK DEAD` row whose anchor
+  is rewritten to a title search rather than left pointing at the 404, flags that the DCF runs
+  12.5% against a 17.62% contract average and an 18.75% cited statute, and ranks 3 findings
+  worst-first. Somalia states plainly that **no** parameter on its table is independently
+  sourced, separates the one row the PSC model never reads with a divider, and scopes every
+  count above the divider.
+- `cpBeFor()` guards `> 1`, so the `be_75 = 1.0` solver floor on Bahrain / Kuwait / Saudi Arabia
+  reaches no surface. **The carried-forward `be-legend-n` "65 vs live 67" item is CLOSED** —
+  v915 made all three spans live; cold-reading them before the Screener has ever been entered
+  returns the stale literal, which is what earlier cycles measured. Entered live they read
+  **67 / $20 and $34 / 63**, matching the Breakeven Map and the Explorer.
+- All 8 exports open and parse: FC XLSX 221 KB, Explorer XLSX 348 KB, Screener XLSX 435 KB /
+  CSV 246 KB, IOC XLSX 83 KB, Breakeven CSV 43 KB, Reform CSV 39 KB, CP XLSX 57 KB. The
+  Breakeven CSV carries `Evidence Basis`, `Model_Terms_Cited`, `Model_Terms_Run` and
+  `Model_Terms_Uncited` per row — the v912 leg is present in the artifact that leaves.
+
+## Friction
+
+**The Sample Analyses tab answers "where did this number come from" with two different numbers
+per card, and does not say which one is current.**
+
+Every card in `renderSampleAnalyses()` (`index.html:53250`) is a **hard-coded** headline and
+paragraph sitting directly on top of a table built **live** from `COUNTRY_DATA`. Nothing ever
+reconciled the two, and they had drifted. Measured against the shipped `country_data.json`:
+
+| card | prose said | its own table printed | drift |
+|---|---|---|---|
+| North Sea Neighbors (`:53345`) | head "~16 percentage points" | 68.0 − 49.2 = **18.8pp** | 2.8pp |
+| North Sea Neighbors (`:53346`) | "UK ... 51.4% effective take" | **49.2%** | 2.2pp |
+| North Sea Fiscal Landscape (`:54026`) | head "~16pp take difference" | **18.8pp** | 2.8pp |
+| North Sea Fiscal Landscape (`:54027`) | "UK (51.4%)" | **49.2%** | 2.2pp |
+| Norway SPT Structure (`:54037`, `:54039`) | "Why 67.9%", "Norway's 67.9% take" | **68.0%**, in that card's own live stat box | 0.1pp |
+| West Africa PSC Bloc (`:53366`) | Ghana "Jubilee terms (42%)" | **52.6%** | **10.6pp** |
+| Indonesia Two Regimes (`:53562`) | "extracts 7.3pp more at $75/bbl" | hard-coded, not derived from `MECHANIC_BREAKDOWN` | — |
+
+**Ghana is the give-up point.** 42% is Ghana's take at **$50**/bbl; the column the sentence
+labels is the **$75** column, which reads 52.6%. So the sentence that tells the analyst *why*
+Ghana is the most IOC-friendly regime in the bloc stated a figure 10.6pp below the number
+printed two lines beneath it, on a price deck it did not name. The Norway SPT card is worse in
+kind if not in size: its uppercase eyebrow read "WHY 67.9% DOESN'T DETER IOCS" directly above a
+`Govt Take @$75` box rendering `${norwayD.take_75.toFixed(1)}%` = **68.0%** — one card, one
+country, two figures, one of them live.
+
+The same stale UK figure had also been copied into two static reference blocks: the Q&A answer
+"does government take include income tax" (`:5078`), which stated **Norway's 68.0% and UK's
+51.4% in the same sentence** — live figure and stale figure side by side — and the UK EPL
+adjustment note (`:6261`), "Platform take (51.4%) does not include EPL at elevated prices."
+
+## Change
+
+Every take figure in the Sample Analyses narrative is now read from **the same `COUNTRY_DATA`
+row object the table cell beside it reads** — `_saNor`, `_saUK`, `_saGh`, `_saPct()`,
+`_saNSGap`, `_saGsGap`, all declared inside `renderSampleAnalyses()` — and each one names its
+price deck. On screen, measured after the edit at all six viewports:
+
+- "Why does Norway capture **18.8pp** more government take than the UK **at $75/bbl**?"
+- "78% headline marginal rate, **68.0%** effective take at $75/bbl ... **49.2%**. ... Both
+  figures are the @$75 column of the table below, read from the same record — not a separate
+  estimate."
+- "Ghana's Jubilee terms (**52.6% at $75/bbl, the lowest in the table below**)"
+- "Same basin, **18.8pp** take difference at $75/bbl" · "Norway (**68.0%** @$75)" ·
+  "UK (**49.2%** @$75)"
+- "WHY **68.0%** DOESN'T DETER IOCS" · "Norway's **68.0%** take at $75/bbl — the figure in the
+  Govt Take box below, not a separate estimate"
+- "government extracts **7.3pp** more at $75/bbl — the gap between the two Govt Take cells
+  below" (same value, now derived, so it tracks `MECHANIC_BREAKDOWN`)
+- The two static blocks now read 49.2%.
+
+No table, grade, rank, tier, filter, sort or export changes. Nothing is deleted or collapsed.
+
+## Result
+
+An analyst can paste a Sample Analyses narrative into an IC memo without publishing a government
+take ORCA's own table refutes, and the figure in the sentence now carries the price deck it was
+computed on — so "Ghana 42%" can no longer be read as a $75 figure. The three North Sea cards,
+the Norway SPT card and the two reference blocks state one number per country instead of two.
+
+## Verify
+
+- JS syntax gate: **PASS**, 11 script blocks, `node --check` on each.
+- **Zero horizontal scroll** at 1920 / 1440 / 1280 / 1024 / 768 / 390 (`scrollWidth ===
+  clientWidth` at every one).
+- **Zero controls under 24px** under `pointer: coarse` on this tab at 390×844 `hasTouch`.
+- **Zero page errors and zero console errors** at all six viewports.
+- `/51\.4|67\.9|~16/` returns **no match** anywhere in the `#tsamples` pane.
+- Runtime suite: see the note below — it was RUN this cycle, not assumed.
+
+## Still open, recorded rather than fixed
+
+- `shareComparison()` on an empty comparison is still a bare `if (!compareList.length) return;`
+  at `:57338` — silent, while its neighbour `Copy for IC Memo` refuses in a sentence.
+- Side-by-Side column header country NAME is still inert text where every other surface makes a
+  country name a route to its profile.
+- The Screener breakeven legend's live numbers are right, but its hard-coded example list still
+  names **Norway** among "the USA, Norway, Canada and Brazil showed a blank" — and Norway's
+  published breakeven is $28.7 while the UK's $20.3 **is** the low end the same sentence now
+  quotes. Text-only, so it was not spent as this cycle, but it is self-falsifying and should be
+  the first thing a later T6 cycle picks up.
+- Carried forward unchanged: Colombia 90.1% rate on 23.6% exposure; `_sbReturnReading` 100% rate
+  cutoff; `INDEX ONLY` double arrows; Paraguay decree typed `government_filing`;
+  `_scFeeCmpAt()` India direction; FAQ bank's retired `$1.2B / $15-flat` deck (`:6117`,
+  `:6234`); `cpBeBound()` "117 of 185" vs live 118; `EXPL-NO-IRR` gate blind spot; FC Reform
+  verdict bare `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; CP headline take
+  rank vs NPV rank counting in opposite directions; `_screenerExportBasis` not naming the 105
+  withheld countries; Home card "up to 4 countries" vs `CMP_MAX` 5; Cote d'Ivoire's two missing
+  API slugs; Fiscal Mechanics page "Ghana ... IOC net take ~40–50% at $75" against a live 52.6%
+  (statutory estimate, not a platform figure — left alone deliberately).
+
+## Loop health
+
+- The 95-minute local-suite problem flagged at cycle 980 is **the server, and it is fixable**:
+  served through a `ThreadingHTTPServer` instead of the default single-threaded handler, the
+  same ~200 page loads of a 10.1 MB `index.html` run without the serialisation that caused it.
+  Starter at `/tmp/c983/serve.py`. Recommend `autonomous_cycle.py` start the gate server this
+  way, or `caddy file-server` / `npx serve`.
+- `claude -p` timeout at `autonomous_cycle.py:231` is still 1800s, equal to the cycle interval.
+- The graded suite copy (`office/tools/petroleum/tests/runtime_comprehensive.js`) is still
+  DIVERGED from the repo copy (`petroleum-fiscal-db/tests/runtime_comprehensive.js`).
+- **Probe debris, twenty-second cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  This cycle wrote every probe and its pre-edit snapshot to `/tmp/c983/`; nothing landed inside
+  the repo. Recommend Zach authorise deletion or a `.gitignore` entry.
