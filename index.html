@@ -1887,6 +1887,40 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      rules key off — precisely because wrapping, not scrolling, is what they should do. */
   .cmp-vd-label { white-space: normal; max-width: 100%; }
 
+  /* v1033 (T3): the verdict strip's long-form basis notes, clamped to three lines on a phone.
+     Walked "how do these three countries compare side by side?" cold at 390x844 with hasTouch,
+     both storages cleared. #cmp-verdict is the first thing on this tab and the only place the
+     orderings are stated — and on a phone it is taller than the phone. Measured, five ordinary
+     screening trios: Namibia+Guyana+Suriname 1029px, Angola+Nigeria+Ghana 779px,
+     Norway+Guyana+Namibia 674px, Indonesia+Norway+Nigeria 606px, Norway+UK+Netherlands 584px,
+     against an 844px viewport — 69% to 122% of the screen, with the grid's first row landing at
+     y=1214 to y=1636. Nothing is deleted: the clamp is overflow on a RENDERED element, so the
+     text stays in the layout tree and the .cmp-notice innerText sweep still carries every word
+     into the Copy-for-IC-Memo paste. Desktop is untouched — this block is max-width:720px and
+     the same strip measures 199-340px with a mouse, which is not a problem worth solving. */
+  /* Height cap rather than -webkit-line-clamp. line-clamp needs display:-webkit-box, and with
+     -webkit-box-orient:vertical a "line" is a CHILD BOX, not a line of text: the reform-exposure
+     row is three spans in a wrapping flex, so clamp:3 kept all three and saved nothing (measured
+     +37px net, the toggle's own height, on Indonesia+Norway+Nigeria and on Angola+Nigeria+Ghana).
+     A max-height caps what is actually painted whatever the row is built from, and leaves the
+     row's own display alone so the flex rows still wrap the way they do on desktop. */
+  #cmp-verdict .cmp-vd-clamp {
+    max-height: 54px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 62%, rgba(0,0,0,.15) 100%);
+    mask-image: linear-gradient(to bottom, #000 62%, rgba(0,0,0,.15) 100%);
+  }
+  #cmp-verdict.cmp-vd-open .cmp-vd-clamp {
+    max-height: none;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  /* The toggle is a flex child of the strip so _cmpNoticeRows() counts it as a block row and the
+     v1008 per-row split of the pasted notes is unchanged; data-cmp-uionly drops its label from
+     the paste, the same way v845 drops the basis-fix button's. */
+  #cmp-vd-more { align-self: flex-start; }
+
   /* v761 (T6): the Evidence Chain on a phone. Parameter / ORCA / Statutory filled the 336px
      wrapper and the Source column sat at x=422-778 -- off screen on 26 of 26 rows walked, behind a
      sideways swipe nothing signals (this wrapper has no .tbl-wrap fade). The analyst read the
@@ -3032,7 +3066,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1032</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1033</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34170,6 +34204,120 @@ function renderCompare() {
   _sbsApplyTermsCited();  // v716 (T6) — must follow, it reads the token _sbsApplyObsSpread bumps
   _sbsScrollHint();       // v712 (T3)
   try { _sbsColBar(); } catch (e) {}   // v791 (T3)
+  try { _sbsClampVerdict(); } catch (e) {}   // v1033 (T3)
+}
+
+/* -- v1033 (T3): the verdict strip is taller than the phone -------------------------------
+   Walked T3 -- "how do these three countries compare side by side?" -- cold at 1440x900 and at
+   390x844 with hasTouch, sessionStorage and localStorage cleared, served so sw.js resolves.
+
+   #cmp-verdict is the first element on the tab and it is where every ordering is stated, so it
+   is read before anything else. On a phone it does not fit on the phone. Measured, five
+   ordinary IOC screening trios at 390x844:
+
+     Namibia + Guyana + Suriname      strip 1029px   grid's first row at y = 1636
+     Angola + Nigeria + Ghana         strip  779px   grid's first row at y = 1386
+     Norway + Guyana + Namibia        strip  674px   grid's first row at y = 1281
+     Indonesia + Norway + Nigeria     strip  606px   grid's first row at y = 1214
+     Norway + UK + Netherlands        strip  584px   grid's first row at y = 1232
+
+   The viewport is 844px. In all five the strip fills 69-122% of the screen, and the analyst
+   swipes one and a half to two full screens of prose before the first number of the comparison
+   they just built. The 1029px case is the MODAL one, not the worst one: 163 of 185 countries
+   carry no verified field production, so roughly two thirds of three-country picks are
+   uniformly proxy and get exactly that strip.
+
+   What makes it tall is not the findings. The four ordering headlines -- govt take, contractor
+   value, term consistency, reform exposure -- total 420px of the 1029. Two long-form basis
+   notes account for 566px on their own:
+
+     "Nothing is set aside because every ranked column is on the weaker basis ..."  758 chars, 232px
+     "... all 3 contractor NPVs above are statutory-terms proxies ..."             1107 chars, 334px
+
+   Both restate at length what the grid underneath then marks on every single cell they apply
+   to: Data basis PROXY on the basis row, "not comparable - statutory terms" under all four Govt
+   Take figures and all four Contractor NPV figures, and "(statutory basis)" on NPV weighting.
+   The analyst is told three times before being shown anything.
+
+   v723 already made this call one element lower on the same tab -- it collapsed the five
+   evidence-depth rows by default, and that is what puts Govt Take @$75 above the fold. This is
+   the same ruling applied to the thing now sitting above it.
+
+   Rules this keeps:
+     - Nothing is deleted and nothing is hidden from the export. The clamp is overflow on a
+       RENDERED element, so the text stays in the layout tree and _cmpNoticeRows()' innerText
+       read still carries every word into the Copy-for-IC-Memo paste. display:none would not --
+       innerText skips it -- which is why the clamp is overflow and not a hide.
+     - Every ordering headline, every pill and every control stays at full length. A row that
+       carries a control -- the v845 "Compare the N statutory-terms columns" rescue button, an
+       Evidence Chain link -- is never clamped as a row; the prose beside the control is clamped
+       and the control is left whole.
+     - Desktop is untouched. The CSS is inside the existing max-width:720px block and this
+       function no-ops above it; the same strip is 199-340px with a mouse.
+     - The toggle is a flex child of the strip, so _cmpNoticeRows() still sees the strip as
+       all-block-children and the v1008 per-row split of the pasted notes is unchanged. Its
+       label is dropped from the paste by data-cmp-uionly, the same way v845's button is.
+
+   The 300-character threshold is read off the measurements above: the ordering headlines run
+   107-281 chars and are never touched; the basis notes run 405-1107 and are. */
+var _sbsVdOpen = false;
+function _sbsClampVerdict() {
+  var vd = document.getElementById('cmp-verdict');
+  if (!vd) return;
+  var old = document.getElementById('cmp-vd-more');
+  if (old && old.parentNode) old.parentNode.removeChild(old);
+  var prev = vd.querySelectorAll('.cmp-vd-clamp');
+  for (var i = 0; i < prev.length; i++) prev[i].classList.remove('cmp-vd-clamp');
+  vd.classList.remove('cmp-vd-open');
+
+  var narrow = false;
+  try { narrow = window.matchMedia('(max-width: 720px)').matches; } catch (e) { narrow = false; }
+  if (!narrow) return;
+
+  var LONG = 300, n = 0;
+  var rows = vd.children;
+  for (var r = 0; r < rows.length; r++) {
+    var row = rows[r];
+    if ((row.textContent || '').length < LONG) continue;
+    var target = row;
+    if (row.querySelector('a, button')) {
+      target = null;
+      for (var k = 0; k < row.children.length; k++) {
+        var kid = row.children[k];
+        if (/^(A|BUTTON)$/.test(kid.tagName)) continue;
+        if (kid.querySelector && kid.querySelector('a, button')) continue;
+        if ((kid.textContent || '').length < LONG) continue;
+        if (!target || (kid.textContent || '').length > (target.textContent || '').length) target = kid;
+      }
+      if (!target) continue;
+    }
+    target.classList.add('cmp-vd-clamp');
+    n++;
+  }
+  if (!n) return;
+
+  var btn = document.createElement('button');
+  btn.id = 'cmp-vd-more';
+  btn.type = 'button';
+  btn.setAttribute('data-cmp-uionly', '1');
+  btn.style.cssText = 'display:flex;align-items:center;min-height:32px;font-size:11px;font-weight:700;'
+    + 'color:var(--accent);background:var(--surface2);border:1px solid var(--accent);border-radius:4px;'
+    + 'padding:4px 10px;cursor:pointer;';
+  var paint = function () {
+    btn.textContent = (_sbsVdOpen ? '▴ Shorten the basis note' : '▾ Read the full basis note')
+      + (n > 1 ? 's (' + n + ')' : '');
+    btn.setAttribute('aria-expanded', _sbsVdOpen ? 'true' : 'false');
+    btn.title = _sbsVdOpen
+      ? 'Collapse the basis notes back to three lines each. Nothing is removed either way -- the '
+        + 'full text travels into Copy for IC Memo whether it is open or closed.'
+      : 'Each note explains at length what the grid below also marks on every cell it applies to. '
+        + 'Open it when the basis is the thing being decided; the full text is in the IC-memo '
+        + 'paste either way.';
+    vd.classList.toggle('cmp-vd-open', _sbsVdOpen);
+  };
+  btn.onclick = function () { _sbsVdOpen = !_sbsVdOpen; paint(); };
+  paint();
+  vd.appendChild(btn);
 }
 
 // ─── v712 (T3): name the columns that are off the right edge ──────────────────────────
@@ -34970,6 +35118,7 @@ function _sbsPaintVerdictRr() {
       + '">Reform exposure, highest first:</span>'
     + body + pill;
   row.style.display = 'flex';
+  try { _sbsClampVerdict(); } catch (e) { /* v1033 (T3) */ }
 }
 function _sbsPaintVerdictFp(s) {
   var row = document.getElementById('cmp-verdict-fp');
@@ -35018,6 +35167,7 @@ function _sbsPaintVerdictFp(s) {
       + 'color:var(--orange);background:rgba(194,65,12,.10);border-radius:3px;padding:2px 8px;line-height:1.5;'
       + 'white-space:nowrap;cursor:help;">≤ = ceiling, not a score</span>';
   row.style.display = 'flex';
+  try { _sbsClampVerdict(); } catch (e) { /* v1033 (T3) */ }
 }
 function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
   if (token !== window._sbsRenderToken) return;
