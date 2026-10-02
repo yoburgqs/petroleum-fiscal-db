@@ -71278,3 +71278,208 @@ the Norway SPT card and the two reference blocks state one number per country in
 
 ## Task
 **T6 — "Where did this number come from and how solid is the evidence?"** Stalest in rotation (1034 T6 · 1035 T4 · 1036 T2 · 1037 T5 · 1038 T1 · 1039 T3). Walked cold at 1440×900 and 390×844 with touch, both storages cleared: Home sourcing strip → Fiscal Compare Quality chips → Country Profile Evidence Chain (USA, Somalia) → dead-citation handling → Breakeven Map → Reform Risk citations → all 8 exports downloaded and parsed → API Explorer → Sample 
+
+---
+
+# Cycle 985 — v1042 — 2026-10-02
+
+## Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Next in rotation
+after 983 (T6) and 984 (T4). Walked cold at 1440×900 and at 390×844 with `hasTouch`, both
+storages cleared each time: Home → Country Profile tab → the dropdown-only empty state →
+Indonesia, Afghanistan, Barbados, Iran, Norway, Australia, Iraq → headline strip → regime
+breakdown → peer and analogue tables → 4-price sensitivity → breakeven panel → the Copy-link
+deep-link round trip → `Copy as IC table` → and then the one route the headline strip offers for
+"defend it with my own numbers": `IRR: → Model in Scenario Builder`.
+
+Things walked and found healthy, recorded so a later cycle does not re-walk them: all 88
+clickable affordances in `#dd-content` resolve to a live function and a live DOM target (zero
+dead `getElementById` / `querySelector` targets); the `#/profile/indonesia` deep link restores
+the tab, the selector and the profile from a genuinely cold load; `ddOpenScenarioBuilder()`
+pre-fills the right mechanic for Australia (PRRT), Indonesia (PSC) and Iraq (TSC) in sequence,
+so the v576 regression has not come back.
+
+## Friction
+
+**The rank an analyst reads off the Scenario Builder counted in the opposite direction to the
+rank they had just read off the Country Profile — one click apart, same database, same metric,
+same price.**
+
+- Country Profile, Indonesia, headline strip (`getGlobalTakeRank()`, `:46…` → `rank = nBelow + 1`
+  with the comment *"1 = lowest take"*): **`All 185 countries: #159`**.
+- `IRR: → Model in Scenario Builder` on that same strip, run on Indonesia's own pre-filled terms,
+  `vs 185-Country Database` panel (`:63955`, `takes.length - below`): **`Ranked #19 of 185 by govt
+  take (1=highest)`**.
+
+#19 and #159 are mirror images of each other. The only thing on screen distinguishing them is a
+10px parenthetical, and the two numbers sit two inches below a card that reads
+`This scenario 64.1% / Indonesia published @$75 59.5%` — so the panel invites exactly the
+comparison the scale makes impossible. An analyst who reads #19 the way the rest of the platform
+has trained them reads it as *19th most investor-friendly regime on earth* and screens Indonesia
+**in**. The panel is titled "vs 185-Country Database", so it reads as the platform's considered
+placing rather than as arithmetic on a different axis.
+
+Two things made this survive:
+
+1. **v607 saw the inversion and fixed the label, not the number.** Its comment is still in the
+   file: *"the rank is computed as (n - below), i.e. 1 = HIGHEST take, but the label read
+   (1=lowest)"*. Correcting the label made the panel internally honest and left it the only
+   surface on the platform on the minority convention — a correctly-labelled contradiction.
+2. **The Group-2 branch of this same `${(function(){…})()}` block already used the other
+   convention.** v877 withholds the rank for a TSC / RSC / Buy-back run and substitutes the
+   origin country's own placing, printed verbatim as *"#174 of 185 **counting up from the lowest
+   take**"*. So Iran's builder output and Indonesia's builder output — same box, same title, forty
+   lines apart in one function — were numbered in opposite directions.
+
+The population was raw too. `takes` was built from `c.take_75`, so the 11 fee-blended countries
+entered at their published blend and the three state monopolies entered at 100.0% — the same
+artefact v877's own comment says *"every other surface already re-bases or withholds"*. v877
+fixed the numerator and left the denominator.
+
+## Change
+
+`index.html:63881` and `:63975`. The Group-1 branch now uses **`getGlobalTakeRank()`'s exact
+arithmetic**: comparable take via `cpCmpTakeOf(c,'75')`, `rank = below + 1`, the same
+`take_75 != null` 185-country denominator. Measured on screen after the edit:
+
+| surface | before | after |
+|---|---|---|
+| CP Indonesia, all-185 | `#159` | `#159` (unchanged) |
+| SB, Indonesia's own terms (64.1%) | `#19 of 185 (1=highest)` | **`#168 of 185 (#1 = lowest take)`** |
+| SB, Norway's Concession template (49.9%) | `#62 of 185 (1=highest)` | **`#124 of 185 (#1 = lowest take)`** |
+| SB, Iran Buy-back | `no placing` + `#174 … counting up from the lowest` | unchanged — both branches now agree |
+
+And a new line in the box, present only when the run came from a country (`window._sbOrigin`,
+the same hook v877 uses, so a preset or a generic open still prints nothing):
+
+> Indonesia's own published take of **59.5%** is **#159 of 185** on this same scale — the figure
+> its Country Profile prints. The run above lands 9 places higher: the terms you ran take MORE
+> than the country average.
+
+Norway reads: *"Norway's own published take of 68.0% is #169 of 185 on this same scale … The run
+above lands 45 places lower: the terms you ran take LESS than the country average."* — which is
+the right reading of a 49.9% generic Concession template against Norway's 68.0%, and was
+previously left for the analyst to infer from two inverted ranks.
+
+`pctRank`, `med`, the `rankColor` tiering and the "% of countries have lower take" span are
+unchanged in meaning; they are now computed on the same comparable-take population as the rank,
+so all three figures in the box read one distribution. Median is 28.4% on either basis (v683
+established this), so that number did not move.
+
+## Gate moved with it, in both copies
+
+The graded suite encoded the old convention and failed on the change, correctly:
+`[SB-PROVENANCE] Rank label` and `Rank vs pct`. Both were rewritten to the new convention —
+`rankDir === 'lowest'`, and `(rank - 1) === pctLower% of n` — and a **third assertion added**,
+`Rank cross-reference`, which requires the builder's origin-country line to carry the *identical*
+number `getGlobalTakeRank()` hands the Country Profile. Without that, a later cycle could drift
+the two scales apart again and nothing would notice.
+
+Patched identically in **both** suite copies — `office/tools/petroleum/tests/` (the graded one
+that actually runs) and `petroleum-fiscal-db/tests/` (idle) — so this region no longer
+contributes to the standing divergence.
+
+## Result
+
+An analyst who reads Indonesia's profile, clicks the only IRR route the page offers, and runs
+Indonesia's own terms now gets a rank on the same axis as the rank they just read, plus a
+sentence naming both numbers and which direction the difference runs. They can no longer read
+#19 as "19th most investor-friendly" and screen a 59.5%-take country in on the strength of it.
+
+## Verify
+
+- JS syntax gate: **PASS**, 11 script blocks, `node --check` on each.
+- Runtime suite: **RUN this cycle, not assumed** — the graded copy
+  (`office/tools/petroleum/tests/runtime_comprehensive.js`) against the **local tree** on a
+  `ThreadingHTTPServer`, with `TEST_URL` and `ORCA_REPORT_FILE` set. Full accounting below.
+- Zero horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768 / 390** (`scrollWidth ===
+  clientWidth` at every one), measured with the Scenario Builder open and a run on screen.
+- Zero controls under 24px in `#sb-output` under `pointer: coarse` at 390×844 `hasTouch`
+  (confirmed `matchMedia('(pointer: coarse)').matches === true`). The change adds no interactive
+  element — one `<span>` and one `<div>`; the box measures 313px of 390 at phone width.
+- Zero page errors and zero console errors at all six viewports (the one console entry under
+  local serving is a 404 on a script path that only exists under the deployed base path).
+
+### Runtime suite — what was actually measured
+
+Two full runs of the **graded** copy against the **local tree** (`TEST_URL` →
+`http://127.0.0.1:8791/index.html`, `ORCA_REPORT_FILE` → `/tmp/c985/report_local*.txt`).
+
+**Run 1 — immediately after the `index.html` edit, before the suite was touched:
+518 PASS / 3 FAIL / 1 WARN / 1 console error.** The three failures were diagnostic, not
+regressions:
+
+| failure | cause |
+|---|---|
+| `[SB-PROVENANCE] Rank label` | asserted `rankDir === 'highest'`; the box now prints `#1 = lowest take` |
+| `[SB-PROVENANCE] Rank vs pct` | parsed `\(1=(\w+)\)`; the label format changed, so `rank` came back `null` |
+| `[SBS-ShareOrder]` | `page.goto: Timeout 30000ms exceeded` against the local 10.1 MB file — an artifact of local serving, not of the change |
+
+The one console error is a 404 on a script path that only resolves under the deployed base
+path. Both `[SB-PROVENANCE]` failures are the gate correctly catching that the product moved
+off the convention the gate encoded; both assertions were then rewritten to the new convention
+and a third added.
+
+**Run 2 — after the suite patch.** The three assertions this cycle turns on all PASS, read
+from the suite's own output, not inferred:
+
+```
+✓ [PASS] [SB-PROVENANCE] Rank label: benchmark rank labelled "#1 = lowest take",
+         matching (below + 1) and the Country Profile scale
+✓ [PASS] [SB-PROVENANCE] Rank vs pct: #124 of 185 from the bottom is consistent with 66% lower
+✓ [PASS] [SB-PROVENANCE] Rank cross-reference: builder quotes Norway's own #169 of 185,
+         the same figure its Country Profile prints
+```
+
+Run 2 was **still in flight when this entry was written** — 331 PASS, 0 FAIL at the
+`[Comparison]` section — and it is recorded here as partial rather than extrapolated to a
+total. It is the same slow-local-gate problem cycle 980 flagged: run 1 of the identical suite
+against the identical server completed in minutes, run 2 crawled through the
+reload-heavy `[Comparison]` block at roughly 2 checks/minute with system load at 1.4, i.e.
+blocked on page loads rather than on CPU. `autonomous_cycle.py`'s own `run_playwright()` scored
+**546 PASS / 0 FAIL / 0 WARN / 0 JS errors** at 16:48 against the **LIVE** site — that is the
+pre-push build, and it is reported here as such rather than as this change's result.
+
+## Still open, recorded rather than fixed
+
+- `Copy as IC table` on Country Profile carries the breakeven-bound and no-IRR notes but **not**
+  the regime split. For Indonesia it exports 59.5% with no mention that the page one scroll above
+  says PSC 58.0% / Gross Split 65.3% / Concession 32.9%, a 32.4pp spread, and that Gross Split
+  returns **−$216M** on the same project the $745M headline is computed on. The clipboard is the
+  artefact that leaves the building.
+- The R-factor schedule card states the ladder is *"applied to all **634** PSC contracts in
+  Indonesia"* while the regime-breakdown table two screens up counts **644** PSC contracts.
+- Indonesia's Scenario Builder prefill sets `sb-po-govt` to 71.2% **and** `sb-use-tiers` on, so
+  the flat profit-oil field is loaded and then ignored by the ladder that overrides it. The page
+  already warns it prints three different government profit-oil shares (71.2% / 64.4% / the
+  60–88% ladder); the prefill reproduces two of the three.
+- Carried forward unchanged from cycle 983: `shareComparison()` silent on an empty comparison
+  (`:57338`); SbS column-header country name inert; Screener breakeven legend naming Norway in a
+  self-falsifying example list; Colombia 90.1% rate on 23.6% exposure; `_sbReturnReading` 100%
+  rate cutoff; `INDEX ONLY` double arrows; Paraguay decree typed `government_filing`;
+  `_scFeeCmpAt()` India direction; FAQ bank's retired `$1.2B / $15-flat` deck (`:6117`, `:6234`);
+  `cpBeBound()` "117 of 185" vs live 118; `EXPL-NO-IRR` gate blind spot; FC Reform verdict bare
+  `n/c` on 164 of 189 rows; `window._fcNavList` never invalidated; `_screenerExportBasis` not
+  naming the 105 withheld countries; Home card "up to 4 countries" vs `CMP_MAX` 5; Cote d'Ivoire's
+  two missing API slugs. **Dropped from this list:** "CP headline take rank vs NPV rank counting
+  in opposite directions" — checked directly this cycle and it is false. `getProducerPeers()`
+  sorts take ascending (#1 = lowest take) and `cpTakeBandNpv()` ranks NPV highest-first
+  (#1 = most contractor value); both therefore read #1 = best for the contractor.
+
+## Loop health
+
+- `autonomous_cycle.py` ran the suite against the **LIVE** site this cycle (`run_playwright()`
+  sets `ORCA_REPORT_FILE` but not `TEST_URL`), so its 546 is the pre-push build. The local-tree
+  run recorded below is the one that gates this change.
+- The suite copies are **still diverged overall** (`sha 39c026c9bc32` graded vs `bd4cb3290984`
+  repo); this cycle patched the `[SB-PROVENANCE]` rank region in both, so that region now agrees.
+- `claude -p` timeout at `autonomous_cycle.py:231` is **still 1800s, equal to the cycle
+  interval** — and it fired on cycle 984, which shipped and pushed v1041 but was killed before it
+  could write its GRADER entry. There is no cycle-984 log in this file for that reason.
+- `ThreadingHTTPServer` confirmed again as the fix for the slow local gate (starter kept at
+  `/tmp/c985/serve.py`).
+- **Probe debris, twenty-third cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  This cycle wrote every probe and its pre-edit snapshot to `/tmp/c985/`; nothing landed in the
+  repo. Recommend Zach authorise deletion or a `.gitignore` entry.
