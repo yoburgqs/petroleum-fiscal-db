@@ -1493,9 +1493,14 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   /* Country comparison grid — full width stack */
   .compare-grid {
-    grid-template-columns: 120px repeat(var(--cmp-n, 4), minmax(84px, 1fr)) !important;
+    grid-template-columns: 120px repeat(var(--cmp-n, 4), minmax(112px, 1fr)) !important;
     font-size: 11px;
   }
+  /* v1039 (T3) — see the ≤600px block below for the measurement. Same defect, smaller:
+     84px of column less 28px of cell padding leaves 56px of text, and "Concession" alone
+     needs 65px at this size. */
+  .compare-grid .cmp-hdr,
+  .compare-grid .cmp-row .cmp-cell { padding-left: 9px; padding-right: 9px; }
 
   /* Facts table and saved-scenario table wrappers */
   [id^="dd-facts-content-"] {
@@ -2710,11 +2715,55 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 }
 
 /* ── Mobile compare grid — horizontal scroll wrapper ── */
+/* ── v1039 (T3): the column floor was still sized to FIT the phone after v712 taught the
+   grid to scroll, so every caption that says a number may not be compared was sliced.
+   ─────────────────────────────────────────────────────────────────────────────────────
+   Walked T3 cold at 390x844 with hasTouch, both storages cleared: Side-by-Side, typed
+   Angola / Nigeria / Ghana / Iraq. Grid template resolves to
+
+       100px  repeat(4, minmax(72px, 1fr))   →  four 72px country columns
+
+   and every cell inside one carries `padding: 9px 14px` from the base rule. 72 − 28 = 44px
+   of usable text per column, against content that measures 65–79px. Measured on the shipped
+   v1038 build with `scrollWidth > clientWidth` over every .cmp-cell / .cmp-hdr:
+
+       390px · 3 countries →  0 cells clipped   (columns auto-size to 86.7px)
+       390px · 4 countries → 35 cells clipped   (floor binds at 72px)
+       390px · 5 countries → 40 cells clipped
+       360px · 3 →  6      430px · 4 →  7       430px · 5 → 40
+
+   `overflow` on the cells is `visible`, so nothing is hidden by its own box — the text spills
+   into the NEXT country's cell and is then painted over by that cell's opaque background.
+   The clip edge therefore lands on a column boundary and reads as deliberate typography.
+   What it actually cut, in that four-country set:
+
+       Nigeria   "highest of 3 · comparable basis"      →  "highest of 3 · comparabl"
+       Iraq      "lowest of 3 · on PSC/Conc"            →  "lowest of 3 · on PSC/Con"
+       Angola    "≥45.2pp observed"                     →  "≥45.2pp observe"
+       Ghana     "not ranked · statutory terms"         →  "not  ranke  statut  term"
+       Take basis "price-linked — but not comparable here" and
+                  "statutory terms, not production-weighted"  — both cut
+
+   The headline figures — 86.9%, 60.2%, 84.7% — are all 56px or less and all render whole.
+   So on a phone this grid printed every number cleanly and sliced every qualifier that says
+   the numbers may not be ranked against each other, which inverts the one thing the tab is
+   built to enforce. On desktop the columns are 239px and none of it happens, which is why
+   twenty cycles of desktop walking never saw it.
+
+   v712 is the reason the fix is just a number. It gave this grid `overflow-x: auto` with a
+   sticky metric column, scroll snapping, a right-edge inset fade and the floating #cmp-colbar
+   — so a column no longer has to fit the viewport to be readable, and the page still does not
+   scroll sideways because the grid consumes the overflow. The floor was simply never raised to
+   match. 104px less 14px of padding leaves 90px of text against the 79px worst case.
+
+   Scoped by width only, exactly as v712 is: nothing above 768px changes. */
 @media (max-width: 600px) {
   .compare-grid {
-    grid-template-columns: 100px repeat(var(--cmp-n, 2), minmax(72px, 1fr)) !important;
+    grid-template-columns: 100px repeat(var(--cmp-n, 2), minmax(104px, 1fr)) !important;
     font-size: 10px;
   }
+  .compare-grid .cmp-hdr,
+  .compare-grid .cmp-row .cmp-cell { padding-left: 7px; padding-right: 7px; }
 }
 
 /* ── v712 (T3): the comparison grid now scrolls inside itself on a phone ─────────────
@@ -3119,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1038</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1039</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
