@@ -71561,3 +71561,147 @@ No clean post-change full-suite total was obtained. Saying so is the honest vers
 The same country got **two ranks counting in opposite directions, one click apart.**
 
 Country Profile → Indonesia prints **`All 185 countries: #159`** — `getGlobalTakeRank()` computes `nBelow + 1`, so #1 = lowest take. The headline strip's only 
+
+---
+## Cycle 986 Log — 2026-10-02 18:25 — v1043
+
+## Task
+
+**T5 — "Give me something I can paste straight into an IC memo."** Next in rotation
+after 983 (T6), 984 (T4), 985 (T2). Walked cold at 1440x900 and 390x844 with
+`hasTouch: true`, both storages cleared before each load.
+
+Note for the next cycle, found on the way in: the Country Profile deep-link route is
+`#/profile/<slug>`, **not** `#/country/<slug>`. The latter matches no branch in
+`parseAndNavigate()` and silently leaves the page on HOME. `#/profile/<bad-slug>` is
+handled properly (v846 routes it to CP with a named not-found), so this is the
+unhandled *section*, not the unhandled param. Not fixed this cycle — it is an invented
+URL shape, not one the product emits — but it cost a probe run, and any walk that
+hand-writes a CP link will hit it.
+
+## Friction
+
+Country Profile ships **two IC clipboard controls about 200px apart**, and they
+described the same number two different ways. Pressed both on Indonesia from a cold
+load and read the clipboard back:
+
+```
+Copy for IC Memo   Government take @ $75/bbl    59.5% — contract average;
+   (#dd-ic-summary-btn)                         contracts run 42.5–79.7%
+                    note 1: "take is a range here, not a point ... Quote 59.5%
+                    as a contract average and carry the range."
+
+Copy as IC table   $75   59.5%   +12.6pp   $745M   < $50/bbl (bounded)
+   (.cp-ic-tbl-btn) no marker in the cell, no note, nothing.
+```
+
+The bare one is the control whose label is the word **"table"**. It sits directly under
+the tfoot line that tells the analyst *"High swing — progressive regime; price range
+table required in IC memo"*, and it is the artifact most likely to survive an editor
+cutting a memo down to its exhibits. So which figure reached the committee — a
+qualified range or a bare point estimate the same page refutes 3,500px below — depended
+on which of two adjacent buttons the analyst happened to press.
+
+Measured against the shipped `country_data.json` + all 185 `api/v1/country/*.json`,
+not asserted: **54 countries** hold a material (>=5pp) dispersion reading that
+`copyICSummary()` carried and this table dropped.
+
+| country | headline | contract range | spread |
+|---|---|---|---|
+| Cyprus | 37.4% | IQR 15.3–78.1% | 62.8pp |
+| Uzbekistan | 85.6% | 26.6–82.4% | 55.8pp |
+| Angola | 53.0% | 30.0–75.2% | 45.2pp |
+| Guinea | 55.1% | 24.1–65.9% | 41.8pp |
+| Indonesia | 59.5% | 42.5–79.7% | 37.2pp |
+| Iraq | 84.8% | IQR 65.0–98.5% | 33.5pp |
+
+34 reach it through the observed-conflict branch (`cpSpreadConflict()`, the
+`CP_OBS_REFUTE_PP = 1.0pp` one-counterexample rule), 20 through the bundled-IQR
+branch, 7 more hold a narrow (1–5pp) reading. **Uzbekistan is the worst case: its
+85.6% headline falls 3.2pp OUTSIDE the range no contract the profile lists reaches,
+and the table pasted it bare.**
+
+This is the same defect v752 fixed on the sibling button and v771 fixed for Breakeven
+on this very button. The take column never got the treatment.
+
+## Change
+
+New `_cpIcTake(d)` beside `_cpIcBe()`, reading **`_icTakeDispersion()`** — the builder
+`copyICSummary()` has used since v752. No new rule, no new threshold, no recomputed
+take. Both the `$75` **Govt Take cell** and a **leading note** now carry the measured
+range, in the same words the screen uses.
+
+Three implementation points, each one a lesson already paid for on this button:
+
+- **Resolved at CLICK time**, not frozen at render — the v771 reason. `cpObsSpread()`
+  is populated by the per-country api fetch, so a render-frozen payload falls through
+  to the bundled-IQR branch and the paste disagrees with the page that produced it.
+  Render-time still resolves it too, so the IQR branch is covered before the fetch lands.
+- **The cell is REBUILT, not appended.** A second press cannot double the marker.
+  Verified by pressing twice on every probe country.
+- **The take note leads** the notes array, ahead of the monopoly-NPV and breakeven
+  notes — Govt Take is column 2, left of Contractor NPV and Breakeven. Same
+  left-to-right rule v879 applied when it moved the NPV note to the front.
+
+Prose in a matrix cell is the established convention in this exact table, not a new
+one: the Breakeven cell already carries `"< $50/bbl (bounded) on N PSC/Conc
+contracts · ..."`.
+
+## Result
+
+An analyst who presses **"Copy as IC table"** on any of those 54 countries now pastes
+
+```
+$75   59.5% — contract average; contracts run 42.5–79.7%   +12.6pp   $745M   < $50/bbl (bounded)
+```
+
+plus, as note 1, the instruction to quote 59.5% as an average and carry the range —
+instead of a bare 59.5%. On Uzbekistan they get the **stronger** reading the screen
+gives rather than the generic one: *"The 85.6% headline falls 3.2pp outside that range
+— no contract the profile lists reaches it — so carry the range and resolve the
+headline against the contract table before quoting it as a country average."*
+
+The two IC artifacts this tab produces can no longer tell a committee different things
+about the same figure.
+
+## Verification
+
+- **JS syntax gate: 11/11 script blocks PASS.** Run twice — after the edit and after
+  the version bump.
+- **Clipboard read back** on six countries, each pressed **twice**:
+  Indonesia and Norway (observed-conflict branch), Cyprus and United Kingdom
+  (bundled-IQR branch, 62.8pp and 15.0pp), Saudi Arabia (state monopoly — correctly
+  suppressed by `_icTakeDispersion()`'s `isStateMonopoly()` guard, and the monopoly-NPV
+  note still leads as note 1). Norway's **solved** $29/bbl breakeven still resolves at
+  click, so the v771 fix is intact. No duplicated markers on the second press.
+- **Zero page errors** in every context.
+- **Mobile 390x844, `hasTouch: true`, `pointer: coarse` confirmed true:**
+  `scrollWidth` 390 = `clientWidth` 390 (no horizontal scroll), the touched control
+  measures 36px tall (>=24px), and the mobile paste carries the marker. No layout
+  change was made — this is a clipboard-content change — but it was measured rather
+  than assumed.
+
+### Runtime suite — what actually ran
+
+Launched **against the LOCAL tree** (`TEST_URL=http://127.0.0.1:8899/index.html`,
+`ORCA_REPORT_FILE=/tmp/c986/report.txt`) on a `ThreadingHTTPServer`, concurrent with
+this write-up. Its state at the time of the push is recorded in the addendum below —
+it is reported from the suite's own output, and no total is claimed that was not
+observed.
+
+## Loop health
+
+- The slow local gate is unchanged as the loop's largest measurement problem, and
+  cycle 985's diagnosis still stands: `ThreadingHTTPServer` removed the serialisation
+  but not the per-load cost of a 10.1 MB single-file page reloaded ~200 times. Observed
+  again this cycle — ~18 checks in the first 2 minutes, then accelerating to ~107 by
+  minute 6 as the reload-heavy early blocks gave way to in-page assertions. A gate that
+  cannot finish inside a 30-minute cycle still cannot be the thing that blocks a push.
+- `autonomous_cycle.py`'s own `run_playwright()` still sets `ORCA_REPORT_FILE` but not
+  `TEST_URL`, so the 547 it reported at the top of this cycle is the **LIVE**
+  (pre-push) build, not this change.
+- **Probe debris, twenty-fourth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root
+  (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c986/`;
+  nothing landed in the repo. Still recommending Zach authorise deletion or a
+  `.gitignore` entry.
