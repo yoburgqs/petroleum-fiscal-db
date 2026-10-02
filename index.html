@@ -280,8 +280,10 @@ table { width: 100%; border-collapse: collapse; }
   #tbl-fc .fc-terms-chip { min-height: 24px; }
   /* v905 (T6): the same chip, same call, on the Explorer's Evidence column. */
   #tbl-explorer .expl-terms-chip { min-height: 24px; }
-  /* v938 (T6): the same chip, same call, on the IOC Portfolio's Evidence column. */
-  #ioc-output .ioc-terms-chip { min-height: 24px; }
+  /* v938 (T6): the same chip, same call, on the IOC Portfolio's Evidence column.
+     v1028 (T6): and on the second country table on the same tab, which never had the chip. */
+  #ioc-output .ioc-terms-chip,
+  #exposure-country-table .ioc-terms-chip { min-height: 24px; }
 }
 /* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
    title, so under a thumb — where there is no hover — it is treated as a control and takes the
@@ -2742,7 +2744,9 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* v938 (T6): identical exemption for the IOC Portfolio chip. Same reason -- it is in a table
      cell once per row, and 44px would inflate a 37-row portfolio table into a scroll. Scoped to
      that one chip on that one table; nothing else is narrowed. */
-  #ioc-output .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
+  /* v1028 (T6): same exemption, same reason, for the Country Breakdown table's copy of it. */
+  #ioc-output .ioc-terms-chip,
+  #exposure-country-table .ioc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
   /* v1015 (T6): identical exemption for the Side-by-Side column-header grade badge. Same reason
      as v730/v884/v938 and v801's ✕ directly below -- it sits inside a 96px grid header cell,
      once per column, and at 44 x 44 it is a block three times the height of the 11px region line
@@ -41909,9 +41913,44 @@ function _iocEvCell(country) {
 //
 // No take, NPV, swing, downside, contract count, roll-up, grade, letter, bar or fact count on
 // this tab changes.
-var _iocTermObs = null;
-function _iocHydrateTermChips() {
-  var slots = document.querySelectorAll('#ioc-output .ioc-terms-slot:not([data-tc-done])');
+// ── v1028 (T6): ...AND THE OTHER COUNTRY TABLE ON THE SAME TAB STILL DIDN'T ─────────────────
+// v938 above closed this gap on the operator table and said so in those words. It closed it on
+// ONE of the two country tables this tab renders. The IOC Portfolio has a second, lower section
+// — Fiscal Exposure, its own operator selector, heading "Country Breakdown" — whose Evidence
+// cell is written inline inside renderIOCExposure() rather than through _iocEvCell(), so it
+// never received the slot. Measured cold at 1440x900 and 390x844 hasTouch, both storages cleared
+// and reloaded, on the tab's own seeded example (Shell), both tables on one scroll:
+//
+//   #ioc-output operator table   top y=527    37 rows   chips 37 / 37
+//   #exposure-country-table      top y=2353   33 rows   chips  0 / 33   slots 0, click routes 0
+//
+// 31 of those 33 countries appear in BOTH tables, so one screen described the same country with
+// two different amounts of evidence, and the weaker version is the lower one — the table that
+// carries ⎘ Copy for IC Memo and ⬇ XLSX and is named in the Methodology tab as the fiscal
+// exposure annex to attach to a memo. Its own <th> tooltip asserted the cell was "Same grade as
+// the Evidence column in the operator table above, the Explorer and Screener Evidence columns,
+// the Fiscal Compare Quality column and the Country Profile badge" — true of the letter, false
+// of the column, which is the exact false equivalence v938 was written to remove.
+//
+// What was missing is the half that decides whether a row is quotable. On the same 33 rows:
+//   * 20 of 33 cite HALF OR FEWER of the fiscal terms the DCF runs to produce the take beside them.
+//   * 8 of the 10 rows graded A are among them — Netherlands A on 278 facts cites 1 of 4, its
+//     uncited terms including the royalty rate; Tanzania A on 388 facts cites 2 of 5; Brazil,
+//     Canada, New Zealand and Albania all read A and all cite 2 of 4.
+//   * Namibia reads B on 125 facts and cites 1 of 4. Iraq reads D on 3,577 facts, prints 98.5%
+//     take and $533M NPV, and cites 1 of 3.
+// An analyst who clicks the letter to ask "how solid is this?" got nothing — no chip, no cursor,
+// no handler — on the one table built to leave the building. That is the give-up point.
+//
+// Reuses _scFillTermChip() verbatim, so the six surfaces cannot give seven answers. Nothing is
+// deleted and no take, NPV, grade, letter, fact count, row, order or export column changes.
+// The container is a parameter now because the two tables sit in different scroll ancestors and
+// the root walk has to run per table; the operator table's call is byte-identical to v938's.
+var _iocTermObs = {};
+function _iocHydrateTermChipsIn(sel) {
+  var box = document.querySelector(sel);
+  if (!box) return;
+  var slots = box.querySelectorAll('.ioc-terms-slot:not([data-tc-done])');
   if (!slots.length || typeof _scFillTermChip !== 'function') return;
   function fill(slot) {
     if (!slot || slot.getAttribute('data-tc-done')) return;
@@ -41926,20 +41965,28 @@ function _iocHydrateTermChips() {
   var root = null;
   for (var a = slots[0].parentElement; a; a = a.parentElement) {
     var ov = getComputedStyle(a).overflowY;
-    if (ov === 'auto' || ov === 'scroll') { root = a; break; }
+    // v1028: ...and it must actually scroll in Y. `.table-scroll` sets only overflow-x, which
+    // makes the used value of overflow-y compute to `auto` while the element is not a Y scroller
+    // at all; taking it as the root makes every row intersect at once and the laziness is lost.
+    if ((ov === 'auto' || ov === 'scroll') && a.scrollHeight > a.clientHeight + 1) { root = a; break; }
   }
-  if (_iocTermObs) { try { _iocTermObs.disconnect(); } catch (e) {} }
-  _iocTermObs = new IntersectionObserver(function(entries) {
+  if (_iocTermObs[sel]) { try { _iocTermObs[sel].disconnect(); } catch (e) {} }
+  var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(en) {
       if (!en.isIntersecting) return;
-      _iocTermObs.unobserve(en.target);
+      obs.unobserve(en.target);
       fill(en.target.querySelector('.ioc-terms-slot'));
     });
   }, { root: root, rootMargin: '200px 0px' });
+  _iocTermObs[sel] = obs;
   Array.prototype.forEach.call(slots, function(el) {
     var tr = el.closest ? el.closest('tr') : null;
-    if (tr) _iocTermObs.observe(tr); else fill(el);
+    if (tr) obs.observe(tr); else fill(el);
   });
+}
+function _iocHydrateTermChips() {
+  _iocHydrateTermChipsIn('#ioc-output');
+  _iocHydrateTermChipsIn('#exposure-country-table');
 }
 var _iocTermHydT = null;
 function _iocHydrateTermChipsSoon() {
@@ -51649,7 +51696,7 @@ function renderIOCExposure(operatorName) {
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mechanic</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Government take at $75/bbl on THIS OPERATOR&#39;S OWN CONTRACTS in that country, not the country-wide figure. The Evidence column beside it IS country-level and says so in its own header; this one is not. Where the two differ at one decimal place the country-wide figure is printed underneath, because that is what the Country Profile this row opens, Fiscal Compare, the Explorer, the Screener and the JSON API all print &mdash; and it is what the two export buttons above this table now carry in their own column beside this one.">Take @$75<span style="display:block;font-size:9px;font-weight:400;text-transform:none;letter-spacing:.02em;">this operator&rsquo;s contracts</span></th>
-        <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Evidence grade for the COUNTRY whose fiscal terms produced the take and NPV on this row — not a grade of this operator&#39;s own contracts. The letter is the worse of two legs: primary-law share (A &ge; 60% / B &ge; 40% / C &ge; 20%) and fact depth (A &ge; 150 / B &ge; 50 / C &ge; 15 facts), so 100% primary law on 4 facts grades D. Same grade as the Evidence column in the operator table above, the Explorer and Screener Evidence columns, the Fiscal Compare Quality column and the Country Profile badge. It is carried into the XLSX and the IC clipboard by the two buttons above this table.">Evidence</th>
+        <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Evidence grade for the COUNTRY whose fiscal terms produced the take and NPV on this row — not a grade of this operator&#39;s own contracts. The letter is the worse of two legs: primary-law share (A &ge; 60% / B &ge; 40% / C &ge; 20%) and fact depth (A &ge; 150 / B &ge; 50 / C &ge; 15 facts), so 100% primary law on 4 facts grades D. Same grade as the Evidence column in the operator table above, the Explorer and Screener Evidence columns, the Fiscal Compare Quality column and the Country Profile badge. It is carried into the XLSX and the IC clipboard by the two buttons above this table. THE CHIP UNDER EACH LETTER COUNTS SOMETHING DIFFERENT and is the one to read before quoting a row: of the fiscal terms the DCF runs to produce the take and NPV on this row, how many have a citation standing behind them. The two do not track — a country can grade A on 60,000 facts and cite 1 of 4. Click any chip for that country&#39;s term-by-term Evidence Chain, which names each term, its ORCA value, the statutory value and the source.">Evidence</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">NPV @$75</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Contracts</th>
       </tr></thead>
@@ -51667,7 +51714,11 @@ function renderIOCExposure(operatorName) {
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${_iocMechModelledSafe(d.mechanic) ? '' : `<div style="font-size:10px;line-height:1.4;color:#C2410C;font-weight:600;" title="${(('"'+d.mechanic+'" is the instrument type on the contract record, not one of the eight fiscal mechanics ORCA models, so no model of that name produced the take or NPV on this row. ') + (_iocResolvedModelSafe(d.country) ? ('They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country) + ' model.') : ('ORCA cannot resolve which model ' + d.country + ' was run on.'))).replace(/"/g,'&quot;')}">not a fiscal mechanic${_iocResolvedModelSafe(d.country) ? ` \u00b7 <span style="color:var(--muted);font-weight:400;">on ${_iocResolvedModelSafe(d.country)}</span>` : ''}</div>`}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%${_iocNoPosition(d) ? `<div class="ioc-no-position" title="${_iocNoPositionWhy(d.country, d.take75).replace(/"/g,'&quot;')}">no contractor position</div>` : ''}${_iocExpCtryWide(d, isCtry, operatorName)}</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});if(!_e)return '<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';
+            // v1028 (T6): the model-terms slot. Same slot, same filler (_scFillTermChip), same
+            // destination (_fcOpenTermChain) as the operator table above and the four other
+            // country surfaces. See _iocHydrateTermChips for why this table was still missing it.
+            return getEvidenceBar(_e)+'<div class="ioc-terms-slot" data-tc-country="'+String(d.country).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" style="margin-top:2px;"></div>';})()}</td>
           ${_iocNoPosition(d)
             ? `<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);cursor:help;" title="${_iocNoPositionWhy(d.country, d.take75).replace(/"/g,'&quot;')}">\u2014<div style="font-size:9px;font-weight:600;line-height:1.3;margin-top:2px;">withheld</div></td>`
             : `<td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>`}
@@ -51677,6 +51728,13 @@ function renderIOCExposure(operatorName) {
     </table>
     </div>
     ${nFromCtry ? `<div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.6;"><span class="ioc-basis-ctry" style="margin-left:0;">country avg</span> &mdash; ORCA holds no ${operatorName} contract terms for ${nFromCtry === 1 ? 'this jurisdiction' : `these ${nFromCtry} jurisdictions`}, so the row shows the average across <em>all</em> operators there. Do not cite ${nFromCtry === 1 ? 'it' : 'those rows'} as ${operatorName}'s take. The ${nFromOp === 0 ? 'table carries no operator-specific row at all' : `other ${nFromOp} ${nFromOp === 1 ? 'row is' : 'rows are'} ${operatorName}'s own contracts`}.</div>` : `<div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.6;">All ${total} rows are ${operatorName}'s own contract terms as held in ORCA. No row falls back to a country average.</div>`}`;
+
+  // v1028 (T6): hydrate this table's model-terms chips. The operator table above has had them
+  // since v938; this one is written inline here, so it needs its own call. Reached through
+  // window.* on purpose: _iocEvEsc and _iocEvCell are NOT visible from this scope, and a bare
+  // `typeof fn === 'function'` guard on something out of scope returns 'undefined' and the call
+  // silently no-ops instead of failing.
+  if (typeof window._iocHydrateTermChipsSoon === 'function') window._iocHydrateTermChipsSoon();
 
   // v637 (T5): stash exactly what was rendered, so the two export controls above the table
   // cannot fork from it the way the FC model/database NPV columns once did. Everything the
