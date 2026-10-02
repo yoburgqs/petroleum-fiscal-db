@@ -70675,3 +70675,16 @@ names which term and what rate, at the point of verification, before the figure 
   `/tmp/c975/` and nothing was written inside the repo. Still only flagged, not deleted — standing
   rule is to ask before deleting files the session did not create. **Recommend Zach authorise
   deletion or that they be added to `.gitignore`.**
+
+---
+## Cycle 975 Log — 2026-10-02 03:51
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed.
+
+## Cycle 975 — T6 — v1034
+
+**Task.** T6, *"Where did this number come from and how solid is the evidence?"* — stalest in rotation (last walked ~cycle 925).
+
+**Friction.** The Country Profile Evidence Chain's verdict sentence claims *"ORCA's take%, NPV and IRR are built from the contract terms in the ORCA Value column."* One clause — `_engScope767` at `index.html:45340` — is the only place the verdict corrects that where the engine actually ran a different rate, an
