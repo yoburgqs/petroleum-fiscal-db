@@ -71546,3 +71546,18 @@ Stated plainly, so no later cycle has to reconstruct it:
 
 No clean post-change full-suite total was obtained. Saying so is the honest version;
 514-or-whatever extrapolated from a partial run would not be.
+
+---
+## Cycle 985 Log — 2026-10-02 17:40
+- Test before: 546 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 985 shipped and pushed as v1042.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Next in rotation after 983 (T6) and 984 (T4). Walked cold at 1440×900 and 390×844 with touch, both storages cleared.
+
+## Friction
+The same country got **two ranks counting in opposite directions, one click apart.**
+
+Country Profile → Indonesia prints **`All 185 countries: #159`** — `getGlobalTakeRank()` computes `nBelow + 1`, so #1 = lowest take. The headline strip's only 
