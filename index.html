@@ -2983,7 +2983,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1026</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1027</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -32686,7 +32686,70 @@ function renderCompare() {
           + (_vdValOnly.length === 1 ? _cmpEsc(_vdValOnly[0].c) : 'them')
           + ' into an IC memo as the lower-take jurisdiction on the strength of this line.</div>'
         : '';
-      return _h + _valOnlyHere + _valAside + (_vdValReb.length ? _valOnly75 : '');
+      // ── v1027 (T3): the all-proxy basis clause on the CONTRACTOR VALUE line. ─────────────────
+      //
+      // The take line above carries _vdBasisClear, whose own words are "A set does not become
+      // comparable by being uniformly weak" — where every ranked column is a statutory-terms proxy
+      // it withholds the all-on-one-basis clearance and states the basis instead. The value line
+      // never got that clause, so on an all-frontier set it rendered completely bare: the chain,
+      // the gap pill, and nothing about what the figures are.
+      //
+      // Walked T3 cold at 1440x900: Side-by-Side -> Suriname, Namibia, Senegal. Three Atlantic
+      // frontier regimes, which is an ordinary 2026 screening trio and the kind of set this tab
+      // exists for. 40px apart the strip read:
+      //
+      //   GOVT TAKE @$75, LOWEST FIRST: Namibia 37.0% > Suriname 54.2% > Senegal 56.9%
+      //     [Nothing is set aside because every ranked column is on the weaker basis — all 3 are
+      //      statutory-terms proxies ... a ranking of legal regimes, not of realised economics]
+      //   CONTRACTOR VALUE @$75, LARGEST FIRST: Namibia $2.67B > Senegal $1.09B > Suriname $1.01B
+      //     [$1.66B apart]  [disagrees with take order]        <- and nothing else
+      //
+      // Namibia's $2.67B is the largest and most quotable number in the view, 2.6x the column
+      // beside it, and nothing on that line says it is the standardized profile run over statutory
+      // terms rather than a result from Namibia's own fields.
+      //
+      // Value is the WORSE half of the pair to leave unstated, not the lesser one. Measured on the
+      // shipped country_data.json, excluding state monopolies: ALL 20 of the twenty largest
+      // contractor NPVs in the database are statutory-basis columns (Vanuatu $5.10B, the Bahamas
+      // $4.67B, Montenegro $4.63B, Greenland, the Faroe Islands, Moldova ...), and the median is
+      // $3.2B across the 161 no-production countries against $1.3B across the 21 that have it —
+      // about 2.4x, the same figure the _cmpNpvBasisFlag cell tooltip already quotes. The proxy
+      // basis inflates value more reliably than it depresses take, so an unflagged value ordering
+      // on an all-proxy set reads as the strongest possible endorsement of the weakest evidence.
+      //
+      // Scope is one case and it is the case the two existing gates both miss by construction.
+      // _cmpNpvBasisFlag (v626-shaped, line ~31059) is deliberately limited to sets that MIX the
+      // two bases, and that limit is correct for a per-cell marker — on an all-proxy set there is
+      // no column to contrast against. _valAside is limited the same way, because _cmpBasisGate is
+      // false here so no statutory column is excluded from _vdVal and _vdValOut is empty. So this
+      // fires ONLY when every ranked value column is a proxy AND nothing is already set aside:
+      // a mixed set is byte-identical (the proxies are in _vdValOut and _valAside speaks), and an
+      // all-producer set is byte-identical (_px is empty). No threshold, no new figure, no
+      // recomputation — _cmpHasProd is the same predicate _cmpRankNpv and _vdValWhy already use.
+      const _valBasisClear = (function () {
+        if (_vdVal.length < 2 || _vdValOut.length) return '';
+        const _px = _vdVal.filter(x => !_cmpHasProd(x.d));
+        if (_px.length !== _vdVal.length) return '';
+        const _n = _vdVal.length;
+        return '<div style="font-size:11px;color:var(--text);line-height:1.55;background:rgba(194,65,12,.07);'
+          + 'border-left:2px solid var(--orange);border-radius:3px;padding:5px 8px;">'
+          + '<strong style="color:var(--orange);">Nothing is set aside from the value ordering because every '
+          + 'ranked column is on the weaker basis — all ' + _n + ' contractor NPVs above are statutory-terms '
+          + 'proxies.</strong> ORCA holds no verified field production for any of them, so each figure is the '
+          + 'standardized Deepwater profile named above the grid run across that country’s statutory terms '
+          + 'and averaged '
+          + 'with production ignored — it describes the legal regime, not the economics of that country’s own '
+          + 'fields. Read the ordering as which regime leaves the contractor most, on paper, and not as which '
+          + 'country is worth the most. <strong style="color:var(--text);">The proxy basis inflates this row '
+          + 'harder than it moves take:</strong> across the database all twenty of the largest contractor NPVs '
+          + 'are no-production columns, and the median is $3.2B across the 161 countries without production '
+          + 'against $1.3B across the 21 that have it. '
+          + fmtNpvShared(_vdVal[0].v) + ' on ' + _cmpEsc(_vdVal[0].c) + ' is therefore not evidence that it '
+          + 'beats a production-weighted country that prints less — it is not on the same basis as one. '
+          + 'Rank it against other statutory-basis columns, and if this goes into an IC memo carry the proxy '
+          + 'basis with the number or leave the number out.</div>';
+      })();
+      return _h + _valOnlyHere + _valAside + _valBasisClear + (_vdValReb.length ? _valOnly75 : '');
     })();
     // ── v840 (T3): the DOWNSIDE line. ────────────────────────────────────────────────────────
     //
