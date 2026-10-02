@@ -70298,3 +70298,16 @@ where that number actually goes.
   flagged, not deleted — standing rule is to ask before deleting files the session did not
   create. **They have now been carried for fifteen cycles; recommend Zach authorise deletion
   or they be added to `.gitignore`.**
+
+---
+## Cycle 968 Log — 2026-10-01 19:29
+- Test before: 546 PASS / 0 FAIL
+- Test after: 546 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 964 complete and pushed (v1027). Both commits are on `main`, the mirror is byte-identical.
+
+## Cycle 964 — v1027
+
+**Task:** T3 — "How do these three countries compare side by side?" Stalest in rotation; last T3 was cycle 957.
+
+**Housekeeping first:** three cycles' work was sitting uncommitted in the working tree (v1024 T2, v1025 T5, v1026 T1). I committed each with its own message before starting. That also corrects the rotation record — the most recent task before this cycle was T1, not T
