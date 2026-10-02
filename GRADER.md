@@ -71504,3 +71504,45 @@ only configuration that tests the LOCAL tree, `autonomous_cycle.py`'s own
 inside a 30-minute cycle cannot be the thing that blocks a push.
 `ThreadingHTTPServer` removed the serialisation cycle 983 diagnosed but did not
 remove the per-load cost of a 10.1 MB single-file page reloaded ~200 times.
+
+### Cycle 985 addendum, corrected — run 2's own report, not my line count
+
+The addendum above states run 2's last observed state as "375 PASS / 0 FAIL" from a
+`grep -c` of the live log. The suite **wrote its report on SIGTERM**, and its own
+report — which is the number the directive says to read — says:
+
+```
+PASS: 422
+FAIL: 12
+WARN: 1
+JS errors: 1
+```
+
+The log tail lagged the report by ~47 checks, so 375 was an undercount. All **twelve**
+failures are one cause, and it is my `pkill`:
+
+```
+[ReformRisk] [BreakevenMap] [SampleAnalyses] [Search] [Routing] [ScreenerLink]
+[Basket] [Mechanics] [Methodology] [METH-EVIDENCE] [CP-NPV100] [SBS-ShareOrder]
+  exception: Target page, context or browser has been closed
+```
+
+Not one of the twelve is an assertion about the product; every one is the section that
+was mid-flight or queued when the browser was torn down. 422 + 12 = 434 of run 1's 522
+checks, so ~88 never executed at all.
+
+Stated plainly, so no later cycle has to reconstruct it:
+
+- **518 PASS / 3 FAIL** — run 1, complete, against the local tree with the edit in
+  place and the suite still on the old convention. Two of the three failures ARE the
+  gate rejecting the convention change; the third is a local-serving `page.goto`
+  timeout.
+- **422 PASS / 12 FAIL** — run 2, against the local tree with the patched suite,
+  **terminated by me at ~70 minutes**; all 12 failures are the termination.
+- **Three targeted assertions PASS** in run 2 — `Rank label`, `Rank vs pct`,
+  `Rank cross-reference` — read from the suite's own output and quoted verbatim above.
+- **546 PASS / 0 FAIL / 0 WARN / 0 JS errors** — `autonomous_cycle.py`'s own gate at
+  16:48 against the **LIVE** site, i.e. the pre-push build. Not this change's result.
+
+No clean post-change full-suite total was obtained. Saying so is the honest version;
+514-or-whatever extrapolated from a partial run would not be.
