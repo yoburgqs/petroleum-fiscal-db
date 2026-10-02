@@ -48884,7 +48884,18 @@ function loadCountryProfile(country) {
       const npvStr = r.npv != null
         ? (_isFee && r.npv < 0
             ? '<span title="Negative NPV reflects standard greenfield profile applied to a service/fee-based contract — not directly comparable to PSC/Concession economics" style="color:var(--muted);font-style:italic;">n/a~</span>'
-            : (r.npv < 0 ? '-$' + Math.abs(Math.round(r.npv)).toLocaleString() : '$' + Math.round(r.npv).toLocaleString()) + 'M')
+            // v1031 (T5): was '-$' + Math.abs(Math.round(r.npv)) — it rounded the SIGNED value and
+            // then took the magnitude, where fmtNpvShared() rounds the MAGNITUDE and re-applies the
+            // sign. The two disagree by $1M on every negative mean ending in .5, because
+            // Math.round(-215.5) is -215 (half rounds toward +Infinity) while Math.round(215.5) is
+            // 216. Indonesia is the live case: its Gross Split mean is -215.5, so this table printed
+            // -$215M while the regime strip, the hover tooltip and the sentence 40px below it — all
+            // three already on fmtNpvShared — printed -$216M for the same figure. The analyst about
+            // to paste Indonesia into an IC memo had two values for one number and no way to tell
+            // which was the database's. This formatter also never switched to B at >=1000, so the
+            // same card printed Concession as '$2,030M' in the table and '$2.03B' in the sentence.
+            // One formatter now, so the table cannot fork from the prose beside it again.
+            : fmtNpvShared(r.npv))
         : '—';
       // v695 (T2): null take = the regime has no contract carrying fiscal rates. See cpRegimeRows().
       const _unpriced = (r.take == null);
