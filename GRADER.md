@@ -71705,3 +71705,14 @@ observed.
   (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c986/`;
   nothing landed in the repo. Still recommending Zach authorise deletion or a
   `.gitignore` entry.
+
+---
+## Cycle 986 Log — 2026-10-02 18:49
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: 463 PASS / 0 FAIL, still running.
+Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.
+
+
+Pixel gate: pixel gate PASS
