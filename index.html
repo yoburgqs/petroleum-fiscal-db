@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1042</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1043</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -50002,14 +50002,19 @@ function loadCountryProfile(country) {
       // v879 (T5): same refusal as the on-screen NPV column this table serialises.
       const _monoNpv879 = (typeof _cpNpvRefused === 'function') && _cpNpvRefused(d);
       const _npvCell879 = function(v){ return _monoNpv879 ? CP_MONO_NPV : _npvC(v); };
+      // v1043 (T5): resolved here AND again in cpCopyICTable() at click, exactly as the breakeven
+      // pair above is. At render the contract sample has usually not landed, so this catches the
+      // bundled-IQR branch; the click-time read catches the observed-conflict branch.
+      const _tkR1043 = _cpIcTake(d);
       const _hdr  = ['Price', 'Govt Take %', 'Delta vs $50', 'Contractor NPV ($M)', 'Breakeven'];
       const _body = [
         ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',                _npvCell879(d.npv_50),  ''],
-        ['$75',  d.take_75  != null ? d.take_75.toFixed(1)+'%'  : '—', _dlt(d.take_75),    _npvCell879(d.npv_75),  _beCell],
+        ['$75',  _tkR1043.cell, _dlt(d.take_75),    _npvCell879(d.npv_75),  _beCell],
         ['$100', d.take_100 != null ? d.take_100.toFixed(1)+'%' : '—', _dlt(d.take_100),   _npvCell879(d.npv_100), ''],
         ['$125', d.take_125 != null ? d.take_125.toFixed(1)+'%' : '—', _dlt(d.take_125),   _npvCell879(d.npv_125), '']
       ];
       const _notes = [];
+      if (_tkR1043.note) _notes.push(_tkR1043.note);
       if (_monoNpv879 && typeof _cpMonoNpvNote === 'function') _notes.push(_cpMonoNpvNote(d));
       if (_beNote) _notes.push(_beNote);
       // v516: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page.
@@ -58718,6 +58723,46 @@ function _cpIcBe(d, country) {
               + 'contractor NPVs in this table do not bracket one.'
   };
 }
+// ── v1043 (T5): the control labelled "IC table" pasted the one number this page spends five
+//    surfaces refuting, bare, while its sibling button 200px away carried the range. ────────
+//
+// Walked T5 cold at 1440x900 and 390x844, both storages cleared: Home -> Country Profile
+// (Indonesia auto-loads) -> settle -> press BOTH IC controls on the tab and read the clipboard.
+// Two artifacts, one click apart, for the same country and the same figure:
+//
+//   "Copy for IC Memo"  -> Government take @ $75/bbl   59.5% — contract average; contracts
+//                                                      run 42.5–79.7%
+//                          note 1: "take is a range here, not a point ... Quote 59.5% as a
+//                          contract average and carry the range."
+//   "Copy as IC table"  -> $75   59.5%   +12.6pp   $745M   < $50/bbl (bounded)
+//                          no marker in the cell, no note, nothing.
+//
+// The bare one is the control whose label is the word "table", sitting directly under the
+// tfoot line that tells the analyst "price range table required in IC memo". It is the artifact
+// most likely to survive an editor cutting the memo down, and it is the one that drops the
+// qualification. Which number reaches the committee depended on which of two adjacent buttons
+// the analyst happened to press.
+//
+// Measured on the shipped country_data.json + all 185 api/v1/country/*.json: 54 countries hold
+// a material (>=5pp) dispersion reading that the summary paste carries and this table did not —
+// Cyprus 62.8pp, Uzbekistan 85.6% headline against contracts running 26.6–82.4% (the headline is
+// OUTSIDE its own evidence range and still pasted bare), Angola 45.2pp, Indonesia 37.2pp. Seven
+// more hold a narrow reading. 
+//
+// Nothing new is computed and no threshold is invented: this is _icTakeDispersion(), already
+// shipping in copyICSummary() since v752, read by a second surface. Resolved at CLICK time for
+// the reason v771 moved breakeven to click time — cpObsSpread() is populated by the per-country
+// api fetch, so a payload frozen at render would fall through to the IQR branch and the paste
+// would again disagree with the page it came from. Full cell is REBUILT, not appended, so a
+// second press cannot double the marker.
+function _cpIcTake(d) {
+  var base = (d && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '\u2014';
+  var disp = (typeof _icTakeDispersion === 'function' && d && d.take_75 != null
+              && d.take_75 > 0 && d.take_75 < 200)
+    ? _icTakeDispersion(d, d.take_75) : null;
+  return { cell: base + ((disp && disp.cell) ? disp.cell : ''),
+           note: (disp && disp.note) ? disp.note : '' };
+}
 function cpCopyICTable(safe) {
   var P = (window.__CP_IC_TBL || {})[safe];
   if (!P) { if (typeof _icRefuse === 'function') _icRefuse('Table not ready — reopen this country and try again.'); return; }
@@ -58725,12 +58770,17 @@ function cpCopyICTable(safe) {
   if (_d) {
     var _be = _cpIcBe(_d, P.country);
     P.body[1][4] = _be.cell;   // the $75 row carries the breakeven cell
+    // v1043 (T5): and the $75 row carries its own measured dispersion, same as the sibling paste.
+    var _tk = _cpIcTake(_d);
+    P.body[1][1] = _tk.cell;
     // v879 (T5): this rebuild replaced the whole notes array, so the state-monopoly NPV note the
     // render attached was dropped at click time — i.e. in the paste, the only place it matters.
     // It leads, because the NPV column sits left of Breakeven.
     var _monoN = ((typeof _cpNpvRefused === 'function') && _cpNpvRefused(_d)
                   && typeof _cpMonoNpvNote === 'function') ? _cpMonoNpvNote(_d) : '';
-    P.notes = [_monoN, _be.note, typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '']
+    // v1043 (T5): the take note LEADS. Same left-to-right rule v879 applied to the NPV note:
+    // Govt Take is column 2, left of Contractor NPV and Breakeven, so its caveat is read first.
+    P.notes = [_tk.note, _monoN, _be.note, typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '']
       .filter(function(t){ return !!t; });
   }
 
