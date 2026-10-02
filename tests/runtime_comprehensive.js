@@ -3676,12 +3676,21 @@ async function testSBProvenance(page) {
       const el = document.getElementById('sb-origin-note');
       const t = el ? el.innerText : '';
       const m = t.match(/This scenario ([\d.]+)%[\s\S]*?published @\$75 ([\d.]+)%/);
-      const rank = document.getElementById('sb-output').innerText.match(/Ranked #(\d+) of (\d+) by govt take \(1=(\w+)\)/);
+      // v1042 (T2): the box now prints "#1 = lowest take" and ranks (below + 1), the same
+      // convention and the same comparable-take basis as getGlobalTakeRank() and therefore as
+      // every Country Profile. The old label was "(1=highest)" on (n - below).
+      const _sbo1042 = document.getElementById('sb-output').innerText;
+      const rank = _sbo1042.match(/Ranked #(\d+) of (\d+) by govt take \(#1 = (\w+) take\)/);
+      const _xr1042 = _sbo1042.match(/own published take of ([\d.]+)% is #(\d+) of (\d+) on this same scale/);
+      const _gr1042 = (typeof getGlobalTakeRank === 'function') ? getGlobalTakeRank('Norway') : null;
       const pct  = document.getElementById('sb-output').innerText.match(/(\d+)% of countries have lower take/);
       const med  = document.getElementById('sb-output').innerText.match(/This regime: ([+\-][\d.]+)pp vs median/);
       return { txt: t, before: t, ic: window._sbICLine, shownSb: m ? +m[1] : null, shownCp: m ? +m[2] : null,
                realSb: window._lastScenario.result.take, realCp: COUNTRY_DATA.find(x => x.country === 'Norway').take_75,
                rank: rank ? +rank[1] : null, rankOf: rank ? +rank[2] : null, rankDir: rank ? rank[3] : null,
+               xrefTake: _xr1042 ? +_xr1042[1] : null, xrefRank: _xr1042 ? +_xr1042[2] : null,
+               xrefOf: _xr1042 ? +_xr1042[3] : null,
+               cpRank: _gr1042 ? _gr1042.rank : null, cpRankOf: _gr1042 ? _gr1042.n : null,
                pctLower: pct ? +pct[1] : null, vsMed: med ? parseFloat(med[1]) : null };
     });
     if (/this is one project, not Norway/.test(norway.txt)) p(S, 'Norway strip', 'separates the single-project scenario from the published country take');
@@ -3761,15 +3770,28 @@ async function testSBProvenance(page) {
     else f(S, 'SB IRR monopoly untouched', 'monopoly path changed: hasRow=' + _irr893.sa.hasRow + ' strip=' + _irr893.sa.strip.slice(0, 160));
 
     // ---- 4. rank direction label must match the rank the code computes -------
-    // pctLower is the share BELOW; a rank counted from the bottom would satisfy
-    // rank-1 === pctLower% of n. The code computes (n - below), i.e. 1 = highest.
-    if (norway.rankDir === 'highest') p(S, 'Rank label', 'benchmark rank labelled 1=highest, matching (n - below)');
-    else f(S, 'Rank label', 'rank labelled 1=' + norway.rankDir + ' while the code ranks from the top');
+    // v1042 (T2): the convention changed, not the intent of this check. The box ranked
+    // (n - below) -- 1 = HIGHEST take -- while getGlobalTakeRank(), the Group-2 branch of the
+    // same box and every Country Profile count up from the LOWEST take. Indonesia printed
+    // "All 185 countries: #159" on the profile and "#19 of 185" in the builder one click away.
+    // v607 corrected the label and left the arithmetic; v1042 moved the arithmetic onto the
+    // platform convention and the comparable-take basis. pctLower is the share BELOW, so a rank
+    // counted from the bottom satisfies (rank - 1) === pctLower% of n.
+    if (norway.rankDir === 'lowest') p(S, 'Rank label', 'benchmark rank labelled "#1 = lowest take", matching (below + 1) and the Country Profile scale');
+    else f(S, 'Rank label', 'rank labelled "#1 = ' + norway.rankDir + ' take" while the code ranks up from the bottom');
 
     if (norway.rank !== null && norway.pctLower !== null &&
-        Math.abs((norway.rankOf - norway.rank) / norway.rankOf * 100 - norway.pctLower) <= 1)
-      p(S, 'Rank vs pct', '#' + norway.rank + ' of ' + norway.rankOf + ' from the top is consistent with ' + norway.pctLower + '% lower');
+        Math.abs((norway.rank - 1) / norway.rankOf * 100 - norway.pctLower) <= 1)
+      p(S, 'Rank vs pct', '#' + norway.rank + ' of ' + norway.rankOf + ' from the bottom is consistent with ' + norway.pctLower + '% lower');
     else f(S, 'Rank vs pct', 'rank and percentile still contradict: ' + JSON.stringify(norway));
+
+    // v1042 (T2): the builder must state the origin country's OWN placing on the same scale,
+    // and it must be the identical number getGlobalTakeRank() hands the Country Profile --
+    // otherwise the analyst is back to two ranks and no way to tell which is theirs.
+    if (norway.xrefRank !== null && norway.cpRank !== null &&
+        norway.xrefRank === norway.cpRank && norway.xrefOf === norway.cpRankOf)
+      p(S, 'Rank cross-reference', 'builder quotes Norway\u2019s own #' + norway.xrefRank + ' of ' + norway.xrefOf + ', the same figure its Country Profile prints');
+    else f(S, 'Rank cross-reference', 'origin-country placing missing or off the CP scale: ' + JSON.stringify({ xrefRank: norway.xrefRank, xrefOf: norway.xrefOf, cpRank: norway.cpRank, cpRankOf: norway.cpRankOf }));
 
     if (norway.vsMed !== null && ((norway.vsMed > 0) === (norway.pctLower > 50)))
       p(S, 'Rank vs median', 'above-median regime reads as above-median in all three spans');

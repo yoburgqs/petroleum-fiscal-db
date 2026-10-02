@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1041</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1042</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -63878,10 +63878,34 @@ ${(function() {
   // Database context: show where custom take sits vs 185-country distribution
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || COUNTRY_DATA.length < 5) return '';
   var customTake = result.take;
-  var takes = COUNTRY_DATA.map(function(c){ return c.take_75; }).filter(function(v){ return v != null; });
+  // ── v1042 (T2): one scale for the rank, shared with Country Profile ──────────────────
+  // This box ranked the run with 1 = HIGHEST take, on raw take_75. Every other surface on the
+  // platform — and the Group-2 branch of THIS SAME box, forty lines below — counts up from the
+  // LOWEST take, on the comparable take. Walked cold: Country Profile → Indonesia prints
+  // "All 185 countries: #159"; the "IRR: → Model in Scenario Builder" button on that same
+  // headline strip loads Indonesia's own terms, and this box closed the screen with
+  // "Ranked #19 of 185 by govt take (1=highest)". Same database, same metric, same price, two
+  // ranks that are mirror images of each other, one click apart, separated only by a 10px
+  // parenthetical. v607 spotted the inversion and corrected the LABEL; the number stayed on the
+  // minority convention, so the contradiction survived as a correctly-labelled one.
+  //   The population was raw as well: the 11 countries that blend fee-basis contracts entered at
+  // their published figure and the three 100% monopolies entered at 100%, which is the percentile
+  // v877 withheld for the run itself. Ranking a PSC run against that distribution is the error
+  // v877 names, applied to the denominator instead of the numerator.
+  //   Now computed with getGlobalTakeRank()'s exact arithmetic — comparable take via
+  // cpCmpTakeOf(), rank = nBelow + 1, ties sharing the lowest rank in their band, the same 185
+  // denominator — so the number this box prints and the number the Country Profile prints are
+  // on one scale and can be read against each other.
+  var _basis1042 = function(c) {
+    return (typeof cpCmpTakeOf === 'function') ? cpCmpTakeOf(c, '75') : (c ? c.take_75 : null);
+  };
+  var takes = COUNTRY_DATA.filter(function(c){ return c.take_75 != null; })
+                          .map(_basis1042).filter(function(v){ return v != null; });
   if (!takes.length) return '';
+  var below = 0;
+  for (var _i1042 = 0; _i1042 < takes.length; _i1042++) if (takes[_i1042] < customTake) below++;
+  var _rank1042 = below + 1;   // 1 = lowest take — identical convention to getGlobalTakeRank()
   takes.sort(function(a,b){ return a-b; });
-  var below = takes.filter(function(v){ return v < customTake; }).length;
   var pctRank = Math.round((below / takes.length) * 100);
   var med = takes[Math.floor(takes.length/2)];
 
@@ -63945,17 +63969,43 @@ ${(function() {
   var diffFromMed = (customTake - med).toFixed(1);
   var diffSign = diffFromMed >= 0 ? '+' : '';
   var rankColor = pctRank <= 30 ? '#15803D' : pctRank <= 60 ? '#A16207' : '#B91C1C';
+  // v1042 (T2): the origin country's OWN placing, read from getGlobalTakeRank() — the identical
+  // figure its Country Profile prints — stated beside the run's placing on the same scale. This
+  // is the line that stops the analyst having to decide which of two ranks describes their
+  // country: the run's terms and the country's published terms are different numbers, and now
+  // they are different numbers on one axis instead of two.
+  var _xref1042 = '';
+  var _og1042 = window._sbOrigin;
+  var _ogC1042 = (_og1042 && !_og1042.monopoly && _og1042.country) ? _og1042.country : null;
+  if (_ogC1042 && typeof getGlobalTakeRank === 'function') {
+    var _gr1042 = getGlobalTakeRank(_ogC1042);
+    var _cd1042 = COUNTRY_DATA.filter(function(c){ return c.country === _ogC1042; })[0];
+    var _cv1042 = _cd1042 ? _basis1042(_cd1042) : null;
+    if (_gr1042 && _cv1042 != null) {
+      var _dr1042 = _rank1042 - _gr1042.rank;
+      var _where1042 = _dr1042 === 0
+        ? 'The run above lands on the same place.'
+        : 'The run above lands ' + Math.abs(_dr1042) + ' place' + (Math.abs(_dr1042) === 1 ? '' : 's')
+          + (_dr1042 > 0 ? ' higher: the terms you ran take MORE than the country average.'
+                         : ' lower: the terms you ran take LESS than the country average.');
+      _xref1042 = '<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--border);line-height:1.55;">'
+        + _ogC1042 + '’s own published take of <strong style="color:var(--text);">' + _cv1042.toFixed(1)
+        + '%</strong> is <strong style="color:var(--text);">#' + _gr1042.rank + ' of ' + _gr1042.n
+        + '</strong> on this same scale — the figure its Country Profile prints. ' + _where1042
+        + '</div>';
+    }
+  }
   return '<div style="margin-top:14px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);">'
     + '<span style="font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:10px;">vs 185-Country Database</span>'
     + '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:14px;">'
-    // v607 (T2): the rank is computed as (n - below), i.e. 1 = HIGHEST take, but the label read
-    // "(1=lowest)". Norway's scenario sat at 49.9% — stated as "+21.5pp vs median" in the very
-    // next span — and was labelled "#64 of 185 (1=lowest)", which reads as a low-take regime.
-    // The adjacent "% of countries have lower take" was already correct; only the label was wrong.
-    + '<span>Ranked <strong style="color:' + rankColor + ';">#' + (takes.length - below) + ' of ' + takes.length + '</strong> by govt take (1=highest)</span>'
+    // v1042 (T2): #1 = LOWEST take, on the comparable take, exactly as getGlobalTakeRank() and
+    // therefore exactly as the Country Profile headline. v607's "(1=highest)" label was true of
+    // the old arithmetic; the arithmetic is what changed.
+    + '<span title="Ranked among the ' + takes.length + ' countries ORCA holds a take for, counting UP FROM THE LOWEST take — #1 is the most investor-friendly regime on the platform, not the harshest. Same convention and same comparable-take basis as the rank on every Country Profile, so the two can be read against each other. Each country enters on its production-sharing and concession contracts alone; fee-basis contracts are excluded from the figure it is placed on, because take% under a fixed $/bbl remuneration fee measures the mechanic rather than the terms.">'
+    + 'Ranked <strong style="color:' + rankColor + ';">#' + _rank1042 + ' of ' + takes.length + '</strong> by govt take <span style="opacity:.8;">(#1 = lowest take)</span></span>'
     + '<span>Median: <strong style="color:var(--muted);">' + med.toFixed(1) + '%</strong> &nbsp; This regime: <strong style="color:' + rankColor + ';">' + diffSign + diffFromMed + 'pp</strong> vs median</span>'
     + '<span>' + pctRank + '% of countries have <em>lower</em> take at $75/bbl</span>'
-    + '</div></div>';
+    + '</div>' + _xref1042 + '</div>';
 })()}
 `;
 
