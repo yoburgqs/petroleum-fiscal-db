@@ -569,6 +569,39 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 .screener-filter-block .filter-lbl { color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
 /* v623 (T1): .be-radio-group removed with the Breakeven Coverage control it styled. */
 .screener-count-bar { align-items:center; display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; }
+/* ── v1032 (T1) — the Screener count line's caveat clauses. ──────────────────────────────
+   #screener-count is the element that tells the analyst WHAT their screening list is and
+   WHY each row is in it. It was assembled as ONE run-on string: _universeLead with up to
+   nine em-dash clauses welded on inside a single 13px span. Measured on the shipped build,
+   at 390x844 with hasTouch, after the pane auto-scrolls results into view:
+       Stable Fiscal Record   1,566 chars   32 unbroken lines   624px   = 74% of the viewport
+       IOC Capital Screen       745 chars   16 unbroken lines   312px
+       Frontier Markets         740 chars   15 unbroken lines   293px
+   all of it above the first country row. The clauses are load-bearing, not decoration: on
+   Stable Fiscal Record they carry "the other 164 countries are NOT screened out on their
+   reform record", "Ecuador TAKE +5pp, Russia TAKE +15pp", and "Iraq admitted, the published
+   blend would have excluded it" — three statements an IC memo must not get wrong — at
+   positions 4, 6 and 8 of one sentence. Nobody with 20 minutes reads it; they scroll past
+   it to the shortlist, which is exactly what they must not do.
+   Each clause already arrives self-labelling, so nothing is reworded and no clause builder
+   is touched. One line each instead of one paragraph. Desktop hides NOTHING — body is
+   display:block, toggle is display:none. The collapse is scoped to pointer:coarse AND
+   <=720px, the same scope as the v612 mobile layer, so a mouse sees no change at all. */
+.sc-count-lead { display:block; }
+.sc-notes { display:block; }
+.sc-notes-toggle { display:none; }
+.sc-notes-body { display:block; }
+.sc-note { display:block; margin-top:3px; line-height:1.5; }
+@media (pointer: coarse) and (max-width: 720px) {
+  .sc-notes-toggle {
+    display:inline-flex; align-items:center; min-height:30px; margin-top:7px;
+    padding:4px 11px; border:1px solid rgba(176,104,0,.45); border-radius:4px;
+    background:rgba(176,104,0,.1); color:var(--accent); font-size:11px; font-weight:700;
+    font-family:inherit; cursor:pointer; text-align:left; max-width:100%;
+  }
+  .sc-notes > .sc-notes-body { display:none; }
+  .sc-notes.is-open > .sc-notes-body { display:block; margin-top:7px; }
+}
 .ioc-checkbox-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
 .ioc-checkbox-grid label { align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; font-size:12px; font-weight:600; gap:5px; padding:4px 10px; transition:.15s; }
 .ioc-checkbox-grid input[type=checkbox] { accent-color:var(--accent); cursor:pointer; }
@@ -2999,7 +3032,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1030</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1032</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -37344,6 +37377,19 @@ function _scProdCovTip(d) {
 const SC_OUT_B_SHOWN = 10;
 // v987 (T1): group C carries its own marker. _scToggleOutMore() selects [data-sc-extra="1"]
 // across the whole host, so reusing that attribute would make either button open both groups.
+// v1032 (T1) — the phone-only disclosure for the Screener count line's caveat clauses.
+// The toggle itself only EXISTS under pointer:coarse and <=720px (CSS display:none otherwise),
+// so this never runs for a mouse. The label is rebuilt from data-n rather than string-patched,
+// so a re-render of the count line cannot leave the caret pointing the wrong way.
+function _scToggleNotes(btn) {
+  const wrap = btn.closest('.sc-notes');
+  if (!wrap) return;
+  const open = wrap.classList.toggle('is-open');
+  const n = Number(btn.getAttribute('data-n')) || 0;
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  btn.innerHTML = '\u26A0 ' + n + ' ' + (n === 1 ? 'caveat' : 'caveats')
+    + ' on this screen ' + (open ? '\u25B4' : '\u25BE');
+}
 function _scToggleClearedMore(btn) {
   const host = document.getElementById('sc-prod-out');
   if (!host || !btn) return;
@@ -38331,7 +38377,46 @@ function runScreener() {
     host.innerHTML = _html;
     host.style.display = 'flex';
   })();
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${reformSet ? _scReformRollup(data) : ''}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  // v1032 (T1) — was one template literal welding _universeLead and up to nine clauses into a
+  // single run-on sentence. See the .sc-notes block in the stylesheet for the measurements that
+  // forced this. The clause BUILDERS above are untouched and nothing is reworded: every clause
+  // already arrives self-labelling ("take ceiling ≤65% tested on…", "reform record: …",
+  // "scope: …", "verified field production only; …"). All that changes is that they stop being
+  // one paragraph and become one line each, and that on a phone they collapse behind a toggle
+  // which COUNTS them, so the shortlist the analyst came for is above the fold.
+  //
+  // The leading em dash is stripped from each clause because it was the inline joiner and a line
+  // does not need one.
+  //
+  // The deck suffix moves to the lead line, where it belongs — it describes the whole screen, not
+  // whichever filter happened to be last — and is deliberately NOT inside the collapsible region:
+  // the production profile behind every NPV must not be one tap away on the device where a number
+  // is most likely to be misread. It also gains a leading NBSP. It carried margin-left:8px and no
+  // text separator, so whatever preceded it welded on: the page printed "…proxy-economics countries
+  // excluded· Deepwater @$75/bbl", and on the cold view "…npv high→low within each block· Deepwater",
+  // where "block · Deepwater" can be read as naming a block. 8px of margin is not a separator —
+  // it vanishes from innerText, every copy path, and every screen reader.
+  (function _scRenderCountLine() {
+    const _clauses = [_setNote, _reformNote, (reformSet ? _scReformRollup(data) : ''), _takeBasisNote,
+                      _npv50Note, _npvLegNote, _retNote, _proxyNote, _evidNote, _beNote]
+      .filter(c => c && String(c).trim())
+      .map(c => String(c).trim().replace(/^(<span[^>]*>)\s*(?:\u2014|&mdash;|&#8212;)\s*/, '$1'));
+    const _deck = `<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">\u00A0· Deepwater @${priceLabel} · 10% WACC</span>`;
+    const _n = _clauses.length;
+    const _body = `<div class="sc-notes-body" id="sc-notes-body">`
+      + _clauses.map(c => `<div class="sc-note">${c}</div>`).join('')
+      + `</div>`;
+    document.getElementById('screener-count').innerHTML =
+      `<div class="sc-count-lead">${_universeLead}${_deck}</div>`
+      + `<div class="sc-notes">`
+      + (_n === 0 ? '' :
+          `<button type="button" class="sc-notes-toggle" data-n="${_n}" aria-expanded="false"`
+          + ` aria-controls="sc-notes-body" onclick="_scToggleNotes(this)"`
+          + ` title="What this screen tested, what it admitted or removed by name, and what it does NOT screen on.`
+          + ` Collapsed on a phone so the shortlist is reachable without scrolling past it; always open on a desktop.">`
+          + `⚠ ${_n} ${_n === 1 ? 'caveat' : 'caveats'} on this screen ▾</button>`)
+      + _body + `</div>`;
+  })();
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
