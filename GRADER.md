@@ -70688,3 +70688,136 @@ names which term and what rate, at the point of verification, before the figure 
 **Task.** T6, *"Where did this number come from and how solid is the evidence?"* — stalest in rotation (last walked ~cycle 925).
 
 **Friction.** The Country Profile Evidence Chain's verdict sentence claims *"ORCA's take%, NPV and IRR are built from the contract terms in the ORCA Value column."* One clause — `_engScope767` at `index.html:45340` — is the only place the verdict corrects that where the engine actually ran a different rate, an
+
+---
+## Cycle 976 — T2 — v1036 — 2026-10-02
+
+**Task.** T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* —
+stalest in rotation by version (v1030 T2 · v1031 T5 · v1032 T1 · v1033 T3 · v1034 T6 ·
+v1035 T4). Walked cold at 1440×900 — no sessionStorage, no localStorage — Country Profile
+tab, then the dropdown, which is the plainest route an IC analyst takes.
+
+**Friction.** The Live DCF panel's middle tile is the only return figure on the Country
+Profile, and it has two modes: quote the rate, or suppress it and lead with the 15% hurdle
+test. The mode is chosen in `_sbReturnReading` (`index.html:60632`) by
+`R.state = R.irr >= 100 ? 'inflated' : 'computed'` — a bare cutoff on the rate's **magnitude**.
+
+The reason the rate is unusable is stated in v703's own note directly above the tile code:
+cost recovery — or, in a Concession, early revenue against uplift — covers most of the capex
+as it is spent, so the contractor's at-risk base is a fraction of the project and the rate is
+struck on that fraction. That is `R.atRisk` against the profile's capex, a number the tile
+block has held in `_capexMM703` since v703 and **never tested**.
+
+Swept all 185 countries, each on its own default panel profile at $75:
+
+| cohort | n | exposure (at-risk / capex) | rate |
+|---|---|---|---|
+| suppressed (`inflated`) | 117 | 9.6% – 21.7% | 100.2% – 297.2% |
+| quoted as the headline (`computed`) | 66 | 16.8% – 43.6% | 12.1% – 98.7% |
+
+The ranges **overlap**, and 21 of the 66 quoted rates stand on an exposure base inside the
+band the page refuses to quote on at all. The pair that settles it is not a rounding argument:
+
+| country | treatment | rate | at risk | exposure |
+|---|---|---|---|---|
+| Suriname | **REFUSED** | 100.2% | $205M of $1,200M | 17.1% |
+| Liberia | **QUOTED, green** | 94.9% | $201M of $1,200M | 16.8% |
+
+Liberia's rate stands on a **thinner** base than Suriname's and was the tile's 20px green
+headline under "Contractor IRR — this scenario", while Suriname's was pushed into the note as
+the thing not to quote. Same structure, opposite claim, decided by six points of a rate
+neither country's IC would accept.
+
+Guyana is the one an analyst actually hits — a frontier screening favourite whose most
+attractive-looking number was a green **91.0%** struck on $210M of a $1.2B project, repaid by
+year 3. The same page carries a paragraph explaining that the country-level IRR column was
+removed because per-contract IRRs *"were being pasted into IC memos"* — and then offered this
+one as the headline.
+
+Second, smaller half: the quoting branch printed `"$523M at risk · payback year 5"` and never
+said **against what**. On all 66 quoted rates the analyst could not see what the rate was
+struck on.
+
+**Change.**
+- The gate moves off the rate and onto the rate's base. A `computed` rate whose at-risk
+  capital is under 22% of the project's capex now leads with the hurdle test — NPV at 15%,
+  clears/fails on its face — with the rate demoted into the note stating its exposure, exactly
+  the treatment the 117 already get. **22 countries move:** Ethiopia 98.7% @18.0%, Senegal
+  96.7% @17.1%, Liberia 94.9% @16.8%, Uganda 92.3% @18.6%, Guyana 91.0% @17.5%, Sao Tome
+  90.6% @18.2%, Mauritania 89.1% @18.0%, South Sudan 87.4%, Sudan 87.1%, Sierra Leone 85.9%,
+  Georgia 81.6%, Iraq 80.1% @21.0%, Laos 79.6%, India 79.1%, Kenya 78.9%, Mongolia 78.5%,
+  Mozambique 76.2%, Malaysia 74.3%, Turkmenistan 70.1%, Uzbekistan 68.3%, Norway 63.2%
+  @21.7%, Philippines 62.8%.
+- **The cut is not a new judgement.** It is the ceiling of the exposure range the page already
+  declines to quote a rate on (21.7%, rounded up). Single named constant
+  `_IRR_THIN_BASE_MAX_PCT`, so it can be moved on review.
+- The thin-base note deliberately does **not** reuse the `inflated` wording, which names cost
+  recovery as the mechanism. That is right for the PSC and TSC rows and **wrong for Norway** —
+  a Concession with no cost recovery, whose base is thin because revenue arrives against
+  uplift and SPT deductions, not because anything is reimbursed. The new wording states the
+  exposure and leaves the mechanism to the waterfall below it.
+- The 44 rates that survive now carry their base: `"$523M at risk of $1.2B capex (43.6% of
+  the project) · payback year 5 · 25yr project."`
+
+**Result.** Suppressed exposure now tops out at 21.7% and quoted exposure starts at 22.1% —
+the overlap is gone, so the page cannot make opposite claims about two countries with the same
+structure. An analyst on Guyana, Liberia, Norway or Iraq is handed **+$1.1B at a 15% IOC
+hurdle** — a figure that holds for 185 of 185 countries — instead of a 91% rate that does not
+survive being asked what it is a return on. On the 44 countries that still show a rate, the
+denominator is on screen.
+
+### Verification — the suite RAN this cycle
+- JS syntax gate **PASS** (`node --check`, 11 extracted blocks).
+- `runtime_comprehensive.js` ran against the local tree
+  (`TEST_URL=http://127.0.0.1:8899/index.html`): **545 PASS / 0 FAIL / 1 WARN**. The WARN is
+  `ConsoleErrors` — the documented local-serve artifact, where the service-worker script 404s
+  under `python -m http.server`. 545 + 1 = the 546 deployed baseline; no test regressed.
+- 185-country re-sweep after the edit: 141 hurdle-headline / 44 rate-headline, **0** countries
+  with no available denominator, `npv15` non-null on 185 of 185 — no country loses its tile.
+- 390×844 `hasTouch`: `scrollWidth - clientWidth = 0` on all eight profiles walked (Guyana,
+  Liberia, Norway, Iraq, Nigeria, Colombia, Algeria, Suriname). The note grows one line on the
+  flipped countries (63px → 78px); tile stays 302px. No control added or touched, so the 24px
+  floor is unaffected.
+- 0 pageerrors at 1440×900 and at 390×844.
+
+### Notes for the next cycle
+- **Committed an orphan first, for the fifth consecutive cycle.** v1035 (T4) was uncommitted in
+  the tree, killed by the 1800s `claude -p` timeout at `autonomous_cycle.py:231`. Verified
+  before committing (Qatar + Sao Tome withdrawn=1, India correctly untouched, 0 overflow at
+  390px) and committed as `0cfb285`: the Reform Risk card gated its cohort-rank withdrawal on
+  `bandMoves` instead of `material`, so Qatar (67 → ceiling ≤60) and Sao Tome (70 → ≤65) kept
+  a rank read off a score the same card had struck through; it also lifts Fiscal Predictability
+  onto its own full-width row, recovering a median 205px / max 323px of blank strip.
+  **Cycles 969, 970, 974, 975 and now 975b have all died on that timeout** — it equals the
+  cycle interval, so a long cycle is killed rather than finishing late, and the loop only
+  recovers because the next cycle spends its first minutes committing the previous one's work.
+  Raising it to 2700s, or decoupling it from the interval, is now the single highest-value
+  change available to the loop itself.
+- **Nearest remaining case, flagged not fixed:** Colombia keeps a 90.1% rate on 23.6%
+  exposure — above the cut, but the highest surviving rate on the thinnest surviving base.
+  One constant if Zach wants it tighter.
+- **Not changed, deliberately:** Scenario Builder renders `_sbReturnReading`'s own
+  `R.color`/`R.state` and so keeps the 100% rate cutoff. v703's stated goal was that the two
+  surfaces cannot report the same run differently, so SB is now the inconsistent one. Fixing it
+  means moving the exposure test into `_sbReturnReading`, which needs a capex denominator that
+  function does not currently receive — worth one cycle, and it is a cross-surface change.
+- Carried forward from 975 and still live: the `INDEX ONLY` rows' two back-to-back arrows 4px
+  apart on a thumb (deliberate per v971, but they mean different things); Somalia is the one
+  profile with no independently sourced parameter at all.
+- Carried forward from 972/964/963 and still live: `_scFeeCmpAt()` India direction (published
+  61.9% → screened 63.2%); the FAQ bank quoting the retired `$1.2B / $15-flat` deck (`:6117`,
+  `:6234`); the typed "65 of 185" breakeven count at `:5508` and `:3837` against a live 67;
+  `cpBeBound()`'s "117 of 185" against a live 118; the solved arm's `ctxStmt` ladder with three
+  unreachable rungs.
+- Carried forward, unchanged: `EXPL-NO-IRR` gate blind spot; serve `~` not the repo; SbS
+  breakeven basis paragraph denominators; FC Reform verdict bare `n/c` on 164 of 189 rows;
+  `window._fcNavList` never invalidated; CP headline take rank vs NPV rank counting in opposite
+  directions; Indonesia's three government profit-oil shares; `be_75 = 1.0` at source for
+  Bahrain/Kuwait/Saudi Arabia; Paraguay decree typed `government_filing`; Screener
+  `_screenerExportBasis` not naming the 105 withheld countries; Home card "up to 4 countries"
+  vs `CMP_MAX` 5; Cote d'Ivoire's two missing API slugs; the Home hurdle stat's "list below".
+- **Probe debris, nineteenth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  This cycle's probes went to `/tmp/c976/` and nothing was written inside the repo. Still only
+  flagged, not deleted — standing rule is to ask before deleting files the session did not
+  create. **Recommend Zach authorise deletion or that they be added to `.gitignore`.**
