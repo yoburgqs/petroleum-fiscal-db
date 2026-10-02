@@ -2958,6 +2958,29 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   }
 }
 
+/* ── v1035 (T4): the Fiscal Predictability block gets its own full-width row ────────────
+   The Reform Risk country verdict is a flex ROW of five tiles. Four of them answer the
+   reform question and end at 101-130px. The fifth -- Fiscal Predictability, which the card
+   itself labels "separate signal" -- is 10px prose stacked in a 230px gutter and runs
+   220-372px, so it alone sets the row height. Measured on a cold load at 1440x900 across
+   all 21 scored jurisdictions: median 205px, max 323px (Mexico) of the strip is blank,
+   under the four tiles that answered the question. On the 164 unscored jurisdictions --
+   89% of the platform, where the reform answer is the three words "n/a / not sourced" --
+   that tile is 430 of the card's 796px.
+   Nothing is hidden and nothing is reworded: the block is lifted out of the tile row onto
+   its own full-width row underneath, where its four parts (score, basis, ceiling, cohort)
+   sit side by side at ~300px instead of stacked at 230px. The 230px clamps are written
+   inline by _rrPaintObsSpread / _rrPaintIqrUnderstated / _fpCohortLine, so they are
+   overridden here rather than at four call sites. */
+#rr-fp-band { flex: 1 1 300px; min-width: 240px; display: flex; flex-wrap: wrap;
+              gap: 4px 18px; align-items: flex-start; }
+#rr-fp-band > .rr-fp-lbl { flex: 0 0 100%; margin-bottom: 0; }
+#rr-fp-band > #rr-fp-score { flex: 0 0 100%; }
+#rr-fp-band > .rr-fp-col,
+#rr-fp-band > #rr-fp-bound { flex: 1 1 190px; max-width: 280px !important; }
+#rr-fp-band > #rr-fp-cohort { flex: 1 1 190px; }
+#rr-fp-band > #rr-fp-cohort > div { max-width: 280px !important; margin-top: 0 !important; }
+
 @media print {
   .tab-nav, .site-header nav, .expl-mode-btn { display: none !important; }
   .tab-panel { display: block !important; page-break-inside: avoid; }
@@ -3066,7 +3089,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1034</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1035</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -55222,16 +55245,42 @@ function _rrPaintIqrUnderstated(c, d, obs, u) {
   // v784 (T4): REPLACE the cohort paragraph instead of appending its retraction beneath it. The
   // card printed "3rd of 28 ... MODERATE here outranks any UNGRADED score" and directly under it
   // "That rank and that comparison do not hold" -- two paragraphs whose net content is one line.
+  // ── v1035 (T4): the gate is `material`, not `bandMoves` ──────────────────────────────
+  // The comment above says the emphatic treatments -- the ▲ marker, the orange ceiling bar
+  // and THE WITHDRAWN COHORT RANK -- appear together, "only where the correction is worth 5
+  // points of score or moves the band". That is _fpObsCeilingFrom()'s `material`. This gate
+  // was `bandMoves` alone, so where a material correction landed inside the same band the
+  // ceiling painted orange and the rank beneath it did not move.
+  //
+  // Live, swept across all 185 lookups: 51 countries paint a ceiling, 43 already withdrew the
+  // rank, 8 kept one. Five of those eight are immaterial 1-4 point corrections in the one-term
+  // cohort and stay as they are. Three are measured-cohort rows, and two of them are material:
+  //   Qatar                 printed 67 · MODERATE -> ceiling ≤60 · MODERATE   7 points
+  //   Sao Tome and Principe printed 70 · MODERATE -> ceiling ≤65 · MODERATE   5 points
+  // On both, the headline struck the printed score through and told the analyst to carry the
+  // ceiling, and the paragraph directly beneath still read "6th of 28 countries ORCA can
+  // measure ... This MODERATE 67 was measured" -- a position inside a 28-country cohort read
+  // off a number the same card had just superseded, which is the figure an analyst copies into
+  // a memo. (India is the third and is left alone: 52 -> 51, one point, not material.)
+  //
+  // Where the band does NOT move the surviving claim survives: a measured MODERATE still
+  // outranks any UNGRADED score. Only the rank is withdrawn, and the text says which is which.
   var coh = document.getElementById('rr-fp-cohort');
-  if (coh && bandMoves && !coh.dataset.withdrawn) {
+  if (coh && material && !coh.dataset.withdrawn) {
     coh.dataset.withdrawn = '1';
     coh.innerHTML =
       '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
       + 'border-left:2px solid var(--orange);max-width:230px;">'
       + '<strong style="color:var(--orange);">No cohort rank for ' + _rrEsc(c) + '.</strong> '
       + 'Its rank among the countries ORCA can measure is computed from the printed ' + fp + ', which this country’s own contract table bounds at '
-      + bound + ' · ' + bLabel + '. At the ceiling ' + _rrEsc(c) + ' is no longer a ' + pLabel
-      + ', so do not rank it above an ungraded score on the strength of the band.</div>';
+      + bound + ' · ' + bLabel + '. '
+      + (bandMoves
+          ? 'At the ceiling ' + _rrEsc(c) + ' is no longer a ' + pLabel
+            + ', so do not rank it above an ungraded score on the strength of the band.'
+          : 'Rank it on ≤' + bound + ', not on ' + fp + '. The band does not move — a measured '
+            + pLabel + ' still outranks any UNGRADED score, however high its number — but the '
+            + 'position inside the cohort was read off a score this card has superseded.')
+      + '</div>';
   }
 
   if (material) _rrFpHeadlineCeiling(score, _cl, why);
@@ -55851,17 +55900,19 @@ function renderReformCountryVerdict() {
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--muted);">n/a</div>'
       + '<div style="font-size:10px;color:var(--muted);">not sourced</div></div>'
+      + _rrTakeBlock(c, take)
+      // v1035 (T4): own full-width row, last in the strip. On this branch the reform answer
+      // is "n/a / not sourced" and this block was 430 of the card's 796px.
       + (fp != null
-          ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
+          ? '<div id="rr-fp-band"><div class="rr-fp-lbl" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
             + fpGradeHtml
-            + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div>'
+            + '<div class="rr-fp-col" style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div>'
             // v719 (T4): this branch had no bound slot at all, so a measured-cohort country with
             // no reform log -- Republic of the Congo, Qatar, Morocco -- had nowhere to print the
             // ceiling on the one score the card offers it as "what you can defend instead".
             + '<div id="rr-fp-bound" style="display:none;"></div>'
             + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
           : '')
-      + _rrTakeBlock(c, take)
       + '</div>'
       + '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;">'
       + (fpDisp.state === 'monopoly'
@@ -56009,17 +56060,21 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div>'
     + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div>'
     + (_v.dirAllLine || '') + '</div>'
+    + _rrTakeBlock(c, take)
+    // v1035 (T4): rendered LAST and on its own full-width row (see #rr-fp-band in the
+    // stylesheet). It stays inside this flex strip, in the same tile shape, so
+    // _rrVerdictPayload()'s metric sweep still finds it and the pasted IC table keeps
+    // its FISCAL PREDICTABILITY row -- it now sits after GOVT TAKE rather than before.
     + (fp != null
-        ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
+        ? '<div id="rr-fp-band"><div class="rr-fp-lbl" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
           + fpGradeHtml
-          + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div>'
+          + '<div class="rr-fp-col" style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div>'
           // v713 (T4): slot for the bounded score. Empty and display:none unless
           // _rrPaintObsSpread finds this country's own contract table refutes the
           // one-term basis the printed score was built on. See the note there.
           + '<div id="rr-fp-bound" style="display:none;"></div>'
           + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
         : '')
-    + _rrTakeBlock(c, take)
     + '</div>'
     + _rrLatestLine(events, latest)
     // v598 (T4): the events themselves, on the tab three other surfaces send the analyst to
