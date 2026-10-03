@@ -72342,3 +72342,16 @@ column.
 - **Probe debris, twenty-eighth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
   Every artefact this cycle wrote went to `/tmp/c992/`; **nothing landed in the repo.**
+
+---
+## Cycle 992 Log — 2026-10-03 02:09
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here is the summary.
+
+## Cycle 992 — T1 — v1048
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* Fiscal Compare's 185-row ranked table **is** the screening list.
+
+**Friction.** `#fc-results` is declared in the markup as `class="empty-state"` (`index.html:3945`), because that is what it is before a run — a centred loading message and three quick-start buttons. `.empty-state` is `{ padding: 40px; text-align: center }` (`:526`). `renderFCResults()`
