@@ -72043,3 +72043,187 @@ the suite's own output. **No total is claimed that was not observed.**
 **Task:** T4 — "What is my fiscal-stability and reform exposure here?"
 
 **Friction.** I walked T4 cold across every surface that answers it: the Reform Risk per-country lookup (all 21 scored jurisdictions plus a sample of the 164 unscored), the Scenario Builder premium handoff, the IC-memo paste, the Country Profile stability block, the Fiscal Compare Reform column and its sort, and the Screener reform axis. 
+
+---
+## Cycle 990 Log — 2026-10-03 00:02 — v1047
+- Test before: 547 PASS / 0 FAIL / 0 WARN / 0 JS errors (cycle 989's run, against the LIVE
+  pre-push build — `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE`
+  but not `TEST_URL`, unchanged since cycle 985)
+- Test after: graded suite launched against the LOCAL tree this cycle
+  (`TEST_URL=http://127.0.0.1:8951/petroleum-fiscal-db/index.html`,
+  `ORCA_REPORT_FILE=/tmp/c990/report.txt`) on a threaded server. State at push time is in the
+  addendum below. **No total is claimed that was not observed.**
+- JS syntax gate: **11/11 script blocks PASS** — run after the cell edit, after the
+  `_explTakeLeadCmp` widening, after the export columns, and again after the version bump.
+- Page errors: **0** at all six viewports across 9 tabs.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest in rotation
+(1039 T3 · 1040 T6 · 985 T2 · 986 T5 · 987/988 T3 · 989 T4; last T1 was cycle 979/v1038).
+Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded, served
+from `~` so `sw.js` resolves and the 404 console artefact does not appear.
+
+**Walked and found already sound — recorded so the next cycle does not re-walk it.** The
+Screener is where ~30 T1 cycles have gone and it holds up under measurement:
+- All **11 presets** advertise an honest count. Each dropdown label's `→ N of 185` was
+  compared against the rows actually rendered: 15/143/34/22/11/5/35/70/6/56/24 — **11 of 11
+  exact**.
+- All four sliders' live `.sc-axis-n` counts match the table: take 40 → 110, take 55 → 143,
+  take 100 → 185, NPV ≥$1000M → 164, evidence ≥60% → 55. The take slider also carries the
+  production-backed subcount (`· 8 verified`), and `· no ceiling` is correctly `display:none`
+  the moment a ceiling is live.
+- The zero-result panel (v802/v1018) names the blocking filter *measured* — "N countries come
+  back if only this is lifted" — plus the best-returning pair, and empties
+  `window._screenerData` so all three exports refuse rather than shipping the previous screen.
+- CSV from the 15-row IOC screen writes **15 rows**, not 185, with a full assumptions block.
+- The Bubble Chart mode **does** respect the screen: `#bubble-scope-wrap` (v809) appears only
+  once something is narrowed and reads `Plotting: IOC Capital Screen (15) | All 182`.
+- `be-legend-n` renders a live **67**, not the 65 typed in the HTML — the carried-forward
+  item from cycle 979 is already fixed by the painter at `:37289`.
+- `tab-btn-tsamples` is `display:none` at all six viewports, but Sample Analyses is reachable
+  through the `Reference ▼` dropdown. Not a defect; tab order is locked regardless.
+
+## Friction — the worst moment, and it is on Browse, not the Screener
+
+Browse (Explorer) opens **cold sorted by Govt Take**, and **v1026** re-based that column, its
+sort and its Tier pill onto the comparable Group-1 take. v1026's own scope note says what it
+left: *"Scope is the take ORDERING and the two cells that state it."* The four other cells on
+that row which are **also readings of government take** — `@$50`, `@$100`, `@$125`, the Curve
+sparkline — plus Swing, stayed on the raw published blend. Correcting one of five did not merely
+leave the others wrong; it made the row **contradict itself**:
+
+    #6 of 185   Iraq
+    Govt Take 34.1%   @$50 81.5%   @$100 86.9%   @$125 88.1%   Swing +6.6pp   Inv-Friendly
+
+A take curve above 80% at every price except the one the column headers say the table is ranked
+at, where it drops **50.7pp** and then climbs back. **415 of Iraq's 610 contracts are TSC
+fee-basis** — fixed $/bbl remuneration, the contractor keeps no price upside — so take% pins
+near 97–99% at every deck as an artefact of the mechanic. On its **195 PSC/Concession
+contracts** the curve is `28.6 / 34.1 / 37.8 / 39.7`. Before v1026 the row read 84.8% at $75
+and was at least internally consistent. The correction punched the hole, and punched it at
+**rank 6 instead of rank 180**, where every analyst now sees it on first contact.
+
+Swing compounded it rather than catching it: `+6.6pp` is the published `88.1 − 81.5`, and on
+this column's own legend (*"<10pp = stable fiscal terms across the price cycle"*) that is the
+**STABLE** tier — awarded to the one row on screen whose take figure moves 50pp between two
+adjacent cells. The comparable swing is `39.7 − 28.6 = +11.1pp`.
+
+**Measured on the shipped `country_data.json`, not inferred.** 11 countries diverge at one or
+more deck — 10 at $50, 10 at $100, 11 at $125:
+
+| country | gap @$50 | gap @$75 | gap @$100 | gap @$125 |
+|---|---|---|---|---|
+| **Iraq** | **+52.9pp** | **+50.7pp** | **+49.1pp** | **+48.4pp** |
+| Ecuador | +4.6 | +7.2 | +8.5 | +9.2 |
+| South Sudan | +7.6 | +4.3 | +4.1 | +4.2 |
+| Iran | −3.7 | +1.3 | +3.7 | +5.2 |
+| Qatar | +2.5 | +2.7 | +2.8 | +2.8 |
+| Mexico | +2.6 | +2.5 | +2.4 | +2.4 |
+| Oman | +2.0 | +2.0 | +2.0 | +2.0 |
+| Azerbaijan | +1.3 | +1.0 | +0.9 | +0.8 |
+| Malaysia | +1.4 | +1.1 | +0.8 | +0.6 |
+| India | −0.3 | −1.3 | −1.9 | +1.0 |
+| Russia | — | — | — | +0.1 |
+
+Iraq is the only one where the gap decides anything. The correction is **symmetric** — India
+and Iran run the other way at some decks — so this is not a thumb on the scale.
+
+Second half, same cell: on the **Swing sort**, Bahrain, Kuwait and Saudi Arabia took **3 of the
+top 5** places on a `+0.0pp` that is a 100%-take placeholder stored identically at all four
+decks, three columns from their own Govt Take cell reading `—`. That is exactly the defect
+**v882** fixed on the Screener. Browse was the last surface still printing the raw figure, and
+it is the one whose Sort menu offers "Swing (pp)" over all 185 rows.
+
+## Change
+
+| cell | before (cold view, Iraq) | after |
+|---|---|---|
+| `@$50` | `81.5%` | `28.6%` + muted `published 81.5%` |
+| `@$100` | `86.9%` | `37.8%` + muted `published 86.9%` |
+| `@$125` | `88.1%` | `39.7%` + muted `published 88.1%` |
+| Curve sparkline | published points (6.6pp band, near-flat) | comparable points (11.1pp span) |
+| Swing | `+6.6pp` | `+11.1pp` + muted `published +6.6pp` |
+| Swing, state monopoly | `+0.0pp` green, rank 1–5 | `—`, withdrawn on every view |
+| Swing sort | `a.swing ?? 999` | `_scSwingAt(a).sort` |
+| Export | 4-point published curve, **1** comparable point | both curves, 4 points each |
+
+New `_explCurveCell(d, deck)` and `_explSwingCell(d)` in `renderExplorer()`;
+`makeTakeSparkline()` gained an optional comparable-points argument (Browse is its only
+caller). **`_explTakeLeadCmp` now also covers `sort === 'swing'`, and it is ONE flag for all
+five take readings on purpose** — Swing is not a sixth reading, it is `take@$125 − take@$50`,
+arithmetic on two of them. A per-column flag cannot be made to reconcile: with the curve
+comparable and Swing published, Iraq printed a curve rising 28.6 → 39.7 beside `+6.6pp`. One
+flag is the only arrangement in which the row's own subtraction checks out, which is the first
+thing an analyst defending the number will try.
+
+**No new rule, no new threshold, nothing recomputed.** Every figure comes from `_scFeeCmpAt()`
+and `_scSwingAt()` — the same two calls v554, v882, v1026, the Screener's ceiling,
+Side-by-Side and the IC-memo clipboard already make. The `.diverges` test is the existing
+0.1pp one, so **174 of 185 rows are byte-identical**.
+
+## Result
+
+An analyst sorting Browse top-down to draw a screening line reads Iraq as a **coherent,
+rankable, monotonic** curve — `28.6 / 34.1 / 37.8 / 39.7`, swing `+11.1pp` — with the
+published blend named beneath every cell, so they can both place the row and defend the
+placement. They no longer have to choose between believing a 34.1% beside an 86.9%, and
+concluding the table is broken. And the three state monopolies no longer occupy the top of
+the "most price-stable regimes" ranking.
+
+## Verification
+
+- **Row self-consistency, the test that proves it.** Across **all 8 sorts × 182 rendered rows
+  = 1,456 row-readings**: every Swing cell equals `@$125 − @$50` to within 0.15pp, and every
+  four-point curve is monotonic. **0 mismatches, 0 non-monotonic.**
+- **The same test on the UNMODIFIED build** (v1046 snapshot served from `/tmp/c990/before/`,
+  never written inside the repo) finds **1 non-monotonic curve on the cold default sort —
+  `Iraq: 81.5 / 34.1 / 86.9 / 88.1`** — and none on any other sort, because on every other
+  sort the $75 cell leads published too. That is the defect, isolated and reproduced on the
+  pre-edit build, and absent after.
+- **Every value cross-checked against ground truth** computed independently from
+  `_scFeeCmpAt()` per deck, for 13 countries spanning all four branches: fee-blended both
+  directions (Iraq, Ecuador, South Sudan, Iran, India, Mexico, Oman), unaffected (Nigeria,
+  Angola, Norway), state monopoly (Saudi Arabia, Kuwait, Bahrain). All match.
+- **Six viewports × 9 tabs** — 1920/1440/1280/1024/768/390: `scrollWidth == clientWidth`
+  everywhere, **zero horizontal scroll**, **zero page errors**. `pointer: coarse` confirmed
+  **true** at 768 and 390, with **0 controls under 24px** in the Browse table at both. No
+  control was added, so there is no new touch surface and nothing for the v612 mobile layer
+  to collide with.
+- **Clipped Browse cells: 1 before, 1 after**, identical at 1440 and 390 — the pre-existing
+  floor-divider row, not one of the touched cells. Not claimed as fixed.
+- **Export opens and parses:** 186 × 33 (was 186 × 30), both sheets, assumptions sheet intact
+  at 21 rows, Iraq carrying `81.5 / 84.8 / 86.9 / 88.1` published and
+  `28.6 / 34.1 / 37.8 / 39.7` comparable.
+
+## Loop health
+
+- **The "one correction, five cells" defect class now has three instances and deserves a gate.**
+  v1046 found the IOC reform tile lagging the export it sits beside; v1047 found Browse's curve
+  lagging its own take cell. Both are a basis correction applied to the cell a cycle was
+  looking at and not to its arithmetic neighbours. The check that would have caught this one is
+  cheap and ran in seconds: **for every row, assert the printed Swing equals the printed
+  @$125 − @$50, and that the four printed take points are monotonic.** Neither the runtime
+  suite, `scrollWidth`, nor the under-24px sweep measures a cell against the cell beside it.
+  Recommend it as a gate.
+- **Still open from cycle 988, unchanged and not touched this cycle:** the swallowed
+  `try { _sbsPaintBasisStrip(); } catch (e) { /* non-critical */ }` in `renderCompare` leaves
+  the *previous* set's assumptions sentence on screen on throw.
+- **New, recorded not fixed:** the Platform Reference Guide's PLATFORM TABS list (`:23745–23746`)
+  is hand-typed and has drifted — it tells a first-time analyst the Screener filters by
+  **IRR** (deleted at v517) and **breakeven** (deliberately never a filter; the legend under
+  the table explains why), says Side-by-Side compares "up to 4 countries" against `CMP_MAX` 5,
+  and omits Explorer and Sample Analyses entirely. Left alone this cycle because the directive
+  bans text-only changes and every item is text; flagged because it is the panel a cold T1
+  analyst opens to orient themselves.
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`,
+  so the 547 reported at the top of this cycle is the **LIVE** (pre-push) build. Unchanged
+  since cycle 985.
+- The slow local gate remains the loop's largest measurement problem — a 10.2 MB single-file
+  page reloaded ~200 times cannot finish inside a 30-minute cycle, so it cannot be the thing
+  that blocks a push. A **threaded** server (used again this cycle) is the cheap half of the
+  fix; the other half is a warm-cache single-context mode in the suite.
+- **Probe debris, twenty-seventh cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  This cycle wrote every probe, the pre-edit snapshot and the before-build server tree to
+  `/tmp/c990/`; **nothing landed in the repo.** Still recommending Zach authorise deletion or
+  a `.gitignore` entry.
