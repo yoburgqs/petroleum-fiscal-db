@@ -1171,6 +1171,24 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 /* v342: scrollbar-gutter:stable — reserves scrollbar track space even when no scrollbar is visible;
    prevents layout shift (~17px) when 185-row FC table first loads and scrollbar appears on Windows. */
 #fc-results { contain: layout style paint; overscroll-behavior: contain; scrollbar-gutter: stable; }
+/* ── v1048 (T6): #fc-results stops wearing the EMPTY state once it is full ────────────────
+   #fc-results is declared in the markup as class="empty-state" because that is what it is
+   before a run: a centred loading message and three quick-start buttons. renderFCResults()
+   then does `.innerHTML = html` and never touches the class, so the 185-row ranked table
+   has always been rendered inside .empty-state { padding: 40px; text-align: center }.
+   Measured on the shipped build at 1920/1440/1280/1024/768/390, cold:
+     * 80px of horizontal budget gone at EVERY width. The table scroller is 80px narrower
+       than its own container -- 280px of 362 at 390, 902 of 982 at 1024 -- on a table that
+       is 1,810px wide and must be dragged sideways to read.
+     * COUNTRY and MECHANIC headers are text-align:left (set explicitly on the <th>), while
+       all 370 of their body cells inherit `center` from the placeholder. The header does not
+       sit over its own column on the two columns that identify the row.
+   #cmp-output and #ioc-output carry the same class in markup and BOTH clear it on render;
+   Fiscal Compare is the one surface that never did. Colour and font-size are restated here
+   so nothing that relies on inheriting --muted (the uncoloured rank cells, the "--" NPV and
+   breakeven placeholders) changes shade. 14px of top padding keeps the gap under the reading
+   guide. No take, NPV, rank, sort, filter, grade or count changes. */
+#fc-results.fc-filled { padding: 14px 0 0; text-align: left; color: var(--muted); font-size: 14px; }
 #fc-results table tbody tr { cursor: pointer; }
 #fc-results table tbody tr:hover { background: rgba(176,104,0,0.04); }
 #fc-results table tbody tr:focus { background: rgba(176,104,0,0.08); outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -65812,7 +65830,7 @@ function runFiscalCompare() {
 
   // Show skeleton loader — deferred 1 frame so DOM repaints before synchronous DCF computation
   var fcDiv = document.getElementById('fc-results');
-  if (fcDiv) fcDiv.innerHTML = _fcSkelHTML();
+  if (fcDiv) { fcDiv.innerHTML = _fcSkelHTML(); fcDiv.className = 'empty-state'; }  // v1048 (T6)
 
   setTimeout(function() {
     const t0 = performance.now();
@@ -66644,6 +66662,7 @@ function renderFCResults(results, price) {
   if (sorted.length === 0) {
     var _fcResEl = document.getElementById('fc-results');
     if (_fcResEl) {
+      _fcResEl.className = 'empty-state';   // v1048 (T6)
       _fcResEl.innerHTML = '<div style="text-align:center;padding:48px 24px;max-width:560px;margin:0 auto;">'
         + '<div style="font-size:24px;margin-bottom:12px;opacity:.35;">\u2296</div>'
         + '<strong style="color:var(--text);font-size:14px;">No countries match your current filters</strong>'
@@ -67761,7 +67780,10 @@ function renderFCResults(results, price) {
     html += '<tfoot><tr><td colspan="' + _beCovCols + '" style="padding:6px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);background:var(--surface2);text-align:center;">Breakeven data: 65 of 185 countries (requires verified per-contract royalty + cost data). Remaining 120 countries show — and sort to the bottom. Use the <strong>Breakeven only</strong> filter above to hide them.</td></tr></tfoot>';
   }
   html += '</table></div>';
-  document.getElementById('fc-results').innerHTML = html;
+  var _fcOut1048 = document.getElementById('fc-results');
+  _fcOut1048.innerHTML = html;
+  // v1048 (T6): this element is no longer the empty state. See #fc-results.fc-filled.
+  _fcOut1048.className = 'fc-filled';
   // Announce result count to screen readers
   (function() {
     var announcer = document.getElementById('sr-announcer');

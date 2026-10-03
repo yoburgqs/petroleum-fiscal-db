@@ -2326,6 +2326,63 @@ async function testReformRisk(page) {
     if (html.includes('Reform') || html.includes('table')) p(S, 'content rendered', `${html.length} chars`);
     else f(S, 'content rendered', 'Reform risk content empty');
 
+    // ── v1023 (T4): every table on this tab must render as many cells as it promises ──────
+    // v1016 declared `function _rrTakeChip(e)` next to an existing `_rrTakeChip(country,
+    // take75, forCell, takeColor)`. Declarations hoist, the last wins, and the Take @ $75
+    // builder died with all four of its call sites. The ranked table then rendered 6 <th> and
+    // 5 <td> on all 21 rows -- the whole TAKE @ $75 column blank -- and the 21 orphan <span>s
+    // were foster-parented out of <tbody> and stacked above the table header. This suite was
+    // 543 PASS / 0 FAIL through all of it: nothing anywhere asserted that a row has as many
+    // cells as its header has columns, so a missing column is not a thing it can see.
+    // Colspan-aware on both axes, so the ranked table's two full-width divider rows and the
+    // heatmap's banded two-row <thead> are counted correctly rather than whitelisted.
+    const struct = await page.evaluate(() => {
+      const tables = [], orphans = [];
+      document.querySelectorAll('#reform-risk-content table').forEach((t, ti) => {
+        const hr = [...t.querySelectorAll('thead tr')].pop();
+        if (!hr) return;
+        const span = els => els.reduce((a, c) => a + (parseInt(c.getAttribute('colspan') || 1, 10) || 1), 0);
+        const nCols = span([...hr.children]);
+        const bad = [];
+        t.querySelectorAll('tbody tr').forEach((r, ri) => {
+          const tds = [...r.children].filter(c => c.tagName === 'TD');
+          if (!tds.length) return;
+          const n = span(tds);
+          if (n !== nCols) bad.push(`t${ti}r${ri} "${(tds[0].innerText || '').trim().slice(0, 18)}" ${n}/${nCols}`);
+        });
+        tables.push({ ti, nCols, bad });
+      });
+      // A take chip outside a .reform-event row is a chip the HTML parser moved out of a table.
+      document.querySelectorAll('#reform-risk-content .reform-take').forEach(e => {
+        if (!e.closest('.reform-event')) orphans.push(e.textContent.trim().slice(0, 44));
+      });
+      return { tables, orphans };
+    });
+    const colBad = struct.tables.reduce((a, t) => a.concat(t.bad), []);
+    if (struct.tables.length >= 3 && !colBad.length)
+      p(S, 'table cells match header columns', `${struct.tables.length} tables, cols ${struct.tables.map(t => t.nCols).join('/')}, every tbody row full-width`);
+    else if (struct.tables.length < 3)
+      f(S, 'table cells match header columns', `expected >=3 tables on this tab, found ${struct.tables.length}`);
+    else
+      f(S, 'table cells match header columns', `${colBad.length} row(s) short of their header: ${colBad.slice(0, 6).join(' | ')}`);
+
+    if (!struct.orphans.length) p(S, 'no foster-parented take chips', 'every .reform-take sits inside its own .reform-event row');
+    else f(S, 'no foster-parented take chips', `${struct.orphans.length} chip(s) parsed out of a table: ${JSON.stringify(struct.orphans.slice(0, 3))}`);
+
+    // The ranked table's Take @ $75 column is the one the header tooltip documents as carrying
+    // the fee-basis correction (Iraq 84.8% blend -> 34.1% comparable, plus Ecuador, Mexico,
+    // India). A populated column and a correct one are different claims; assert both.
+    const takeCol = await page.evaluate(() => {
+      const t = document.querySelectorAll('#reform-risk-content table')[1];
+      if (!t) return null;
+      const rows = [...t.querySelectorAll('tbody tr')].filter(r => [...r.children].filter(c => c.tagName === 'TD').length > 2);
+      const last = rows.map(r => [...r.children].filter(c => c.tagName === 'TD').pop().innerText.replace(/\s+/g, ' ').trim());
+      return { n: rows.length, withPct: last.filter(x => /%/.test(x)).length, cmp: last.filter(x => /cmp/.test(x)).length };
+    });
+    if (takeCol && takeCol.n === takeCol.withPct && takeCol.cmp === 4)
+      p(S, 'ranked table Take @ $75 populated', `${takeCol.withPct}/${takeCol.n} rows carry a take%, 4 marked fee-basis comparable`);
+    else f(S, 'ranked table Take @ $75 populated', `expected all rows with a take% and 4 cmp markers, got ${JSON.stringify(takeCol)}`);
+
     // Check reform table section
     const tbody = await page.$('#tbody-reforms');
     const reformFilter = await page.$('#reform-filter-country');
@@ -2494,13 +2551,52 @@ async function testBreakevenMap(page) {
     } else w(S, 'SVG', 'breakeven-map-svg not found');
 
     // Price slider
+    // v1018 (T1): this drove the slider to a hard-coded 50 and asserted the label read "50".
+    // The marker's range is derived from the breakeven distribution (min/max/step computed next
+    // to the colour bands), so 50 fell outside it, the browser clamped to max, and the test
+    // warned about a slider that was working. Same typed-constant-vs-refitted-range fault the
+    // product had. The probe value now comes from the control's OWN range, so it survives the
+    // range re-fitting when the DB gains a country outside today's span. Also asserts the
+    // threshold counters actually move, which is the behaviour an analyst depends on and which
+    // a label-only check could never see.
     const slider = await page.$('#be-price-marker');
     if (slider) {
-      await slider.evaluate(el => { el.value = 50; el.dispatchEvent(new Event('input')); });
-      await page.waitForTimeout(300);
-      const labelText = await page.evaluate(() => (document.getElementById('be-price-label') || {}).textContent);
-      if (labelText && labelText.includes('50')) p(S, 'price slider', `Label updated to "${labelText}"`);
-      else w(S, 'price slider', `Label: "${labelText}"`);
+      const rng = await page.evaluate(() => {
+        const s = document.getElementById('be-price-marker');
+        return { min: +s.min, max: +s.max, step: +s.step || 1 };
+      });
+      const lo = rng.min, hi = rng.max;
+      const probe = Math.round((lo + hi) / 2);
+      if (!(hi > lo)) {
+        w(S, 'price slider', `degenerate range ${lo}-${hi}`);
+      } else {
+        const readState = () => page.evaluate(() => ({
+          label: (document.getElementById('be-price-label') || {}).textContent || '',
+          below: (document.getElementById('be-below-count') || {}).textContent || '',
+          above: (document.getElementById('be-above-count') || {}).textContent || ''
+        }));
+        await slider.evaluate((el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); }, probe);
+        await page.waitForTimeout(300);
+        const mid = await readState();
+        if (mid.label.includes(String(probe))) p(S, 'price slider', `Label tracks the marker: "${mid.label}" at $${probe} of range $${lo}-$${hi}`);
+        else w(S, 'price slider', `Label "${mid.label}" did not follow marker $${probe} (range $${lo}-$${hi})`);
+
+        // the range must actually discriminate: the two ends cannot give the same split
+        await slider.evaluate((el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); }, lo);
+        await page.waitForTimeout(250);
+        const atLo = await readState();
+        await slider.evaluate((el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); }, hi);
+        await page.waitForTimeout(250);
+        const atHi = await readState();
+        if (atLo.below !== atHi.below && atLo.above !== atHi.above) {
+          p(S, 'price slider discriminates', `$${lo} -> ${atLo.below} viable / ${atLo.above} above; $${hi} -> ${atHi.below} / ${atHi.above}`);
+        } else {
+          w(S, 'price slider discriminates', `both ends of $${lo}-$${hi} report ${atLo.below} viable / ${atLo.above} above — the marker's range sits outside the breakeven distribution`);
+        }
+        // restore the cold-load marker so later assertions see the default view
+        await slider.evaluate((el) => { el.value = el.getAttribute('value') || String(window._beMarkerInit || el.value); el.dispatchEvent(new Event('input', { bubbles: true })); });
+        await page.waitForTimeout(200);
+      }
     } else w(S, 'price slider', '#be-price-marker not found');
 
     // Lowest/highest lists

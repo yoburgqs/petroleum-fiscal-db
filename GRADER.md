@@ -72227,3 +72227,118 @@ the "most price-stable regimes" ranking.
   This cycle wrote every probe, the pre-edit snapshot and the before-build server tree to
   `/tmp/c990/`; **nothing landed in the repo.** Still recommending Zach authorise deletion or
   a `.gitignore` entry.
+
+---
+
+## Cycle 992 Log — 2026-10-03 — T1 — v1048
+
+**This cycle shipped and verified the edit cycle 991 left uncommitted when it was SIGKILLed at
+its 1800s timeout.** 991 wrote the change, never measured it, never committed it, and died
+part-way through its mirror copy. Nothing in the loop noticed. This cycle re-derived the defect
+from the source, reproduced it on the pre-edit build, measured the fix, and shipped it.
+
+### Task
+**T1 — "Which countries should even be on my screening list?"** Fiscal Compare's 185-row ranked
+table *is* the screening list. (991 labelled its own edit T6; the defect it fixes is a
+read-the-table problem, so it is logged here as T1. The rotation was broken by 991's timeout,
+not by choosing to repeat T1 after cycle 990.)
+
+### Friction
+`#fc-results` is declared at `index.html:3945` as `<div id="fc-results" class="empty-state">`,
+because before a run that is what it is: a centred "Loading fiscal terms for all 185
+countries…" message plus three quick-start buttons. `.empty-state` is
+`{ color: var(--muted); font-size: 14px; padding: 40px; text-align: center; }` (`:526`).
+
+`renderFCResults()` ended with a bare `document.getElementById('fc-results').innerHTML = html;`
+and **never cleared the class**. So the ranked table has always been rendered *inside the empty
+state*. Two measured consequences, on the cold walk Home → click Fiscal Compare (the table
+renders in ~250ms; no auto-run defect, `#t0` is not the landing tab):
+
+1. **80px of horizontal budget gone at every width**, on a table that is **1,805px wide** and
+   must be dragged sideways to read. The `.tbl-wrap` scroller was 80px narrower than its own
+   container at all six viewports — worst at the phone, where 282px of 362 were usable.
+2. **The two columns that identify the row did not sit under their own headers.**
+   `thead th { text-align: left }` (`:406`) left-aligns the COUNTRY and MECHANIC headers, while
+   all 370 of their body cells inherited `center` from the placeholder. Measured at 1440 on the
+   pre-edit build: header `COUNTRY` = `left`, cell `USA` = `center`; header `MECHANIC` = `left`,
+   cell `Concession` = `center`. Numeric cells were never affected — `.num { text-align: right }`
+   (`:424`) is set on the cell itself, so inheritance never reached them.
+
+`#cmp-output` (`:33975`) and `#ioc-output` (`:43177`, `:43276`) carry the same class in markup and
+**both** clear it before writing. Fiscal Compare was the one output surface that never did.
+
+### Change
+`#fc-results` now runs a three-state class machine, so it only wears the empty state when it *is*
+empty: `empty-state` for the skeleton (`:65833`), `empty-state` for the zero-match message
+(`:66665`), and a new `fc-filled` for the table (`:67785`).
+`#fc-results.fc-filled { padding: 14px 0 0; text-align: left; color: var(--muted); font-size: 14px; }`
+restates colour and font-size so the uncoloured rank cells and the `--` NPV/breakeven
+placeholders do not change shade.
+
+On screen: the ranked table is **80px wider at every viewport**, and the COUNTRY and MECHANIC
+columns are left-aligned under their left-aligned headers.
+
+### Result
+The analyst reading the screening list sees ~80px more of a table they have to drag — at 390px
+that is 282px → 360px of usable width, **28% more of each row per drag** — and the country name
+and mechanic now line up under the headers that name them, so the two columns that tell them
+*which row this is* can be scanned down the left edge instead of read out of a centred ragged
+column.
+
+### Verification — all measured this cycle, nothing carried forward
+- **JS syntax gate: PASS** — 11 inline blocks, 0 failures.
+- **Reproduced on the pre-edit build**, served from `/tmp/c992/b2/` (HEAD's `index.html`
+  symlinked against the real repo tree so `country_data.json` loads; `COUNTRY_DATA` = 185).
+  First probe attempt served `index.html` alone, `COUNTRY_DATA` came back **0**, Fiscal Compare
+  never rendered and the run was discarded as invalid rather than reported.
+- **Before → after at 1440, cold:** `cls` `empty-state` → `fc-filled`; padding `40px` → `14px 0 0`;
+  `text-align` `center` → `left`; scroller `1318` → `1398` (**lost 82px → 2px**); COUNTRY cell
+  `center` → `left`, MECHANIC cell `center` → `left`, `TAKE%` cell `right` → `right` (unmoved);
+  185 rows both ways; `color` `rgb(107,101,96)` and `font-size` `14px` **identical** both ways;
+  render time 249ms → 252ms.
+- **6 viewports × 9 tabs on the after build** — 1920/1440/1280/1024/768/390:
+  `scrollWidth == clientWidth` on every tab at every width, **zero horizontal scroll**,
+  **zero page errors**. `pointer: coarse` confirmed **true** at 768 and 390, **0 controls under
+  24px** in `#fc-results` at both. No control was added, so there is no new touch surface and
+  nothing for the v612 mobile layer to collide with.
+- **Scroller width recovered, per viewport** (before → after, both measured on the same cold walk):
+  1920: 1798→1878 · 1440: 1318→1398 · 1280: 1158→1238 · 1024: 902→982 · 768: 666→746 ·
+  **390: 280→360 (+28.6%)**. `LOST` is 82px before and 2px after at every one of the six widths;
+  the before build also showed 0 horizontal scroll and 0 page errors, so neither was regressed.
+- **Nothing that relied on the inherited centring lost it.** Every threshold divider
+  (`_gdCols`, `_nColspan`, `_t40/_tm/_t60/_t75`, `_b50/_b80`, `_s10/_s20`, `_rrColspan`) sets
+  `text-align:center` on its own inner `<div>`, and the breakeven-coverage `<tfoot>` sets it on
+  the cell. Only the `_dtCols` data-basis footnote moves centre → left, which is the right
+  reading for a multi-line paragraph.
+- STILL LOCKED items untouched: no tab reorder, no v612 mobile-layer edit, `#reference-panel`
+  not touched, Govt NPV still absent from FC, CP headline untouched.
+
+## Loop health
+
+- **A 1800s cycle timeout can leave the repo in a half-shipped state and nothing detects it.**
+  991 died holding an uncommitted `index.html` edit *and* a **truncated mirror**:
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html` was **326,375 bytes** in the
+  working tree against **10,004,731** at office HEAD — a partial `cp` killed mid-write. A cycle
+  that reads that mirror, or a `git add -A` in the office repo, would have committed a 3%
+  fragment of the platform. Repaired by this cycle's step 5. Recommend the cycle script write the
+  mirror to a temp file and `mv` it into place, so the copy is atomic.
+- **The diverged suite copies are not symmetric, and the stale one is the repo's.**
+  `cycle_log.txt` warns every run that the copies differ. Measured: the **graded** copy
+  (`office/tools/petroleum/tests/runtime_comprehensive.js`, 4,864 lines) is **96 lines AHEAD** of
+  the repo copy (`petroleum-fiscal-db/tests/`, 4,768) — it holds the v1023 cell-count guard the
+  repo copy lacks. So the thing that runs is the richer one and no check is being skipped, but
+  any cycle that edits the repo copy is editing a dead file. Synced this cycle.
+- **Still open from cycle 988, not touched:** the swallowed
+  `try { _sbsPaintBasisStrip(); } catch (e) {}` in `renderCompare` leaves the *previous* set's
+  assumptions sentence on screen on throw.
+- **Still open from cycle 990, not touched:** the Platform Reference Guide's PLATFORM TABS list
+  (`:23745–23746`) still advertises Screener filters by IRR (deleted at v517) and breakeven
+  (never a filter), says Side-by-Side takes 4 countries against `CMP_MAX` 5, and omits Explorer
+  and Sample Analyses.
+- **The "one correction, five cells" gate recommended by cycle 990 is still unbuilt.**
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`, so
+  the 547 PASS at the top of this cycle is the **LIVE** (pre-push) build, not this edit.
+  Unchanged since cycle 985. This cycle's own gates were measured locally and are reported above.
+- **Probe debris, twenty-eighth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
+  Every artefact this cycle wrote went to `/tmp/c992/`; **nothing landed in the repo.**
