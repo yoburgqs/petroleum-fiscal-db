@@ -73123,3 +73123,116 @@ unadjusted rate is what needs stating as the exception."
 **Task — T4:** "What is my fiscal-stability and reform exposure here?" (stalest of the six; 998 was T2, 996 T6, 995 T3, 994 T5, 992 T1.)
 
 **Friction.** Cold walk at 1440×900 → IOC Portfolio → `Quick: CNOOC`. On a portfolio the REFORM EXPOSURE tile (`_iocReformStat`, `index.html:42859`) *is* the whole T4 a
+
+---
+## Cycle 1000 — v1054 — 2026-10-03
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?"
+(999 was T4, 998 T2, 996 T6, 995 T3, 994 T5, 992 T1. Picked T6 over the staler T1 because
+the defect below was found open and sized during the walk, is the largest single-number error
+on the platform, and sits on the first readable row of a ranked table.)
+
+**Friction.** Cold walk at 1440x900, sessionStorage and localStorage cleared: Home → IOC
+Portfolio → Shell (the default) → COUNTRY BREAKDOWN. That table is ranked by government take,
+highest first, so the rows an IC memo opens on are the top of it. Rows 1 and 2 are Philippines
+and Kuwait at 100.0%, both already withheld as "NO CONTRACTOR POSITION". The first row carrying
+a readable number was:
+
+| # | country | mechanic | take cell |
+|---|---|---|---|
+| 3 | Iraq | TSC | `98.5%` · `country-wide 84.8%` |
+| 4 | Oman | RSC | `85.0%` · `country-wide 77.6%` |
+
+Both figures on the Iraq row are remuneration-fee artefacts and neither said so.
+
+- **98.5%** is the take across the operator's own TSC contracts. TSC is **Group 2** in
+  `~/MECHANIC_COMPARABILITY.md` (2026-08-26): the contractor is paid a fixed $/bbl remuneration
+  fee and keeps no price upside, so a ~99% "take" measures contract **structure**, not the
+  severity of Iraq's fiscal terms — and that document's rule is that Group 2 may not be compared
+  against Group 1 at all. 28 of ORCA's 1,772 IOC rows sit on a Group-2 mechanic (TSC, RSC,
+  India RSC, Buy-back); every Iraq TSC row in the set reads 98.5%.
+- **`country-wide 84.8%`** is the published blend, 415 of Iraq's 610 contracts being TSC. The
+  comparable figure on its 195 PSC/Concession contracts is **34.1%** — a **50.7pp** gap, the
+  largest on the platform. Iraq is not where Shell is squeezed hardest; on terms that can be
+  ranked it is softer than every row in the table bar the USA, the Netherlands and Argentina.
+  The analyst read the top of the ranked table and took the conclusion away **inverted**.
+
+Every other surface has carried the correction for ~500 versions — v549 (Side-by-Side), v552
+(Country Profile), v553 (the IC clipboard), v554 (the Screener ceiling), v988 (the six Reform
+Risk surfaces) — and all of them route through one call, `_scFeeCmpAt()`. The two IOC take cells
+read `cd.take_75` **raw**, so the one tab organised around an operator's book was the last place
+on the platform still printing the blend with nothing beside it. **10 of 185** countries diverge
+at $75 and the IOC tables showed the uncorrected figure for all 10:
+
+    Iraq 84.8 → 34.1 (-50.7pp) · Ecuador 46.5 → 39.3 · South Sudan 53.3 → 49.0
+    Qatar 77.2 → 74.5 · Mexico 32.2 → 29.7 · Oman 77.6 → 75.6 · India 61.9 → 63.2 (+1.3)
+    Iran 75.7 → 74.4 · Malaysia 59.4 → 58.3 · Azerbaijan 60.8 → 59.8
+
+**Change.** `_iocTakeCell()` (operator table, `index.html:42637`) and `_iocExpCtryWide()`
+(exposure annex, `index.html:52866`) now both route through one shared helper,
+`_iocCtryWideSub()`, instead of each holding its own copy of the sub-line. That duplication is
+how the defect arose: v820 built the cell for the top table, v822 copied it into the annex
+2,000px below, and the correction was absent from both. On screen:
+
+- The country sub-line prints the **comparable PSC/Concession figure**, labelled `PSC/Conc` and
+  in orange, wherever published and comparable disagree at 0.1pp. Iraq's row now reads
+  `country-wide 34.1% PSC/Conc`, not 84.8%.
+- A row whose **own** mechanic is Group 2 carries the orange fee-basis marker
+  `⊘ TSC fee basis`, reusing `.cp-fee-mark` — the same ⊘ the Country Profile peer strip and the
+  Side-by-Side columns already use for this exact finding.
+- **Fallback rows are no longer skipped outright.** On ExxonMobil and BP, Iraq is a
+  `COUNTRY AVG` row that printed a bare `84.8%` with nothing beside it; it now carries
+  `34.1% PSC/Conc`. That was the second-worst instance of the same defect.
+
+No new vocabulary and no new threshold: the divergence test is `_scFeeCmpAt()`'s own 0.1pp
+print test, and `PSC/Conc` is the label already used 47 times across the Screener, Fiscal
+Compare and Country Profile.
+
+Shell's top four rows now read:
+
+    1  Philippines  100.0%  NO CONTRACTOR POSITION   country-wide 46.5%
+    2  Kuwait       100.0%  NO CONTRACTOR POSITION
+    3  Iraq  TSC     98.5%  ⊘ TSC fee basis          country-wide 34.1% PSC/Conc
+    4  Oman  RSC     85.0%  ⊘ RSC fee basis          country-wide 75.6% PSC/Conc
+
+**Result.** An analyst opening an operator's book can read the take column as a ranking again.
+The two rows at the top of it now say that their figures are contract structure rather than
+fiscal severity, and name the figure that can actually be screened — so Iraq stops presenting as
+the harshest jurisdiction in the portfolio when its rankable terms are among the softest.
+
+### Verification — all run this cycle, nothing carried forward
+- **JS syntax gate:** 11 inline `<script>` blocks extracted and `node --check`-ed, **0 failures**.
+- **Playwright `runtime_comprehensive` against the LOCAL tree** (`TEST_URL=http://127.0.0.1:8787`):
+  **546 PASS / 0 FAIL / 1 WARN**. HEAD through the **identical** local harness (`:8788`):
+  **546 / 0 / 1**. **Suite-neutral.** The 1 WARN and the `sw.js` 404s are the artefact of serving
+  at `/` rather than `/petroleum-fiscal-db/` — present on HEAD, not from this change. The 547
+  quoted at the top of the cycle prompt is the LIVE build; see the standing note below.
+- **All 16 top-table operators and all 6 annex operators rendered:** 40 fee-basis markers and
+  132 comparable sub-lines placed, **0 pageerrors, 0 console errors**.
+- **Export path exercised:** `_iocExpRows()` 33 rows, `_iocExpBasisLines()` 9,829 chars, no throw.
+- **Mobile 390x844 `hasTouch: true`:** `scrollWidth 390 = clientWidth 390`, no sideways scroll.
+  Of the **63** elements this change touches or adds on `#t5`, **0** render under 24px —
+  `.ioc-ctry-wide` keeps its v822 `(pointer: coarse)` 24px floor and `.cp-fee-mark` its own.
+
+### Notes for the next cycle
+- **Closed this cycle:** the IOC Portfolio `country-wide` blend defect carried open since 999.
+- **Carried, still open:** `copyFCForIC` / `exportFCResults` do not say *which* default rate the
+  record contradicts on the 120 default rows (996/998). The CP's Live DCF panel and Fiscal
+  Breakdown still not walked for the default-basis case (996, 998). The two screen-only strings
+  in the SbS IC-pack PDF and the `display:none` at `index.html:2458` (995). `_icRefuse()` pins
+  `minWidth` not `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in
+  `renderCompare` (988). The Platform Reference Guide still advertises deleted Screener
+  filters (990).
+- **Found this cycle, not fixed:** the IOC **XLSX and clipboard** carry a `Govt Take @$75 (%)`
+  country column built in `_iocExpRows()` from `cd.take_75` — the same raw blend the screen just
+  stopped printing. The screen and the artifact now disagree on Iraq (34.1 on screen, 84.8 in the
+  sheet). `_iocCtryWideSub()` is the on-screen fix; `_iocExpRows()` needs the same `_scFeeCmpAt()`
+  call. **Next cycle's T5.**
+- **`autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`**,
+  so the PASS count at the top of every cycle prompt is the LIVE pre-push build, not the tree
+  being edited. Unchanged since cycle 985 — now **fifteen** cycles. Worked around again this
+  cycle by running the suite twice against local, tree and HEAD.
+- **Probe debris, thirty-fourth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  Everything this cycle wrote went to `/tmp/c1000/`; **nothing landed in the repo.** Safe to
+  delete but not created this session, so flagged rather than removed unasked.
