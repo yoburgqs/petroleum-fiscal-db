@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1047</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1049</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -53222,8 +53222,12 @@ function copyIOCPortfolio() {
   // v1025 (T5): 9pt and 4px side padding, not 10pt/8px. Measured: at 10pt with 8px padding a
   // 43px-wide figure column has a 26px content box, so every one of the 33 "100.0%" cells
   // overflowed its border. The exhibit metric is page fit, not screen comfort.
-  var th  = 'border:1px solid #999;padding:3px 2px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;';
-  var td  = 'border:1px solid #999;padding:3px 2px;font-family:Calibri,Arial,sans-serif;font-size:9pt;';
+  // v1049 (T5): word-wrap:break-word, which Fiscal Compare (v977) and the Screener (v1008) have
+  // carried since they got this treatment and this paste never did. A proper noun longer than
+  // its column ('Philippines', 'Trinidad and Tobago') has no break opportunity, so without it
+  // the token spills into the neighbouring cell and overprints the figure in it.
+  var th  = 'border:1px solid #999;padding:3px 2px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;vertical-align:bottom;word-wrap:break-word;';
+  var td  = 'border:1px solid #999;padding:3px 2px;font-family:Calibri,Arial,sans-serif;font-size:9pt;word-wrap:break-word;';
   var tdL = td + 'font-weight:bold;';
   // ── v1025 (T5) ─ the v977 exhibit treatment, carried to the LAST paste that never got it ──
   // Walked T5 cold at 1440x900, storage cleared: IOC Portfolio -> operator loads -> "Copy for
@@ -53262,11 +53266,45 @@ function copyIOCPortfolio() {
   // exception flag. That also closes the width budget: 13 columns of this content do not fit a
   // 6.5in text column at any readable size, 12 do. text/plain still carries it as a column,
   // because Excel has no page to fit and v977 already accepts the two flavours diverging.
-  var _iocDrop = { 3: 1 };
+  // ── v1049 (T5) ─ every map in this function is keyed by column NAME, not position ──────
+  // v1029 (T4) inserted 'Reform verdict' and 'Reform basis' at cols[11..12] and extended none
+  // of the five positional tables below it. Everything from index 11 rightward shifted two
+  // places, so the exhibit this button pastes into Word shipped with a header row that was
+  // wrong about four of its fourteen columns. Measured cold on Shell at 624px (letter portrait,
+  // 6.5in text column), on the text/html flavour Word consumes:
+  //   col 11  Reform verdict      ... labelled "Take basis"      (Norway: "TAKE NET 0pp")
+  //   col 12  Reform basis        ... labelled "Compar-ability"  (the Reform Frequency prose)
+  //   col 13  Take basis          ... labelled "undefined"       headShortIoc[13] does not exist
+  //   col 14  Take comparability  ... labelled "undefined"       headShortIoc[14] does not exist
+  // The two shifted-off columns also lost their shorteners and their colgroup weights, so the
+  // 348- and 428-character basis sentences v1025 moved OUT of the cells went straight back in,
+  // at the 30px fallback width: Norway's row rendered 2,163px (22.5in) tall, the longest cell
+  // 1,008 characters, 126 cells overflowing, and the 33-row exhibit 44,067px = 51 letter pages.
+  // v1025 had it at 2.5. The regression was invisible because nothing measures a clipboard.
+  //
+  // Positional keys are the defect, so they are gone rather than renumbered: a name-keyed map
+  // cannot be shifted by inserting a column, it can only be MISSING an entry — which is a
+  // visible blank label, not a silently mislabelled one. _iocMissingShort below makes even that
+  // loud: an unmapped column falls back to its own full header rather than to undefined.
+  var SHORT_IOC = {
+    'Country': 'Country', 'Region': 'Region', 'Mechanic': 'Mech-anic',
+    'Mechanic basis': 'Mech. basis', 'Govt Take @$75 (%)': 'Govt take %',
+    'Country-wide take @$75 (%)': 'Ctry-wide take %', 'Take gap (pp)': 'Take gap pp',
+    'Contractor NPV @$75 ($M)': 'NPV $M', 'Contracts': 'Con-tracts',
+    'Evidence grade': 'Evi-dence', 'Evidence basis': 'Evid. basis',
+    'Reform verdict': 'Re-form', 'Reform basis': 'Reform basis',
+    'Take basis': 'Take basis', 'Take comparability': 'Compar-ability'
+  };
+  // 'Reform basis' joins 'Mechanic basis' as a RIDER, not a column, for the reason v1025 gave
+  // for the first one: it is a 300-700 character sentence qualifying the short verdict in the
+  // cell beside it, and that is what an exhibit puts in a note. Each rider names the column it
+  // qualifies, so the pairing is declared in one place instead of hard-coded at the render site.
+  var _iocRider = { 'Mechanic': 'Mechanic basis', 'Reform verdict': 'Reform basis' };
+  var _iocDropName = {}; for (var _rk in _iocRider) _iocDropName[_iocRider[_rk]] = 1;
+  var _iocDrop = {};
+  matrix[0].forEach(function(c, i){ if (_iocDropName[c]) _iocDrop[i] = 1; });
   var _iocCols = matrix[0].map(function(c, i){ return i; }).filter(function(i){ return !_iocDrop[i]; });
-  var headShortIoc = ['Country','Region','Mech-anic','Mech. basis','Govt take %',
-    'Ctry-wide take %','Take gap pp','NPV $M','Con-tracts','Evi-dence','Evid. basis',
-    'Take basis','Compar-ability'];
+  var headShortIoc = matrix[0].map(function(c){ return SHORT_IOC[c] || c; });
   // Labels are kept to words of six characters or fewer, hyphen-broken where longer, for the
   // reason v977 recorded: a long word cannot be broken, so at column width it spills into the
   // next cell instead of wrapping. That is the mechanism behind the overprinting.
@@ -53367,13 +53405,47 @@ function copyIOCPortfolio() {
         return w.slice(0, 5) + '\u00ad' + w.slice(5);
       });
   }
-  var _iocProse = { 2: [_iocShMechName, null], 3: [_iocShMech, null],
-                    7: [_iocShNpv, function(){ return 'NPV $M — "n/a" is the state-monopoly '
-                          + 'cell: government take leaves no contractor position to value, so ORCA '
-                          + 'reports no NPV rather than the $0M the DCF returns. See the '
-                          + 'Compar-ability note on the same row.'; }],
-                    10: [_iocShEvid, _iocEvidNote],
-                    11: [_iocShTakeBasis, _iocTakeBasisNote], 12: [_iocShCmp, _iocCmpNote] };
+  // v1049 (T5): the reform verdict is already a short token ("TAKE +5pp", "WACC +3–5pp",
+  // "↑ PRE-2010", "SIZE UNKNOWN") on 21 of 185 jurisdictions and a 27-character sentence on the
+  // other 164. Only that one case needs shortening, and its note is the rider carrying the full
+  // 'Reform basis' sentence, so no second note is minted here.
+  function _iocShReform(t) {
+    t = String(t || ''); if (!t) return '';
+    return /^n\/c/.test(t) ? 'n/c' : t;
+  }
+  /* v1049 (T5): the same generalisation _iocEvidNote() already applies, for the same reason.
+     164 of 185 jurisdictions have no sourced reform log, and the sentence saying so names the
+     country twice — "and Philippines is one of the 164 without one", "(Philippines's own
+     petroleum act, IMF Article IV, ...)". Keyed verbatim it is 20 notes on a 33-row Shell
+     exhibit that differ only by a proper noun already printed in column 1 of the row that
+     carries the mark. Generalised, the 20 key as ONE: measured 57 notes -> 31 on Shell.
+     Jurisdictions that ARE scored keep a note each, because a Reform Frequency Score, its rank
+     and its named statute are genuinely per-country and are the reason the column exists. */
+  function _iocGenRd(t) {
+    t = String(t || '');
+    if (!/^NO SOURCED LOG\./.test(t)) return t;
+    return t.replace(/ and [^.]+? is one of the 164 without one/, ' and this country is one of the 164 without one')
+            .replace(/\(.+?'s own petroleum act/, '(that country\u2019s own petroleum act')
+            .replace(/\(.+?\u2019s own petroleum act/, '(that country\u2019s own petroleum act');
+  }
+  var _iocProseName = {
+    'Mechanic':                   [_iocShMechName, null],
+    'Mechanic basis':             [_iocShMech, null],
+    'Contractor NPV @$75 ($M)':   [_iocShNpv, function(){ return 'NPV $M — "n/a" is the state-monopoly '
+                                      + 'cell: government take leaves no contractor position to value, so ORCA '
+                                      + 'reports no NPV rather than the $0M the DCF returns. See the '
+                                      + 'Compar-ability note on the same row.'; }],
+    'Evidence basis':             [_iocShEvid, _iocEvidNote],
+    // `false`, not null: shorten the cell and mint NO note. The 'Reform basis' rider on this
+    // same cell already opens with the full verdict, so the auto-note would have put a second
+    // mark on 164 of 185 rows reading "Re-form — n/c — no sourced reform log" beside a note
+    // that says the same thing at length. One mark per cell, carrying the longer text.
+    'Reform verdict':             [_iocShReform, false],
+    'Take basis':                 [_iocShTakeBasis, _iocTakeBasisNote],
+    'Take comparability':         [_iocShCmp, _iocCmpNote]
+  };
+  var _iocProse = {};
+  matrix[0].forEach(function(c, i){ if (_iocProseName[c]) _iocProse[i] = _iocProseName[c]; });
   var _iocNotes = [], _iocNoteAt = {}, _iocLet = 'abcdefghijklmnopqrstuvwxyz';
   function _iocNoteKey(txt) {
     if (_iocNoteAt[txt]) return _iocNoteAt[txt];
@@ -53384,6 +53456,14 @@ function copyIOCPortfolio() {
   var _iocHdrKey = matrix[0].map(function(c, ci) {
     return (!_iocDrop[ci] && headShortIoc[ci] !== c) ? _iocNoteKey(c) : '';
   });
+  // v1049 (T5): an unmapped column is a build error, not a cell to fill with undefined. Name it
+  // in the console so the next inserted column is caught by the suite rather than by a reader of
+  // the memo, and let the exhibit fall back on the full header, which is long but true.
+  var _iocMissingShort = matrix[0].filter(function(c, i){ return !_iocDrop[i] && !SHORT_IOC[c]; });
+  if (_iocMissingShort.length && typeof console !== 'undefined' && console.warn) {
+    console.warn('ORCA IOC paste: no short label for column(s) ' + _iocMissingShort.join(', ')
+      + ' — add them to SHORT_IOC.');
+  }
   // Proportional widths declared on the header cells AND as a colgroup, because Word's
   // AutoFit-to-window otherwise divides the text column equally — 13 columns at 0.5in, which is
   // what put a government take on top of its neighbouring Mechanic cell. Weights are by content
@@ -53392,11 +53472,24 @@ function copyIOCPortfolio() {
   // UNBREAKABLE token in each column ('Philippines' 71px, 'CIS/FSU' 48, 'Contract' 52,
   // '-$1,797M' 41, 'COUNTRY' 50), not hand-tuned per column. Declared sum fits 624px once the
   // 12 x 11px of padding and borders is taken out.
-  var _iocWtAll = { 0:73, 1:49, 2:65, 4:41, 5:41, 6:31, 7:53, 8:37, 9:41, 10:51, 11:60, 12:49 };
-  var _iocWt = _iocCols.map(function(i){ return _iocWtAll[i] || 30; });
+  // v1049 (T5): same weights v1025 measured, re-keyed by name, plus 'Reform verdict' at 44 —
+  // the width of its longest unbreakable token ('UNKNOWN', 48px at 9pt Calibri) less the padding
+  // the declared sum already excludes. Thirteen columns now share the 624px rather than twelve;
+  // every weight is a proportion, so the others scale down together instead of two of them
+  // collapsing to the 30px fallback, which is what put a 428-character sentence in a 29px cell.
+  var _iocWtAll = { 'Country':73, 'Region':49, 'Mechanic':65, 'Govt Take @$75 (%)':41,
+    'Country-wide take @$75 (%)':41, 'Take gap (pp)':31, 'Contractor NPV @$75 ($M)':53,
+    'Contracts':37, 'Evidence grade':41, 'Evidence basis':51, 'Reform verdict':44,
+    'Take basis':60, 'Take comparability':49 };
+  var _iocWt = _iocCols.map(function(i){ return _iocWtAll[matrix[0][i]] || 30; });
   var _iocWtSum = _iocWt.reduce(function(a, b){ return a + b; }, 0);
   var _iocPct = _iocWt.map(function(w){ return (100 * w / _iocWtSum).toFixed(2) + '%'; });
-  function _iocNumeric(ci) { return ci >= 4 && ci <= 8; }
+  // v1049 (T5): was `ci >= 4 && ci <= 8`. It survived v1029 only because the two columns were
+  // inserted to the RIGHT of the figure block; an insertion one place earlier would have
+  // right-aligned and nowrapped a 700-character sentence. Keyed by name it cannot.
+  var _iocNumName = { 'Govt Take @$75 (%)':1, 'Country-wide take @$75 (%)':1, 'Take gap (pp)':1,
+                      'Contractor NPV @$75 ($M)':1, 'Contracts':1 };
+  function _iocNumeric(ci) { return !!_iocNumName[matrix[0][ci]]; }
   var _iocHeadHtml = '<tr>' + _iocCols.map(function(ci, k) {
     return '<th width="' + _iocPct[k] + '" style="' + th + 'width:' + _iocPct[k] + ';'
       + (_iocNumeric(ci) ? 'text-align:right;' : '')
@@ -53412,16 +53505,26 @@ function copyIOCPortfolio() {
           cell = esc(sh);
           // A cell shortened only by inserting a hyphen or a space says nothing a note could
           // add, so it keys none: strip the soft breaks and compare.
-          if (String(sh).replace(/[-\s\u00ad]/g, '') !== String(c).replace(/[-\s\u00ad]/g, '')) {
+          if (pr[1] !== false
+              && String(sh).replace(/[-\s\u00ad]/g, '') !== String(c).replace(/[-\s\u00ad]/g, '')) {
             nud = _iocMk(_iocNoteKey(pr[1] ? pr[1](c) : (headShortIoc[ci] + ' — ' + c)));
           }
         }
       }
-      // The dropped Mechanic-basis column rides as a mark on the Mechanic cell (ci 2).
-      if (ci === 2) {
-        var mb = r[3];
-        if (mb && !/^fiscal mechanic modelled by ORCA/.test(mb)) {   // the exception, not the default
-          nud += _iocMk(_iocNoteKey('Mech-anic — ' + _iocShMech(mb) + '. ' + mb));
+      // v1049 (T5): each dropped basis column rides as a mark on the column it qualifies.
+      // Was hard-coded to `ci === 2` reading `r[3]`; now driven by _iocRider, so 'Reform basis'
+      // reaches the memo through the same route as 'Mechanic basis' instead of occupying a
+      // column of its own under someone else's header.
+      var _rdName = _iocRider[matrix[0][ci]];
+      if (_rdName) {
+        var _rdI = matrix[0].indexOf(_rdName), _rd = _rdI >= 0 ? r[_rdI] : null;
+        // Only the exception earns a note. 'Mechanic basis' reads "fiscal mechanic modelled by
+        // ORCA" on 31 of 33 rows and 'Reform basis' is absent where there is no sourced log, and
+        // a mark on every row is a mark that carries nothing.
+        if (_rd && _rd !== '\u2014' && !/^fiscal mechanic modelled by ORCA/.test(_rd)) {
+          nud += _iocMk(_iocNoteKey(
+            (SHORT_IOC[_rdName] || _rdName) + ' — '
+            + (_rdName === 'Mechanic basis' ? _iocShMech(_rd) + '. ' + _rd : _iocGenRd(_rd))));
         }
       }
       return '<td style="' + (ci === 0 ? tdL : td)
