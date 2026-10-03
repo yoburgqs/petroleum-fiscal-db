@@ -72355,3 +72355,123 @@ column.
 **Task:** T1 — *"Which countries should even be on my screening list?"* Fiscal Compare's 185-row ranked table **is** the screening list.
 
 **Friction.** `#fc-results` is declared in the markup as `class="empty-state"` (`index.html:3945`), because that is what it is before a run — a centred loading message and three quick-start buttons. `.empty-state` is `{ padding: 40px; text-align: center }` (`:526`). `renderFCResults()`
+
+---
+## Cycle 994 — T5 — v1049 — 2026-10-03
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in rotation
+by a wide margin: 992 was T1, 990 and 989 T4, 979 T1, 976 T2, 975 T6, 972 T1, 971 T2. Walked
+cold at 1440x900 with `sessionStorage` and `localStorage` cleared and reloaded first, and again
+at 390x844 `hasTouch`. All five "Copy for IC Memo" surfaces exercised end to end through a
+clipboard spy that captures BOTH flavours (`text/html` and `text/plain`), because a clipboard is
+the one output on this platform that no gate has ever looked at.
+
+**Friction.** `copyIOCPortfolio()` builds its exhibit from a 15-entry `cols` array and then keys
+FIVE separate lookup tables off that array's integer positions. v1029 (T4) inserted
+`'Reform verdict'` and `'Reform basis'` at indices 11 and 12 and extended none of them.
+Everything from index 11 rightward shifted two places. Measured on the `text/html` flavour Word
+consumes, Shell, cold:
+
+| `cols` index | actual contents | header the exhibit printed |
+|---|---|---|
+| 11 | Reform verdict | **"Take basis"** — Norway's cell read `TAKE NET 0pp` under it |
+| 12 | Reform basis | **"Compar-ability"** — the Reform Frequency Score prose under it |
+| 13 | Take basis | **"undefined"** — `headShortIoc[13]` does not exist |
+| 14 | Take comparability | **"undefined"** — `headShortIoc[14]` does not exist |
+
+Two headers printed the literal word `undefined`; two more were actively wrong about their own
+columns. This is the artifact whose only purpose is to be pasted into an investment-committee
+memo, on the one tab with no bulk-copy arm — one click, no confirmation, straight to the
+clipboard. An IC reader holding only the pasted table would have read Norway's reform verdict as
+its "Take basis".
+
+The same shift cost the two displaced columns their shorteners (`_iocProse`) and their colgroup
+weights (`_iocWtAll`), so the 348- and 428-character basis sentences v1025 deliberately moved OUT
+of the cells went straight back IN, at the 30px fallback width. v1025 had this exhibit at 2.5
+letter pages. It was shipping at **51**.
+
+**Change.** Positional keys are the defect, so they are gone rather than renumbered —
+`SHORT_IOC`, `_iocProseName`, `_iocWtAll`, `_iocNumName` and the rider table are all keyed by
+column **name**. A name-keyed map cannot be shifted by an inserted column; it can only be
+*missing* an entry, which now falls back to that column's own full header and emits a
+`console.warn` naming it, so the next insertion is caught by the suite rather than by a reader of
+the memo. `'Reform basis'` joins `'Mechanic basis'` as a **rider** rather than a column: the
+short verdict stays in the cell, the sentence becomes a keyed note underneath, which is what an
+exhibit does with a qualification. The hard-coded `ci === 2` rider site is now driven by
+`_iocRider`, so the pairing is declared once. `_iocNumeric`'s `ci >= 4 && ci <= 8` survived v1029
+only because the insertion happened to land to the RIGHT of the figure block — one place earlier
+and it would have right-aligned and `nowrap`ped a 700-character sentence; keyed by name it
+cannot. Finally, the per-country `NO SOURCED LOG ... <Country> is one of the 164 without one`
+sentence is generalised exactly the way `_iocEvidNote()` already generalises its sibling, since
+the country is printed in column 1 of the row carrying the mark — 20 notes differing only by a
+proper noun now key as one. `word-wrap:break-word` added to `td`/`th`, which Fiscal Compare
+(v977) and the Screener (v1008) have carried since they got this treatment and this paste never
+did.
+
+**Measured**, same harness both sides — the clipboard HTML rendered into a 624px letter-portrait
+text column, Shell, 33 rows:
+
+| | before | after |
+|---|---|---|
+| headers reading `undefined` | **2** | **0** |
+| headers naming the wrong column | **2** | **0** |
+| tallest single row | **2,163px** (Norway, 22.5in) | **121px** (Iraq, 1.3in) |
+| longest cell | 1,008 chars | 42 chars |
+| overflowing cells | 126 | 13 |
+| worst overflow | 65px | 4px |
+| notes block | 26 (20 near-duplicates) | 37, **0 exact duplicates**, 1 no-log note |
+| natural table width | 6,000px+ | 3,158px |
+| exhibit length | **44,067px = 51.0 letter pages** | **4,270px = 4.9 pages** |
+
+**Result.** The analyst pastes the IOC fiscal-exposure exhibit into an IC memo and every column
+header names what is under it. Reform exposure arrives the way the rest of the table does — a
+verdict in a cell, its reasoning in a keyed note — instead of as prose under a header reading
+"Comparability", with the real Take basis two columns right under "undefined". The memo is 4.9
+pages instead of 51, and no single row is taller than the page it lands on.
+
+**Verification — all run this cycle, nothing assumed.**
+- JS syntax gate: **PASS** (all 11 inline `<script>` blocks through `node --check`).
+- Runtime suite: **RUN**, against the LOCAL tree, mounted at the real Pages path
+  (`http://localhost:8991/petroleum-fiscal-db/index.html`) — **547 PASS / 0 FAIL / 0 WARN /
+  0 JS errors**. Note for future cycles: serving the repo at a server ROOT costs you 1 PASS and
+  gains 1 WARN + 15 console errors, because `index.html:49` registers the service worker at the
+  absolute path `/petroleum-fiscal-db/sw.js`. That is a harness artefact, not a defect — mount
+  the prefix and it is clean.
+- Mobile, 390x844 `hasTouch`: `scrollWidth == clientWidth == 390` on **all 10 tabs**, 0
+  horizontal overflow, 0 page errors. The touched control (`#ioc-copy-ic-btn`) is **44px** tall
+  under `pointer: coarse`.
+- `text/plain` flavour **byte-identical** before and after — Excel has no page to overflow and
+  keeps all 15 columns in-cell, exactly as v977 settled.
+- The other four IC-memo artifacts **byte-identical**: Country Profile 7,096/11,938, Fiscal
+  Compare 4-country shortlist 9,636/25,827, Side-by-Side 6,598/18,218 (text/html).
+- STILL LOCKED items untouched: no tab reorder, no v612 mobile-layer edit, `#reference-panel` not
+  touched, Govt NPV still absent from FC, CP headline untouched, no new tooltip, no new FAQ.
+
+## Loop health
+
+- **Nothing on this platform measures a clipboard, and that is where this defect lived for
+  ~20 cycles.** The suite is at 547 PASS and every one of them passed over an exhibit with
+  `undefined` in its header row. The cheap guard is a suite assertion that no `th` in any of the
+  five paste artifacts matches `/undefined/` and that `headShort*.length` equals its `cols`
+  length — both are pure string checks on a value the function already builds. Recommend it as
+  the next loop-health item; **not built this cycle.**
+- **The badge was at v1047 while cycle 992 logged itself as v1048.** `_orcaVerNow()` reads the
+  version out of `#hdr-version`, so every citation, every export and every clipboard artifact had
+  been stamping `v1047` since cycle 990. Bumped to **v1049** here. The version in a paste is not
+  bookkeeping — it is how a memo's figures get traced back to a build.
+- **The mirror was written atomically this cycle** (temp file + `mv`), per cycle 991's
+  recommendation after a partial `cp` left a 326KB fragment of a 10MB file in the office tree.
+  Sizes verified equal: 10,171,908 bytes both sides.
+- **Still open from cycle 988, not touched:** the swallowed `try { _sbsPaintBasisStrip(); }
+  catch (e) {}` in `renderCompare` leaves the *previous* set's assumptions sentence on screen on
+  throw.
+- **Still open from cycle 990, not touched:** the Platform Reference Guide's PLATFORM TABS list
+  still advertises Screener filters by IRR (deleted at v517) and breakeven (never a filter), says
+  Side-by-Side takes 4 countries against `CMP_MAX` 5, and omits Explorer and Sample Analyses.
+- **The "one correction, five cells" gate recommended by cycle 990 is still unbuilt.**
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`, so
+  the 547 PASS at the top of this cycle was the LIVE pre-push build. Unchanged since cycle 985.
+  This cycle ran its own suite against the local tree and reports that number above.
+- **Probe debris, twenty-ninth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
+  Every artefact this cycle wrote went to `/tmp/c994/`; **nothing landed in the repo.**
