@@ -72986,3 +72986,127 @@ paste into the memo now carries the take range the screen was already warning th
 ## Cycle 998 — T2: "Is this country attractive at $75/bbl, and can I defend that?"
 
 **First, a provenance note you should know about:** cycle 997 picked T2, built this work, and then **hit the 1800s subprocess timeout before it could commit, test, or push anything**. Its edit was sitting in the working tree at v1052, entirely unverified — badge already bumped, so a later cycle reading o
+
+---
+## Cycle 999 — T4 — v1053 — 2026-10-03
+
+### Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest of the six: 998 was
+T2, 996 T6, 995 T3, 994 T5, 992 T1; the last T4 was v1029.)
+
+### Friction
+Cold load at 1440x900, no sessionStorage, no localStorage → **IOC Portfolio** → `Quick: CNOOC`.
+
+On a portfolio the **REFORM EXPOSURE** tile (`_iocReformStat`, `index.html:42859`) *is* the T4
+answer. It printed:
+
+```
+2 WACC · 1 flagged · 3 n/c
+REFORM EXPOSURE
+of 6 jurisdictions · n/c = no sourced log, not clean
+⚠ add a discount-rate premium on: Brazil, United Kingdom
+```
+
+and its `title` closed with *"If the memo runs one rate across the whole book, those
+jurisdictions are the exceptions to state."* The XLSX annex (`_iocExpBasisLines`, `:53142`)
+said it in the same words: *"these jurisdictions are the exception to state."*
+
+**"Exception" is a claim about how much of the book is affected, and a count of countries cannot
+support it.** Measured off the shipped `IOC_DATA` through the seeded Quick buttons — read from
+the rendered tile, not inferred:
+
+| brand | class | by jurisdiction | by contract | |
+|---|---|---|---|---|
+| **CNOOC** | WACC | 2 of 6 — **33%** | UK 76 + Brazil 2 = 78 of 106 — **74%** | inverts the finding |
+| **Shell** | n/c | 19 of 31 — **61%** | 65 of 884 — **7%** | 9x |
+| **Harbour Energy** | WACC | 1 of 2 — **50%** | 5 of 87 — **6%** | 8x |
+| **Chevron** | flagged | 9 of 16 — 56% | **92%** of the book | |
+| BP | n/c | 48% | 3% | |
+| Equinor | n/c | 36% | 2% | |
+| Eni | WACC | 7% | 12% | |
+| Petronas | n/c | 86% | 93% | agrees |
+
+The error runs **both ways**. For CNOOC the 2 WACC jurisdictions are **74% of the book** — the
+premium is the base case, and the screen and the export both called it the exception. For Shell
+the tile read as "ORCA barely covers my portfolio" when 93% of the book sits in a scored
+jurisdiction.
+
+And the inconsistency was on the same strip: the **Wtd Avg Take @$75** tile immediately to the
+left already weights by contract count, labels that basis ("weighted by contract count") and
+warns on concentration ("⚠ USA is 54% of the weight"). One tile weighted; the tile next to it
+counted and then talked as though it had weighted.
+
+### Change
+The jurisdiction count is **not replaced** — reform exposure is a property of the jurisdiction,
+which is exactly why one country holding twenty contracts is one reading. What is new is that
+each class prints the share of **this** book it covers, and the tile stops wording a weight
+claim it never measured:
+
+```
+2 WACC 74% · 1 flagged 8% · 3 n/c 18%
+REFORM EXPOSURE
+of 6 jurisdictions · % = share of 106 contracts · n/c = no sourced log, not clean
+⚠ add a discount-rate premium on: Brazil, United Kingdom
+  78 of 106 contracts — 74% of this book, so the premium is the base case here, not the exception
+```
+
+Below 50% that line reads `…so the rest runs at the unadjusted rate` (Shell 13%, BP 15%,
+Chevron 5%, Harbour 6%). New `_iocReformWeight()` sums `r.n` per country off the **same `rows`**
+both call sites already pass to the Contracts tile, so the weight cannot drift from the table
+beneath it. Weight is contract **documents** — the basis the Wtd Avg Take tile already declares —
+never production, reserves or value, none of which ORCA models per operator; the title states that.
+
+The **XLSX annex** takes the same two corrections, so the sheet and the screen cannot hand one
+portfolio two exposure readings. Its "more than half this portfolio is unscored" sentence now
+separates the units rather than letting one stand for the other:
+
+> More than half this portfolio is unscored **BY JURISDICTION** … **By contract it is not:** the
+> unscored jurisdictions hold only 17% of the book, so 83% of these contracts DO sit in a scored
+> jurisdiction and the counts above do cover them.
+
+### Result
+An analyst can tell, without opening the 33-row table and adding contract counts by hand,
+whether a WACC premium is an exception to state or the base case for the book — and whether a
+coverage gap that reads as 61% of their portfolio is actually 7% of it. **On CNOOC the decision
+flips**: from "run one rate, flag two countries" to "the premium is the base case; the
+unadjusted rate is what needs stating as the exception."
+
+### Verification — ran this cycle, not carried forward
+- **JS syntax gate:** 11 inline `<script>` blocks extracted and `node --check`-ed, **0 failures**.
+- **Playwright `runtime_comprehensive` against the LOCAL tree** (`TEST_URL=http://127.0.0.1:8777`):
+  **546 PASS / 0 FAIL / 1 WARN.** HEAD (`pre1053.html`) through the **identical** local harness:
+  **546 / 0 / 1.** Suite-neutral. The 1 WARN and the 15 "JS errors" are the `sw.js` 404 from
+  serving at `/` rather than `/petroleum-fiscal-db/` — present on HEAD, not from this change.
+  The 547 quoted at the top of the cycle prompt is the LIVE build; see the standing note below.
+- **Rendered tile read for 6 brands** (Shell, CNOOC, BP, Chevron, Petronas, Harbour Energy),
+  **0 pageerrors**. Export annex exercised via `_iocExpBasisLines()`, 0 throws.
+- **Mobile 390x844 `hasTouch: true`:** `scrollWidth 390 = clientWidth 390`; tile right edge
+  **376 < 390**; elements with a right edge past 390 inside `#t5` = **1465 (Shell) / 727 (CNOOC)**,
+  **equal to the HEAD baseline measured the same way** — the change adds no overflow. No control
+  was added or touched; the new elements are inline text spans inside existing non-interactive divs.
+
+### Notes for the next cycle
+- **Open, found this cycle and not fixed:** the **IOC Portfolio table's `country-wide` take figure
+  prints the published BLEND, uncorrected.** v988 fixed exactly this on the six Reform Risk
+  surfaces and v549/552/553/554 on Side-by-Side, Country Profile, the IC clipboard and the
+  Screener ceiling — this table was missed. Live on Shell: `Iraq … country-wide 84.8%` where the
+  comparable figure is **34.1%**; also Mexico 32.2 (cmp 29.7), Malaysia 59.4 (cmp 58.3),
+  India 61.9 (cmp 63.2). The row's own take cell is per-operator and separately exposed: Shell's
+  Iraq row reads **98.5%** on 2 TSC contracts, a Group-2 mechanic whose ~99% take is a structural
+  artefact per `MECHANIC_COMPARABILITY.md`, with no `⊘` marker on either number. `_rrFeeCmp()` /
+  `_scFeeCmpAt()` are the existing calls. Good T3 or T6 cycle.
+- **Carried, still open:** `copyFCForIC` / `exportFCResults` do not say *which* default rate the
+  record contradicts on the 120 default rows (from 996/998). The CP's Live DCF panel and Fiscal
+  Breakdown still not walked for the default-basis case (996, 998). The two screen-only strings
+  in the SbS IC-pack PDF and the `display:none` at `index.html:2458` (995). `_icRefuse()` pins
+  `minWidth` not `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in
+  `renderCompare` (988). The Platform Reference Guide still advertises deleted Screener filters (990).
+- **`autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`**,
+  so the PASS count at the top of every cycle prompt is the LIVE pre-push build, not the tree
+  being edited. Unchanged since cycle 985 — now **fourteen** cycles. This cycle worked around it
+  by running the suite twice against local, tree and HEAD, which is the only way to get a
+  comparison that means anything.
+- **Probe debris, thirty-third cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+  `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB). Everything this
+  cycle wrote went to `/tmp/c999/`; **nothing landed in the repo**. Safe to delete but not created
+  this session, so flagged rather than removed unasked.
