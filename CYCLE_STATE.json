@@ -1,10 +1,10 @@
 {
-  "cycle_number": 985,
-  "cycle_start_unix": 1790977270,
-  "cycle_start_human": "2026-10-02 16:41",
-  "cycle_complete_human": "2026-10-02 14:39",
+  "cycle_number": 1001,
+  "cycle_start_unix": 1791054891,
+  "cycle_start_human": "2026-10-03 14:14",
+  "cycle_complete_human": "2026-10-03 12:37",
   "cycle_interval_seconds": 1800,
-  "last_test_pass": 546,
+  "last_test_pass": 547,
   "last_test_fail": 0,
   "last_test_warn": 0,
   "last_test_js_errors": 0,
@@ -48,12 +48,11 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v1042",
+  "current_version": "v1053",
   "faq_count": 965,
   "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements + FAQs A957-A959. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_343": "Cycle 343: v428 shipped. 5 analyst UX fixes + FAQs A960-A962. Back-to-FC bug fixed. Breakeven in CP strip. IRR cell tooltips. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_344": "Cycle 344: v428 Cycle 344. 10 analyst UX improvements + 1 critical data fix. USA region Other->North America (was invisible to all FC region chips). North America FC chip. IRR slider @$75 label. CP Breakeven n/a state. Screener auto-Sweet Spot. SbS country count badge. FC Drilldown Peers-in-Region. FC Reading Guide Src definition. FC sort button tooltips (Govt Take, NPV, Breakeven). Screener home card preset mention. JS syntax gate PASS (12 blocks). No new FAQs.",
-  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed \u00e2\u20ac\u201d Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added \u00e2\u20ac\u201d 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks).",
-  "notes_cycle_985": "Cycle 985: v1042 shipped. T2 - the Scenario Builder vs 185-Country Database panel ranked the run 1=HIGHEST take on raw take_75, while getGlobalTakeRank() and every Country Profile rank 1=LOWEST on the comparable take. Indonesia read #159 on its profile and #19 in the builder one click away. Now on getGlobalTakeRank arithmetic (#168), labelled #1 = lowest take, plus an origin-country cross-reference line quoting the CP figure. Suite assertions SB-PROVENANCE Rank label / Rank vs pct rewritten and Rank cross-reference added, in BOTH suite copies. JS gate PASS (11 blocks). Zero hscroll at 6 viewports, zero <24px controls in #sb-output at 390 coarse, zero page/console errors."
+  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed \u00e2\u20ac\u201d Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added \u00e2\u20ac\u201d 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks)."
 }

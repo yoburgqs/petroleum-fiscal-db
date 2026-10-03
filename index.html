@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1053</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1054</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -26676,6 +26676,142 @@ function _scFeeCmpCount(price) {
   return COUNTRY_DATA.filter(function(d) { return _scFeeCmpAt(d, price).diverges; }).length;
 }
 
+// ── v1054 (T6) — THE IOC PORTFOLIO WAS THE LAST SURFACE STILL PRINTING THE FEE BLEND RAW ─────
+//
+// T6 is "where did this number come from and how solid is the evidence?" Walked cold at
+// 1440x900, storage cleared: Home -> IOC Portfolio -> Shell (the default) -> COUNTRY BREAKDOWN.
+// That table is ranked by government take, highest first, so the rows an IC memo opens on are the
+// top of it. Rows 1 and 2 are Philippines and Kuwait at 100.0%, both already withheld as "NO
+// CONTRACTOR POSITION". The first row carrying a readable number is:
+//
+//     3  Iraq   TSC   98.5%   country-wide 84.8%
+//     4  Oman   RSC   85.0%   country-wide 77.6%
+//
+// BOTH figures on the Iraq row are remuneration-fee artefacts, and neither said so.
+//
+//   - 98.5% is the take across the operator's own TSC contracts. TSC is Group 2 in
+//     ~/MECHANIC_COMPARABILITY (2026-08-26): the contractor is paid a fixed $/bbl fee and keeps
+//     no price upside, so a ~99% "take" measures the contract's STRUCTURE, not the severity of
+//     Iraq's fiscal terms, and that document's rule is that Group 2 may not be compared against
+//     Group 1 at all. 28 of ORCA's 1,772 IOC rows sit on a Group-2 mechanic (TSC, RSC,
+//     India RSC, Buy-back); every Iraq TSC row in the set reads 98.5%.
+//   - "country-wide 84.8%" is the PUBLISHED BLEND, 415 of Iraq's 610 contracts being TSC. The
+//     comparable figure, on its 195 PSC/Concession contracts, is 34.1% — a 50.7pp gap, the
+//     largest on the platform. Iraq is not where this operator is squeezed hardest; on terms
+//     that can be ranked it is softer than every row in the table bar the USA, the Netherlands
+//     and Argentina. An analyst reading the top of the ranked table takes the conclusion away
+//     INVERTED, and nothing on the row offered a route to discovering that.
+//
+// Every other surface has carried the correction for ~500 versions — v549 (Side-by-Side), v552
+// (Country Profile), v553 (the IC clipboard), v554 (the Screener ceiling), v988 (the six Reform
+// Risk surfaces) — and all of them route through one call, _scFeeCmpAt(). These two IOC cells
+// were written from the country record directly, `cd.take_75` raw, so the one tab organised
+// around an operator's book was the last place on the platform still printing the blend with
+// nothing beside it. 10 of 185 countries diverge at $75 and the IOC tables showed the
+// uncorrected figure for all 10.
+//
+// Both IOC take cells now route through this ONE helper rather than each holding its own copy of
+// the sub-line — which is how the defect arose: v820 built the cell for the operator table at the
+// top of the tab, v822 copied it into the exposure annex 2,000px below, and the correction was
+// absent from both. Markers reuse the platform's existing vocabulary exactly: the orange ⊘
+// of .cp-fee-mark that Country Profile and Side-by-Side already use for this same finding, and
+// the "PSC/Conc" label the Screener, Fiscal Compare and Country Profile already use for this
+// same figure. .ioc-ctry-wide keeps its (pointer: coarse) 24px floor from v822.
+
+// Is the mechanic on THIS row one of the country's Group-2 (fee-basis) mechanics?
+function _iocG2Own(country, mechanic) {
+  if (!mechanic || typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return null;
+  var cd = COUNTRY_DATA.find(function(c) { return c.country === country; });
+  if (!cd || !Array.isArray(cd.mech_mix)) return null;
+  return cd.mech_mix.find(function(x) { return x.m === mechanic && x.g === 2; }) || null;
+}
+
+// The sub-line(s) under an IOC take cell. opTake is the figure printed in the cell above:
+// the operator's own contracts, or — on a fallback row — the country blend itself.
+function _iocCtryWideSub(country, opTake, operatorName, mechanic, isCtry) {
+  if (opTake == null || typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return '';
+  var cd = COUNTRY_DATA.find(function(c) { return c.country === country; });
+  if (!cd || cd.take_75 == null) return '';
+  var fc  = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(cd, '75')
+                                                : { head: cd.take_75, cmp: cd.take_75, diverges: false, n2: 0, n1: null };
+  var op  = Number(opTake);
+  var ct  = (fc.diverges && fc.cmp != null) ? Number(fc.cmp) : Number(cd.take_75);
+  var who = operatorName || 'this operator';
+  var g2  = isCtry ? null : _iocG2Own(country, mechanic);
+  var n1s = (fc.n1 != null) ? Number(fc.n1).toLocaleString() + ' ' : '';
+  var out = '';
+
+  // 1. The row's OWN take, when the mechanic behind it is fee-basis. This comes first because it
+  //    is the number in the cell above and the one the table is RANKED on, and on a Group-2
+  //    mechanic it is not a fiscal measure at all.
+  if (g2) {
+    var gt = country + ': ' + mechanic + ' is a fee-basis mechanic — the contractor is paid a '
+      + 'fixed $/bbl remuneration fee and keeps no price upside. The ' + op.toFixed(1) + '% above is '
+      + 'therefore a measure of CONTRACT STRUCTURE, not of how hard ' + country + '’s fiscal '
+      + 'terms are, and the platform comparability rules (Group 2: TSC, RSC, Buy-back) do not permit ranking it '
+      + 'against the PSC and Concession takes in this column. Do not read this row as ' + who
+      + '’s hardest jurisdiction, and do not carry the figure into a cross-country screen. '
+      + (fc.diverges
+          ? 'Screen ' + country + ' on the comparable figure beneath instead: ' + ct.toFixed(1)
+            + '% across its ' + n1s + 'PSC/Concession contracts.'
+          : 'Screen the jurisdiction on its PSC/Concession contracts instead.')
+      + ' ' + (g2.n ? Number(g2.n).toLocaleString() + ' of ' + country + '’s contracts are on this mechanic. ' : '')
+      + 'Same finding, same ⊘, as the Country Profile peer strip and the Side-by-Side columns.';
+    out += '<div class="ioc-ctry-wide cp-fee-mark" style="font-size:10px;font-weight:700;'
+         + 'color:var(--orange);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="'
+         + gt.replace(/"/g, '&quot;') + '">⊘ ' + mechanic + ' fee basis</div>';
+  }
+
+  // 2. The country figure. Suppressed only when it prints the same as the cell above at the
+  //    precision this cell uses — the v820/v822 rule — EXCEPT where the comparable and published
+  //    figures disagree, in which case the line carries information the cell above cannot.
+  if (!fc.diverges && Math.abs(op - ct) < 0.05) return out;
+
+  if (fc.diverges) {
+    var ctip = country + ': ' + Number(fc.n2).toLocaleString() + ' of its contracts are fee-basis '
+      + '(fixed $/bbl remuneration, no price upside), so the figure ORCA publishes as its headline '
+      + 'take — ' + Number(fc.head).toFixed(1) + '% — blends contract STRUCTURE into the '
+      + 'number. Across its ' + n1s + 'PSC/Concession contracts government take is ' + ct.toFixed(1)
+      + '% at $75/bbl, and that is the figure the platform comparability rules permit comparing against '
+      + 'other countries. This line prints the comparable figure, not the blend. '
+      + (isCtry
+          ? 'This row is the country average itself, so ' + ct.toFixed(1) + '% is what to screen '
+            + country + ' on; ORCA holds no ' + who + ' contract terms here.'
+          : 'The cell above is ' + who + '’s own contracts at ' + op.toFixed(1) + '%, which is a '
+            + 'different question and not comparable with this one.')
+      + ' Where you will meet each number: the published ' + Number(fc.head).toFixed(1) + '% is the '
+      + 'headline on the Country Profile, Fiscal Compare, the Explorer and the JSON API; the '
+      + ct.toFixed(1) + '% is what the Screener tests its take ceiling against, what Side-by-Side '
+      + 're-bases its columns to, and what the Country Profile prints beside its own headline. '
+      + 'Both travel in the clipboard and the XLSX from the buttons above this table. Cite '
+      + ct.toFixed(1) + '% to screen the jurisdiction, and say it is the PSC/Concession basis.';
+    out += '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--orange);'
+         + 'line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="'
+         + ctip.replace(/"/g, '&quot;') + '">' + (isCtry ? '' : 'country-wide ') + ct.toFixed(1)
+         + '% <span style="font-weight:400;">PSC/Conc</span></div>';
+    return out;
+  }
+
+  var gap = op - ct;
+  var tip = country + ': this row is the take across ' + who + '’s own contracts, '
+    + op.toFixed(1) + '% at $75/bbl. Across ALL operators in ' + country + ' it is '
+    + ct.toFixed(1) + '% — ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 'pp. '
+    + (typeof isStateMonopoly === 'function' && isStateMonopoly(op)
+        ? 'The operator figure is suppressed above because it reaches ' + op.toFixed(1)
+          + '%, at which point the contractor has no access to project economics at all. '
+        : '')
+    + 'Clicking the country name opens the Country Profile, which prints ' + ct.toFixed(1)
+    + '%; so do Fiscal Compare, the Explorer, the Screener and the JSON API. Neither figure is '
+    + 'wrong — a gap of this kind is normally the licence vintage and the block terms this '
+    + 'operator actually holds, against a national average that includes every other operator’s. '
+    + 'Both numbers are in the clipboard and the XLSX from the buttons above, with the difference '
+    + 'in a "Take gap (pp)" column. Cite whichever answers your question, and say which one it is.';
+  out += '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--muted);'
+       + 'line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="'
+       + tip.replace(/"/g, '&quot;') + '">country-wide ' + ct.toFixed(1) + '%</div>';
+  return out;
+}
+
 // ── v882 (T1): the Screener's Swing column, on the basis its own Govt Take column already uses ──
 // Price Swing is take@$125 minus take@$50 -- it is DERIVED from the take figures two columns to
 // its left. That take column withdraws state monopolies (fmtTake), carries a comparable sub-cell
@@ -42636,30 +42772,11 @@ var _IOC_TAKE_TH = '<th class="num" title="' + _iocEvEsc(
 // when the two do not print the same at one decimal place, so the sub-line's presence is itself
 // the signal that this row will not reconcile with the page it links to.
 function _iocTakeCell(r) {
-  var lead = fmtTake(r.take_75);
-  var d = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
-    ? COUNTRY_DATA.find(function(x) { return x.country === r.country; }) : null;
-  if (!d || r.take_75 == null || d.take_75 == null) return '<td class="num">' + lead + '</td>';
-  var op = Number(r.take_75), ct = Number(d.take_75);
-  if (Math.abs(op - ct) < 0.05) return '<td class="num">' + lead + '</td>';
-  var gap = op - ct;
-  var tip = r.country + ': this row is ' + (r.n ? Number(r.n).toLocaleString() + ' of ' : '')
-    + 'the operator\u2019s own contracts, and government take across them is ' + op.toFixed(1)
-    + '% at $75/bbl. Across ALL operators in ' + r.country + ' it is ' + ct.toFixed(1) + '% \u2014 '
-    + (gap > 0 ? '+' : '') + gap.toFixed(1) + 'pp. '
-    + (typeof isStateMonopoly === 'function' && isStateMonopoly(op)
-        ? 'The operator figure is suppressed above because it reaches ' + op.toFixed(1)
-          + '%, at which point the contractor has no access to project economics at all. '
-        : '')
-    + 'Clicking this row opens ' + r.country + '\u2019s Country Profile, which prints '
-    + ct.toFixed(1) + '%; so do Fiscal Compare, the Explorer, the Screener, the XLSX export and '
-    + 'the JSON API. Neither figure is wrong. A gap this size is normally the licence vintage and '
-    + 'the block terms this operator actually holds, against a national average that includes '
-    + 'every other operator\u2019s. Cite whichever answers your question, and say which one it is.';
-  return '<td class="num">' + lead
-    + '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;'
-    + 'margin-top:2px;white-space:nowrap;cursor:help;" title="' + _iocEvEsc(tip) + '">country-wide '
-    + ct.toFixed(1) + '%</div></td>';
+  // v1054 (T6): the sub-line is now _iocCtryWideSub(), shared with the exposure annex below, so
+  // the two tables cannot drift apart again and both carry the fee-basis correction. The leading
+  // operator figure is unchanged.
+  return '<td class="num">' + fmtTake(r.take_75)
+       + _iocCtryWideSub(r.country, r.take_75, r.operator, r.mechanic, false) + '</td>';
 }
 
 // ── v807 (T6) — THE BREAKEVEN COLUMN ON THIS TAB PRINTED A NUMBER THE PLATFORM DOES NOT HOLD ──
@@ -52864,23 +52981,13 @@ function _iocNpvFmt(v) {
 // sub-line appears ONLY where the two disagree at one decimal place, so its presence is itself
 // the signal that this row will not reconcile with the page the country name opens.
 function _iocExpCtryWide(d, isCtry, operatorName) {
-  if (isCtry || d.take75 == null) return '';   // a fallback row IS the country figure already
-  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
-    ? COUNTRY_DATA.find(function(c){ return c.country === d.country; }) : null;
-  if (!cd || cd.take_75 == null) return '';
-  var op = Number(d.take75), ct = Number(cd.take_75), gap = op - ct;
-  if (Math.abs(gap) < 0.05) return '';
-  var tip = d.country + ': this row is the take across ' + operatorName + "'s own contracts, "
-    + op.toFixed(1) + '% at $75/bbl. Across ALL operators in ' + d.country + ' it is '
-    + ct.toFixed(1) + '% — ' + (gap > 0 ? '+' : '') + gap.toFixed(1) + 'pp. Clicking the country '
-    + 'name opens the Country Profile, which prints ' + ct.toFixed(1) + '%; so do Fiscal Compare, '
-    + 'the Explorer, the Screener and the JSON API. Neither figure is wrong — a gap of this kind '
-    + 'is normally the licence vintage and the block terms this operator actually holds, against a '
-    + 'national average that includes every other operator’s. Both numbers are in the clipboard '
-    + 'and the XLSX from the buttons above, with the difference in a "Take gap (pp)" column.';
-  return '<div class="ioc-ctry-wide" style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;'
-       + 'margin-top:2px;white-space:nowrap;cursor:help;" title="' + tip.replace(/"/g, '&quot;') + '">country-wide '
-       + ct.toFixed(1) + '%</div>';
+  // v1054 (T6): routed through the shared _iocCtryWideSub(). Two changes of behaviour beyond the
+  // de-duplication: where the country's published take blends fee-basis contracts the line now
+  // prints the COMPARABLE PSC/Concession figure rather than the blend, and a row whose own
+  // mechanic is Group 2 carries the orange fee-basis marker. Fallback rows are no longer skipped
+  // outright — on a diverging country the blend IS the figure in the cell, so it is the one that
+  // needs the correction most.
+  return _iocCtryWideSub(d.country, d.take75, operatorName, d.mechanic, !!isCtry);
 }
 
 function _iocExpRows() {
