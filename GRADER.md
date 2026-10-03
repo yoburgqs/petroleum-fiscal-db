@@ -72032,3 +72032,14 @@ the suite's own output. **No total is claimed that was not observed.**
   (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c989/`;
   nothing landed in the repo. Still recommending Zach authorise deletion or a
   `.gitignore` entry.
+
+---
+## Cycle 989 Log — 2026-10-02 22:35
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The change is shipped and pushed. While the suite finishes, here is the cycle summary.
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?"
+
+**Friction.** I walked T4 cold across every surface that answers it: the Reform Risk per-country lookup (all 21 scored jurisdictions plus a sample of the 164 unscored), the Scenario Builder premium handoff, the IC-memo paste, the Country Profile stability block, the Fiscal Compare Reform column and its sort, and the Screener reform axis. 
