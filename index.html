@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1051</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1052</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -27147,6 +27147,92 @@ function _icProdBasisClause(d) {
   return ' [production-weighted on ' + b.cov.toFixed(1) + '% of ' + b.nStr + ' contracts]';
 }
 
+// ---------------------------------------------------------------------------
+// v1052 (T2): the one-line IC citation carried no take-dispersion statement at all.
+//
+// Walked T2 cold: Country Profile -> Guyana. The page leads with the orange verdict
+// "Take is a range here, not a point. By regime, Concession prices at 18.1% (9 contracts)
+// and PSC at 56.5% (134 contracts), so the regime you sign moves the take by 38.4pp",
+// and the summary chip repeats it as "Contract take: 18.1-56.5% by regime (38.4pp)
+// -- none listed at headline 54.1%". The analyst reads that, scrolls back up to the
+// toolbar, and clicks the button whose entire purpose is the memo sentence. What it
+// pasted:
+//     "Guyana: Govt Take 54.1% @$75/bbl [statutory model basis -- ORCA PROXY: ...
+//      directional, +/-5-15pp, not to be cited as definitive], $1.07B NPV @$75, ..."
+// The regime range is gone, and the only uncertainty band left in the string is the
+// PROXY clause's +/-5-15pp -- a production-weighting caveat, a different axis, and on
+// this country roughly a third of the real spread. This is exactly the failure v596
+// named for the production basis one register up: "the analyst read the warning on
+// screen, clicked the button whose entire purpose is to produce the memo text, and
+// pasted the exact memo the tool's own rule forbids."
+//
+// Not a rare edge, and not a new rule. _icTakeDispersion() already exists, already
+// serves the "Copy for IC Memo" table beside this button (which prints
+// "54.1% -- range by regime: Concession 18.1% - PSC 56.5% (38.4pp)" plus a numbered
+// note), and already shares its closing instruction with the screen through
+// cpDefendClose(). copyICCitation() simply never called it. Measured live on all 185:
+// it returns a MATERIAL cell on 63, across all three of its registers (34 observed
+// contract spread, 20 interquartile, 9 regime split), and on 3 of those the headline
+// falls outside its own range. The citation dropped every one.
+//
+// The fee-basis branch is v770's reasoning, not a new threshold. On the 10 countries
+// where cpFeeBasis() diverges, the clause immediately before this one has just
+// redirected the reader to the comparable take, and _icTakeDispersion()'s blended
+// registers -- quartiles and contract table, both fee-dominated -- do not describe that
+// figure: Iraq would pair "comparable take ... is 34.1%, which is the figure to rank
+// on" with "half of contracts price 65.0-98.5%", the exact pairing v770 removed from
+// the screen for being a sentence a reviewer takes apart in one question. Those
+// countries carry the Group-1 regime range instead, which is on the same basis as the
+// comparable take and brackets it (Iraq: Concession 13.9% on 80, PSC 48.2% on 115).
+// No take is recomputed and no threshold is invented anywhere here.
+//
+// Measured live over all 185 at v1052 (re-verified cycle 998, not carried forward):
+// cpFeeBasis() diverges on 10, and only 6 of those have a _cpRegimeSplit() to state, so
+// the fee branch emits on 6 and returns '' on the other 4 rather than inventing a range.
+// _icTakeDispersion() is material on 63; 7 of those are fee-divergent and route to the
+// branch above, leaving 56 on the blended branch (30 contract spread, 17 interquartile,
+// 9 regime split; 3 of the 56 have a headline outside their own range). Net: 62 of 185
+// citations now carry a range statement where none did before, 123 correctly carry none.
+function _icCiteDispersion(d) {
+  if (!d || d.take_75 == null || !(d.take_75 > 0 && d.take_75 < 200)) return '';
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return '';
+  var bar = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+  var fb = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
+
+  if (fb && fb.diverges) {
+    var sp = (typeof _cpRegimeSplit === 'function') ? _cpRegimeSplit(d) : null;
+    if (!sp) return '';
+    var cmp = fb.cmpTake;
+    var outCmp = (typeof cmp === 'number' && isFinite(cmp))
+      && (cmp < sp.lo.take - bar || cmp > sp.hi.take + bar);
+    return ' (comparable take is a range, not a point: ' + sp.lo.mechanic + ' '
+      + sp.lo.take.toFixed(1) + '% on ' + Number(sp.lo.nPriced).toLocaleString() + ', '
+      + sp.hi.mechanic + ' ' + sp.hi.take.toFixed(1) + '% on '
+      + Number(sp.hi.nPriced).toLocaleString() + ', ' + sp.pp.toFixed(1) + 'pp apart'
+      + (outCmp
+          ? '; it falls outside that range, so quote the regime row rather than the blend)'
+          : '; quote the regime you would sign, not only the average)');
+  }
+
+  var r = (typeof _icTakeDispersion === 'function') ? _icTakeDispersion(d, d.take_75) : null;
+  if (!r || !r.material || !r.cell) return '';
+  // Normalise the three table-cell registers into one range phrase. The cell is written for a
+  // two-column table ("— contract average; contracts run 14.2–54.5%"); the leading dash and
+  // the repeated "contract average" are the table's framing, not part of the range.
+  var phrase = String(r.cell).replace(/^\s*—\s*/, '').trim()
+    .replace(/^contract average;\s*/, '')
+    .replace(/^range by regime:\s*/, 'by regime, ');
+  if (!phrase) return '';
+  // The verdict is cpDefendClose()'s, read off the note this same call already built, so the
+  // cite cannot instruct the analyst differently from the screen or the memo table.
+  var outside = /falls\s+[\d.]+pp\s+outside that range/.test(r.note || '');
+  return ' (take is a range, not a point: ' + phrase
+    + (outside
+        ? '; the ' + d.take_75.toFixed(1) + '% headline falls outside that range, so resolve it '
+          + 'against the contract table before quoting it as a country average)'
+        : '; quote ' + d.take_75.toFixed(1) + '% as a contract average and carry the range)');
+}
+
 // Short cell value for the tabular artifacts.
 function _icProdBasisCell(d) {
   var b = _icProdBasis(d);
@@ -48204,10 +48290,58 @@ function loadCountryProfile(country) {
     var col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
     var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.1)' : diff > 0 ? 'rgba(249,115,22,.1)' : 'rgba(34,197,94,.1)';
     var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
+    // ── v1052 (T2) ─ this pill is the only COLOURED element in the headline strip, and on 161
+    // of the 185 countries it was painting a verdict the line directly above it forbids.
+    // Measured at render time over the shipped country_data.json:
+    //   in the producer set        21   take is production-weighted; the comparison is like-for-like
+    //   state monopoly             3   pill already suppressed
+    //   outside the producer set 161   prod_coverage_pct = 0 on every one of them
+    // On those 161 the strip read, two lines apart:
+    //   "#61 of 185 (tied with 1 other) · not production-weighted"      (grey, tooltip:
+    //        "It is a fiscal-terms comparison, not a producer benchmark, and it should not be
+    //         ranked head-to-head against one.")
+    //   "-32.2pp vs producer median @$75"                               (GREEN, tooltip:
+    //        "Median govt take @$75/bbl across the 21 production-weighted regimes is 55.6%.
+    //         This is the number to cite.")
+    // Two tooltips in the same strip giving opposite instructions, and the one carrying colour
+    // was the one saying cite it. Green on 120 of the 161, orange on 17, grey on 24 — and 31 of
+    // the 161 are an equal-weighted average over 5 contracts or fewer (Ascension Island n=1 at
+    // -30.0pp green, Guadeloupe n=1 at -34.3pp green, Belgium n=2 at -39.0pp green). A first-time
+    // analyst screening at $75 reads one green pill and one grey rank and takes the green one.
+    // The number stays (v452 lock: the vs-median pill stays in Zone A) and the direction stays.
+    // What stops is the colour voting on an attractiveness it cannot evidence: on a cross-basis
+    // row the pill renders in the platform's unverified idiom — muted text, dashed grey border,
+    // no fill — and says on its FACE what only the tooltip used to say.
+    var _xBasis452 = !(_prodCtx534 && _prodCtx534.inSet);
+    var _nBelow452 = null;
+    if (_xBasis452) {
+      col = 'var(--muted)';
+      bgCol = 'transparent';
+      borderCol = 'var(--border)';
+      try {
+        var _pp452 = getProducerPeers();
+        _nBelow452 = _pp452.filter(function(x){ return cpCmpTakeOf(x, '75') < _verdictTake552; }).length;
+      } catch (e) { _nBelow452 = null; }
+    }
     var _tip = _cmpTakeOn552
       ? (country + '\u2019s comparable take of ' + _verdictTake552.toFixed(1) + '% against the median comparable take of the ' + _nPeers + ' production-weighted producers, ' + _med.toFixed(1) + '%. Both sides of this comparison are production-sharing basis. Read instead on this country\u2019s blended headline of ' + d.take_75.toFixed(1) + '%, the same pill would say ' + ((d.take_75 - _med) >= 0 ? '+' : '') + (d.take_75 - _med).toFixed(1) + 'pp \u2014 because the headline blends in ' + Number(_cpFee552.n2).toLocaleString() + ' fee-basis contracts (' + _cpFee552.names + ') whose take% is a structural artefact of the remuneration mechanic rather than a fiscal measure.')
-      : ('Median govt take @$75/bbl across the ' + _prodCtx534.n + ' production-weighted regimes is ' + _prodMedian534.toFixed(1) + '%. This is the number to cite. The all-185 median of ' + (_globalMedian452 != null ? _globalMedian452.toFixed(1) + '%' : 'n/a') + ' is pulled down by ' + _prodCtx534.nEqualWeighted + ' countries with no verified production data.');
-    return '<span style="display:inline-flex;align-items:center;font-size:11px;color:' + col + ';font-weight:600;padding:2px 9px;background:' + bgCol + ';border:1px solid ' + borderCol + ';border-radius:12px;cursor:help;" title="' + _tip.replace(/"/g,'&quot;') + '">' + sign + diff.toFixed(1) + 'pp vs producer median @$75' + (_cmpTakeOn552 ? ' (comparable)' : '') + '</span>';
+      : ('Median govt take @$75/bbl across the ' + _prodCtx534.n + ' production-weighted regimes is ' + _prodMedian534.toFixed(1) + '%. This is the number to cite \u2014 this country is one of them. The all-185 median of ' + (_globalMedian452 != null ? _globalMedian452.toFixed(1) + '%' : 'n/a') + ' is pulled down by ' + _prodCtx534.nEqualWeighted + ' countries with no verified production data.');
+    // v1052 (T2): on a cross-basis row the pill no longer tells the analyst this is "the number
+    // to cite" — the rank line immediately above it says the opposite, and that line is right.
+    if (_xBasis452) {
+      _tip = country + '\u2019s take is an equal-weighted average over ' + (d.n || 0) + ' contract'
+        + ((d.n === 1) ? '' : 's') + ' with NO verified production behind it (prod_coverage_pct = '
+        + ((d.prod_coverage_pct || 0).toFixed(0)) + '), so the two sides of this gap are not on the same '
+        + 'evidential footing: ' + _verdictTake552.toFixed(1) + '% is modelled from statute, '
+        + _med.toFixed(1) + '% is measured across the ' + _nPeers + ' regimes with block-level production on file. '
+        + 'The gap is real arithmetic and it is NOT a producer benchmark \u2014 do not cite it as this country '
+        + 'being ' + Math.abs(diff).toFixed(1) + 'pp cheaper than the regimes it competes with for capital. '
+        + (_nBelow452 === null ? '' : (_nBelow452 === 0
+            ? ('The defensible statement is the other one: NOT ONE of the ' + _nPeers + ' producers takes less than ' + _verdictTake552.toFixed(1) + '%, so nothing that actually produces sits below this figure.')
+            : (_nBelow452 + ' of the ' + _nPeers + ' producers take less than ' + _verdictTake552.toFixed(1) + '%; those are the comparators an IC screening can defend.')))
+        + ' Establish the terms against this jurisdiction\u2019s own petroleum act before it goes on a capital-allocation list.';
+    }
+    return '<span id="cp-prodmed-pill" data-xbasis="' + (_xBasis452 ? '1' : '0') + '" style="display:inline-flex;align-items:center;font-size:11px;color:' + col + ';font-weight:600;padding:2px 9px;background:' + bgCol + ';border:1px ' + (_xBasis452 ? 'dashed' : 'solid') + ' ' + borderCol + ';border-radius:12px;cursor:help;min-height:24px;" title="' + _tip.replace(/"/g,'&quot;') + '">' + sign + diff.toFixed(1) + 'pp vs producer median @$75' + (_cmpTakeOn552 ? ' (comparable)' : '') + (_xBasis452 ? '<span style="opacity:.9;font-weight:700;"> \u00b7 not a producer benchmark</span>' : '') + '</span>';
   })() : '';
   // v534: the all-185 basis, kept and labelled, on its own muted line beneath the pill.
   const _allBasisHtml534 = (!_isMonopoly && d.take_75 != null && _grank452 && _globalMedian452 != null && _prodCtx534) ? (function(){
@@ -48215,7 +48349,19 @@ function loadCountryProfile(country) {
     // d.take_75 against a blended median, which put Iraq at #180 / +56.4pp directly beneath a
     // producer line reading "lower-mid \u00b7 -21.5pp \u00b7 on the comparable take".
     var diffAll = _verdictTake552 - _globalMedian452;
-    return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Same basis as the producer rank above \u2014 the comparable take, on every country \u2014 but a wider and weaker peer set: it mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts. Cite the producer line for an IC claim; this line is here so the two denominators are both visible.' + (_cmpTakeOn552 ? ' On ' + country + '\u2019s published headline of ' + d.take_75.toFixed(1) + '% instead, this line would read #' + getGlobalTakeRank.__blendedRank(country) + ' and ' + ((d.take_75 - _globalMedian452) >= 0 ? '+' : '') + (d.take_75 - _globalMedian452).toFixed(1) + 'pp \u2014 a position set by the remuneration structure of its fee-basis contracts rather than by its fiscal terms.' : '') + '">All 185 countries: #' + _grank452.rank + _tie683 + ' \u00b7 ' + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data' + (_cmpTakeOn552 ? ', on the comparable take' : '') + '</span>';
+    return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Same basis as the producer rank above \u2014 the comparable take, on every country \u2014 but a wider and weaker peer set: it mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts. Cite the producer line for an IC claim; this line is here so the two denominators are both visible.' + (_cmpTakeOn552 ? ' On ' + country + '\u2019s published headline of ' + d.take_75.toFixed(1) + '% instead, this line would read #' + getGlobalTakeRank.__blendedRank(country) + ' and ' + ((d.take_75 - _globalMedian452) >= 0 ? '+' : '') + (d.take_75 - _globalMedian452).toFixed(1) + 'pp \u2014 a position set by the remuneration structure of its fee-basis contracts rather than by its fiscal terms.' : '') + '">'
+      // v1052 (T2): v534 moved the all-185 figures to this second line so the analyst "can now
+      // see the two bases disagree, and by how much". That holds on the 21 countries where the
+      // line above it reads "#N of 21 producers". On the other 161 the line above ALREADY reads
+      // "#N of 185", so this line restated the identical rank and the identical tie suffix
+      // verbatim, two lines down -- Albania printed "#29 of 185 (tied with 9 others)" and then
+      // "All 185 countries: #29 (tied with 9 others)". Measured: 161 of 185 countries duplicated
+      // it. There is only one basis on those rows, so the rank is printed once and this line
+      // carries only what the line above does not -- the all-country median comparison.
+      + ((_prodCtx534 && _prodCtx534.inSet)
+          ? ('All 185 countries: #' + _grank452.rank + _tie683 + ' \u00b7 ')
+          : 'Against the all-185 median instead: ')
+      + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data' + (_cmpTakeOn552 ? ', on the comparable take' : '') + '</span>';
   })() : '';
   // v454: IC Memo implication for CP headline strip — distills take+swing+stability into a specific IC memo rule
   // v670 (T2): this box is the page's ONE instruction on what to put in the memo, and it was
@@ -58963,6 +59109,7 @@ function copyICCitation() {
             + _beBnd.blendTxt + ' on the all-contract blend ORCA publishes' : '') + ')')) : '';
   var metricsStr = [npvStr, downStr, beStr].filter(Boolean).join(', ');
   var cite = country + ': Govt Take ' + takeStr + ' @$75/bbl' + _icFeeBasisClause(d)
+    + _icCiteDispersion(d)    // v1052 (T2)
     + _icProdBasisClause(d)   // v596 (T5)
     + (metricsStr ? ', ' + metricsStr : '')
     + ' — Deepwater profile, 10% WACC, 100% WI, ' + mechStr + ' regime, ' + tierStr
