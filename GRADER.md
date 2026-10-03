@@ -71716,3 +71716,181 @@ Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG
 
 
 Pixel gate: pixel gate PASS
+
+---
+# Cycle 988 — v1045 — 2026-10-02
+
+## Task
+
+**T3 — "How do these three countries compare side by side?"** Stalest in rotation
+(982 T3 · 983 T6 · 984 T4 · 985 T2 · 986 T5 · 987 T1). Walked cold at 1440x900 and at
+390x844 with `hasTouch`, both storages cleared and the page reloaded before each pass,
+served from the repo tree over a threaded local server.
+
+The walk: Home → Side-by-Side cold (seeded UK/Norway/Nigeria example) → the search-box
+add path (`cmpSearch` → `_cmpRenderDrop` → Enter) → three analyst-chosen sets, including
+a mixed-comparability set (Angola/Iraq/Norway, TSC fee-basis against PSC/Concession) and
+an all-statutory set (Guyana/Brazil/Suriname) → the `Rank at` price switch across all four
+decks → `Order columns` → the verdict strip → the notices under the grid → both charts →
+and the documented IC route in: **Fiscal Compare → tick 3 → "⇌ Side-by-Side"**.
+
+**Walked and found healthy, recorded so a later cycle does not re-walk it:** the seeded
+example clears itself on the analyst's first own add, and the count badge tracks it; the
+`Rank at` control propagates correctly to every ordering surface — the verdict strip lead,
+the `Order columns` option labels and the `Rank among producers (take @$N)` row all move
+together through $50/$75/$100/$125; the `lowest of 3` / `highest of 3` markers move with
+the price (Angola holds lowest at $50 and $75, Brazil takes it at $100 and $125, which is
+exactly what the `⚠ order changes in $75–$100` pill claims); the price-ordering notice and
+the take-vs-NPV inversion notice under the grid both render and both name the specific
+columns that trade places; `_sbsAdoptDeck` correctly carries Fiscal Compare's run price
+across the handoff. Zero page errors on every set.
+
+## Friction
+
+**The one line on this tab that tells the analyst how it relates to Fiscal Compare was
+telling them the wrong direction — for the majority of countries, on most profiles.**
+
+`#cmp-profile-xref`, painted by `_sbsPaintBasisStrip()` (`:60026`), read
+`DCF_PROFILES.deepwater` **unconditionally** and printed, always:
+
+> *not its MODEL columns, which run a different **$1.2B / $15-opex** project and **read higher***
+
+Fiscal Compare does not run `DCF_PROFILES`. It runs `FC_PROFILES[#fc-profile.value]`
+(`:65481`), and the analyst picks one of **seven**. Both halves of the sentence are
+therefore wrong as soon as they touch the Profile dropdown — and the second half is wrong
+for a large minority even on the default.
+
+Measured across all 185 countries at $75/bbl — `_fcResults.liveNPV` (MODEL) against
+`COUNTRY_DATA.npv_75` (the CITABLE figure this grid actually shows):
+
+| FC profile | real project | MODEL **higher** | MODEL **lower** |
+|---|---|---|---|
+| Deepwater *(default)* | $1.2B / $15 | 153 | **32** |
+| LNG | $3.0B / $20 | 165 | 20 |
+| Giant | $2.0B / $10 | 182 | 3 |
+| Shallow Offshore | $400M / $12 | 33 | **152** |
+| North Sea | $600M / $22 | 24 | **161** |
+| Onshore | $200M / $8 | 13 | **172** |
+| Marginal | $100M / $6 | 5 | **180** |
+
+So "read higher" is wrong for the **majority** of countries on **four of the seven**
+profiles, and the named "$1.2B / $15-opex" project is wrong on **six of the seven**.
+
+Angola is the worked case. This grid shows **$1.14B** at $75/bbl. Fiscal Compare's MODEL
+column for Angola reads **$255M** under Marginal and **$4.37B** under Giant — a 17x range —
+and the strip said the same sentence for both. It is wrong even on the untouched default,
+for the 32 Deepwater countries where MODEL sits below CITABLE: Angola again, **$903M**
+against $1.14B.
+
+**Why this is the worst moment in a T3 walk rather than a wording nit.** This is the tab's
+*only* statement of how the two tabs relate. It is the sentence an analyst uses to decide
+whether a discrepancy they just spotted is a bug or a basis difference, and in which
+direction. When the direction is wrong it does not merely mislead — it tells them a real
+discrepancy is not one, and points them at the wrong figure as the modelled one. Concretely:
+set Onshore, tick three countries, press "⇌ Side-by-Side", and the analyst meets **$552M**
+on one tab and **$1.14B** on the other under a line that says the MODEL column reads higher.
+The only reading available to them is that $1.14B *is* the modelled figure. It is the
+stored one.
+
+**The second half of the same gap.** The handoff carries the **price** deck across
+(`_sbsAdoptDeck(window._fcLastPrice)`, `fcOpenSbs` `:65906`) and silently drops the
+**profile**. The analyst watches half their selection survive the jump, which teaches them
+the handoff preserves settings, and nothing anywhere said the other half was discarded.
+The strip named "Deepwater" in 10px grey, which reads as a description of the standard
+basis, not as notice that a selection was thrown away.
+
+## Change
+
+- **`_sbsPaintBasisStrip()` now resolves `FC_PROFILES[#fc-profile.value]`** — the profile
+  Fiscal Compare is actually running — instead of `DCF_PROFILES.deepwater`. Same
+  unconditional-read defect **v859** removed from the Scenario NPV card; this copy survived.
+- **The direction is measured, never asserted.** It is computed over the columns actually
+  in the comparison, from `_fcResults` against `COUNTRY_DATA`, at Fiscal Compare's own run
+  price — and only when `_fcResults` was produced by the profile now selected. That required
+  a new **`window._fcLastProfile`**, set beside the existing `_fcLastPrice` in
+  `runFiscalCompare()`; without it the strip could not tell whether the results still
+  matched the dropdown. It renders as `read HIGHER on all 3`, `read LOWER on all 3`, or
+  `higher on 2 of these columns, lower on 1`. **With no run to measure against, no direction
+  is claimed at all** — the cold strip now simply stops after naming the project.
+- **When the selected profile is not the standardized basis**, the strip leads in orange:
+  *"Fiscal Compare is set to "Onshore" ($200M / $8-opex) — that profile is NOT applied
+  here. Side-by-Side carries the price deck over from Fiscal Compare but never the profile:
+  these columns are the stored figures on the basis named at left. FC's MODEL columns run
+  your profile and read higher on 2 of these columns, lower on 1."*
+- **`#fc-profile`'s change listener repaints the strip**, so the statement is true before
+  the analyst crosses tabs rather than only after the next `renderCompare()`.
+- **A latent trap fixed on the way, which is itself the cycle's lesson.** The first version
+  used `_cmpEsc` — a `const` **local to `renderCompare`**, not in scope in
+  `_sbsPaintBasisStrip`. It threw a `ReferenceError` that `renderCompare`'s own
+  `catch (e) { /* non-critical */ }` (`:30559`) swallowed, leaving the **previous** profile's
+  sentence on screen with **no page error and no failing test**. The verification table below
+  caught it only because it compared the strip against independently computed ground truth
+  rather than checking that it rendered. Exactly the "stable but wrong" shape. Now uses a
+  local escaper with no cross-scope dependency. (`:35095` shows this scope hazard was already
+  known in one other place.)
+
+## Result
+
+An analyst comparing three countries can now tell, **correctly and per-column**, whether a
+number that differs between Fiscal Compare and Side-by-Side differs because of the basis
+and in which direction — instead of being handed a constant that is wrong for 172 of 185
+countries on Onshore and 180 of 185 on Marginal. And when they have selected a profile that
+this tab does not apply, they are told so in orange at the top of the grid, rather than
+discovering it from a 17x discrepancy they have no way to explain.
+
+## Verification
+
+- **JS syntax gate: 11/11 script blocks PASS.** Run after each edit and again after the
+  version bump.
+- **All five profile branches checked against ground truth** computed independently from
+  `_fcResults.liveNPV` vs `COUNTRY_DATA.npv_75`, on the Angola/Brazil/Nigeria set loaded
+  through the real `fcOpenSbs()` handoff:
+
+  | FC profile | strip said | truth (MODEL vs CITABLE) | |
+  |---|---|---|---|
+  | Deepwater | higher on 2, lower on 1 | 903<1140 · 4257>1726 · 1592>302 | ✓ |
+  | Onshore | higher on 2, lower on 1 | 552<1140 · 1829>1726 · 572>302 | ✓ |
+  | Marginal | **LOWER on all 3** | 255<1140 · 795<1726 · 241<302 | ✓ |
+  | Giant | **HIGHER on all 3** | 4374>1140 · 15628>1726 · 5080>302 | ✓ |
+  | North Sea | higher on 2, lower on 1 | 452<1140 · 2763>1726 · 974>302 | ✓ |
+
+- **Cold state** (Fiscal Compare never run): no direction claimed, project named from the
+  dropdown's current value. Correct — there is nothing to measure.
+- **Zero page errors** at every viewport and on every set walked.
+- **Six viewports, zero horizontal scroll:** 1920 / 1440 / 1280 / 1024 / 768 / 390 all
+  report `scrollWidth == clientWidth`. `pointer: coarse` confirmed **true** at 768 and 390.
+  The xref line wraps to 75px at 390 and stays inside the strip. **No control was added or
+  touched**, so there is no 24px surface and nothing for the v612 mobile layer to collide with.
+- **The default Deepwater presentation is unchanged** — same position, same right-aligned
+  10px italic, same text except that the unmeasured "and read higher" is gone. Screenshotted
+  before and after.
+- **No export changed.** `_cmpPngCaptionLines()` reads `#cmp-profile-terms`, not this span,
+  so the chart PNG caption and print PDF are untouched.
+
+### Runtime suite — what actually ran
+
+Launched **against the LOCAL tree** (`TEST_URL=http://127.0.0.1:8912/index.html`,
+`ORCA_REPORT_FILE=/tmp/c988/report.txt`) on a threaded server, concurrent with this
+write-up. Its state at the time of the push is recorded in the addendum below, reported from
+the suite's own output. No total is claimed that was not observed.
+
+## Loop health
+
+- **A swallowed exception can leave a stale, wrong assumptions line on screen.** The
+  `try { _sbsPaintBasisStrip(); } catch (e) { /* non-critical */ }` in `renderCompare` is
+  correct in intent — a basis strip failing should not take the grid down — but "non-critical"
+  is the wrong reading of a function whose whole job is stating what the numbers mean. A
+  failure there does not blank the strip; it leaves the **previous set's** sentence in place,
+  which is worse than nothing and invisible to every gate. Flagging rather than changing it
+  this cycle: the fix is for the paint to fall back to a minimal always-true string on throw,
+  and it is worth a cycle of its own rather than a rider on this one.
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`,
+  so the 547 it reported at the top of this cycle is the **LIVE** (pre-push) build, not this
+  change. Unchanged from cycles 985-987.
+- The slow local gate is unchanged as the loop's largest measurement problem — a 10.1 MB
+  single-file page reloaded ~200 times. A gate that cannot finish inside a 30-minute cycle
+  still cannot be the thing that blocks a push.
+- **Probe debris, twenty-fifth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root
+  (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c988/`; nothing
+  landed in the repo. Still recommending Zach authorise deletion or a `.gitignore` entry.
