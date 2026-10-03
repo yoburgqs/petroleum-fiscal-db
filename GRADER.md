@@ -73110,3 +73110,16 @@ unadjusted rate is what needs stating as the exception."
   `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB). Everything this
   cycle wrote went to `/tmp/c999/`; **nothing landed in the repo**. Safe to delete but not created
   this session, so flagged rather than removed unasked.
+
+---
+## Cycle 999 Log — 2026-10-03 12:37
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both commits are on `origin/main`; the two remaining modified files are loop-managed state. Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Cycle 999 — v1053
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" (stalest of the six; 998 was T2, 996 T6, 995 T3, 994 T5, 992 T1.)
+
+**Friction.** Cold walk at 1440×900 → IOC Portfolio → `Quick: CNOOC`. On a portfolio the REFORM EXPOSURE tile (`_iocReformStat`, `index.html:42859`) *is* the whole T4 a
