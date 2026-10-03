@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1045</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1046</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -42598,24 +42598,73 @@ function _iocReformChip(country) {
 // book-level answer to T4 before scrolling a 31-row table. Counted over COUNTRIES, not
 // contracts: reform exposure is a property of the jurisdiction, and two Brunei rows are one
 // jurisdiction. Uses _rrClassify()'s own green/non-green verdict as the divider — no new rule.
+//
+// ── v1046 (T4): "N flagged" was one number standing for six verdicts in different units ──
+// This tile is, by its own comment above, the book-level answer to T4. It printed a single
+// orange count of every non-green verdict in the portfolio. On Shell — the operator this tab
+// loads on a cold open — that count is 12, and it merges:
+//   WACC +3–5pp     Brazil, United Kingdom      percentage points to ADD TO THE DISCOUNT RATE
+//   TAKE +15pp / +5pp  Russia, Australia        take ALREADY raised — size against it, never add
+//   SIZE UNKNOWN    India, Iraq, Mexico, Nigeria terms rewritten, effect never quantified
+//   TAKE NET 0pp    Norway                      in-window rise cancelled by an in-window cut
+//   ↑ PRE-2010      Canada, Colombia, USA       the rupture predates the scoring window
+// Fiscal Compare spent v744 and v753 undoing exactly this conflation in its Reform column
+// ("until v753 both of these printed as a bare pp in the same colour at the same weight, so
+// Russia's take rise of +15pp outranked the UK's 3–5pp WACC premium on sight"), and its sorted
+// table bands the rows under six headers. This tile put them back into one figure.
+//
+// Worse, this tab's own exports already do the split and the screen did not. _iocICPaste()
+// prints "CARRIES A WACC PREMIUM — 2 of 31: Brazil, United Kingdom. This is the only verdict
+// class ORCA says changes a model input", and the XLSX assumptions line says the same. So the
+// analyst who exported got a usable answer and the analyst reading the screen — the one with
+// 20 minutes before a screening meeting — got "12 flagged" and a 1,200-character title
+// attribute, which is unreachable under pointer: coarse.
+//
+// No new rule and no new threshold: the WACC family is the verdicts whose icToken starts
+// "WACC", the same test _iocICPaste() and the XLSX line already use. The tile now leads with
+// that count and names the jurisdictions under it, because they are the only ones that change
+// a number in the model.
 function _iocReformStat(countries) {
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : null;
   var list = (countries || []).slice();
   if (!rh || !Object.keys(rh).length || !list.length) return '';
-  var flagged = [], clear = [], nc = [];
+  var wacc = [], flagged = [], clear = [], nc = [];
   list.forEach(function(c) {
     var evs = Array.isArray(rh[c]) ? rh[c] : [];
     if (!evs.length) { nc.push(c); return; }
     var v = (typeof _rrClassify === 'function') ? _rrClassify(c) : null;
     if (!v) { nc.push(c); return; }
-    (v.icColor === 'var(--green)' ? clear : flagged).push(c + ' (' + _icPlain(v.icToken) + ')');
+    var lbl = c + ' (' + _icPlain(v.icToken) + ')';
+    if (v.icColor === 'var(--green)') { clear.push(lbl); return; }
+    if (String(_icPlain(v.icToken)).indexOf('WACC') === 0) { wacc.push(c); flagged.push(lbl); return; }
+    flagged.push(lbl);
   });
+  // Flagged-but-not-WACC. The headline keeps BOTH counts rather than replacing one with the
+  // other: the non-WACC verdicts are real exposure and dropping them would be the opposite
+  // error to the one this fixes.
+  var others = flagged.length - wacc.length;
+  var waccNames = wacc.slice().sort();
+  var waccTxt = waccNames.length > 6
+    ? waccNames.slice(0, 6).join(', ') + ' +' + (waccNames.length - 6) + ' more'
+    : waccNames.join(', ');
   var tip = 'Reform exposure across the ' + list.length + ' jurisdictions in this portfolio, counted by '
     + 'country rather than by contract. '
-    + (flagged.length
-        ? flagged.length + ' carr' + (flagged.length === 1 ? 'ies' : 'y') + ' a verdict this platform will not '
-          + 'read as a zero reform premium: ' + flagged.sort().join(', ') + '. '
-        : 'None carries a non-clean reform verdict. ')
+    + (wacc.length
+        ? 'WACC PREMIUM — ' + wacc.length + ' of ' + list.length + ': ' + waccNames.join(', ')
+          + '. This is the ONLY verdict class ORCA says changes a model input: percentage points to '
+          + 'add to the discount rate. If the memo runs one rate across the whole book, '
+          + (wacc.length === 1 ? 'that jurisdiction is the exception' : 'those jurisdictions are the exceptions')
+          + ' to state. '
+        : 'No jurisdiction in this portfolio carries a WACC-premium verdict, so nothing here asks '
+          + 'for a discount-rate add. ')
+    + (others > 0
+        ? others + ' further jurisdiction' + (others === 1 ? '' : 's') + ' carr' + (others === 1 ? 'ies' : 'y')
+          + ' a verdict this platform will not read as a zero reform premium, in units that are NOT a '
+          + 'WACC add — take already raised inside the window, a rewrite whose size was never '
+          + 'quantified, or a rupture that predates 2010: '
+          + flagged.filter(function(x) { return wacc.indexOf(x.split(' (')[0]) < 0; }).sort().join(', ')
+          + '. Size against the move, never add it to a discount rate. '
+        : '')
     + (clear.length
         ? clear.length + ' ' + (clear.length === 1 ? 'is' : 'are') + ' scored and clear: ' + clear.sort().join(', ') + '. '
         : '')
@@ -42628,16 +42677,42 @@ function _iocReformStat(countries) {
         : '')
     + 'Per-country verdicts are under each country name in the table below. Same classification as the '
     + 'Fiscal Compare Reform verdict column and the Reform Risk tab — all call _rrClassify().';
-  var headCol = flagged.length ? 'var(--orange)' : nc.length ? 'var(--muted)' : '#15803D';
+  var headCol = wacc.length ? 'var(--red)' : flagged.length ? 'var(--orange)' : nc.length ? 'var(--muted)' : '#15803D';
+  var dot = ' <span style="color:var(--border);">·</span> ';
+  var head = [];
+  if (wacc.length) head.push('<span style="color:var(--red);">' + wacc.length + ' WACC</span>');
+  if (others > 0)  head.push('<span style="color:var(--orange);">' + others + ' flagged</span>');
+  if (clear.length) head.push('<span style="color:#15803D;">' + clear.length + ' clear</span>');
+  if (nc.length)   head.push('<span style="color:var(--muted);">' + nc.length + ' n/c</span>');
+  // The sub-line, in the same 10px / non-uppercase / wrapping shape the weighted-take tile
+  // uses for its concentration warning. It names the WACC jurisdictions because a count the
+  // analyst cannot resolve to countries is not actionable inside 20 minutes.
+  var sub = wacc.length
+    ? '<div style="font-size:10px;font-weight:700;text-transform:none;letter-spacing:0;'
+      + 'color:var(--red);margin-top:3px;line-height:1.5;">⚠ add a discount-rate premium on: '
+      + _iocEvEsc(waccTxt)
+      + (others > 0
+          ? '<br><span style="font-weight:400;color:var(--muted);">the other ' + others
+            + ' flagged ' + (others === 1 ? 'is' : 'are') + ' take-already-raised, '
+            + 'size-unquantified or pre-window — size against '
+            + (others === 1 ? 'it' : 'those') + ', do not add ' + (others === 1 ? 'it' : 'them')
+            + ' to a rate</span>'
+          : '')
+      + '</div>'
+    : (flagged.length
+        ? '<div style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;'
+          + 'color:var(--muted);margin-top:3px;line-height:1.5;">no WACC premium anywhere in this book — '
+          + 'the ' + flagged.length + ' flagged ' + (flagged.length === 1 ? 'is' : 'are')
+          + ' take-already-raised, size-unquantified or pre-window, which '
+          + (flagged.length === 1 ? 'is' : 'are') + ' sized against, not added to a rate</div>'
+        : '');
   return '<div class="ioc-stat" style="flex:1.2;min-width:170px;" title="' + _iocEvEsc(tip) + '">'
     + '<div class="sv" style="font-size:12px;font-weight:700;color:' + headCol + ';line-height:1.5;">'
-    + (flagged.length ? '<span style="color:var(--orange);">' + flagged.length + ' flagged</span>' : '')
-    + (flagged.length && (clear.length || nc.length) ? ' <span style="color:var(--border);">·</span> ' : '')
-    + (clear.length ? '<span style="color:#15803D;">' + clear.length + ' clear</span>' : '')
-    + (clear.length && nc.length ? ' <span style="color:var(--border);">·</span> ' : '')
-    + (nc.length ? '<span style="color:var(--muted);">' + nc.length + ' n/c</span>' : '')
+    + head.join(dot)
     + '</div><div class="sk">Reform exposure<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">'
-    + 'of ' + list.length + ' jurisdiction' + (list.length === 1 ? '' : 's') + ' · n/c = no sourced log, not clean</span></div></div>';
+    + 'of ' + list.length + ' jurisdiction' + (list.length === 1 ? '' : 's')
+    + (nc.length ? ' · n/c = no sourced log, not clean' : '') + '</span>'
+    + sub + '</div></div>';
 }
 
 // ── v748 (T6) — THE MECHANIC COLUMN NAMED A DOCUMENT TYPE, NOT A FISCAL MODEL ────────────
