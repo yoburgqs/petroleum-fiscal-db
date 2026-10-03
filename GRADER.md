@@ -73249,3 +73249,72 @@ the harshest jurisdiction in the portfolio when its rankable terms are among the
 **Task — T6:** "Where did this number come from and how solid is the evidence?"
 
 **Friction.** Cold walk at 1440×900, storage cleared: Home → IOC Portfolio → Shell (the default) → COUNTRY BREAKDOWN. That table is ranked by government take, highest first, so the rows an IC memo opens on are the top of it. Rows 1 and 2 are Philippines and Kuwait at 100.0%, already wi
+
+---
+## Cycle 1002 — v1055
+
+**Task — T5:** "Give me something I can paste straight into an IC memo."
+
+**Friction.** Cold walk at 1440x900, storage cleared: Home -> IOC Portfolio -> Shell (the default)
+-> COUNTRY BREAKDOWN -> **Copy for IC Memo** / **XLSX**. The screen, since v1054, prints under the
+Iraq take cell:
+
+    Iraq   TSC   98.5%  ⊘ TSC fee basis   country-wide 34.1% PSC/Conc
+
+The artifact it produces does not. `_iocExpRows()` (`index.html:53039`) built the
+`Country-wide take @$75 (%)` column from `cd.take_75` **raw** — the published blend, **84.8%** —
+so the workbook an analyst pastes into an IC memo carried **84.8%** under a column of the same
+name as the figure the screen had just corrected to **34.1%**. **50.7pp apart.** And the memo is
+read long after the tab that produced it is closed.
+
+The sheet also **contradicted itself**, one cell apart. `Take comparability` on the Iraq row
+already read *"NOT rankable as published — 415 of 610 contracts (68%) are fee-basis (TSC 415) …
+Rank on 34.1%"*, immediately to the right of a numeric column printing 84.8%. An analyst who sorts
+on the numeric column gets Iraq near the top of the portfolio by severity; one who reads the prose
+column gets told not to. Nothing reconciled them.
+
+Second defect, same root. `Take gap (pp)` (`index.html:53042`) read **+13.7** on that row —
+98.5% across two Group-2 TSC contracts, less an 84.8% blend that is 68% Group-2. Two measures of
+*contract structure*, differenced, and the result formatted as though it were 13.7pp of fiscal
+distance between an operator and its host government. It is not a quantity. This is the column an
+exposure annex gets summed and sorted on.
+
+Scale, read off the data rather than asserted: **10 of 185** countries diverge at $75;
+**191 of 1,772** IOC rows sit in one of them; on Shell's own 33-row book, **6** rows.
+
+**Change.**
+
+1. **A third take column**, named exactly as the Fiscal Compare (v1026) and Screener (v1047)
+   workbooks already name theirs, so the three files stay one vocabulary:
+   `Country-wide take @$75 — comparable, PSC/Concession only (%)`. Populated from the same
+   `_scFeeCmpAt(cd,'75')` call the screen makes, blank on the 175 countries where the published
+   blend already *is* the comparable figure — so a value in it is itself the signal that the
+   column to its left must not be screened on. **Nothing is retracted:** the published blend keeps
+   its own column.
+2. **`Take gap (pp)` now REFUSES the subtraction** wherever either leg is a remuneration-fee
+   figure, and says which leg and why in the cell — the same withholding v983 applies to the
+   state-monopoly NPV cell, for the same reason. Numeric on every other row, unchanged.
+3. **The clipboard exhibit** carries the new column at `Rank-able ctry %`, name-keyed through
+   `SHORT_IOC` / `_iocWtAll` / `_iocNumName` (so the v1049 positional-key defect cannot recur).
+   The refusal enters the matrix at full length — `text/plain` keeps the whole sentence — and
+   `_iocShGap()` reduces it to the token `n/c` for the HTML, minting **one** generalised note
+   rather than up to ten near-identical ones.
+4. **Both basis blocks** introduce the third column: the XLSX *Basis & Assumptions* sheet names
+   every diverging row with both figures (`Iraq 84.8% published vs 34.1% comparable; …`), and the
+   clipboard header paragraph explains the `n/c` cells.
+
+**Result.** An analyst who exports Shell's exposure annex and sorts it on the country column now
+gets the same ranking the screen gave them, and Iraq sits where its rankable terms put it instead
+of third from the top. The number in the pasted memo matches the number on the page it came from,
+so a reader checking the memo against the platform finds a reconciliation rather than a 50.7pp
+contradiction — and the one column that could not be checked at all, the gap, now says so instead
+of printing a plausible figure.
+
+**Regression guard, because this defect was invisible for a full cycle.** v1054 fixed the screen;
+the artifact disagreed for ~15 cycles and nothing noticed, because the screen is re-read every
+cycle and the clipboard is read by nobody. Three assertions added to `runtime_comprehensive.js`
+`testIOC()` that pin the *agreement* rather than either side of it:
+`IOC-ARTIFACT comparable column` (every exported row equals `_scFeeCmpAt()`),
+`IOC-ARTIFACT gap withheld on a fee leg` (withheld iff a leg is fee-basis), and
+`IOC-ARTIFACT the correction actually fires` (fails if the diverging set is empty — a guard that
+passes on an all-null column is a guard that passes on a deleted feature).
