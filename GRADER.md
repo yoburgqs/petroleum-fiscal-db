@@ -73318,3 +73318,64 @@ cycle and the clipboard is read by nobody. Three assertions added to `runtime_co
 `IOC-ARTIFACT gap withheld on a fee leg` (withheld iff a leg is fee-basis), and
 `IOC-ARTIFACT the correction actually fires` (fails if the diverging set is empty — a guard that
 passes on an all-null column is a guard that passes on a deleted feature).
+
+### Verification — all run this cycle, nothing carried forward
+
+- **JS syntax gate:** 11 inline `<script>` blocks extracted and `node --check`-ed, **0 failures**.
+- **Playwright `runtime_comprehensive`, A/B through identical local harnesses.** Patched tree
+  (`TEST_URL=http://127.0.0.1:8787`): **546 PASS / 0 FAIL / 1 WARN**. HEAD (`:8788`):
+  **546 / 0 / 1**. **Suite-neutral.** The 1 WARN and the 15 `sw.js` 404s are the artefact of
+  serving at `/` rather than `/petroleum-fiscal-db/` — identical on HEAD. The 547 quoted at the
+  top of the cycle prompt is the LIVE build; see the standing note below.
+- **The three new guards, proven in both directions** in the same browser context the suite uses,
+  including the preceding `#exposure-ioc-select` step that moves `window._iocExp`:
+  on **v1055** `mismatch: [] gapBad: [] nCmp: 6 nGapStr: 6 nGapNum: 27` → all three pass;
+  on **HEAD** all six diverging Shell rows report `want=34.1 got=null` and
+  `withhold=true type=number` → `IOC-ARTIFACT comparable column` and
+  `IOC-ARTIFACT gap withheld on a fee leg` both fail. A guard that cannot fail on the defect it
+  was written for is not a guard.
+- **Export paths exercised end to end.** XLSX downloaded as
+  `ORCA_ioc_portfolio_shell_2026-10-03.xlsx`, reopened in **openpyxl**: 2 sheets, 16 columns,
+  Iraq reads `98.5 / 84.8 / 34.1 /` withheld gap, Norway `68.0 / None / -0.7` unchanged, and the
+  Basis sheet carries the new paragraph at row ≤48. Clipboard built: 101,802 chars `text/html`,
+  47,201 `text/plain`, **0 pageerrors**; `text/plain` carries the full refusal sentence and the
+  HTML carries the `n/c` token plus exactly **one** generalised note.
+- **Exhibit geometry at the declared 624px Word text column, A/B against HEAD:** table width
+  **624 both**, table height **885 both**, max row height **26 both**. The new column measures
+  38px and has **0 body-cell overflow**; its header wraps like the two figure columns beside it.
+  Notes 121 → 128. HEAD already carries 179 overflowing cells of 442 (worst: the 197px
+  `Take comparability` cell); patched is 183 of 476 — the same pre-existing condition, not a
+  regression, and worth a cycle of its own.
+- **Mobile 390x844 `hasTouch: true`:** all **10** screens `scrollWidth 390 = clientWidth 390`.
+  Of **121** controls checked on `#t5`, **0** render under 24px. 0 console and 0 page errors.
+
+### Notes for the next cycle
+
+- **Closed this cycle:** the IOC XLSX/clipboard `Govt Take @$75 (%)` country column flagged open
+  at the end of cycle 1000, and the `Take gap (pp)` defect found while fixing it.
+- **Carried, still open:** `copyFCForIC` / `exportFCResults` do not say *which* default rate the
+  record contradicts on the 120 default rows (996/998). The CP's Live DCF panel and Fiscal
+  Breakdown still not walked for the default-basis case (996, 998). The two screen-only strings
+  in the SbS IC-pack PDF and the `display:none` at `index.html:2458` (995). `_icRefuse()` pins
+  `minWidth` not `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in
+  `renderCompare` (988). The Platform Reference Guide still advertises deleted Screener
+  filters (990).
+- **Found this cycle, not fixed.** The IOC clipboard exhibit overflows **183 of 476** cells at the
+  624px Word column — and **HEAD overflows 179 of 442**, so this is nine cycles of accreted
+  content, not this change. The single worst is the `Take comparability` cell at **197px of
+  excess** in a 45px column (`NOT rank-able; fee 415/610; rank on 34.1%`). v1025 and v1049 moved
+  prose out of two basis columns for exactly this reason and stopped before this one. **A candidate
+  T5 for a later cycle:** the same rider/note treatment `_iocRider` already applies to
+  `Mechanic basis` and `Reform basis`.
+- **A third full suite run, with the new guards in it, was still in flight when this cycle
+  closed** and is NOT the basis of any claim above. Every number here comes from a run that
+  completed. Said plainly rather than rounded off: the guards were proven by direct execution of
+  their own page-side block against both trees, not by the suite reporting them.
+- **`autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`**,
+  so the PASS count at the top of every cycle prompt is the LIVE pre-push build, not the tree
+  being edited. Unchanged since cycle 985 — now **sixteen** cycles. Worked around again by running
+  the suite against local for both tree and HEAD.
+- **Probe debris, thirty-fifth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  Everything this cycle wrote went to `/tmp/c1002/`; **nothing landed in the repo.** Safe to
+  delete but not created this session, so flagged rather than removed unasked.
