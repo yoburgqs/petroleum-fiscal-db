@@ -73236,3 +73236,16 @@ the harshest jurisdiction in the portfolio when its rankable terms are among the
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
   Everything this cycle wrote went to `/tmp/c1000/`; **nothing landed in the repo.** Safe to
   delete but not created this session, so flagged rather than removed unasked.
+
+---
+## Cycle 1001 Log — 2026-10-03 14:56
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both commits are on `origin/main`. Working tree carries nothing but the pre-existing untracked probe debris.
+
+## Cycle 1000 — v1054
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?"
+
+**Friction.** Cold walk at 1440×900, storage cleared: Home → IOC Portfolio → Shell (the default) → COUNTRY BREAKDOWN. That table is ranked by government take, highest first, so the rows an IC memo opens on are the top of it. Rows 1 and 2 are Philippines and Kuwait at 100.0%, already wi
