@@ -72650,3 +72650,16 @@ and the grid labels its own basis.
   suite's own `ORCA_REPORT_FILE`, not assumed. The re-run was done because the first had been
   served pre-badge-bump; the suite carries no version assertion, but "measured against the
   deployed build" should mean the bytes that deploy.
+
+---
+## Cycle 994 Log — 2026-10-03 04:40
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here's the summary.
+
+## Cycle 995 — T3 — v1050
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation (last run at cycle 957; 994 was T5, 992 T1, 990/989 T4). Walked cold at 1440×900 with both storages cleared, using an analyst's *own* trio rather than the seeded UK/Norway/Nigeria example — typing the first country is what clears that example, so the real set is the one no walk ever reaches.
+
+**Friction.** `index.html:77201` wired th
