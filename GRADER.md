@@ -71894,3 +71894,141 @@ the suite's own output. No total is claimed that was not observed.
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root
   (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c988/`; nothing
   landed in the repo. Still recommending Zach authorise deletion or a `.gitignore` entry.
+
+---
+
+# CYCLE 989 — v1046 — T4
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?"
+
+## Friction
+
+Walked T4 cold (no sessionStorage, no localStorage) through every surface on the
+platform that answers it, in the order a first-time analyst would reach them:
+
+| surface | walked | result |
+|---|---|---|
+| Reform Risk — per-country lookup | all 21 scored + Qatar / Saudi / Oman / Guyana from the 164 unscored | sound. IC action first, event log under it, statute link live on the unscored branch |
+| Reform Risk — `⚙ Model this premium in Scenario Builder` | clicked on UK | works: opens SB on `north_sea`, sets `sb-discount` to **13**, writes the reform note into `sb-discount-note` |
+| Reform Risk — `⎘ Copy for IC Memo` | UK, Nigeria, Qatar | real table, correct for all three branches; the SB button's own text is correctly excluded from the paste |
+| Reform Risk — direction filter | `reform-filter-dir` | already carries all four buckets incl. `unmeasured` / `context`. Not the v585 conflation |
+| Country Profile — stability block | Venezuela, Qatar | sound; Venezuela correctly carries the "citation predates a logged reform" verdict |
+| Fiscal Compare — Reform column + sort | 185 rows, sorted | sound: bands under 6 headers, "21 of 21 countries ranked" printed, `◆ Reform-scored only` visibly ticks |
+| Screener — reform axis + Stable Fiscal Record preset | applied | sound: visible criteria text states "the other 164 countries are NOT screened out on their reform record" |
+| Reform Risk at 390x844 `hasTouch` | measured | `scrollWidth == clientWidth == 390`, **0** controls under 24px |
+
+**Cross-surface consistency, measured rather than assumed.** `_rrClassify().icToken`
+vs `_fcReformRank().token` vs `_scReformChip()` for all **21** covered jurisdictions:
+**21/21 agree, 0 disagreements.** The claim those four surfaces make about each other
+holds.
+
+**The IOC Portfolio roll-up does not.** `_iocReformStat()` (index.html:42597) is, by
+its own comment, *"the book-level answer to T4 before scrolling a 31-row table"*. It
+printed a single orange count of every non-green verdict. On **Shell** — the operator
+the tab loads on a cold open — that count is **12**, and it merges five verdict
+families whose units are not the same thing:
+
+| verdict | jurisdictions in Shell's book | what the unit is |
+|---|---|---|
+| `WACC +3–5pp` | Brazil, United Kingdom | pp to **add to the discount rate** |
+| `TAKE +15pp` / `+5pp` | Russia, Australia | take **already raised** — size against it |
+| `SIZE UNKNOWN` | India, Iraq, Mexico, Nigeria | rewritten, effect never quantified |
+| `TAKE NET 0pp` | Norway | in-window rise cancelled by an in-window cut |
+| `↑ PRE-2010` | Canada, Colombia, USA | the rupture predates the scoring window |
+
+Fiscal Compare spent **v744** and **v753** undoing exactly this conflation in its own
+Reform column — *"until v753 both of these printed as a bare pp in the same colour at
+the same weight, so Russia's take rise of +15pp outranked the UK's 3–5pp WACC premium
+on sight"* — and bands its sorted table under six headers. This tile put them back
+into one figure.
+
+And the tab's own exports already did the split. `_iocICPaste()` prints
+*"CARRIES A WACC PREMIUM — 2 of 31: Brazil, United Kingdom. This is the only verdict
+class ORCA says changes a model input"*, and the XLSX assumptions line says the same.
+So **the analyst who exported got a usable answer and the analyst reading the screen
+did not** — the screen being where the analyst with 20 minutes before a screening
+meeting actually is. The breakdown existed only in a ~1,200-character `title`
+attribute, which is unreachable under `pointer: coarse`.
+
+## Change
+
+| | before | after |
+|---|---|---|
+| headline (Shell) | `12 flagged · 19 n/c` | `2 WACC · 10 flagged · 19 n/c` — WACC in `var(--red)` |
+| sub-line | *none* | `⚠ add a discount-rate premium on: Brazil, United Kingdom` |
+| second sub-line | *none* | muted: the other 10 are take-already-raised, size-unquantified or pre-window — size against those, do not add them to a rate |
+| no-WACC book | `N flagged · M n/c`, no explanation | same headline + `no WACC premium anywhere in this book — the N flagged are … sized against, not added to a rate` |
+| `n/c = no sourced log, not clean` legend | always printed | printed only when `nc.length` — on Harbour Energy (0 n/c) it defined a bucket the tile does not show |
+
+Sub-line uses the same 10px / non-uppercase / wrapping shape the weighted-take tile
+already uses for its concentration warning. Names are capped at 6 + "+N more".
+
+**No new rule and no new threshold.** The WACC family is the verdicts whose `icToken`
+starts `WACC` — the same test `_iocICPaste()` and the XLSX assumptions line already
+use. Nothing is recomputed; `_rrClassify()` is untouched.
+
+## Result
+
+An IOC analyst opening their own book reads, without hovering anything and without
+exporting, **which of their jurisdictions change a model input and which do not** —
+and gets the country names rather than a count they cannot resolve. On Shell that is
+**2 of 31, not 12**.
+
+## Verification
+
+- **JS syntax gate: 11/11 script blocks PASS.** Run after the edit, after the
+  pluralisation fix, and again after the version bump.
+- **All four tile branches exercised** across 8 operators: WACC+others+n/c (Shell,
+  Equinor, Woodside, Santos, CNOOC), no-WACC (Kosmos, Tullow), no-n/c (Harbour).
+- **Every count and name cross-checked against ground truth** computed independently
+  from `_fcReformRank()` band 0 over each operator's own country list:
+
+  | operator | tile | independent truth | |
+  |---|---|---|---|
+  | Shell | 2 WACC · 10 · 19 n/c of 31 | 2 (Brazil, UK) · 10 · 19 of 31 | ✓ |
+  | Equinor | 2 WACC · 5 · 4 n/c of 11 | 2 (Brazil, UK) · 5 · 4 of 11 | ✓ |
+  | Woodside | 1 WACC · 2 · 5 n/c of 8 | 1 (UK) · 2 · 5 of 8 | ✓ |
+  | Santos | 1 WACC · 1 · 2 n/c of 4 | 1 (Brazil) · 1 · 2 of 4 | ✓ |
+  | Tullow Oil | 2 flagged · 2 n/c of 4 | 0 WACC · 2 · 2 of 4 | ✓ |
+  | Harbour Energy | 1 WACC · 1 flagged of 2 | 1 (UK) · 1 · 0 of 2 | ✓ |
+
+- **Six viewports, zero horizontal scroll:** 1920 / 1440 / 1280 / 1024 / 768 / 390,
+  measured on **all 8 tabs** at each — `scrollWidth == clientWidth` everywhere.
+  **Zero page errors** at every viewport. `pointer: coarse` confirmed **true** at 768
+  and 390.
+- **No control was added**, so there is no new 24px surface; the touched tile reports
+  **0** controls under 24px at every viewport, and there is nothing for the v612
+  mobile layer to collide with.
+- **No export changed.** `_iocICPaste()` and the XLSX assumptions line were already
+  doing this split and were not edited — this cycle brought the screen up to them.
+
+### Runtime suite — what actually ran
+
+Launched against the **LOCAL tree** (`TEST_URL=http://127.0.0.1:8947/index.html`,
+`ORCA_REPORT_FILE=/tmp/c989/report.txt`) on a threaded server, concurrent with the
+write-up. Its state at the time of the push is in the addendum below, reported from
+the suite's own output. **No total is claimed that was not observed.**
+
+## Loop health
+
+- **The screen lagging the export is a defect class, not an incident.** This cycle's
+  finding is the second of its shape: the IC paste and the XLSX assumptions line both
+  knew the WACC/non-WACC distinction and the tile beside them did not. Both are
+  generated by different functions reading the same classifier, and nothing compares
+  them. Worth a cycle: a check that every roll-up figure on screen is derivable from
+  the export the same surface produces, run as a gate rather than noticed by walking.
+- **Still open from cycle 988, unchanged:** the swallowed
+  `try { _sbsPaintBasisStrip(); } catch (e) { /* non-critical */ }` in `renderCompare`
+  leaves the **previous set's** assumptions sentence on screen on throw, which is worse
+  than blanking it and invisible to every gate. Not touched this cycle.
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not
+  `TEST_URL`, so the 547 reported at the top of this cycle is the **LIVE** (pre-push)
+  build, not this change. Unchanged from cycles 985–988.
+- The slow local gate remains the loop's largest measurement problem — a 10.1 MB
+  single-file page reloaded ~200 times cannot finish inside a 30-minute cycle, so it
+  cannot be the thing that blocks a push.
+- **Probe debris, twenty-sixth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root
+  (~47 MB). This cycle wrote every probe and the pre-edit snapshot to `/tmp/c989/`;
+  nothing landed in the repo. Still recommending Zach authorise deletion or a
+  `.gitignore` entry.
