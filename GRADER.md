@@ -72663,3 +72663,143 @@ and the grid labels its own basis.
 **Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation (last run at cycle 957; 994 was T5, 992 T1, 990/989 T4). Walked cold at 1440×900 with both storages cleared, using an analyst's *own* trio rather than the seeded UK/Norway/Nigeria example — typing the first country is what clears that example, so the real set is the one no walk ever reaches.
 
 **Friction.** `index.html:77201` wired th
+
+---
+## Cycle 996 — T6 — v1051 — 2026-10-03
+
+**Task.** T6, *"Where did this number come from and how solid is the evidence?"* — stalest in
+rotation (T6 last walked at cycle 975; 976 T2, 989/990 T4, 992 T1, 994 T5, 995 T3). Walked cold
+at 1440×900 and at 390×844 with `hasTouch`, both storages cleared and the page reloaded first,
+served from the LOCAL tree at the real Pages path (`http://localhost:8996/petroleum-fiscal-db/`)
+so the bytes under test are the bytes that deploy.
+
+**What was checked first and found healthy**, so it is not what this cycle changed: the Quality
+column's `N of M terms cited →` chip hydrates on all 185 rows (16 at cold load, 185 after
+scrolling the `.tbl-wrap` — the IntersectionObserver is working, not capped), and the same chip
+reaches every row of both IOC Portfolio tables (37/37 and 33/33). `_fcOpenTermChain` lands the
+Evidence Chain 44–47px below the viewport top. USA's chain prints `⚠ DCF USES 12.5%`, `LINK DEAD`
+and a three-finding index; the FC `G` badge, the `default` tag inside the model cell and the v505
+drawer banner all name the generic basis. The drill-down route is in good shape.
+
+**Friction.** The drawer *ends* in `FISCAL BREAKDOWN (% OF REVENUE)` — the component bars, the
+`Largest component:` line and the IC note hung off it. Two annotations exist to qualify that
+split, and **neither can fire on a default-terms row:**
+
+- `_fcRenderWfCiteLeg978()` returns at its first line on `termsBasis === 'default'`
+  (`index.html:69825`).
+- `_fcEngineOverride()` returns `null` unless `getDCFParams` resolved `_basis === 'country'`
+  (`:69625`) — and on a default row `_overrideKeys` is `[]` anyway.
+
+Measured basis split across the 185 FC rows: **`default` 120 · `db` 56 · `country` 9.** So 120 of
+185 rows render a component split, an IC note and a `⎘ IC Citation` button with nothing on them
+at all.
+
+v978's own note reasoned that those 120 *"already carry the v505 Generic terms banner … so there
+is nothing to source"*. The premise is true and the conclusion does not follow. The un-askable
+question is whether a default is **cited** — it cannot be. The askable one is whether **ORCA's own
+record for the country contradicts the default rate the bar ran**, and measured live across all
+185 rows it does on **117 of the 120**:
+
+| country | the bars ran | ORCA's record holds |
+|---|---|---|
+| Saudi Arabia | royalty 10% · income tax 25% · special 0% · state equity 0% | 20% · 50% · 50% · 100% |
+| Bahrain | royalty 10% · income tax 25% · state equity 0% | 0% · 46% · 100% |
+| Kuwait | royalty 10% · income tax 25% · state equity 0% | 0% · 55% · 100% |
+| UAE | royalty 10% · income tax 25% · state equity 0% | 0% · 55% · 60% |
+| Venezuela | royalty 10% · income tax 25% · state equity 0% | 33.2% · 34.6% · 60% |
+| Netherlands | royalty 10% · income tax 25% | 0% · 25.8% |
+
+Distribution of contradicted terms over the 117: income tax 102, royalty 92, state equity 9,
+special tax 3; 70 countries contradict 2 terms, 38 one, 8 three, 1 four. The three exceptions are
+**Djibouti, Namibia, Zimbabwe** — and there the default does not agree with the record either, it
+has nothing to agree with: 1–2 terms match and the rest carry no value on record at all.
+
+The v505 banner is also **not where the split is read**. Measured on Netherlands, bottom of the
+banner to the `Largest component:` line:
+
+| viewport | gap | viewport height |
+|---|---|---|
+| 1440×900 | **561px** | 900 |
+| 390×844 `hasTouch` | **911px** | 844 |
+
+On a phone the gap exceeds the whole viewport, so the banner is off-screen *by construction* at
+the moment the IC note is in view. That is the same argument v967 used to put its override block
+ON the breakdown rather than only in the header chip — applied here to the complement set, which
+is 120 rows against v967's 6.
+
+**Change.**
+- New `_fcDefaultBasis(country)` beside `_fcEngineOverride()`, same `_FC_ENG_MAP` pairing, same
+  0.15 tolerance, gated on `_basis === 'default'`. Returns the contradicted terms plus counts of
+  the ones that match and the ones with no record value.
+- New block under the Fiscal Breakdown on default-basis rows only. Red where the record
+  contradicts something (117), muted where it does not (3). It names the default rate each bar
+  ran and what ORCA's record for that country holds instead, then: *"A mechanic default is not
+  this country's rate and not a citation. Cite the database take in the price table above, not
+  this split — and do not quote the 'Largest component' reading as X's fiscal character."*
+- Where the dominant bar's own term is one of the contradicted ones — **101 of the 120**, resolved
+  through the existing `_FC_TERM_WF978` map — the `Largest component:` sentence itself now ends
+  **"— and it is the default, not X's rate."** It reuses v978's `#fc-dd-dom-nocite` slot, which is
+  safe because v978 returns early on exactly this basis. The substitution uses a function
+  replacer so a literal `$` in a `$/bbl` rate cannot be read as a capture-group reference.
+- The block's control is **"Show X's own terms →"**, routing through `_fcOpenTermChain`.
+
+Nothing about any take, NPV, IRR, breakeven, rank, grade, tier letter, filter result or export
+value changes. The 65 non-default rows are byte-identical in behaviour.
+
+**Result.** An analyst who scrolls to the component split on any of 120 countries is told, at the
+bars, that the split is a generic mechanic default and which of its rates their own database
+contradicts — and the one sentence they would paste is marked where they read it. Before this,
+clicking Saudi Arabia in the ranked table gave `Royalty 10.0% · CIT 12.2%` and *"Largest
+component: CIT at 12.2% — IC note: CIT-dominant = deductible costs reduce effective burden"*,
+unqualified, on a country whose own ORCA record holds 20% royalty, 50% income tax, 50% special
+tax and 98.2% state participation. Clicking the new control now lands on exactly those four rows
+of the Evidence Chain.
+
+**Verification.**
+- JS syntax gate **PASS** (11 blocks, `node --check` on each).
+- Graded suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **actually run this
+  cycle**, `TEST_URL` pointed at the local tree, on the shipped bytes including the v1051 badge:
+  **547 PASS / 0 FAIL / 0 WARN / 0 JS errors** (`2026-10-03T10:43:10Z`). Numbers read from the
+  suite's own `ORCA_REPORT_FILE`, not assumed.
+- Swept all 185 drawers programmatically: block present on **120/120** default rows, **0/65**
+  non-default rows, 117 red / 3 muted, 101 dominant-line markers, 0 rows missing the control.
+- The new control clicked for real on Saudi Arabia: lands on `#dd-facts-saudi-arabia` at 16px
+  from the viewport top, chain printing Royalty 20% / Income Tax 50% / State Participation 98.2%
+  / Special Tax 50%.
+- 390×844 `hasTouch`: `scrollWidth 390 = clientWidth 390` on Netherlands, Saudi Arabia, Namibia
+  and Venezuela; new control **44px** tall (floor is 24). Elements with a right edge past 390px:
+  **18 on each of the four drawers — identical to the HEAD baseline served alongside on :8997**,
+  so the change adds no overflow. 0 page errors in every probe.
+
+### Notes for the next cycle
+- **The symmetric gap is still open on the other two artifacts.** v968 fixed `copyFCForIC` and
+  `exportFCResults` so the `Model basis` / `Terms_Basis` column stops printing "Country-specific
+  terms" on override rows. Neither was re-walked this cycle, and neither carries anything about
+  *which* default rate the record contradicts on the 120 default rows — only the basis label. A
+  T5 cycle should check whether the paste and the XLSX say more than "Generic default".
+- **The Country Profile has no counterpart to this block.** Its Evidence Chain names the terms
+  ORCA holds, which is the right answer, but the profile's own Live DCF panel and Fiscal
+  Breakdown were not walked here for the default-basis case. Unknown whether the CP runs the same
+  default. Worth one T2 cycle.
+- **Open from cycle 995, not touched:** the two screen-only strings printing inside the
+  Side-by-Side IC-pack PDF (`▦ Rank all 185 countries`, and the `Tip: Ctrl+P …` line), one
+  `display:none` in the `@media print` block at `index.html:2458`; `_icRefuse()` pinning
+  `minWidth` not `width`; the unbuilt export-guard walk over `#fc-export-btn`,
+  `#breakeven-csv-btn` and the Screener export.
+- **Open from cycle 988, not touched:** the swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}`
+  in `renderCompare`.
+- **Open from cycle 990, not touched:** the Platform Reference Guide's PLATFORM TABS list still
+  advertises Screener filters by IRR (deleted at v517) and breakeven (never a filter), says
+  Side-by-Side takes 4 countries against `CMP_MAX` 5, and omits Explorer and Sample Analyses.
+- **Seen while walking, not fixed:** `_fcTermLeg()` produced **23 console 404s** over a sweep of
+  all 185 drawers, fetching `api/v1/country/<slug>.json` for slugs with no file. The identical 23
+  appear on the HEAD baseline, so this is pre-existing, not this change — but it is the same
+  missing-slug family cycle 975 logged for Côte d'Ivoire, now counted. The chips degrade silently
+  (the slot just stays empty), so nothing on screen reports it.
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`,
+  so the 547 PASS quoted at the top of a cycle prompt is the LIVE pre-push build. Unchanged since
+  cycle 985. This cycle ran its own suite against the local tree.
+- **Probe debris, thirty-first cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
+  Every artefact this cycle wrote went to `/tmp/c996/`; **nothing landed in the repo.** The HEAD
+  baseline was served from `/tmp/c996/base/` by symlink rather than copied in.
