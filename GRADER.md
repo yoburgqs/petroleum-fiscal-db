@@ -72803,3 +72803,15 @@ of the Evidence Chain.
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
   Every artefact this cycle wrote went to `/tmp/c996/`; **nothing landed in the repo.** The HEAD
   baseline was served from `/tmp/c996/base/` by symlink rather than copied in.
+
+---
+## Cycle 995 Log — 2026-10-03 05:53
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 996 complete and pushed (v1051).
+
+## Task
+**T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (T6 last walked cycle 975; 995 was T3, 994 T5, 992 T1, 990/989 T4, 976 T2). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded, served from the local tree at the real Pages path.
+
+I checked the obvious T6 route first and it is healthy — the `N of M terms cited →` chip hydrates on all 185 Fiscal Compare rows and both IOC ta
