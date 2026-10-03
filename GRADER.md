@@ -72815,3 +72815,163 @@ of the Evidence Chain.
 **T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in rotation (T6 last walked cycle 975; 995 was T3, 994 T5, 992 T1, 990/989 T4, 976 T2). Walked cold at 1440×900 and 390×844 `hasTouch`, both storages cleared and reloaded, served from the local tree at the real Pages path.
 
 I checked the obvious T6 route first and it is healthy — the `N of M terms cited →` chip hydrates on all 185 Fiscal Compare rows and both IOC ta
+
+---
+## Cycle 998 Log — 2026-10-03 11:30
+
+- Test before: 547 PASS / 0 FAIL (live site, per the cycle prompt)
+- Test after: **546 PASS / 0 FAIL / 1 WARN / 15 JS errors** — suite ACTUALLY RUN this cycle
+  against the local tree, numbers read from the suite's own `ORCA_REPORT_FILE`. The HEAD
+  baseline served alongside on :8995 returns the **identical** 546/0/1/15, so the delta
+  against the live 547/0/0 is not this change — see Verification.
+- JS errors: 15, all one repeated service-worker 404, identical on HEAD. Explained below.
+
+## Task
+**T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* Last walked
+cycle 976, so stalest in rotation (996 was T6, 995 T3, 994 T5, 992 T1, 990/989 T4). Cycle 996's
+own notes also asked for a T2 pass over the Country Profile. Walked cold at 1440×900 and
+390×844 `hasTouch`, both storages cleared and reloaded, served from the local tree.
+
+**Provenance, stated plainly.** Cycle 997 picked T2, built this work, and **timed out at
+1800 s before it could commit, test, mirror or push** (`subprocess.TimeoutExpired` in
+`autonomous_cycle.py:231`, recorded in `cycle_log.txt`). Its edit was sitting uncommitted in
+the working tree at v1052, entirely unverified — no syntax gate, no suite, no mobile probe. This
+cycle verified it against the live data, corrected two things in it, and shipped it. The walk
+below is 997's; every number in Verification is this cycle's own measurement.
+
+## Friction
+
+**1 — the vs-producer-median pill, `loadCountryProfile()`, CP headline strip.** It is the only
+COLOURED element in the strip, and on **161 of 185** countries it painted a verdict the line two
+rows above it contradicts. Measured on HEAD over all 185 rendered profiles, reading the pill's
+inline `color:`:
+
+| cross-basis pill on HEAD | count |
+|---|---|
+| `var(--green)` | **120** |
+| `var(--orange)` | 17 |
+| `var(--muted)` | 24 |
+| tooltip reads "This is the number to cite" | **158** |
+
+Two lines apart, the strip read:
+
+- `#61 of 185 (tied with 1 other) · not production-weighted` — grey, tooltip: *"It is a
+  fiscal-terms comparison, not a producer benchmark, and it should not be ranked head-to-head
+  against one."*
+- `-32.2pp vs producer median @$75` — **GREEN**, tooltip: *"…is 55.6%. This is the number to
+  cite."*
+
+Two tooltips in one strip giving opposite instructions, and the one carrying colour was the one
+saying cite it. `prod_coverage_pct = 0` on every one of the 161, and 31 of them are an
+equal-weighted average over ≤5 contracts (Ascension Island n=1 at −30.0pp green, Guadeloupe n=1
+at −34.3pp green, Belgium n=2 at −39.0pp green). A first-time analyst reads one green pill and
+one grey rank and takes the green one.
+
+**2 — the all-185 line beneath it restated the rank already printed two lines up, verbatim.**
+v534 added that line so "the analyst can see the two bases disagree, and by how much", which
+holds on the 21 in-set countries where the line above reads `#N of 21 producers`. On the other
+**161** the line above already reads `#N of 185`, so the line duplicated it exactly — Albania
+printed `#29 of 185 (tied with 9 others)` and then `All 185 countries: #29 (tied with 9 others)`.
+Measured: **161 of 185** duplicated, 0 of the in-set 21.
+
+**3 — `copyICCitation()` carried no take-dispersion statement at all.** On Guyana the page leads
+with *"Take is a range here, not a point. By regime, Concession prices at 18.1% (9 contracts) and
+PSC at 56.5% (134 contracts), so the regime you sign moves the take by 38.4pp."* The analyst
+reads that, scrolls to the toolbar, clicks the button whose entire purpose is the memo sentence,
+and gets `Guyana: Govt Take 54.1% @$75/bbl [statutory model basis — ORCA PROXY: … ±5-15pp …]`.
+The regime range is gone and the only band left is the PROXY clause's ±5-15pp — a
+production-weighting caveat, a different axis, about a third of the real spread. `_icTakeDispersion()`
+already existed and already served the IC Memo **table beside the same button**; the citation
+simply never called it.
+
+## Change
+
+- **Cross-basis rows now render the pill in the platform's unverified idiom** — muted text,
+  dashed grey border, no fill — and say on the pill's **face** what only the tooltip used to:
+  `· not a producer benchmark`. The number and the direction stay (v452 lock: the vs-median
+  pill stays in Zone A). The tooltip now names `prod_coverage_pct`, states which side is
+  modelled from statute and which is measured, and hands over the **defensible** statement
+  instead: `N of the 21 producers take less than X%` or, where none do, `NOT ONE of the 21
+  producers takes less than X%, so nothing that actually produces sits below this figure`.
+- **The rank prints once.** On cross-basis rows the second line opens `Against the all-185
+  median instead:` and carries only the median comparison the line above lacks.
+- **New `_icCiteDispersion()`, wired into `copyICCitation()`.** Normalises the three existing
+  table-cell registers into one citation phrase and takes its verdict from the note
+  `_icTakeDispersion()` already built, so the cite cannot instruct the analyst differently from
+  the screen or the memo table. Fee-basis rows carry the Group-1 regime range instead, on the
+  same basis as the comparable take, for v770's reason: pairing *"comparable take is 34.1%"*
+  with *"half of contracts price 65.0-98.5%"* is the exact sentence v770 removed from the screen.
+- **In-set rows (21) keep "This is the number to cite"** — reinstated this cycle. 997 had
+  stripped that sentence from the shared tooltip, but it is only wrong on the cross-basis branch,
+  and the branch it was removed from now serves in-set rows only.
+
+No take, NPV, IRR, breakeven, rank, grade, tier letter, filter result or export value is
+recomputed. Tab order untouched; the v612 mobile layer untouched.
+
+## Result
+
+An analyst screening a non-producer at $75 can no longer read a green pill as evidence the
+country is cheap. The pill tells them on its face that it is not a producer benchmark, and the
+tooltip hands them the one comparator statement an IC can defend. The duplicated rank is gone, so
+the second line carries new information instead of repeating the first. And the sentence they
+paste into the memo now carries the take range the screen was already warning them about — on
+**62 of 185** countries, where previously **none** did.
+
+## Verification
+
+- **JS syntax gate PASS** — 11 blocks, `node --check` on each.
+- **Graded suite actually run**, `TEST_URL` pointed at the local tree, on the shipped bytes:
+  **546 PASS / 0 FAIL / 1 WARN / 15 JS errors**. The HEAD baseline on :8995 returns
+  **546 / 0 / 1 / 15 — identical**. All 15 errors are one repeated service-worker fetch 404:
+  `navigator.serviceWorker.register('/petroleum-fiscal-db/sw.js')` is hardcoded to the Pages
+  path and cannot resolve on localhost. **That, not this change, is the whole gap between the
+  local 546/1 WARN and the live 547/0** — worth knowing for any future cycle that gates locally.
+- **Pill sweep over all 185 rendered profiles:** 21 in-set solid/coloured, **161 cross-basis all
+  muted AND dashed, 0 green, 0 orange, 0 solid**, 3 monopoly-suppressed (no pill),
+  **0 rows still duplicating the rank line** (HEAD: 161). 0 pageerrors.
+- **Citation clause measured live over all 185** — reconciles exactly against the raw helper:
+  `cpFeeBasis()` diverges on 10, 6 have a `_cpRegimeSplit()` → fee branch emits on **6**, the
+  other 4 emit nothing rather than invent a range. `_icTakeDispersion()` material on 63, of
+  which 7 are fee-divergent and route to the branch above → **56** on the blended branch
+  (30 contract spread, 17 interquartile, 9 regime split; 3 with a headline outside their own
+  range). **62 emit, 123 correctly empty, 0 errors.**
+- **390×844 `hasTouch`, `pointer: coarse` asserted true:** `scrollWidth 390 = clientWidth 390`
+  on Albania, Afghanistan, Angola, Guyana and Iraq. Pill **39px** cross-basis, **24px** in-set,
+  against the 24px floor. Right edge 358 < 390. Elements with a right edge past 390px: **66,
+  equal to the HEAD baseline** — the change adds no overflow. 0 pageerrors.
+- **One probe of my own was wrong and is recorded as such:** a first mobile pass read Albania as
+  solid orange at +3.9pp, contradicting the desktop sweep. Cause was a 500 ms wait racing
+  `switchTab('t7')`, not the code; re-measured pinned to the rendered country, Albania is
+  −35.9pp dashed cross-basis on both widths. A first desktop probe also mis-selected the pill via
+  `getComputedStyle` on the wrong span and reported 0 green on HEAD; reading the inline `color:`
+  reproduced 997's 120/17/24 exactly. Both corrected above.
+
+### Notes for the next cycle
+- **Cycle 997 died at the 1800 s subprocess timeout with finished work uncommitted.** This is a
+  loop-level failure mode nothing was watching: the edit was in the tree at v1052 with the badge
+  already bumped, so a later cycle reading only the badge would have assumed it shipped. If a
+  cycle starts and `git status` shows a modified `index.html` with a version badge ahead of
+  `git log`, the previous cycle timed out — verify and ship it rather than building on top of it.
+- **The symmetric gap is still open on the other two artifacts** (carried from 996): neither
+  `copyFCForIC` nor `exportFCResults` says *which* default rate the record contradicts on the
+  120 default rows. A T5 cycle should check the paste and the XLSX.
+- **The CP's own Live DCF panel and Fiscal Breakdown were still not walked for the default-basis
+  case** — 996 asked for this and this cycle went to the headline strip instead. Unknown whether
+  the CP runs the same generic default the FC breakdown does. Still worth one T2 cycle.
+- **Open from 995, not touched:** the two screen-only strings inside the SbS IC-pack PDF
+  (`▦ Rank all 185 countries`, the `Tip: Ctrl+P …` line), one `display:none` in `@media print`
+  at `index.html:2458`; `_icRefuse()` pinning `minWidth` not `width`; the export-guard walk over
+  `#fc-export-btn`, `#breakeven-csv-btn`, Screener export.
+- **Open from 988:** the swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in `renderCompare`.
+- **Open from 990:** the Platform Reference Guide still advertises Screener filters by IRR
+  (deleted at v517) and breakeven (never a filter), says SbS takes 4 against `CMP_MAX` 5, and
+  omits Explorer and Sample Analyses.
+- **`autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`**,
+  so the PASS count quoted at the top of every cycle prompt is the LIVE pre-push build, not the
+  tree being edited. Unchanged since cycle 985, now thirteen cycles.
+- **Probe debris, thirty-second cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  Every artefact this cycle wrote went to `/tmp/c998/`; **nothing landed in the repo**, and the
+  HEAD baseline was served from `/tmp/c998/base/` by symlink rather than copied in. These are
+  prior-cycle baseline copies and are safe to delete, but they were not created this session so
+  the cycle is leaving them and flagging them rather than deleting unasked.
