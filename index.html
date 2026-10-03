@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1044</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1045</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -60042,16 +60042,110 @@ function _sbsPaintBasisStrip() {
   }
   var x = document.getElementById('cmp-profile-xref');
   if (x) {
-    var d = (typeof DCF_PROFILES !== 'undefined') ? DCF_PROFILES.deepwater : null;
-    x.textContent = d
-      ? 'Matches Fiscal Compare\u2019s DB \u00b7 CITABLE columns \u2014 not its MODEL columns, which run a different $'
-        + (d.capexMM / 1000).toFixed(1) + 'B / $' + d.opexBbl + '-opex project and read higher'
-      : 'Matches Fiscal Compare\u2019s DB \u00b7 CITABLE columns \u2014 not its MODEL columns';
-    x.setAttribute('title', 'Fiscal Compare shows both. Its MODEL columns are a live run of the Live DCF / '
-      + 'Scenario Builder profile, which is also labelled \u201cDeepwater\u201d but is a different project. '
-      + 'Its DB \u00b7 CITABLE columns are the stored figures \u2014 the same numbers this grid shows, on the '
-      + 'basis named to the left. Norway @$75 reads $1.21B in the MODEL column and $826M in the CITABLE '
-      + 'column; this grid shows $826M.');
+    /* ── v1045 (T3) — this line described a project Fiscal Compare may not be running, and
+       asserted a direction that is wrong for most countries on most profiles. ────────────
+       It read DCF_PROFILES.deepwater UNCONDITIONALLY — the same unconditional read v859
+       removed from the Scenario NPV card — and printed "which run a different $1.2B /
+       $15-opex project and read higher". Fiscal Compare does not run DCF_PROFILES; it runs
+       FC_PROFILES[#fc-profile.value], and the analyst picks one of seven. Measured across
+       all 185 countries at $75/bbl, MODEL contractor NPV vs the CITABLE figure this grid
+       shows:
+
+           profile          MODEL higher    MODEL lower
+           Deepwater            153              32
+           LNG                  165              20
+           Giant                182               3
+           Shallow               33             152
+           North Sea             24             161
+           Onshore               13             172
+           Marginal               5             180
+
+       So "read higher" is wrong for the MAJORITY of countries on four of the seven
+       profiles, and the named "$1.2B / $15-opex" project is wrong on six of the seven.
+       Angola is the worked case: this grid shows $1.14B at $75; FC's MODEL column reads
+       $255M under Marginal and $4.37B under Giant, and the strip said the same sentence
+       for both. It is wrong even on the default for the 32 Deepwater countries where MODEL
+       is below CITABLE — Angola again, $903M against $1.14B.
+
+       This is the tab's ONLY statement of how the two tabs relate. A wrong direction does
+       not merely mislead: it tells the analyst that a real discrepancy is not one, and
+       points them at the wrong figure as the modelled one.
+
+       Second half of the fix: the PROFILE does not carry across the Fiscal Compare →
+       Side-by-Side handoff, while the PRICE does (_sbsAdoptDeck). An analyst who sets
+       Onshore, ticks three countries and presses "⇌ Side-by-Side" watches half their
+       selection survive and is never told the other half was dropped. When the selected
+       profile is not the standardized basis, that is now said outright. */
+    // _cmpEsc is a const LOCAL to renderCompare() and is NOT in scope here. Using it threw a
+    // ReferenceError that renderCompare's own `catch (e) { /* non-critical */ }` swallowed,
+    // leaving the PREVIOUS profile's sentence on screen with no page error — the exact
+    // "stable but wrong" failure this cycle is about. Local helper, no cross-scope dependency.
+    var _esc = function (v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+    var _fcSel = document.getElementById('fc-profile');
+    var _fcKey = _fcSel ? _fcSel.value : 'deepwater';
+    var _fcP   = (typeof FC_PROFILES !== 'undefined' && FC_PROFILES[_fcKey]) ? FC_PROFILES[_fcKey] : null;
+    var _cap   = function (mm) { return mm >= 1000 ? '$' + (mm / 1000).toFixed(1) + 'B' : '$' + mm + 'M'; };
+    var _proj  = _fcP ? (_cap(_fcP.capexMM) + ' / $' + _fcP.opexBbl + '-opex') : '';
+
+    // Direction, measured on the columns actually in this comparison — never asserted.
+    // Only trusted when _fcResults was produced by the profile now selected.
+    var _nHi = 0, _nLo = 0, _nSeen = 0, _dirStr = '';
+    if (window._fcResults && window._fcLastProfile === _fcKey && typeof COUNTRY_DATA !== 'undefined'
+        && typeof compareList !== 'undefined') {
+      var _P  = window._fcLastPrice || 75;
+      var _ck = (_P === 50) ? 'npv_50' : (_P === 100) ? 'npv_100' : (_P === 125) ? 'npv_125' : 'npv_75';
+      var _cdx = {}; COUNTRY_DATA.forEach(function (r) { _cdx[r.country] = r; });
+      var _rsx = {}; window._fcResults.forEach(function (r) { _rsx[r.country] = r; });
+      compareList.forEach(function (c) {
+        var m = _rsx[c], d = _cdx[c];
+        if (!m || !d || m.liveNPV == null || d[_ck] == null) return;
+        _nSeen++; if (m.liveNPV > d[_ck]) _nHi++; else _nLo++;
+      });
+      if (_nSeen) {
+        var _all = (_nSeen === 1) ? 'this column' : 'all ' + _nSeen + ' of these columns';
+        _dirStr = (_nHi === _nSeen) ? ' and read HIGHER on ' + _all
+                : (_nLo === _nSeen) ? ' and read LOWER on ' + _all
+                : ' and read higher on ' + _nHi + ' of these columns, lower on ' + _nLo;
+      }
+    }
+
+    var _tip;
+    if (_fcP && _fcKey !== 'deepwater') {
+      // The analyst changed the profile. Say that it was dropped, and name what was kept.
+      x.innerHTML = '<strong style="color:var(--orange);">Fiscal Compare is set to &ldquo;'
+        + _esc(_fcP.name) + '&rdquo; (' + _esc(_proj) + ') &mdash; that profile is NOT applied here.</strong>'
+        + '<span style="color:var(--muted);"> Side-by-Side carries the price deck over from Fiscal Compare '
+        + 'but never the profile: these columns are the stored figures on the basis named at left. '
+        + 'FC&rsquo;s MODEL columns run your profile' + _esc(_dirStr) + '.</span>';
+      x.style.fontStyle = 'normal';
+      _tip = 'Side-by-Side has one basis — the standardized ' + ((typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS.name : 'Deepwater')
+        + ' project named to the left — and no profile control, because every figure in this grid is a STORED '
+        + 'database result, not a live run. Fiscal Compare’s DB · CITABLE columns are those same stored '
+        + 'figures and also do not move with the profile; its MODEL columns do. Your “' + _fcP.name
+        + '” selection therefore changes Fiscal Compare’s MODEL columns and nothing on this tab. '
+        + 'To screen your own profile, stay on Fiscal Compare and read its MODEL columns, or open the Scenario '
+        + 'Builder; to compare the published figures across countries, use this grid.'
+        + (_nSeen ? ' Measured on the ' + _nSeen + ' column(s) in this comparison at $' + (window._fcLastPrice || 75)
+            + '/bbl: MODEL above the figure here on ' + _nHi + ', below on ' + _nLo + '.' : '');
+    } else {
+      x.textContent = 'Matches Fiscal Compare’s DB · CITABLE columns — not its MODEL columns'
+        + (_proj ? ', which run a different ' + _proj + ' project' : '')
+        + _dirStr;
+      x.style.fontStyle = 'italic';
+      _tip = 'Fiscal Compare shows both. Its MODEL columns are a live run of the profile selected in its '
+        + 'Profile dropdown' + (_fcP ? ' (currently “' + _fcP.name + '”, ' + _proj + ')' : '')
+        + '. Its DB · CITABLE columns are the stored figures — the same numbers this grid shows, on the '
+        + 'basis named to the left. Which of the two reads higher is a property of the profile, not a constant: '
+        + 'across all 185 countries at $75/bbl the MODEL NPV is above the CITABLE figure on 153 countries under '
+        + 'Deepwater but only 13 under Onshore and 5 under Marginal, so it is measured here on the columns in '
+        + 'this comparison rather than assumed.'
+        + (_nSeen ? ' In this set: MODEL above on ' + _nHi + ', below on ' + _nLo + ', at $'
+            + (window._fcLastPrice || 75) + '/bbl.' : ' Run Fiscal Compare to have the direction measured for these columns.');
+    }
+    x.setAttribute('title', _tip);
   }
 }
 // ── v859 (T2) — the reconciliation now describes the profile the panel IS RUNNING ──────
@@ -65548,6 +65642,10 @@ function runFiscalCompare() {
     window._fcResults = results;
     window._fcLastResults = results;
     window._fcLastPrice = price;
+    // v1045 (T3): which profile these MODEL figures were actually run on. Side-by-Side's
+    // basis strip describes FC's MODEL columns, and could not previously tell whether
+    // _fcResults still corresponded to the profile now showing in the dropdown.
+    window._fcLastProfile = profileKey;
     window._fcSortState = 'take'; // reset sort on new run
     window._fcSortDir = 'asc'; // v465: reset direction on new run
     var _sdBtn = document.getElementById('fc-sort-dir-btn');
@@ -76846,7 +76944,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // v108: FC profile/price selects — onchange migrated to event listeners
   var fcProfile = document.getElementById('fc-profile');
-  if (fcProfile) fcProfile.addEventListener('change', function() { if (window._fcLastResults) runFiscalCompare(); });
+  if (fcProfile) fcProfile.addEventListener('change', function() {
+    if (window._fcLastResults) runFiscalCompare();
+    // v1045 (T3): Side-by-Side's basis strip now states whether this profile applies there.
+    // Repaint it on change so the statement is true before the analyst crosses tabs, not
+    // only after the next renderCompare().
+    if (typeof _sbsPaintBasisStrip === 'function') { try { _sbsPaintBasisStrip(); } catch (e) {} }
+  });
   var fcPrice = document.getElementById('fc-price');
   if (fcPrice) fcPrice.addEventListener('change', function() { if (window._fcLastResults) runFiscalCompare(); });
   // v108: Search input — oninput/onkeydown migrated to event listeners
