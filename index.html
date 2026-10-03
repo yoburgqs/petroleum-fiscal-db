@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1049</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1050</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -77074,10 +77074,66 @@ document.addEventListener('DOMContentLoaded', function() {
   // v660: the .depth-radio-group listener is removed with the control it drove.
 });
 
+// ── v1050 (T3) — "how do these three countries compare side by side?" ────────────────────────
+// Walked T3 cold at 1440x900, both storages cleared, with the analyst's OWN trio rather than the
+// seeded example. The add path is clean. The EXPORT path is not, and the defect is one button
+// wide.
+//
+// `cmp-print-btn` was `addEventListener('click', function() { window.print(); })` — a bare print
+// with no set check. Pressed with 0 or 1 countries loaded it produces a fully branded ORCA
+// artifact: the print header stamps "Side-by-Side — exported view", the platform URL, the live
+// version and today's date, over a page carrying NO comparison. Measured, Letter, print media:
+//
+//     3 countries -> 464,106 bytes / 5 pages / 5,839 chars of printed text
+//     1 country   -> 134,087 bytes / 1 page  /   745 chars  (no grid, no charts, no figures)
+//     0 countries ->  98,906 bytes / 1 page  /   688 chars
+//
+// The 0-country PDF is the worst of the three, because the print rule hides .cmp-quickstart-btn
+// but not the sentence that introduces it — so an IC-pack page ends on "Search above or start
+// with a standard IOC benchmark set:" with nothing after the colon.
+//
+// Neither state is an exotic one. The empty state is a DESTINATION: "Clear" sits 8px from the
+// chips, the seeded example clears itself the moment the analyst types their first country, and
+// sbsKeepBasis() — the "Compare the N statutory-terms columns" remedy — REMOVES columns, so a
+// 3-country set can land on 1. The 1-column state is explicitly a transit state; the page itself
+// prints "add 1–4 more countries to begin comparison" there.
+//
+// The asymmetry is what makes it a defect rather than an edge case. "⎘ Copy for IC Memo" sits in
+// the SAME toolbar and already refuses on the SAME condition, with _icRefuse() writing
+// "✕ Not copied" onto the button and naming the reason. _icRefuseLabel() has returned
+// "✕ Not exported" for any button matching /export|pdf|save/ since v808. The machinery was built;
+// this button never called it. Two adjacent controls, one artifact class, one guarded.
+//
+// The gate is copyComparisonTable()'s own gate — #cmp-data-table with >= 2 rows — read through
+// one helper so the two buttons cannot drift apart. Verified absent at 0 and 1 countries and
+// present with 24 rows at 2+, including an all-statutory-basis pair (Ghana + Guyana), which must
+// still export: a proxy-basis comparison is a comparison, and the grid labels its own basis.
+function _sbsExportable() {
+  var t = document.getElementById('cmp-data-table');
+  return !!(t && t.rows && t.rows.length >= 2);
+}
+// Ctrl+P cannot be cancelled from script, so the keyboard route is LABELLED instead of blocked:
+// _orcaStampPrintHeader() below appends the column count to the view line, which means a
+// hand-printed PDF of an incomplete set says so on its own first page instead of passing as a
+// comparison. The button route, being a deliberate press, refuses outright.
+function _sbsPrint() {
+  if (!_sbsExportable()) {
+    var n = (typeof compareList !== 'undefined' && compareList) ? compareList.length : 0;
+    _icRefuse(n === 1
+      ? 'One country is not a comparison — add at least one more before exporting. Nothing was exported.'
+      : 'Load at least 2 countries into Side-by-Side first — nothing was exported.');
+    return;
+  }
+  window.print();
+}
+
 // v109: Populate print header export date
 // v535: extended — the print header now also has to say WHICH view was printed, because print
 // follows the active tab instead of always rendering Country Profile. Stamped on every tab
 // switch and again on beforeprint (which fires for Ctrl+P and for every window.print() button).
+// v1050 (T3): on Side-by-Side the view line also carries HOW MANY columns the printed set holds
+// when it holds too few to compare. beforeprint fires for Ctrl+P as well as for every
+// window.print() call, so this is the one hook that covers the route the button guard cannot.
 function _orcaStampPrintHeader() {
   try {
     var active = document.querySelector('.tab-btn.active')
@@ -77086,7 +77142,14 @@ function _orcaStampPrintHeader() {
     // Explorer and Screener share one pane; name the mode that is actually on screen.
     if (name === 'Explorer' && window._explorerMode === 'screen') name = 'Screener';
     var view = document.getElementById('print-header-view');
-    if (view) view.textContent = name ? name + ' \u2014 exported view' : '';
+    var suffix = '';
+    if (name === 'Side-by-Side' && typeof _sbsExportable === 'function' && !_sbsExportable()) {
+      var nsel = (typeof compareList !== 'undefined' && compareList) ? compareList.length : 0;
+      suffix = nsel === 1
+        ? ' \u2014 INCOMPLETE: 1 country selected, no comparison in this export'
+        : ' \u2014 INCOMPLETE: no countries selected, no comparison in this export';
+    }
+    if (view) view.textContent = name ? name + ' \u2014 exported view' + suffix : '';
     var ver = document.getElementById('print-header-ver');
     if (ver && typeof _orcaVerNow === 'function') { var v = _orcaVerNow(); if (v) ver.textContent = v; }
     var d = document.getElementById('print-export-date');
@@ -77104,7 +77167,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('cmp-inline-copy-btn')) { if (typeof copyComparisonTable === 'function') copyComparisonTable(e.target); }
-    else if (e.target.classList.contains('cmp-inline-print-btn')) { window.print(); }
+    else if (e.target.classList.contains('cmp-inline-print-btn')) { _sbsPrint(); }
     else if (e.target.classList.contains('cmp-inline-png-btn')) { if (typeof downloadCmpChart === 'function') downloadCmpChart(); }
     else if (e.target.classList.contains('cmp-inline-share-btn')) { if (typeof shareComparison === 'function') shareComparison(); }
   });
@@ -77197,8 +77260,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cmpRankSel) cmpRankSel.addEventListener('change', function() {
     if (typeof setCompareRankPrice === 'function') setCompareRankPrice(cmpRankSel.value);
   });
+  // v1050 (T3): guarded — see _sbsPrint(). A bare window.print() here exported a branded,
+  // version-stamped "Side-by-Side — exported view" PDF with no comparison in it.
   var cmpPrint = document.getElementById('cmp-print-btn');
-  if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });
+  if (cmpPrint) cmpPrint.addEventListener('click', function() { _sbsPrint(); });
   var cmpShare = document.getElementById('cmp-share-btn');
   if (cmpShare) cmpShare.addEventListener('click', function() { if (typeof shareComparison === 'function') shareComparison(); });
   // v541 (T5): this toolbar button is the FIRST copy control an analyst meets on Side-by-Side

@@ -72486,3 +72486,167 @@ pages instead of 51, and no single row is taller than the page it lands on.
 ## Cycle 994 — T5 — v1049
 
 **Task:** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in rotation (992 was T1, 990/989 T4, 979 T1, 976 T2, 975 T6). I walked all five "Copy for IC Memo" surfaces cold at 1440×900 with both storages cleared, capturing both clipboard flavours — beca
+
+## Cycle 995 — T3 — v1050 — 2026-10-03
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation: last
+run at cycle 957, against 994 (T5), 992 (T1), 990/989 (T4), 979 (T1), 976 (T2), 975 (T6).
+
+Walked it cold at 1440x900 with `sessionStorage` and `localStorage` cleared, using the analyst's
+OWN trio rather than the seeded UK/Norway/Nigeria example — because typing the first country is
+what clears the example, so the analyst's real set is the one nobody's walk ever reaches.
+
+**What was already clean,** recorded so a later cycle does not re-walk it:
+- The add path. `Angola → Ghana → Guyana`, typed, Enter after each: the example self-clears on the
+  first add (3 → 1, not 3 → 4), the counter tracks (`1/5 … room for 4 more`), 0 page errors.
+- The `CMP_MAX` overfill trap does not exist: `.cmp-quickstart-btn` renders ONLY in the empty
+  state, so the delegated `countries.forEach(addCompare)` can never be fired at a set that is
+  already part-full. Measured 0 quickstart buttons present at 3 countries.
+- `cmpOrder = 'take_asc'` and `<option value="take_asc" selected>` are in sync, so the order
+  control does not misreport the grid — the v908/v929 invariant still holds.
+- The all-proxy trio is handled: `Angola + Ghana + Guyana` correctly refuses to rank ("NOTHING
+  RANKS HERE — only Angola carries a comparable take"), and the `sbsKeepBasis()` remedy button
+  ("Compare the 2 statutory-terms columns →") works, dropping to `['Ghana','Guyana']` and
+  restoring both orderings on one basis.
+- Both chart canvases render identically under `print` and `screen` media (ink-sampled, 375 and
+  905 non-transparent samples) — the IC-pack PDF is not getting blank plots.
+
+**Friction.** `⬇ Export PDF` on Side-by-Side was wired, at `index.html:77201`, as:
+
+    if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });
+
+A bare `window.print()` with no set check. Pressed with 0 or 1 countries loaded it produces a
+fully branded ORCA artifact — `print-header` stamps **"Side-by-Side — exported view"**, the
+platform URL, the live version and today's date — over a page carrying no comparison at all.
+Measured, Letter, print media, `#cmp-data-table` absent in both short cases:
+
+| set | PDF bytes | pages | printed chars | grid | charts |
+|---|---|---|---|---|---|
+| 3 countries | 464,106 | 5 | 5,839 | yes | yes |
+| **1 country** | **134,087** | **1** | **745** | **none** | **none** |
+| **0 countries** | **98,906** | **1** | **688** | **none** | **none** |
+
+The 0-country PDF is the worst of the three: the print rule at `index.html:2460` hides
+`.cmp-quickstart-btn` but not the sentence introducing it, so an IC-pack page ends on
+*"Search above or start with a standard IOC benchmark set:"* — a colon with nothing after it.
+
+Neither state is exotic. **The empty state is a destination, not an accident.** `Clear` sits 8px
+from the chips; the seeded example clears itself the moment the analyst types their first country
+(measured: 3 → 1); and `sbsKeepBasis()` — the remedy the page itself offers on a mixed-basis set —
+*removes* columns, so a 3-country set lands on 1 by following the page's own advice. The 1-column
+state is explicitly a transit state: the page prints *"add 1–4 more countries to begin comparison"*
+there, with the full export toolbar live 150px above it.
+
+**The asymmetry is what makes it a defect rather than an edge case.** `⎘ Copy for IC Memo` sits in
+the SAME toolbar, 8px right, and already refuses on the SAME condition — `_icRefuse()` writes
+`✕ Not copied` onto the button and names the reason. `_icRefuseLabel()` has returned
+**`✕ Not exported`** for any button matching `/export|pdf|save/` since **v808**. The machinery was
+built, tested and shipped seven cycles of work ago; this button never called it. Two adjacent
+controls, one artifact class, one guarded — and the unguarded one is the one that writes a file.
+
+**Change.**
+1. `_sbsExportable()` — one helper reading `copyComparisonTable()`'s own gate (`#cmp-data-table`
+   with `>= 2` rows) so the two neighbouring buttons cannot drift apart again.
+2. `_sbsPrint()` replaces the bare `window.print()` on both `#cmp-print-btn` and
+   `.cmp-inline-print-btn`. Under 2 columns it calls `_icRefuse()`: the button turns
+   `var(--negative)` and reads **`✕ Not exported`** for 2.8s, with a toast naming the reason —
+   and the 1-country case gets its own sentence, *"One country is not a comparison — add at least
+   one more before exporting"*, rather than the 0-country wording.
+3. `Ctrl+P` cannot be cancelled from script, so the keyboard route is **labelled, not blocked**:
+   `_orcaStampPrintHeader()` — already bound to `beforeprint`, which fires for Ctrl+P *and* for
+   every `window.print()` — now appends the column count to the view line when the active tab is
+   Side-by-Side and the set is short. A hand-printed PDF reads
+   **"Side-by-Side — exported view — INCOMPLETE: 1 country selected, no comparison in this
+   export"** on its own first page instead of passing as a comparison.
+
+**Result.** The analyst cannot produce a version-stamped, ORCA-branded "Side-by-Side — exported
+view" PDF that contains no side-by-side. Pressing Export PDF at 0 or 1 countries now reports its
+refusal **on the button they just pressed** — the same way the Copy button beside it already did —
+instead of opening a print dialog over an empty page, which in a 20-minute pre-meeting window is a
+file that reaches the IC pack and is only discovered there. A proxy-basis pair still exports:
+`Ghana + Guyana` passes the gate, because a comparison on the weaker basis is still a comparison
+and the grid labels its own basis.
+
+**Verification — all run this cycle against the LOCAL tree, nothing assumed.**
+- JS syntax gate: **PASS** — all 11 inline `<script>` blocks through `node --check`.
+- Guard, measured at every set size (`window.print` stubbed and counted):
+
+| set | `print()` calls | button label | toast |
+|---|---|---|---|
+| 0 countries | **0** | `✕ Not exported` | "Load at least 2 countries … nothing was exported." |
+| 1 country | **0** | `✕ Not exported` | "One country is not a comparison … Nothing was exported." |
+| 2 countries | 1 | `⬇ Export PDF` | none |
+| 2 all-statutory (Ghana+Guyana) | 1 | `⬇ Export PDF` | none |
+| 3 countries | 1 | `⬇ Export PDF` | none |
+| 3, inline `⬇ Save as PDF` | 1 | — | none |
+
+- `beforeprint` stamp, dispatched exactly as Ctrl+P does, and **correctly scoped**: the suffix
+  appears only on Side-by-Side. Country Profile and Fiscal Compare still read plain
+  "— exported view" with an empty compare set, so no other tab's PDF was touched.
+- **The 3-country PDF is byte-identical before and after: 464,106 bytes, 5 pages.** The real
+  export path is untouched. The two short cases grew by the label only (134,087 → 138,764;
+  98,906 → 100,919).
+- Mobile, 390x844 `hasTouch`, `pointer: coarse` confirmed true: `scrollWidth == clientWidth == 390`
+  on all 8 primary tabs, 0 horizontal scroll, 0 page errors. `#cmp-print-btn` measures **44px**
+  tall at 0, 1 and 3 countries, and **44px in the refusal state**. The refusal toast sits at
+  `right: 366` of 390 — inside the viewport, and geometrically identical to the Copy button's
+  toast in the pre-change baseline (`right: 366`, h 54 both sides).
+- The one fixed element extending past 390 is `#reference-panel` at `right: 788` — **identical in
+  the pre-change baseline**, off-canvas by `translateX` not by a negative `right` offset, with
+  `scrollWidth` still 390. That is the v612 locked mobile layer; not touched.
+- STILL LOCKED items untouched: no tab reorder, no v612 edit, `#reference-panel` untouched, Govt
+  NPV still absent from FC, CP headline untouched, no new tooltip, no new FAQ, no text-only edit —
+  `print()` either fires or it does not, and the button's own label changes.
+- Version badge `v1049 → v1050`, the single live occurrence at `index.html:3189`. The other 8
+  `v1049` strings are comment provenance tags and were deliberately left. `_orcaVerNow()` reads
+  `#hdr-version`, so citations, exports and clipboard artifacts now stamp v1050.
+
+### Loop health
+
+- **This is the second cycle running to find that an EXPORT path had no gate while its
+  clipboard twin did.** v808 built `_icRefuse()` and `_icRefuseLabel()`, and `_icRefuseLabel()`
+  was written from the start to return `✕ Not exported` for `/xlsx|excel|csv|export|pdf|download|save/`
+  — a branch that, until this cycle, **no caller could ever reach**, because every call site was a
+  clipboard button. The cheap guard is a suite assertion that walks every button matching that
+  regex and checks it refuses on an empty/short set rather than firing. Recommend it as the next
+  loop-health item; **not built this cycle.** The same question is open for Fiscal Compare's
+  `#fc-export-btn`, the Screener's export, and `#breakeven-csv-btn` — none was walked here.
+- Cycle 994's recommended guard — *no `th` in any of the five paste artifacts matches
+  `/undefined/`, and `headShort*.length === cols.length`* — **is still unbuilt.**
+- **Still open from cycle 988, not touched:** the swallowed `try { _sbsPaintBasisStrip(); }
+  catch (e) {}` in `renderCompare` leaves the *previous* set's assumptions sentence on screen on
+  throw. This cycle walked straight past it in `renderCompare` and left it alone.
+- **Still open from cycle 990, not touched:** the Platform Reference Guide's PLATFORM TABS list
+  still advertises Screener filters by IRR (deleted at v517) and breakeven (never a filter), says
+  Side-by-Side takes 4 countries against `CMP_MAX` 5, and omits Explorer and Sample Analyses.
+- **New, not fixed, deliberately:** two screen-only strings print inside the Side-by-Side IC-pack
+  PDF — the `▦ Rank all 185 countries` nav button, and `Tip: Ctrl+P to print, select "Save as PDF"
+  as printer for best results`, which is advice printed *inside the thing it is advice about*.
+  Both are one `display:none` line in the `@media print` block at `index.html:2458`. Left out of
+  this cycle because they are cosmetic and the directive bans padding a cycle with a list; logged
+  so the next T3 or T5 cycle has them.
+- **Also new, not fixed:** `_icRefuse()` pins `minWidth`, not `width`, so a longer refusal label
+  grows the button (96px → 105px on mobile, measured). It does not overflow and `scrollWidth`
+  stays 390, and it is v808 behaviour shared with the Copy button, so it was left alone rather
+  than changed under a T3 cycle.
+- `autonomous_cycle.py`'s `run_playwright()` still sets `ORCA_REPORT_FILE` but not `TEST_URL`,
+  so the 547 PASS reported at the top of this cycle was the LIVE pre-push build. Unchanged since
+  cycle 985. This cycle ran its own suite against the local tree and reports that number below.
+- **Probe debris, thirtieth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+  `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB). Every artefact this
+  cycle wrote went to `/tmp/c995/`; **nothing landed in the repo.**
+
+### Suite
+
+- Ran **twice**, both against the LOCAL tree mounted at the real Pages path
+  (`http://localhost:8995/petroleum-fiscal-db/index.html`) — the prefix matters, because
+  `index.html:49` registers the service worker at the absolute path `/petroleum-fiscal-db/sw.js`
+  and serving at a server ROOT costs 1 PASS and gains 1 WARN + 15 console errors (harness
+  artefact, recorded by cycle 994).
+- First run, guard in place, badge still v1049: **547 PASS / 0 FAIL / 0 WARN / 0 JS errors**
+  (`2026-10-03T09:22:29Z`).
+- Second run, on the **exact shipped bytes** including the v1050 badge:
+  **547 PASS / 0 FAIL / 0 WARN / 0 JS errors** (`2026-10-03T09:30:15Z`). Numbers read from the
+  suite's own `ORCA_REPORT_FILE`, not assumed. The re-run was done because the first had been
+  served pre-badge-bump; the suite carries no version assertion, but "measured against the
+  deployed build" should mean the bytes that deploy.
