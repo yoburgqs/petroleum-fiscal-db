@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1046</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1047</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -27754,8 +27754,13 @@ function getPriceKey() {
   return document.querySelector('input[name="price"]:checked')?.value || '75';
 }
 
-function makeTakeSparkline(d, activePrice) {
-  const vals = [d.take_50, d.take_75, d.take_100, d.take_125];
+// v1047 (T1): valsOverride lets the caller hand in the four points on the comparable Group-1
+// basis, so this curve cannot draw a different shape from the four price cells beside it. Null or
+// omitted keeps the published points, which is the only thing it ever drew before. Used by the
+// Browse row and nowhere else — see _explCurveVals().
+function makeTakeSparkline(d, activePrice, valsOverride) {
+  const vals = (Array.isArray(valsOverride) && valsOverride.length === 4)
+    ? valsOverride : [d.take_50, d.take_75, d.take_100, d.take_125];
   const prices = ['50','75','100','125'];
   const valid = vals.every(v => v !== null && v !== undefined);
   if (!valid) return '<svg width="60" height="24"></svg>';
@@ -28128,7 +28133,17 @@ function renderExplorer() {
     ? _scFeeCmpAt(d, price) : { head: d[takeKey], cmp: d[takeKey], diverges: false, n2: 0, n1: null };
   // The Explorer has no "screen on comparable take" checkbox, so unlike the Screener there is
   // exactly one state in which this column does the ranking: its own sort being the live one.
-  const _explTakeLeadCmp = (sort === 'take' || !sort);
+  // ── v1047 (T1): 'swing' joins that set, and it is one flag for the whole row on purpose ──
+  // Five cells on this row are readings of government take — @$50, the $75 Govt Take cell, @$100,
+  // @$125 and the Curve sparkline — and Swing is not a sixth reading, it is take@$125 minus
+  // take@$50, arithmetic on two of them. So a per-column lead flag cannot be made consistent: with
+  // the curve on the comparable basis and Swing on the published one, Iraq's row printed a curve
+  // rising 28.6 → 39.7 beside a Swing cell reading +6.6pp, and 39.7 − 28.6 is 11.1. One flag for
+  // all five is the only arrangement in which the row's own subtraction checks out, which is the
+  // first thing an analyst defending the number will try. The rule v1026 and v882 both state —
+  // the figure the row is ORDERED ON leads — is unchanged and now simply covers the swing sort,
+  // which since v1047 ranks on the comparable figure too.
+  const _explTakeLeadCmp = (sort === 'take' || sort === 'swing' || !sort);
   const _explTakeSortVal = (d) => {
     const fc = _explFeeCmpOf(d);
     return (fc.diverges && fc.cmp != null) ? fc.cmp : (d[takeKey] ?? 999);
@@ -28177,6 +28192,117 @@ function renderExplorer() {
     return tierCellHtml(take, false, floorTip, '')
       + `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:3px;cursor:help;" title="${tip}">PSC/Conc: ${tierLabel(fc.cmp)}</div>`;
   };
+  // ── v1047 (T1): the rest of the row's take curve, on the basis the $75 cell already uses ──
+  // v1026 re-based this table's Govt Take cell, its take SORT and its Tier pill onto the
+  // comparable Group-1 take. Its own scope note says so: "Scope is the take ORDERING and the two
+  // cells that state it." The four other cells on the row that are ALSO readings of government
+  // take -- @$50, @$100, @$125, the Curve sparkline and Swing -- were left on the raw published
+  // blend. Browse's cold default sort IS take, so v1026 is live the moment the tab opens, and the
+  // result is that it did not merely leave those cells wrong, it made the row CONTRADICT ITSELF:
+  //
+  //   Iraq, rank 6 of 185 on the cold Browse view, read left to right:
+  //       Govt Take 34.1%   @$50 81.5%   @$100 86.9%   @$125 88.1%   Swing +6.6pp   Inv-Friendly
+  //
+  // A take curve that is above 80% at every price except the one price the column headers say the
+  // table is ranked at, where it drops 50.7pp and then climbs back. Before v1026 that row read
+  // 84.8% at $75 and was at least internally consistent; correcting one of five cells is what
+  // punched the hole, and it punched it at rank 6 instead of rank 180 where nobody looked.
+  //
+  // Measured on the shipped country_data.json, not assumed. 11 countries diverge at one or more
+  // of the three decks (Azerbaijan, Ecuador, India, Iran, Iraq, Malaysia, Mexico, Oman, Qatar,
+  // Russia, South Sudan); 10 at $50, 10 at $100, 11 at $125. Iraq is the only one where the gap
+  // decides anything -- 52.9pp at $50, 49.1pp at $100, 48.4pp at $125 -- because 415 of its 610
+  // contracts are TSC fee-basis, where the contractor is paid a fixed $/bbl remuneration and keeps
+  // no price upside, so take% pins near 97-99% at EVERY price as an artefact of the mechanic.
+  // On its 195 PSC/Concession contracts the curve is 28.6 / 34.1 / 37.8 / 39.7 -- monotonic, and
+  // it reconciles with the comparable swing of +11.1pp (39.7 - 28.6). The published blend does
+  // not: 88.1 - 81.5 = +6.6pp, which on this column's own legend ("<10pp = stable fiscal terms
+  // across the price cycle") is the STABLE tier, awarded to the one row on screen whose take
+  // figure moves 50pp between two adjacent cells.
+  //
+  // No new rule, no new threshold, nothing recomputed. These read _scFeeCmpAt(d, deck) and
+  // _scSwingAt(d) -- the same two calls v554/v882/v1026, the Screener's ceiling, Side-by-Side and
+  // the IC-memo clipboard already make. The lead figure follows _explTakeLeadCmp exactly, so the
+  // whole row is on ONE basis under any sort: comparable while the take sort is doing the ranking,
+  // published under every other sort, which is what these cells print today. 174 of 185 rows are
+  // byte-identical; a row whose two figures agree at 0.1pp is untouched by the .diverges test.
+  const _explCurveCell = (d, p) => {
+    const _disp = `display:${_fourPriceActive ? '' : 'none'}`;
+    const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, p) : null;
+    if (!fc || !fc.diverges || fc.cmp == null || fc.head == null) {
+      return `<td class="num expl-mp-col" style="${_disp}">${fmtTake(d['take_' + p])}</td>`;
+    }
+    const lead  = _explTakeLeadCmp ? fc.cmp  : fc.head;
+    const other = _explTakeLeadCmp ? fc.head : fc.cmp;
+    const tip = (`${d.country} at $${p}/bbl: ${Number(fc.n2).toLocaleString()} of its contracts are `
+      + `fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% `
+      + `blends contract structure into the take figure at this price as well. On its `
+      + `${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government `
+      + `take is ${fc.cmp.toFixed(1)}% at $${p}/bbl. `
+      + (_explTakeLeadCmp
+          ? `The Govt Take column is doing the ranking and leads with the comparable figure, so this `
+            + `cell does too — the four price points on this row are one curve on one basis. The `
+            + `published blend is named beneath and is what the export carries.`
+          : `This cell leads with the published figure because the table is not ranked on take; sort `
+            + `by Govt Take and the whole curve re-bases to the comparable reading.`)).replace(/"/g,'&quot;');
+    const sub = `<div style="font-size:10px;font-weight:700;color:${_explTakeLeadCmp ? 'var(--muted)' : 'var(--accent)'};line-height:1.3;margin-top:2px;white-space:nowrap;">`
+      + `${_explTakeLeadCmp ? 'published ' : 'PSC/Conc '}${other.toFixed(1)}%</div>`;
+    return `<td class="num expl-mp-col" style="${_disp};cursor:help;" title="${tip}">${fmtTake(lead)}${sub}</td>`;
+  };
+  // The Curve column is the same four numbers drawn instead of printed, and makeTakeSparkline()
+  // is used by this row and nowhere else. It autoscales to its own min/max, so what it carries is
+  // the SHAPE -- which is exactly the thing that differs: Iraq's published points bunch into a
+  // 6.6pp band and flatten to a near-straight line, while its comparable points span 11.1pp. Left
+  // alone it would be the one cell on the row still drawing the other basis.
+  const _explCurveVals = (d) => {
+    if (!_explTakeLeadCmp || typeof _scFeeCmpAt !== 'function') return null;
+    const out = ['50','75','100','125'].map(p => { const f = _scFeeCmpAt(d, p); return f.diverges && f.cmp != null ? f.cmp : f.head; });
+    return out.every(v => v != null) ? out : null;
+  };
+  // The SWING cell. v882 did this for the Screener and its note says why it is unconditional for a
+  // state monopoly and conditional for a fee blend; this is that cell, against this table's sort.
+  // Browse was the last surface still printing the raw figure -- and it is the one whose Sort menu
+  // offers "Swing (pp)" over all 185 rows. On that sort Bahrain, Kuwait and Saudi Arabia took 3 of
+  // the top 5 places on a +0.0pp that is a 100%-take placeholder stored at all four decks, three
+  // columns from their own Govt Take cell reading "—".
+  // Shares the row's single basis flag — see the note on _explTakeLeadCmp for why it is not its own.
+  const _explSwingLeadCmp = _explTakeLeadCmp;
+  const _explSwingCell = (d) => {
+    const sw = (typeof _scSwingAt === 'function') ? _scSwingAt(d)
+      : { head: d.swing, cmp: d.swing, diverges: false, monopoly: false, n1: null, n2: 0 };
+    const _txt = (v) => '+' + fmt(v) + 'pp';
+    const _col = (v) => (v < 10 ? '#15803D' : v < 20 ? '#A16207' : '#B91C1C');
+    if (sw.monopoly) {
+      const t = (`${d.country}: no price swing is reported. Government take is stored as `
+        + `${d.take_75 != null ? d.take_75.toFixed(1) + '%' : '≥ 99.5%'} at $50, $75, $100 and $125/bbl `
+        + `— a state-monopoly placeholder, not four measured points — so the difference between the ends `
+        + `is 0.0pp by construction. On this column's own legend ("<10pp = stable fiscal terms across the `
+        + `price cycle") that reads as the most price-stable regime in the database. It inverts it: there `
+        + `is no contractor position here whose returns could swing. The same placeholder is why the Govt `
+        + `Take cell on this row reads "—" and the Tier cell reads "State Monopoly". The Screener (v882), `
+        + `Side-by-Side (v697) and the Country Profile withdraw it for the same reason.`).replace(/"/g,'&quot;');
+      return `<td class="num" style="color:var(--muted)"><span style="cursor:help;" title="${t}">—</span></td>`;
+    }
+    if (sw.head === null) return `<td class="num">—</td>`;
+    if (!(sw.diverges && sw.cmp != null)) {
+      return `<td class="num"><span style="color:${_col(sw.head)};font-weight:600">${_txt(sw.head)}</span></td>`;
+    }
+    const lead  = _explSwingLeadCmp ? sw.cmp  : sw.head;
+    const other = _explSwingLeadCmp ? sw.head : sw.cmp;
+    const t = (`${d.country}: ${Number(sw.n2 || 0).toLocaleString()} of its contracts are fee-basis (fixed `
+      + `$/bbl remuneration, the contractor keeps no price upside). A fee-basis take% is pinned near 97–99% `
+      + `at EVERY price by that remuneration structure, so blending it in flattens the swing toward zero — `
+      + `and on this column's legend a small swing is the most stable tier on the board. Across its `
+      + `${sw.n1 != null ? Number(sw.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts the swing is `
+      + `${_txt(sw.cmp)}; the published blend is ${_txt(sw.head)}. `
+      + (_explSwingLeadCmp
+          ? `This column is doing the ranking, so the row is placed on the comparable figure and leads with it.`
+          : `Sort this table by Swing (pp) and the row is ranked on ${_txt(sw.cmp)}, not on the blend above.`)
+      + ` The Screener and Side-by-Side print the same pair for this country.`).replace(/"/g,'&quot;');
+    return `<td class="num"><span style="color:${_col(lead)};font-weight:600;cursor:help;" title="${t}">${_txt(lead)}</span>`
+      + `<div style="font-size:10px;font-weight:700;color:${_explSwingLeadCmp ? 'var(--muted)' : 'var(--accent)'};line-height:1.3;margin-top:2px;white-space:nowrap;">`
+      + `${_explSwingLeadCmp ? 'published ' : 'PSC/Conc '}${_txt(other)}</div></td>`;
+  };
   // sort — the metric comparator is unchanged; v578 only decides what it is applied WITHIN.
   const _explMetricCmp = (a, b) => {
     let va, vb;
@@ -28197,7 +28323,14 @@ function renderExplorer() {
       // guard on `> 1`. This comparator did not, so it ranked those three AHEAD of Belgium at
       // $27 -- the genuine lowest breakeven in the database. _beTested() is that same guard.
       case 'be':      va = _explBe(a) != null ? _explBe(a) : 999; vb = _explBe(b) != null ? _explBe(b) : 999; break;
-      case 'swing':    va = a.swing ?? 999; vb = b.swing ?? 999; break;
+      // v1047 (T1): was `a.swing ?? 999` — the raw published blend, with the state-monopoly
+      // +0.0pp placeholder taken at face value. _scSwingAt().sort is null for a monopoly and the
+      // comparable figure for a fee blend, so the three 100%-take rows fall to the tail instead of
+      // taking 3 of the top 5 "most price-stable regimes", and Iraq ranks on +11.1pp not +6.6pp.
+      // Same call the Screener's _scSortVal has used since v882. See _explSwingCell().
+      case 'swing':    { const _sa = (typeof _scSwingAt === 'function') ? _scSwingAt(a).sort : a.swing;
+                         const _sb = (typeof _scSwingAt === 'function') ? _scSwingAt(b).sort : b.swing;
+                         va = _sa ?? 999; vb = _sb ?? 999; break; }
       case 'stability': va = _fpSortVal(a); vb = _fpSortVal(b); break;
       case 'evidence': va = _evidenceSortVal(a); vb = _evidenceSortVal(b); break;
       case 'country':  va = a.country; vb = b.country; break;
@@ -28408,10 +28541,10 @@ function renderExplorer() {
       <td>${mechs}</td>
       ${_explTakeCell(d, take, _explRowFloor ? _explFloorTip : null)}
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="expl-terms-slot" data-tc-country="${String(d.country).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="margin-top:2px;"></div></td>
-      <td class="num expl-sm-off">${makeTakeSparkline(d, price)}</td>
-      <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
-      <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
-      <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
+      <td class="num expl-sm-off">${makeTakeSparkline(d, price, _explCurveVals(d))}</td>
+      ${_explCurveCell(d, '50')}
+      ${_explCurveCell(d, '100')}
+      ${_explCurveCell(d, '125')}
       <td class="num">${_explFloorLe}${fmtNpvShared(npv)}</td>
       <td class="num expl-sm-off">${_explFloorLe}${fmtDownsideNpv(d)}</td>
       <td class="num expl-sm-off" data-explbe="${String(d.country).replace(/"/g,'&quot;')}" title="${(function(){
@@ -28428,12 +28561,7 @@ function renderExplorer() {
         if (_b <= 75) return 'border-left:3px solid #A16207;padding-left:5px;';
         return 'border-left:3px solid #B91C1C;padding-left:5px;';
       })()}">${formatBreakeven(_explBe(d))}</td>
-      <td class="num">${(function(){
-        if (d.swing === null) return '—';
-        const s = d.swing;
-        const col = s < 10 ? '#15803D' : s < 20 ? '#A16207' : '#B91C1C';
-        return `<span style="color:${col};font-weight:600">+${fmt(s)}pp</span>`;
-      })()}</td>
+      ${_explSwingCell(d)}
       <td class="num">${(function(){
         const score = getFiscalPredictabilityScore(d);
         // v536 (T3): null = ORCA holds no contract-level take distribution, so the IQR term has no
@@ -51767,6 +51895,25 @@ function exportExplorer() {
     // GovtTake_75_Comparable / FeeBasis_Blend, so the two workbooks stay one vocabulary.
     [`Govt Take @$${price} — comparable, PSC/Concession only (%)`]: (function(){
       const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, price) : null;
+      return (fc && fc.diverges && fc.cmp != null) ? +fc.cmp.toFixed(1) : null;
+    })(),
+    // v1047 (T1): the other three decks, for the same reason v1026 added the one above. The
+    // workbook carried a FOUR-point published curve (81.5 / 84.8 / 86.9 / 88.1 for Iraq) beside a
+    // SINGLE comparable point at the active deck, so an analyst who exported could not rebuild the
+    // curve now on screen — and the four-point curve they could rebuild is the one the comparability
+    // rules forbid ranking on. Three more cells of the same call closes it. Where `price` is already
+    // 50/100/125 the duplicate key resolves to the same value from the same source, exactly as the
+    // published columns above have always done.
+    'Govt Take @$50 — comparable, PSC/Concession only (%)': (function(){
+      const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, '50') : null;
+      return (fc && fc.diverges && fc.cmp != null) ? +fc.cmp.toFixed(1) : null;
+    })(),
+    'Govt Take @$100 — comparable, PSC/Concession only (%)': (function(){
+      const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, '100') : null;
+      return (fc && fc.diverges && fc.cmp != null) ? +fc.cmp.toFixed(1) : null;
+    })(),
+    'Govt Take @$125 — comparable, PSC/Concession only (%)': (function(){
+      const fc = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, '125') : null;
       return (fc && fc.diverges && fc.cmp != null) ? +fc.cmp.toFixed(1) : null;
     })(),
     FeeBasis_Blend: (function(){
