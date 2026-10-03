@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1054</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1055</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -53014,6 +53014,24 @@ function _iocExpRows() {
     var _ctTake = (cd && cd.take_75 != null) ? Number(cd.take_75) : null;
     var _opTake = (d.take75 != null) ? Number(d.take75) : null;
     var _gap    = (_ctTake != null && _opTake != null) ? (_opTake - _ctTake) : null;
+    // ── v1055 (T5) — THE FEE-BASIS CORRECTION STOPPED AT THE SCREEN ────────────────
+    // v1054 fixed the IOC cell: the Iraq row now reads "country-wide 34.1% PSC/Conc", the take on
+    // Iraq's 195 PSC/Concession contracts, because the published 84.8% blends in 415 TSC contracts
+    // where the contractor is paid a fixed $/bbl fee. It did NOT fix the artifact. _iocExpRows()
+    // is the choke point for both things that leave the browser, and it still built the
+    // "Country-wide take @$75 (%)" column from `cd.take_75` raw. So the workbook an analyst pastes
+    // into an IC memo said Iraq 84.8% while the screen it was exported from said 34.1% — 50.7pp
+    // apart, under a column of the same name, and the memo is read long after the tab is closed.
+    // Worse, the sheet contradicted ITSELF: "Take comparability" on that same row already said
+    // "Rank on 34.1%", one cell to the right of a numeric column printing 84.8%. Of 1,772 IOC rows
+    // 191 sit in one of the 10 countries that diverge at $75.
+    //
+    // Same call (_scFeeCmpAt), same column name, as the Fiscal Compare (v1026) and Screener
+    // (v1047) workbooks, so the three files stay one vocabulary. The published blend keeps its
+    // column: nothing is retracted, the comparable figure is added beside it.
+    var _fcE   = (cd && typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(cd, '75') : null;
+    var _ctCmp = (_fcE && _fcE.diverges && _fcE.cmp != null) ? Number(_fcE.cmp) : null;
+    var _g2own = (typeof _iocG2Own === 'function') ? _iocG2Own(d.country, d.mechanic) : null;
     return {
       Country: d.country,
       Region: d.region,
@@ -53037,9 +53055,35 @@ function _iocExpRows() {
       // v822 (T5): the figure every OTHER ORCA surface prints for this country, so the memo and
       // the platform can be reconciled without reopening the tab that produced the memo.
       'Country-wide take @$75 (%)': _ctTake != null ? +_ctTake.toFixed(1) : null,
+      // v1055 (T5): the figure the SCREEN prints in this row's sub-line, and the only one of the
+      // two that the platform comparability rules permit ranking across countries. Blank on the
+      // 175 countries where the published blend already IS the comparable figure — a value here
+      // is itself the signal that the column to the left must not be screened on.
+      'Country-wide take @$75 — comparable, PSC/Concession only (%)': _ctCmp != null ? +_ctCmp.toFixed(1) : null,
       // The subtraction done here rather than left to the reader: an IC reader scanning 33 rows
       // for the ones that will not reconcile should not have to difference two columns by eye.
-      'Take gap (pp)': _gap == null ? null : +_gap.toFixed(1),
+      // v1055 (T5): except where one of the two legs is a remuneration-fee artefact, and then the
+      // subtraction is REFUSED rather than printed. Shell/Iraq read "+13.7" — 98.5% across two
+      // Group-2 TSC contracts less an 84.8% blend that is 68% Group-2 — a difference of two
+      // measures of contract structure, formatted as though it were 13.7pp of fiscal distance
+      // between an operator and its host. It is not a quantity. Same withholding v983 applies to
+      // the state-monopoly NPV cell, and for the same reason: this column gets summed, averaged
+      // and sorted in an exposure annex, and a plausible-looking number is worse than a gap.
+      'Take gap (pp)': _gap == null ? null
+        : (_ctCmp == null && !_g2own) ? +_gap.toFixed(1)
+        : ('n/c — not a difference of comparable figures. '
+           + (_g2own
+               ? 'The operator take (' + _opTake.toFixed(1) + '%) is on ' + d.mechanic
+                 + ', a fee-basis (Group 2) mechanic: fixed $/bbl remuneration, no price upside, so '
+                 + 'it measures contract structure rather than fiscal severity. '
+               : '')
+           + (_ctCmp != null
+               ? 'The country-wide blend (' + _ctTake.toFixed(1) + '%) includes '
+                 + Number(_fcE.n2).toLocaleString() + ' fee-basis contracts; the comparable figure is '
+                 + _ctCmp.toFixed(1) + '%, in the column beside it. '
+               : '')
+           + 'Screen the jurisdiction on the comparable column. Differencing these two would not '
+           + 'tell you how far this operator sits from its host government.'),
       // v983 (T5): a STRING, not the number 0, on a state-monopoly row. This column is the one
       // an exposure annex gets summed and averaged on; a numeric 0 there is not a valuation and
       // folding it in understates the portfolio silently. Same withholding _cpMonoNpvNote() has
@@ -53187,6 +53231,38 @@ function _iocExpBasisLines() {
       + 'mechanic. "Country-wide take @$75 (%)" is the all-operator figure for the same country '
       + '\u2014 the one the ORCA Country Profile, Fiscal Compare, the Explorer, the Screener and '
       + 'the JSON API print. "Take gap (pp)" is the first less the second.');
+    // v1055 (T5): a THIRD take column, and the Basis sheet has to introduce it or a reader treats
+    // a mostly-blank column as a data gap rather than as the marker it is.
+    (function() {
+      var cm = rows.filter(function(r) { return r['Country-wide take @$75 — comparable, PSC/Concession only (%)'] != null; });
+      if (!cm.length) {
+        L.push('"Country-wide take @$75 \u2014 comparable, PSC/Concession only (%)" is blank on every '
+          + 'row of this sheet: none of these jurisdictions blends fee-basis contracts into its '
+          + 'published take, so the country-wide column is already the rankable figure.');
+        return;
+      }
+      L.push('A THIRD TAKE COLUMN, AND IT IS THE ONE TO SCREEN ON. '
+        + '"Country-wide take @$75 \u2014 comparable, PSC/Concession only (%)" carries a figure on '
+        + cm.length + ' of ' + rows.length + ' rows (' + cm.map(function(r){ return r.Country; }).join(', ')
+        + '). On those rows the published country-wide take blends in fee-basis contracts '
+        + '(TSC / RSC / Buy-back), where the contractor is paid a fixed $/bbl remuneration fee and '
+        + 'keeps no price upside \u2014 so the published figure measures CONTRACT STRUCTURE, not how '
+        + 'hard the terms are, and the platform comparability rules do not permit ranking it across '
+        + 'countries. The comparable column is the take on that country\u2019s PSC and Concession '
+        + 'contracts only, and is the figure the ORCA screen printed under the take cell this row '
+        + 'was exported from. '
+        + cm.map(function(r) {
+            return r.Country + ' ' + r['Country-wide take @$75 (%)'].toFixed(1) + '% published vs '
+                 + r['Country-wide take @$75 — comparable, PSC/Concession only (%)'].toFixed(1) + '% comparable';
+          }).join('; ')
+        + '. Rank and screen on the comparable column; cite the published column only where the '
+        + 'memo is quoting ORCA\u2019s published country figure and says so.');
+      L.push('"Take gap (pp)" reads "n/c" wherever either take on the row is a remuneration-fee '
+        + 'figure. That is a WITHHELD subtraction, not missing data: differencing a fee-basis take '
+        + 'against a PSC or Concession take produces a number with no fiscal meaning, and this '
+        + 'column is one an exposure annex gets summed and sorted on. The cell itself names which '
+        + 'leg is the fee-basis one.');
+    })();
     if (dv.length) {
       var worst = dv.reduce(function(a, r) {
         return Math.abs(r['Govt Take @$75 (%)'] - r['Country-wide take @$75 (%)'])
@@ -53473,8 +53549,12 @@ function copyIOCPortfolio() {
       + 'the largest by ' + Math.abs(wg).toFixed(1) + 'pp (' + worst.Country + ' '
       + worst['Govt Take @$75 (%)'].toFixed(1) + '% here vs '
       + worst['Country-wide take @$75 (%)'].toFixed(1) + '% there). Both figures are in the table, '
-      + 'in adjacent columns, with the difference in "Take gap (pp)" \u2014 so a reader checking '
+      + 'in adjacent columns, with the difference in "Take gap pp" \u2014 so a reader checking '
       + 'this memo against the platform finds the reconciliation here rather than a contradiction. '
+      + 'Where that cell reads "n/c" the subtraction is withheld because one of the two takes is a '
+      + 'remuneration-fee figure and the difference would mean nothing; the "Rank-able ctry %" '
+      + 'column on those rows is the jurisdiction figure to screen on, and the note on the cell '
+      + 'says which leg is fee-basis. '
       + 'Quote the operator column where the memo names ' + st.operator
       + '; quote the country-wide column where it screens the jurisdiction; say which one you used.';
   })();
@@ -53564,17 +53644,27 @@ function copyIOCPortfolio() {
   // both are readings about how much weight the row's figures carry, and an IC reader holding
   // only the pasted table has no tooltip and no tab to go back to. 'Reform basis' follows it
   // for the same reason 'Evidence basis' follows the grade.
-  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Country-wide take @$75 (%)','Take gap (pp)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Reform verdict','Reform basis','Take basis','Take comparability'];
+  // v1055 (T5): the comparable column sits between the published blend and the gap, because on
+  // the 10 diverging countries it is the figure the screen printed and the only one of the two
+  // that may be ranked. An exhibit reader scanning left to right meets it before the gap.
+  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Country-wide take @$75 (%)','Country-wide take @$75 — comparable, PSC/Concession only (%)','Take gap (pp)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Reform verdict','Reform basis','Take basis','Take comparability'];
   var matrix = [cols].concat(rows.map(function(r){
     return cols.map(function(c){
       if (c === 'Take gap (pp)') {
         var g = r['Take gap (pp)'];
         if (g == null) return '\u2014';
+        // v1055 (T5): the refusal goes into the matrix at FULL LENGTH, so text/plain carries the
+        // whole sentence; _iocShGap() below reduces it to the token 'n/c' for the HTML exhibit and
+        // mints the note that explains it. Shortening it here instead would have left the cell
+        // reading a bare 'n/c' with nothing behind it, because the exhibit's note only fires where
+        // the shortener actually changed the string. Same two-stage split as _iocShNpv().
+        if (typeof g === 'string') return g;
         return Math.abs(g) < 0.05 ? 'same' : (g > 0 ? '+' : '') + g.toFixed(1);
       }
       var v = r[c];
       if (v == null) return '\u2014';
-      if (c === 'Govt Take @$75 (%)' || c === 'Country-wide take @$75 (%)') return v.toFixed(1) + '%';
+      if (c === 'Govt Take @$75 (%)' || c === 'Country-wide take @$75 (%)'
+          || c === 'Country-wide take @$75 — comparable, PSC/Concession only (%)') return v.toFixed(1) + '%';
       // v983 (T5): the withheld state-monopoly cell is a string; _iocNpvFmt() would render it "$NaNM".
       if (c === 'Contractor NPV @$75 ($M)') return (typeof v === 'number') ? _iocNpvFmt(v) : String(v);
       return String(v);
@@ -53656,7 +53746,8 @@ function copyIOCPortfolio() {
   var SHORT_IOC = {
     'Country': 'Country', 'Region': 'Region', 'Mechanic': 'Mech-anic',
     'Mechanic basis': 'Mech. basis', 'Govt Take @$75 (%)': 'Govt take %',
-    'Country-wide take @$75 (%)': 'Ctry-wide take %', 'Take gap (pp)': 'Take gap pp',
+    'Country-wide take @$75 (%)': 'Ctry-wide take %',
+    'Country-wide take @$75 — comparable, PSC/Concession only (%)': 'Rank-able ctry %', 'Take gap (pp)': 'Take gap pp',
     'Contractor NPV @$75 ($M)': 'NPV $M', 'Contracts': 'Con-tracts',
     'Evidence grade': 'Evi-dence', 'Evidence basis': 'Evid. basis',
     'Reform verdict': 'Re-form', 'Reform basis': 'Reform basis',
@@ -53726,7 +53817,12 @@ function copyIOCPortfolio() {
     return 'Take basis, own con-tracts — this operator’s own contracts in ORCA, NOT the '
       + 'jurisdiction’s. The gap against the figure the Country Profile, Fiscal Compare, the '
       + 'Explorer, the Screener and the JSON API all print is the "Ctry-wide take %" and "Take gap '
-      + 'pp" columns on the same row. Neither is wrong: cite the row where the memo names '
+      // v1055 (T5): this sentence named the gap column as the reconciliation, and on the rows
+      // where the reconciliation matters MOST that column now reads "n/c". Left as it was it
+      // would have pointed a reader at a cell that refuses to answer, with no onward route.
+      + 'pp" columns on the same row — or, where that gap reads "n/c" because one of the two takes '
+      + 'is a remuneration-fee figure, the "Rank-able ctry %" column. Neither is wrong: cite the '
+      + 'row where the memo names '
       + st.operator + ', cite the country-wide column where it screens the jurisdiction, and say '
       + 'which one you used.';
   }
@@ -53795,8 +53891,27 @@ function copyIOCPortfolio() {
             .replace(/\(.+?'s own petroleum act/, '(that country\u2019s own petroleum act')
             .replace(/\(.+?\u2019s own petroleum act/, '(that country\u2019s own petroleum act');
   }
+  // v1055 (T5): the refused gap cell. The matrix holds the full 300-500 character refusal, so
+  // text/plain carries all of it; this reduces it to the token 'n/c' for the HTML exhibit, where a
+  // sentence that length in a 29px right-aligned figure column is the single worst overflow on the
+  // table. A no-op on the numeric rows ('+13.7', 'same'), which mint no note. The note is what an
+  // exhibit reader needs, because 'n/c' alone in a figure column reads as missing data rather than
+  // as a withheld subtraction. Generalised like _iocGenRd(): the per-row sentences differ only by
+  // the mechanic name and two figures already printed in the row, so the whole exhibit keys ONE
+  // note instead of up to ten.
+  function _iocShGap(t) { return /^n\/c/.test(String(t)) ? 'n/c' : t; }
+  function _iocGapNote() {
+    return 'Take gap pp, "n/c" — the subtraction is WITHHELD, not missing. It is refused on any '
+      + 'row where either take is a remuneration-fee figure: a fee-basis mechanic (TSC / RSC / '
+      + 'Buy-back) pays the contractor a fixed $/bbl fee with no price upside, so its ~99% "take" '
+      + 'measures contract structure, not fiscal severity, and the platform comparability rules do '
+      + 'not permit differencing it against a PSC or Concession take. Where the country-wide blend '
+      + 'is the fee-basis side, the figure to screen on is in the "Rank-able ctry %" column on the '
+      + 'same row. See the Compar-ability note for the contract counts behind it.';
+  }
   var _iocProseName = {
     'Mechanic':                   [_iocShMechName, null],
+    'Take gap (pp)':              [_iocShGap, _iocGapNote],
     'Mechanic basis':             [_iocShMech, null],
     'Contractor NPV @$75 ($M)':   [_iocShNpv, function(){ return 'NPV $M — "n/a" is the state-monopoly '
                                       + 'cell: government take leaves no contractor position to value, so ORCA '
@@ -53845,7 +53960,8 @@ function copyIOCPortfolio() {
   // every weight is a proportion, so the others scale down together instead of two of them
   // collapsing to the 30px fallback, which is what put a 428-character sentence in a 29px cell.
   var _iocWtAll = { 'Country':73, 'Region':49, 'Mechanic':65, 'Govt Take @$75 (%)':41,
-    'Country-wide take @$75 (%)':41, 'Take gap (pp)':31, 'Contractor NPV @$75 ($M)':53,
+    'Country-wide take @$75 (%)':41, 'Country-wide take @$75 — comparable, PSC/Concession only (%)':41, 'Take gap (pp)':31,
+    'Contractor NPV @$75 ($M)':53,
     'Contracts':37, 'Evidence grade':41, 'Evidence basis':51, 'Reform verdict':44,
     'Take basis':60, 'Take comparability':49 };
   var _iocWt = _iocCols.map(function(i){ return _iocWtAll[matrix[0][i]] || 30; });
@@ -53854,7 +53970,8 @@ function copyIOCPortfolio() {
   // v1049 (T5): was `ci >= 4 && ci <= 8`. It survived v1029 only because the two columns were
   // inserted to the RIGHT of the figure block; an insertion one place earlier would have
   // right-aligned and nowrapped a 700-character sentence. Keyed by name it cannot.
-  var _iocNumName = { 'Govt Take @$75 (%)':1, 'Country-wide take @$75 (%)':1, 'Take gap (pp)':1,
+  var _iocNumName = { 'Govt Take @$75 (%)':1, 'Country-wide take @$75 (%)':1,
+                      'Country-wide take @$75 — comparable, PSC/Concession only (%)':1, 'Take gap (pp)':1,
                       'Contractor NPV @$75 ($M)':1, 'Contracts':1 };
   function _iocNumeric(ci) { return !!_iocNumName[matrix[0][ci]]; }
   var _iocHeadHtml = '<tr>' + _iocCols.map(function(ci, k) {
