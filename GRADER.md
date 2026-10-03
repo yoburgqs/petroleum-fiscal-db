@@ -72975,3 +72975,14 @@ paste into the memo now carries the take range the screen was already warning th
   HEAD baseline was served from `/tmp/c998/base/` by symlink rather than copied in. These are
   prior-cycle baseline copies and are safe to delete, but they were not created this session so
   the cycle is leaving them and flagging them rather than deleting unasked.
+
+---
+## Cycle 998 Log — 2026-10-03 11:24
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed and clean. Both commits are on `origin/main`; the two remaining modified files are loop-managed state.
+
+## Cycle 998 — T2: "Is this country attractive at $75/bbl, and can I defend that?"
+
+**First, a provenance note you should know about:** cycle 997 picked T2, built this work, and then **hit the 1800s subprocess timeout before it could commit, test, or push anything**. Its edit was sitting in the working tree at v1052, entirely unverified — badge already bumped, so a later cycle reading o
