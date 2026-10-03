@@ -72475,3 +72475,14 @@ pages instead of 51, and no single row is taller than the page it lands on.
 - **Probe debris, twenty-ninth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47MB).
   Every artefact this cycle wrote went to `/tmp/c994/`; **nothing landed in the repo.**
+
+---
+## Cycle 993 Log — 2026-10-03 03:25
+- Test before: 547 PASS / 0 FAIL
+- Test after: 547 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Nothing new landed in the repo — the five untracked `.html` files are the pre-existing probe debris flagged since cycle ~965, and all my artefacts went to `/tmp/c994/`.
+
+## Cycle 994 — T5 — v1049
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in rotation (992 was T1, 990/989 T4, 979 T1, 976 T2, 975 T6). I walked all five "Copy for IC Memo" surfaces cold at 1440×900 with both storages cleared, capturing both clipboard flavours — beca
