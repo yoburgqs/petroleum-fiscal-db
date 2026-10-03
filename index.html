@@ -3186,7 +3186,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1050</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1051</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -68923,6 +68923,84 @@ function openFCDrilldown(country) {
         + '\u26a0 DCF USES on each affected row beside the ORCA value and the statutory value.">'
         + 'Show the Evidence Chain \u2192</span></div>';
     })();
+    // ── v1051 (T6): the default-terms counterpart of the v967 block above ───────────────────
+    // Fires on the 120 rows whose model ran the generic mechanic default, where both the v967
+    // block and the v978 citation leg are silent by construction. It does not ask whether the
+    // default is cited — it cannot be. It names which of the default rates the bars above ran
+    // are contradicted by ORCA's own record for this country, which is true on 117 of the 120,
+    // and it says so beside the split rather than 561px (1440x900) / 911px (390x844) above it.
+    (function() {
+      var _dfO = (typeof _fcDefaultBasis === 'function') ? _fcDefaultBasis(country) : null;
+      if (!_dfO) return;
+      var _dfMech = _dfO.mech || 'DCF';
+      var _dfN = _dfO.diffs.length;
+      var _dfEsc = String(country).replace(/'/g, "\\'");
+      var _dfRed = _dfN > 0;
+      var _dfCol = _dfRed ? 'var(--red)' : 'var(--muted)';
+      var _dfRows = _dfO.diffs.map(function(c) {
+        return '<div style="margin-top:2px;">&bull; <strong style="color:var(--text);">' + c.label
+          + '</strong> &mdash; these bars ran ' + _fcEngFmt(c.eng, c.unit)
+          + ', ORCA’s record for ' + country + ' is ' + _fcEngFmt(c.rec, c.unit) + '</div>';
+      }).join('');
+
+      // The "Largest component" sentence is the one an analyst lifts into a memo, so when the
+      // bar it names comes from a contradicted term it is marked there, not only underneath.
+      // Same slot v978 uses; v978 returns early on this basis, so the two cannot collide.
+      var _dfWf = Object.entries(r.waterfall).filter(function(e) { return e[1] >= 0.1; });
+      var _dfDomKey = _dfWf.length
+        ? _dfWf.reduce(function(mx, e) { return e[1] > mx[1] ? e : mx; }, _dfWf[0])[0] : null;
+      var _dfDomHit = null;
+      _dfO.diffs.forEach(function(c) {
+        var ks = (typeof _FC_TERM_WF978 !== 'undefined' && _FC_TERM_WF978[c.key]) || [];
+        if (!_dfDomHit && _dfDomKey && ks.indexOf(_dfDomKey) >= 0) _dfDomHit = c;
+      });
+      if (_dfDomHit) {
+        var _dfMark = ' <span id="fc-dd-dom-nocite" style="color:var(--red);font-weight:700;'
+          + 'cursor:help;" title="' + _esc594(_dfDomHit.label) + ' is the generic '
+          + _esc594(_dfMech) + ' default, not ' + _esc594(country) + '’s rate: these bars '
+          + 'ran ' + _esc594(_fcEngFmt(_dfDomHit.eng, _dfDomHit.unit)) + ' where ORCA’s own '
+          + 'record for ' + _esc594(country) + ' holds '
+          + _esc594(_fcEngFmt(_dfDomHit.rec, _dfDomHit.unit)) + '. The largest single component '
+          + 'of this split, and the IC note read off it, are therefore a reading of the default '
+          + 'rather than of this jurisdiction. Read the block below before quoting either.">'
+          + '— and it is the default, not ' + _esc594(country) + '’s rate.</span>';
+        // Function replacer: a literal $ in a $/bbl rate would otherwise be read as a group ref.
+        html = html.replace('<span id="fc-dd-dom-nocite"></span>', function() { return _dfMark; });
+      }
+
+      var _dfLead = _dfRed
+        ? '<strong>⚠ These bars are the generic ' + _dfMech + ' default, not ' + country
+          + '’s terms.</strong> ORCA holds no country-specific terms for ' + country
+          + ' in the compare engine, so the split above and the “Largest component” line '
+          + 'under it were produced from the standard ' + _dfMech + ' default. '
+          + (_dfN === 1 ? 'One of those rates is' : _dfN + ' of those rates are')
+          + ' contradicted by ORCA’s own record for ' + country + ':'
+        : '<strong>⚠ These bars are the generic ' + _dfMech + ' default, not ' + country
+          + '’s terms.</strong> ORCA holds no country-specific terms for ' + country
+          + ' in the compare engine, so the split above and the “Largest component” line '
+          + 'under it were produced from the standard ' + _dfMech + ' default. Nothing on record '
+          + 'contradicts those rates — ' + (_dfO.agree === 1 ? '1 matches' : _dfO.agree + ' match')
+          + ' the record and ORCA holds no value at all for the other ' + _dfO.norec
+          + ', which is not corroboration.';
+
+      html += '<div style="font-size:11px;color:' + _dfCol + ';margin-top:8px;padding-top:6px;'
+        + 'border-top:1px solid ' + (_dfRed ? 'rgba(185,28,28,.35)' : 'var(--border)')
+        + ';line-height:1.55;">' + _dfLead + _dfRows
+        + '<div style="margin-top:4px;color:var(--muted);">A mechanic default is not this '
+        + 'country’s rate and not a citation. Cite the database take in the price table '
+        + 'above, not this split — and do not quote the “Largest component” reading '
+        + 'as ' + country + '’s fiscal character.</div>'
+        + '<span role="button" tabindex="0" style="display:inline-flex;align-items:center;'
+        + 'min-height:24px;margin-top:5px;background:transparent;border:1px solid '
+        + (_dfRed ? 'rgba(185,28,28,.45)' : 'var(--border)') + ';border-radius:4px;color:'
+        + _dfCol + ';font-size:10px;font-weight:700;padding:2px 9px;cursor:pointer;"'
+        + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + _dfEsc + '\');"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + _dfEsc + '\');}"'
+        + ' title="Opens ' + country + '’s Key Fiscal Parameters evidence chain, which names '
+        + 'every term the regime needs, the value ORCA holds for it and the source behind that '
+        + 'value — the rates this split did NOT run.">'
+        + 'Show ' + country + '’s own terms →</span></div>';
+    })();
     html += '</div>';
   }
 
@@ -69637,6 +69715,51 @@ function _fcEngineOverride(country) {
   } catch (e) { return null; }
 }
 window._fcEngineOverride = _fcEngineOverride;
+
+// ── v1051 (T6): the same question for the 120 rows the engine holds no terms for at all ─────
+// _fcEngineOverride() above answers "did the engine run a rate ORCA's own record contradicts"
+// ONLY where getDCFParams resolved country terms (`_basis === 'country'`), and
+// _fcRenderWfCiteLeg978() returns at its first line on `termsBasis === 'default'`. So on the
+// 120 of 185 rows whose model runs the generic mechanic default, neither annotation can fire:
+// the Fiscal Breakdown bars, the "Largest component" line and the IC note hung off it render
+// with nothing on them at all.
+//
+// v978's note reasoned that those 120 "already carry the v505 Generic terms banner ... so there
+// is nothing to source". The first half is true and the conclusion does not follow. The
+// un-askable question is whether the default is CITED — it cannot be. The askable one is
+// whether ORCA's own record for the country contradicts the default rate the bar ran, and
+// measured live across all 185 rows it does on 117 of the 120: Saudi Arabia's bars run royalty
+// 10% / income tax 25% / special 0% / state equity 0% where the record holds 20% / 50% / 50% /
+// 100%; Bahrain, Kuwait and UAE each run state equity 0% against a record of 100%, 100% and 60%;
+// Venezuela royalty 10% against 33.2%. The three exceptions are Djibouti, Namibia and Zimbabwe.
+//
+// And the banner is not where the split is read: measured on Netherlands, the gap from the
+// bottom of the v505 banner to the "Largest component" line is 561px at 1440x900 and 911px at
+// 390x844 — more than a whole phone viewport, so on a phone the banner is off-screen by
+// construction at the moment the IC note is in view. Same reason v967 put its block ON the
+// breakdown rather than only in the header chip.
+function _fcDefaultBasis(country) {
+  try {
+    var d = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+      ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+    if (!d) return null;
+    var mech = (typeof fcResolveMechanic === 'function') ? fcResolveMechanic(d) : null;
+    var prm  = getDCFParams(country, mech);
+    if (!prm || prm._basis !== 'default') return null;
+    var diffs = [], agree = 0, norec = 0;
+    Object.keys(_FC_ENG_MAP).forEach(function(k) {
+      var m = _FC_ENG_MAP[k];
+      if (prm[k] == null || !isFinite(prm[k])) return;    // the default does not run this term
+      var rec = d[m[0]];
+      if (rec == null || !isFinite(rec)) { norec++; return; }   // nothing on record to compare
+      var eng = prm[k] * m[2];
+      if (Math.abs(eng - rec) <= 0.15) { agree++; return; }     // the default happens to match
+      diffs.push({ key: k, label: m[1], eng: eng, rec: rec, unit: m[3] });
+    });
+    return { mech: prm._mechanic || mech, diffs: diffs, agree: agree, norec: norec };
+  } catch (e) { return null; }
+}
+window._fcDefaultBasis = _fcDefaultBasis;
 
 // "Royalty at 12.5% where ORCA's own record for USA is 17.6%"
 function _fcEngineList(country, o) {
