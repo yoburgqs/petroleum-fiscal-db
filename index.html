@@ -3168,7 +3168,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1043</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1044</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4586,6 +4586,10 @@ window.copyPlatformCitation = function(btn) {
       </span>
       <span id="bubble-basis-note" style="font-size:11px;color:var(--muted);" aria-live="polite"></span>
     </div>
+    <!-- v1044 (T1) — the countries this scatter cannot plot, named rather than parked at 100%.
+         Filled by renderBubbleChart(). Hidden when the active scope contains no state monopoly,
+         so a screened view that already excluded them does not carry a standing caveat. -->
+    <div id="bubble-mono-note" style="display:none;align-items:flex-start;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;padding:7px 11px;background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:6px;" aria-live="polite"></div>
     <!-- v809 (T1) — which countries this scatter plots. Hidden entirely until the Screener has
          narrowed something, so the cold view is byte-identical to before. -->
     <div id="bubble-scope-wrap" style="display:none;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
@@ -73783,6 +73787,19 @@ function exportFCResults() {
 
 // ─── Bubble Chart (Take vs NPV) ───────────────────────────────────────────────
 window._bubblePriceKey = window._bubblePriceKey || '75';
+// v1044 (T1): the same destination a bubble click reaches, lifted out so the monopoly chips
+// below the chart behave identically to the bubbles beside them.
+function _bubOpenCountry(name) {
+  if (!name) return;
+  var cpBtn = Array.from(document.querySelectorAll('.tab-btn')).find(function (b) { return b.textContent.includes('Country Profile'); });
+  if (cpBtn) switchTab('t7', cpBtn);
+  setTimeout(function () {
+    var sel = document.getElementById('dd-country-select');
+    if (sel) { sel.value = name; loadCountryProfile(name); }
+  }, 100);
+}
+window._bubOpenCountry = _bubOpenCountry;
+
 function renderBubbleChart() {
   var container = document.getElementById('explorer-bubble-container');
   if (!container) return;
@@ -73792,6 +73809,53 @@ function renderBubbleChart() {
   var takeKey_b = 'take_' + bprice;
   var npvKey_b  = 'npv_'  + bprice;
   var allData = (COUNTRY_DATA || []).filter(function(d) { return d[takeKey_b] != null && d[npvKey_b] != null; });
+
+  // ── v1044 (T1) — the three state monopolies come OFF the scatter ─────────────────────────
+  // Walked T1 cold at 1440x900: Home -> Explorer -> Bubble Chart. The caption directly above
+  // this canvas teaches the analyst to read the X axis as fiscal burden -- "the LEFT frontier
+  // (low take) with high NPV is where the most IOC-favorable regimes sit ... RIGHT side (high
+  // take) with positive NPV = large-reserve countries where project scale delivers value even
+  // under high fiscal burden." It then plotted Saudi Arabia, Kuwait and Bahrain as ordinary
+  // bubbles at x = 100.0% take, y = $0M NPV: the far right edge of the axis it had just defined
+  // as the harshest terms in the world, at zero contractor value.
+  //
+  // Those are not measurements. state_eq = 100 on these three zeroes the contractor out of the
+  // model entirely -- v832 established exactly this on the Screener's exclusion strip, where the
+  // same rows used to read "Saudi Arabia NPV @$75 $0M < $2.40B" as though they had been valued
+  // and come last. Measured against the shipped country_data.json, all three pin to take 100.0%
+  // and NPV $0 at EVERY deck ($50/$75/$100/$125), so the price buttons above cannot move them;
+  // they are degenerate outputs of an empty position, not a fiscal result. fmtTake() refuses to
+  // print the 100.0% anywhere on the platform, the Screener's table renders them take "—" /
+  // "no position" / tier State Monopoly, and this chart was the last ranked surface still
+  // bypassing all of it.
+  //
+  // Three things made it the worst moment in the walk rather than a footnote:
+  //   - Bubble size = contract count, so these are among the LARGEST discs on the plot
+  //     (Saudi 381 contracts at the max radius of 20px, Kuwait 177).
+  //   - Saudi Arabia carries prod_coverage 0.3%, so _dqTier() calls it PART-PROD and v870 draws
+  //     it FILLED and NAMED -- the chart's own strongest "this number is measured" encoding --
+  //     and its hover read "Basis: PART-PROD — verified field production / Take: 100.0% /
+  //     NPV: $0M".
+  //   - At 100 they stretch the X axis to 105 while the highest real take in the database is
+  //     87.2%, so all 182 measurable countries were squeezed into 83% of the plot width to make
+  //     room for three points that measure nothing.
+  //
+  // A scatter cannot render "—": a point must have an x. So they come off the plot and are
+  // NAMED beneath it with the reason, which is the question the removal raises. Same resolution
+  // as v451 (Govt NPV deleted from Fiscal Compare) and v832 (the chip kept, the figure fixed) --
+  // "why isn't Saudi Arabia on here?" deserves an answer, and it now gets the right one.
+  var _monoOut = [];
+  (function () {
+    if (typeof isStateMonopoly !== 'function') return;
+    allData = allData.filter(function (d) {
+      if (!isStateMonopoly(d[takeKey_b])) return true;
+      _monoOut.push(d.country);
+      return false;
+    });
+  })();
+  var _monoSet = {};
+  _monoOut.forEach(function (c) { _monoSet[c] = 1; });
+
   if (!allData.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
 
   // ── v809 (T1) — the scatter plots the Screener's result, not a different population ──────
@@ -73824,7 +73888,11 @@ function renderBubbleChart() {
     _scoped = allData.filter(function (d) { return _keep[d.country]; });
     // A screened country with no modelled take/NPV at THIS price deck cannot be plotted. Say how
     // many rather than letting the bubble count quietly disagree with the Screener's row count.
-    _droppedNoEcon = _scrSet.length - _scoped.length;
+    // v1044: a state monopoly the screen returned is off the plot for a DIFFERENT reason, and the
+    // strip below names it. Counting it here would report "no modelled economics at $75/bbl",
+    // which is the wrong reason and the exact class of error v832 fixed on the Screener's strip.
+    _droppedNoEcon = _scrSet.length - _scoped.length
+      - _scrSet.filter(function (d) { return _monoSet[d.country]; }).length;
     if (!_scoped.length) { _useScreen = false; _scoped = allData; }
   }
 
@@ -73924,6 +73992,39 @@ function renderBubbleChart() {
       note.style.color = (!_verifiedOnly && _proxyN > 0) ? 'var(--accent)' : 'var(--muted)';
       note.style.fontWeight = (!_verifiedOnly && _proxyN > 0) ? '600' : '400';
     }
+  })();
+
+  // ── v1044 (T1) — name what came off the plot, scoped to what this view would have shown ────
+  // Only the monopolies the CURRENT view would otherwise have plotted are named, so an analyst
+  // whose screen already excluded them does not carry a standing caveat about countries they
+  // never asked for. Each chip opens the Country Profile, the same destination a bubble click
+  // reaches, because "no contractor position" is a statement the profile has to substantiate.
+  (function () {
+    var host = document.getElementById('bubble-mono-note');
+    if (!host) return;
+    var _inScreen = {};
+    if (_useScreen && _scrSet) _scrSet.forEach(function (d) { _inScreen[d.country] = 1; });
+    var _named = (COUNTRY_DATA || []).filter(function (d) {
+      if (!_monoSet[d.country]) return false;
+      if (_useScreen && !_inScreen[d.country]) return false;
+      if (_verifiedOnly && !_tierOf(d).hasProduction) return false;
+      return true;
+    }).map(function (d) { return d.country; });
+    if (!_named.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    var _chips = _named.map(function (c) {
+      return '<button type="button" onclick="_bubOpenCountry(' + JSON.stringify(c).replace(/"/g, '&quot;') + ')"'
+        + ' title="Open ' + c.replace(/"/g, '&quot;') + '’s Country Profile — the fiscal terms are on file; what is absent is a contractor position for this chart to place."'
+        + ' style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);'
+        + 'font-size:11px;font-weight:700;padding:2px 9px;min-height:24px;cursor:pointer;font-family:inherit;">' + c + '</button>';
+    }).join(' ');
+    host.innerHTML = '<span style="font-weight:700;color:var(--text);">Not on this chart — '
+      + _named.length + ' state ' + (_named.length === 1 ? 'monopoly' : 'monopolies') + ':</span> '
+      + _chips
+      + ' <span style="flex:1 1 220px;min-width:0;">The state holds 100% equity, so the model carries no contractor position to value: take pins to 100.0% and contractor NPV to $0 at '
+      + '<strong style="color:var(--text);">every</strong> deck ($50 / $75 / $100 / $125), and the price buttons above cannot move them. Those are outputs of an empty position, '
+      + 'not fiscal measurements — plotting them at the right-hand edge of the take axis would read as the harshest terms in the database, which is '
+      + '<strong style="color:var(--text);">not</strong> what they are. Their terms are on the Country Profile; there is no IOC-equity screen for them to sit on.</span>';
+    host.style.display = 'flex';
   })();
 
   var regionGroups = {};
@@ -74107,7 +74208,14 @@ function renderBubbleChart() {
         title: { display: true, text: (function () {
           var scope = _useScreen
             ? _screenLabel + ' \u00b7 ' + data.length + ' of ' + allData.length
-            : (_truncated ? 'Top ' + data.length + ' of ' + allData.length + ' by contract count' : 'All Regimes');
+            // v1044 (T1): "All Regimes" is now false by 3 — the state monopolies are off the
+            // plot. This title is baked into the Download PNG, which travels into an IC pack
+            // without the strip above it, so the one branch that did not name its own
+            // population is the one that most needed to. Conditional on the drop actually
+            // having happened, so an empty monopoly set restores the old string exactly.
+            : (_truncated ? 'Top ' + data.length + ' of ' + allData.length + ' by contract count'
+               : (_monoOut.length ? 'All ' + allData.length + ' regimes with a contractor position'
+                  : 'All Regimes'));
           if (_useScreen && _truncated) scope += ' (largest ' + data.length + ' shown)';
           if (_verifiedOnly) scope = 'Verified production only \u00b7 ' + data.length + ' of ' + allData.length;
           return (isMobile ? '' : 'Govt Take vs Contractor NPV — ')
@@ -74132,7 +74240,11 @@ function renderBubbleChart() {
         x: {
           title: { display: true, text: 'Govt Take @$' + bprice + '/bbl (%)', color: '#6B6560' },
           grid: { color: '#EDE9E3' }, ticks: { color: '#6B6560' },
-          min: 0, max: 105
+          // v1044 (T1): 105, not 100, because three bubbles used to sit AT 100 and needed the
+          // overhang. With the state monopolies off the plot the highest take rendered is 87.2%
+          // at the $75 deck and 89.0% at $125, so the axis ends where a percentage axis should
+          // and the 182 measurable countries get back the width the overhang was holding.
+          min: 0, max: 100
         },
         y: {
           title: { display: true, text: 'Contractor NPV @$' + bprice + ' ($M)', color: '#6B6560' },
