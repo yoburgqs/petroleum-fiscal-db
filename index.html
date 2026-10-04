@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1066</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1067</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -52042,10 +52042,11 @@ function loadCountryProfile(country) {
       <span style="color:var(--muted);font-size:12px;">Loading\u2026</span>
     </div>
     <div id="dd-prod-ts-${country.replace(/[^a-z0-9]/gi,'_').toLowerCase()}" style="display:none;margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:2px;">
         <span style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;">ANNUAL PRODUCTION (BOE)</span>
-        <span id="dd-prod-ts-src-${country.replace(/[^a-z0-9]/gi,'_').toLowerCase()}" style="font-size:10px;color:var(--muted);"></span>
+        <span id="dd-prod-ts-tier-${country.replace(/[^a-z0-9]/gi,'_').toLowerCase()}" style="font-size:10px;color:var(--muted);"></span>
       </div>
+      <div id="dd-prod-ts-src-${country.replace(/[^a-z0-9]/gi,'_').toLowerCase()}" style="font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:6px;"></div>
       <div class="prod-chart-wrap" style="position:relative;height:140px;">
         <canvas id="dd-prod-ts-canvas-${country.replace(/[^a-z0-9]/gi,'_').toLowerCase()}" style="width:100%;height:140px;"></canvas>
       </div>
@@ -73143,13 +73144,17 @@ function fetchFCDrawerProductionChart(country, sectId, canvasId) {
       const confs = rows.map(r => r.confidence || 'D');
       const colMap = {A:'rgba(76,175,125,0.75)',B:'rgba(45,212,191,0.65)',C:'rgba(120,120,150,0.4)',D:'rgba(100,100,120,0.25)'};
       const bgColors = confs.map(c => colMap[c] || colMap['D']);
-      const peakBoe = Math.max(...boe);
-      const peakYear = years[boe.indexOf(peakBoe)];
-      const cumBoe = boe.reduce((a,v) => a+v, 0);
-      const confLabel = {A:'Primary govt',B:'Operator filing',C:'Synthetic',D:'Proxy'};
-      const confSet = [...new Set(confs)].sort();
+      // v1067 (T6): same basis builder the Country Profile tile reads. This line said
+      // "Operator filing · Peak 2023 · 36 MMbbl cum." on Malaysia — a 3-year sum over the 0.3%
+      // of contracts carrying production, with neither the window nor the coverage on it.
+      const B = _prodSeriesBasis(country, rows);
       const srcEl = document.getElementById(srcId);
-      if (srcEl) srcEl.textContent = confSet.map(c => confLabel[c]||c).join('·') + ' · Peak ' + peakYear + ' · ' + cumBoe.toFixed(0) + ' MMbbl cum.';
+      if (srcEl) {
+        srcEl.textContent = B.tierShort + ' · ' + B.winTxt + ' · ' + B.totTxt
+          + ' · floor, ' + B.covTxt;
+        srcEl.title = B.winTip + '  ' + B.covTip;
+        srcEl.style.cursor = 'help';
+      }
       sect.style.display = 'block';
       if (window._fcDrawerCharts[canvasId]) { window._fcDrawerCharts[canvasId].destroy(); }
       window._fcDrawerCharts[canvasId] = new Chart(canvas.getContext('2d'), {
@@ -75114,6 +75119,138 @@ function _cpBeSettle(safe, state, country, fpt) {
     + 'title="Open Scenario Builder pre-filled with this country’s fiscal terms and solve a breakeven from your own inputs">run Scenario Builder →</a>';
 }
 
+
+// ── v1067 (T6) — the production tile asserted national output it does not hold ───────────────
+// Walked T6 cold at 1440x900 and 390x844 hasTouch, storage cleared before each pass, on Malaysia,
+// USA, Libya, Kazakhstan, Nigeria and Norway.
+//
+// Everything else on the Country Profile answers "where did this number come from". The take
+// routes to a per-term Evidence Chain (_cpTakeToEvidence). The NPV routes to the cost deck
+// (_cpCostBasis, v990). The profit-oil shares carry a three-way reconciliation note. The reform
+// score states that a zero premium is an absence of measurement. The one tile with no basis of
+// any kind was ANNUAL PRODUCTION (BOE) — and it is the tile that states how much oil a country
+// produces.
+//
+// It printed exactly two aggregates, and both overstated their own scope:
+//
+//   "Peak: 2023 (12.6 MMbbl)   Cumulative: 36 MMbbl"        <- Malaysia
+//   "Peak: 2010 (20.6 MMbbl)   Cumulative: 104 MMbbl"       <- USA
+//   "Peak: 2017 (1281.0 MMbbl) Cumulative: 45411 MMbbl"     <- Norway
+//
+// 1. "Cumulative" named no window, and the window is not comparable between countries. Measured
+//    over the 16 countries that get this chart, the series runs from 3 years (Malaysia 2023-2025)
+//    to 56 (Norway 1971-2026). Nigeria's 53-year 39,314 MMbbl is in the right order of magnitude
+//    for a national cumulative and reads correctly; Malaysia's 3-year 36 MMbbl is the same word
+//    on the same tile for something three orders of magnitude smaller. Kazakhstan is worse again:
+//    6 points across a 7-year span, so the total silently steps over a missing year.
+//
+// 2. The series is drawn only from the contracts ORCA has matched to verified field production,
+//    and that coverage is a measured number already on this page — prod_coverage_pct, the figure
+//    behind the PROD-WTD / PART-PROD / PROXY badge. It runs 0.2% (USA, over 37,222 contracts) to
+//    37.6% (United Kingdom). So the USA tile's 2010-2024 total is the volume attached to 0.2% of
+//    the USA contract record, printed under a heading that says ANNUAL PRODUCTION. China at 1.4%
+//    prints 11,492 MMbbl. Nothing on the tile said the figure was partial.
+//
+// 3. The numbers were unformatted — `cumBoe.toFixed(0)` rendered 39314 and 45411, no separators,
+//    beside a peak printed to one decimal.
+//
+// So an analyst asking "is this a producing country, and how much?" reads a figure that is a
+// lower bound of unstated tightness over a window of unstated length. That is the give-up point
+// in this walk, and it is the one number on the page that can be wrong by 1000x while looking
+// precise. Nothing is removed: the window, the coverage and the consequence go on the face of the
+// tile, and the coverage figure becomes the control that opens the panel which grades it.
+//
+// One function, read by both surfaces that draw this chart — the Country Profile tile and the
+// Fiscal Compare drawer — because they had already forked on the wording ("Cumulative: N MMbbl"
+// versus "N MMbbl cum.") and would fork again.
+function _prodSeriesBasis(country, rows) {
+  var years = rows.map(function (r) { return r.year; });
+  var boe   = rows.map(function (r) { return r.boe_mmbbl || 0; });
+  var confs = rows.map(function (r) { return r.confidence || 'D'; });
+  var y0 = Math.min.apply(null, years), y1 = Math.max.apply(null, years);
+  var span = y1 - y0 + 1;
+  var held = years.length;
+  var gaps = span - held;
+  var pk = 0; boe.forEach(function (v, i) { if (v > boe[pk]) pk = i; });
+  var cum = boe.reduce(function (a, v) { return a + v; }, 0);
+
+  var e = null;
+  try {
+    if (typeof COUNTRY_DATA !== 'undefined' && Array.isArray(COUNTRY_DATA)) {
+      e = COUNTRY_DATA.filter(function (d) { return d.country === country; })[0] || null;
+    }
+  } catch (err) { e = null; }
+  var cov  = (e && e.prod_coverage_pct != null) ? Number(e.prod_coverage_pct) : null;
+  var nCon = (e && e.n != null) ? Number(e.n) : null;
+
+  var TIER = { A: 'Primary govt (SODIR/NSTA/ANP)', B: 'Operator filings',
+               C: 'Synthetic profile', D: 'Regional proxy' };
+  var TIER_SHORT = { A: 'Primary govt', B: 'Operator filing', C: 'Synthetic', D: 'Proxy' };
+  var set = confs.filter(function (c, i) { return confs.indexOf(c) === i; }).sort();
+
+  // The window is part of the number, never a separate caption. A total with no dates on it is
+  // the thing that read as a national cumulative on a three-year series.
+  var winTxt = y0 + '–' + y1 + (gaps ? ', ' + held + ' of ' + span + ' years on file' : '');
+  var totTxt = (gaps ? held + '-year' : span + '-year') + ' total ' + Math.round(cum).toLocaleString() + ' MMbbl';
+
+  // Two renderings of the same measured fact. covTxt stands alone in the drawer's single line;
+  // covTx2 is the object of a sentence on the profile ("built from the <covTx2> with verified
+  // production"), so it carries no trailing verb.
+  var covTx2 = (cov == null) ? 'contracts' 
+    : cov.toFixed(1) + '% of ' + (nCon != null ? nCon.toLocaleString() + ' contracts' : 'contracts');
+  var covTxt = (cov == null) ? 'coverage not recorded' : covTx2 + ' matched';
+
+  var covTip;
+  if (cov == null) {
+    covTip = 'ORCA does not record a production-coverage figure for ' + country + ', so there is no '
+      + 'way to say what share of the country this series represents. Treat the total as a lower bound '
+      + 'of unknown tightness.';
+  } else {
+    covTip = 'This series is built ONLY from the ' + cov.toFixed(1) + '% of '
+      + (nCon != null ? country + '’s ' + nCon.toLocaleString() + ' contract records' : country + '’s contract records')
+      + ' that carry verified field production. It is not national output and must not be cited as '
+      + 'it: the figure is a FLOOR, and how far below national production it sits is exactly this '
+      + 'coverage percentage. Across the 16 countries ORCA draws this chart for, coverage runs from '
+      + '0.2% (USA) to 37.6% (United Kingdom), so two tiles that look alike can be two orders of '
+      + 'magnitude apart in completeness. The same percentage drives the PROD-WTD / PART-PROD / '
+      + 'PROXY badge and whether this country’s take is production-weighted at all — click '
+      + 'to open Evidence Quality, which grades it.';
+  }
+
+  var winTip = 'ORCA holds ' + held + ' year' + (held === 1 ? '' : 's') + ' of production for '
+    + country + ', ' + y0 + ' to ' + y1
+    + (gaps ? ' — ' + gaps + ' year' + (gaps === 1 ? '' : 's') + ' inside that span are MISSING from the '
+              + 'record, and the total steps over them rather than interpolating. ' : '. ')
+    + 'The total is the sum of those years only. It was labelled "Cumulative" until ' 
+    + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : 'v1067')
+    + ', which read as a national cumulative on every country — and the window is not '
+    + 'comparable between them: Malaysia holds 3 years, Norway 56. Peak means the highest year ON '
+    + 'FILE, not the country’s historical peak, unless the window happens to cover it.';
+
+  return {
+    years: years, boe: boe, confs: confs, peakIdx: pk, peakYear: years[pk], peakBoe: boe[pk],
+    cum: cum, y0: y0, y1: y1, held: held, span: span, gaps: gaps, cov: cov, nCon: nCon,
+    tierTxt: set.map(function (c) { return TIER[c] || c; }).join(' · '),
+    tierShort: set.map(function (c) { return TIER_SHORT[c] || c; }).join(' · '),
+    winTxt: winTxt, totTxt: totTxt, covTxt: covTxt, covTx2: covTx2,
+    winTip: winTip, covTip: covTip
+  };
+}
+window._prodSeriesBasis = _prodSeriesBasis;
+
+// The coverage figure's destination. Evidence Quality is the only panel on the profile that says
+// what a production-coverage percentage licenses — it carries the PROD-WTD / PART-PROD / PROXY
+// badge and getDataQualityExplain()'s sentence on whether take is production-weighted. It is a
+// <details> and ships closed, so arriving at it collapsed is the failure this exists to prevent.
+function _cpProdToBasis() {
+  var panel = document.getElementById('cp-evidence-panel');
+  if (!panel) return;
+  try { panel.open = true; } catch (e) { /* not a details */ }
+  if (typeof _ecSettleTo === 'function') { _ecSettleTo(panel, 'rgba(194,65,12,.45)'); return; }
+  try { panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { panel.scrollIntoView(); }
+}
+window._cpProdToBasis = _cpProdToBasis;
+
 // v42: Production time series chart + breakeven population — fetches from api/v1/country/{slug}.json
 if (!window._prodTsCharts) window._prodTsCharts = {};
 function fetchCountryProductionChart(country) {
@@ -75241,20 +75378,37 @@ function fetchCountryProductionChart(country) {
       const colMap = {A:'rgba(76,175,125,0.75)',B:'rgba(45,212,191,0.65)',C:'rgba(120,120,150,0.4)',D:'rgba(100,100,120,0.25)'};
       const bgColors = confs.map(c => colMap[c] || colMap['D']);
 
-      // Compute peak year and cumulative
-      let peakIdx = 0;
-      boe.forEach((v, i) => { if (v > boe[peakIdx]) peakIdx = i; });
-      const peakYear = years[peakIdx];
-      const peakBoe = boe[peakIdx];
-      const cumBoe = boe.reduce((a, v) => a + v, 0);
+      // v1067 (T6): one basis builder, shared with the Fiscal Compare drawer. See
+      // _prodSeriesBasis() for what the two aggregates on this tile used to claim.
+      const B = _prodSeriesBasis(country, rows);
+      const peakIdx = B.peakIdx;
+      const esc = function (x) { return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
 
-      // Source note with peak annotation
-      const confSet = [...new Set(confs)].sort();
-      const confLabel = {A:'Primary govt (SODIR/NSTA/ANP)',B:'Operator filings',C:'Synthetic profile',D:'Regional proxy'};
-      const confText = confSet.map(c => confLabel[c] || c).join(' · ');
-      if (srcEl) srcEl.innerHTML = confText
-        + '<span style="margin-left:12px;color:var(--accent);">Peak: ' + peakYear + ' (' + peakBoe.toFixed(1) + ' MMbbl)</span>'
-        + '<span style="margin-left:12px;color:var(--muted);">Cumulative: ' + cumBoe.toFixed(0) + ' MMbbl</span>';
+      const tierEl = document.getElementById('dd-prod-ts-tier-' + safe);
+      if (tierEl) tierEl.textContent = B.tierTxt;
+
+      if (srcEl) srcEl.innerHTML =
+          '<span style="cursor:help;border-bottom:1px dotted var(--muted);" title="' + esc(B.winTip) + '">'
+        +   B.winTxt
+        + '</span>'
+        + '<span style="margin:0 7px;opacity:.5;">·</span>'
+        + '<span style="color:var(--accent);cursor:help;border-bottom:1px dotted var(--accent);" title="'
+        +   esc('Highest year ON FILE, not ' + country + '’s historical peak — ORCA holds ' + B.held
+              + ' of this country’s production years (' + B.y0 + '–' + B.y1 + '). ' + B.covTip) + '">'
+        +   'Peak ' + B.peakYear + ' — ' + B.peakBoe.toFixed(1) + ' MMbbl'
+        + '</span>'
+        + '<span style="margin:0 7px;opacity:.5;">·</span>'
+        + '<span style="font-weight:700;color:var(--text);cursor:help;border-bottom:1px dotted var(--muted);" title="'
+        +   esc(B.winTip) + '">' + B.totTxt + '</span>'
+        + '<br>'
+        + (B.cov == null
+            ? '<span style="color:var(--orange);cursor:help;border-bottom:1px dotted var(--orange);" title="'
+              + esc(B.covTip) + '">⚠ a floor, not national output — coverage not recorded</span>'
+            : '<button type="button" onclick="_cpProdToBasis()" title="' + esc(B.covTip) + '"'
+              + ' style="background:none;border:0;border-bottom:1px dotted var(--accent);padding:2px 0;'
+              + 'min-height:24px;font:inherit;font-size:10px;color:var(--accent);cursor:pointer;text-align:left;">'
+              + '⚠ a floor, not national output — built from the ' + B.covTx2 + ' with verified production'
+              + ' <span style="opacity:.75;">· grade it ›</span></button>');
 
       sect.style.display = 'block';
 
@@ -75282,7 +75436,7 @@ function fetchCountryProductionChart(country) {
                 return (c.parsed.y||0).toFixed(1) + ' MMbbl BOE (' + (confFull[conf]||conf) + ')';
               }
             }},
-            annotation: peakBoe > 0 ? {
+            annotation: B.peakBoe > 0 ? {
               annotations: {
                 peakLine: {
                   type: 'line', xMin: peakIdx, xMax: peakIdx,
