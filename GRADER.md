@@ -73628,3 +73628,18 @@ the same claim in two opposite directions about four different countries.
   `_pre1011.html`, `_base970.html`, `_pre1035.html`, `__ctl1063.html` still untracked in the
   repo root (~47 MB+). Everything this cycle wrote went to `/tmp/c1009/`; **nothing landed in
   the repo.** Not created this session, so flagged rather than removed unasked.
+
+---
+## Cycle 1013 Log — 2026-10-04 04:42
+- Test before: 550 PASS / 0 FAIL
+- Test after: 550 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 1009 complete and pushed.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (last cycle was T3, before that T5.)
+
+## Friction
+Walked T4 cold at 1440×900 and 390×844 with both storages cleared. The country lookup, the 186-option optgrouped dropdown, and the row-click routing are all solid — the worst moment is in the three stability cards, on the two rows where the WACC-premium decision actually gets made: **Russia (+15pp, 2022)** and **Ecuador (+5pp, 2010)**.
+
+One d
