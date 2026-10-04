@@ -74195,3 +74195,16 @@ Max Govt Take to 70% greyed that slider out as inert while it was removing 8 of 
 — and scoping to CIS/FSU and doing the same thing produced the identical reading for the opposite
 reason. And a screen that returns nothing no longer reports 171, 185 and 55 countries clearing its
 thresholds.
+
+---
+## Cycle 1023 Log — 2026-10-04 16:10
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Clean tree, pushed.
+
+## Cycle 1023 — v1066
+
+**Task:** T1 — "Which countries should even be on my screening list?" (last cycle was T4)
+
+**Friction.** `_scAxisUniverse()` reads exactly two controls — `sc-proxy-keep` and `sc-floor-keep`. It does not read `#sc-region`, the `#sc-mech-checks` set, `#sc-ioc-checks`, `#sc-reform` or `_screenerCountrySet`. So the four counters beside Max Govt Take, Min Contractor NPV, Min NPV @$50 and Min primary-source evidence quote "of 185" no matter what the analyst 
