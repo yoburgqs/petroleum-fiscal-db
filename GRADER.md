@@ -73643,3 +73643,311 @@ the same claim in two opposite directions about four different countries.
 Walked T4 cold at 1440×900 and 390×844 with both storages cleared. The country lookup, the 186-option optgrouped dropdown, and the row-click routing are all solid — the worst moment is in the three stability cards, on the two rows where the WACC-premium decision actually gets made: **Russia (+15pp, 2022)** and **Ecuador (+5pp, 2010)**.
 
 One d
+
+---
+## Cycle 1018 Log — 2026-10-04 09:42
+
+- Test before: **547 PASS / 0 FAIL / 1 WARN** (this tree, suite actually run before any edit)
+- Test after: see Verification below — suite re-run against the edited tree
+- JS errors: 0
+
+## Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Last cycle was T6
+(1015), before that T1 (1017) and T4 (1009/1013).
+
+## Friction
+
+Walked T2 cold at 1440x900 and 390x844 `hasTouch`, both storages cleared: Home → Country Profile
+→ the auto-loaded Indonesia benchmark → the 186-option optgrouped selector → the headline strip →
+the Live DCF panel → the "WHICH NUMBER GOES IN THE IC MEMO?" reconciliation.
+
+Most of this surface is in good shape and I checked the things most likely to be broken first,
+all of which held: all 185 profiles render with zero `undefined` / `NaN` / `[object Object]` /
+`Infinity` and zero page errors; the Fiscal Breakdown components sum to the scenario take within
+0.65pp on 183 of 185 (the 2 exceptions, Iran and Iraq, carry a contractor `Cost Reimbursement`
+line by design on the fee-basis engines); and the price-rebasing in the reconciliation block is
+genuinely well built — dragging the Live DCF slider to $100 / $125 / $40 re-states the scenario
+card at the new price but holds the take gap and NPV gap at "both at $75", with an explicit
+sentence saying a raw subtraction "would charge the price move to the regime."
+
+**The worst moment is the middle tile of the Live DCF panel's three metric tiles, on the 4
+countries where the engine substitutes the platform's generic template.**
+
+The panel renders three tiles side by side. v704 set the rule for them, in its own words at
+:63988: *"A generic-template result is never painted on the take tier ramp. The ramp is the page
+telling the analyst where THIS COUNTRY sits, and a number 119 countries share says nothing about
+any of them. Same rule v703 applied to the inflated IRR."* That rule was wired into tile 1 (take
+→ `var(--muted)`, label `Govt Take — generic template`, note `no X terms in the engine`) and
+tile 3 (label `Contractor NPV — generic template`, note `not X's`).
+
+**It never reached tile 2, because `_irrVerdict1061()` had no parameter for the basis at all.**
+The middle tile of the three was structurally incapable of knowing what its two neighbours were
+saying. Measured on the panel's own default profile at $75: `_ldcfProvenance().generic` is true
+for **4 of 185** countries — **Bahrain, Denmark, Kuwait, Saudi Arabia** — and on all 4 the middle
+tile read:
+
+    CONTRACTOR NPV @ 15% — CLEARS THE IOC HURDLE        +$2.9B
+
+with both the verdict words and the figure in `var(--green)` (`rgb(21,128,61)`), sitting between
+two grey tiles explicitly labelled *generic template*. It was the only one of the three tiles
+that states a pass/fail **investment verdict**, and the only one carrying no basis marker.
+
+**Three of those 4 — Saudi Arabia, Kuwait, Bahrain — are state monopolies.** The same panel's own
+scope line, one block above, reads *"the acreage is closed to contractor entry … It is not Saudi
+Arabia's economics and no figure in it is citable for Saudi Arabia."* Its reconciliation block,
+two scrolls below, reads *"Neither. Both figures on this panel are withdrawn for Saudi Arabia"*
+and *"Quoting either one as Saudi Arabia's government take would be inventing a number."*
+
+So at scan altitude the analyst read: grey template / **GREEN CLEARS THE IOC HURDLE +$2.9B** /
+grey template. The single most salient element on the panel was an IC-grade pass over a
+jurisdiction with no contractor position to pass, and both blocks that withdrew it were off
+screen. Saudi Arabia and Kuwait are not edge cases — they are two of the largest producers on
+earth and among the first countries a Middle East screening loads. This is the same defect class
+as cycle 1009's unearned green on the Reform Risk Quiet card: every contradicting word was on the
+page, none of it at the altitude the verdict was read.
+
+## Change
+
+`_irrVerdict1061()` now takes the `_ldcfProvenance()` object as a 5th argument, and the Country
+Profile call site passes the same `_p704` object the other two tiles already relabel themselves
+from — so the three tiles report one basis by construction rather than by three constants
+agreeing. On a generic-template run, and only there:
+
+- **The label is now the same string its two siblings carry, in the same orange** —
+  `Contractor NPV @ 15% — generic template`. The pass/fail words are **withheld, not restated
+  more quietly**: "clears the IOC hurdle" is a claim about a country, and on this branch there is
+  no country in the figure.
+- **The figure renders `var(--muted)`**, measured identical to the take tile's grey
+  (`rgb(107,101,96)`), under the v704 rule — a verdict colour is the page asserting the number is
+  this country's.
+- **A new orange sentence in the tile's own note**, at the altitude the withheld verdict was
+  read, so the fix is not silent: *"This is not an IOC verdict for this country. The engine holds
+  no fiscal terms for it on this branch, so the hurdle test is a property of the platform's
+  generic Concession template, which 3 countries return identically — pass or fail, it says
+  nothing about this one."* The mechanic and the shared count are read off the run and the
+  provenance object, not written in (Denmark correctly omits the count clause, its PRRT template
+  being shared by one).
+- The non-hurdle branch's tail clause is gated the same way, so the verdict cannot re-enter
+  through it if a profile change flips the tile's state.
+
+## Result
+
+An analyst screening Saudi Arabia or Kuwait at $75/bbl no longer reads a green **CLEARS THE IOC
+HURDLE +$2.9B** as the most prominent element on the Live DCF panel for acreage that is closed to
+contractor entry — the one tile of three that looked like a decision is now the one that names
+its own basis, in the same words and the same colour as the two beside it. The hurdle figure is
+still shown, because it is real arithmetic on the template and withholding it would hide the
+substitution; what is withdrawn is the verdict. An analyst who pastes from this panel can no
+longer carry an IC-grade pass out of it for a country that has no contractor position.
+
+## Verification
+
+- JS syntax gate: 11 inline `<script>` blocks, **0 syntax errors**.
+- **A/B against a saved pre-edit copy of this tree served on a second port**, comparing the
+  middle tile's label HTML, value, computed colour and note HTML across **all 185 countries**:
+  **4 changed — Bahrain, Denmark, Kuwait, Saudi Arabia — and 181 byte-identical.** Norway, Iraq
+  and Indonesia were re-read by hand and keep their green `clears the IOC hurdle`. This is the
+  measurement that proves the change is scoped to the defect and not to the surface.
+- Runtime suite **ran** against the edited tree — see "Test after" above. Baseline captured from
+  the same tree before any edit, same suite, same URL.
+- Zero horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768** across all 9 visible tabs **and**
+  on the Country Profile with Saudi Arabia loaded, and at **390x844 `hasTouch`** on all 9
+  (`scrollWidth 390 = clientWidth 390` throughout).
+- **0 of the Live DCF panel's controls render under 24px on a thumb** on all 4 generic countries
+  and on Indonesia. The note grows from 63px to 183px on the generic rows — it is a full-width
+  stacked column at 390px, the widest element in the panel measures 346px against a 390px
+  viewport, and the document stays 390/390.
+- 0 console errors, 0 page errors, at both desktop and mobile.
+
+### Notes for the next cycle
+
+- **Closed this cycle:** the unlabelled, green IOC verdict on the Live DCF middle tile for the 4
+  generic-template countries, and the `_irrVerdict1061()` signature gap that made it possible.
+- **Also walked and found sound, recorded so the next cycle does not re-walk it:** the Live DCF
+  price-rebasing (slider at $40/$100/$125 all hold the gaps at "both at $75" and say so); the
+  default-basis disclosure on the panel's scope line and its reconciliation block, which was
+  carried open from 996/998 and is in fact **well handled** — the "WHICH NUMBER GOES IN THE IC
+  MEMO?" block withdraws both figures by name on the monopolies. That carried item can be closed;
+  the gap was never in the prose, it was in the tile.
+- **Found this cycle, not fixed.** On the 3 monopolies the middle tile's body still reads *"A
+  Concession reimburses nothing — the contractor funds the whole spend, and the exposure is this
+  thin only because revenue arrives while the capex is still running"* — a sentence describing
+  the behaviour of a contractor that cannot exist on closed acreage. It is true of the template
+  and is now immediately followed by the new disclosure sentence, so the misread is contained,
+  but the wording is a property of the template and should say so. Same fix shape: the branch
+  needs `V.generic` in its wording, not just in its label and colour.
+- **Carried, still open** (not walked this cycle): `copyFCForIC` / `exportFCResults` do not name
+  *which* default rate the record contradicts on the 120 default rows (996/998). `_icRefuse()`
+  pins `minWidth` not `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}`
+  in `renderCompare` (988). Platform Reference Guide still advertises deleted Screener filters
+  (990). The IOC clipboard exhibit's 183-of-476 overflowing cells at the 624px Word column
+  (1002). The three T3 grid findings from cycle 1003. The two T4 wording findings from 1009
+  (`midCard`'s "that bar is the only thing they clear", and the Regional Reform Tilt panel
+  pointing at a card headed "Below the line" that does not exist).
+- **The PASS count in the cycle prompt is not this tree. Nineteenth cycle flagged.** The prompt
+  says **551**; a run of this repo's own suite against this repo's own tree says **547 PASS / 0
+  FAIL / 1 WARN**, captured before any edit this cycle. The two suites remain different files —
+  graded `office/tools/petroleum/tests/runtime_comprehensive.js` vs repo
+  `tests/runtime_comprehensive.js`. Both sides of this cycle's A/B and both suite runs used the
+  repo suite against the repo tree, so the comparison is sound; the prompt's number describes
+  neither.
+- **Probe debris, thirty-eighth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html`, `__ctl1063.html` still untracked in the repo
+  root (~47 MB+). Everything this cycle wrote went to `/tmp/c1018/`; **nothing landed in the
+  repo.** Not created this session, so flagged rather than removed unasked.
+
+---
+## Cycle 1020 Log — 2026-10-04 — T5 — v1061
+
+- Test before: **547 PASS / 0 FAIL / 1 WARN** (this repo's `tests/runtime_comprehensive.js` against
+  this repo's tree, served over `http://localhost:8731/`, run before any edit)
+- Test after:  ****547 PASS / 0 FAIL / 1 WARN** — unchanged from the pre-edit baseline, suite
+  **ACTUALLY RAN** twice this cycle (once on the edited tree, once again on the frozen tree
+  after the version badge bump); both runs returned the same totals. The 1 WARN is the
+  pre-existing `[ConsoleErrors]` 404 on an external script and is present in the baseline too** — suite **ACTUALLY RAN** this cycle, on the frozen post-edit tree
+- JS syntax gate: PASS (11 inline blocks, `node --check` each)
+- JS errors / page errors: 0 at 1440x900 and at 390x844 `hasTouch`
+
+## Task
+
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation: 1018 was
+T2, 1017 T1, 1015 T6, 1013/1009 T4, 1006/1003 T3 — T5 last ran at 1002.
+
+## Friction
+
+Walked all six "Copy for IC Memo" surfaces cold at 1440x900 with both storages cleared, capturing
+both clipboard flavours through a `navigator.clipboard` shim and then **laying each pasted exhibit
+out at the real Word text column** — 624px, which is US Letter less 1in margins at 96dpi.
+
+Five of the six are in good shape and are recorded here so the next cycle does not re-walk them.
+At the 624px column: Country Profile 0 of 34 cells overflow, Side-by-Side 0 of 96, Screener 0 of
+2,604, IOC 12 of 476 (down from the 183 of 476 that cycle 1002 flagged — that carried item is
+**closed**), Fiscal Compare 3 of 64 on a three-row shortlist and all three are the Breakeven cell
+holding "— not modelled" in a 30px column. The HTML flavour carries short footnote-lettered
+headers with an `a`–`n` Notes list under the table, including per-row override notes, and that
+machinery works.
+
+The worst moment is not in the exhibit. It is in **the one guard whose entire job is the decision
+the analyst is about to get wrong.**
+
+Cold load → Fiscal Compare → nothing ticked → `⎘ Copy for IC Memo`. `copyFCForIC()` calls
+`_icArmBulkCopy()` (index.html ~L61392), which arms rather than pastes and raises a toast:
+
+> "Nothing ticked, so this would copy all 185 rows — **about 7 pages in Word**. Click again to copy
+> all 185, or tick the rows you want in the highlighted left-hand column and copy just those."
+
+The toast is visible (997x36 at y=840, 1440x900) and it holds for 20s, so v828 and v923 both do
+what they claim. The **number** does not. It read `Math.round(n / 26)` — 26 single-line rows to a
+page — and these exhibits have no single-line rows: Model basis, Data basis, Evidence tier and
+Reform verdict are each a sentence, so one Fiscal Compare row renders **103–139px** tall in a Word
+column, not ~33px. Measured on the actual clipboard HTML at 624px:
+
+| surface, nothing ticked | warning said | actually renders |
+|---|---|---|
+| Fiscal Compare, 185 rows | **7 pages** | **19,271px = 22.3 pages** |
+| Screener, 185 rows | **7 pages** | **18,053px = 20.9 pages** |
+
+Understating by 3x is worse than saying nothing. "About 7 pages" reads like an appendix an analyst
+with 20 minutes waves through; 22 pages is a different decision, and *making that decision* is the
+only reason the arm step exists. The guard was arguing the analyst into the outcome it was built to
+prevent. The same constant was wrong in the other direction on smaller sets: a 33-row Europe filter
+is 4.1 pages and the warning called it 1.
+
+## Change
+
+`_icPastePages(html)` (new, at the `IC_ARM_MS` block) lays the finished exhibit out in a clean
+hidden **iframe** at `IC_WORD_COL_PX = 624` and divides `body.scrollHeight` by
+`IC_WORD_PAGE_PX = 864` (9in of text height). The iframe is load-bearing: measuring inside the main
+document would apply the platform's own table CSS, which the clipboard payload does not carry, and
+would return a page count for a page nobody is pasting into. The probe is parked at
+`left:-10000px`, 1px tall, and its payload is dropped immediately after the read — deliberately
+**not** a negative `right` offset, which is what made all twelve screens scroll 390px sideways
+before the v612 mobile layer.
+
+`_icArmBulkCopy()` takes a fifth optional `pasteHtml` argument and quotes the measured count. The
+arm call in `copyFCForIC()` and `copyScreenerTable()` **moved** from before the exhibit build to
+immediately above the clipboard write, so there is a real artifact to measure; the build in between
+is read-only (it reads `#tbl-fc`, `_fcResults`, `COUNTRY_DATA` and the two selectors and writes
+nothing), so running it on the arming click too costs one pass and changes no state. If no HTML is
+passed or the probe fails, the sentence **drops the page claim** rather than inventing one.
+
+On screen, nothing ticked on Fiscal Compare:
+
+- button: `⚠ Copy all 185 rows — confirm` → **`⚠ Copy all 185 rows · 22 pages — confirm`**
+- toast: "about 7 pages in Word" → **"22 pages in Word, measured on this exhibit at a 6.5in text
+  column"**
+- Screener, same path: **21 pages** (actual 20.9)
+
+## Result
+
+The analyst deciding whether to paste the whole table now reads the length Word is actually about
+to produce, on the click where that is still reversible — and reads it on the button itself, not
+only in a toast they may have looked away from. At 22 pages they tick the five countries they came
+for; at 7 they did not. The number also tracks the exhibit instead of the row count, so the same
+control is now honest on a filtered set, where the old constant was wrong the other way.
+
+## Verification
+
+- **Measured, not asserted.** Same probe run independently against each copied exhibit:
+
+  | set | rows | button now says | independent measure |
+  |---|---|---|---|
+  | all countries | 185 | `· 22 pages` | 19,331px = 22.4 pages |
+  | Europe filter | 33 | `· 4 pages` | 3,583px = 4.1 pages |
+  | Middle East filter | 17 | *(no arm — under the 25-row threshold, unchanged)* | 2,999px = 3.5 |
+  | Screener, cold | 185 | `· 21 pages` | 18,053px = 20.9 pages |
+
+- **Scope held.** A ticked shortlist still copies on ONE click with no arm (4 ticked → 26,418 chars
+  of HTML on the first click, `_icArmedBtn` null). Result sets at or under `IC_BULK_ROWS = 25`
+  still never arm. The confirming click still pastes: 510,572 / 77,725 chars on Fiscal Compare,
+  459,006 / 67,198 on the Screener. `_icPastePages(null)` → `null`; a 1,728px payload → 2 pages.
+- **Mobile, 390x844 `hasTouch`.** `scrollWidth 390 = clientWidth 390` on **all 9 visible tabs**.
+  The touched control measures **254x44** — above the 24px floor. The arm toast is 366x90 and
+  `scrollHeight` does not exceed `clientHeight`, so the longer sentence is not clipped. The probe
+  iframe sits at x=-10000, 624x1, and adds nothing to the document's scroll width.
+- Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390. 0 console errors, 0 page errors.
+- Arming cost with the build moved ahead of it: ~130ms over the 700ms settle wait on a 185-row
+  Fiscal Compare, measured end-to-end on the click.
+
+### Notes for the next cycle
+
+- **Closed this cycle:** the `n / 26` page estimate in `_icArmBulkCopy`, and the carried 1002 item
+  on the IOC clipboard exhibit's cell overflow (re-measured at 12 of 476, not 183).
+- **Also walked and found sound**, recorded so it is not re-walked: the Country Profile paste
+  (0 overflowing cells, 7 numbered notes keyed to the rows they qualify, the default-basis
+  disclosure present); the Side-by-Side paste (0 overflow); the Screener paste (0 overflow of
+  2,604 cells); the Fiscal Compare HTML flavour's footnote-letter header scheme and its per-row
+  `k`/`l`/`m`/`n` override notes; the arm toast's visibility and its 20s window.
+- **Found this cycle, not fixed.**
+  1. `IC_BULK_ROWS = 25` is a **row** threshold on a decision that is about **pages**. It is now
+     measurably miscalibrated in both directions: a 17-row Middle East set is 3.5 pages and never
+     arms, while the IOC Portfolio copy is 33 rows / 5.2 pages and is **not wired to the arm at
+     all** (`ioc-copy-ic-btn` copies 101,924 chars on a single click with no confirm step). With
+     `_icPastePages` now in place the honest threshold is a page count, not a row count.
+  2. The `text/plain` (TSV) flavour of the Fiscal Compare and Screener pastes still carries the
+     **full prose column headers** — the Evidence tier header alone is ~700 characters — where the
+     `text/html` flavour correctly uses short headers plus a footnote list. Paste into Word and it
+     is clean; paste into Excel, which the button's own tooltip advertises, and row 1 holds two
+     700-character essays.
+  3. Fiscal Compare's Breakeven cell renders "— not modelled" into a 30px fixed column, overflowing
+     on every row of every set walked.
+  4. The FC caption reads "Breakeven is populated for 0 of these 3 rows; **the other 3** name the
+     reason in the cell" — arithmetically consistent but it reads as a contradiction.
+- **Carried, still open** (not walked this cycle): `copyFCForIC` / `exportFCResults` do not name
+  *which* default rate the record contradicts on the 120 default rows (996/998). `_icRefuse()` pins
+  `minWidth` not `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in
+  `renderCompare` (988). Platform Reference Guide still advertises deleted Screener filters (990).
+  The three T3 grid findings from 1003. The two T4 wording findings from 1009. The monopoly-row
+  Live DCF template wording from 1018.
+- **The PASS count in the cycle prompt is not this tree. Twentieth cycle flagged.** The prompt says
+  **551**; this repo's own suite against this repo's own tree says **547 PASS / 0 FAIL / 1 WARN**,
+  captured before any edit. The two suites are still different files —
+  graded `office/tools/petroleum/tests/runtime_comprehensive.js` (sha d702c84acc1e) vs repo
+  `tests/runtime_comprehensive.js` (sha bc1f059fe991); the cycle driver prints the divergence
+  itself. Both sides of this cycle's before/after used the repo suite against the repo tree, so the
+  comparison is sound; the prompt's number describes neither.
+- **Probe debris, thirty-ninth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`, `_pre1011.html`,
+  `_base970.html`, `_pre1035.html`, `__ctl1063.html` still untracked in the repo root (~47 MB+).
+  Everything this cycle wrote went to `/tmp/c1020/`; **nothing landed in the repo.** Not created
+  this session, so flagged rather than removed unasked.
