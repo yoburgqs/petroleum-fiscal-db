@@ -73964,3 +73964,234 @@ control is now honest on a filtered set, where the old constant was wrong the ot
 **Task.** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in rotation (1018 was T2, 1017 T1, 1015 T6, 1013/1009 T4, 1006/1003 T3; T5 last ran at 1002).
 
 **Friction.** I walked all six "Copy for IC Memo" surfaces cold at 1440×900 with both storages cleared, captured both clipboard flavours through a shim, and then laid each pasted exhibit out at the real Word te
+
+---
+## Cycle 1021 — T3 — v1062 — 2026-10-04
+
+**Task.** T3 — *"How do these three countries compare side by side?"* Stalest in rotation: 1020 was
+T5, 1018 T2, 1017 T1, 1015 T6, 1013/1009 T4; T3 last ran at 1006/1003.
+
+**Friction.** Walked T3 cold at 1440x900 with both storages cleared — `clearCompare()` then three
+typed countries — across five sets: Guyana/Suriname/Namibia, Guyana/Suriname/Senegal,
+Norway/United Kingdom/Nigeria, Guyana/Brazil/Angola, Indonesia/Malaysia/Vietnam.
+
+The separation pill in the verdict strip is the one number this tab exists to produce. v1020
+established that the strip is what gets pasted into the memo, and the pill is the figure in it that
+reads as the finding: **"17.2pp apart"**. It coloured itself on `_span < 5` — a **typed constant** —
+while the tooltip it opened claimed the test was *"inside the spread ORCA itself observes across
+contracts within a single one of these countries."* That spread is MEASURED, it varies by two orders
+of magnitude between countries, and this grid already prints it four rows down on *Take spread
+across contracts*. The pill never read it. The sentence described a measurement that was never made.
+
+It failed in the direction that costs money — **it stayed silent**:
+
+| set | span | pill was | the platform's own contract file |
+|---|---|---|---|
+| Guyana / Suriname / Namibia | 17.2pp | **neutral** | Namibia 36.8–57.8% (21.0pp) |
+| United Kingdom / Norway / Nigeria | 31.9pp | **neutral** | Nigeria 57.5–91.4% (33.9pp) |
+
+On the first, the strip reads *"Namibia 37.0% › Guyana 54.1% › Suriname 54.2%, 17.2pp apart"* and the
+price-ordering notice 900px below adds *"Namibia holds the lowest government take at all four
+published prices, **17.1pp clear** of the next column."* ORCA's own `namibia.json` lists Namibia's 50
+largest producing contracts running **36.8–57.8%**. A Namibian block at 57.8% is **worse than every
+Guyana and every Suriname figure on the screen**, so "17.1pp clear" is not a separation this platform
+can defend — and the number that says so was already on the grid, four rows down. The three sets
+where the constant DID fire (1.2pp, 2.8pp, 2.6pp) were right by coincidence: 5 happens to sit below
+the dispersion there too.
+
+**Measured before choosing the fix, because the obvious fix was wrong.** Replacing `5` with "span is
+inside the widest within-country spread" alarms on **7 of 7** real screening sets — an alarm with a
+100% rate on the cases that matter is worth less than the constant it replaced. Over 4,000 random
+three-country sets: **61%** hold no measured dispersion in any ranked column at all, and of the rest
+that test is true **22.9%** of the time (median span 35.0pp against median widest 14.6pp). The gap
+between the two populations is the point: realistic sets are exactly where ORCA holds a contract file
+and v864's refutation lands, so there the span is almost always inside. That is a true property of
+this dataset, so it is now **stated on every set** — but it is not the alarm.
+
+**Change.** `index.html` — three new top-level functions (`_sbsRecOf`, `_sbsWithinWidest`,
+`_sbsSpanPillHtml`) plus `_sbsPaintVerdictSpan`, replacing the inline `_pill(... _span < 5 ...)` call
+in `renderCompare`'s verdict strip.
+
+The colour is now spent on the narrower condition that actually **breaks the ordering**: the
+lowest-take column's own blocks reaching **past the figure of the column ranked behind it**. On
+screen, three states instead of two:
+
+- **broken** (orange) — `17.2pp apart · Namibia’s blocks reach 57.8%, past Guyana`
+- **clears** (neutral) — `31.9pp apart · widest column spread 33.9pp`
+- **nothing held** (neutral) — `49.8pp apart · no spread held`
+
+Nothing new is computed. `_fpDispersion()` is v610 and is the same input the *Take spread* row and the
+Predictability Score are built on; the async contract-file refutation is v864's `window._sbsObsHits`,
+read here exactly as `_sbsBoundOrder()` reads it. Fee-boundary columns are excluded on **v889's rule** —
+there the band's width is the distance between two contract types, not a dispersion, so it is not a
+yardstick for a separation either (`_sbsWithinWidest(['Iraq'])` → `null`, verified).
+
+**Gated to the deck its evidence is measured at.** Every contract-level band this platform holds —
+bundled p25/p75 and v864's observed range alike — is measured at **$75/bbl**, while the ranked takes
+follow the *Rank at* control. Comparing a $75 band top against a $125 ranked take would be a
+cross-price comparison, and the pill would have gone quiet at the other three decks for a reason that
+has nothing to do with the regimes. The block-level claim is made only at $75; at $50/$100/$125 the
+pill keeps the neutral "widest column spread" state and the tooltip says the two figures are on
+different decks and are not compared there. Verified round-tripping all four decks.
+
+**One builder serves both paints.** Namibia's 21.0pp/57.8% arrives from the async per-country fetch
+*after* the strip has painted, and it is the figure that decides this pill. The pill carries its own
+inputs in `data-span` / `data-pr` / `data-ranked` and `_sbsPaintVerdictSpan()` re-runs the identical
+builder when a refuted spread lands — the same contract `_sbsPaintVerdictFp()` already uses — so the
+first render and the repaint cannot disagree about the threshold.
+
+**Result.** The analyst who screens Guyana / Suriname / Namibia no longer reads "17.2pp apart" as a
+margin. The pill now tells them, on screen and in the pasted exhibit, that Namibia's own blocks reach
+57.8% — past Guyana's 54.1% — so "Namibia is the cheapest of this set" is a statement about a country
+average and not one they can defend about a licence. And on United Kingdom › Norway › Nigeria, where
+the UK's 36.4–51.4% band genuinely clears Norway's 68.0%, the pill stays neutral and the tooltip says
+the first position *does* hold at block level — so the warning still means something when it fires.
+
+## Cycle 1023 Log — 2026-10-04 — T1 — v1066
+
+- Test before: **547 PASS / 0 FAIL / 1 WARN** — `tests/runtime_comprehensive.js` ACTUALLY RUN this
+  cycle against the pre-edit tree (`_pre1066.html`, byte-identical to index.html at cycle start)
+  over a local http server, which is what the suite's `page.route` interception needs.
+- Test after:  **547 PASS / 0 FAIL / 1 WARN** — suite re-run against the edited tree on the same
+  server and the same filename convention. Byte-identical to the pre-edit baseline, 0 FAIL.
+  (The 1 WARN and the 15 "JS errors" are both the same harness artefact present on BOTH sides:
+  `serviceWorker.register('/petroleum-fiscal-db/sw.js')` 404s under a server rooted at the repo,
+  which is why a local run reads 547 against the cycle harness's 551.)
+- JS syntax gate: **PASS**, 11 inline blocks, 0 failures (before and after).
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 (`hasTouch`): **0 overflow**, cold and
+  in the scoped state this cycle touches, before and after.
+
+### Task
+
+**T1 — "Which countries should even be on my screening list?"** Last cycle was T4 (v1063); the two
+uncommitted trees before it were T2 (v1064) and T6 (v1065), so T1 is the furthest from recency.
+
+### What I walked, and the three candidates I rejected first
+
+Cold load at 1440x900 and 390x844 `hasTouch`, both storages cleared and reloaded: Home → Screener
+card → the 185-row cold table → all 11 presets → every sortable header, three clicks each → the
+Max Govt Take slider across its travel → region / mechanic / operator / reform legs → tick-and-route.
+
+Three things looked like the answer and were not:
+
+1. **The `npv` header's third click does not return to the default ranking.** It is a two-state
+   toggle where every sibling is three-state. Read the code: v858 did that deliberately, because
+   `_scSortKey === null` IS contractor-NPV-descending, so asking for that column re-applies the
+   order already on screen. Working as designed.
+2. **Tightening the take ceiling makes the shortlist LESS defensible, not more.** Measured on the
+   shipped `country_data.json`: proxy share of the result set 88.1% at no ceiling → 93.7% at ≤55%
+   → 95.0% at ≤35% → 98.9% at ≤30%, with verified-production rows collapsing 22 → 9 → 5 → 1. True,
+   and genuinely counter-intuitive — but v668's count-bar button already says it in the state that
+   matters (`⚠ 96 of 102 are proxy — Production-backed only (6)`, solid amber because proxy rows
+   dominate), and `#sc-prod-out` names the removed producers one by one with their figures. Covered.
+3. **"1 countries match"** under a region-scoped preset. Real, and cosmetic.
+
+### Friction
+
+**The four per-axis counters, and the amber-inert signal they drive, ignore every leg that decides
+which countries are candidates at all.**
+
+`_scAxisUniverse()` (v996, line ~38048) reads exactly two controls: `sc-proxy-keep` and
+`sc-floor-keep`. It does not read `#sc-region`, the `#sc-mech-checks` set, `#sc-ioc-checks`,
+`#sc-reform`, or `_screenerCountrySet`. So the counters beside Max Govt Take, Min Contractor NPV,
+Min NPV @$50 and Min primary-source evidence all quote a denominator of 185 no matter what the
+analyst has scoped to.
+
+v996 defended that for the NUMBER — "clear this" is a per-axis count, so a global denominator is
+honest about being global. It did not reason about the SIGNAL. `.sc-axis-inert` greys an axis amber
+once `pass >= uni.length * 0.9`, which reads *this control is doing no work, ignore it* — and that
+is a RATIO, so taking it on a population the analyst has already excluded makes it point the wrong
+way. This is the identical defect v996's own note calls **"worse than an imprecise number; it is a
+signal pointing the wrong way"**, left live on the leg a T1 analyst reaches for first.
+
+Measured live in the browser, not computed beside it:
+
+| screen state | table | axis said | painted |
+|---|---|---|---|
+| Region **Middle East**, take ≤70% | **9 of 17** rows | `· 171 of 185 clear this · 18 verified` | **AMBER-INERT** |
+| Region Middle East, take ≤75% | 13 of 17 | `· 178 of 185 clear this · 19 verified` | **AMBER-INERT** |
+| Region **CIS/FSU**, take ≤70% | 5 of 5 | `· 171 of 185 clear this · 18 verified` | AMBER-INERT |
+| Mechanic = **PSC only**, take ≤70% | 74 | `· 171 of 185 …` | AMBER-INERT |
+| Operator = **Equinor**, take ≤70% | 11 | `· 171 of 185 …` | AMBER-INERT |
+| Reform = quiet record, take ≤70% | 5 of 6 | `· 171 of 185 …` | AMBER-INERT |
+| **0 mechanics ticked** (empty screen) | **0 rows** | `· 171 of 185`, `· 185 of 185`, `· 55 of 185` | two AMBER |
+
+Two rows of that table are the whole finding. On **Middle East** the ceiling had just removed 8 of
+the analyst's 17 candidates — 47% of their list — and the page greyed it out as doing no work. On
+**CIS/FSU** it removed nobody and the page greyed it out too. The reading is identical in both
+states, because the denominator is 185 in both, so there is no way to tell them apart. And in the
+last row the table is EMPTY while three counters confidently report 171, 185 and 55 — counting a
+universe with nothing in it, because v996's `return out.length ? out : all` divide-by-zero guard
+silently falls back to all 185.
+
+### Change
+
+`index.html` — `_scAxisUniverse()` rewritten, plus two helpers lifted out of `runScreener()` and
+one new predicate. The rule it now implements:
+
+> **Scope legs narrow the denominator. Threshold legs do not.**
+
+A leg that answers *is this country a candidate?* — region, fiscal mechanic, operator presence,
+reform record, named country set, and the two data-basis boxes — is in the universe. A leg that
+answers *does this candidate clear my bar?* — take, either NPV floor, evidence share, fact depth,
+retention — is the axis itself and is still counted on its own, exactly as v996 intended. So the
+counter answers *of the countries this screen is scoped to, how many clear this threshold*, and
+the amber flag is a ratio taken on the base the analyst is looking at.
+
+- `_scCheckedMechs()` and `_scIocScope()` are new top-level functions holding the mechanic-checkbox
+  read and the `IOC_DATA`-first / `IOC_PRESENCE`-fallback operator resolution. `runScreener()` now
+  calls both instead of inlining them, so the axis universe and the filter body cannot drift about
+  who is eligible — the same construction v554 and v706 used, rather than a parallel
+  re-implementation beside it. The mechanic, region and reform legs likewise call the same
+  `_regionMatch()` / `_scReformUniverse()` / `_screenerCountrySet` the filter calls.
+- `_scAxisScoped()` is true while the universe is narrower than `COUNTRY_DATA`. It adds **` in
+  scope`** to the counter in exactly that state, so `· 9 of 17 in scope clear this` cannot be read
+  as 17 countries in the database. Four words, and only where the number would otherwise be
+  ambiguous.
+- **The empty-universe fallback is removed.** `_scAxisUniverse()` now returns an empty array when
+  nothing is in scope, and all four call sites blank their counter instead of quoting 185. There is
+  no ratio to report when nothing is in scope, and the zero-result panel below the table already
+  names the cause.
+- The take / NPV / NPV@$50 / evidence slider labels state which legs narrow the denominator and
+  which do not, because the take label previously promised "how many of the 185 clear this ceiling"
+  and that is no longer what it does.
+
+On screen, after:
+
+| screen state | table | axis now says | painted |
+|---|---|---|---|
+| **cold**, take ≤70% | 171 | `· 171 of 185 clear this · 18 verified` | AMBER — **byte-identical to v996** |
+| Region Middle East, take ≤70% | 9 of 17 | `· 9 of 17 in scope clear this · 1 verified` | **full strength** |
+| Region Middle East, take ≤75% | 13 of 17 | `· 13 of 17 in scope clear this · 1 verified` | **full strength** |
+| Region CIS/FSU, take ≤70% | 5 of 5 | `· 5 of 5 in scope clear this · 2 verified` | AMBER — correctly |
+| Mechanic = PSC only | 74 of 81 | `· 74 of 81 in scope clear this · 13 verified` | AMBER — correctly (9%) |
+| Operator = Equinor | 11 of 11 | `· 11 of 11 in scope clear this · 7 verified` | AMBER — correctly (0%) |
+| Reform = quiet record | 5 of 6 | `· 5 of 6 in scope clear this · 2 verified` | full strength (17%) |
+| 0 mechanics ticked | 0 rows | all four counters **blank** | — |
+
+The amber comes **off** the Middle East and **stays on** CIS/FSU, Equinor and PSC-only. That is the
+point: the signal now discriminates between a control doing nothing and a control deleting half the
+list, which it could not do before at any setting.
+
+### Not done, deliberately
+
+- No new control, no new tooltip as the deliverable, no FAQ, no layout restructure, no tab-order
+  change. Nothing in the STILL LOCKED list is touched; the v612 mobile layer and `#reference-panel`
+  are not in this code path.
+- The cold default is byte-identical by construction: with no scope leg set `_scAxisUniverse()`
+  returns `COUNTRY_DATA` on the same early return v996 wrote.
+- Strings stay short. `.sc-axis-n` is `white-space: nowrap` inside a slider label and v681 put 36px
+  of horizontal scroll on a phone by writing a long string into one of these spans. Measured at
+  390x844 `hasTouch` in the scoped state: the four spans grow 22–32px (171→193, 109→140, 109→141,
+  103→134) and `scrollWidth` stays **390 = clientWidth`**. Zero elements extend past the viewport.
+  The spans are label text, not controls, and their rendered heights (11/11/15/11px) are unchanged.
+
+### Result
+
+An analyst who scopes the Screener to a region, a mechanic, an operator, a reform record or a named
+basin can now read, from the number beside the slider, whether the threshold they just set is doing
+any work **on the countries in front of them**. Before this, scoping to the Middle East and pulling
+Max Govt Take to 70% greyed that slider out as inert while it was removing 8 of their 17 candidates
+— and scoping to CIS/FSU and doing the same thing produced the identical reading for the opposite
+reason. And a screen that returns nothing no longer reports 171, 185 and 55 countries clearing its
+thresholds.
