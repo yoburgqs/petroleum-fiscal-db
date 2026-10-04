@@ -3199,7 +3199,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1060</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1061</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -41978,10 +41978,9 @@ function copyScreenerTable() {
   if (!rows.length) { _icRefuse(_scEmptyMsg('copy')); return; }
   // v828 (T5): same guard as Fiscal Compare, on the tab whose caption already calls its own
   // cold output "the full ORCA universe, not a screen result". Ticked shortlists never arm.
+  // v1061 (T5): the arm check itself MOVED to just above the clipboard write so it can
+  // measure the finished exhibit. The build in between is read-only.
   var _scSelN = (typeof _scSelOrdered === 'function' && _scSelOrdered()) ? _scSelOrdered().length : 0;
-  if (!_scSelN && typeof _icArmBulkCopy === 'function'
-      && !_icArmBulkCopy(btn, rows.length, '#tbl-screener .sc-selcell',
-          (typeof _scSyncSelUI === 'function') ? _scSyncSelUI : null)) return;
   var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   var b = window._screenerExportBasis;
 
@@ -42114,6 +42113,11 @@ function copyScreenerTable() {
   }
   var okMsg = 'Shortlist copied as a table (' + rows.length + ' countr' + (rows.length === 1 ? 'y' : 'ies')
             + ', with the screen that produced it) — paste into your IC memo or Excel.';
+  // v828/v1061 (T5): arm, do not paste — with the page count measured off `html`, the
+  // exhibit that is one line away from reaching the clipboard.
+  if (!_scSelN && typeof _icArmBulkCopy === 'function'
+      && !_icArmBulkCopy(btn, rows.length, '#tbl-screener .sc-selcell',
+          (typeof _scSyncSelUI === 'function') ? _scSyncSelUI : null, html)) return;
 
   if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
     navigator.clipboard.write([new ClipboardItem({
@@ -61354,6 +61358,63 @@ window.IC_BULK_ROWS = 25;   // above any hand-built IC shortlist, far below the 
 window._icArmedBtn = null;
 window._icArmTimer = null;
 
+/* ── v1061 (T5) — the page count in the bulk-copy warning, MEASURED instead of assumed ────
+   v828 put a confirm step in front of a 185-row IC paste and v923 made the confirm window
+   outlast the reading of the sentence that opens it. Both of those are sound. The NUMBER in
+   the sentence was not. It read Math.round(n / 26) — 26 single-line rows to a Word page —
+   and these exhibits do not have single-line rows: Model basis, Data basis, Evidence tier
+   and Reform verdict are each a sentence, so one Fiscal Compare row renders 103–139px tall
+   in a Word text column rather than ~33px. Measured cold at the 624px Word column
+   (US Letter less 1in margins, 96dpi):
+
+     Fiscal Compare, 185 rows, nothing ticked   warning said 7 pages   actual 22.3
+     Screener,       185 rows, nothing ticked   warning said 7 pages   actual 20.9
+
+   Understating by 3x is worse than saying nothing. "7 pages" reads like an appendix an
+   analyst would wave through, "22 pages" does not, and that decision is the entire reason
+   the arm step exists. So measure the artifact: by the time the arm is raised the exhibit
+   HTML has been built, and laying it out at the Word column width is exactly what Word is
+   about to do with it. The iframe is load-bearing — measuring inside this document would
+   apply the platform's own table CSS, which the clipboard payload does not carry, and the
+   answer would be a number from a page nobody is pasting into. */
+var IC_WORD_COL_PX  = 624;   // 6.5in of text column — US Letter less 1in margins, at 96dpi
+var IC_WORD_PAGE_PX = 864;   // 9.0in of text height on that same page
+window.IC_WORD_COL_PX = IC_WORD_COL_PX;
+window.IC_WORD_PAGE_PX = IC_WORD_PAGE_PX;
+
+function _icPastePages(html) {
+  if (!html || typeof html !== 'string') return null;
+  try {
+    var fr = document.getElementById('_ic-paste-probe');
+    if (!fr) {
+      fr = document.createElement('iframe');
+      fr.id = '_ic-paste-probe';
+      fr.setAttribute('aria-hidden', 'true');
+      fr.setAttribute('tabindex', '-1');
+      fr.setAttribute('title', 'IC paste measurement probe');
+      /* Off-canvas to the LEFT, and 1px tall in flow. Deliberately NOT a negative `right`
+         offset: parking a positioned element that way extends the document's scroll width,
+         which is what made all twelve screens scroll 390px sideways on a phone before the
+         v612 mobile layer. left:-10000px extends nothing. */
+      fr.style.cssText = 'position:absolute;left:-10000px;top:0;width:' + IC_WORD_COL_PX +
+        'px;height:1px;border:0;visibility:hidden;pointer-events:none;';
+      document.body.appendChild(fr);
+    }
+    var d = fr.contentDocument;
+    if (!d) return null;
+    d.open();
+    d.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;' +
+            'padding:0;width:' + IC_WORD_COL_PX + 'px;font-family:Calibri,Arial,sans-serif;">' +
+            html + '</body></html>');
+    d.close();
+    var px = (d.body && d.body.scrollHeight) || 0;
+    d.open(); d.write(''); d.close();          // drop the payload, keep the probe
+    if (!(px > 0)) return null;
+    return { px: px, pages: Math.max(1, Math.round(px / IC_WORD_PAGE_PX)) };
+  } catch (e) { return null; }
+}
+window._icPastePages = _icPastePages;
+
 /* v923 (T5): how long a bulk-copy confirm stays live. Must exceed the time it takes to read
    the instruction that arms it — see the note at the showCopyToast call in _icArmBulkCopy. */
 var IC_ARM_MS = 20000;
@@ -61389,7 +61450,7 @@ function _icDisarmBulk() {
 // Returns TRUE if the caller should go ahead and copy, FALSE if this click only armed it.
 // Fails open in every degenerate case (no button, no rows, small set) so no existing path
 // can be blocked by this: the only outcome it can add is one extra click.
-function _icArmBulkCopy(btn, n, tickSel, restoreFn) {
+function _icArmBulkCopy(btn, n, tickSel, restoreFn, pasteHtml) {
   if (!btn || !document.body.contains(btn)) return true;
   if (!(n > (window.IC_BULK_ROWS || 25))) return true;
   if (window._icArmedBtn === btn) { _icDisarmBulk(); return true; }   // confirmed
@@ -61406,7 +61467,12 @@ function _icArmBulkCopy(btn, n, tickSel, restoreFn) {
   // on one line — the same guard v808 uses for the refusal label. Verified 1920→390.
   btn.style.minWidth = btn.offsetWidth + 'px';
   btn.style.whiteSpace = 'nowrap';
-  btn.innerHTML = '⚠ Copy all ' + n + ' rows — confirm';
+  /* v1061 (T5): measured from the exhibit that is about to be written, not from a
+     rows-per-page constant. Null only if the caller passed no HTML or the probe failed —
+     in which case the sentence below drops the claim rather than inventing one. */
+  var _pg    = (typeof _icPastePages === 'function') ? _icPastePages(pasteHtml) : null;
+  var _pgTxt = _pg ? (_pg.pages + ' page' + (_pg.pages === 1 ? '' : 's')) : null;
+  btn.innerHTML = '⚠ Copy all ' + n + ' rows' + (_pgTxt ? ' \u00b7 ' + _pgTxt : '') + ' — confirm';
   btn.style.color = 'var(--accent)';
   btn.style.borderColor = 'var(--accent)';
   btn.style.fontWeight = '700';
@@ -61422,9 +61488,11 @@ function _icArmBulkCopy(btn, n, tickSel, restoreFn) {
      always took longer than the window, it re-armed every time and the clipboard was never
      written. Measured cold on Fiscal Compare: 2s gap copied, 8s and 12s gaps did not.
      The toast is now pinned to the arm, and the arm outlasts the read. */
-  window._icArmMsg = 'Nothing ticked, so this would copy all ' + n + ' rows — about '
-    + Math.round(n / 26) + ' pages in Word. Click again to copy all ' + n + ', or tick the rows '
-    + 'you want in the highlighted left-hand column and copy just those.';
+  window._icArmMsg = 'Nothing ticked, so this would copy all ' + n + ' rows — '
+    + (_pgTxt ? _pgTxt + ' in Word, measured on this exhibit at a 6.5in text column'
+              : 'a table that will run to many pages in Word')
+    + '. Click again to copy all ' + n + ', or tick the rows you want in the highlighted '
+    + 'left-hand column and copy just those.';
   showCopyToast(window._icArmMsg, IC_ARM_MS);
   window._icArmTimer = setTimeout(_icDisarmBulk, IC_ARM_MS);
   return false;
@@ -74877,11 +74945,11 @@ function copyFCForIC(btn) {
   }
   var _isShortlist = !!(_selNames && _selNames.length);
   // v828 (T5): nothing ticked and the table is still at screening scale — arm, do not paste.
-  // Returns false on the arming click (clipboard untouched); true on the confirming one and
-  // on every ticked / already-small / no-button path, which all behave exactly as before.
-  if (!_isShortlist && typeof _icArmBulkCopy === 'function'
-      && !_icArmBulkCopy(btn, trs.length, '#tbl-fc .fc-selcell',
-            (typeof _fcSyncSelUI === 'function') ? _fcSyncSelUI : null)) return;
+  // v1061 (T5): the arm check MOVED to just above the clipboard write, so it can hand the
+  // finished exhibit to _icPastePages and quote a measured page count instead of n/26. The
+  // build between here and there is read-only — it reads #tbl-fc, _fcResults, COUNTRY_DATA
+  // and the two selectors and writes nothing — so running it on the arming click as well
+  // costs one extra pass and changes no state.
   var _selOffscreen = 0;
   if (_isShortlist) for (var _oi = 0; _oi < _selNames.length; _oi++) if (!_rowByC[_selNames[_oi]]) _selOffscreen++;
   var byC = {}; (window._fcResults || []).forEach(function(x){ byC[x.country] = x; });
@@ -75508,6 +75576,13 @@ function copyFCForIC(btn) {
   var okMsg = (_isShortlist
     ? N + ' selected countr' + (N === 1 ? 'y' : 'ies') + ' copied as a table — paste into your IC memo (Word/Docs) or Excel.'
     : N + ' countries copied as a table — paste into your IC memo (Word/Docs) or Excel.');
+  // v828/v1061 (T5): arm, do not paste. Returns false on the arming click (clipboard
+  // untouched); true on the confirming one and on every ticked / already-small / no-button
+  // path, which all behave exactly as before. htmlOut is the exhibit itself, so the warning
+  // states the page count Word is actually about to produce.
+  if (!_isShortlist && typeof _icArmBulkCopy === 'function'
+      && !_icArmBulkCopy(btn, trs.length, '#tbl-fc .fc-selcell',
+            (typeof _fcSyncSelUI === 'function') ? _fcSyncSelUI : null, htmlOut)) return;
   if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
     navigator.clipboard.write([new ClipboardItem({
       'text/html': new Blob([htmlOut], { type: 'text/html' }),
