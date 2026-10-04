@@ -62653,7 +62653,36 @@ function _sbReturnReading(res) {
 // never be described as reimbursing anything. No figure, colour, threshold or verdict changes
 // -- `V.costRec` touches wording only -- and the 6 countries whose engine does reimburse read
 // exactly as before.
-function _irrVerdict1061(R, capexMM, npv10, mech) {
+// ── v1064 (T2): a generic-template run no longer renders an IOC pass/fail verdict ──────────
+// v704 set the rule for this panel, in its own words: "A generic-template result is never
+// painted on the take tier ramp. The ramp is the page telling the analyst where THIS COUNTRY
+// sits, and a number 119 countries share says nothing about any of them. Same rule v703 applied
+// to the inflated IRR." It was applied to the take tile (grey number, label "generic template")
+// and to the 10% NPV tile (label "generic template", note "not X's"). It never reached THIS
+// tile, because `_irrVerdict1061()` had no parameter for the basis at all -- the middle tile of
+// the three was structurally incapable of knowing what the other two were saying.
+//
+// Measured on the Country Profile Live DCF panel at $75 on its default profile: `generic` is
+// true for 4 of 185 countries -- Bahrain, Denmark, Kuwait, Saudi Arabia -- and on all 4 the
+// middle tile rendered "Contractor NPV @ 15% — CLEARS THE IOC HURDLE  +$2.9B", the words in
+// green and the figure in green, sitting between two grey tiles explicitly labelled "generic
+// template". It was the only one of the three tiles that states a pass/fail INVESTMENT verdict
+// and the only one carrying no basis marker.
+//
+// Three of those 4 -- Saudi Arabia, Kuwait, Bahrain -- are state monopolies. The same panel's
+// own scope line reads "the acreage is closed to contractor entry ... It is not Saudi Arabia's
+// economics and no figure in it is citable for Saudi Arabia", and its reconciliation block two
+// scrolls below reads "Neither. Both figures on this panel are withdrawn for Saudi Arabia."
+// At scan altitude the analyst read: grey template / GREEN CLEARS THE IOC HURDLE +$2.9B / grey
+// template. The single most salient element on the panel was an IC-grade pass over a country
+// with no contractor position to pass, and the two blocks that withdrew it were below the fold.
+//
+// `prov` is therefore now an argument -- the `_ldcfProvenance()` object, or null. It gates the
+// verdict words, the verdict colour and one disclosure sentence, and nothing else: no figure,
+// threshold or state changes, and the 181 countries with real terms render byte-identically.
+// Call sites that do not pass it (Scenario Builder, the IC citation rows, the XLSX rows, where
+// the user sets the terms and no template substitution happens) are unaffected by construction.
+function _irrVerdict1061(R, capexMM, npv10, mech, prov) {
   if (!R) return null;
   // The engines runLiveDCF() and runCustomScenario() dispatch to that actually hold a
   // cost-recovery leg. Anything else -- dcfConcession, dcfPRRT, or a mechanic this function was
@@ -62671,6 +62700,10 @@ function _irrVerdict1061(R, capexMM, npv10, mech) {
   // wording of three branches below and nothing else.
   V.costRec  = !!(mech && V_CR_MECHS[mech]);
   V.mechTxt  = mech ? String(mech) : null;
+  // v1064: the basis this cash flow was produced on. True only where the engine substituted the
+  // platform's generic template because it holds no terms for the country on this branch.
+  V.generic  = !!(prov && prov.generic);
+  V.genShare = (prov && prov.shared > 1) ? prov.shared : null;
   V.inflated = (R.state === 'inflated' || R.state === 'unbounded');
   V.expo     = (capexMM && capexMM > 0 && R.atRisk > 0) ? (R.atRisk / capexMM) * 100 : null;
   V.thin     = R.state === 'computed' && V.expo !== null && V.expo < THIN_MAX_PCT;
@@ -62685,18 +62718,27 @@ function _irrVerdict1061(R, capexMM, npv10, mech) {
     // Headline becomes the hurdle test. The dollar figure carries its own discount rate in the
     // label above it, so it can never be read as headroom over the 10% NPV tile.
     V.value = sgn(R.npv15);
-    V.color = V.clears ? 'var(--green)' : 'var(--red)';
+    // v1064: same rule v704 applied to the take ramp on this panel. A verdict colour is the page
+    // asserting the figure is THIS COUNTRY'S; a template figure 4 countries return identically
+    // is not, so it renders neutral and the words below it say why.
+    V.color = V.generic ? 'var(--muted)' : (V.clears ? 'var(--green)' : 'var(--red)');
   } else {
     V.value = R.value;
     // An inflated or unbounded rate is never painted green. Green is the page telling the
-    // analyst the number is usable, and this one is not.
-    V.color = V.inflated ? 'var(--muted)' : R.color;
+    // analyst the number is usable, and this one is not. v1064: nor is a generic-template rate.
+    V.color = (V.inflated || V.generic) ? 'var(--muted)' : R.color;
   }
   V.big = V.value.length > 7;
 
-  V.hurdleLabelHTML = 'Contractor NPV @ 15% &mdash; '
-    + '<span style="color:' + (V.clears ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
-    + (V.clears ? 'clears the IOC hurdle' : 'fails the IOC hurdle') + '</span>';
+  // v1064: on a generic-template run the label is the SAME string its two sibling tiles carry,
+  // in the same orange, so the three read as one basis instead of two disclaimers flanking a
+  // verdict. The pass/fail words are withheld, not restated more quietly -- "clears the IOC
+  // hurdle" is a claim about a country, and on this branch there is no country in the figure.
+  V.hurdleLabelHTML = V.generic
+    ? 'Contractor NPV @ 15% &mdash; <span style="color:var(--orange);font-weight:700;">generic template</span>'
+    : 'Contractor NPV @ 15% &mdash; '
+      + '<span style="color:' + (V.clears ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
+      + (V.clears ? 'clears the IOC hurdle' : 'fails the IOC hurdle') + '</span>';
 
   // The long form, for a note that has a full-width line to render on.
   if (R.state === 'no-capital-at-risk') {
@@ -62763,11 +62805,28 @@ function _irrVerdict1061(R, capexMM, npv10, mech) {
   if (V.useHurdle) {
     V.tailHTML = 'Same cash flow as the 10% NPV tile, discounted at 15% instead'
       + (npv10 != null ? ' (' + sgn(npv10) + ' at 10%)' : '') + '.';
+  } else if (R.npv15 !== null && V.generic) {
+    // v1064: the figure is real arithmetic on the template, so it is still stated -- but the
+    // pass/fail clause that followed it is removed, for the same reason as the label above.
+    V.tailHTML = 'Hurdle test on the template: contractor NPV <strong style="color:var(--text);">'
+      + sgn(R.npv15) + ' at 15%</strong>. Same cash flow, higher discount rate.';
   } else if (R.npv15 !== null) {
     V.tailHTML = 'Hurdle test: contractor NPV <strong style="color:var(--text);">' + sgn(R.npv15)
       + ' at 15%</strong> &mdash; '
       + '<span style="color:' + (V.clears ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
       + (V.clears ? 'clears' : 'fails') + '</span> a 15% IOC hurdle. Same cash flow, higher discount rate.';
+  }
+  // v1064: and say so once, in the tile, at the altitude the withheld verdict was read. Without
+  // this the fix is silent -- the analyst sees a grey figure and no reason, and the two blocks
+  // that explain it are a scroll away, which is the condition that produced the misread.
+  if (V.generic) {
+    V.tailHTML += (V.tailHTML ? ' ' : '')
+      + '<strong style="color:var(--orange);">This is not an IOC verdict for this country.</strong> '
+      + 'The engine holds no fiscal terms for it on this branch, so the hurdle test is a property '
+      + 'of the platform’s generic ' + (V.mechTxt ? _cpEsc704(V.mechTxt) + ' ' : '')
+      + 'template'
+      + (V.genShare ? ', which ' + V.genShare + ' countries return identically' : '')
+      + ' &mdash; pass or fail, it says nothing about this one.';
   }
 
   // The short form, for the 1/3-width centred Scenario Builder tile -- measured 140px wide at
@@ -64064,7 +64123,9 @@ function _execLiveDCF(country, profileKey, price) {
     // tile refuses, in green, on 137 of 185 countries. One function, both tiles.
     const _capexMM703 = (DCF_PROFILES[profileKey] && DCF_PROFILES[profileKey].capexMM) || null;
     // v1062: result.mechanic is stamped by runLiveDCF() from the engine it dispatched to.
-    const _v1061 = _irrVerdict1061(_r703, _capexMM703, result.npv, result.mechanic);
+    // v1064: _p704 is the object the take tile and the 10% NPV tile 30 lines above already
+    // relabel themselves from. Passing it here is what makes the three tiles report one basis.
+    const _v1061 = _irrVerdict1061(_r703, _capexMM703, result.npv, result.mechanic, _p704);
 
     irrEl.textContent   = _v1061.value;
     irrEl.style.color   = _v1061.color;
