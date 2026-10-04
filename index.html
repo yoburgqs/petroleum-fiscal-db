@@ -3199,7 +3199,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1061</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1062</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -33064,13 +33064,7 @@ function renderCompare() {
       ).join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
       _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Govt take @$' + cmpRankPrice + ', lowest first:</span>'
         + '<span style="font-size:12px;">' + _chain + '</span>'
-        + _pill(_span.toFixed(1) + 'pp apart',
-                _span < 5 ? 'var(--orange)' : 'var(--text)',
-                _span < 5 ? 'rgba(194,65,12,.10)' : 'var(--surface2)',
-                _span < 5
-                  ? 'Lowest to highest government take across the ranked columns at $' + cmpRankPrice + '/bbl is only ' + _span.toFixed(1)
-                    + ' percentage points. That is inside the spread ORCA itself observes across contracts within a single one of these countries, so the base-case row does not separate them on its own.'
-                  : 'Lowest to highest government take across the ranked columns at $' + cmpRankPrice + '/bbl, in percentage points.')
+        + _sbsSpanPillHtml(_span, _vdRanked, cmpRankPrice)
         + (_vdHold
             ? _pill('order holds $50–$125', 'var(--green)', 'rgba(21,128,61,.10)',
                     'These columns rank in this same order at all four published prices ($50 / $75 / $100 / $125), so the $' + cmpRankPrice + ' ordering is the ordering at every price ORCA publishes.')
@@ -35756,6 +35750,184 @@ function _sbsPaintVerdictRr() {
   row.style.display = 'flex';
   try { _sbsClampVerdict(); } catch (e) { /* v1033 (T3) */ }
 }
+// ── v1062 (T3): the separation pill's threshold was the constant 5, and its own tooltip
+// claimed to be measuring against something else entirely ─────────────────────────────────
+//
+// The pill beside the take ordering is the one number this tab exists to produce: "17.2pp
+// apart" is what gets read, and v1020 established that the strip is what gets pasted into the
+// memo. Until this cycle it coloured itself on `_span < 5` — a typed constant — while the
+// tooltip it opened said the test was "inside the spread ORCA itself observes across contracts
+// within a single one of these countries." That spread is MEASURED, it differs by two orders of
+// magnitude between countries, and this grid already prints it four rows down on Take spread
+// across contracts. The pill never read it.
+//
+// It fails in the direction that costs money — it stays silent. Walked cold this cycle:
+//
+//   Guyana / Suriname / Namibia   span 17.2pp   pill NEUTRAL   Namibia's own contracts: 21.0pp
+//   United Kingdom / Norway / Nigeria  span 31.9pp  pill NEUTRAL  Nigeria's own: 33.9pp
+//
+// On the first, the strip reads "Namibia 37.0% › Guyana 54.1% › Suriname 54.2%, 17.2pp apart"
+// and the price-ordering notice underneath adds "Namibia holds the lowest government take at
+// all four published prices, 17.1pp clear of the next column." Namibia's own contract file runs
+// 36.8–57.8%. A Namibian block at 57.8% is worse than every Guyana and every Suriname figure on
+// the screen, so "17.1pp clear" is not a separation this platform can defend — and the number
+// that says so was already on the grid. The three sets where the constant DID fire (1.2pp,
+// 2.8pp, 2.6pp) were right by coincidence: 5 happens to sit below the dispersion there too.
+//
+// Nothing new is computed. _fpDispersion() is v610 and is the same input the Take spread row and
+// the Predictability Score are built on; the async contract-file refutation is v864's
+// window._sbsObsHits, read here exactly as _sbsBoundOrder() reads it. Fee-boundary columns are
+// excluded on v889's rule — there the band's width is the distance between two contract types,
+// not a dispersion, so it is not a yardstick for a separation either.
+function _sbsRecOf(c) { return ((typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) || [])
+    .filter(function (x) { return x.country === c; })[0] || null; }
+// Widest within-country take dispersion among the columns the set actually ranks, with the
+// observed floor taking precedence wherever ORCA's own contract file has refuted the bundled
+// IQR upward. Returns null when no ranked column holds a dispersion at all.
+function _sbsWithinWidest(cols) {
+  let best = null;
+  (cols || []).forEach((c) => {
+    const d = _sbsRecOf(c);
+    if (!d) return;
+    if (typeof orcaSpreadFeeBoundary === 'function' && orcaSpreadFeeBoundary(d)) return;
+    let pp = null, obs = false;
+    const dp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : null;
+    if (dp && dp.state === 'measured' && dp.iqr != null) pp = dp.iqr;
+    const h = (window._sbsObsHits || {})[c];
+    if (h && h.obs && h.obs.spread != null && (pp == null || h.obs.spread > pp)) {
+      pp = h.obs.spread; obs = true;
+    }
+    if (pp == null || !(pp > 0)) return;
+    if (!best || pp > best.pp) best = { c: c, pp: pp, obs: obs, n: (h && h.obs) ? h.obs.n : null };
+  });
+  return best;
+}
+// The separation pill. Carries its own inputs in data- attributes so the async contract-file
+// pass (v864) can re-run exactly this decision when a refuted spread lands, without the strip
+// having to be rebuilt -- same pattern as _sbsPaintVerdictFp().
+//
+// Measured before this was wired, because a pill that alarms on every set is worth less than the
+// typed 5 it replaced. Over 4,000 random three-country sets: 61% hold no measured dispersion in
+// any ranked column at all, and of the rest "span is inside the widest column spread" is true 22.9%
+// of the time -- but on the sets an analyst actually screens, where ORCA holds a contract file and
+// v864's refutation lands, it was true on 7 of 7. So that test is NOT the alarm. It is stated as a
+// fact on every set, and the colour is spent on the narrower condition that actually breaks the
+// ordering: the lowest-take column's own blocks reaching PAST the figure of the column ranked
+// behind it. That one fires on 4.9% of random sets, fires on Guyana/Suriname/Namibia and
+// Guyana/Brazil/Angola, and stays quiet on United Kingdom › Norway › Nigeria -- where the UK's
+// 36.4-51.4% band really does clear Norway's 68.0%, and the ordering is defensible at block level.
+function _sbsSpanPillHtml(span, ranked, pr) {
+  const cols = (ranked || []).map(x => (x && x.c != null) ? x.c : x);
+  const w = _sbsWithinWidest(cols);
+  const _mk = (txt, col, bg, ttl) =>
+    '<span id="cmp-vd-span" data-span="' + span.toFixed(2) + '" data-pr="' + pr
+    + '" data-ranked="' + _sbsAttr((ranked || []).map(x => (x && x.c != null)
+        ? (x.c + '~' + (x.v != null ? x.v : '')) : String(x)).join('|')) + '"'
+    + ' title="' + _sbsAttr(ttl)
+    + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;color:'
+    + col + ';background:' + bg + ';border-radius:3px;padding:2px 8px;line-height:1.5;'
+    + 'white-space:nowrap;cursor:help;">' + txt + '</span>';
+
+  // No ranked column holds a dispersion at all -- there is nothing to read this separation
+  // against. Say so, rather than falling back to a number this platform cannot source. This is
+  // the majority state across the full country list.
+  if (!w) {
+    return _mk(span.toFixed(1) + 'pp apart · no spread held', 'var(--text)', 'var(--surface2)',
+      'Lowest to highest government take across the ranked columns at $' + pr + '/bbl, in '
+      + 'percentage points. ORCA holds no measured take dispersion for any ranked column in this '
+      + 'set — each prices to a single statutory term, or its band is the fee-basis boundary '
+      + 'rather than a dispersion — so there is no within-country spread to read this gap '
+      + 'against. It is a separation between legal terms, not between observed outcomes.');
+  }
+
+  // The band of the column at the head of the ordering, on the widest basis ORCA holds for it:
+  // the observed contract range where v864 has refuted the bundled IQR, the bundled p75 otherwise.
+  const _bandTop = (c) => {
+    const d = _sbsRecOf(c);
+    if (!d) return null;
+    if (typeof orcaSpreadFeeBoundary === 'function' && orcaSpreadFeeBoundary(d)) return null;
+    const h = (window._sbsObsHits || {})[c];
+    if (h && h.obs && h.obs.max != null) return { v: h.obs.max, obs: true, n: h.obs.n };
+    const dp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : null;
+    if (dp && dp.state === 'measured' && d.p75_take != null) return { v: d.p75_take, obs: false };
+    return null;
+  };
+  const _lo = (ranked && ranked.length >= 2 && ranked[0] && ranked[0].c != null) ? ranked[0] : null;
+  const _nx = (ranked && ranked.length >= 2 && ranked[1] && ranked[1].c != null) ? ranked[1] : null;
+  const _top = _lo ? _bandTop(_lo.c) : null;
+  // Every contract-level band this platform holds is measured at $75/bbl -- both the bundled
+  // p25/p75 and v864's observed range. The ranked takes follow the "Rank at" control, which the
+  // analyst can move to $50/$100/$125. Comparing a $75 band top against a $125 ranked take would
+  // be a cross-price comparison, and it would go QUIET at the other three decks for a reason that
+  // has nothing to do with the regimes -- the worst kind of silence. The block-level claim is
+  // therefore made only at the deck its evidence is measured at, and the other decks say so.
+  const _at75 = String(pr) === '75';
+  const _broken = _at75 && _top && _nx && _nx.v != null && _top.v > _nx.v;
+
+  const _src = w.obs
+    ? 'ORCA’s own contract file lists ' + (w.n != null ? 'the ' + w.n + ' largest producing contracts in ' : '')
+      + w.c + ' running ' + w.pp.toFixed(1) + 'pp apart on government take at $75/bbl'
+    : w.c + '’s own contracts run ' + w.pp.toFixed(1)
+      + 'pp apart on government take at $75/bbl (measured interquartile band, Take spread row below)';
+
+  if (_broken) {
+    return _mk(span.toFixed(1) + 'pp apart · ' + _sbsAttr(_lo.c) + '’s blocks reach '
+               + _top.v.toFixed(1) + '%, past ' + _sbsAttr(_nx.c),
+      'var(--orange)', 'rgba(194,65,12,.12)',
+      'The column at the head of this ordering does not hold that position at block level. '
+      + _lo.c + ' is ranked on ' + _lo.v.toFixed(1) + '% at $' + pr + '/bbl, but '
+      + (_top.obs
+          ? 'ORCA’s own contract file lists its ' + _top.n + ' largest producing contracts reaching '
+            + _top.v.toFixed(1) + '%'
+          : 'its measured p75 take is ' + _top.v.toFixed(1) + '%')
+      + ' — above ' + _nx.c + '’s ' + _nx.v.toFixed(1) + '%. So a block in ' + _lo.c
+      + ' can be the WORSE of the two, and "' + _lo.c + ' is the cheapest of this set" is a '
+      + 'statement about the country average, not one you can defend about a licence. The set span '
+      + 'is ' + span.toFixed(1) + 'pp; ' + _src + '. Screen this on named blocks, or carry the '
+      + 'ordering with ' + _lo.c + '’s range attached.');
+  }
+
+  return _mk(span.toFixed(1) + 'pp apart · widest column spread ' + w.pp.toFixed(1) + 'pp',
+    'var(--text)', 'var(--surface2)',
+    'Lowest to highest government take across the ranked columns at $' + pr + '/bbl is '
+    + span.toFixed(1) + 'pp. The widest within-country dispersion in this set is ' + w.pp.toFixed(1)
+    + 'pp, in ' + w.c + ' — ' + _src + '. '
+    + (span < w.pp
+        ? 'The gap between these countries is therefore NARROWER than the gap between blocks inside '
+          + w.c + ', so the set span is not a margin to quote. '
+        : 'The set span clears the widest within-country dispersion here, so the ordering is not an '
+          + 'artefact of contract selection. ')
+    + (!_at75
+        ? 'Every contract-level band ORCA holds is measured at $75/bbl, so at this deck the set is '
+          + 'ordered at $' + pr + ' while the dispersion beside it is the $75 figure — the two are '
+          + 'not compared here. Re-rank at $75 to read the block-level check.'
+        : (_lo && _nx && _top
+            ? _lo.c + ' heads the ordering at ' + _lo.v.toFixed(1) + '% and its own blocks top out at '
+              + _top.v.toFixed(1) + '%, below ' + _nx.c + '’s ' + _nx.v.toFixed(1)
+              + '%, so that first position does hold at block level.'
+            : (_lo && _nx
+                ? 'No contract-level band is held for ' + _lo.c
+                  + ', so its lead over ' + _nx.c + ' is readable only as a country average.'
+                : ''))));
+}
+// The async contract-file pass (v864) can refute a bundled IQR upward AFTER the strip has
+// painted -- Namibia's 21.0pp arrives that way, and it is the figure that decides this pill. One
+// builder serves both paints, so the first render and the repaint cannot disagree about the
+// threshold. Same contract as _sbsPaintVerdictFp(): read window._sbsObsHits, patch in place.
+function _sbsPaintVerdictSpan() {
+  var el = document.getElementById('cmp-vd-span');
+  if (!el) return;
+  var span = parseFloat(el.dataset.span);
+  var pr   = el.dataset.pr;
+  var ranked = (el.dataset.ranked || '').split('|').filter(Boolean).map(function (t) {
+    var i = t.lastIndexOf('~');
+    return i < 0 ? { c: t, v: null }
+                 : { c: t.slice(0, i), v: t.slice(i + 1) === '' ? null : parseFloat(t.slice(i + 1)) };
+  });
+  if (!isFinite(span) || !ranked.length) return;
+  var html = _sbsSpanPillHtml(span, ranked, pr);
+  if (html && html !== el.outerHTML) el.outerHTML = html;
+}
 function _sbsPaintVerdictFp(s) {
   var row = document.getElementById('cmp-verdict-fp');
   if (!row) return;
@@ -35897,6 +36069,7 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token, mode, cl) {
     + 'because a top-N-by-production sample cannot establish a population spread; they are marked \u25b2 best case.'
     + _sbsBoundOrder(hits, measured, fpSink);
   _sbsPaintVerdictFp(fpSink);
+  _sbsPaintVerdictSpan();
 }
 function _sbsApplyObsSpread() {
   window._sbsRenderToken = (window._sbsRenderToken || 0) + 1;
