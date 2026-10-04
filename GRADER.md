@@ -73379,3 +73379,121 @@ passes on an all-null column is a guard that passes on a deleted feature).
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
   Everything this cycle wrote went to `/tmp/c1002/`; **nothing landed in the repo.** Safe to
   delete but not created this session, so flagged rather than removed unasked.
+
+---
+
+## Cycle 1003 — T3 — v1058 — 2026-10-03
+
+**Task:** T3 — "How do these three countries compare side by side?"
+
+**Friction.** Walked T3 cold at 1440x900 with both storages cleared. The Side-by-Side tab
+loads with a default set (United Kingdom / Norway / Nigeria), so `Clear` then three typed
+countries is the real entry path. Ran it on the two sets the code block's own comment names:
+**Guyana / Suriname / Senegal** and **Guyana / Suriname / Namibia** — the frontier screens.
+
+The verdict strip above the grid — which this file's own v1057 note calls *"the line that gets
+read and pasted into the memo"* — closed with:
+
+> "... which is why the **Rank among producers** row below reads **not ranked · no production
+> data** for every column in this set."
+
+That stopped being true at **v1057**, which wired `_cmpStatCtxAt()` into
+`_cmpProducerRankCell()`. Measured on HEAD, the row reads for every proxy column:
+
+| column | Rank among producers cell, as rendered |
+|---|---|
+| Guyana | `not ranked` / `no production data` / **`#129 of 161 statutory regimes`** / `highest-take quartile of these` |
+| Namibia | `not ranked` / `no production data` / **`#100 of 161 statutory regimes`** / **`above the statutory median`** |
+| Suriname | `not ranked` / `no production data` / **`#132 of 161 statutory regimes`** / `highest-take quartile of these` |
+
+The same commit stated those placements in the strip for columns the producer ordering **sets
+aside** (the `_aside` branch — verified still working on Guyana/Brazil/Angola and
+Netherlands/Norway/UK) and left this branch — `_all`, the all-proxy frontier screen — asserting
+the opposite. A strip assertion of **absence**, 900px above the row that had computed the answer
+for all three columns.
+
+**It suppressed the decision, not just a cross-reference.** Namibia prints **37.0%** take, which
+this tab colours **green** (tier ≤40%) and the strip ranks **first of three**. Against the 161
+regimes on its own statutory basis it is **#100 of 161**, **above** their **26.9%** median. An
+analyst reading "Namibia 37.0%, and nothing else is placed" concludes the opposite of what the
+platform holds. `_cmpStatCtxAt`'s own v1057 comment anticipated exactly this — *"the analyst
+reads 'not ranked', has no idea whether 54.1% is cheap or expensive for a frontier regime"* —
+and then the strip went on saying it.
+
+**Change.** `index.html`, `_vdBasisClear` inside `renderCompare`.
+
+- The false sentence is **deleted**. The row is now described as withholding a **producer**
+  placement, which is what it actually does.
+- New `_pxPlace` clause states the real placements inline, computed by `_cmpStatCtxAt` at
+  `cmpRankPrice`, in the strip's own ordering:
+  *"Placed instead against the 161 statutory-terms regimes on this platform, at $75/bbl:
+  Namibia #100, Guyana #129, Suriname #132 of 161 lowest take first, against a median of 26.9%
+  across that population — the like-for-like placement, on the Rank among producers row below."*
+- The population median prints **once**: it is one number per deck per population, not per column.
+- The clause is **shared with the mixed branch** (`_nPx < _nAll`), which told the analyst to
+  *"read those columns against other statutory-basis columns"* and likewise never performed it.
+- Partial coverage is handled: `_cmpStatCtxAt` returns null for a column outside the statutory
+  population, and the clause then says `(N of M placed)` rather than over-claiming.
+- The producer-rank refusal is **kept**. These are not producer ranks and v626's gate is untouched.
+
+**Result.** A frontier analyst comparing three statutory-terms countries now gets a defensible
+position for **every** column, in the headline, at the deck they chose, and can see that a
+green-tier 37.0% sits **above** the median of its own peer population. The one number on that
+screen that could have said so was previously absent and the strip said it did not exist.
+
+### Verification — every number below is from a run that completed
+
+- **JS syntax gate: PASS** (all inline `<script>` bodies extracted and `node --check`'d, before
+  and after the version bump).
+- **Runtime suite RAN this cycle**, against the **local tree** on both sides, because
+  `autonomous_cycle.py`'s `run_playwright()` still does not set `TEST_URL`:
+  **HEAD 546 PASS / 0 FAIL / 1 WARN** · **patched 546 PASS / 0 FAIL / 1 WARN**. The two
+  `ORCA_REPORT_FILE` reports **differ only in their timestamp line** (`diff` = 4 lines). The
+  single WARN is a `sw.js` 404 from the local `http.server` and is present on HEAD.
+- **Strip matches grid, name-for-name and rank-for-rank, at all four decks** on
+  Guyana/Suriname/Namibia: `$50` #101/#117/#120 · `$75` #100/#129/#132 · `$100` #99/#132/#133 ·
+  `$125` #97/#132/#135. The strip clause and the grid row agree at every one.
+- **The false claim is gone and does not reappear** on any of six sets tested
+  (Guyana+Suriname+Senegal, Guyana+Suriname+Namibia, Guyana+Brazil+Angola,
+  Norway+UK+Nigeria, USA+Iraq, Netherlands+Norway+UK+Nigeria+Brazil). Regex-asserted both ways.
+- **Mixed-basis sets unchanged** — Guyana/Brazil/Angola and Netherlands/Norway/UK still print
+  v1057's `_aside` wording with its `#129 of 161` / `#61 of 161` placements, byte-for-byte.
+- **IC clipboard exercised end to end** on the all-proxy set: 21,006 chars `text/html`, 9,329
+  `text/plain`, **0 page errors**. The clause reaches the exhibit, and the exporter correctly
+  resolves "row below" to "row" for a pasted artefact.
+- **Zero horizontal scroll** at 1920 / 1440 / 1280 / 1024 / 768 on the changed surface, and at
+  **390x844 `hasTouch: true`** on **all 9 visible tabs** (`scrollWidth 390 = clientWidth 390`).
+  **0 of 22** `#t2` controls render under 24px on a thumb. **0 console errors, 0 page errors.**
+
+### Notes for the next cycle
+
+- **Closed this cycle:** the `_all` branch of `_vdBasisClear` asserting the Rank-among-producers
+  row prints only a refusal. The mixed branch's unperformed "read them against other
+  statutory-basis columns" instruction is closed with the same clause.
+- **Found this cycle, not fixed.** Three candidates, all on the T3 surface, all real:
+  1. The `⚠ The column that wins this comparison is a proxy` box under the grid names **only
+     the winning column** — on an all-proxy set it singles out Guyana as if the other two were
+     production-backed, directly under a strip that says all three are proxies. Same class of
+     defect as the one fixed here, in the opposite direction.
+  2. The grid's `# Contracts` row prints **`4211` / `7643` / `834`** unformatted, while the two
+     adjacent rows print `4,211` and `7,643` with separators in the same column.
+  3. The row label reads **"Rank among producers"** for a cell whose only content on a proxy
+     column is a rank among *statutory regimes*. The label follows `cmpRankPrice` correctly but
+     not the population.
+- **Carried, still open:** `copyFCForIC` / `exportFCResults` do not say *which* default rate the
+  record contradicts on the 120 default rows (996/998). CP Live DCF panel and Fiscal Breakdown
+  still not walked for the default-basis case (996/998). `_icRefuse()` pins `minWidth` not
+  `width` (995). The swallowed `try { _sbsPaintBasisStrip(); } catch (e) {}` in `renderCompare`
+  (988). Platform Reference Guide still advertises deleted Screener filters (990). The IOC
+  clipboard exhibit's 183-of-476 overflowing cells at the 624px Word column, worst the 197px
+  `Take comparability` cell (1002).
+- **The PASS count at the top of the cycle prompt is not this tree.** Seventeenth cycle flagged.
+  `cycle_log.txt` this cycle makes the mechanism explicit: the graded suite is
+  `office/tools/petroleum/tests/runtime_comprehensive.js` `sha=d702c84acc1e` while the repo copy
+  is `sha=bc1f059fe991` — **two different files**, which is why the prompt says 550 and a local
+  run of the repo suite says 546. Both trees read 546 here, so the A/B is sound, but the prompt's
+  number describes neither the repo suite nor the edited tree.
+- **Probe debris, thirty-sixth cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
+  Everything this cycle wrote went to `/tmp/c1003/`; **nothing landed in the repo.** Not created
+  this session, so flagged rather than removed unasked.
