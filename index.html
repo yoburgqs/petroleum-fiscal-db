@@ -2474,6 +2474,19 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   #cmp-chart-png-btn, #cmp-npv-chart-png-btn { display: none !important; }
   /* v503: action buttons under the Side-by-Side grid are screen-only — keep them out of the PDF */
   .cmp-inline-copy-btn, .cmp-inline-print-btn, .cmp-inline-png-btn, .cmp-inline-share-btn { display: none !important; }
+  /* v1057 (T3): the two Side-by-Side screen controls that were still printing into the IC-pack PDF.
+     Measured in the print flow at 1440 on a 3-country comparison, both occupying real space:
+       #cmp-rankprice-wrap   a live <select> widget, 128x26px at y=161 — the top of page 1
+       .cmp-inline-rank-btn  "Rank all 185 countries", 155x25px at y=3029 — the last page
+     Both are the fifth-of-five oversight. v535 listed #cmp-order-wrap when it wrote this block and
+     v929 added the "Rank at" control beside it four hundred versions later without joining it to
+     the list, so the PDF showed a dropdown where its twin was correctly suppressed. v503 hid four
+     of the five buttons under the grid by class; the fifth was the only unclassed one, so it never
+     matched — it now carries .cmp-inline-rank-btn like its siblings.
+     The DECK IS NOT LOST FROM THE EXHIBIT: the "Reading:" line under the grid states it in words
+     ("Sorted left→right by government take at $100/bbl, lowest first"), which is what a reader of
+     a printed memo can actually use, and the four Govt Take rows print all four prices regardless. */
+  #cmp-rankprice-wrap, .cmp-inline-rank-btn { display: none !important; }
   /* v791: the floating column-name strip is a screen aid — the printed grid carries its own header */
   #cmp-colbar { display: none !important; }
 
@@ -3186,7 +3199,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1055</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1058</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4569,7 +4582,7 @@ window.copyPlatformCitation = function(btn) {
   <!-- Bubble Chart mode -->
   <div id="explorer-bubble-mode" style="display:none;padding-top:16px;">
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
-      Scatter plot: Government Take (X) vs Contractor NPV (Y, standardized $1.2B deepwater project). Bubble size = number of contracts.
+      Scatter plot: Government Take (X) vs Contractor NPV (Y, ORCA&rsquo;s standardized Deepwater reference project &mdash; $1.0B all-in capex, $18/bbl opex escalating 2%/yr, 10% WACC; <em>not</em> the $1.2B / $15-flat project the in-page Live DCF and Scenario Builder run). Bubble size = number of contracts.
       Click any bubble to open the Country Profile. The <strong>left frontier</strong> (low take) with <strong>high NPV</strong> (upper position) is where the most IOC-favorable regimes sit &mdash; but read it on the <strong>filled</strong> bubbles only. A <strong>dotted</strong> bubble is a country ORCA holds no petroleum rent instrument for: its take is a <strong>floor</strong> and its NPV a <strong>ceiling</strong>, so its true position is somewhere <strong>right of and below</strong> where it is drawn. Those are plotted at their bound, which is why they crowd the top-left corner &mdash; a low take there is missing record, not favourable terms.
       <strong>Right side</strong> (high take) with <strong>positive NPV</strong> = large-reserve countries where project scale delivers value even under high fiscal burden. Countries with negative NPV (below the X-axis) are uneconomic at the standardized project size and selected price.
     </div>
@@ -4608,6 +4621,11 @@ window.copyPlatformCitation = function(btn) {
          Filled by renderBubbleChart(). Hidden when the active scope contains no state monopoly,
          so a screened view that already excluded them does not carry a standing caveat. -->
     <div id="bubble-mono-note" style="display:none;align-items:flex-start;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;padding:7px 11px;background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:6px;" aria-live="polite"></div>
+    <!-- v1056 (T1) — the countries whose bubble is plotted on the comparable take rather than
+         the published blend, named with the size and direction of the move. Filled by
+         renderBubbleChart(); hidden when the active scope and deck produce no divergence, so a
+         screened view that holds none of the 10 carries no caveat about them. -->
+    <div id="bubble-fee-note" style="display:none;align-items:flex-start;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;padding:7px 11px;background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:6px;" aria-live="polite"></div>
     <!-- v809 (T1) — which countries this scatter plots. Hidden entirely until the Screener has
          narrowed something, so the cold view is byte-identical to before. -->
     <div id="bubble-scope-wrap" style="display:none;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
@@ -4619,7 +4637,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="bubble-scope-note" style="font-size:11px;color:var(--muted);"></span>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Countries with verified field production are filled and labelled by name, and the highest-NPV proxy-estimate countries on the upper-left frontier are labelled too. A name ending in a down-right arrow is a country whose take is a floor and NPV a ceiling, so its true position is right of and below the point drawn. Click a bubble to open its Country Profile." role="img"></canvas></div>
+      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Countries with verified field production are filled and labelled by name, and the highest-NPV proxy-estimate countries on the upper-left frontier are labelled too. A name ending in a down-right arrow is a country whose take is a floor and NPV a ceiling, so its true position is right of and below the point drawn. A name ending in a crossed circle is a country whose published take blends fee-basis contracts; it is plotted on its PSC/Concession take instead, and both figures are on its tooltip and in the strip above the chart. Click a bubble to open its Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
         <button id="download-bubble-png"
           style="padding:6px 14px;background:var(--surface2);color:var(--accent);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.8rem;"
@@ -31963,6 +31981,53 @@ function renderCompare() {
     return { n: peers.length, median: median, rank: idx >= 0 ? idx + 1 : null, inSet: idx >= 0,
              nEqualWeighted: ((COUNTRY_DATA || []).filter(c => c.take_75 != null).length) - peers.length };
   };
+  // ── v1057 (T3): the mirror of the above, for the columns the producer ranking refuses ──────
+  // Walked T3 cold at 1440x900, both storages cleared, with the set the directive's own example
+  // names: Guyana, Brazil, Angola. Two of the three are production-weighted, Guyana is not, and
+  // every ordering on the page therefore drops it:
+  //
+  //     take         "Angola 53.0% > Brazil 55.6%"   + "Set aside - 1 of 3 columns cannot join"
+  //     value        "Brazil $1.73B > Angola $1.14B" + "Not in the value ordering - 1 of 3"
+  //     consistency  "no order established"
+  //     Rank among producers                           "not ranked / no production data"
+  //
+  // The analyst typed three countries and the headline answers for two. That part is CORRECT and
+  // is not being weakened here: a statutory-terms average and a production-weighted figure are
+  // not one scale, and v626's gate stays exactly as it is.
+  //
+  // What was missing is the other half of the sentence. Five separate blocks on that screen tell
+  // the analyst what to do about it -- "Compare it on the Govt Take rows below with the PROXY
+  // basis stated", "Read it against other statutory-basis columns", "Compare Guyana against
+  // other statutory-basis columns", "the ordering is readable against other statutory-basis
+  // columns" -- and the platform never once performs that comparison for them. There are 163
+  // statutory-terms regimes in COUNTRY_DATA and the tab held no placement against any of them.
+  // The one rank it did compute for such a column, _cmpAllRankAt's all-185 figure, is in the
+  // tooltip with its own basis disclaimed in the same breath, because it mixes the two scales.
+  //
+  // So the exit the prose points at required leaving the tool: the analyst reads "not ranked",
+  // has no idea whether 54.1% is cheap or expensive for a frontier regime, and the column they
+  // chose carries no position into the memo at all. 54.1% is in fact ABOVE the statutory median
+  // of the 163 -- the only number on that screen that could have said so was absent.
+  //
+  // Same shape, same basis and same price as _cmpProdCtxAt: cpCmpTakeOf() at the deck the
+  // analyst chose, state monopolies out, median measured on the take rather than on the rank.
+  // Scoped to this tab, like v889 and v973, and the shared producer helpers are untouched.
+  const _cmpStatCtxAt = (countryName, pp) => {
+    const peers = (COUNTRY_DATA || []).filter(c =>
+        c.take_75 != null && !isStateMonopoly(c.take_75)
+        && String(c.weighting || '').indexOf('prod_weighted') !== 0
+        && cpCmpTakeOf(c, String(pp)) != null)
+      .sort((a, b) => cpCmpTakeOf(a, String(pp)) - cpCmpTakeOf(b, String(pp)));
+    if (peers.length < 3) return null;
+    let idx = -1;
+    for (let i = 0; i < peers.length; i++) { if (peers[i].country === countryName) { idx = i; break; } }
+    if (idx < 0) return null;
+    const vals = peers.map(c => cpCmpTakeOf(c, String(pp))).sort((a, b) => a - b);
+    const median = vals.length % 2 ? vals[(vals.length - 1) / 2]
+                                   : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2;
+    return { n: peers.length, median: median, rank: idx + 1,
+             take: cpCmpTakeOf(peers[idx], String(pp)) };
+  };
   // The all-185 line in the tooltip is ranked at the same price for the same reason.
   const _cmpAllRankAt = (countryName, pp) => {
     const list = (COUNTRY_DATA || []).filter(c => c['take_' + pp] != null)
@@ -32042,11 +32107,44 @@ function renderCompare() {
         + '">not ranked' + sub('state monopoly', 'var(--muted)') + '</span>';
     }
     const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
+    // v1057 (T3): it still carries no PRODUCER rank -- that refusal is the point of the row and
+    // it stays. What it now also carries is its placement among the statutory-terms regimes,
+    // which is the comparison five blocks on this screen tell the analyst to make and none of
+    // them performed. Both lines are shown, so the cell cannot be misread as a producer rank:
+    // the refusal is first and in muted type, the placement names its own population.
+    const _stC = _cmpStatCtxAt(d.country, _rkP);
+    const _stLine = (function () {
+      if (!_stC) return sub('no production data', 'var(--muted)');
+      const _sm = _stC.median, _st = _stC.take;
+      const _tier = _stC.rank <= _stC.n / 4     ? ['lowest-take quartile of these', 'var(--green)']
+                  : _stC.rank > _stC.n * 3 / 4  ? ['highest-take quartile of these', 'var(--red)']
+                  : (_sm == null || _st == null) ? ['mid-range of these', 'var(--muted)']
+                  : Math.abs(_st - _sm) < 0.05  ? ['at the statutory median', 'var(--muted)']
+                  : _st < _sm                   ? ['below the statutory median', 'var(--green)']
+                  :                               ['above the statutory median', 'var(--orange)'];
+      return sub('no production data', 'var(--muted)')
+        + '<span style="display:block;font-size:10px;font-weight:600;color:var(--text);cursor:help;" title="'
+        + _cmpEsc(d.country + ': #' + _stC.rank + ' of the ' + _stC.n + ' countries on this platform '
+          + 'whose take is a statutory-terms average rather than production-weighted, sorted lowest '
+          + 'take first at $' + _rkP + '/bbl on the same comparable basis the producer ranking uses. '
+          + 'This is the like-for-like placement for a proxy column, and it is the comparison the '
+          + 'notices under this grid ask for. Median take across those ' + _stC.n + ' is '
+          + (_sm != null ? _sm.toFixed(1) + '%' : 'n/a') + ' and this country is at '
+          + (_st != null ? _st.toFixed(1) + '%' : 'n/a') + '. It is NOT a producer rank and must '
+          + 'not be read against the #N of ' + (ctx ? ctx.n : 21) + ' producers figures in the '
+          + 'other columns of this row -- the two populations are the two sides of the basis '
+          + 'split, and across the database they differ by about 30 percentage points of take. '
+          + 'Carry it into the memo with the statutory basis attached.')
+        + '">#' + _stC.rank + ' of ' + _stC.n + ' statutory regimes<span style="display:block;font-weight:600;color:'
+        + _tier[1] + ';">' + _tier[0] + '</span></span>';
+    })();
     return '<span style="color:var(--muted);" title="' + _cmpEsc(d.country
       + ': ORCA holds no verified field production for this country (prod_coverage_pct = '
       + (d.prod_coverage_pct || 0).toFixed(0) + '), so its take is a simple average of statutory terms across '
-      + nc + ' contracts. That is a fiscal-terms figure, not realised economics, and it has no honest position in a producer ranking. Compare it on the Govt Take rows below with the PROXY basis stated.' + allNote)
-      + '">not ranked' + sub('no production data', 'var(--muted)') + '</span>';
+      + nc + ' contracts. That is a fiscal-terms figure, not realised economics, and it has no honest position in a producer ranking. Compare it on the Govt Take rows below with the PROXY basis stated.'
+      + (_stC ? ' Its placement among the ' + _stC.n + ' statutory-terms regimes -- the comparison that IS like-for-like for this column -- is on the line beneath.' : '')
+      + allNote)
+      + '">not ranked' + _stLine + '</span>';
   };
   // ── v701 (T4) — the reform record was missing from the one grid built to rank countries ──
   // Side-by-Side is where a shortlist becomes finalists: the Screener's "Load top 5 in
@@ -33075,6 +33173,49 @@ function renderCompare() {
       }
       const _all = (_nPx === _nAll);
       const _names = _vdProxy.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong>').join(', ');
+      // ── v1058 (T3) — the strip asserted the absence of a placement the grid prints ──────────
+      //
+      // Walked T3 cold at 1440x900, both storages cleared, on the two sets this very block's
+      // comment names: Guyana / Suriname / Senegal, and Guyana / Suriname / Namibia. In both the
+      // strip closed with
+      //
+      //   "... which is why the Rank among producers row below reads
+      //    not ranked · no production data for every column in this set."
+      //
+      // That is no longer what the row below reads. v1057 wired _cmpStatCtxAt into
+      // _cmpProducerRankCell, so every proxy column in the grid now carries a second pair of
+      // lines underneath the refusal — measured on HEAD:
+      //
+      //   Guyana  not ranked / no production data / #129 of 161 statutory regimes / highest-take quartile
+      //   Namibia not ranked / no production data / #100 of 161 statutory regimes / ABOVE the statutory median
+      //
+      // The same commit stated those placements in the strip for columns the producer ordering
+      // SETS ASIDE (see the _aside branch below) and left this branch — the all-proxy frontier
+      // screen — asserting the opposite. So the one line the analyst reads and pastes told them
+      // the like-for-like comparison does not exist, 900px above the row that had computed it for
+      // every column.
+      //
+      // And it suppresses the decision. Namibia prints 37.0% take, which this tab colours GREEN
+      // (tier ≤40%) and the strip ranks first of three. Against the 161 regimes on its own
+      // statutory basis it is #100 — above their median. A frontier analyst reading "Namibia
+      // 37.0%, nothing else is placed" concludes the opposite of what the platform holds.
+      //
+      // The placements are stated here, on the ordering they qualify, with the population median
+      // once (it is one number for the whole population at a given deck). The refusal is kept —
+      // these are not producer ranks and the row is still right to withhold one.
+      const _pxPl  = _vdProxy.map(x => ({ c: x.c, s: _cmpStatCtxAt(x.c, cmpRankPrice) }))
+                             .filter(x => !!x.s && x.s.rank != null);
+      const _pxN   = _pxPl.length ? _pxPl[0].s.n : null;
+      const _pxMed = (_pxPl.length && _pxPl[0].s.median != null) ? _pxPl[0].s.median : null;
+      const _pxPlace = _pxPl.length
+        ? '<span style="color:var(--text);">Placed instead against the ' + _pxN
+          + ' statutory-terms regimes on this platform, at $' + cmpRankPrice + '/bbl: '
+          + _pxPl.map(x => '<strong>' + _cmpEsc(x.c) + '</strong> #' + x.s.rank).join(', ')
+          + ' of ' + _pxN + ' lowest take first'
+          + (_pxMed != null ? ', against a median of ' + _pxMed.toFixed(1) + '% across that population' : '')
+          + '</span> \u2014 the like-for-like placement, on the <em>Rank among producers</em> row below'
+          + (_pxPl.length === _nPx ? '' : ' (' + _pxPl.length + ' of ' + _nPx + ' placed)') + '. '
+        : '';
       return '<div style="font-size:11px;color:var(--text);line-height:1.55;background:rgba(194,65,12,.07);'
         + 'border-left:2px solid var(--orange);border-radius:3px;padding:5px 8px;">'
         + '<strong style="color:var(--orange);">'
@@ -33086,14 +33227,17 @@ function renderCompare() {
         + ', so ' + (_nPx === 1 ? 'its take is a simple average' : 'their takes are simple averages')
         + ' of statutory terms rather than a figure weighted by barrels. '
         + (_all
-            ? 'The ordering above is a ranking of legal regimes, not of realised economics — which is why the '
-              + '<strong style="color:var(--text);">Rank among producers</strong> row below reads '
-              + '<strong style="color:var(--text);">not ranked · no production data</strong> for every column in this set. '
+            ? 'The ordering above is a ranking of legal regimes, not of realised economics, so the '
+              + '<strong style="color:var(--text);">Rank among producers</strong> row below withholds a '
+              + 'producer placement for every column in this set. '
+              + _pxPlace
               + 'A set does not become comparable by being uniformly proxy: the ordering is readable against other '
               + 'statutory-basis columns, and is not a like-for-like ranking against any production-weighted country '
               + 'on this platform. Carry it into an IC memo on the proxy basis or not at all.'
             : 'Read ' + (_nPx === 1 ? 'that column' : 'those columns') + ' against other statutory-basis columns; the '
-              + 'production-weighted columns of this set are the ones that rank like-for-like. State the proxy basis in the IC memo.')
+              + 'production-weighted columns of this set are the ones that rank like-for-like. '
+              + _pxPlace
+              + 'State the proxy basis in the IC memo.')
         + '</div>';
     })();
     const _aside = _vdOut.length
@@ -33103,7 +33247,25 @@ function renderCompare() {
         + _vdOut.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> — ' + x.why).join('; ')
         + '. ' + (_vdOut.length === 1 ? 'Its take rows print, and are' : 'Their take rows print, and are')
         + ' correct on their own basis — ' + (_vdOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
-        + ' in this set.</div>'
+        + ' in this set.'
+        // v1057 (T3): and here is the position it DOES have. The sentence above is the whole
+        // truth about this set and was the whole of what the strip said, so a column the analyst
+        // deliberately chose left the headline with no placement of any kind. Its like-for-like
+        // ranking — against the statutory-terms regimes, at the deck the analyst chose — is
+        // computed by _cmpStatCtxAt and now stated where the set-aside is announced, not only in
+        // the grid row 900px below. Only the statutory-terms columns get a clause: a PRRT or
+        // state-monopoly set-aside has no such population and _cmpStatCtxAt returns null for it.
+        + (function () {
+            const _pl = _vdOut.map(x => ({ c: x.c, s: _cmpStatCtxAt(x.c, cmpRankPrice) }))
+                              .filter(x => !!x.s);
+            if (!_pl.length) return '';
+            return ' <span style="color:var(--text);">On ' + (_pl.length === 1 ? 'its' : 'their')
+              + ' own basis ' + _pl.map(x => '<strong>' + _cmpEsc(x.c) + '</strong> is #' + x.s.rank
+                  + ' of ' + x.s.n).join(', ') + ' statutory-terms regime'
+              + (_pl.length === 1 && _pl[0].s.n === 1 ? '' : 's') + ' at $' + cmpRankPrice
+              + '/bbl</span> — the like-for-like placement, on the <em>Rank among producers</em> row below.'
+          })()
+        + '</div>'
       : _vdBasisClear;
     // v823 (T3): the line above used to end the strip. On a set holding a fee-blended column it
     // ended it with a reassurance that was not true of the figures printed: Iraq / Norway / Angola
@@ -34189,7 +34351,7 @@ function renderCompare() {
     <button class="cmp-inline-print-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
     <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download BOTH comparison charts as PNGs \u2014 Govt Take vs Oil Price and Contractor NPV vs Oil Price. Each file is named for its metric and the countries in the set (ORCA_govt-take_... / ORCA_contractor-npv_...), so the two exhibits cannot be mixed up in an IC memo. Charts not currently on screen are skipped, and the toast says what was saved.">⬇ Chart PNGs (take + NPV)</button>
     <button class="cmp-inline-share-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
-    <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:6px;color:var(--accent);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.08)'" onmouseout="this.style.background='transparent'" title="Switch to Fiscal Compare — see all 185 countries ranked at the same price and profile. Your ${compareList.length} selected countries will be visible in the global ranking.">&#x25A6; Rank all 185 countries</button>
+    <button class="cmp-inline-rank-btn" onclick="switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:6px;color:var(--accent);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.08)'" onmouseout="this.style.background='transparent'" title="Switch to Fiscal Compare — see all 185 countries ranked at the same price and profile. Your ${compareList.length} selected countries will be visible in the global ranking.">&#x25A6; Rank all 185 countries</button>
     <span style="font-size:10px;color:var(--muted);margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
   </div>`;
   // Accessibility/data table: structured table mirroring the comparison grid (screen readers and tests)
@@ -58646,12 +58808,32 @@ function _bubblePngCaptionLines() {
   lines.push({ bold: true, text: 'Govt Take vs Contractor NPV @$' + P + '/bbl. Bubble size = contract count. '
     + 'Filled and named = ORCA holds verified field production; hollow = regional proxy estimate, directional only. '
     + 'A name ending in an arrow marks a country whose take is a floor and NPV a ceiling — its true position is '
-    + 'right of and below the point drawn.' + (scopeTxt ? ' ' + scopeTxt : '') });
+    + 'right of and below the point drawn; a name ending in \u2298 is plotted on its comparable take, see below.' + (scopeTxt ? ' ' + scopeTxt : '') });
+  // v1056 (T1): this used to close by saying fee-basis take "is not rankable against Concession
+  // or PSC" — underneath a bitmap that had just ranked it, across the full width of the X axis.
+  // The axis now carries the comparable take, so the caption states what was done and to whom,
+  // counted at export time off the same helper the renderer used.
+  var _feeMoved = (function () {
+    if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || typeof _scFeeCmpAt !== 'function') return [];
+    var out = [];
+    COUNTRY_DATA.forEach(function (d) {
+      if (d['take_' + P] == null || d['npv_' + P] == null) return;
+      var f = _scFeeCmpAt(d, P);
+      if (!f || !f.diverges || f.cmp == null) return;
+      out.push(d.country + ' ' + f.head.toFixed(1) + '%→' + f.cmp.toFixed(1) + '%');
+    });
+    return out;
+  })();
   lines.push({ bold: true, text: 'Basis — both axes are one standardized project run through each country’s fiscal terms: '
     + ((typeof _sbsBasisTerms === 'function') ? _sbsBasisTerms() : 'ORCA standardized reference project')
-    + '. These are not country properties; a different capex/opex profile gives different numbers. Fee-basis regimes '
-    + '(TSC / RSC / Buy-back) carry a take% that is an artefact of the contract form and is not rankable against '
-    + 'Concession or PSC.' });
+    + '. These are not country properties; a different capex/opex profile gives different numbers.'
+    + (_feeMoved.length
+        ? ' X axis — fee-basis regimes (TSC / RSC / Buy-back) carry a take% that is an artefact of the contract '
+          + 'form and may not be ranked against Concession or PSC, so the ' + _feeMoved.length + ' countries marked '
+          + '⊘ are plotted on their take across PSC/Concession contracts alone, not on the published blend: '
+          + _feeMoved.join('; ') + '. Quote the published blend from the Country Profile, never from this axis.'
+        : ' No country plotted at this price deck blends fee-basis contracts, so the X axis is each one\u2019s '
+          + 'published take as shown everywhere else on the platform.') });
   lines.push(_orcaPngSourceLine());
   return lines;
 }
@@ -60235,7 +60417,16 @@ function copyComparisonTable(btn) {
       var prevGlue = false;
       for (var m = 1; m < pieces.length; m++) {
         // Only separate where the two readings would otherwise collide into one token.
-        var fuses = /[\w%)\]]$/.test(out) && /^[\w$]/.test(pieces[m]);
+        // v1057 (T3): '#' added to the reading-opener class. The comment above lists what an
+        // independent reading on this grid can open with -- "a digit, a currency symbol, a
+        // capital, a <= or a !" -- and a rank marker opens with '#', which was not in the set.
+        // It only mattered once a cell carried a rank marker in a NON-first position, which
+        // v1056's statutory placement is the first to do: the pasted row came out as
+        //   "not ranked no production data #129 of 161 statutory regimes . highest-take quartile"
+        // -- the one boundary in that cell with no separator, between the refusal and the
+        // placement, which are the two independent readings the cell exists to keep apart.
+        // '#' starts nothing else anywhere on this grid, so no other cell's paste moves.
+        var fuses = /[\w%)\]]$/.test(out) && /^[\w$#]/.test(pieces[m]);
         var isGlue = GLUE.test(pieces[m]);
         if (isGlue || prevGlue) fuses = false;
         out += (fuses ? ' \u00b7 ' : ' ') + pieces[m];
@@ -62506,15 +62697,87 @@ function _dcfJoin964(a) {
 
 // Which of the five PSC form terms this country actually supplied, and which are still the
 // platform template. Returns null unless the run really is on the 'db' basis.
+// ── v1056 (T2): a term list that asks the ENGINE whether it reads the term ───────────────
+//
+// `dcfPSC` resolves the profit-oil split one of two ways, and they are mutually exclusive:
+//
+//     const tiers = params.tier_schedule && params.tier_schedule.length > 0 ? ... : null;
+//     const contractorPct = tiers ? getContractorPct(R)
+//                                 : (1 - (params.profit_oil_govt_pct || 0.6));
+//
+// With a ladder on file, `profit_oil_govt_pct` is never read — not in the take, not in the
+// NPV, not in the waterfall. `_SB_PSC_TERMS` was walked unconditionally, so the Live DCF
+// scope line named it anyway. Measured across the 185 on each country's own default panel
+// profile: 58 countries run the PSC family, 51 of them carry a tier schedule, and of those 51
+//
+//     40   printed the flat figure inside the HELD list, as a term "from <Country>'s record"
+//          — Indonesia "cost recovery cap 71.2%, FTP 20.0%, govt profit oil 71.2%, royalty
+//          0.0% and 4-tier R-factor ladder", which asserts a flat 71.2% split and a 60–88%
+//          ladder in one sentence, and is built on the one of the two the engine ignores
+//     11   printed it in the TEMPLATE list ("… runs the platform template"), sending the
+//          analyst to check a parameter that cannot move the number
+//      0   said anywhere that it is inert
+//
+// and the denominator was inflated with it: Indonesia read "5 of 6 terms from Indonesia's
+// record" when 4 of the 5 named terms are inputs. The page's own R-factor warning, ~2,000px
+// further up the same profile, already states the engine fact — "The DCF resolves PSC
+// contracts on this ladder, so the take on this page is computed from the tiers — neither
+// flat figure is an input to it." The provenance line built to answer "what did this run on"
+// was the one surface contradicting it.
+//
+// So the partition now asks a predicate that mirrors the engine branch, in one place, and the
+// inert term is stated as inert with the ladder's own government range beside it — the range
+// that IS the input — instead of being dropped silently.
+function _dcfTermIsLive(key, params) {
+  if (key === 'profit_oil_govt_pct') {
+    return !(params && Array.isArray(params.tier_schedule) && params.tier_schedule.length > 0);
+  }
+  return true;
+}
+// Government share across the ladder, as the tier table on the Country Profile prints it.
+function _dcfLadderGovtRange(params) {
+  var ts = (params && Array.isArray(params.tier_schedule)) ? params.tier_schedule : null;
+  if (!ts || !ts.length) return null;
+  var g = ts.map(function(t) { return 100 - (Number(t.cont) || 0); })
+            .filter(function(v) { return isFinite(v); });
+  if (!g.length) return null;
+  var lo = Math.min.apply(null, g), hi = Math.max.apply(null, g);
+  return { lo: lo, hi: hi,
+           txt: (lo === hi) ? lo.toFixed(0) + '%' : lo.toFixed(0) + '–' + hi.toFixed(0) + '%' };
+}
+
+function _dcfInertSentence(inert, ladder, country, html) {
+  if (!inert || !inert.length) return '';
+  var esc = html ? (typeof _cpEsc704 === 'function' ? _cpEsc704 : String) : String;
+  var names = _dcfJoin964(inert.map(function(x) { return x.t.label + ' ' + x.ran; }));
+  var bOpen = html ? '<strong>' : '', bClose = html ? '</strong>' : '';
+  return names.charAt(0).toUpperCase() + names.slice(1)
+    + (inert.length > 1 ? ' are ' : ' is ')
+    + (inert.every(function(x) { return x.onRecord; })
+         ? 'on ' + esc(country) + '’s record but '
+         : 'the platform template figure and ')
+    + bOpen + 'not an input' + bClose + ' to the figures below — with an R-factor ladder on '
+    + 'file the profit-oil split comes from the tiers'
+    + (ladder ? ' (govt ' + ladder.txt + ')' : '')
+    + ', so moving that flat figure moves nothing here.';
+}
+
 function _dcfDbTerms(country, params) {
   if (!params || params._basis !== 'db') return null;
   var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
     ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
   var dbk = Array.isArray(params._dbKeys) ? params._dbKeys : [];
   var pct = function(v) { return (Math.round(Number(v || 0) * 1000) / 10).toFixed(1) + '%'; };
-  var held = [], tmpl = [];
+  var held = [], tmpl = [], inert = [];
   _SB_PSC_TERMS.forEach(function(t) {
     var ran = pct(params[t.key]);
+    // v1056: a term the engine does not read is neither held nor template — it is inert, and
+    // counting it in either bucket is what made the scope line contradict the ladder.
+    if (!_dcfTermIsLive(t.key, params)) {
+      inert.push({ t: t, txt: t.label + ' ' + ran, ran: ran,
+                   onRecord: dbk.indexOf(t.key) !== -1 });
+      return;
+    }
     if (dbk.indexOf(t.key) !== -1) { held.push({ t: t, txt: t.label + ' ' + ran }); return; }
     var rv = (cd && cd[t.cd] != null && isFinite(cd[t.cd])) ? Number(cd[t.cd]) : null;
     // A record value the engine does not read, and which is not already the template figure.
@@ -62523,17 +62786,27 @@ function _dcfDbTerms(country, params) {
   });
   var tiers = dbk.indexOf('tier_schedule') !== -1;
   var nTier = (tiers && Array.isArray(params.tier_schedule)) ? params.tier_schedule.length : 0;
+  var ladder = _dcfLadderGovtRange(params);
   var heldTxt = _dcfJoin964(held.map(function(h) { return h.txt; })
-    .concat(tiers ? [(nTier ? nTier + '-tier ' : '') + 'R-factor ladder'] : []));
+    .concat(tiers ? [(nTier ? nTier + '-tier ' : '') + 'R-factor ladder'
+                     + (ladder ? ' (govt ' + ladder.txt + ' of profit oil)' : '')] : []));
   var unread = tmpl.filter(function(x) { return x.unread != null; });
   return {
     country: country,
-    held: held, tmpl: tmpl, tiers: tiers,
-    nHeld: held.length + (tiers ? 1 : 0), nTerms: _SB_PSC_TERMS.length + (tiers ? 1 : 0),
+    held: held, tmpl: tmpl, tiers: tiers, inert: inert, ladder: ladder,
+    nHeld: held.length + (tiers ? 1 : 0),
+    // v1056: the denominator is the terms this run HAS, not the length of the form.
+    nTerms: held.length + tmpl.length + (tiers ? 1 : 0),
     heldTxt: heldTxt,
     tmplTxt: (function(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; })(
                _dcfJoin964(tmpl.map(function(x) { return x.txt; }))),
     unread: unread,
+    // v1056: "Govt profit oil 71.2% is on Indonesia's record but is NOT an input: with an
+    // R-factor ladder on file the split comes from the tiers (govt 60-88%)."
+    // Built once in two renderings because the Live DCF scope line is innerHTML and the
+    // Scenario Builder banner is textContent — one string, two escapings, no drift.
+    inertTxt: _dcfInertSentence(inert, ladder, country, true),
+    inertPlain: _dcfInertSentence(inert, ladder, country, false),
     // "CIT is the platform's 25.0% template, not Indonesia's — ORCA's record holds 41.8%."
     unreadTxt: unread.length
       ? _dcfJoin964(unread.map(function(x) { return x.t.label + ' ' + x.ran; }))
@@ -62544,6 +62817,8 @@ function _dcfDbTerms(country, params) {
       : ''
   };
 }
+window._dcfTermIsLive = _dcfTermIsLive;
+window._dcfLadderGovtRange = _dcfLadderGovtRange;
 
 // v505: human-readable description of the generic default terms a mechanic falls back to.
 // Used by the Fiscal Compare Quality column so "where did this number come from" has an answer.
@@ -62723,6 +62998,11 @@ function renderLiveDCFPanel(country, containerId) {
                                     + (_db964.tmpl.length > 1 ? 'run' : 'runs') + ' the platform template. ')
             : '<strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through '
               + country + '\u2019s ' + _runMech504 + ' terms at a price and profile you choose. ';
+          // v1056 (T2): the flat profit-oil figure the ladder supersedes, named as inert rather
+          // than listed as an input. Fires on the 51 tiered PSC-family countries.
+          if (_db964 && _db964.inertTxt) {
+            _lead += '<span style="color:var(--orange);">' + _db964.inertTxt + '</span> ';
+          }
           return _lead
             + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
             + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
@@ -65907,6 +66187,9 @@ function ddOpenScenarioBuilder(country) {
           }
           return db.nHeld + ' of ' + db.nTerms + ' ' + (_probeParams._mechanic || mechanic)
             + ' terms pre-filled from ORCA’s record for ' + country + ' — ' + db.heldTxt + '. '
+            // v1056 (T2): same inert-term statement the Live DCF panel makes, so the two
+            // what-if surfaces cannot describe one run's inputs differently.
+            + (db.inertPlain ? db.inertPlain + ' ' : '')
             + (db.unreadTxt
                 ? db.unreadTxt + ' Set it before quoting this run as ' + country + '.'
                 : db.tmplTxt + ' ' + (db.tmpl.length > 1 ? 'run' : 'runs')
@@ -74863,6 +75146,44 @@ function renderBubbleChart() {
   var npvKey_b  = 'npv_'  + bprice;
   var allData = (COUNTRY_DATA || []).filter(function(d) { return d[takeKey_b] != null && d[npvKey_b] != null; });
 
+  // ── v1056 (T1) — THE SCATTER WAS THE LAST SURFACE PLOTTING THE FEE BLEND, AND IT PLOTS IT
+  //    AS POSITION ───────────────────────────────────────────────────────────────────────────
+  // T1 is "which countries should even be on my screening list?" Walked cold at 1440x900 with
+  // storage cleared: Home -> Explorer -> Bubble Chart. The caption directly above this canvas
+  // teaches the analyst to read the X axis and nothing else: "the LEFT frontier (low take) with
+  // high NPV is where the most IOC-favorable regimes sit ... RIGHT side (high take) ... even
+  // under high fiscal burden." The data block below then set `x: d[takeKey_b]` — the PUBLISHED
+  // BLENDED headline, raw.
+  //
+  // Measured on the shipped country_data.json at the $75 deck, 10 of the 182 plotted countries
+  // diverge, and Iraq is drawn at x = 84.8% — rank 180 of 182 on the take axis, hard against
+  // the right-hand edge the caption calls the harshest terms in the database. Its comparable
+  // take, on its 195 PSC/Concession contracts, is 34.1%: rank 6 of 182, on the left frontier the
+  // caption had just told the analyst to read. A 50.7pp horizontal error on a production-backed
+  // 610-contract jurisdiction, in the one encoding an analyst cannot argue with — a position.
+  // Ecuador was out by 7.2pp (rank 118 vs 8), South Sudan 4.3pp, Qatar 2.7pp, Mexico 2.5pp.
+  //
+  // Every other surface has routed through _scFeeCmpAt() for ~500 versions — v549 Side-by-Side,
+  // v552 Country Profile, v553 the IC clipboard, v554 the Screener ceiling, v988 Reform Risk,
+  // v1054/v1055 the IOC Portfolio. This chart was not in that list. What it had instead was a
+  // sentence in the Download PNG caption saying fee-basis take "is not rankable against
+  // Concession or PSC" — printed underneath a picture that had just ranked it, spatially, across
+  // the full width of the plot. A disclaimer under a wrong position is not a correction.
+  //
+  // The axis now carries the comparable take, which is the figure the Screener's ceiling tests,
+  // the Screener's Govt Take sort orders on, and Side-by-Side's take chart already re-bases to.
+  // The published blend is not dropped: it is on the tooltip of every re-based bubble, named as
+  // the blend, with the contract split behind it; the bubble's label carries the platform's
+  // existing orange fee mark; and the strip below the chart names the moved countries with the
+  // size and direction of each move, so the correction is legible without a hover. Symmetric by
+  // construction — India's comparable 63.2% is ABOVE its 61.9% headline, so India moves right.
+  var _bubFee = {}, _bubFeeMoved = [];
+  allData.forEach(function (d) {
+    var f = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(d, bprice) : null;
+    if (!f || !f.diverges || f.cmp == null) return;
+    _bubFee[d.country] = f;
+  });
+
   // ── v1044 (T1) — the three state monopolies come OFF the scatter ─────────────────────────
   // Walked T1 cold at 1440x900: Home -> Explorer -> Bubble Chart. The caption directly above
   // this canvas teaches the analyst to read the X axis as fiscal burden -- "the LEFT frontier
@@ -75080,6 +75401,47 @@ function renderBubbleChart() {
     host.style.display = 'flex';
   })();
 
+  // ── v1056 (T1) — the re-based bubbles, named on screen with the size of the move ──────────
+  // Scoped to what this view actually plots and to the active deck, counted off the data rather
+  // than written in, so the strip can never claim a correction the chart did not make. Each chip
+  // opens the Country Profile, the same destination the bubble and the monopoly chips reach.
+  (function () {
+    var host = document.getElementById('bubble-fee-note');
+    if (!host) return;
+    _bubFeeMoved = data.filter(function (d) { return !!_bubFee[d.country]; })
+                       .map(function (d) {
+                         var f = _bubFee[d.country];
+                         return { c: d.country, pub: f.head, cmp: f.cmp, d: f.cmp - f.head, n1: f.n1, n2: f.n2, n: d.n || 0 };
+                       })
+                       .sort(function (a, b) { return Math.abs(b.d) - Math.abs(a.d); });
+    if (!_bubFeeMoved.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    var _esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+    var _chips = _bubFeeMoved.map(function (q) {
+      var dir = q.d < 0 ? 'left' : 'right';
+      return '<button type="button" onclick="_bubOpenCountry(' + JSON.stringify(q.c).replace(/"/g, '&quot;') + ')"'
+        + ' title="' + _esc(q.c) + ' \u2014 published blend ' + q.pub.toFixed(1) + '% at $' + bprice + '/bbl across all '
+        + Number(q.n).toLocaleString() + ' contracts, of which ' + Number(q.n2 || 0).toLocaleString()
+        + ' are fee-basis (TSC / RSC / Buy-back: fixed $/bbl remuneration, no oil-price upside, so take% climbs toward '
+        + '97\u201399% as an artefact of the contract form). Plotted instead at ' + q.cmp.toFixed(1)
+        + '%, the take on its ' + Number(q.n1 || 0).toLocaleString() + ' PSC/Concession contracts \u2014 '
+        + Math.abs(q.d).toFixed(1) + 'pp to the ' + dir + ' of where the blend would have put it. '
+        + 'Open the Country Profile." style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.35);'
+        + 'border-radius:10px;color:var(--accent);font-size:11px;font-weight:700;padding:2px 9px;min-height:24px;'
+        + 'cursor:pointer;font-family:inherit;">' + _esc(q.c) + ' <span style="font-weight:400;opacity:.85;">'
+        + q.pub.toFixed(1) + '% \u2192 ' + q.cmp.toFixed(1) + '%</span></button>';
+    }).join(' ');
+    host.innerHTML = '<span style="font-weight:700;color:var(--text);">\u2298 Plotted on comparable take \u2014 '
+      + _bubFeeMoved.length + ' of the ' + data.length + ' bubbles:</span> ' + _chips
+      + ' <span style="flex:1 1 240px;min-width:0;">Their published headline blends <strong style="color:var(--text);">fee-basis</strong> '
+      + 'contracts (TSC / RSC / Buy-back), where the contractor is paid a fixed $/bbl remuneration and keeps no '
+      + 'price upside \u2014 so that take% measures the <strong style="color:var(--text);">contract form</strong>, not how hard '
+      + 'the terms are, and may not be ranked against Concession or PSC. The X axis therefore carries each one\u2019s take on '
+      + 'its PSC/Concession contracts alone, which is the same figure the Screener\u2019s ceiling tests and its Govt Take sort '
+      + 'orders on. The published blend is on every \u2298 bubble\u2019s tooltip. Largest move: <strong style="color:var(--text);">'
+      + _esc(_bubFeeMoved[0].c) + ' ' + Math.abs(_bubFeeMoved[0].d).toFixed(1) + 'pp</strong>.</span>';
+    host.style.display = 'flex';
+  })();
+
   var regionGroups = {};
   data.forEach(function(d) {
     var r = d.region || 'Other';
@@ -75105,8 +75467,9 @@ function renderBubbleChart() {
         // On mobile, increase bubble radius slightly for easier tapping
         var baseR = Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5));
         var _t = _tierOf(d);
+        var _f = _bubFee[d.country] || null;
         return {
-          x: d[takeKey_b],
+          x: _f ? _f.cmp : d[takeKey_b],
           y: d[npvKey_b],
           r: isMobile ? Math.min(24, baseR * 1.3) : baseR,
           country: d.country,
@@ -75114,6 +75477,9 @@ function renderBubbleChart() {
           basis: _t.label,
           verified: !!_t.hasProduction,
           floor: (typeof _scTakeIsFloor === 'function') && !!_scTakeIsFloor(d),
+          // v1056: the published blend travels with the point so the tooltip can print both
+          // figures and say which one the axis used. null on the 172 that do not diverge.
+          fee: _f ? { pub: _f.head, cmp: _f.cmp, n1: _f.n1, n2: _f.n2, n: d.n || 0 } : null,
           n: d.n || 0
         };
       })
@@ -75146,7 +75512,7 @@ function renderBubbleChart() {
     datasets.forEach(function (ds, di) {
       ds.data.forEach(function (pt, pi) {
         all.push({ di: di, pi: pi, country: pt.country, verified: !!pt.verified,
-                   floor: !!pt.floor, y: pt.y, x: pt.x });
+                   floor: !!pt.floor, fee: !!pt.fee, y: pt.y, x: pt.x });
       });
     });
     var pool;
@@ -75198,7 +75564,11 @@ function renderBubbleChart() {
         // v942 (T1): a floor-take name is suffixed with the bound arrow. The point is drawn at
         // take-floor / NPV-ceiling, so the country's real position is right of and below it --
         // the same thing the Screener says with its >= take cell and <= NPV cell.
-        var name = q.country + (q.floor ? ' \u2198' : ''), w = c.measureText(name).width, h = fs + 4;
+        // v1056 (T1): a re-based name carries the platform's existing fee mark (the orange
+        // \u2298 that Country Profile, Side-by-Side and the IOC tables already use for exactly
+        // this finding), so the moved bubbles are identifiable on the plot and in the PNG
+        // without a hover. Same suffix convention as the v942 floor arrow beside it.
+        var name = q.country + (q.floor ? ' \u2198' : '') + (q.fee ? ' \u2298' : ''), w = c.measureText(name).width, h = fs + 4;
         var cands = [
           { x: el.x + r + 4, y: el.y,         a: 'left'   },
           { x: el.x - r - 4, y: el.y,         a: 'right'  },
@@ -75281,17 +75651,30 @@ function renderBubbleChart() {
               var d = ctx.raw;
               // v818: the basis line comes FIRST after the name. An analyst reading a
               // frontier bubble must not learn the number is a regional estimate last.
-              return [d.country,
+              var _lines = [d.country,
                       d.verified ? 'Basis: ' + d.basis + ' \u2014 verified field production'
-                                 : 'Basis: PROXY \u2014 regional estimate, no verified production',
-                      'Take: ' + ctx.parsed.x.toFixed(1) + '%', 'NPV: $' + Math.round(ctx.parsed.y) + 'M', 'Contracts: ' + d.n, 'Mechanic: ' + d.mechanic];
+                                 : 'Basis: PROXY \u2014 regional estimate, no verified production'];
+              // v1056 (T1): on a re-based bubble the tooltip states BOTH figures and which one
+              // placed the point, so "the scatter and the Screener disagree" never happens.
+              if (d.fee) {
+                _lines.push('Take: ' + d.fee.cmp.toFixed(1) + '% \u2014 comparable, and the figure this point is plotted at');
+                _lines.push('  on its ' + Number(d.fee.n1 || 0).toLocaleString() + ' PSC/Concession contracts of ' + Number(d.fee.n || 0).toLocaleString());
+                _lines.push('Published blend: ' + d.fee.pub.toFixed(1) + '% \u2014 includes ' + Number(d.fee.n2 || 0).toLocaleString() + ' fee-basis contracts');
+                _lines.push('  (fixed $/bbl fee, no price upside) \u2014 not comparable across countries');
+              } else {
+                _lines.push('Take: ' + ctx.parsed.x.toFixed(1) + '%');
+              }
+              _lines.push('NPV: $' + Math.round(ctx.parsed.y) + 'M', 'Contracts: ' + d.n, 'Mechanic: ' + d.mechanic);
+              return _lines;
             }
           }
         }
       },
       scales: {
         x: {
-          title: { display: true, text: 'Govt Take @$' + bprice + '/bbl (%)', color: '#6B6560' },
+          title: { display: true, text: 'Govt Take @$' + bprice + '/bbl (%)'
+                     + (_bubFeeMoved.length ? ' \u2014 comparable basis for the ' + _bubFeeMoved.length + ' \u2298 fee-blended countries' : ''),
+                   color: '#6B6560' },
           grid: { color: '#EDE9E3' }, ticks: { color: '#6B6560' },
           // v1044 (T1): 105, not 100, because three bubbles used to sit AT 100 and needed the
           // overhang. With the state monopolies off the plot the highest take rendered is 87.2%
