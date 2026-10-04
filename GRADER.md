@@ -73512,3 +73512,119 @@ screen that could have said so was previously absent and the strip said it did n
 Walked T3 cold at 1440×900 with both storages cleared, on the two frontier sets the code's own comment names: Guyana/Suriname/Senegal and Guyana/Suriname/Namibia.
 
 The verdict strip above the grid — which the file itself calls *"the line that gets read and pasted into the memo"* — closed with: *"…which is why the **Rank among producers** row below
+
+---
+## Cycle 1009 Log — 2026-10-04
+
+- Test before: 547 PASS / 0 FAIL / 1 WARN (local run of `tests/runtime_comprehensive.js` against this tree)
+- Test after:  547 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN this cycle, totals byte-identical to the pre-edit baseline of the same tree
+- JS errors: 0 console, 0 page errors
+- Shipped: **v1059**, commit `b52679c`, pushed to `origin/main`
+
+### Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (last cycle was T3, the one before T5, so no repeat.)
+
+### Friction
+Walked T4 cold at 1440x900 and at 390x844 `hasTouch`, both storages cleared: intro strip ->
+`#rr-country-lookup` (Norway, Iraq, Malaysia) -> the global view in `#reform-risk-content`.
+The lookup card, the 186-option optgrouped dropdown, `_rrOpenLocal` row-click routing (64
+clickable rows, all resolve, lookup value set correctly) and the ranked table are all sound.
+
+The worst moment is in the three stability cards, on the two rows where the WACC-premium
+decision is actually taken — **Russia (+15pp, 2022)** and **Ecuador (+5pp, 2010)**. One
+defect with two halves:
+
+1. **`quietRiseDivider` (index.html:57989) asserted the inverse of its own finding.** It read
+   *"These 2 clear the frequency bar but each raised government take in 2010 or later."* The
+   bar is 3+ fiscal law changes since 2010. Every row in this card satisfies `since2010 <= 1`
+   by construction (`quiet`, :57843), so they do not clear it — they sit as far below it as a
+   row can while having a change at all. Worse, the sentence carried the number **2**, which
+   is also the Snapshot's count for the countries that genuinely do clear the bar (*"2 clear
+   this tab's WACC-premium bar of 3+ ... United Kingdom and Brazil"*). The tab printed
+   "2 clear the frequency bar" **twice, over four different countries, in opposite senses.**
+   The idiom is used in the `<=1` sense at the `_rrArtefact` definition (:24157) and in the
+   `3+` sense in the Snapshot, the ranked-table divider and the heatmap Scored tooltip — four
+   to one, so the divider was the one that moved.
+2. **The card wore green that v561 had already forbidden.** v561 set the rule for this tab:
+   *"Green is now reserved for rows with no take-raising event on record at all."* It was
+   applied to the ranked table and never to this card, whose heading text and 3px left border
+   were `var(--green)` — leftmost in a green/orange/red scan gradient, titled QUIET SINCE 2010.
+   Only **4 of its 13 rows** (Ghana, Guyana, Iraq, India) meet v561's condition. Nine have a
+   take rise on record, 2 inside the window, and the **largest quantified in-window take rise
+   anywhere on the platform — Russia +15pp — is one of them.** Every contradicting word was
+   on screen, but three sub-blocks down, at 10px, in grey, beneath the inverted sentence
+   above. At scan altitude the card said green and quiet and nothing else.
+
+### Change
+- Divider prints the **count and the bar as numbers** instead of an idiom: *"These 2 sit
+  below this tab's frequency bar — at most 1 fiscal law change since 2010 against a bar of 3,
+  so no frequency premium is indicated for them — and each raised government take in 2010 or
+  later anyway."* `quietMaxScored` is read off the bucket, not hard-coded.
+- **Green is now earned.** Heading colour and the 3px left border are `var(--green)` only when
+  `quietClean.length === quiet.length`. On live data that is 4 of 13, so both render
+  `var(--muted)` and the three-card gradient reads neutral / orange / red.
+- **New amber chip on the heading line** — `⚠ 9 of 13 raised take` — with the v561 rule in its
+  `title`.
+- The lead paragraph now names it a **frequency** band and prints the split: 9 of 13 with a
+  take rise on record, 2 inside the window, 7 before it.
+- **New amber strip above the first row**, putting the magnitude axis at the altitude the
+  frequency axis is read: *"Largest take rise inside the window, in this card: Russia +15pp in
+  2022 — Windfall tax on oil export revenues. A low change-count is not a small change."*
+  Computed from `lastHostile.cumIn`, not written in.
+
+### Result
+An analyst screening Russia for reform exposure no longer reads a green "quiet" card and a
+sentence saying it clears the premium bar, over a jurisdiction that raised government take
+15pp in 2022. They now get both findings in one glance — below the frequency bar, so no
+frequency premium; +15pp four years ago, so size is the exposure — and the tab no longer makes
+the same claim in two opposite directions about four different countries.
+
+### Verification
+- JS syntax gate: 11 inline `<script>` blocks, **0 syntax errors**.
+- Runtime suite **ran** against this tree: 547 PASS / 0 FAIL / 1 WARN, identical to the
+  pre-edit baseline captured from the same tree before any edit.
+- Zero horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768**, and at **390x844 `hasTouch`
+  on all 9 visible tabs** (`scrollWidth 390 = clientWidth 390`).
+- **0 of 65** `#treformrisk` controls render under 24px on a thumb. 0 console, 0 page errors.
+- **Caught and fixed mid-cycle, recorded because the directive is explicit about it:** the
+  chip's first draft carried `white-space:nowrap`. Its min-content floor blew the
+  `1.15fr 1fr .8fr` card grid out to **446px at a 390px viewport** and put the tab back into
+  sideways scroll — the exact regression the directive's Step 5b exists to catch. Found by
+  A/B against a saved pre-edit copy served on a second port, not by reading the diff. The
+  grid now measures 372/362 and the document 390/390, the baseline profile exactly.
+
+### Notes for the next cycle
+- **Closed this cycle:** the `quietRiseDivider` inversion, and the unearned green on the
+  Quiet card's heading and left border.
+- **Found this cycle, not fixed.** Two, both on the T4 surface, both real:
+  1. `midCard`'s lead reads *"Exactly 2 sourced fiscal law changes since 2010 — one below the
+     Actively Reforming frequency bar of 3. **That bar is the only thing they clear.**"* Same
+     idiom, same ambiguity as the one fixed here: these rows have 2 against a bar of 3, so the
+     bar is precisely the thing they do *not* clear. Lower stakes than the Quiet card because
+     the sentence before it gives the numbers, but it is the same defect class and the phrase
+     should go the same way.
+  2. The Regional Reform Tilt panel cross-references *"the card headed **Below the line**
+     further down names all seven."* There is no card by that name — it is a sub-divider
+     inside QUIET SINCE 2010, and the card a reader lands on first ("Below: a sourced log, but
+     no fiscal law change in it at any date") names **two** jurisdictions for an unrelated
+     reason. The seven are there, one block further down. The pointer should name the card it
+     is actually inside.
+- **Carried, still open** (unchanged, not walked this cycle): `copyFCForIC` / `exportFCResults`
+  do not name *which* default rate the record contradicts on the 120 default rows (996/998).
+  CP Live DCF panel and Fiscal Breakdown still not walked for the default-basis case (996/998).
+  `_icRefuse()` pins `minWidth` not `width` (995). The swallowed
+  `try { _sbsPaintBasisStrip(); } catch (e) {}` in `renderCompare` (988). Platform Reference
+  Guide still advertises deleted Screener filters (990). The IOC clipboard exhibit's
+  183-of-476 overflowing cells at the 624px Word column (1002). The three T3 grid findings
+  from cycle 1003 (winning-column proxy box, unformatted `# Contracts`, "Rank among producers"
+  label on a statutory-regime population).
+- **The PASS count in the cycle prompt is not this tree. Eighteenth cycle flagged.** The
+  prompt says 550; a run of this repo's own suite says 547. Re-confirmed by hash this cycle:
+  the graded suite `office/tools/petroleum/tests/runtime_comprehensive.js` is
+  `sha=d702c84acc1e` while the repo copy `tests/runtime_comprehensive.js` is
+  `sha=bc1f059fe991` — **two different files.** The A/B above is sound because both sides of
+  it used the repo suite against the repo tree, but the prompt's number describes neither.
+- **Probe debris, thirty-seventh cycle flagged:** `_ctl907.html`, `_baseline_t3.html`,
+  `_pre1011.html`, `_base970.html`, `_pre1035.html`, `__ctl1063.html` still untracked in the
+  repo root (~47 MB+). Everything this cycle wrote went to `/tmp/c1009/`; **nothing landed in
+  the repo.** Not created this session, so flagged rather than removed unasked.
