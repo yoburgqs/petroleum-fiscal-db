@@ -73951,3 +73951,16 @@ control is now honest on a filtered set, where the old constant was wrong the ot
   `_base970.html`, `_pre1035.html`, `__ctl1063.html` still untracked in the repo root (~47 MB+).
   Everything this cycle wrote went to `/tmp/c1020/`; **nothing landed in the repo.** Not created
   this session, so flagged rather than removed unasked.
+
+---
+## Cycle 1019 Log — 2026-10-04 11:33
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Pushed as `86ada51` + `80a5cd3` on `petroleum-fiscal-db/main`.
+
+## Cycle 1020 — T5 — v1061
+
+**Task.** T5 — *"Give me something I can paste straight into an IC memo."* Stalest in rotation (1018 was T2, 1017 T1, 1015 T6, 1013/1009 T4, 1006/1003 T3; T5 last ran at 1002).
+
+**Friction.** I walked all six "Copy for IC Memo" surfaces cold at 1440×900 with both storages cleared, captured both clipboard flavours through a shim, and then laid each pasted exhibit out at the real Word te
