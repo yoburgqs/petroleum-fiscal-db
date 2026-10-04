@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1062</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1066</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4259,7 +4259,7 @@ window.copyPlatformCitation = function(btn) {
     </div>
     <div class="slider-row">
       <div class="slider-group">
-        <label title="Maximum government take at the selected price deck. The counter beside it is live: how many of the 185 clear this ceiling, and how many of those have verified field production. Counted on the basis the ceiling actually tests — comparable take while the checkbox below is ticked, published blend when it is not. The counter greys amber when the ceiling is removing fewer than a tenth of the set, i.e. when it is doing no work.">Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span><span class="sc-axis-n" id="sc-take-n"></span></label>
+        <label title="Maximum government take at the selected price deck. The counter beside it is live: how many clear this ceiling, and how many of those have verified field production. The denominator is the set this screen is SCOPED to &mdash; region, fiscal mechanic, operator presence, reform record, named country set and the two data-basis boxes all narrow it, and the counter says &ldquo;in scope&rdquo; when they have. It is not narrowed by the take, NPV, evidence or retention thresholds: those are the bars being measured, so each is still counted on its own. The amber-inert grey is a ratio against that same scoped set, so it means &ldquo;this ceiling is doing no work on the countries you are actually looking at&rdquo;. Counted on the basis the ceiling actually tests — comparable take while the checkbox below is ticked, published blend when it is not. The counter greys amber when the ceiling is removing fewer than a tenth of the set, i.e. when it is doing no work.">Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span><span class="sc-axis-n" id="sc-take-n"></span></label>
         <input type="range" id="sl-take" min="10" max="100" value="100" aria-label="Maximum government take percentage (10–100%). Starts at 100% — no ceiling applied, every country passes. The floor was 30% until v692; the median comparable take across the 185 countries is 28.4%, so half the distribution sat behind the stop and the hardest reachable screen still returned 95 countries.">
         <!-- v554: take-comparability control. Hidden while the slider sits at 100 (no ceiling =
              nothing to test); revealed by _scUpdateNeutralFlags() the moment a ceiling is set.
@@ -4292,7 +4292,7 @@ window.copyPlatformCitation = function(btn) {
            left untouched; the Advanced "measured breakeven only" data-coverage filter stays, since
            it is honestly labelled as a coverage filter and not as a price test. -->
       <div class="slider-group">
-        <label title="Filter by minimum contractor NPV at the price deck currently selected (the &quot;@$&quot; tag names it). runScreener() has always tested this floor against npv_50/75/100/125 following the price selector, so the slider&#39;s travel is re-scaled to that deck&#39;s own distribution rather than to a fixed $50-era range. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$<span id="sv-npv-deck">75</span></span><span class="sc-nolimit" id="sn-npv"> · no floor</span><span class="sc-axis-n" id="sc-npv-n"></span><span class="sc-nolimit" id="sn-npv-inert" style="display:none;color:var(--accent);font-weight:600;"></span></label>
+        <label title="Filter by minimum contractor NPV at the price deck currently selected (the &quot;@$&quot; tag names it). runScreener() has always tested this floor against npv_50/75/100/125 following the price selector, so the slider&#39;s travel is re-scaled to that deck&#39;s own distribution rather than to a fixed $50-era range. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making). All values in $M. The counter beside it counts within the set this screen is scoped to (region, mechanic, operator, reform record, named set, data basis) and says &ldquo;in scope&rdquo; when that is narrower than the whole database; the other thresholds do not narrow it.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$<span id="sv-npv-deck">75</span></span><span class="sc-nolimit" id="sn-npv"> · no floor</span><span class="sc-axis-n" id="sc-npv-n"></span><span class="sc-nolimit" id="sn-npv-inert" style="display:none;color:var(--accent);font-weight:600;"></span></label>
         <input type="range" id="sl-npv" min="-500" max="4500" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the selected price deck. Upper bound re-scales with the deck. Starts at -500 — no floor applied, loss-making regimes are shown.">
       </div>
       <div class="slider-group">
@@ -4311,7 +4311,7 @@ window.copyPlatformCitation = function(btn) {
         <input type="range" id="sl-npv50" min="-500" max="2000" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the 50 dollar per barrel downside price (-500 to 2000). Starts at -500 - no floor applied.">
       </div>
       <div class="slider-group">
-        <label title="Filter by the share of a country&#39;s fiscal facts read directly out of the primary legal instrument — the petroleum act, gazette, finance act or PSC text (tier A). Median across the 185 countries is 66.7%. This slider used to gate on A+B combined; tier B is the EY / IHS / Wood Mac / Rystad bulk harvest, which is 45.2% of the whole database, so the A+B gate passed 171 of 185 countries at 80% and 102 of 185 at its maximum setting of 100%. Tier A alone discriminates: 128 countries at 50%, 107 at 60%, 52 at 70%. A share is only as good as the record it is a share OF, so the fact-depth floor below travels with this slider — see its own tooltip.">Min primary-source evidence (A): <span class="val" id="sv-evid">0</span>%<span class="sc-nolimit" id="sn-evid"> &middot; no floor</span><span class="sc-axis-n" id="sc-evid-n"></span></label>
+        <label title="Filter by the share of a country&#39;s fiscal facts read directly out of the primary legal instrument — the petroleum act, gazette, finance act or PSC text (tier A). Median across the 185 countries is 66.7%. This slider used to gate on A+B combined; tier B is the EY / IHS / Wood Mac / Rystad bulk harvest, which is 45.2% of the whole database, so the A+B gate passed 171 of 185 countries at 80% and 102 of 185 at its maximum setting of 100%. Tier A alone discriminates: 128 countries at 50%, 107 at 60%, 52 at 70%. A share is only as good as the record it is a share OF, so the fact-depth floor below travels with this slider — see its own tooltip. The counter beside it counts within the set this screen is scoped to (region, mechanic, operator, reform record, named set, data basis) and says &ldquo;in scope&rdquo; when that is narrower than the whole database; the other thresholds do not narrow it.">Min primary-source evidence (A): <span class="val" id="sv-evid">0</span>%<span class="sc-nolimit" id="sn-evid"> &middot; no floor</span><span class="sc-axis-n" id="sc-evid-n"></span></label>
         <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum primary-source evidence percentage — share of fiscal facts read from the primary legal instrument, tier A (0–100%). A fact-depth floor of 50 facts travels with this slider by default.">
         <!-- v681 (T1): the fact-depth leg, ON the evidence slider. Hidden while the slider sits at
              0 (nothing to qualify); revealed by _scUpdateNeutralFlags() the moment a share is set.
@@ -4545,7 +4545,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="sc-selcell" title="Tick rows to build an IC shortlist. &#x2398; Copy for IC Memo, &#8595; CSV and &#8595; Excel then carry ONLY the ticked countries &mdash; with nothing ticked they carry every row the screen returned, which on the cold view is all 185. The ticks survive re-sorting and a price-deck change; use Clear beside the buttons to drop them. This header box ticks or clears every row currently shown."><input type="checkbox" class="sc-sel-all" id="sc-sel-all" onclick="scToggleSelAll(this)" aria-label="Select or clear all Screener rows currently shown"></th><th title="Placing in the ranking the column headers set. It restarts inside each data-basis block rather than counting straight through the whole result set: bare 1, 2, 3 for the countries with verified field production, then &#80;1, &#80;2 below the proxy divider, then &#70;1, &#70;2 below the floor divider. A &#80; or &#70; row is the top of ITS block, never the top of the screen &mdash; proxy terms are regional estimates that carry none of the country-specific surcharges real producers pay, so their takes read systematically lower. Turn the data-basis grouping off and the rows become one list, numbered 1..N.">#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
           <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take<span id="sc-take-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV<span id="sc-npv-deck-hdr" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">@ $75/bbl</span></th>
-          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
+          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%. The counter beside it counts within the set this screen is scoped to (region, mechanic, operator, reform record, named set, data basis) and says &ldquo;in scope&rdquo; when that is narrower than the whole database; the other thresholds do not narrow it.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
           <th class="num" data-sc-sort="prodcov" tabindex="0" role="columnheader" aria-sort="none" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" data-sc-sort="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
         </tr>
       </thead>
@@ -38045,18 +38045,120 @@ window._scSetBasis = _scSetBasis;
 // byte-identical to before. The strings also stay at or below their current length ("8 of 22" is
 // shorter than "110 of 185"), because .sc-axis-n is white-space:nowrap inside a slider label and
 // v681 put 36px of horizontal scroll on a phone by writing a long string into one of these spans.
+// ── v1066 (T1): the SCOPE legs the axis counters still did not read ───────────────────────
+// v996 pointed the counters at the admissible set and fixed the two data-basis checkboxes.
+// It left the other five legs that decide WHICH COUNTRIES ARE CANDIDATES AT ALL out of the
+// universe -- region, fiscal mechanic, IOC operator presence, reform record and an explicit
+// country set -- and defended that with the wording: "clear this" is a per-axis count, so a
+// global denominator is honest about being global.
+//
+// It is honest about the NUMBER. It is not honest about the SIGNAL. `.sc-axis-inert` greys an
+// axis amber once >=90% of the denominator clears it, which reads "this control is doing no
+// work, ignore it", and that threshold is a RATIO -- so taking it on a population the analyst
+// has already excluded makes it point the wrong way. This is the identical failure v996's own
+// note calls "worse than an imprecise number; it is a signal pointing the wrong way", left
+// live on the leg a T1 analyst reaches for first.
+//
+// Walked T1 cold at 1440x900 and 390x844 (hasTouch), both storages cleared: Screener ->
+// Advanced Filters -> Region: Middle East -> drag Max Govt Take. Measured against the shipped
+// country_data.json:
+//
+//   Region         ceiling   axis said        painted      actually removed, in scope
+//   Middle East    <=70%     170 of 185       AMBER-INERT  8 of 14 countries -- 57%
+//   Middle East    <=75%     175 of 185       AMBER-INERT  7 of 14           -- 50%
+//   Middle East    <=80%     178 of 185       AMBER-INERT  4 of 14           -- 29%
+//   CIS/FSU        <=70%     170 of 185       AMBER-INERT  0 of 5            --  0%  (correct)
+//
+// So on the Middle East the page greyed out the control that had just deleted more than half
+// of the analyst's candidate list, and the only number on screen next to it described a set of
+// 185 countries they had explicitly scoped away from. On CIS/FSU the same reading is right.
+// An analyst cannot tell those two states apart, because the denominator is the same in both.
+//
+// The rule now: SCOPE legs are in the universe, THRESHOLD legs are not. A leg that answers
+// "is this country a candidate?" (region, mechanic, operator, reform record, named set, data
+// basis) narrows the denominator; a leg that answers "does this candidate clear my bar?"
+// (take, either NPV floor, evidence share, fact depth, retention) is the axis itself and is
+// still counted on its own, exactly as v996 intended. So the counter answers: of the countries
+// this screen is SCOPED to, how many clear this threshold -- and the amber flag is a ratio
+// taken on the base the analyst is actually looking at.
+//
+// The mechanic and operator legs are not re-implemented here. _scCheckedMechs() and
+// _scIocScope() are lifted out of runScreener() and called by BOTH, so a counter and the table
+// cannot drift about who is eligible -- the same construction v554 and v706 used for the
+// comparability basis and the marginal-effect counts.
+//
+// Cold default is untouched: no scope leg set returns COUNTRY_DATA and every counter renders
+// byte-identical to v996.
+function _scCheckedMechs() {
+  return [].slice.call(document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked'))
+           .map(function (cb) { return cb.value; });
+}
+window._scCheckedMechs = _scCheckedMechs;
+// The set of countries where ANY ticked operator has presence, or null when none is ticked.
+// IOC_DATA first, IOC_PRESENCE as the fallback -- the order runScreener has always used.
+function _scIocScope() {
+  var checked = [].slice.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked'))
+                  .map(function (cb) { return cb.value; });
+  if (!checked.length) return null;
+  var out = new Set();
+  checked.forEach(function (brand) {
+    var matchOps = (typeof ALL_OPERATORS !== 'undefined' && ALL_OPERATORS)
+      ? ALL_OPERATORS.filter(function (op) { return op.toLowerCase().indexOf(brand.toLowerCase()) !== -1; })
+      : [];
+    if (matchOps.length && typeof IOC_DATA !== 'undefined' && IOC_DATA) {
+      IOC_DATA.filter(function (d) { return matchOps.indexOf(d.operator) !== -1; })
+              .forEach(function (d) { out.add(d.country); });
+    } else if (typeof IOC_PRESENCE !== 'undefined' && IOC_PRESENCE) {
+      (IOC_PRESENCE[brand] || []).forEach(function (c) { out.add(c); });
+    }
+  });
+  return out;
+}
+window._scIocScope = _scIocScope;
+// True while any scope leg is narrowing the universe below COUNTRY_DATA. Drives the "in scope"
+// marker on the counters, so the analyst can tell a scoped denominator from the whole database
+// without counting rows.
+function _scAxisScoped() {
+  var all = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  return !!all.length && _scAxisUniverse().length < all.length;
+}
+window._scAxisScoped = _scAxisScoped;
 function _scAxisUniverse() {
   var all = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
   if (!all.length) return all;
   var keepProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
   var keepFloor = document.getElementById('sc-floor-keep')?.checked !== false;
-  if (keepProxy && keepFloor) return all;   // cold default -- identical output to pre-v996
-  var out = all.filter(function (d) {
+  // v1066: the five scope legs, resolved once and read exactly as runScreener reads them.
+  var regEl  = document.getElementById('sc-region');
+  var region = regEl ? regEl.value : '';
+  var mechs  = _scCheckedMechs();
+  var mechAll = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
+  var iocSet = _scIocScope();
+  var refMode = (typeof _scReformMode === 'function') ? _scReformMode() : '';
+  var refList = refMode && typeof _scReformUniverse === 'function' ? (_scReformUniverse(refMode) || []) : null;
+  var refSet  = refList ? new Set(refList) : null;
+  var cSet    = (typeof _screenerCountrySet !== 'undefined') ? _screenerCountrySet : null;
+  var mechScopes = mechAll > 0 && mechs.length < mechAll;
+  if (keepProxy && keepFloor && !region && !mechScopes && !iocSet && !refSet && !cSet) {
+    return all;   // cold default -- identical output to pre-v996
+  }
+  return all.filter(function (d) {
     if (!keepProxy && !(typeof _dqTier === 'function' && _dqTier(d).hasProduction)) return false;
     if (!keepFloor && typeof _scTakeIsFloor === 'function' && _scTakeIsFloor(d)) return false;
+    if (cSet && cSet.indexOf(d.country) === -1) return false;
+    if (refSet && !refSet.has(d.country)) return false;
+    if (iocSet && !iocSet.has(d.country)) return false;
+    if (mechScopes) {
+      var dm = String(d.mechanics || '').split(',').map(function (m) { return m.trim(); });
+      if (!dm.some(function (m) { return mechs.indexOf(m) !== -1; })) return false;
+    }
+    if (region && typeof _regionMatch === 'function' && !_regionMatch(d.region, region)) return false;
     return true;
   });
-  return out.length ? out : all;   // never divide by zero; a 0-country universe cannot be screened
+  // v1066: an EMPTY scoped universe is returned as empty. v996 fell back to all 185 here to
+  // avoid dividing by zero; that fallback is the lie this cycle is removing, so the four call
+  // sites blank their counter instead -- there is no ratio to report when nothing is in scope,
+  // and the zero-result panel below the table already names the cause.
 }
 window._scAxisUniverse = _scAxisUniverse;
 
@@ -38149,6 +38251,9 @@ function _scUpdateNeutralFlags() {
       const _tkCmpOn = (document.getElementById('sc-fee-cmp') || {}).checked !== false;
       // v996: counted on the admissible set, not on all 185. See _scAxisUniverse().
       const _tkUni  = _scAxisUniverse();
+      // v1066: nothing in scope means there is no ratio to report, and no base to grey an axis
+      // against. Blank rather than fall back to all 185 -- see the note above _scAxisUniverse().
+      if (!_tkUni.length) { _tkAxis.textContent = ''; _tkAxis.className = 'sc-axis-n'; return; }
       const _tkPass = _tkUni.filter(function (d) {
         const _h = d[_tkKey];
         if (_h === null || _h === undefined) return false;
@@ -38164,7 +38269,11 @@ function _scUpdateNeutralFlags() {
       // Capital Screen returns 15 rows while 167 countries clear its 65% ceiling on its own.
       // v996: the "\u00b7 N verified" tail is dropped once the universe is already
       // production-only, where it would only restate _tkPass.length.
-      _tkAxis.textContent = '\u00b7 ' + _tkPass.length + ' of ' + _tkUni.length + ' clear this'
+      // v1066: " in scope" names the denominator when a scope leg has narrowed it, so "6 of 14"
+      // cannot be read as 14 countries in the database. Four characters, and it only appears in
+      // the state where the number would otherwise be ambiguous.
+      _tkAxis.textContent = '\u00b7 ' + _tkPass.length + ' of ' + _tkUni.length
+                          + (_scAxisScoped() ? ' in scope' : '') + ' clear this'
                           + (_scAxisUniverseIsVerified() ? '' : ' \u00b7 ' + _tkVer + ' verified');
       // A ceiling removing under a tenth of the set is doing no work and should read that way --
       // same threshold the NPV axes use in paint(). v996: "the set" is the admissible set.
@@ -38188,14 +38297,19 @@ function _scUpdateNeutralFlags() {
       const _evDepthOn = !!(document.getElementById('sc-evid-depth') || {}).checked;
       const _evFloor = Math.max(_evDepthOn ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
       const _nDep = document.getElementById('sc-evid-depth-n');
-      const _evUni = _scAxisUniverse();   // v996
-      if (_evV <= 0) {
+      const _evUni = _scAxisUniverse();   // v996; v1066 adds the five scope legs
+      if (_evUni.length === 0) {
+        // v1066: no country in scope -- neither the share counter nor the depth caption has a
+        // base. Clear both rather than quote a denominator the screen has excluded.
+        if (_nDep) _nDep.textContent = '';
+        if (_evAxis) { _evAxis.textContent = ''; _evAxis.className = 'sc-axis-n'; }
+      } else if (_evV <= 0) {
         if (_nDep) _nDep.textContent = _evUni.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
           + ' of ' + _evUni.length + ' countries fall short';
         const _fl0 = document.getElementById('sc-evid-depth-floor');
         if (_fl0) _fl0.textContent = SC_EVID_MIN_FACTS;
       }
-      if (_evAxis) {
+      if (_evAxis && _evUni.length) {
         if (_evV <= 0) { _evAxis.textContent = ''; _evAxis.className = 'sc-axis-n'; }
         else {
           const _shareOnly = _evUni.filter(d => (d.a_pct || 0) >= _evV).length;
@@ -38205,7 +38319,8 @@ function _scUpdateNeutralFlags() {
           // than the viewport. The share-vs-depth comparison goes on the checkbox line below,
           // which wraps. (v681 shipped that text here first and put 36px of horizontal scroll on
           // a phone and 37-141px at 1024/1280/1440.)
-          _evAxis.textContent = '\u00b7 ' + _both + ' of ' + _evUni.length + ' clear this';
+          _evAxis.textContent = '\u00b7 ' + _both + ' of ' + _evUni.length
+                              + (_scAxisScoped() ? ' in scope' : '') + ' clear this';
           // An axis that is removing nobody should read as inert rather than as work being done.
           _evAxis.className = 'sc-axis-n' + (_both >= _evUni.length ? ' sc-axis-inert' : '');
           // The floor the analyst is told about must be the floor that is actually applied:
@@ -38366,11 +38481,16 @@ function _scSyncNpvAxis() {
     // v996: the admissible set, not all 185 -- this counter drove the amber inert flag, and on a
     // production-only universe a floor removing 6 of 22 read "175 of 185" and greyed itself out.
     var uni = _scAxisUniverse();
+    // v1066: the region / mechanic / operator / reform / country-set legs are in the universe
+    // too, so this ratio -- and the amber flag it drives -- is taken on the set the analyst is
+    // actually looking at. An empty scope has no ratio; blank it.
+    if (!uni.length) { sp.textContent = ''; sp.className = 'sc-axis-n'; return; }
     var pass = uni.filter(function(d){
       var x = d[dataKey];
       return !(x !== null && x !== undefined && x < floor);
     }).length;
-    sp.textContent = '\u00b7 ' + pass + ' of ' + uni.length + ' clear this';
+    sp.textContent = '\u00b7 ' + pass + ' of ' + uni.length
+                   + (_scAxisScoped() ? ' in scope' : '') + ' clear this';
     // Flag a floor that is barely screening, so an inert axis reads as inert.
     sp.className = 'sc-axis-n' + (pass >= uni.length * 0.9 ? ' sc-axis-inert' : '');
   }
@@ -38588,25 +38708,17 @@ function runScreener() {
   const feeCmpOn = document.getElementById('sc-fee-cmp')?.checked !== false;
 
   // mechanic checkbox filter
-  const checkedMechs = [...document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked')].map(cb => cb.value);
+  // v1066: read through the lifted helper, which _scAxisUniverse() also calls. Two readers of
+  // one definition, so the axis counters and this filter body cannot disagree about which
+  // mechanics are included -- the drift v996 left open on this leg.
+  const checkedMechs = _scCheckedMechs();
 
   // IOC operator filter — any checked operators (data-driven from IOC_DATA)
   const checkedIOCs = [...document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked')].map(cb => cb.value);
-  // build set of countries where ANY checked IOC has presence (use IOC_DATA first, fall back to IOC_PRESENCE)
-  let iocCountries = null;
-  if (checkedIOCs.length > 0) {
-    iocCountries = new Set();
-    checkedIOCs.forEach(brand => {
-      // IOC_DATA: find all operators whose name includes the brand
-      const matchOps = ALL_OPERATORS.filter(op => op.toLowerCase().includes(brand.toLowerCase()));
-      if (matchOps.length > 0) {
-        IOC_DATA.filter(d => matchOps.includes(d.operator)).forEach(d => iocCountries.add(d.country));
-      } else {
-        // fall back to static map
-        (IOC_PRESENCE[brand] || []).forEach(c => iocCountries.add(c));
-      }
-    });
-  }
+  // v1066: the IOC_DATA-first / IOC_PRESENCE-fallback resolution moved to _scIocScope(), shared
+  // with the axis universe for the same reason. Returns null when nothing is ticked, which is
+  // the value this filter leg has always used to mean "no operator restriction".
+  let iocCountries = _scIocScope();
 
   // v554 — the filter body is a named predicate taking the comparability basis as an argument,
   // so the SAME code path can be evaluated twice: once on the active basis and once on the other.
