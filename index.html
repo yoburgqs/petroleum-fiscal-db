@@ -4862,7 +4862,7 @@ window.copyPlatformCitation = function(btn) {
   <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Take Distribution &amp; Peer Comparison</div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Select an operator to see how their global contract portfolio distributes across government take tiers — and how they compare to IOC peers (Shell, BP, TotalEnergies, Equinor, Chevron). <strong style="color:var(--text);">IC application:</strong> Portfolios with &gt;40% of contracts in the &gt;65% take tier have elevated fiscal risk exposure — flag for reform risk and price-stress analysis in the IC memo.</div>
   <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-    <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;">
+    <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis, grouped by how many countries ORCA holds for each" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;max-width:100%;">
       <option value="">Select Operator…</option>
     </select>
     <div id="exposure-ioc-quick" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
@@ -50483,13 +50483,76 @@ function loadCountryProfile(country) {
     if (peers.length === 0) return '';
     // Show up to 6 peers. Find where current country fits in the sorted regional list
     const allRegional = COUNTRY_DATA.filter(p => p.region === region && p.take_75 != null).sort((a,b) => a.take_75 - b.take_75);
-    const selfIdx = allRegional.findIndex(p => p.country === country);
-    // Pick 2 below and 3 above current country, fill remaining from ends
-    let shown = peers.slice(0, 6);
     const selfTake = d.take_75;
-    const below = peers.filter(p => p.take_75 <= selfTake).slice(-2);
-    const above = peers.filter(p => p.take_75 > selfTake).slice(0, 4);
-    shown = [...below, ...above].slice(0, 6);
+    /* ── v1019 (T2): "Regional Peers" drew a fixed 2-below / 4-above shape, so a 7-row ──────
+       window out of 54 rendered a POSITION it had never measured.
+
+       Walked T2 cold at 1440x900 and at 390x844 hasTouch, both storages cleared, entering from
+       the country dropdown the way a first-time analyst does. "Is this country attractive at
+       $75/bbl, and can I defend that?" is answered on this page, and REGIONAL PEERS (y~2870) is
+       the FIRST regional comparison on it — about 3000px above the REGIONAL PEER COMPARISON
+       panel that does the careful producer-median framing. Whatever this window shows is what
+       goes into the meeting.
+
+       The window was `peers.filter(<= self).slice(-2)` plus `peers.filter(> self).slice(0, 4)`.
+       Two below, four above, hardcoded, for every country that is not at an edge of its region
+       — which is almost every country. The bar ladder then renders the selected country with
+       four peers stacked above it, so it READS as sitting in the bottom third of its region.
+       That placement was a property of the slice, not of the data. Measured over all 185:
+
+         87 of 185 render lower in their region than they are, by >15pp of the ladder
+         52 of 185 are in their region's TOP 40% and render in the bottom 40%
+
+         Niger        61.2%   truly 46 of 50 African peers BELOW it (92nd pct)  drawn 2 below / 4 above
+         Sao Tome     60.6%   truly 45 below / 5 above               (90th pct)  drawn 2 below / 4 above
+         Rep. Congo   60.2%   truly 44 below / 6 above               (88th pct)  drawn 2 below / 4 above
+         Eq. Guinea   65.8%   truly 47 below / 3 above               (94th pct)  drawn 2 below / 3 above
+         France       31.6%   truly 28 of 32 European peers below    (88th pct)  drawn 2 below / 4 above
+         Guyana       54.1%   truly 24 of 28 LatAm peers below       (86th pct)  drawn 2 below / 4 above
+
+       Niger is the 5th highest-take jurisdiction of the 51 ORCA measures in Africa, and this
+       panel drew it near the bottom of the ladder. Both edges were always correct — the 10
+       countries that truly top their region rendered with nothing above them and the 8 truly
+       lowest with nothing below — so the defect was absent exactly where anyone would spot-check
+       it and present everywhere else.
+
+       Two separate things were wrong. Both are fixed here.
+
+       1. MEMBERSHIP. The four upper slots went to whatever came next in sort order, however far
+          away, while nearer countries below were cut. Syria's set reached UAE at 74.6% — 47pp
+          away — and excluded Jordan at 2.3pp. 138 of the 179 countries that render the toggle
+          named rows that were not their nearest peers, under a button whose expanded label
+          reads "Show the closest N". The window is now the N nearest by absolute take distance,
+          so the label is true and the panel means what it is named.
+
+       2. POSITION. A nearest-neighbour window still cannot carry a rank — that is not what a
+          window is for, and making it symmetric would not have helped: 3-below/3-above would
+          still have drawn Niger mid-ladder. So the rank is now STATED, beside the count that
+          describes the same set, rather than inferred from the shape of six bars. `selfIdx` was
+          already being computed on the line above and had never been read by anything.
+
+       The rank population is `peers` + self — the set the rows are drawn from (>=2 contracts),
+       NOT the larger filed count in the header. Those two numbers differ (Africa: 51 against 54)
+       and the chip says which one it is on, because conflating them is the same defect in a
+       different place. */
+    const _rpPop    = peers.length + 1;                      // the set the rows are drawn from, plus self
+    const _rpNBelow = peers.filter(p => p.take_75 < selfTake).length;
+    const _rpNAbove = peers.filter(p => p.take_75 > selfTake).length;
+    // Competition ranking: #1 = highest take, and everything tied on take shares one rank.
+    // _rpPop - _rpNBelow would have been WORST-case rank, which prints "#3 of 17" for Saudi
+    // Arabia -- joint-highest in the Middle East at 100.0% with Bahrain and Kuwait, nothing
+    // above it. An analyst would read that as two Gulf states taking more than Saudi.
+    const _rpRank   = _rpNAbove + 1;
+    const _rpNTied  = peers.filter(p => p.take_75 === selfTake).length;
+    // Nearest by absolute distance. Ties broken by take then name so the set is stable across
+    // re-renders of the same country. _rpRows re-sorts ascending for display.
+    let shown = peers
+      .map(p => ({ p: p, gap: Math.abs(p.take_75 - selfTake) }))
+      .sort((a, b) => (a.gap - b.gap)
+                   || (a.p.take_75 - b.p.take_75)
+                   || String(a.p.country).localeCompare(String(b.p.country)))
+      .slice(0, 6)
+      .map(x => x.p);
     if (shown.length === 0) shown = peers.slice(0, 6);
     // v970 (T2): the bar scale is now derived per rendered SET, because this panel renders two
     // of them -- the six-peer window and the full regional ladder the header counts. A scale
@@ -50591,6 +50654,26 @@ function loadCountryProfile(country) {
               : ('The list above already shows all ' + allRegional.length + ' of them — that is the set behind that median.')))
       : ('Opens the Explorer filtered to ' + region + ' — the same ' + allRegional.length + ' jurisdictions this list is drawn from, with the full metric table.');
     // The count line says which taxonomy it is on the moment the two disagree.
+    // v1019 (T2): the rank chip. The six bars below are a nearest-neighbour window and cannot
+    // show position; this says it. Tier colours are the same four the ladder and the CP headline
+    // use, keyed on take, so the chip never contradicts the row it describes. No white-space
+    // rule on purpose -- a nowrap min-content floor on this line is what blew the card grid out
+    // to 446px at 390 in cycle 1009, and the directive's Step 5b exists because of it.
+    const _rpRankTip = country + ' has the ' + (_rpNTied > 0 ? ('joint-' + (_rpRank === 1 ? 'highest' : '#' + _rpRank)) : (_rpRank === 1 ? 'highest' : _rpNAbove + _rpNTied === _rpPop - 1 ? 'lowest' : '#' + _rpRank + ' highest'))
+      + ' government take at $75/bbl of the ' + _rpPop + ' ' + region + ' jurisdictions ORCA measures on at least 2 contracts'
+      + ' \u2014 ' + _rpNBelow + ' below it, ' + _rpNAbove + ' above'
+      + (_rpNTied > 0 ? (', and ' + _rpNTied + ' level with it on take, which share this rank') : '')
+      + '. That is the set the rows below are drawn from. '
+      + (allRegional.length > _rpPop
+          ? ('It is NOT the ' + allRegional.length + ' filed under ' + region + ' in the header: the other '
+             + (allRegional.length - _rpPop) + ' are held on a single contract and are ranked by neither number. ')
+          : ('Every one of the ' + allRegional.length + ' filed under ' + region + ' is measured on at least 2 contracts, so here the two counts agree. '))
+      + 'The rows below are this country\u2019s NEAREST peers by take, which is not the same thing as its position '
+      + '\u2014 read the position here, not off the bars.';
+    const _rpRankChip = '<span style="display:inline-block;border:1px solid ' + selfCol + '66;background:' + selfCol
+      + '14;color:' + selfCol + ';border-radius:3px;padding:0 5px;margin-right:6px;font-size:10px;font-weight:700;'
+      + 'font-family:\'IBM Plex Mono\',monospace;cursor:help;" title="' + _rpAttr(_rpRankTip) + '">#'
+      + _rpRank + ' of ' + _rpPop + ' by take' + (_rpNTied > 0 ? ' (tied)' : '') + '</span>';
     const _rpLblCollapsed = 'Show all ' + allRegional.length + ' in ' + region + ' &#9662;';
     const _rpLblExpanded  = 'Show the closest ' + _rpShownN + ' &#9652;';
     const _rpChipNote = _rpWider
@@ -50598,7 +50681,11 @@ function loadCountryProfile(country) {
       : '';
     return '<div class="dd-section">'
       + '<h3>Regional Peers <span style="font-weight:400;font-size:11px;color:var(--muted);">'+region+' · govt take @ $75/bbl</span></h3>'
-      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+allRegional.length+' countries filed under '+region+_rpChipNote+'</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.7;">'+_rpRankChip+' '+allRegional.length+' countries filed under '+region
+      // Only say which subset is ranked when it IS a subset. Europe files 33 and measures 33, and
+      // "33 of them measured on >=2 contracts" there is noise that reads like a second number.
+      + (allRegional.length > _rpPop ? (' &middot; '+_rpPop+' of them measured on &ge;2 contracts, which is the set ranked and listed above') : '')
+      + _rpChipNote+'</div>'
       + '<div style="margin:0 -4px;">'
       + '<div style="display:grid;grid-template-columns:130px 1fr 60px;gap:8px;padding:3px 8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">COUNTRY</span>'
@@ -52953,11 +53040,104 @@ function initIOCExposureControls() {
   const quick = document.getElementById('exposure-ioc-quick');
   if (!sel || !quick) return;
 
+  // ── v1061 (T5): the operator list could not tell a portfolio from a stub, and several
+  //    spellings of one company sat next to each other resolving to different portfolios. ──
+  //
+  // Walked T5 cold at 1440x900 and 390x844, both storages cleared: IOC Portfolio -> pick an
+  // operator -> "Copy for IC Memo". The selector is step one of that flow and it was a flat
+  // alphabetical list of 1,561 raw ORCA entity strings — no grouping, no search box, and no
+  // indication of what any entry would produce. Measured by driving the live tab and reading
+  // the v466 heading back for each option:
+  //
+  //     option as it appeared in the list        list index     the tab then renders
+  //     ExxonMobil                                    517       32 countries
+  //     Exxon Mobil Corporation                       515        1 country     <- "Exxon" lands here
+  //     Exxon-Mobil                                   516        1 country
+  //     Shell                                        1248       33 countries
+  //     A/S Norske Shell                                5        1 country     <- 5th in the whole list
+  //     Chevron                                       257       19 countries
+  //     CHEVRON BRITAIN LIMITED                       183        1 country     <- caps sort first
+  //     Equinor                                       487       14 countries
+  //     EQUINOR UK LIMITED                            418        1 country
+  //     ConocoPhillips                                314       11 countries
+  //     Conoco                                        313        2 countries
+  //     ENI                                           385       25 countries
+  //     Eni                                           465       32 countries   <- same company, both big
+  //
+  // So three adjacent options spelled "Exxon..." produced a 32-country portfolio and two
+  // one-country stubs, each exhibit captioned as that operator's fiscal exposure, and nothing
+  // on screen distinguished them BEFORE the click. Whichever the analyst happened to press is
+  // what went into the memo. The 57 consortium strings compound it: the first option in the
+  // entire list mentioning TotalEnergies is "ADNOC Onshore (ADNOC 60% / TotalEnergies 10% /
+  // CNPC 8% / INPEX 5% / GS Energy 3%)" at index 10 — a 10% minority stake — while
+  // TotalEnergies itself, 52 countries, sits at index 1406 of 1562.
+  //
+  // Each option now carries the country count the heading will print, and the list is split so
+  // the entries that can produce a cross-border portfolio are not buried among the ones that
+  // cannot. The count comes from _iocResolvePortfolio() — the function renderIOCExposure()
+  // itself now calls — so the label and the heading cannot disagree. No curated list of majors
+  // and no invented threshold: "2 or more countries" is the arithmetic condition for a
+  // cross-border portfolio existing at all, and the counts are read, not judged.
+  //
+  // Resolution is ~700ms over 1,561 operators, so it is NOT done at init — this tab is already
+  // idle-deferred and a second of main-thread jank on load is its own regression. It runs once,
+  // on the first focus/pointerdown/keydown on the select, which is the moment the analyst is
+  // about to read the list. Until then the list is exactly what it was. option.value is always
+  // the raw ORCA string, so renderIOCExposure(), the quick buttons, the v477 Shell seed and
+  // every option[value=...] lookup are untouched either side of the annotation.
   const operators = [...new Set((IOC_DATA||[]).map(d=>d.operator).filter(Boolean))].sort();
   operators.forEach(op => {
     const opt = document.createElement('option');
     opt.value = op; opt.textContent = op;
     sel.appendChild(opt);
+  });
+
+  var _iocAnnotated = false;
+  var _iocAnnotate = function() {
+    if (_iocAnnotated) return;
+    _iocAnnotated = true;
+    var keep = sel.value;
+    var cov = {};
+    operators.forEach(function(op) {
+      var n = 0;
+      // Fail soft: an operator that throws keeps its bare label rather than losing the option.
+      try { n = _iocResolvePortfolio(op).portfolio.length; } catch (e) { n = -1; }
+      cov[op] = n;
+    });
+    var nf = function(x) { return Number(x).toLocaleString(); };
+    var multi  = operators.filter(function(o) { return cov[o] >= 2; })
+      .sort(function(a, b) { return cov[b] - cov[a] || a.localeCompare(b); });
+    var single = operators.filter(function(o) { return cov[o] < 2; }).sort();
+    var add = function(parent, op, label) {
+      var o = document.createElement('option');
+      o.value = op;                  // raw ORCA string — every downstream reader keys on this
+      o.textContent = label;
+      parent.appendChild(o);
+    };
+    // Rebuild the option list under two optgroups, leaving the leading placeholder in place.
+    while (sel.options.length > 1) sel.remove(1);
+    if (multi.length) {
+      var g1 = document.createElement('optgroup');
+      g1.label = 'Cross-border portfolios — ' + nf(multi.length)
+               + ' entries ORCA resolves to 2 or more countries';
+      multi.forEach(function(op) { add(g1, op, op + '  —  ' + cov[op] + ' countries'); });
+      sel.appendChild(g1);
+    }
+    if (single.length) {
+      var g2 = document.createElement('optgroup');
+      g2.label = 'Single-jurisdiction entities — ' + nf(single.length)
+               + ' (one country or none; no cross-border portfolio to compare)';
+      single.forEach(function(op) {
+        add(g2, op, op + (cov[op] === 1 ? '  —  1 country'
+                        : cov[op] === 0 ? '  —  no modelled country'
+                                        : ''));
+      });
+      sel.appendChild(g2);
+    }
+    if (keep) sel.value = keep;      // the v477 Shell seed must survive the rebuild
+  };
+  ['focus', 'pointerdown', 'keydown'].forEach(function(ev) {
+    sel.addEventListener(ev, _iocAnnotate);
   });
 
   // Quick buttons for top IOCs by presence — with active state highlighting
@@ -53024,6 +53204,65 @@ function _iocExpReformChip(country) {
     + 'travels into the ⌘ Copy for IC Memo paste and the XLSX this table’s own buttons produce.');
 }
 
+// ── v1061 (T5) — one resolver, so the operator selector and the exposure heading cannot
+//    print two different country counts for the same operator. ──────────────────────────────
+// Lifted verbatim out of renderIOCExposure(), which is the only thing that used it. The
+// selector annotation added in initIOCExposureControls() calls this and reads
+// portfolio.length, which IS the number the v466 heading prints. Keeping it in one place is
+// the same rule the clipboard/page split already follows on this platform: an independent
+// reimplementation of this merge would drift the moment either source changed, and the
+// brand-group resolution (_iocBrandEntities), the country|mechanic dedup, the IOC_PRESENCE
+// union and the `take75 != null` filter all have to agree exactly or the label lies.
+function _iocResolvePortfolio(operatorName) {
+  const _expGrp   = (typeof _iocBrandEntities === 'function') ? _iocBrandEntities(operatorName) : { entities: [] };
+  const _expEnts  = (_expGrp.entities && _expGrp.entities.length > 1) ? _expGrp.entities : [operatorName];
+  const _expGroup = _expEnts.length > 1;
+  const _expSeen = {}, _expDed = [];
+  (IOC_DATA || []).filter(d => _expEnts.indexOf(d.operator) !== -1)
+    .slice().sort((a,b) => b.n - a.n)
+    .forEach(r => { const k = r.country + '|' + r.mechanic; if (!_expSeen[k]) { _expSeen[k] = r; _expDed.push(r); } });
+  const _expByCtry = {};
+  _expDed.forEach(r => {
+    const e = _expByCtry[r.country] || (_expByCtry[r.country] = { n:0, tw:0, tn:0, vw:0, vn:0, mech:{}, ents:{} });
+    e.n += r.n;
+    if (r.take_75 != null) { e.tw += r.take_75 * r.n; e.tn += r.n; }
+    if (r.npv_75  != null) { e.vw += r.npv_75  * r.n; e.vn += r.n; }
+    e.mech[r.mechanic] = (e.mech[r.mechanic] || 0) + r.n;
+    e.ents[r.operator] = true;
+  });
+  const opData = Object.keys(_expByCtry).map(c => {
+    const e = _expByCtry[c];
+    const mechs = Object.keys(e.mech).sort((a,b) => e.mech[b] - e.mech[a]);
+    return { country: c,
+             take_75: e.tn ? e.tw / e.tn : null,
+             npv_75:  e.vn ? e.vw / e.vn : null,
+             n: e.n, mechanic: mechs[0] || '\u2014',
+             mechanicCount: mechs.length, entityCount: Object.keys(e.ents).length };
+  });
+
+  // Also try IOC_PRESENCE for country list
+  const presenceCountries = (IOC_PRESENCE || {})[operatorName] || [];
+
+  // Merge: use IOC_DATA where available, fallback to COUNTRY_DATA for presence countries
+  const countrySet = new Set([...opData.map(d=>d.country), ...presenceCountries]);
+  const portfolio = [...countrySet].map(c => {
+    const iocEntry = opData.find(d => d.country === c);
+    const cdEntry = (COUNTRY_DATA || []).find(d => d.country === c);
+    return {
+      country: c,
+      take75: iocEntry ? iocEntry.take_75 : cdEntry ? cdEntry.take_75 : null,
+      npv75: iocEntry ? iocEntry.npv_75 : cdEntry ? cdEntry.npv_75 : null,
+      n: iocEntry ? iocEntry.n : cdEntry ? cdEntry.n : null,
+      mechanic: iocEntry ? iocEntry.mechanic : cdEntry ? cdEntry.mechanics : '\u2014',
+      mechanicCount: iocEntry ? iocEntry.mechanicCount : 1,
+      entityCount: iocEntry ? iocEntry.entityCount : 0,
+      region: cdEntry ? cdEntry.region : '\u2014',
+      source: iocEntry ? 'IOC_DATA' : 'COUNTRY_DATA'
+    };
+  }).filter(d => d.take75 != null).sort((a,b) => b.take75 - a.take75);
+  return { grp: _expGrp, ents: _expEnts, isGroup: _expGroup, opData: opData, portfolio: portfolio };
+}
+
 function renderIOCExposure(operatorName) {
   const output = document.getElementById('ioc-exposure-output');
   if (!operatorName || !output) return;
@@ -53056,52 +53295,15 @@ function renderIOCExposure(operatorName) {
   // because summing entities double-counts a rename (Statoil Petroleum AS / Equinor Energy
   // AS are the same company either side of 2018). Mechanics within a country are then
   // collapsed contract-weighted, so this section counts what the headline counts.
-  const _expGrp   = (typeof _iocBrandEntities === 'function') ? _iocBrandEntities(operatorName) : { entities: [] };
-  const _expEnts  = (_expGrp.entities && _expGrp.entities.length > 1) ? _expGrp.entities : [operatorName];
-  const _expGroup = _expEnts.length > 1;
-  const _expSeen = {}, _expDed = [];
-  (IOC_DATA || []).filter(d => _expEnts.indexOf(d.operator) !== -1)
-    .slice().sort((a,b) => b.n - a.n)
-    .forEach(r => { const k = r.country + '|' + r.mechanic; if (!_expSeen[k]) { _expSeen[k] = r; _expDed.push(r); } });
-  const _expByCtry = {};
-  _expDed.forEach(r => {
-    const e = _expByCtry[r.country] || (_expByCtry[r.country] = { n:0, tw:0, tn:0, vw:0, vn:0, mech:{}, ents:{} });
-    e.n += r.n;
-    if (r.take_75 != null) { e.tw += r.take_75 * r.n; e.tn += r.n; }
-    if (r.npv_75  != null) { e.vw += r.npv_75  * r.n; e.vn += r.n; }
-    e.mech[r.mechanic] = (e.mech[r.mechanic] || 0) + r.n;
-    e.ents[r.operator] = true;
-  });
-  const opData = Object.keys(_expByCtry).map(c => {
-    const e = _expByCtry[c];
-    const mechs = Object.keys(e.mech).sort((a,b) => e.mech[b] - e.mech[a]);
-    return { country: c,
-             take_75: e.tn ? e.tw / e.tn : null,
-             npv_75:  e.vn ? e.vw / e.vn : null,
-             n: e.n, mechanic: mechs[0] || '—',
-             mechanicCount: mechs.length, entityCount: Object.keys(e.ents).length };
-  });
-
-  // Also try IOC_PRESENCE for country list
-  const presenceCountries = (IOC_PRESENCE || {})[operatorName] || [];
-
-  // Merge: use IOC_DATA where available, fallback to COUNTRY_DATA for presence countries
-  const countrySet = new Set([...opData.map(d=>d.country), ...presenceCountries]);
-  const portfolio = [...countrySet].map(c => {
-    const iocEntry = opData.find(d => d.country === c);
-    const cdEntry = (COUNTRY_DATA || []).find(d => d.country === c);
-    return {
-      country: c,
-      take75: iocEntry ? iocEntry.take_75 : cdEntry ? cdEntry.take_75 : null,
-      npv75: iocEntry ? iocEntry.npv_75 : cdEntry ? cdEntry.npv_75 : null,
-      n: iocEntry ? iocEntry.n : cdEntry ? cdEntry.n : null,
-      mechanic: iocEntry ? iocEntry.mechanic : cdEntry ? cdEntry.mechanics : '\u2014',
-      mechanicCount: iocEntry ? iocEntry.mechanicCount : 1,
-      entityCount: iocEntry ? iocEntry.entityCount : 0,
-      region: cdEntry ? cdEntry.region : '\u2014',
-      source: iocEntry ? 'IOC_DATA' : 'COUNTRY_DATA'
-    };
-  }).filter(d => d.take75 != null).sort((a,b) => b.take75 - a.take75);
+  // v1061 (T5): lifted verbatim into _iocResolvePortfolio() just above this function, so the
+  // operator SELECTOR can label each option with the same country count this function is about
+  // to print in the heading. Nothing here is recomputed — these are the same five locals.
+  const _expRes   = _iocResolvePortfolio(operatorName);
+  const _expGrp   = _expRes.grp;
+  const _expEnts  = _expRes.ents;
+  const _expGroup = _expRes.isGroup;
+  const opData    = _expRes.opData;
+  const portfolio = _expRes.portfolio;
 
   // v639 (T4): how many of these rows are actually this operator.
   // renderIOCExposure builds `portfolio` from two different sources and has done since it was
@@ -53966,8 +54168,11 @@ function copyIOCPortfolio() {
   if (!rows.length) { _icRefuse('Select an operator first — there is nothing to copy.'); return; }
   var st = window._iocExp;
 
+  // v1061 (T5): plural agreement — the single-jurisdiction entities are 1,522 of the 1,561
+  // in the selector, so "1 countries" was the commonest caption this exhibit could produce.
   var caption = 'ORCA fiscal exposure — ' + st.operator + ', ' + rows.length
-              + ' countries at $75/bbl, ranked by government take (highest first)';
+              + ' countr' + (rows.length === 1 ? 'y' : 'ies')
+              + ' at $75/bbl, ranked by government take (highest first)';
   var assump = 'Portfolio average take ' + st.avgTake.toFixed(1) + '%, median ' + st.medianTake.toFixed(1)
     + '% — unweighted country averages, each country counted once regardless of contract count, volumes or working interest; not a production-weighted portfolio take. '
     + (st.wtdTake != null
