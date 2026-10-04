@@ -454,6 +454,18 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
   letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
   border: 1px dashed var(--muted); border-radius: 3px; padding: 0 3px; line-height: 13px;
   vertical-align: 1px; opacity: .85; }
+/* v1065 (T6): the model take/NPV on a row where ORCA DOES hold country-specific terms.
+   Same marking family as .fc-gen-* above — a basis marker on the cell itself, which holds in
+   every sort order — but these rows are not generic defaults, so they are not greyed to .fc-gen
+   muted. They keep full text weight and lose only the take-TIER ramp, because the tier ramp is
+   this table's decision signal and on 24 of these 65 rows it pointed at the wrong band. */
+.fc-mod-val { font-weight: 600; font-size: 14px; color: var(--text); }
+.fc-mod-tag { display: inline-block; margin-left: 5px; font-size: 9px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
+  border: 1px dashed var(--muted); border-radius: 3px; padding: 0 3px; line-height: 13px;
+  vertical-align: 1px; opacity: .85; white-space: nowrap; }
+/* The 24 rows where this figure's own band is not the band of the citable take beside it. */
+.fc-mod-tag.fc-mod-x { color: var(--orange); border-color: var(--orange); opacity: 1; }
 
 /* ── comparison ── */
 .compare-grid { display: grid; grid-template-columns: 160px repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
@@ -69349,6 +69361,88 @@ function renderFCResults(results, price) {
   // _fcMonopoly is the single read point for the condition, shared with exportFCResults().
   // v580 (T5): _fcSelPrice / _fcDbTake / _fcMonopoly moved up to the sort block — the rank is
   // built from the citable take now, so the comparator needs the same accessor these cells use.
+  // ── v1065 (T6): the MODEL columns wore the decision colour on the 65 rows where they are real ──
+  // Walked T6 cold at 1440x900 and at 390x844 hasTouch, both storages cleared and reloaded first,
+  // entering from Home -> Fiscal Compare and reading the grid the default sort produces.
+  //
+  // This table prints the same quantity twice -- Take% MODEL and Take% DB-CITABLE -- and v748
+  // already found and fixed the hazard on the generic rows. Its own words: the mechanic constant
+  // "rendered bold GREEN, because takeClass(22.2) returns 'take-if', the investible tier", so
+  // Venezuela, UAE, Qatar and Russia "carried a green investible take against citable figures of
+  // 74.9 / 74.6 / 74.5 / 46.4". The remedy was to drop the tier pill on those rows and mark the
+  // cell `default`. That remedy was applied to the `termsBasis === 'default'` branch ONLY.
+  //
+  // The `else` branch -- the 65 rows where ORCA DOES hold country-specific terms, i.e. the actual
+  // producers -- kept the bare tier pill. Measured on the shipped build, cold default sort:
+  //
+  //   MODEL take cells carrying no tooltip, no handler and no label   65 of 185
+  //     ... and all 65 are the country-specific rows. The 117 generic
+  //         rows all carry one. An exact inversion: the uninformative
+  //         constant was explained, the informative figure left bare.
+  //   Both pills render take-val at 14px on the same ramp               65 of 65
+  //   MODEL pill sits in a DIFFERENT take band than the citable pill    24 of 65  (37%)
+  //
+  // So on 24 rows the biggest, boldest, tier-coloured figure in the row contradicts the band of
+  // the number that is actually ranked, cited, exported and pasted:
+  //
+  //   Nigeria        model 47.3% moderate   citable 81.1% NOC-dominated   two bands apart
+  //   Turkmenistan   model 61.0% high       citable 87.2% NOC-dominated
+  //   Norway         model 54.1% moderate   citable 68.0% high
+  //   Kazakhstan     model 58.3% moderate   citable 69.9% high
+  //   Iraq           model 67.2% high       citable 34.1% investible
+  //
+  // v580 moved the # rank and the tier DIVIDERS onto the citable take, so the row's POSITION is
+  // right -- Nigeria sits under the NOC divider. The pill colour is the only thing on the row
+  // still saying otherwise, and colour is what a 20-minute scan reads first. An analyst scanning
+  // the take ramp down this column reads Nigeria as moderate and keeps it on the screening list.
+  //
+  // Fix, following v748's own precedent rather than inventing one: the take-tier ramp is the
+  // table's decision signal and exactly one figure per row can own it -- the citable one, the one
+  // every downstream surface carries. The model figure keeps full text weight (it is not a generic
+  // default and must not read as one) and loses only the ramp, and the cell is labelled `model` so
+  // the two pills are finally distinguishable without reading a header four columns away. On the
+  // 24 rows where the bands disagree the label turns orange and carries the direction -- up means
+  // the citable take is in a HARDER band than this figure looks.
+  //
+  // Nothing is recomputed, nothing is removed from the screen, no row changes height, and both
+  // columns still print the same figures to the same precision.
+  var _TIER_NAME1065 = { 'take-if': 'investible (≤40%)', 'take-mod': 'moderate (41–60%)',
+                         'take-hi': 'high (61–75%)', 'take-noc': 'NOC-dominated (>75%)' };
+  // The value the citable pill is tier-coloured ON. On the 10 fee-basis rows that is v675's
+  // COMPARABLE take, not the published blend -- read it the same way here so this marker and the
+  // cell beside it can never disagree about which band the row is in.
+  var _fcCitedTierVal1065 = function (r) {
+    var _f = (typeof _fcFeeState === 'function') ? _fcFeeState(r) : null;
+    if (_f && _f.cmp != null) return Number(_f.cmp);
+    var v = _fcDbTake(r);
+    return (v == null || isNaN(v)) ? null : Number(v);
+  };
+  // One builder for both model cells, so the take and the NPV cannot end up marked two
+  // different ways on the same row.
+  var _fcModelCell1065 = function (r, body, what) {
+    var cited = _fcCitedTierVal1065(r);
+    var mt    = (r.liveTake == null) ? null : takeClass(r.liveTake);
+    var ct    = (cited == null) ? null : takeClass(cited);
+    var clash = !!(mt && ct && mt !== ct);
+    var t = 'MODEL — ' + r.country + ' ' + what + ' as computed by THIS SCREEN’S DCF engine on the '
+      + 'profile selected above. It is the only figure in the tool that moves with the profile '
+      + 'selector, which is what it is for. It is NOT citable and it is not what this row is ranked '
+      + 'on: the # rank, the tier dividers, the drilldown citation, the JSON API, the XLSX and '
+      + '⌘ Copy for IC Memo all carry the db · citable figure beside it.';
+    if (clash) {
+      t += ' This figure sits in the ' + _TIER_NAME1065[mt] + ' take band. The citable take beside it, '
+        + cited.toFixed(1) + '%, is ' + _TIER_NAME1065[ct] + ' — a different band, which is why this '
+        + 'cell is not tier-coloured. Read the colour on the citable cell, and screen on that band.';
+    } else {
+      t += ' Not tier-coloured, because exactly one take per row owns the tier ramp and it is the '
+        + 'citable one.';
+    }
+    var tag = clash
+      ? '<span class="fc-mod-tag fc-mod-x">model ' + (ct && cited > r.liveTake ? '↑' : '↓') + '</span>'
+      : '<span class="fc-mod-tag">model</span>';
+    return '<td class="num" title="' + t.replace(/"/g, '&quot;') + '">'
+      + '<span class="fc-mod-val">' + body + '</span>' + tag + '</td>';
+  };
   // v547 (T5): the citable database take cell. Same value the drilldown, Country Profile, the API
   // and the XLSX GovtTake_ column carry. Tier-coloured on the same ramp as the model column so the
   // two are read on one scale, and the tooltip names the gap between them where there is one.
@@ -69879,10 +69973,15 @@ function renderFCResults(results, price) {
         html += _fcDbNpvCell(r);
         html += '<td class="num" data-fcbe="' + r.country.replace(/"/g, '&quot;') + '">' + beStr + '</td>';
       } else {
-      html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
+      // v1065 (T6): was a bare `take-val takeClass(r.liveTake)` pill with no title, no handler
+      // and no label — identical rendering to the citable pill beside it, in a contradicting
+      // take band on 24 of these 65 rows. See _fcModelCell1065 above for the measurements.
+      html += _fcModelCell1065(r, r.liveTake.toFixed(1) + '%', 'government take');
       html += _fcDbTakeCell(r);
       html += '<td class="num">' + _qualCell + '</td>';
-      html += '<td class="num">' + npvStr + '</td>';
+      // v1065 (T6): the model NPV carried the same absence — no title and no label on exactly
+      // these 65 rows, while the 117 generic ones were marked `default` by v748.
+      html += _fcModelCell1065(r, npvStr, 'contractor NPV');
       html += _fcDbNpvCell(r);
       html += '<td class="num" data-fcbe="' + r.country.replace(/"/g, '&quot;') + '">' + beStr + '</td>';
       }
