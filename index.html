@@ -3199,7 +3199,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1058</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1060</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -39983,7 +39983,73 @@ function runScreener() {
   var _verifiedRows = data.filter(function(d){ return _dqTier(d).hasProduction; });
   var _sbsFromVerified = _verifiedRows.length >= 2 && _nProxy > 0;
   var _sbsPool = _sbsFromVerified ? _verifiedRows : data;
-  var top4 = _sbsPool.slice(0, 5);
+  // ── v1060 (T1) — the frontier presets could not be carried to the comparison tab ──────────
+  //
+  // Walked T1 cold at 1440x900, both storages cleared: Screener -> Atlantic Frontier. That
+  // preset selects SIX named countries -- Guyana, Angola, Brazil, Nigeria, Suriname, Gabon --
+  // and Side-by-Side holds CMP_MAX = 5. So the one-click handoff is the whole point of the
+  // screen, and measured on HEAD it handed over THREE:
+  //
+  //     Atlantic Frontier   6 rows   button "Load top 3 verified-production"  Brazil, Angola, Nigeria
+  //     Frontier Markets   56 rows   button "Load top 3 verified-production"  Angola, Indonesia, Malaysia
+  //     PSC Africa         34 rows   button "Load top 2 verified-production"  Libya, Angola
+  //
+  // Two of the five columns go unused while Gabon, Guyana and Suriname -- the three rows the
+  // preset exists to surface, and the pair that makes the Guyana-Suriname basin the frontier
+  // play of the decade -- are left on the Screener. The label is honest about the RULE it
+  // applied ("verified-production") and says nothing about the rows it dropped, so the analyst
+  // reads three columns as the answer the screen produced rather than as a truncation of it.
+  //
+  // v507 set the rule -- "the shortlist handoff must not ship proxy economics into
+  // Side-by-Side" -- and v543 reinforced it after the R-factor sort handed over five proxies.
+  // The hazard was real and it is NOT reopened here. Measured against the shipped
+  // country_data.json, what makes that hazard is the FLOOR-TAKE group, not proxy status:
+  //
+  //     Vanuatu     take  5.0%  NPV $5.10B   0 rent levers   14 facts   floor
+  //     Bahamas     take 10.0%  NPV $4.67B   0 rent levers    8 facts   floor
+  //     Montenegro  take 10.5%  NPV $4.63B   0 rent levers   30 facts   floor
+  //     Gabon       take 55.4%  NPV $1.35B   6 rent levers  980 facts   NOT floor
+  //     Guyana      take 54.1%  NPV $1.07B   4 rent levers 1051 facts   NOT floor
+  //     Suriname    take 54.2%  NPV $1.01B   4 rent levers  367 facts   NOT floor
+  //
+  // v743 built _scTakeIsFloor() for exactly this distinction and recorded that its 45 rows hold
+  // "not one real petroleum jurisdiction". So the top-up screens on that predicate, which names
+  // the hazard directly, instead of on hasProduction, which only correlates with it -- and the
+  // micro-states that triggered v507 and v543 stay excluded by name.
+  //
+  // The destination has also changed. v507 was written when Side-by-Side could not qualify a
+  // proxy column; v1057/v1058 built _cmpStatCtxAt() and _vdBasisClear() so that every
+  // proxy-basis column is placed against the 161 statutory-terms regimes and labelled as such,
+  // and scOpenSbs() already toasts the mixed basis at hand-over. The guard is now removing rows
+  // the receiving tab is equipped to caveat.
+  //
+  // Nothing is re-ranked: the top-up walks `data` in the screen's own order, so the verified
+  // rows still lead and the proxies follow in the rank the table shows. State monopolies are
+  // skipped -- take pins to 100% and contractor NPV to $0, so there is no position to compare.
+  var _sbsCap = (typeof CMP_MAX === 'number' ? CMP_MAX : 5);
+  var _sbsToppedUp = 0;
+  if (_sbsFromVerified && _sbsPool.length < _sbsCap) {
+    var _sbsHave = {};
+    _sbsPool.forEach(function (d) { _sbsHave[d.country] = 1; });
+    var _sbsAdd = [];
+    for (var _sbsI = 0; _sbsI < data.length && (_sbsPool.length + _sbsAdd.length) < _sbsCap; _sbsI++) {
+      var _sbsD = data[_sbsI];
+      if (_sbsHave[_sbsD.country]) continue;
+      if (typeof _scTakeIsFloor === 'function' && _scTakeIsFloor(_sbsD)) continue;
+      var _sbsT = _sbsD['take_' + price];
+      if (typeof isStateMonopoly === 'function' && isStateMonopoly(_sbsT)) continue;
+      _sbsAdd.push(_sbsD);
+    }
+    if (_sbsAdd.length) {
+      _sbsPool = _sbsPool.concat(_sbsAdd);
+      _sbsToppedUp = _sbsAdd.length;
+      // Hand the mixed-pool branch of _scSyncSbsBtn() (v909) the state it keys on, so the
+      // button prints "N verified-production + M proxy" rather than claiming all five are
+      // measured. _allProxy is untouched -- this branch only runs with >= 2 verified rows.
+      _sbsFromVerified = false;
+    }
+  }
+  var top4 = _sbsPool.slice(0, _sbsCap);
   var screenerTop4Btn = document.getElementById('screener-top4-btn');
   if (!screenerTop4Btn) {
     screenerTop4Btn = document.createElement('div');
@@ -39999,6 +40065,11 @@ function runScreener() {
   window._scSbsTop5 = top4.map(function(d) { return d.country; });
   window._scSbsFromVerified = _sbsFromVerified;
   window._scSbsAllProxy = !!_allProxy;
+  // v1060 (T1): how many columns came from the top-up, and how many screened rows the grid's
+  // five columns cannot carry. _scSyncSbsBtn() states both; the second is what tells the analyst
+  // that three columns on Atlantic Frontier was a truncation rather than the screen's answer.
+  window._scSbsToppedUp = _sbsToppedUp;
+  window._scSbsScreenRows = data.length;
   // ── v909 (T1): the MIXED pool had no name. ─────────────────────────────────────────────────
   // v507 set the contract in its own words: "the shortlist handoff must not ship proxy economics
   // into Side-by-Side", and the button "says which group it drew from so the analyst is not
@@ -41126,13 +41197,51 @@ function _scSyncSbsBtn() {
   // PROXY badge on every row of the table; this line sat directly under it carrying none.
   if (names) {
     var shownProxy = _scProxyNames(shown);
+    // ── v1060 (T1) — what the five columns do NOT carry. ─────────────────────────────────────
+    // Walked T1 cold: Atlantic Frontier screens to 6 rows and this line printed 3 names with
+    // nothing to mark the other 3 as dropped, so three columns read as the screen's answer
+    // rather than as a truncation of it. v1060 tops the pool up to CMP_MAX; where the screen
+    // still holds more rows than the grid can take, the shortfall is named here, beside the
+    // names that ARE going -- the only place on the page that lists the hand-over set.
+    // Gated to a SHORTLIST-sized screen (<= cap + 3). "Load top 5" already tells an analyst
+    // looking at 15 or 185 rows that they are getting the top five of a longer list; the note
+    // earns its place only where the screen is small enough that the whole thing looks like it
+    // ought to transfer, which is the case Atlantic Frontier creates at 6 rows.
+    var _ncRows   = (!sel.length && typeof window._scSbsScreenRows === 'number') ? window._scSbsScreenRows : 0;
+    var _ncLeft   = (_ncRows > 0 && _ncRows <= cap + 3) ? Math.max(0, _ncRows - shown.length) : 0;
+    var _ncNames  = [];
+    if (_ncLeft > 0 && _ncLeft <= 3 && Array.isArray(window._screenerLastNames)) {
+      for (var _nci = 0; _nci < window._screenerLastNames.length; _nci++) {
+        if (shown.indexOf(window._screenerLastNames[_nci]) === -1) _ncNames.push(window._screenerLastNames[_nci]);
+      }
+    }
+    var _ncNote = _ncLeft > 0
+      ? '   \u2014 ' + _ncLeft + ' more on this screen not carried'
+        + (_ncNames.length ? ' (' + _ncNames.join(', ') + ')' : '')
+        + '; Side-by-Side holds ' + cap + '. Tick rows to choose your own ' + cap + '.'
+      : '';
     names.textContent = shown.map(function (c) {
       return c + (window._scProxyByCountry && window._scProxyByCountry[c] ? ' \u00b0' : '');
-    }).join(' \u00b7 ') + (shownProxy.length ? '   \u00b0 proxy economics \u2014 no verified field production' : '');
-    names.title = shownProxy.length
+    }).join(' \u00b7 ') + (shownProxy.length ? '   \u00b0 proxy economics \u2014 no verified field production' : '')
+      + _ncNote;
+    names.title = (shownProxy.length
       ? shownProxy.join(', ') + (shownProxy.length === 1 ? ' is' : ' are')
         + ' modelled on regional terms \u2014 indicative, not measured.'
-      : '';
+      : '')
+      + (_ncLeft > 0
+          ? (shownProxy.length ? ' ' : '')
+            + 'This screen returned ' + _ncRows + ' countries and Side-by-Side holds ' + cap
+            + ', so ' + _ncLeft + ' of them '
+            + (_ncLeft === 1 ? 'is' : 'are') + ' not in this hand-over'
+            + (_ncNames.length ? ': ' + _ncNames.join(', ') : '')
+            + '. Tick the rows you want in the table below to compare your own choice instead.'
+          : '')
+      + (!sel.length && window._scSbsToppedUp
+          ? ' ' + window._scSbsToppedUp + ' of these ' + shown.length
+            + ' column' + (window._scSbsToppedUp === 1 ? ' is' : 's are')
+            + ' proxy-terms rows added because this screen holds fewer than ' + cap
+            + ' production-backed countries; rows whose take is only a floor are still excluded.'
+          : '');
   }
   var dockSbs = document.getElementById('sc-dock-sbs');
   if (dockSbs) {
@@ -49234,6 +49343,54 @@ function loadCountryProfile(country) {
       + '</div>';
   })();
 
+  // ── v1063 (T2): the mechanic pill beside the take, where the dispute does its damage ──────
+  // This pill is the first thing read and the thing that gets said out loud in the meeting —
+  // "Denmark, PRRT, 41.5%". On Denmark, Liberia and Sierra Leone the pill names a mechanic
+  // that this page's own Fiscal Mechanic Breakdown gives 0.9%, 18.7% and 6.8% of the contract
+  // record respectively, and nothing on the strip said so. The card that would settle it sits
+  // ~2,500px below the fold.
+  //
+  // The pill now carries its own count and the plurality it contradicts, with the take each of
+  // the two mechanics actually runs, and is a control that scrolls to the breakdown. On the
+  // 182 countries where _cpMechDispute() returns null the markup is byte-identical to v1062.
+  const _mechDis1063 = (typeof _cpMechDispute === 'function') ? _cpMechDispute(d) : null;
+  const _mechTag1063 = _mechDis1063
+    ? '<span class="' + getMechTagClass(_primaryMech344) + '" role="button" tabindex="0"'
+      + ' onclick="_cpToMechBreakdown()"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_cpToMechBreakdown();}"'
+      + ' style="align-self:flex-start;cursor:pointer;min-height:24px;display:inline-flex;align-items:center;'
+      + 'gap:6px;border:1px solid var(--orange);"'
+      + ' title="' + ('ORCA labels ' + country + ' ' + _primaryMech344 + ', but its own contract record files '
+          + Number(_mechDis1063.mixN).toLocaleString() + ' of ' + Number(_mechDis1063.tot).toLocaleString()
+          + ' contracts as ' + _mechDis1063.mixTop + ' and only '
+          + Number(_mechDis1063.labelledN).toLocaleString() + ' as ' + _mechDis1063.labelled
+          + '. The label drives the DCF the Live DCF panel runs and the terms the Evidence Chain '
+          + 'scopes its findings to. ORCA does not record which of the two is right. Click for the '
+          + 'per-mechanic breakdown.').replace(/"/g, '&quot;') + '">'
+      + (_primaryMech344 || '—')
+      + '<span style="font-size:10px;font-weight:700;color:var(--orange);white-space:nowrap;">&#9888; '
+      + Number(_mechDis1063.labelledN).toLocaleString() + ' of '
+      + Number(_mechDis1063.tot).toLocaleString() + '</span>'
+      + '</span>'
+    : '<span class="' + getMechTagClass(_primaryMech344) + '" title="'
+      + getMechTagTitle(_primaryMech344).replace(/"/g, '&quot;') + '" style="align-self:flex-start;">'
+      + (_primaryMech344 || '—') + '</span>';
+  const _mechDisLine1063 = _mechDis1063
+    ? '<div role="button" tabindex="0" onclick="_cpToMechBreakdown()"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_cpToMechBreakdown();}"'
+      + ' style="max-width:340px;font-size:10px;line-height:1.45;color:var(--muted);cursor:pointer;'
+      + 'min-height:24px;padding:3px 7px;border-left:2px solid var(--orange);background:rgba(176,104,0,.05);">'
+      + '<strong style="color:var(--orange);">' + Number(_mechDis1063.mixN).toLocaleString() + ' of '
+      + Number(_mechDis1063.tot).toLocaleString() + ' contracts (' + _mechDis1063.mixPct.toFixed(1)
+      + '%) are ' + _mechDis1063.mixTop + '</strong>, not ' + _mechDis1063.labelled + '. '
+      + ((_mechDis1063.mixTake != null && _mechDis1063.labelledTake != null)
+          ? 'They run ' + _mechDis1063.mixTake.toFixed(1) + '% take against '
+            + _mechDis1063.labelledTake.toFixed(1) + '%. '
+          : '')
+      + 'ORCA does not record which reading is right; the label picks the engine. '
+      + '<span style="color:var(--accent);font-weight:700;white-space:nowrap;">breakdown &darr;</span></div>'
+    : '';
+
   // v451: CP headline strip redesigned — two visual zones separated by a vertical rule.
   // v452: Zone A now includes global rank + vs-median pill directly under the take number.
   // v454: Zone B now shows IC Memo guidance below stability dots.
@@ -49242,7 +49399,7 @@ function loadCountryProfile(country) {
   const _headlineStrip344 = `<div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:16px;">
   <div style="display:flex;align-items:flex-start;gap:10px;padding-right:18px;">
     <div style="display:flex;flex-direction:column;gap:6px;">
-      <span class="${getMechTagClass(_primaryMech344)}" title="${getMechTagTitle(_primaryMech344).replace(/"/g,'&quot;')}" style="align-self:flex-start;">${_primaryMech344 || '—'}</span>
+      ${_mechTag1063}${_mechDisLine1063}
       <div id="cp-take-source" role="button" tabindex="0" onclick="_cpTakeToEvidence('${_rrJs344}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();_cpTakeToEvidence('${_rrJs344}');}" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;cursor:pointer;min-height:24px;">
         <span style="font-size:26px;font-weight:900;color:${_takeColor344};letter-spacing:-.5px;border-bottom:2px dotted ${_takeColor344};">${_takeDisplay344}</span>
         <span style="font-size:12px;color:var(--muted);">govt take @$75</span>
@@ -57829,10 +57986,48 @@ function renderReformRisk() {
       + '</div>';
   }
 
+  // ── v1059 (T4): the in-window-rise rows, and the green the card wore over them ──────────
+  // Two defects, both at the point where the analyst decides whether to carry a 3-5pp WACC
+  // premium, and both on the SAME two rows — Russia (+15pp, 2022) and Ecuador (+5pp, 2010).
+  //
+  // 1. This divider read "These 2 clear the frequency bar but each raised government take in
+  //    2010 or later." The bar is 3+ changes since 2010. Every row in this card has at most
+  //    ONE. They do not clear it — they sit as far below it as a row can while still having a
+  //    change at all. The sentence asserted the opposite of the finding it exists to deliver,
+  //    and it asserted it with the number 2, which is also the count the Snapshot at the top of
+  //    the tab gives for the countries that genuinely DO clear the bar ("2 clear this tab's
+  //    WACC-premium bar of 3+ ... United Kingdom and Brazil"). So the tab printed "2 clear the
+  //    frequency bar" twice, over four different countries, in opposite senses. "Clears the
+  //    frequency bar" is used in the ≤1 sense at the _rrArtefact definition and in the 3+ sense
+  //    in the Snapshot, the ranked-table divider and the heatmap Scored tooltip — four to one,
+  //    so the divider is the one that moves. It now prints the count and the bar as numbers
+  //    rather than an idiom, so there is nothing left to read two ways.
+  //
+  // 2. v561 established the rule for this tab: "Green is now reserved for rows with no
+  //    take-raising event on record at all." It was applied to the ranked table and never to
+  //    this card, whose heading text and 3px left border are var(--green) — the leftmost card
+  //    in a green/orange/red scan gradient, titled QUIET SINCE 2010. Only 4 of its 13 rows
+  //    (Ghana, Guyana, Iraq, India) meet v561's condition. The other 9 have a take rise on
+  //    record, 2 of them inside the scoring window, and the largest quantified in-window take
+  //    rise anywhere on the platform — Russia +15pp — is one of them. The contradicting text
+  //    was all there, but three sub-blocks down, at 10px, in grey, under the inverted sentence
+  //    above. At scan altitude the card said green/quiet and nothing else.
+  //
+  // The band itself is not wrong: these are the 0-1-change jurisdictions, which is what the
+  // card measures. What was missing was the second axis — magnitude — at the altitude the
+  // first axis is read. So the green is now earned rather than assumed, and the largest
+  // in-window rise is named in the header strip, before any row.
+  var quietRiseMax = quietInWindow.reduce(function (best, r) {
+    var pp = (r.lastHostile && r.lastHostile.cumIn) || 0;
+    return (!best || pp > ((best.lastHostile && best.lastHostile.cumIn) || 0)) ? r : best;
+  }, null);
+  var quietMaxScored = quiet.reduce(function (m, r) { return Math.max(m, r.since2010 || 0); }, 0);
   var quietRiseDivider = quietInWindow.length
     ? '<div style="margin:10px 0 4px;padding:7px 9px;background:rgba(176,104,0,.09);border-left:3px solid var(--orange);border-radius:4px;font-size:10px;line-height:1.55;color:var(--text);">'
       + '<strong style="color:var(--orange);">Take was raised inside the window.</strong> '
-      + 'These ' + quietInWindow.length + ' clear the frequency bar but each raised government take in 2010 or later. '
+      + 'These ' + quietInWindow.length + ' sit <strong style="color:var(--text);">below</strong> this tab’s frequency bar '
+      + '— at most ' + quietMaxScored + ' fiscal law change' + (quietMaxScored === 1 ? '' : 's') + ' since 2010 against a bar of 3, '
+      + 'so no frequency premium is indicated for them — and each raised government take in 2010 or later anyway. '
       + 'The score counts that change once and never reads how big it was, so a +15pp rupture and a 1pp tweak score the same. '
       + 'Read the event, not the score.'
       + '</div>'
@@ -57903,10 +58098,37 @@ function renderReformRisk() {
     + ((typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA ? COUNTRY_DATA.length : 185)) + ' countries and says so explicitly.'
     + '</div>';
 
+  // v1059 (T4): green iff earned, by v561's rule — no take-raising event on record anywhere in
+  // the card. On the live data quietClean is 4 of 13, so the heading and the left border go
+  // neutral and the scan gradient reads neutral / orange / red instead of safe / watch / risk.
+  var quietRises  = quiet.length - quietClean.length;
+  var quietEarnsGreen = quietRises === 0;
+  var quietAccent = quietEarnsGreen ? 'var(--green)' : 'var(--muted)';
+  // The magnitude axis, at the altitude the frequency axis is read. Named before any row, so
+  // the largest quantified in-window take rise in the card cannot be missed by an analyst who
+  // reads the heading and moves on.
+  var quietRiseStrip = (quietRiseMax && quietRiseMax.lastHostile)
+    ? '<div style="margin:-2px 0 10px;padding:6px 9px;background:rgba(176,104,0,.10);border-left:3px solid var(--orange);border-radius:4px;font-size:10px;line-height:1.55;">'
+      + '<strong style="color:var(--orange);">Largest take rise inside the window, in this card:</strong> '
+      + '<span style="color:var(--text);font-weight:700;">' + _rrEsc(quietRiseMax.country) + '</span>'
+      + '<span style="font-family:\'IBM Plex Mono\',monospace;color:var(--red);font-weight:700;"> +'
+      + quietRiseMax.lastHostile.cumIn.toFixed(0) + 'pp</span>'
+      + '<span style="color:var(--muted);"> in ' + quietRiseMax.lastHostile.year + ' — '
+      + _rrEsc(quietRiseMax.lastHostile.event) + '. A low change-count is not a small change.</span>'
+      + '</div>'
+    : '';
   var stabVol = '<div style="display:grid;grid-template-columns:1.15fr 1fr .8fr;gap:16px;margin-bottom:20px;align-items:start;">'
-    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:16px;">'
-    + '<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Quiet Since 2010 <span style="color:var(--muted);">(' + quiet.length + ')</span></div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">0–1 sourced fiscal law changes since 2010. This measures recent legislative activity only — it is not a judgement that the regime is safe. Each row shows its most recent take-raising event so the window cut-off is visible.</div>'
+    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid ' + quietAccent + ';border-radius:10px;padding:16px;">'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-bottom:8px;">'
+    + '<span style="font-size:11px;font-weight:700;color:' + quietAccent + ';text-transform:uppercase;letter-spacing:.06em;">Quiet Since 2010 <span style="color:var(--muted);">(' + quiet.length + ')</span></span>'
+    + (quietRises
+        ? '<span style="font-size:9px;font-weight:700;color:var(--orange);background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:3px;padding:1px 5px;text-transform:uppercase;letter-spacing:.04em;" title="' + quietRises + ' of these ' + quiet.length + ' jurisdictions have a take-raising event on record — ' + quietInWindow.length + ' of them dated 2010 or later. Only the ' + quietClean.length + ' with no take rise at all are printed green on this tab (v561).">&#9888; ' + quietRises + ' of ' + quiet.length + ' raised take</span>'
+        : '')
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">0–1 sourced fiscal law changes since 2010 — a <em>frequency</em> band, and the only thing these rows have in common. It measures recent legislative activity, never magnitude, and it is not a judgement that the regime is safe. '
+    + (quietRises ? 'Of the ' + quiet.length + ' here, <strong style="color:var(--text);">' + quietRises + ' have a take-raising event on record</strong> — ' + quietInWindow.length + ' inside the window, ' + quietArtefact.length + ' before it — so the band is printed uncoloured rather than green. ' : '')
+    + 'Each row shows its most recent take-raising event so the window cut-off is visible.</div>'
+    + quietRiseStrip
     + (quietClean.length
         ? quietClean.map(function(r){ return _quietRow(r, 'clean'); }).join('')
         : '<div style="font-size:11px;color:var(--muted);padding:6px 0;">None — every quiet jurisdiction on file has a take-raising event on record.</div>')
@@ -62000,6 +62222,234 @@ function _sbReturnReading(res) {
   return R;
 }
 
+
+// ── v1061 (T2): the suppression the Country Profile applies, and Scenario Builder did not ──
+//
+// Walked T2 cold at 1440x900, sessionStorage and localStorage cleared: Country Profile ->
+// Brazil. The headline strip's ONLY route to a return is the "IRR: -> Model in Scenario
+// Builder" button on its IRR row, and the Live DCF panel further down that same page refuses
+// the rate in so many words:
+//
+//   "IRR is 100.8% and is not quoted: only $261M of $1.2B capex is ever at risk -- cost
+//    recovery reimburses the rest as it is spent, repaid by year 3. The rate is a return on
+//    that exposure, not on the project."
+//
+// Click the button. Scenario Builder runs the SAME mechanic on the SAME record terms, the SAME
+// Deepwater profile at the SAME $75, and prints 100.8% as a 22px var(--green) headline under
+// the label "Contractor IRR". Green is this platform's own signal that a figure is usable, and
+// three tiles are what an analyst reads before scrolling.
+//
+// Scenario Builder then contradicts itself inside its own output. _sbHurdleLine() has printed
+// "quote the hurdle test, not the rate" since v594, and _sbBuildICTable() withholds the rate
+// from the clipboard entirely ("IRR, withheld -- not a project return"). So the artifact that
+// LEAVES the building is already honest and the tile on screen is not -- the inverse of the
+// usual defect, and worse, because the analyst reads the tile and pastes the table and never
+// sees that the two disagree.
+//
+// The verdict existed; it was inline inside renderLiveDCFPanel() (v703 / v865 / v1036), so only
+// one of the two surfaces had it. Measured across all 185 countries, each on its own Country
+// Profile panel run at $75 -- which is exactly the run the button hands to Scenario Builder:
+//
+//   inflated (rate >= 100%)        117   every one painted var(--green) by the SB tile
+//   thin base (< 22% of capex)      20   Norway among them; _sbHurdleLine misses these too
+//   quotable rate                   45
+//   no rate exists                   3   (SB already prints "no IRR" for these)
+//
+// 137 of 185. The fix is not new wording -- the wording was written at v703. It is one verdict
+// function, called by both tiles, so the two cannot report one run differently again.
+//
+// ── v1062 (T2): the verdict explained the exposure with a mechanic the regime does not have ──
+//
+// Walked T2 cold at 1440x900, both storages cleared: Country Profile -> Brazil, the default
+// Deepwater profile at $75. The Live DCF panel's middle tile is the one surface on the page that
+// answers "and can I defend that" -- it leads with the hurdle test, +$2.3B, and explains in its
+// note why the rate underneath it is withheld:
+//
+//   "IRR is 100.8% and is not quoted: only $261M of $1.2B capex is ever at risk -- cost
+//    recovery reimburses the rest as it is spent, repaid by year 3."
+//
+// Brazil is a Concession. dcfConcession() has no cost-recovery leg of any kind: it takes
+// revenue, subtracts royalty, opex and a 7-year straight-line depreciation allowance, taxes the
+// remainder, and charges the contractor its full working-interest share of every dollar of
+// capex. Nothing is reimbursed to anyone. The panel's own FISCAL BREAKDOWN, rendered ~200px
+// above this note, prints Royalty 14.9% and Corp. Income Tax 15.0% and no cost-recovery line at
+// all -- so the tile contradicts the waterfall beside it on the same screen.
+//
+// v1036 had already found this exact sentence and this exact reason, and fixed it for ONE
+// branch. Its own comment, still above the `thin` case below: "That sentence names cost recovery
+// as the mechanism, which is right for the PSC and TSC rows but wrong for Norway -- a Concession
+// with no cost recovery at all". It wrote mechanism-free wording for `thin` and left `inflated`
+// -- the branch 117 of 185 countries actually land in -- asserting it.
+//
+// Measured on the shipped build, every country run on its own Country Profile default profile
+// at $75, classified by whether runLiveDCF() dispatches it to an engine that has a cost-recovery
+// leg (dcfPSC / dcfTSC / dcfBuyback) or one that does not (dcfConcession / dcfPRRT):
+//
+//   prints "cost recovery", engine has none     111 of 185   109 Concession + 2 PRRT
+//   prints "cost recovery", engine has one        6 of 185   Azerbaijan, China, Kazakhstan,
+//                                                            Madagascar, Suriname, Timor-Leste
+//
+// So the sentence is wrong 111 times out of the 117 it is printed -- 95% -- and the 111 include
+// USA, Brazil, Saudi Arabia, Mexico, Argentina, Kuwait, Qatar and Australia. Across all six
+// profile selections it is 637 of 1,110 runs and 125 distinct countries, in three states
+// (`inflated` 236, `no-capital-at-risk` 245, `unbounded` 156). PRRT is wrong for the same
+// reason by a different route: dcfPRRT() carries costs forward in an augmented expenditure base
+// compounded at an uplift rate, which is a deferral, not a reimbursement.
+//
+// This is worse than an unexplained number. An analyst defending Brazil on this tile repeats
+// "the capital exposure is low because costs are recovered as they are spent" to an IC that
+// knows a Brazilian concession does no such thing, and loses the room on a sentence the
+// platform handed them. The real reason the at-risk base is thin on these engines is that
+// revenue arrives while the capex is still being spent, so few years are ever net negative --
+// which is a property of the profile, not a fiscal term, and is worth saying plainly.
+//
+// `mech` is therefore now an argument, and it gates all three cost-recovery claims in this
+// function. When it is absent the no-cost-recovery wording is used: an unknown mechanic must
+// never be described as reimbursing anything. No figure, colour, threshold or verdict changes
+// -- `V.costRec` touches wording only -- and the 6 countries whose engine does reimburse read
+// exactly as before.
+function _irrVerdict1061(R, capexMM, npv10, mech) {
+  if (!R) return null;
+  // The engines runLiveDCF() and runCustomScenario() dispatch to that actually hold a
+  // cost-recovery leg. Anything else -- dcfConcession, dcfPRRT, or a mechanic this function was
+  // not told -- reimburses nothing, and must not be described as if it did.
+  var V_CR_MECHS = { 'PSC':1, 'EPSA':1, 'Gross Split':1, 'Revenue Share':1,
+                     'TSC':1, 'RSC':1, 'Buy-back':1, 'Buyback':1 };
+  // v1036: the ceiling of the exposure range the page already declines to quote a rate on.
+  // Named in one place so it can be moved on review.
+  var THIN_MAX_PCT = 22;
+  var m   = function(v) { return v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'B' : '$' + Math.round(v) + 'M'; };
+  var sgn = function(v) { return (v < 0 ? '−' : '+') + m(Math.abs(v)); };
+
+  var V = {};
+  // v1062: true only where the engine that produced this cash flow reimburses capex. Gates the
+  // wording of three branches below and nothing else.
+  V.costRec  = !!(mech && V_CR_MECHS[mech]);
+  V.mechTxt  = mech ? String(mech) : null;
+  V.inflated = (R.state === 'inflated' || R.state === 'unbounded');
+  V.expo     = (capexMM && capexMM > 0 && R.atRisk > 0) ? (R.atRisk / capexMM) * 100 : null;
+  V.thin     = R.state === 'computed' && V.expo !== null && V.expo < THIN_MAX_PCT;
+  // The rate is unusable in four structurally different ways, and in all four the hurdle test is
+  // the figure that answers the question. `uneconomic` is included deliberately: its "no IRR" is
+  // a finding, but a NEGATIVE NPV at 15% states the size of the miss.
+  V.noRate    = V.inflated || R.state === 'no-capital-at-risk' || R.state === 'uneconomic' || V.thin;
+  V.useHurdle = V.noRate && R.npv15 !== null;
+  V.clears    = R.npv15 !== null && R.npv15 > 0;
+
+  if (V.useHurdle) {
+    // Headline becomes the hurdle test. The dollar figure carries its own discount rate in the
+    // label above it, so it can never be read as headroom over the 10% NPV tile.
+    V.value = sgn(R.npv15);
+    V.color = V.clears ? 'var(--green)' : 'var(--red)';
+  } else {
+    V.value = R.value;
+    // An inflated or unbounded rate is never painted green. Green is the page telling the
+    // analyst the number is usable, and this one is not.
+    V.color = V.inflated ? 'var(--muted)' : R.color;
+  }
+  V.big = V.value.length > 7;
+
+  V.hurdleLabelHTML = 'Contractor NPV @ 15% &mdash; '
+    + '<span style="color:' + (V.clears ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
+    + (V.clears ? 'clears the IOC hurdle' : 'fails the IOC hurdle') + '</span>';
+
+  // The long form, for a note that has a full-width line to render on.
+  if (R.state === 'no-capital-at-risk') {
+    V.bodyHTML = 'Contractor funds no negative year'
+      + (capexMM
+           ? (V.costRec
+                ? ' &mdash; cost recovery reimburses the ' + m(capexMM) + ' capex as it is spent'
+                // v1062: no reimbursement exists on this engine. Revenue simply covers the spend
+                // in the year it is made, which is a property of the profile, not a fiscal term.
+                : ' &mdash; revenue covers its share of the ' + m(capexMM) + ' capex in the year it is '
+                  + 'spent, and ' + (V.mechTxt ? 'a ' + V.mechTxt + ' reimburses nothing' : 'nothing is reimbursed'))
+           : '')
+      + ', so there is no capital base for a rate of return.';
+  } else if (R.state === 'uneconomic') {
+    V.bodyHTML = m(R.atRisk) + ' at risk &middot; never repaid &mdash; no IRR exists.';
+  } else if (V.inflated && V.costRec) {
+    V.bodyHTML = 'IRR is <strong style="color:var(--text);">' + R.value + '</strong> and is not quoted: only '
+      + '<strong style="color:var(--text);">' + m(R.atRisk) + '</strong>'
+      + (capexMM ? ' of ' + m(capexMM) + ' capex' : '')
+      + ' is ever at risk &mdash; cost recovery reimburses the rest as it is spent'
+      + (R.payback ? ', repaid by year ' + R.payback : '')
+      + '. The rate is a return on that exposure, not on the project.';
+  } else if (V.inflated) {
+    // v1062: same refusal, true mechanism. The contractor funds the whole spend here; the
+    // exposure is thin because revenue overlaps the capex schedule, and saying so is the
+    // difference between a defensible note and one an IC can refute from the regime name.
+    V.bodyHTML = 'IRR is <strong style="color:var(--text);">' + R.value + '</strong> and is not quoted: only '
+      + '<strong style="color:var(--text);">' + m(R.atRisk) + '</strong>'
+      + (capexMM ? ' of ' + m(capexMM) + ' capex' : '')
+      + (V.expo !== null ? ' &mdash; ' + V.expo.toFixed(1) + '% of the project &mdash;' : '')
+      + ' is ever net negative for the contractor'
+      + (R.payback ? ', repaid by year ' + R.payback : '')
+      + '. ' + (V.mechTxt ? 'A ' + V.mechTxt + ' reimburses nothing' : 'Nothing is reimbursed on this engine')
+      + ' &mdash; the contractor funds the whole spend, and the exposure is this thin only because '
+      + 'revenue arrives while the capex is still running. The rate is a return on that exposure, '
+      + 'not on the project.';
+  } else if (V.thin) {
+    // v1036 (T2): deliberately NOT the inflated wording. That sentence names cost recovery as
+    // the mechanism, which is right for the PSC and TSC rows but wrong for Norway -- a
+    // Concession with no cost recovery at all, whose at-risk base is thin because revenue
+    // arrives against uplift and SPT deductions, not because anything is reimbursed. This
+    // states the exposure and leaves the mechanism to the waterfall.
+    V.bodyHTML = 'IRR is <strong style="color:var(--text);">' + R.value + '</strong> and is not quoted: only '
+      + '<strong style="color:var(--text);">' + m(R.atRisk) + '</strong> of '
+      + m(capexMM) + ' capex &mdash; ' + V.expo.toFixed(1) + '% of the project &mdash; is ever '
+      + 'net negative for the contractor'
+      + (R.payback ? ', repaid by year ' + R.payback : '')
+      + '. The rate is a return on that exposure, not on the project.';
+  } else {
+    // The base, not just the dollar figure, so a quoted rate is readable as a return on a
+    // stated fraction of the project rather than as a project return.
+    V.bodyHTML = m(R.atRisk) + ' at risk'
+      + (V.expo !== null && capexMM
+           ? ' of ' + m(capexMM) + ' capex (' + V.expo.toFixed(1) + '% of the project)'
+           : '')
+      + (R.payback ? ' &middot; payback year ' + R.payback : ' &middot; never repaid')
+      + ' &middot; 25yr project.';
+  }
+
+  // Both figures are the SAME cash flow at two discount rates. Whichever one is the headline,
+  // the closing line names the other and says so -- that is why "+$1.9B" could be misread as
+  // headroom over the 10% tile.
+  V.tailHTML = '';
+  if (V.useHurdle) {
+    V.tailHTML = 'Same cash flow as the 10% NPV tile, discounted at 15% instead'
+      + (npv10 != null ? ' (' + sgn(npv10) + ' at 10%)' : '') + '.';
+  } else if (R.npv15 !== null) {
+    V.tailHTML = 'Hurdle test: contractor NPV <strong style="color:var(--text);">' + sgn(R.npv15)
+      + ' at 15%</strong> &mdash; '
+      + '<span style="color:' + (V.clears ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
+      + (V.clears ? 'clears' : 'fails') + '</span> a 15% IOC hurdle. Same cash flow, higher discount rate.';
+  }
+
+  // The short form, for the 1/3-width centred Scenario Builder tile -- measured 140px wide at
+  // 1440x900, three equal-height grid siblings, so a long note stretches all three cards and
+  // pushes the price deck and the hurdle box below the fold. Measured: the full body ran the
+  // card to 276px against 124px before. The tile therefore carries only what stops the misread
+  // -- the rate is withheld, and the fraction of the project it was struck on. The mechanism,
+  // the dollar exposure, the payback year and the 10%-vs-15% reconciliation all already render
+  // full-width on the same screen in _sbHurdleLine() 200px below it.
+  if (R.state === 'no-capital-at-risk') {
+    // v1062: the no-cost-recovery form is deliberately the SHORTER of the two, so the 140px
+    // tile this renders in cannot grow and stretch its two grid siblings.
+    V.shortHTML = V.costRec
+      ? 'no capital base for a rate &mdash; cost recovery reimburses capex as it is spent'
+      : 'no capital base for a rate &mdash; revenue covers capex as it is spent, nothing reimbursed';
+  } else if (R.state === 'uneconomic') {
+    V.shortHTML = m(R.atRisk) + ' at risk &middot; never repaid &mdash; no IRR exists';
+  } else if (V.inflated || V.thin) {
+    V.shortHTML = 'IRR <strong style="color:var(--text);">' + R.value + '</strong> not quoted &mdash; a return on '
+      + (V.expo !== null ? V.expo.toFixed(1) + '% of project capex' : 'a fraction of project capex')
+      + ', not on the project';
+  } else {
+    V.shortHTML = R.note;
+  }
+  return V;
+}
+
 // The one-line hurdle verdict that is available for 100% of runs, including every run where
 // no IRR exists. NPV > 0 discounted at the hurdle rate IS the hurdle test.
 // v607 (T2): the IC line is the one Scenario Builder artifact that LEAVES the tool. Opened from
@@ -62231,6 +62681,10 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
   var rows = [], notes = [];
   var riskStr = R.atRisk >= 1000 ? '$' + (R.atRisk / 1000).toFixed(1) + 'B' : '$' + Math.round(R.atRisk) + 'M';
   var noCap   = (R.state === 'no-capital-at-risk');
+  // v1061: same verdict the on-screen tile applies, so the paste cannot carry a rate the screen
+  // it was copied from refuses.
+  var _tv1061 = (typeof _irrVerdict1061 === 'function')
+    ? _irrVerdict1061(R, (profile && profile.capexMM) || null, res.npv, mech) : null;   // v1062: mech gates the cost-recovery wording
 
   rows.push(['Government take @ $' + price + '/bbl', res.take != null ? res.take.toFixed(1) + '%' : '—']);
   rows.push(['Contractor NPV @ ' + _sbDiscTxt(profile && profile.discountRate) + ' WACC', fmtSigned(res.npv)]);
@@ -62258,6 +62712,15 @@ function _sbBuildICTable(res, R, profile, price, mech, clears, fmtSigned) {
     irrCell = 'none — never repaid';
     notes.push('IRR, none — the undiscounted contractor cash flow never turns positive on these '
       + 'terms, so no rate of return exists. ' + riskStr + ' of capital is exposed and not repaid.');
+  } else if (_tv1061 && _tv1061.thin) {
+    // v1061: 20 countries — Guyana, Senegal, Liberia, Uganda among them — land here. The rate
+    // clears the 100% cutoff the branch above tests, but stands on the same thin exposure, and
+    // the Country Profile has refused it since v1036. The table used to print it bare.
+    irrCell = 'withheld — not a project return';
+    notes.push('IRR, withheld — only ' + riskStr + ' of the project capex is ever net negative '
+      + 'for the contractor on this profile (' + _tv1061.expo.toFixed(1) + '% of it), so the rate'
+      + (R.irr != null ? ' (' + R.irr.toFixed(1) + '%)' : '')
+      + ' is a return on that exposure and not on the project. Quote the 15% hurdle test instead.');
   } else {
     irrCell = (R.irr != null) ? R.irr.toFixed(1) + '%' : '—';
   }
@@ -62408,6 +62871,9 @@ function _sbHurdleLine(res, profile, price, mech) {
   };
   var clears = R.npv15 > 0;
   var capexMM = (profile && profile.capexMM) || null;
+  // v1061: one verdict, shared with the two IRR tiles, so the box, the tile and the clipboard
+  // cannot describe the same run differently.
+  var _hv1061 = (typeof _irrVerdict1061 === 'function') ? _irrVerdict1061(R, capexMM, res.npv, mech) : null;   // v1062
   // The plain-text artifact. Built here so the on-screen line and the clipboard cannot drift.
   window._sbICLine = mech + ', ' + ((profile && profile.name) || '') + ' profile, $' + price + '/bbl — govt take '
     + res.take.toFixed(1) + '%, contractor NPV ' + f(res.npv) + ' @' + _sbDiscTxt(profile && profile.discountRate)
@@ -62419,7 +62885,13 @@ function _sbHurdleLine(res, profile, price, mech) {
           + (R.payback ? ', payback year ' + R.payback : ', never repaid')
           + (R.state === 'inflated' || R.state === 'unbounded'
               ? '; IRR not quoted — first oil lands in the same year as first capex on this profile, so the rate is not a project return'
-              : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : '')))
+              // v1061: the thin-base case. Withheld on screen since v1036 on the Country Profile
+              // and since this cycle in the Scenario Builder tile; the paste said nothing and
+              // carried the rate, so the artifact asserted what the screen had just refused.
+              : (_hv1061 && _hv1061.thin
+                  ? '; IRR not quoted — the rate is struck on the ' + _hv1061.expo.toFixed(1)
+                    + '% of project capex ever at risk on this profile, not on the project'
+                  : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : ''))))
     + _sbICBasisClause()
     + _sbICTermsClause(mech, window._sbRunParams)
     + _sbICProjectClause(profile)
@@ -62438,7 +62910,11 @@ function _sbHurdleLine(res, profile, price, mech) {
     riskTxt = 'Contractor capital at risk <strong>' + riskStr + '</strong>'
       + ((capexMM && R.atRisk <= capexMM) ? ' of $' + (capexMM >= 1000 ? (capexMM/1000).toFixed(1) + 'B' : capexMM + 'M') + ' project capex' : '')
       + (R.payback ? ' · payback year <strong>' + R.payback + '</strong>' : ' · never repaid')
-      + (R.state === 'inflated' ? '. The IRR above is high because the profile takes first oil in the same year as first capex, so the exposure is small and brief — quote the hurdle test, not the rate.' : '.');
+      + (R.state === 'inflated'
+          ? '. The IRR above is high because the profile takes first oil in the same year as first capex, so the exposure is small and brief — quote the hurdle test, not the rate.'
+          : ((_hv1061 && _hv1061.thin)
+              ? '. That is ' + _hv1061.expo.toFixed(1) + '% of the project, so the rate of return on it is not a project return — the tile above withholds it. Quote the hurdle test.'
+              : '.'));
   }
   return '<div style="margin-top:12px;padding:10px 14px;border:1px solid ' + (clears ? 'rgba(21,128,61,.45)' : 'rgba(185,28,28,.45)')
     + ';border-left:3px solid ' + (clears ? 'var(--green)' : 'var(--red)')
@@ -62956,7 +63432,53 @@ function renderLiveDCFPanel(country, containerId) {
   const _runMech504 = resolveLiveDCFMechanic(country);
   // v704 (T6): and say whether those terms are this country's or the platform's generic template.
   const _prov704 = _ldcfProvenance(country) || { basis:'default', generic:true, monopoly:false, terms:'', shared:0, mechanic:_runMech504 };
-  const _scope704 = _prov704.monopoly
+  // ── v1063 (T2): "ORCA holds no Denmark-specific fiscal parameters" is FALSE ────────────────
+  // On Denmark that sentence is the consequence of the mechanic dispute, not of an evidence
+  // gap. fcResolveMechanic() resolves Denmark to PRRT off n_prrt=110; the record's own
+  // mech_mix files 109 of the 110 contracts as Concession. getDCFParams() on the PRRT branch
+  // returns _basis 'default' — hence the generic template and the "holds no parameters"
+  // claim — while the SAME call on the Concession branch returns _basis 'record' carrying
+  // Denmark's CIT 52.0% and special tax 52.0%, which are printed, cited to primary law, in
+  // the Evidence Chain table on this same page. The panel is not short of Denmark data; it is
+  // running the regime 0.9% of the record carries, and it told the analyst the opposite.
+  const _dis1063 = (typeof _cpMechDispute === 'function') ? _cpMechDispute(d) : null;
+  const _alt1063 = (function() {
+    if (!_dis1063) return null;
+    try {
+      var ap = getDCFParams(country, _dis1063.mixTop, { record: true });
+      if (!ap || ap._basis === 'default') return null;
+      return { basis: ap._basis,
+               held: (ap._basis === 'record' && typeof _dcfRecordTerms === 'function')
+                       ? ((_dcfRecordTerms(ap) || {}).held || null) : null };
+    } catch (e) { return null; }
+  })();
+  // One sentence, appended wherever the panel already describes its own basis, so the three
+  // disputed countries carry it on the db/record branches too without rewriting those.
+  const _disTail1063 = _dis1063
+    ? ' <span style="color:var(--orange);">This run is a <strong>' + _runMech504 + '</strong> model, but ORCA’s own '
+      + 'Fiscal Mechanic Breakdown on this page files <strong>' + Number(_dis1063.mixN).toLocaleString()
+      + ' of the ' + Number(_dis1063.tot).toLocaleString() + ' contracts ('
+      + _dis1063.mixPct.toFixed(1) + '%) as ' + _dis1063.mixTop + '</strong> — a different engine. '
+      + 'ORCA does not record which reading is right.</span>'
+    : '';
+  const _scope704 = (!_prov704.monopoly && _prov704.generic && _dis1063)
+    ? '<strong style="color:var(--orange);">What-if tool — generic template, on a mechanic this record disputes.</strong> '
+      + 'This run is the platform’s generic <strong>' + _runMech504 + '</strong> template ('
+      + _prov704.terms + '), because ORCA resolves ' + country + ' to ' + _runMech504 + '. '
+      + 'Its own <strong>Fiscal Mechanic Breakdown</strong> further down this page files <strong>'
+      + Number(_dis1063.mixN).toLocaleString() + ' of the ' + Number(_dis1063.tot).toLocaleString()
+      + ' contracts (' + _dis1063.mixPct.toFixed(1) + '%) as ' + _dis1063.mixTop + '</strong> and '
+      + Number(_dis1063.labelledN).toLocaleString() + ' as ' + _dis1063.labelled + '. '
+      + ((_alt1063 && _alt1063.held)
+          ? 'ORCA <strong>does</strong> hold ' + country + ' rates — <strong>'
+            + _cpEsc704(_alt1063.held) + '</strong>, both in the Evidence Chain table below — and the '
+            + _runMech504 + ' engine does not read them. So this panel is not short of ' + country
+            + ' data; it is running the regime ' + _dis1063.labelledPct.toFixed(1) + '% of the record carries. '
+          : 'ORCA holds no parameters on the ' + _runMech504 + ' branch, so the run falls to the template. ')
+      + 'Treat the three figures below as a property of the template, not of ' + country + '. '
+      + country + '’s own take, averaged over ' + (d.n ? d.n.toLocaleString() : 'all')
+      + ' real contracts, is at the top of this page.'
+    : _prov704.monopoly
     ? '<strong style="color:var(--orange);">No contractor regime to model.</strong> ORCA holds '
       + country + ' as a <strong>state monopoly</strong> \u2014 the acreage is closed to contractor entry, and the 100.0% '
       + 'take stored against it is a placeholder for &ldquo;no contractor position&rdquo;, not a measured fiscal take. '
@@ -62983,7 +63505,7 @@ function renderLiveDCFPanel(country, containerId) {
         + ', so if ' + country + ' levies ' + (_prov704.recordTerms.zeroCount > 1 ? 'either' : 'it') + ', the take below is understated. '
         + 'The results are that project’s economics &mdash; <em>not</em> ' + country + '’s headline figures, '
         + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
-        + 'Reconciliation of the two is at the bottom of this panel.'
+        + 'Reconciliation of the two is at the bottom of this panel.' + _disTail1063
       : (function() {
           // v964 (T2): the same claim the Scenario Builder banner was making. On the 56 'db'
           // countries this panel ran a 25% template CIT and called it the country's terms.
@@ -63006,7 +63528,7 @@ function renderLiveDCFPanel(country, containerId) {
           return _lead
             + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
             + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
-            + 'Reconciliation of the two is at the bottom of this panel.';
+            + 'Reconciliation of the two is at the bottom of this panel.' + _disTail1063;
         })();
 
   container.innerHTML = `
@@ -63095,6 +63617,17 @@ function _execLiveDCF(country, profileKey, price) {
 
   // ── v704 (T6): what basis are these terms on? ───────────────────────────────────
   const _p704 = _ldcfProvenance(country) || { basis:'default', generic:true, monopoly:false, terms:'', shared:0 };
+  // v1063 (T2): the same mechanic dispute the scope line above now states, carried into the
+  // IC-facing reconciliation block below. "The engine holds no <Country> terms" is the reason
+  // this exhibit gives for the gap, and on a disputed record it is not the reason.
+  const _dis1063x = (typeof _cpMechDispute === 'function') ? _cpMechDispute(country) : null;
+  const _disWhy1063 = _dis1063x
+    ? ' The engine is on ' + _cpEsc704(_dis1063x.labelled) + ' because ORCA labels '
+      + _cpEsc704(country) + ' ' + _cpEsc704(_dis1063x.labelled) + ', while its own mechanic breakdown files '
+      + Number(_dis1063x.mixN).toLocaleString() + ' of ' + Number(_dis1063x.tot).toLocaleString()
+      + ' contracts (' + _dis1063x.mixPct.toFixed(1) + '%) as ' + _cpEsc704(_dis1063x.mixTop)
+      + '. ORCA does not record which reading is right, so the gap is a mechanic dispute, not a measured difference.'
+    : '';
   const _tkLbl704  = document.getElementById('ldcf-take-lbl-' + slug);
   const _tkNote704 = document.getElementById('ldcf-take-note-' + slug);
   const _npLbl704  = document.getElementById('ldcf-npv-lbl-' + slug);
@@ -63115,9 +63648,18 @@ function _execLiveDCF(country, profileKey, price) {
       : 'Govt Take &mdash; this scenario';
   }
   if (_tkNote704) {
+    // v1063 (T2): on a disputed mechanic "no X terms in the engine" is the same false claim the
+    // scope line above was making, in the smallest type on the card and directly under the
+    // number. ORCA holds terms; the engine this label routed to does not read them.
+    var _dis1063t = (typeof _cpMechDispute === 'function') ? _cpMechDispute(country) : null;
     _tkNote704.innerHTML = _p704.generic
-      ? 'no ' + _cpEsc704(country) + ' terms in the engine'
-        + (_p704.shared > 1 ? ' &middot; ' + _p704.shared + ' countries return this' : '')
+      ? (_dis1063t
+          ? 'generic ' + _cpEsc704(_dis1063t.labelled) + ' template &middot; '
+            + Number(_dis1063t.mixN).toLocaleString() + ' of '
+            + Number(_dis1063t.tot).toLocaleString() + ' contracts are '
+            + _cpEsc704(_dis1063t.mixTop)
+          : 'no ' + _cpEsc704(country) + ' terms in the engine'
+            + (_p704.shared > 1 ? ' &middot; ' + _p704.shared + ' countries return this' : ''))
       : '% of revenue &middot; 1 project';
   }
   if (_npLbl704) {
@@ -63171,129 +63713,25 @@ function _execLiveDCF(country, profileKey, price) {
   const _lblEl703  = document.getElementById('ldcf-irr-lbl-' + slug);
   const _noteEl703 = document.getElementById('ldcf-irr-note-' + slug);
   if (irrEl && _r703) {
+    // v1061 (T2): the verdict this block built inline from v703 to v1036 now lives in
+    // _irrVerdict1061(), because Scenario Builder -- the surface the headline strip's
+    // "IRR: -> Model in Scenario Builder" button routes to -- was printing the rate this
+    // tile refuses, in green, on 137 of 185 countries. One function, both tiles.
     const _capexMM703 = (DCF_PROFILES[profileKey] && DCF_PROFILES[profileKey].capexMM) || null;
-    const _m703 = v => v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'B' : '$' + Math.round(v) + 'M';
-    const _sgn703 = v => (v < 0 ? '−' : '+') + _m703(Math.abs(v));
-    const _inflated703 = (_r703.state === 'inflated' || _r703.state === 'unbounded');
-    // ── v1036 (T2): the suppression decided on the rate, not on the rate's base ──────────
-    //
-    // `_sbReturnReading` sets `inflated` on `R.irr >= 100` — a bare cutoff on the rate. But
-    // the reason the rate is unusable is stated in v703's own note above: cost recovery (or,
-    // in a Concession, early revenue against uplift) covers most of the capex as it is spent,
-    // so the contractor's at-risk base is a fraction of the project and the rate is struck on
-    // that fraction. That is `R.atRisk` against the profile's capex — a number this block has
-    // had in `_capexMM703` since v703 and never tested.
-    //
-    // Swept across all 185 countries on each one's own default panel profile at $75:
-    //   suppressed (`inflated`)   n=117   exposure  9.6%–21.7% of capex   rate 100.2%–297.2%
-    //   quoted as the headline    n= 66   exposure 16.8%–43.6% of capex   rate  12.1%– 98.7%
-    // The two ranges overlap, and 21 of the 66 quoted rates stand on an exposure base inside
-    // the band the page refuses to quote on at all. The pair that shows it is not a rounding
-    // argument:
-    //   Suriname   REFUSED   100.2%   $205M of $1,200M ever at risk  (17.1%)
-    //   Liberia    QUOTED     94.9%   $201M of $1,200M ever at risk  (16.8%)
-    // Liberia's rate stands on a THINNER base than Suriname's and is the tile's 20px green
-    // headline, under the label "Contractor IRR — this scenario", while Suriname's is pushed
-    // into the note as the thing not to quote. Same structure, opposite claim, decided by six
-    // points of a rate that neither country's IC would accept. Guyana (91.0% on 17.5%) is the
-    // one an analyst is most likely to hit: a frontier screening favourite whose most
-    // attractive-looking number is a return on a sixth of the project, repaid by year 3.
-    //
-    // So the test moves onto the base. The cut is NOT a new judgement — it is the ceiling of
-    // the exposure range the page already declines to quote a rate on (21.7%, rounded up to
-    // 22). It is named and in one place so it can be moved on review.
-    const _IRR_THIN_BASE_MAX_PCT = 22;
-    const _expo703 = (_capexMM703 && _capexMM703 > 0 && _r703.atRisk > 0)
-      ? (_r703.atRisk / _capexMM703) * 100 : null;
-    const _thinBase703 = _r703.state === 'computed' && _expo703 !== null
-                         && _expo703 < _IRR_THIN_BASE_MAX_PCT;
-    // The rate is unusable in three structurally different ways, and in all three the hurdle
-    // test is the figure that answers the question. `uneconomic` is included deliberately:
-    // its "no IRR" is a finding, but a NEGATIVE NPV at 15% states the size of the miss.
-    // v1036 adds the fourth: a rate whose base is a fraction of the project's capital.
-    const _noRate703 = _inflated703 || _r703.state === 'no-capital-at-risk'
-                       || _r703.state === 'uneconomic' || _thinBase703;
-    const _useHurdle703 = _noRate703 && _r703.npv15 !== null;
-    const _clears703 = _r703.npv15 !== null && _r703.npv15 > 0;
+    // v1062: result.mechanic is stamped by runLiveDCF() from the engine it dispatched to.
+    const _v1061 = _irrVerdict1061(_r703, _capexMM703, result.npv, result.mechanic);
 
-    if (_useHurdle703) {
-      // Headline becomes the hurdle test. The dollar figure carries its own discount rate in
-      // the label above it, so it can never be read as headroom over the 10% NPV tile.
-      irrEl.textContent = _sgn703(_r703.npv15);
-      irrEl.style.color = _clears703 ? 'var(--green)' : 'var(--red)';
-      irrEl.style.fontSize = (irrEl.textContent.length > 7) ? '15px' : '';
-    } else {
-      irrEl.textContent = _r703.value;
-      // An inflated or unbounded rate is never painted green. Green is the page telling the
-      // analyst the number is usable, and this one is not.
-      irrEl.style.color = _inflated703 ? 'var(--muted)' : _r703.color;
-      irrEl.style.fontSize = (_r703.value.length > 7) ? '15px' : '';
-    }
+    irrEl.textContent   = _v1061.value;
+    irrEl.style.color   = _v1061.color;
+    irrEl.style.fontSize = _v1061.big ? '15px' : '';
 
     if (_lblEl703) {
-      if (_useHurdle703) {
-        _lblEl703.innerHTML = 'Contractor NPV @ 15% &mdash; '
-          + '<span style="color:' + (_clears703 ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
-          + (_clears703 ? 'clears the IOC hurdle' : 'fails the IOC hurdle') + '</span>';
-      } else {
-        _lblEl703.innerHTML = 'Contractor IRR &mdash; this scenario';
-      }
+      _lblEl703.innerHTML = _v1061.useHurdle ? _v1061.hurdleLabelHTML
+                                             : 'Contractor IRR &mdash; this scenario';
     }
     if (_noteEl703) {
-      let _body703;
-      if (_r703.state === 'no-capital-at-risk') {
-        _body703 = 'Contractor funds no negative year'
-          + (_capexMM703 ? ' &mdash; cost recovery reimburses the ' + _m703(_capexMM703) + ' capex as it is spent' : '')
-          + ', so there is no capital base for a rate of return.';
-      } else if (_r703.state === 'uneconomic') {
-        _body703 = _m703(_r703.atRisk) + ' at risk &middot; never repaid &mdash; no IRR exists.';
-      } else if (_inflated703) {
-        _body703 = 'IRR is <strong style="color:var(--text);">' + _r703.value + '</strong> and is not quoted: only '
-          + '<strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong>'
-          + (_capexMM703 ? ' of ' + _m703(_capexMM703) + ' capex' : '')
-          + ' is ever at risk &mdash; cost recovery reimburses the rest as it is spent'
-          + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
-          + '. The rate is a return on that exposure, not on the project.';
-      } else if (_thinBase703) {
-        // v1036 (T2): deliberately NOT the _inflated703 wording. That sentence names cost
-        // recovery as the mechanism, which is right for the PSC and TSC rows but wrong for
-        // Norway — a Concession with no cost recovery at all, whose at-risk base is thin
-        // because revenue arrives against uplift and SPT deductions, not because anything is
-        // reimbursed. This states the exposure and leaves the mechanism to the waterfall.
-        _body703 = 'IRR is <strong style="color:var(--text);">' + _r703.value + '</strong> and is not quoted: only '
-          + '<strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong> of '
-          + _m703(_capexMM703) + ' capex &mdash; ' + _expo703.toFixed(1) + '% of the project &mdash; is ever '
-          + 'net negative for the contractor'
-          + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
-          + '. The rate is a return on that exposure, not on the project.';
-      } else {
-        // v1036 (T2): the base, not just the dollar figure. This branch printed "$523M at
-        // risk · payback year 5" and never said against what, so on all 66 quoted rates the
-        // analyst had no way to see what the rate was struck on. The 44 that keep the rate
-        // after the thin-base test now carry the share too, so the figure is readable as a
-        // return on a stated fraction of the project rather than as a project return.
-        _body703 = _m703(_r703.atRisk) + ' at risk'
-          + (_expo703 !== null && _capexMM703
-               ? ' of ' + _m703(_capexMM703) + ' capex (' + _expo703.toFixed(1) + '% of the project)'
-               : '')
-          + (_r703.payback ? ' &middot; payback year ' + _r703.payback : ' &middot; never repaid')
-          + ' &middot; 25yr project.';
-      }
-      // Both figures are the SAME cash flow at two discount rates. Whichever one is the
-      // headline, the closing line names the other and says so — that is the sentence that
-      // was missing, and it is why "+$1.9B" could be misread as headroom.
-      let _tail703 = '';
-      if (_useHurdle703) {
-        _tail703 = 'Same cash flow as the 10% NPV tile, discounted at 15% instead'
-          + (result.npv != null ? ' (' + _sgn703(result.npv) + ' at 10%)' : '') + '.';
-      } else if (_r703.npv15 !== null) {
-        _tail703 = 'Hurdle test: contractor NPV <strong style="color:var(--text);">' + _sgn703(_r703.npv15)
-          + ' at 15%</strong> &mdash; '
-          + '<span style="color:' + (_clears703 ? 'var(--green)' : 'var(--red)') + ';font-weight:700;">'
-          + (_clears703 ? 'clears' : 'fails') + '</span> a 15% IOC hurdle. Same cash flow, higher discount rate.';
-      }
-      _noteEl703.innerHTML = _body703
-        + (_tail703 ? '<br><span style="display:inline-block;margin-top:3px;">' + _tail703 + '</span>' : '');
+      _noteEl703.innerHTML = _v1061.bodyHTML
+        + (_v1061.tailHTML ? '<br><span style="display:inline-block;margin-top:3px;">' + _v1061.tailHTML + '</span>' : '');
       _noteEl703.style.lineHeight = '1.5';
     }
   } else if (irrEl) {
@@ -63522,8 +63960,9 @@ function _execLiveDCF(country, profileKey, price) {
       sevCol = 'var(--orange)'; sevBg = 'rgba(176,104,0,.06)'; sevBorder = 'rgba(176,104,0,.3)';
       verdict = 'This gap is not a finding about ' + _cpEsc704(country) + '. The scenario ran the generic '
               + result.mechanic + ' template because the engine holds no ' + _cpEsc704(country)
-              + ' terms, so the difference measures the template, not the regime. Cite the '
-              + result.dbTake.toFixed(1) + '% country average; cite the scenario only as a template run, and say so.';
+              + ' terms on that branch, so the difference measures the template, not the regime. Cite the '
+              + result.dbTake.toFixed(1) + '% country average; cite the scenario only as a template run, and say so.'
+              + _disWhy1063;
     }
 
     // v833 (T2): a take match is not an NPV match. When the two NPVs diverge materially the
@@ -63610,7 +64049,7 @@ function _execLiveDCF(country, profileKey, price) {
         + 'real contracts and their own negotiated terms'
         + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '')
         + ' — so the two are not two readings of one regime, and the scenario carries no '
-        + _cpEsc704(country) + ' information.'
+        + _cpEsc704(country) + ' information.' + _disWhy1063
       : '<strong>Terms:</strong> this scenario applies ' + country + '’s <em>statutory</em> parameters as held in the engine. The country average uses each contract’s own negotiated terms'
         + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '') + '.';
     if (_p704.generic) drivers.unshift(_termsDriver704); else drivers.push(_termsDriver704);
@@ -63690,8 +64129,13 @@ function _execLiveDCF(country, profileKey, price) {
             + (_p704.generic ? 'the generic ' + result.mechanic + ' template' : country + '\u2019s ' + result.mechanic + ' terms') + ' @ $' + price + '/bbl</div>'
           + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">'
             + (_p704.generic
-                ? 'Carries no ' + _cpEsc704(country) + '-specific terms'
-                  + (_p704.shared > 1 ? ' \u2014 ' + _p704.shared + ' countries return this same figure' : '') + '.'
+                ? (_dis1063x
+                    ? 'Generic ' + _cpEsc704(_dis1063x.labelled) + ' terms \u2014 ORCA files '
+                      + Number(_dis1063x.mixN).toLocaleString() + ' of '
+                      + Number(_dis1063x.tot).toLocaleString() + ' contracts as '
+                      + _cpEsc704(_dis1063x.mixTop) + ', a different engine.'
+                    : 'Carries no ' + _cpEsc704(country) + '-specific terms'
+                      + (_p704.shared > 1 ? ' \u2014 ' + _p704.shared + ' countries return this same figure' : '') + '.')
                 : 'Answers \u201cwhat would <em>my</em> project pay here\u201d. If you use it, say so in the memo.') + '</div>'
           + _atNote903
         + '</div>'
@@ -65093,10 +65537,21 @@ function runCustomScenario() {
   // `result.irr >= 500` tooltip branch was unreachable -- calcIRR() nulls that case before
   // it returns -- so it was deleted rather than left as a dead explanation.
   const reading = _sbReturnReading(result);
-  const irrHtml = reading.value;
+  // ── v1061 (T2): this tile printed `reading.value` in `reading.color`, raw ────────────────
+  // `_sbReturnReading` paints an `inflated` rate green (its colour ramp is `irr < 10 ? red :
+  // irr < 20 ? orange : green`, and an inflated rate is >= 100), so a 100.8% return on a fifth
+  // of the project rendered as a 22px var(--green) headline labelled "Contractor IRR" — on the
+  // tab the Country Profile's own "IRR: -> Model in Scenario Builder" button sends the analyst
+  // to for a defensible return, and on the run that button loads. The Live DCF panel on the
+  // page they came from refuses that exact rate; _sbHurdleLine() below says "quote the hurdle
+  // test, not the rate"; _sbBuildICTable() withholds it from the clipboard. The tile was the
+  // one surface in the chain still asserting it. Same verdict function as the panel now.
+  const _ivCapex1061 = (profile && profile.capexMM) || null;
+  const _iv1061 = _irrVerdict1061(reading, _ivCapex1061, result.npv, mech);   // v1062
+  const irrHtml = _iv1061.value;
   const npvDisplay = result.npv !== null ? fmtNpvShared(result.npv) : 'n/a';
   const takeColor = result.take > 75 ? 'var(--red)' : result.take > 60 ? 'var(--orange)' : result.take > 40 ? 'var(--yellow)' : 'var(--green)';
-  const irrColor = reading.color;
+  const irrColor = _iv1061.color;
   const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? 'var(--red)' : 'var(--green)';
 
   const takeClampWarning = result.take >= 99.5
@@ -65115,9 +65570,9 @@ ${_sbOriginNote(result, price, profileKey)}
     <div class="sb-result-note">% of revenue</div>
   </div>
   <div class="sb-result-card">
-    <div class="sb-result-label">Contractor IRR</div>
-    <div class="sb-result-value" style="color:${irrColor};${reading.value.length > 6 ? 'font-size:19px;' : ''}">${irrHtml}</div>
-    <div class="sb-result-note">${reading.note}${_sbIrrTileFlag893(result, price)}</div>
+    <div class="sb-result-label">${_iv1061.useHurdle ? _iv1061.hurdleLabelHTML : 'Contractor IRR'}</div>
+    <div class="sb-result-value" style="color:${irrColor};${irrHtml.length > 6 ? 'font-size:19px;' : ''}">${irrHtml}</div>
+    <div class="sb-result-note">${_iv1061.shortHTML}${_sbIrrTileFlag893(result, price)}</div>
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor NPV</div>
@@ -66096,12 +66551,30 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
   // as a deliberate absence, so the slot says why it is empty.
   var _irrRow893 = '', _irrNote893 = '';
   var _ib893 = _sbIrrBasis893(result, sbPrice);
+  // v1061 (T2): this row printed "This scenario <rate>" from reading.value regardless of
+  // whether the rate is a return on the project, so on the 137 runs the tile beside it now
+  // refuses it was the last place on the screen still asserting the figure. It reports the
+  // same verdict as the tile -- and the country-attribution finding v893 added is kept: the
+  // two are different objections and an analyst needs both.
+  var _ivRow1061 = (_ib893 && _ib893.reading)
+    ? _irrVerdict1061(_ib893.reading,
+        ((typeof DCF_PROFILES !== 'undefined' && sbProfileKey && DCF_PROFILES[sbProfileKey])
+          ? DCF_PROFILES[sbProfileKey].capexMM : null), result.npv,
+        // v1062: the same element runCustomScenario() read to pick the engine for this run.
+        ((document.getElementById('sb-mechanic') || {}).value || null))
+    : null;
+  var _rateHeld1061 = !!(_ivRow1061 && _ivRow1061.noRate && (_ivRow1061.inflated || _ivRow1061.thin));
   if (_ib893 && _ib893.reading) {
     var _mono893 = 'font-family:\'IBM Plex Mono\',monospace;';
     _irrRow893 = '<div style="display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-top:5px;">'
       + '<span style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-width:104px;">Contractor IRR</span>'
       + '<span style="font-size:11px;color:var(--muted);">This scenario <strong style="color:var(--text);font-size:15px;' + _mono893 + '">'
-        + _esc594(_ib893.reading.value) + '</strong></span>'
+        + (_rateHeld1061 ? 'not quoted' : _esc594(_ib893.reading.value)) + '</strong>'
+        + (_rateHeld1061
+            ? '<span style="opacity:.85;"> (' + _esc594(_ib893.reading.value) + ' on '
+              + _ivRow1061.expo.toFixed(1) + '% of the project)</span>'
+            : '')
+      + '</span>'
       + '<span style="font-size:11px;color:var(--muted);">' + cn + ' published <strong style="color:var(--text);">no IRR</strong>'
         + '<span style="opacity:.8;"> (ORCA publishes no country-level IRR)</span></span>'
       + (_ib893.material && _ib893.hasRate
@@ -66116,7 +66589,16 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
       var _pubHigher893 = (_ib893.gap < 0);
       _irrNote893 = '<div style="margin-top:8px;padding:7px 10px;background:var(--surface);'
         + 'border:1px solid var(--border);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">'
-        + '<strong style="color:var(--text);">This IRR is not ' + cn + '\u2019s IRR.</strong> '
+        // v1061: the paragraph below reasons about where the rate would move at the published
+        // take, which reads as a concession that the rate IS a project return on these terms.
+        // Where the tile withholds it, say that first -- the objection is prior to the other one.
+        + (_rateHeld1061
+            ? '<strong style="color:var(--text);">This is not a project return, and it is not '
+              + cn + '\u2019s IRR \u2014 two separate objections.</strong> The tile above withholds '
+              + _esc594(_ib893.reading.value) + ' because it is struck on the '
+              + _ivRow1061.expo.toFixed(1) + '% of project capex this run ever puts at risk, not on the '
+              + 'project. What follows is the second objection, and it holds whichever base the rate is on. '
+            : '<strong style="color:var(--text);">This IRR is not ' + cn + '\u2019s IRR.</strong> ')
         + '<strong style="color:var(--text);">' + _esc594(_ib893.reading.value) + '</strong> is the return earned at the '
         + '<strong style="color:var(--text);">' + _ib893.sbTake.toFixed(1) + '%</strong> take in the row above, not at '
         + cn + '\u2019s published <strong style="color:var(--text);">' + _ib893.pub.v.toFixed(1) + '%</strong> at $'
@@ -66569,6 +67051,74 @@ function fcResolveMechanic(d) {
   if (typeof d === 'string') d = (window.COUNTRY_DATA || []).find(function(x) { return x.country === d; });
   if (!d) return 'Concession';
   return FC_MECHANIC_OVERRIDE[d.country] || fcDominantMechanic(d);
+}
+
+// ── v1063 (T2): the mechanic label and this page's own mechanic breakdown are two ──────────
+// different answers off ONE record, and the loud one is the wrong one.
+//
+// fcDominantMechanic() takes plurality off the n_concession / n_psc / n_prrt / ... count
+// fields. The Fiscal Mechanic Breakdown card lower down the Country Profile reads d.mech_mix,
+// which carries a take and an NPV per mechanic and must therefore have been grouped off the
+// actual contracts. Measured live across all 185 records, the two disagree on exactly three:
+//
+//   Denmark       n_prrt 110, n_concession 0   vs  mech_mix Concession 109 / PRRT 1  (99.1%)
+//   Liberia       n_psc  75, n_concession 0    vs  mech_mix Concession  61 / PSC 14  (81.3%)
+//   Sierra Leone  n_psc  43, n_concession 1    vs  mech_mix Concession  41 / PSC  3  (93.2%)
+//
+// It is not a label. fcResolveMechanic() picks the DCF the Live DCF panel runs and the set of
+// terms the Evidence Chain scopes its findings to. On Denmark it routes to dcfPRRT, which
+// makes getDCFParams() return _basis 'default' — so the panel declares in bold "ORCA holds no
+// Denmark-specific fiscal parameters in this engine" while the Evidence Chain 1,500px below
+// prints CIT 52.0% and special tax 52.0%, both A-tier primary law, and the Concession reading
+// of the same record returns _basis 'record' on exactly those two rates.
+//
+// ORCA does not record which of the two fields is right, and this function does not decide.
+// It reports that the record contradicts itself, with both counts, at the points where the
+// unexplained label changes what the analyst concludes. Returns null — and therefore changes
+// nothing on 182 of 185 countries — wherever the two agree.
+function _cpMechDispute(d) {
+  try {
+    if (typeof d === 'string') d = (window.COUNTRY_DATA || []).find(function(x) { return x.country === d; });
+    if (!d || !Array.isArray(d.mech_mix) || d.mech_mix.length < 2) return null;
+    var rows = d.mech_mix.filter(function(r) { return r && r.m && (r.n || 0) > 0; })
+                         .sort(function(a, b) { return (b.n || 0) - (a.n || 0); });
+    if (rows.length < 2) return null;
+    var tot = rows.reduce(function(s, r) { return s + (r.n || 0); }, 0);
+    if (!tot) return null;
+    var labelled = fcResolveMechanic(d);
+    if (!labelled || labelled === rows[0].m) return null;
+    // A curated FC_MECHANIC_OVERRIDE is not an unrecorded dispute — it is ORCA choosing one
+    // reading on a stated economic-dominance ground, and the sentences below say "ORCA does not
+    // record which reading is right", which would then be false. One country reaches this today:
+    // Egypt, labelled PSC by override against 129 Concession / 89 PSC in mech_mix. Held out
+    // rather than silently re-worded; the page still never says that label is a curated call.
+    if (FC_MECHANIC_OVERRIDE[d.country]) return null;
+    var lr = null;
+    for (var i = 0; i < rows.length; i++) { if (rows[i].m === labelled) { lr = rows[i]; break; } }
+    return {
+      labelled:     labelled,
+      labelledN:    lr ? (lr.n || 0) : 0,
+      labelledPct:  lr ? (100 * lr.n / tot) : 0,
+      labelledTake: (lr && lr.t75 != null) ? lr.t75 : null,
+      mixTop:       rows[0].m,
+      mixN:         rows[0].n,
+      mixPct:       100 * rows[0].n / tot,
+      mixTake:      (rows[0].t75 != null) ? rows[0].t75 : null,
+      curated:      !!FC_MECHANIC_OVERRIDE[d.country],
+      tot:          tot
+    };
+  } catch (e) { return null; }
+}
+
+// Scroll + flash the Fiscal Mechanic Breakdown card. Same gesture _cpRegimeSplit570 already
+// uses for the Fiscal Regime Breakdown table, so the disputed pill behaves like its neighbour.
+function _cpToMechBreakdown() {
+  var e = document.getElementById('cp-mech-breakdown');
+  if (!e) return;
+  e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  e.style.transition = 'background .4s';
+  e.style.background = 'rgba(176,104,0,.10)';
+  setTimeout(function() { e.style.background = ''; }, 1500);
 }
 
 // How dominant that mechanic is, for the Mechanic cell's hover text: returns
@@ -71136,6 +71686,33 @@ function _scRouteQuery() {
   var sel = (window._scSelected || []);
   if (sel.length && sel.length <= _SC_ROUTE_SEL_MAX) push('s', sel.join('|'));
 
+  /* v1059 (T1) — the ORDER travels. This was the one piece of the screen the link threw away.
+     Walked T1 cold at 1440x900, storage cleared: Home → "open the screen →" → IOC Capital
+     Screen → deck $100 → click "GOVT TAKE" (15 → 12 rows, re-ranked lowest take first) →
+     🔗 Copy Link. The URL written was
+
+         #/screener/iochurdle?d=100&t=65&n=0&n5=0&px=0
+
+     — preset, deck and all four thresholds, and no sort. Opened cold in a second profile it
+     restored the same 12 countries under a count line reading "ranked by Contractor NPV
+     high→low": sender saw USA (25.1%) at #1, recipient saw Canada (35.0%) at #1. Same link,
+     same 12 rows, different top pick, and nothing on either screen said the order had moved.
+
+     Membership is only half of T1's answer — the # column is a RANK, and an analyst sorts by
+     take because the take ordering IS the shortlist they are about to defend. The product
+     already holds this principle for the other shareable surface: shareComparison() appends
+     '~' + cmpOrder, and v933's note on it reads "this button and the address bar must not hand
+     out two different links for one screen." The Screener's link never got it. Its in-session
+     drill save/restore has carried sortK/sortD since v858; only the URL had not.
+
+     Emitted ONLY when the analyst has actually clicked a header (_scSortKey non-null), so every
+     cold and preset-only link is byte-identical to the one v1058 wrote. _scTakeSortOnCmp is not
+     carried: runScreener() re-derives it from the restored screen. */
+  if (_scSortKey && _SC_SORT_DEFAULT_DIR.hasOwnProperty(_scSortKey)) {
+    push('k', _scSortKey);
+    if (_scSortDir !== _SC_SORT_DEFAULT_DIR[_scSortKey]) push('kd', String(_scSortDir));
+  }
+
   return q.length ? '?' + q.join('&') : '';
 }
 window._scRouteQuery = _scRouteQuery;
@@ -71228,6 +71805,18 @@ function _scRouteApplyQuery(qs) {
     var wantS = params.s ? params.s.split('|').filter(function (x) { return x; }) : [];
     window._scSelected = wantS.slice(0, _SC_ROUTE_SEL_MAX);
     wrote = true;
+  }
+  /* v1059 (T1): the sort the sender was reading. Assigned straight to (_scSortKey, _scSortDir)
+     rather than routed through setScreenerSort(), because that function is a three-state CYCLE
+     (asc -> desc -> off, with the npv/swing implicit column reversing on first click) and
+     replaying it from whatever state the restore inherited would land on a different order than
+     the one the link names. Same direct assignment the drill-state restore has used since v858.
+     A hand-edited or truncated 'k' is dropped, not coerced: an unknown key would otherwise reach
+     _scSortVal() as undefined and sort every row to the bottom under a count line still claiming
+     to name the order, which is the fault the slider() helper above was written to avoid. */
+  if ('k' in params && _SC_SORT_DEFAULT_DIR.hasOwnProperty(params.k)) {
+    var _kd = ('kd' in params) ? Number(params.kd) : _SC_SORT_DEFAULT_DIR[params.k];
+    if (_kd === 1 || _kd === -1) { _scSortKey = params.k; _scSortDir = _kd; wrote = true; }
   }
   if (wrote && typeof runScreener === 'function') runScreener();
   if ('s' in params && typeof _scSyncSelUI === 'function') _scSyncSelUI();
@@ -71347,6 +71936,54 @@ function _cpFcRunPrice887() {
   return [50, 75, 100, 125].indexOf(p) >= 0 ? p : null;
 }
 
+/* ── v1059 (T1): the Screener's price deck reached the profile; the warning did not ─────────
+   Walked T1 cold at 1440x900 and 390x844, both storages cleared, from Home -> Screener.
+
+   The Screener carries its own four-button price deck (v651, `input[name="price"]`, read by
+   getPriceKey()) and its caption says "Click any row to open its Country Profile." Both halves
+   work. They do not agree on a price, and nothing on screen said so. Measured on the shipped
+   build, deck moved, first row clicked:
+
+     deck   row         Screener cell        Country Profile    gap
+     $100   Canada      35.0% / $6.17B       32.7% / $3.91B     2.3pp · $2.27B
+     $125   Canada      36.3% / $8.44B       32.7% / $3.91B     3.6pp · $4.53B
+     $50    Azerbaijan  50.9% / $1.78B       60.8% / $2.95B     9.9pp · $1.17B
+
+   In all three #cp-price-basis was display:none with innerHTML empty, and #fc-nav-bar hidden.
+   This is the exact defect v889 found and v1014 widened — except v1014 resolved the off-basis
+   price from _cpFcRunPrice887() alone, i.e. window._fcLastPrice, which ONLY runFiscalCompare()
+   writes. An analyst who came in through Home's "open the screen" CTA and never touched Fiscal
+   Compare has _fcLastPrice === undefined, so `off` is false and the strip cannot fire however
+   far the Screener deck has been moved.
+
+   The asymmetry is the tell: the Screener's OTHER one-click destination already handles this.
+   scOpenSbs() calls _sbsAdoptDeck(getPriceKey()) (v935), so Side-by-Side opens at $100/$125/$50
+   with the deck carried — verified cmp-rankprice = 100 / 125 / 50. Side-by-Side can be re-based;
+   the Country Profile cannot (v889: "the profile cannot be re-based; the ranking is what moves").
+   So the profile is the one destination that silently drops the deck, and it is the destination
+   the analyst goes to in order to DEFEND the screen.
+
+   Additive only: the FC price still wins whenever it is set, so every state that showed this
+   strip before shows the same strip now. The deck is only consulted when the FC price is absent
+   or is itself $75. The deck defaults to $75, so this cannot fire on a page nobody has re-priced.
+*/
+function _cpScrDeckPrice1059() {
+  if (typeof getPriceKey !== 'function') return null;
+  var v = Number(getPriceKey());
+  return ([50, 75, 100, 125].indexOf(v) >= 0 && v !== _CP_BASE_PRICE_887) ? v : null;
+}
+
+// The Screener's analogue of _cpReRankAtBase(): put the SCREEN on the profile's basis, then go
+// back to it so the re-based list is what the analyst sees. The deck moves first, so runScreener()
+// has already re-filtered by the time the tab is shown.
+function _cpReScreenAtBase1059() {
+  if (typeof _scSetDeck === 'function') _scSetDeck(String(_CP_BASE_PRICE_887));
+  try { _cpPriceBasisUpdate(null); } catch (e) {}
+  var bn = document.getElementById('tab-btn-tscreener');
+  if (bn) bn.click();
+}
+window._cpReScreenAtBase1059 = _cpReScreenAtBase1059;
+
 // Put the screen on the profile's own basis. This is the only price reconciliation available from
 // here: the profile cannot be re-based, so the ranking is what moves.
 function _cpReRankAtBase() {
@@ -71378,7 +72015,19 @@ window._cpReRankAtBase = _cpReRankAtBase;
 function _cpPriceBasisUpdate(country) {
   var el = document.getElementById('cp-price-basis');
   var btn = document.getElementById('cp-run-fc-btn');
-  var p = _cpFcRunPrice887();
+  // v1059 (T1): two ranked surfaces can reach this page at a price the profile does not read.
+  // FC wins when it has one, so nothing that fired before stops firing; the Screener/Explorer
+  // deck is the fallback, which is the route Home's "open the screen" CTA puts the analyst on.
+  var pFc = _cpFcRunPrice887();
+  var p = pFc, _src1059 = 'fc';
+  if (pFc == null || pFc === _CP_BASE_PRICE_887) {
+    var pScr = _cpScrDeckPrice1059();
+    if (pScr != null) { p = pScr; _src1059 = 'scr'; }
+  }
+  var _scr1059 = (_src1059 === 'scr');
+  // The price #fc-nav-bar's rank was produced at. Null pFc means FC never ran, in which case the
+  // nav list is empty and the bar is hidden, so the value is unused.
+  var _rankAt1059 = (pFc != null ? pFc : _CP_BASE_PRICE_887);
   var off = (p != null && p !== _CP_BASE_PRICE_887);
   // The bar is the only thing that prints a $p-ordered rank next to this strip, and the only
   // thing that already carries a re-rank button. Read its state, then say the true thing.
@@ -71389,13 +72038,16 @@ function _cpPriceBasisUpdate(country) {
     country = (_dd1014 && _dd1014.value) ? _dd1014.value : null;
   }
   if (btn) {
-    btn.innerHTML = off ? '&#9654; Re-rank all 185 at $75' : '&#9654; Re-run FC at $75';
-    btn.title = off
-      ? 'Your last Fiscal Compare run ranked all 185 countries at $' + p + '/bbl. This profile is '
+    // v1059: this button re-runs FISCAL COMPARE, so it must describe FC's price and no other.
+    // The Screener deck gets its own remedy below (_cpReScreenAtBase1059).
+    var _offFc1059 = (pFc != null && pFc !== _CP_BASE_PRICE_887);
+    btn.innerHTML = _offFc1059 ? '&#9654; Re-rank all 185 at $75' : '&#9654; Re-run FC at $75';
+    btn.title = _offFc1059
+      ? 'Your last Fiscal Compare run ranked all 185 countries at $' + pFc + '/bbl. This profile is '
         + 'computed at $75/bbl. This re-runs the ranking at $75 so the screen and this page sit on '
         + 'one price basis.'
       : 'Re-run the Fiscal Compare ranking at $75/bbl — the price this profile is computed at.';
-    btn.style.borderColor = off ? 'var(--orange)' : 'rgba(176,104,0,.3)';
+    btn.style.borderColor = _offFc1059 ? 'var(--orange)' : 'rgba(176,104,0,.3)';
   }
   if (!el) return;
   var d = (Array.isArray(COUNTRY_DATA) && country)
@@ -71425,11 +72077,16 @@ function _cpPriceBasisUpdate(country) {
       + '<span style="opacity:.8;">(' + dn(nAt - nBase) + ' vs ' + fmtN(nBase) + ')</span>');
   }
 
-  var tip = 'The Fiscal Compare ranking above this line was run at $' + p + '/bbl. This Country '
+  var tip = (_scr1059
+      ? 'The Screener shortlist you came from is filtered and ranked at $' + p + '/bbl — its deck '
+        + 'buttons drive the price behind every take, NPV and tier letter in that table. '
+      : 'The Fiscal Compare ranking above this line was run at $' + p + '/bbl. ')
+    + 'This Country '
     + 'Profile is computed at $75/bbl throughout — the headline take, the tier band, the '
     + 'contractor NPV and its rank, the peer set and the IC memo line. The figures in this strip '
     + 'are ' + country + "'s own take and NPV at $" + p + '/bbl, read from the same fields as '
-    + "Fiscal Compare's citable columns. The 4-price sensitivity table further down this page "
+    + (_scr1059 ? "the Screener's own columns. " : "Fiscal Compare's citable columns. ")
+    + 'The 4-price sensitivity table further down this page '
     + 'carries $50 / $75 / $100 / $125 in full.';
 
   el.style.display = 'block';
@@ -71439,7 +72096,8 @@ function _cpPriceBasisUpdate(country) {
     + 'title="' + tip.replace(/"/g, '&quot;') + '">'
     + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
     + '<span style="color:var(--orange);flex-shrink:0;">&#9888;</span>'
-    + '<strong style="color:var(--orange);">Ranked at $' + p + '/bbl — this profile reads $75/bbl</strong>'
+    + '<strong style="color:var(--orange);">' + (_scr1059 ? 'Screened' : 'Ranked') + ' at $' + p
+    + '/bbl — this profile reads $75/bbl</strong>'
     + '</div>'
     + (pairs.length
         ? '<div style="margin-top:3px;">' + country + ' at $' + p + ': ' + pairs.join(' &middot; ') + '</div>'
@@ -71447,18 +72105,38 @@ function _cpPriceBasisUpdate(country) {
             ? country + ' is a state monopoly — it carries no contractor take or NPV at any price, '
               + 'so there is nothing here that moves between $' + p + ' and $75.'
             : country + ' carries no $' + p + ' figure to compare against.') + '</div>')
-    + '<div style="margin-top:3px;opacity:.9;">' + (_barOn1014
-        ? 'The rank beside it is the $' + p + ' ordering. '
-        : 'The ranking you ran in Fiscal Compare is ordered at $' + p + '. ')
+    // v1059: #fc-nav-bar's "#N of 185" rank is produced by the Fiscal Compare RUN, so it belongs
+    // to pFc — never to the Screener deck. Saying "the rank beside it is the $50 ordering" when
+    // FC last ran at $75 would be the same false adjacency this strip exists to prevent.
+    + '<div style="margin-top:3px;opacity:.9;">' + (_scr1059
+        ? 'The Screener shortlist you came from is filtered and ranked at $' + p + '. '
+          + (_barOn1014
+              ? 'The rank beside this line is a Fiscal Compare ordering at $' + _rankAt1059
+                + ', not this deck. '
+              : '')
+        : (_barOn1014
+            ? 'The rank beside it is the $' + p + ' ordering. '
+            : 'The ranking you ran in Fiscal Compare is ordered at $' + p + '. '))
     + 'Everything below — tier, NPV rank, peers, IC line — is $75.</div>'
-    + (_barOn1014 ? ''
-        : '<div style="margin-top:6px;"><button type="button" onclick="_cpReRankAtBase()" '
+    // v1059: the remedy has to move the surface the analyst actually came from. Sending a
+    // Screener analyst to Fiscal Compare re-ranks a table they were not using and leaves their
+    // shortlist on the wrong deck.
+    + ((_barOn1014 && !_scr1059) ? ''
+        : '<div style="margin-top:6px;"><button type="button" onclick="'
+          + (_scr1059 ? '_cpReScreenAtBase1059()' : '_cpReRankAtBase()') + '" '
           + 'style="background:rgba(194,65,12,.12);border:1px solid var(--orange);border-radius:4px;'
           + 'color:var(--orange);font-size:11px;font-weight:700;cursor:pointer;padding:4px 10px;'
-          + 'min-height:24px;white-space:nowrap;" title="Re-run the Fiscal Compare ranking at $75/bbl '
-          + '— the price this profile is computed at — so the screen and this page sit on one price '
-          + 'basis. The profile cannot be re-based to $' + p + '; the ranking is what moves.">'
-          + '&#9654; Re-rank all 185 at $75</button></div>')
+          + 'min-height:24px;white-space:nowrap;" title="'
+          + (_scr1059
+              ? 'Move the Screener price deck back to $75/bbl — the price this profile is computed '
+                + 'at — re-filter the shortlist there, and return to it, so the screen and this page '
+                + 'sit on one price basis. The profile cannot be re-based to $' + p + '; the screen '
+                + 'is what moves. Reversible: the deck buttons are still on the Screener.'
+              : 'Re-run the Fiscal Compare ranking at $75/bbl '
+                + '— the price this profile is computed at — so the screen and this page sit on one price '
+                + 'basis. The profile cannot be re-based to $' + p + '; the ranking is what moves.')
+          + '">'
+          + (_scr1059 ? '&#9654; Re-screen at $75' : '&#9654; Re-rank all 185 at $75') + '</button></div>')
     + '</div>';
 }
 window._cpPriceBasisUpdate = _cpPriceBasisUpdate;
