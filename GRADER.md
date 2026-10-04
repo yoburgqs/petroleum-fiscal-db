@@ -74208,3 +74208,128 @@ thresholds.
 **Task:** T1 — "Which countries should even be on my screening list?" (last cycle was T4)
 
 **Friction.** `_scAxisUniverse()` reads exactly two controls — `sc-proxy-keep` and `sc-floor-keep`. It does not read `#sc-region`, the `#sc-mech-checks` set, `#sc-ioc-checks`, `#sc-reform` or `_screenerCountrySet`. So the four counters beside Max Govt Take, Min Contractor NPV, Min NPV @$50 and Min primary-source evidence quote "of 185" no matter what the analyst 
+
+---
+## Cycle 1024 — T6 — v1067 — 2026-10-04
+
+- Test before: 547 PASS / 0 FAIL / 1 WARN (local tree, `TEST_URL=http://localhost:8080`)
+- Test after:  547 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RUN this cycle, both passes
+- JS syntax gate: PASS, 11 blocks
+- Pixel audit: PASS — no surface worse than baseline
+- Page errors on the walk: 0
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+(last cycle was T1)
+
+### Friction
+
+Walked T6 cold at 1440x900 and at 390x844 `hasTouch`, sessionStorage and
+localStorage cleared before each pass, on Malaysia, USA, Libya, Kazakhstan, Nigeria
+and Norway.
+
+Rejected first, recorded so they are not re-walked: the per-term **Evidence Chain**
+(answers T6 completely — ORCA value vs statutory value, instrument, tier, whether
+the link still resolves, severity-ranked findings; checked on Vanuatu, Tuvalu and
+Russia, including the no-value and shared-regional-instrument cases). The **five
+exports** (`exportReformRiskCSV`, `exportBreakevenCSV`, `exportVintageCSV`,
+`exportExplorer`, `exportScreenerCSV` — all fired, all downloaded, all parsed, and
+every one carries a sourcing/comparability/basis block; the Vintage file even
+explains why its blended series differs from averaging its own pivot row). The
+**Breakeven Map** (every `.be-ret-row` is `role="button"` with a full basis tooltip
+and a route to the profile; the off-projection countries are named individually).
+
+The tile with no basis of any kind was **ANNUAL PRODUCTION (BOE)** — and it is the
+tile that states how much oil a country produces. Two builders,
+`fetchCountryProductionChart()` and `fetchFCDrawerProductionChart()`, each printed
+two aggregates, and both overstated their own scope:
+
+| | rendered, before |
+|---|---|
+| Malaysia | `Operator filings  Peak: 2023 (12.6 MMbbl)  Cumulative: 36 MMbbl` |
+| USA | `Primary govt  Peak: 2010 (20.6 MMbbl)  Cumulative: 104 MMbbl` |
+| Nigeria | `Operator filings  Peak: 2023 (954.7 MMbbl)  Cumulative: 39314 MMbbl` |
+| Norway | `Primary govt  Peak: 2017 (1281.0 MMbbl)  Cumulative: 45411 MMbbl` |
+
+Measured over all 16 countries that get this chart:
+
+1. **"Cumulative" named no window, and the window is not comparable between
+   countries.** The series runs from 3 years (Malaysia 2023-2025) to 56 (Norway
+   1971-2026). Nigeria's 53-year 39,314 MMbbl is the right order of magnitude for a
+   national cumulative and reads correctly; Malaysia's 3-year 36 MMbbl is the same
+   word on the same tile for something three orders of magnitude smaller.
+   Kazakhstan holds 6 points across a 7-year span, so the total steps silently over
+   a missing year.
+2. **The series is built only from the contracts matched to verified field
+   production**, and that coverage is already a number on this page —
+   `prod_coverage_pct`, the figure behind the PROD-WTD / PART-PROD / PROXY badge. It
+   runs **0.2% (USA, over 37,222 contracts) to 37.6% (United Kingdom)**. So the USA
+   tile's 2010-2024 total is the volume attached to 0.2% of the USA contract record,
+   printed under a heading reading ANNUAL PRODUCTION. China at 1.4% prints 11,492
+   MMbbl. Nothing on the tile said the figure was partial.
+3. `cumBoe.toFixed(0)` rendered **39314** and **45411** — no separators, beside a
+   peak printed to one decimal.
+
+An analyst asking "is this a producing country, and how much?" read a lower bound of
+unstated tightness over a window of unstated length. It is the one number on the page
+that can be wrong by 1000x while looking precise.
+
+### Change
+
+- **`_prodSeriesBasis(country, rows)`** — one builder, read by BOTH surfaces that
+  draw this chart. They had already forked on the wording (`Cumulative: N MMbbl`
+  versus `N MMbbl cum.`) and would fork again.
+- **The window is part of the number, never a caption.** `53-year total 39,314
+  MMbbl`. Thousands separators. Holes are named: `2019–2025, 6 of 7 years on file ·
+  6-year total 2,577 MMbbl`.
+- **Peak** is stated as the highest year ON FILE, not the country's historical peak.
+- **A second line states the consequence and is a real control:** `⚠ a floor, not
+  national output — built from the 0.2% of 37,222 contracts with verified production
+  · grade it ›` → `_cpProdToBasis()` opens and flashes `#cp-evidence-panel`, the only
+  panel that says what a coverage percentage licenses. It is a `<details>` that ships
+  closed, so the opener sets `.open` before scrolling.
+- **Layout:** the basis moved out of the right-hand slot of the heading's flex row
+  onto its own full-width line. v681 put 36px of horizontal scroll on a phone by
+  writing a long string into a squeezed span; this one cannot.
+- **Latent bug fixed:** removing the local `const peakBoe` left the Chart.js peak
+  annotation reading a free variable. Both builders sit inside a `.then()` with a
+  trailing `.catch(){}`, so that ReferenceError would have been **swallowed with no
+  page error** — the trap v945 was caught by. Repointed to `B.peakBoe`, peak line
+  verified still drawing.
+
+On screen, after — Country Profile:
+
+| country | line 1 | line 2 |
+|---|---|---|
+| Malaysia | `2023–2025 · Peak 2023 — 12.6 MMbbl · 3-year total 36 MMbbl` | `⚠ a floor … 0.3% of 365 contracts · grade it ›` |
+| USA | `2010–2024 · Peak 2010 — 20.6 MMbbl · 15-year total 104 MMbbl` | `⚠ a floor … 0.2% of 37,222 contracts · grade it ›` |
+| Kazakhstan | `2019–2025, 6 of 7 years on file · Peak 2019 — 522.2 MMbbl · 6-year total 2,577 MMbbl` | `⚠ a floor … 30.5% of 302 contracts · grade it ›` |
+| Nigeria | `1973–2025 · Peak 2023 — 954.7 MMbbl · 53-year total 39,314 MMbbl` | `⚠ a floor … 14.1% of 834 contracts · grade it ›` |
+| Norway | `1971–2026 · Peak 2017 — 1281.0 MMbbl · 56-year total 45,411 MMbbl` | `⚠ a floor … 18.2% of 7,643 contracts · grade it ›` |
+
+Fiscal Compare drawer, same builder, one line:
+`Operator filing · 2023–2025 · 3-year total 36 MMbbl · floor, 0.3% of 365 contracts matched`
+
+### Not done, deliberately
+
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no
+tab-order change. Nothing in STILL LOCKED is touched; the v612 mobile layer and
+`#reference-panel` are not in this code path. The version badge was bumped silently
+at the end and is not an improvement.
+
+### Mobile
+
+Measured at 390x844 `hasTouch` on all six countries, on both surfaces:
+`scrollWidth 390 = clientWidth` every time, zero elements past the viewport. The new
+button renders **24px** under a mouse and **37px** under a thumb — at and above the
+24px floor, not under it.
+
+### Result
+
+An analyst can now read, off the face of the production tile, how many years ORCA
+holds and what share of the country those years represent — so `36 MMbbl` on
+Malaysia and `39,314 MMbbl` on Nigeria stop reading as the same kind of number. The
+word "Cumulative", which promised a national cumulative on a three-year series, is
+gone from both surfaces, the totals carry separators, Kazakhstan's missing year is
+declared instead of absorbed, and the coverage percentage — 0.2% on the USA — is now
+the control that opens the panel grading it, instead of a fact held only in a badge
+two sections away.
