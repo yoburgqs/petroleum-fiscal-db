@@ -44645,17 +44645,117 @@ function _cpScrollToLiveDcf() {
 }
 window._cpScrollToLiveDcf = _cpScrollToLiveDcf;
 
+// ── v1015 (T6) — the provenance route aimed at a loading placeholder and landed short ─────
+// Walked T6 cold at 1440x900 and at 390x844 hasTouch, both storages cleared, entering from
+// Fiscal Compare rather than from inside a profile — because that is where the question gets
+// asked. Six surfaces (Fiscal Compare, Explorer, Screener, Side-by-Side, IOC Portfolio and the
+// Country Profile headline take) route "where did this number come from?" through this one
+// function, and five of the six arrive via _fcOpenTermChain(), which switches tab and loads a
+// profile that has not rendered yet.
+//
+// Instrumented Element.prototype.scrollIntoView on the shipped build and caught the single call
+// _fcOpenTermChain() makes, cold, on Nigeria at 390x844:
+//
+//     id dd-facts-nigeria   absTop 6746   height 76   {behavior:smooth, block:start}
+//
+// Height 76 is the loading placeholder. _fcOpenTermChain()'s wait loop tests only that the
+// container EXISTS, and the v780 note says so deliberately: "the chain container renders with a
+// loading placeholder before its fetch resolves, so this can scroll immediately." The smooth
+// scroll then animates faithfully to 6746 and stops there — 160 scroll events, last eight
+// 6738..6746, dead on target.
+//
+// By the time it arrives the target is no longer at 6746. The rest of the profile finished
+// rendering ABOVE the chain and pushed it to 7177. Nothing re-aimed. Measured at rest, six
+// countries, every one short, distance = how much the profile grew above the chain after the
+// aim was taken:
+//
+//     390x844   Nigeria 431px  Indonesia 435  Angola 403  Somalia 373  Guyana 296  Norway 174
+//     1440x900  Somalia 115    Indonesia 104  Angola 105  Nigeria 95   Guyana 80   Norway 46
+//
+// On a phone 431px is HALF the 844px viewport, and what fills it is the tail of 4-Price
+// Sensitivity and the collapsed "Cost Profile Assumptions" heading — so the analyst who clicked
+// "3 of 4 model terms cited" to check a citation before an IC memo is looking at a cost deck.
+// Worse, the orange ring that exists to say "this is the thing you asked for" was painted on
+// arrival at the WRONG place, and had faded by the time anything settled. Confirmed it is the
+// aim and not the scroller: one clean scrollIntoView after everything settles lands at exactly
+// chainTop 0.
+//
+// The container cannot be made to render its final height before the aim — it is waiting on a
+// fetch, and refusing to scroll until then is the inert-click failure v780 fixed. So the aim is
+// kept immediate and made self-correcting: re-aim whenever the target's document offset moves,
+// stop once it has stopped moving and we are on it, and flash only then. The one rule is that it
+// must never fight the analyst — any wheel, touch or key input hands control back for good.
+function _ecSettleTo(el, ring) {
+  if (!el) return;
+  var released = false;
+  var evts = ['wheel', 'touchstart', 'keydown'];
+  function release() {
+    if (released) return;
+    released = true;
+    evts.forEach(function (t) { window.removeEventListener(t, taken, true); });
+  }
+  // The analyst taking over is not a race to win. Hand the page back and do not flash.
+  function taken() { release(); }
+  evts.forEach(function (t) { window.addEventListener(t, taken, true); });
+
+  function absTop() { return Math.round(el.getBoundingClientRect().top + window.scrollY); }
+  function offset() { return Math.round(el.getBoundingClientRect().top); }
+  function aim(smooth) {
+    try { el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }); }
+    catch (e) { el.scrollIntoView(); }
+  }
+  function flash() {
+    if (!ring) return;
+    var prev = el.style.boxShadow;
+    el.style.transition = 'box-shadow .3s';
+    el.style.boxShadow = '0 0 0 3px ' + ring;
+    setTimeout(function () { el.style.boxShadow = prev || ''; }, 1800);
+  }
+  function atFloor() {
+    // Element too close to the end of the document to bring to the top. Being clamped by the
+    // scroller is not a miss, and re-aiming at it forever would spin.
+    return Math.ceil(window.scrollY) >= (document.documentElement.scrollHeight - window.innerHeight - 2);
+  }
+
+  aim(true);
+  // absTop is document-absolute, so it is scroll-invariant: it changes only when LAYOUT moves
+  // the target, which is exactly the condition that invalidates an aim already in flight. That
+  // is the ONLY condition this loop re-aims on. It does not chase a scroll position it did not
+  // cause.
+  var aimedAt = absTop(), lastY = Math.round(window.scrollY), quiet = 0, tries = 0;
+  (function step() {
+    if (released) return;
+    var now = absTop(), y = Math.round(window.scrollY), off = Math.abs(offset());
+    if (now !== aimedAt) {
+      aim(true); aimedAt = now; quiet = 0; lastY = y;        // target moved under us -- re-aim
+    } else if (off <= 8 || atFloor()) {
+      release(); flash(); return;                            // arrived
+    } else {
+      // Target stable, and we are not on it. If the scroll position has gone quiet as well then
+      // the aim is no longer in flight and something else owns the scroll -- a scrollbar drag, a
+      // momentum fling, another handler. None of those fire wheel/touchstart/keydown, so the
+      // listeners above would not have caught them. Let go. An unrequested correction arriving
+      // seconds later, after the analyst has started reading somewhere else, is worse than a
+      // short landing: it is the page taking the scroll away from them.
+      quiet = (y === lastY) ? quiet + 1 : 0;
+      lastY = y;
+      if (quiet >= 2) { release(); return; }                 // ~260ms still = not our scroll
+    }
+    if (++tries < 45) setTimeout(step, 130); else release();  // ~5.8s cap, and never a late yank
+  })();
+}
+window._ecSettleTo = _ecSettleTo;
+
 // v660 (T6): the Evidence Quality chip at the top of a profile is a control, not a caption --
 // clicking "N of M model terms cited" lands on the term-by-term Evidence Chain that says which
 // M they are. Same flash treatment as _cpScrollToLiveDcf so the destination is unambiguous.
+// v1015: the aim now settles. On a profile that is already rendered this is a no-op -- the first
+// check finds the target stable and on screen, so the behaviour an in-page click already had is
+// unchanged; it is the cross-tab arrival that was landing short.
 function _cpScrollToEvidenceChain(slug) {
   var el = document.getElementById('dd-facts-' + slug) || document.getElementById('dd-facts-content-' + slug);
   if (!el) return;
-  try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
-  var prev = el.style.boxShadow;
-  el.style.transition = 'box-shadow .3s';
-  el.style.boxShadow = '0 0 0 3px rgba(194,65,12,.45)';
-  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+  _ecSettleTo(el, 'rgba(194,65,12,.45)');
 }
 window._cpScrollToEvidenceChain = _cpScrollToEvidenceChain;
 
