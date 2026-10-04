@@ -74333,3 +74333,16 @@ gone from both surfaces, the totals carry separators, Kazakhstan's missing year 
 declared instead of absorbed, and the coverage percentage — 0.2% on the USA — is now
 the control that opens the panel grading it, instead of a fact held only in a badge
 two sections away.
+
+---
+## Cycle 1024 Log — 2026-10-04 17:21
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed, tree clean. Cycle complete.
+
+## Cycle 1024 — v1067
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (last cycle was T1)
+
+**Friction.** I walked T6 cold at 1440×900 and 390×844 with touch, storage cleared before each pass. Most of the T6 surface is genuinely finished — the per-term Evidence Chain answers it completely (I checked the hard cases: Vanuatu, Tuvalu, Russia), and all five exports fire, parse, and carry their own sourcing and comparability blocks.
