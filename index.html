@@ -38505,6 +38505,12 @@ function runScreener() {
     ? COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'npv75')).length - data.length : null;
   const _npv50Removes = (minNPV50 > -500)
     ? COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'npv50')).length - data.length : null;
+  // v1017 (T1) — the floor-take leg is measured here for the same reason the two NPV legs are:
+  // it is about to be named in the exported criteria, and a criterion that reaches an investment
+  // committee has to state how many rows it actually took out of THIS screen rather than how many
+  // floor-take countries exist in the database.
+  const _floorRemoves = !includeFloor
+    ? COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'floor')).length - data.length : null;
   // A zero-row result makes every leg's removal count 0 by arithmetic rather than by inertness,
   // so the claim is only made while there is a row set to make it about.
   const _npv75Inert = (_npv75Removes === 0) && data.length > 0;
@@ -38684,6 +38690,25 @@ function runScreener() {
   if (checkedIOCs.length > 0) activeCount++;
   if (scRegionActive) activeCount++;
   if (!includeProxy) activeCount++; // v517: excluding proxy-economics countries is a filter
+  // v1017 (T1) — THE FILTER THAT REMOVED 45 COUNTRIES AND TOLD THE ANALYST NOTHING HAD HAPPENED.
+  // Walked T1 cold at 1440x900, both storages cleared: Home -> "Screener" card -> Advanced
+  // Filters -> untick "Include the 45 countries whose take is a floor, not a measurement".
+  // 185 rows became 140. activeCount stayed 0, and that one number gates four surfaces:
+  //   count line   "All 140 countries — no filters applied yet. Load a preset or move a slider
+  //                 to narrow."  <- a filter had just been applied, and 140 is not "All".
+  //   badge        #screener-active-filters hidden and emptied. No "1 filter active" anywhere.
+  //   #sc-prod-out display:none — the one strip whose whole job is naming which countries this
+  //                 screen removed and why, short-circuited on `activeCount > 0`.
+  //   export       _screenerExportBasis.criteria fell through to its no-criteria fallback and
+  //                 declared "None — this is the full ORCA universe, not a screen result" over a
+  //                 row set the same object recorded as matched:140, universe:185.
+  // Meanwhile #sc-adv-summary-note two inches above read "Measured take only" in bold accent,
+  // with a tooltip saying it was "narrowing the list while it is collapsed". So the page both
+  // asserted and denied the same filter on one screen, and the denial was the one that got
+  // exported. The comment at the top of this function already claims includeFloor is shared with
+  // "the count line, the active-filter badge, the export criteria and the zero-result diagnosis";
+  // it had only ever reached the diagnosis.
+  if (!includeFloor) activeCount++;
   if (takeCeilingActive && !feeCmpOn && _nFeeDivForBadge > 0) activeCount++; // v554: screening the ceiling on the blended headline is a choice that removes countries
   const totalMechBoxes = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
   if (checkedMechs.length < totalMechBoxes) activeCount++; // some mechanic unchecked = active filter
@@ -39248,6 +39273,21 @@ function runScreener() {
     // v623: neither is the coverage radio. No breakeven criterion is claimed because none exists.
     if (!includeProxy) crit.push('Verified field production only — '
       + (COUNTRY_DATA.length - COUNTRY_DATA.filter(function(x){ return _dqTier(x).hasProduction; }).length) + ' proxy-economics countries excluded');
+    // v1017 (T1): this leg was missing, so a shortlist narrowed on it alone exported under
+    // "None — this is the full ORCA universe, not a screen result". It is a different question
+    // from the production leg above: Guyana, Namibia, Mozambique, Senegal and Suriname hold no
+    // verified production but are modelled on real PSC terms and this leg keeps them.
+    // The inert case gets its own sentence, for the reason v706 gave the NPV legs one: with the
+    // production box ALSO off, every floor-take country has already gone with the 163 proxies, and
+    // "removed 0 countries" printed as a criterion is a test the screen did not get to apply.
+    if (!includeFloor) crit.push('Measured take only — excludes countries whose take is royalty and income tax alone'
+      + ' on a record of under ' + SC_EVID_MIN_FACTS + ' fiscal facts, with no petroleum rent instrument of any kind on file.'
+      + ' For those countries take is a LOWER bound and contractor NPV an UPPER bound, so they rank at the top of an NPV'
+      + ' ordering on the thinness of their record rather than the generosity of their terms. '
+      + (_floorRemoves === 0 && data.length > 0
+          ? 'NOT BINDING on this shortlist: it removed 0 rows, because all ' + _scFloorCount()
+            + ' of them also lack verified field production and the production criterion above had already excluded every one. This shortlist was decided without this leg'
+          : 'Removed ' + _floorRemoves + (_floorRemoves === 1 ? ' country' : ' countries') + ' from this shortlist'));
     if (minEvid > 0) crit.push('Min primary-source evidence: ≥' + minEvid + '% of fiscal facts read from the primary legal instrument (tier A); the EY/IHS/KPMG bulk harvest (tier B) does not count toward this'
       + (evidDepthOn ? ', on a record of at least ' + SC_EVID_MIN_FACTS + ' fiscal facts — a share on a thinner record is not evidence'
                      : ', on a record of ANY depth — fact-depth floor switched OFF, so a 100% share on a 2-fact record passes'));
