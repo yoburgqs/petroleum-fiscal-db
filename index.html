@@ -24301,19 +24301,108 @@ function _rrStatuteTail(d, where) {
        + 'it is printed ' + (where === 'above' ? 'above' : 'below') + ', with IMF Article IV and operator annual reports after it.';
 }
 // The block itself. Returns '' where there is no legislation citation to show.
+// ── v1063 (T4): the one instruction this card gives, checked against whether it works ──
+// The 164 unscored jurisdictions get exactly one actionable step on this card -- "start the
+// external check at this statute" -- and the document's name was rendered as an openable link
+// without ever asking the platform's own dead-citation registry whether it opens. Walked T4 cold
+// 2026-10-04 over all 164 in the lookup: 94 of them cite an address that is in _CITE_DEAD, i.e.
+// it returned a 404 or an unresolvable hostname when every citation URL on the platform was
+// fetched on 4 Sep 2026. 64 are live, 4 carry one of each, Paraguay names a document ORCA holds
+// no address for, Somalia holds no instrument at all. So on 57% of the rows that reach this
+// block the single next step was a link to nothing -- while the sourced event log directly
+// beneath it, and the Country Profile source list, both already mark exactly this condition
+// LINK DEAD and hand over a find-document search instead.
+//
+// Nothing new is computed. _citeLinkDead(), _citeFindHref() and _srcTitleSplit() are the same
+// three builders the citation surfaces use, so this card and the event log cannot now disagree
+// about whether one address resolves. _srcTitleSplit() matters most on exactly these rows: v850
+// measured that 84% of dead-address citations print ORCA's harvest annotation welded onto the
+// title ("... SOCAR PSA Model CIT 32 pct Profit Oil 80 pct"), which returns nothing from a search
+// engine -- and locating the instrument by name is the only step left once the address fails.
+//
+// No score, no count, no premium and no coverage figure moves: all 164 of these rows stay n/c.
+function _rrStatuteLinkState(url) {
+  var u = String(url || '');
+  if (!/^https?:\/\//.test(u)) return 'none';
+  return (typeof _citeLinkDead === 'function' && _citeLinkDead(u)) ? 'dead' : 'live';
+}
+function _rrStatuteFindTip(title, state) {
+  return state === 'dead'
+    ? 'The address ORCA holds for this document returned a 404, or named a hostname that does not '
+      + 'resolve, when every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED
+      + '. That is not a judgement on the instrument — its tier letter is unchanged and the terms '
+      + 'ORCA read from it are unaffected. What is broken is the one step that would let you check '
+      + 'it yourself. This control searches for “' + title + '” instead of opening the dead address.'
+    : 'ORCA records this document by name and holds no address for it, so there is nothing to open. '
+      + 'This control searches for “' + title + '”. Locate the instrument before an IC memo rests '
+      + 'on a reform reading taken from it.';
+}
+// One row builder for both statute cards, so the live / dead / never-had-an-address cases cannot
+// be rendered three different ways on two surfaces that answer the same question.
+function _rrStatuteHeadHtml(s) {
+  var raw   = String((s && s.name) || '');
+  var sp    = (typeof _srcTitleSplit === 'function') ? _srcTitleSplit(raw) : { title: raw, note: '' };
+  var title = sp.title || raw;
+  var state = _rrStatuteLinkState(s && s.url);
+  var css   = 'display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;font-weight:700;font-size:11.5px;';
+  // The annotation is real provenance and stays on screen, demoted and labelled as ORCA's note
+  // rather than passed off as part of what the document is called.
+  var note  = sp.note
+    ? '<div style="font-size:10px;color:var(--muted);font-weight:400;line-height:1.5;">ORCA’s harvest '
+      + 'note, not part of the title: ' + _rrEsc(sp.note) + '</div>'
+    : '';
+  if (state === 'live') {
+    return '<a href="' + _rrEsc(String(s.url)) + '" target="_blank" rel="noopener" style="' + css
+      + 'color:var(--accent);text-decoration:none;" '
+      + 'title="Open the source register ORCA cites for this document. Address last checked '
+      + _CITE_DEAD_CHECKED + '.">' + _rrEsc(title) + ' &nearr;</a>' + note;
+  }
+  var tip  = _rrStatuteFindTip(title, state);
+  var find = (typeof _citeFindHref === 'function')
+    ? '<a href="' + _rrEsc(_citeFindHref(title)) + '" target="_blank" rel="noopener" style="' + css
+      + 'color:var(--muted);text-decoration:none;" title="' + _rrEsc(tip) + '">' + _rrEsc(title)
+      + ' <span class="ec-find-chip">⌕ find document ↗</span></a>'
+    : '<span style="' + css + 'color:var(--text);">' + _rrEsc(title) + '</span>';
+  var chip = state === 'dead'
+    ? ' <span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid '
+      + 'rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;'
+      + 'border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="'
+      + _rrEsc(tip) + '">LINK DEAD</span>'
+    : ' <span class="ec-nopage-chip" title="' + _rrEsc(tip) + '">no address on record</span>';
+  return find + chip + note;
+}
+// Appended to the card's body wherever not one starting document can be opened, because that
+// changes the instruction itself -- from "open this" to "search for it by name". Stays silent
+// whenever at least one address resolves: there the analyst has a working next click and the
+// per-row chips already say which of the others do not.
+function _rrStatuteOpenTail(legs) {
+  var states = (legs || []).map(function (s) { return _rrStatuteLinkState(s && s.url); });
+  if (!states.length) return '';
+  if (states.some(function (x) { return x === 'live'; })) return '';
+  var anyDead = states.some(function (x) { return x === 'dead'; });
+  var many    = states.length > 1;
+  return ' <strong style="color:var(--orange);">'
+    + (anyDead ? (many ? 'None of these addresses opens' : 'That address does not open')
+               : (many ? 'ORCA holds no address for any of them' : 'ORCA holds no address for it'))
+    + '.</strong> '
+    + (anyDead
+        ? 'Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + ' and '
+          + (many ? 'each of these returned' : 'this one returned')
+          + ' a 404 or a hostname that does not resolve. The tier letter above is unchanged — '
+          + 'whether the instrument is authoritative and whether ORCA can hand you a copy are '
+          + 'different questions. '
+        : '')
+    + 'So the external check starts from the document’s name rather than from a link on this '
+    + 'card: use the find-document '
+    + (many ? 'controls' : 'control') + ' above, then IMF Article IV and operator annual reports.';
+}
 function _rrStatuteBlock(d) {
   var legs = _rrStatuteSources(d);
   if (!legs.length) return '';
   var esc  = _rrEsc((d && d.country) || 'this country');
   var maxY = _rrStatuteMaxYear(legs);
   var rows = legs.map(function(s) {
-    var nm  = _rrEsc(s.name);
-    var url = String(s.url || '');
-    var head = /^https?:\/\//.test(url)
-      ? '<a href="' + _rrEsc(url) + '" target="_blank" rel="noopener" '
-        + 'style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--accent);font-weight:700;text-decoration:none;font-size:11.5px;" '
-        + 'title="Open the source register ORCA cites for this statute">' + nm + ' &nearr;</a>'
-      : '<span style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--text);font-weight:700;font-size:11.5px;">' + nm + '</span>';
+    var head = _rrStatuteHeadHtml(s);   // v1063 (T4) — live / LINK DEAD / no address on record
     return '<div style="margin-bottom:7px;">' + head
       + '<div style="font-size:10.5px;color:var(--muted);line-height:1.5;">'
       + (s.tier ? _rrEsc(s.tier) + '-tier legislation' : 'legislation')
@@ -24327,6 +24416,7 @@ function _rrStatuteBlock(d) {
     ? 'The most recent year that citation names is <strong style="color:var(--text);">' + maxY + '</strong> — <strong style="color:var(--text);">before</strong> the 2010 scoring window. '
       + 'Everything ORCA prints for ' + esc + ' is read from it, so any amendment passed since 2010 is unrecorded on this platform. That act is where the check starts.'
     : 'That citation names no year, so ORCA cannot tell you whether the instrument it read predates the 2010 window. Establish which version is in force before anything else.';
+  verdict += _rrStatuteOpenTail(legs);   // v1063 (T4)
   return '<div style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;background:var(--surface);">'
     + '<div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;">Start the external check here — the statute ORCA sourced these terms from</div>'
     + rows
@@ -24412,12 +24502,7 @@ function _rrFallbackBlock(d) {
   var owner = fb.mode === 'parent' ? _rrEsc(fb.parent) : esc;
   var maxY  = _rrStatuteMaxYear(fb.legs);
   var rows  = fb.legs.map(function (s) {
-    var nm = _rrEsc(s.name), url = String(s.url || '');
-    var head = /^https?:\/\//.test(url)
-      ? '<a href="' + _rrEsc(url) + '" target="_blank" rel="noopener" '
-        + 'style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--accent);font-weight:700;text-decoration:none;font-size:11.5px;" '
-        + 'title="Open the source register ORCA cites for this instrument">' + nm + ' &nearr;</a>'
-      : '<span style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--text);font-weight:700;font-size:11.5px;">' + nm + '</span>';
+    var head = _rrStatuteHeadHtml(s);   // v1063 (T4) — same three states as the statute card
     return '<div style="margin-bottom:7px;">' + head
       + '<div style="font-size:10.5px;color:var(--muted);line-height:1.5;">'
       + (s.tier ? _rrEsc(s.tier) + '-tier ' : '') + _rrEsc(s.kind || 'legislation')
@@ -24432,6 +24517,7 @@ function _rrFallbackBlock(d) {
     : maxY > 0
     ? 'The most recent year it names is <strong style="color:var(--text);">' + maxY + '</strong> &mdash; <strong style="color:var(--text);">before</strong> the 2010 scoring window, so any amendment passed since is unrecorded on this platform. That is where the check starts.'
     : 'It names no year, so ORCA cannot tell you which version it read. Establish which text is in force before anything else.';
+  yr += _rrStatuteOpenTail(fb.legs);   // v1063 (T4)
 
   var head = fb.mode === 'parent'
     ? 'Start the external check here &mdash; the nearest instrument ORCA holds is ' + owner + '&rsquo;s'
@@ -24466,6 +24552,9 @@ window._rrFallbackBlock = _rrFallbackBlock;
 
 window._rrStatuteSources = _rrStatuteSources;
 window._rrStatuteBlock = _rrStatuteBlock;
+window._rrStatuteLinkState = _rrStatuteLinkState;   /* v1063 (T4) */
+window._rrStatuteHeadHtml = _rrStatuteHeadHtml;
+window._rrStatuteOpenTail = _rrStatuteOpenTail;
 window._rrStatuteTail = _rrStatuteTail;
 
 window._rrEventDir = _rrEventDir;
