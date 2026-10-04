@@ -73497,3 +73497,18 @@ screen that could have said so was previously absent and the strip said it did n
   `_pre1011.html`, `_base970.html`, `_pre1035.html` still untracked in the repo root (~47 MB).
   Everything this cycle wrote went to `/tmp/c1003/`; **nothing landed in the repo.** Not created
   this session, so flagged rather than removed unasked.
+
+---
+## Cycle 1006 Log — 2026-10-03 20:42
+- Test before: 550 PASS / 0 FAIL
+- Test after: 550 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 1003 complete and pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (last cycle was T5, so no repeat.)
+
+## Friction
+Walked T3 cold at 1440×900 with both storages cleared, on the two frontier sets the code's own comment names: Guyana/Suriname/Senegal and Guyana/Suriname/Namibia.
+
+The verdict strip above the grid — which the file itself calls *"the line that gets read and pasted into the memo"* — closed with: *"…which is why the **Rank among producers** row below
