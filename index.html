@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1069</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1070</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -30404,6 +30404,23 @@ var _cmpOpts = [];      // country names currently rendered, in order
 var _cmpFocus = -1;     // index of the highlighted option; Enter adds this one
 var _cmpRefused = [];   // v958: names the cap turned away since the last successful add
 
+// ── v1070 (T3): what the open dropdown is. Null on a real match list; set only while the
+// list is a Levenshtein "Did you mean?" guess list -- i.e. while the country Enter would
+// commit is a DIFFERENT STRING from the one the analyst typed. Read by the Enter handler,
+// which has to announce that substitution, and must be captured before _cmpPick() because
+// _cmpCloseDrop() clears all three.
+var _cmpFzTop = null;   // the country Enter is armed to add
+var _cmpFzAlt = null;   // the runner-up guess, if there is one
+var _cmpFzTie = false;  // top two guesses within CMP_FZ_MARGIN -- no basis to choose
+// Measured against 25 plausible misspellings of real petroleum jurisdictions: 22 resolve with
+// a margin of 0.12-0.34 over the runner-up and are right. The three that are not clear-cut are
+// "lybia" (Libya 0.60 / Syria 0.60), "narnia" (Armenia 0.57 / Namibia 0.57) -- exact ties, where
+// sort order alone decided it -- and "nigera" (Nigeria 0.86 / Niger 0.83), which is the
+// expensive pair: Nigeria is production-weighted at 81.1%, Niger is a statutory proxy, so they
+// do not even rank against each other. 0.05 disarms exactly those three and leaves the other 22
+// on the fast path.
+var CMP_FZ_MARGIN = 0.05;
+
 function _cmpPaintFocus() {
   var els = cmpDrop.querySelectorAll('.cmp-opt');
   for (var i = 0; i < els.length; i++) {
@@ -30421,6 +30438,7 @@ function _cmpCloseDrop() {
   cmpDrop.style.display = 'none';
   cmpDrop.innerHTML = '';
   _cmpOpts = []; _cmpFocus = -1;
+  _cmpFzTop = null; _cmpFzAlt = null; _cmpFzTie = false;   // v1070
   cmpSearch.removeAttribute('aria-activedescendant');
   cmpSearch.setAttribute('aria-expanded', 'false');
 }
@@ -30611,14 +30629,33 @@ function _cmpRenderDrop() {
       + exp.replace(/</g, '&lt;') + '</strong></div>';
     html = hdr + matches.map(function(d, i) { return _cmpOptHTML(d, i, ''); }).join('');
     _cmpOpts = matches.map(function(d) { return d.country; });
+    _cmpFzTop = null; _cmpFzAlt = null; _cmpFzTie = false;   // v1070: a real match list
   } else {
     var fz = _cmpFuzzy(raw);
     if (fz.length) {
-      html = '<div style="padding:5px 12px;font-size:10px;font-weight:700;color:var(--accent);'
-        + 'border-bottom:1px solid var(--border);background:var(--surface2);">Did you mean?</div>'
+      // ── v1070 (T3): the header now names the country Enter will commit. ──────────────
+      // It said only "Did you mean?" -- correct as a question, but this is the one list on
+      // the tab where the row Enter adds is spelled differently from what is in the box, so
+      // "Did you mean?" was the only place that could say which way the guess went, and it
+      // did not. On a tie it says so and Enter is left unarmed (see _cmpFocus below).
+      _cmpFzTop = fz[0].d.country;
+      _cmpFzAlt = fz.length > 1 ? fz[1].d.country : null;
+      _cmpFzTie = fz.length > 1 && (fz[0].score - fz[1].score) < CMP_FZ_MARGIN;
+      var _q = raw.replace(/</g, '&lt;').replace(/&/g, '&amp;');
+      // Named top-then-alt so the sentence reads in the same order as the rows under it, and
+      // "too close to call" rather than "the same distance" because CMP_FZ_MARGIN also catches
+      // the 0.03 near-tie (nigera -> Nigeria / Niger), which is not an exact tie.
+      var _fhdr = _cmpFzTie
+        ? 'Did you mean? \u2014 <strong style="color:var(--text);">' + _cmpFzTop + '</strong> and <strong style="color:var(--text);">'
+          + _cmpFzAlt + '</strong> are too close to call on \u201c' + _q + '\u201d, so Enter adds nothing. Pick one.'
+        : 'Did you mean? \u2014 nothing is spelled \u201c' + _q + '\u201d; Enter adds <strong style="color:var(--text);">'
+          + _cmpFzTop + '</strong>.';
+      html = '<div style="padding:5px 12px;font-size:10px;font-weight:700;color:var(--accent);line-height:1.55;'
+        + 'border-bottom:1px solid var(--border);background:var(--surface2);">' + _fhdr + '</div>'
         + fz.map(function(x, i) { return _cmpOptHTML(x.d, i, ''); }).join('');
       _cmpOpts = fz.map(function(x) { return x.d.country; });
     } else {
+      _cmpFzTop = null; _cmpFzAlt = null; _cmpFzTie = false;
       // Was `display:none` — indistinguishable from an idle box. Say it out loud.
       html = '<div style="padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
         + '<strong style="color:var(--text);">No country matches &ldquo;'
@@ -30634,7 +30671,11 @@ function _cmpRenderDrop() {
   cmpDrop.style.display = 'block';
   cmpSearch.setAttribute('aria-expanded', 'true');
   // Pre-highlight the top row so the analyst can SEE what Enter is about to add.
-  _cmpFocus = _cmpOpts.length ? 0 : -1;
+  // v1070 (T3): except on a tied guess list, where there is nothing to see -- two countries
+  // sit at the identical Levenshtein score and whichever one Enter took was decided by sort
+  // order, not by the query. Arming nothing makes the analyst pick; ↓ then Enter, hover,
+  // or a click all still commit, so the explicit route costs one keystroke.
+  _cmpFocus = (_cmpOpts.length && !_cmpFzTie) ? 0 : -1;
   _cmpPaintFocus();
 }
 cmpSearch.addEventListener('input', _cmpRenderDrop);
@@ -30647,9 +30688,40 @@ cmpSearch.addEventListener('keydown', function(e) {
     _cmpPaintFocus();
   } else if (e.key === 'Enter') {
     e.preventDefault();
-    if (_cmpFocus >= 0 && _cmpOpts[_cmpFocus]) { _cmpPick(_cmpOpts[_cmpFocus]); }
-    else if (cmpSearch.value.trim() && typeof showCopyToast === 'function') {
-      showCopyToast('No country matches “' + cmpSearch.value.trim() + '” — nothing was added.');
+    // ── v1070 (T3): a guess committed by Enter is now ANNOUNCED. ────────────────────────
+    // The placeholder on this box is literally "Type a country, press Enter…", so the
+    // three-country walk is three names typed fast with Enter after each. On a typo the box
+    // matched nothing, _cmpRenderDrop() fell through to the Levenshtein branch, and
+    // _cmpFocus was pre-armed to 0 there exactly as it is on a real match list -- so Enter
+    // committed a country the analyst had never typed, the input cleared, the list closed,
+    // and NOTHING was said. A new column simply appeared. Measured on the live build:
+    // "narnia" put Armenia into the comparison, at 16.1% -- low enough to take first place
+    // in "GOVT TAKE @$75, LOWEST FIRST", which is the one line the analyst reads and the one
+    // the IC-memo paste carries. "nigera" puts in Nigeria when Niger is 0.03 away.
+    // Every other refusal on this tab announces itself (v501: "a refusal is always announced
+    // instead of being a silent no-op"); this was the one path that SUBSTITUTED rather than
+    // refused, and it was the only one that said nothing.
+    // Captured before _cmpPick(), which ends in _cmpCloseDrop() and clears all of it.
+    var _typed = cmpSearch.value.trim();
+    var _fzTop = _cmpFzTop, _fzAlt = _cmpFzAlt, _fzTie = _cmpFzTie;
+    if (_cmpFocus >= 0 && _cmpOpts[_cmpFocus]) {
+      var _name = _cmpOpts[_cmpFocus];
+      _cmpPick(_name);
+      // Only when the committed name is a different string from the typed one. A click or a
+      // ↓-then-Enter on the same row lands here too, and is announced for the same reason:
+      // what the analyst sees afterwards is a chip they did not type.
+      if (_fzTop && compareList.indexOf(_name) >= 0 && typeof showCopyToast === 'function') {
+        showCopyToast('Nothing is spelled “' + _typed + '” — added ' + _name
+          + ', the closest match'
+          + (_fzAlt ? '; next closest was ' + _fzAlt : '')
+          + '. Wrong country? ✕ on its chip drops it.', 6000);
+      }
+    } else if (_fzTie && _fzTop && typeof showCopyToast === 'function') {
+      showCopyToast('Nothing is spelled “' + _typed + '”, and ' + _fzTop + ' and ' + _fzAlt
+        + ' are too close to call on it — so nothing was added. Pick the one you meant '
+        + 'from the list, or press ↓ then Enter.', 6000);
+    } else if (_typed && typeof showCopyToast === 'function') {
+      showCopyToast('No country matches “' + _typed + '” — nothing was added.');
     }
   } else if (e.key === 'Escape') {
     _cmpCloseDrop();
