@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1067</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1068</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -23881,15 +23881,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div id="sb-concession-params">
           <div class="sb-section-hdr">Concession Parameters</div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Royalty Rate (%)</label><input type="number" id="sb-royalty" value="10" min="0" max="40" step="1" title="Royalty Rate — percentage of gross production revenue taken by government off the top, before cost deductions. Typical range: 5–20% (OECD Concessions); 0–10% (PSC regimes where FTP substitutes for royalty); Norway 0% (replaced by SPT); US federal lands 12.5–18.75%. Higher royalty compresses contractor margins at all price levels."></div>
-            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-cit" value="25" min="0" max="60" step="1" title="Corporate Income Tax rate on contractor taxable income, after royalties, depreciation, and opex deductions. Typical range: 20–55%. Norway: 22% CIT + 56% SPT = 78% marginal. UK: 30% (pre-EPL). US: 21% federal. W. Africa: 30–50%. Applied after deductions — lower effective rate than the statutory headline."></div>
+            <div class="sb-control-group"><label>Royalty Rate (%)</label><input type="number" id="sb-royalty" value="10" min="0" max="40" step="0.1" title="Royalty Rate — percentage of gross production revenue taken by government off the top, before cost deductions. Typical range: 5–20% (OECD Concessions); 0–10% (PSC regimes where FTP substitutes for royalty); Norway 0% (replaced by SPT); US federal lands 12.5–18.75%. Higher royalty compresses contractor margins at all price levels."></div>
+            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-cit" value="25" min="0" max="60" step="0.1" title="Corporate Income Tax rate on contractor taxable income, after royalties, depreciation, and opex deductions. Typical range: 20–55%. Norway: 22% CIT + 56% SPT = 78% marginal. UK: 30% (pre-EPL). US: 21% federal. W. Africa: 30–50%. Applied after deductions — lower effective rate than the statutory headline."></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Special Tax (%)</label><input type="number" id="sb-spt" value="0" min="0" max="80" step="1" title="Special Petroleum Tax / Supplemental Resource Rent Tax — additional levy on contractor income above standard CIT. Applied to gross petroleum income before deductions in most regimes. Examples: Norway SPT = 56% (total marginal 78%); UK SCT = 35% (total 40%); Kazakhstan MET = variable 5–18%. Set 0 for standard Concession without supplemental levy."></div>
-            <div class="sb-control-group"><label>State Equity (%)</label><input type="number" id="sb-state-eq" value="0" min="0" max="80" step="1" title="State Equity / NOC Participation Interest — the government or NOC's working interest share. Reduces contractor net revenue proportionally. Typical range: 0% (many OECD markets) to 55%+ (Nigeria NNPC, Angola Sonangol, Malaysia Petronas). Modeled as paying participation — NOC funds its proportional cost share from day one. Carried arrangements require separate adjustments."></div>
+            <div class="sb-control-group"><label>Special Tax (%)</label><input type="number" id="sb-spt" value="0" min="0" max="80" step="0.1" title="Special Petroleum Tax / Supplemental Resource Rent Tax — additional levy on contractor income above standard CIT. Applied to gross petroleum income before deductions in most regimes. Examples: Norway SPT = 56% (total marginal 78%); UK SCT = 35% (total 40%); Kazakhstan MET = variable 5–18%. Set 0 for standard Concession without supplemental levy."></div>
+            <div class="sb-control-group"><label>State Equity (%)</label><input type="number" id="sb-state-eq" value="0" min="0" max="80" step="0.1" title="State Equity / NOC Participation Interest — the government or NOC's working interest share. Reduces contractor net revenue proportionally. Typical range: 0% (many OECD markets) to 55%+ (Nigeria NNPC, Angola Sonangol, Malaysia Petronas). Modeled as paying participation — NOC funds its proportional cost share from day one. Carried arrangements require separate adjustments."></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Windfall Tax (%)</label><input type="number" id="sb-windfall" value="0" min="0" max="50" step="1" title="Windfall / Excess Profit Tax rate triggered at high oil prices or profitability. Examples: UK EPL 35% (triggered 2022); US Crude Oil Windfall Profit Tax (historical). Modeled as a flat additional rate on contractor income above the normal CIT level. Set 0 if regime has no windfall mechanism. Use 'Excess Profits Tax' in TSC params for service-contract-specific EPT."></div>
+            <div class="sb-control-group"><label>Windfall Tax (%)</label><input type="number" id="sb-windfall" value="0" min="0" max="50" step="0.1" title="Windfall / Excess Profit Tax rate triggered at high oil prices or profitability. Examples: UK EPL 35% (triggered 2022); US Crude Oil Windfall Profit Tax (historical). Modeled as a flat additional rate on contractor income above the normal CIT level. Set 0 if regime has no windfall mechanism. Use 'Excess Profits Tax' in TSC params for service-contract-specific EPT."></div>
             <div class="sb-control-group"><label>Severance Tax (%)</label><input type="number" id="sb-severance" value="0" min="0" max="20" step="1" title="Severance Tax — production-based tax assessed as % of wellhead value, before income deductions. Primarily US state-level (Texas: 4.6%, Oklahoma: 7%, Wyoming: 6%). Most IOC-relevant international regimes use royalty rather than severance. Set 0 for non-US scenarios. Royalty and severance are both deductible from CIT taxable income in most US jurisdictions."></div>
           </div>
         </div>
@@ -23897,15 +23897,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div id="sb-psc-params" style="display:none">
           <div class="sb-section-hdr">PSC Parameters</div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label id="sb-crcap-lbl" for="sb-cr-cap">Cost Recovery Cap (%)</label><input type="number" id="sb-cr-cap" value="60" min="10" max="100" step="5" title="Cost Recovery Cap — maximum % of gross production the contractor can recover as cost oil in any period. Limits government downside but compresses contractor returns when costs exceed the cap. Typical range: 50% (Nigeria deepwater), 60–65% (Angola, Ghana), 75–80% (some SE Asia PSCs). Unrecovered costs carry forward to future periods. 100% = uncapped cost recovery."></div>
-            <div class="sb-control-group"><label id="sb-ftp-lbl" for="sb-ftp">FTP / First Tranche (%)</label><input type="number" id="sb-ftp" value="10" min="0" max="30" step="1" title="FTP (First Tranche Petroleum) — percentage of gross production taken by government or NOC before cost recovery begins. Government's priority slice regardless of contractor's cost recovery position. Typical range: 0% (Nigeria, Indonesia old PSC), 10% (Angola, Ghana), 15–20% (Malaysia Petronas, some MENA PSCs). High FTP = contractor earns nothing until the FTP tranche is cleared."></div>
+            <div class="sb-control-group"><label id="sb-crcap-lbl" for="sb-cr-cap">Cost Recovery Cap (%)</label><input type="number" id="sb-cr-cap" value="60" min="10" max="100" step="0.1" title="Cost Recovery Cap — maximum % of gross production the contractor can recover as cost oil in any period. Limits government downside but compresses contractor returns when costs exceed the cap. Typical range: 50% (Nigeria deepwater), 60–65% (Angola, Ghana), 75–80% (some SE Asia PSCs). Unrecovered costs carry forward to future periods. 100% = uncapped cost recovery."></div>
+            <div class="sb-control-group"><label id="sb-ftp-lbl" for="sb-ftp">FTP / First Tranche (%)</label><input type="number" id="sb-ftp" value="10" min="0" max="30" step="0.1" title="FTP (First Tranche Petroleum) — percentage of gross production taken by government or NOC before cost recovery begins. Government's priority slice regardless of contractor's cost recovery position. Typical range: 0% (Nigeria, Indonesia old PSC), 10% (Angola, Ghana), 15–20% (Malaysia Petronas, some MENA PSCs). High FTP = contractor earns nothing until the FTP tranche is cleared."></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label id="sb-po-lbl" for="sb-po-govt">Profit Oil - Govt (%)</label><input type="number" id="sb-po-govt" value="60" min="10" max="90" step="5" title="Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier."></div>
-            <div class="sb-control-group"><label id="sb-psccit-lbl" for="sb-psc-cit">CIT Rate (%)</label><input type="number" id="sb-psc-cit" aria-describedby="sb-psc-cit-note" value="25" min="0" max="60" step="1" title="CIT Rate in PSC — applied to contractor's profit oil tranche after cost recovery. In some PSCs (Nigeria, Angola), the NOC pays CIT on behalf of contractor from the government profit oil, making the headline CIT invisible to contractor cash flow. Typical range: 25–35% where contractor-paid; 0–15% where NOC-paid-on-behalf arrangements apply."><div id="sb-psc-cit-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;"></div></div>
+            <div class="sb-control-group"><label id="sb-po-lbl" for="sb-po-govt">Profit Oil - Govt (%)</label><input type="number" id="sb-po-govt" value="60" min="10" max="90" step="0.1" title="Profit Oil — Government Share: after FTP and cost recovery, this % of remaining production (profit oil) goes to government. Contractor receives (100 − this %). Typical base-tier range: 50–70% government in SE Asia; 55–80% in W. Africa deepwater. Many PSCs have R-factor tiers where govt share rises with cumulative profitability — this models the base (lowest R) tier."></div>
+            <div class="sb-control-group"><label id="sb-psccit-lbl" for="sb-psc-cit">CIT Rate (%)</label><input type="number" id="sb-psc-cit" aria-describedby="sb-psc-cit-note" value="25" min="0" max="60" step="0.1" title="CIT Rate in PSC — applied to contractor's profit oil tranche after cost recovery. In some PSCs (Nigeria, Angola), the NOC pays CIT on behalf of contractor from the government profit oil, making the headline CIT invisible to contractor cash flow. Typical range: 25–35% where contractor-paid; 0–15% where NOC-paid-on-behalf arrangements apply."><div id="sb-psc-cit-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;"></div></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label id="sb-pscroy-lbl" for="sb-psc-royalty">Royalty Rate (%)</label><input type="number" id="sb-psc-royalty" value="0" min="0" max="20" step="1" title="Royalty in PSC — most pure PSCs have 0% royalty (FTP substitutes). Some hybrid PSCs add a small royalty on top. W. Africa: typically 0–5%; SE Asia: 0–10%. If modeling a hybrid concession-PSC or a PSC with production levy, enter the royalty rate here. Pure PSC = 0%."></div>
+            <div class="sb-control-group"><label id="sb-pscroy-lbl" for="sb-psc-royalty">Royalty Rate (%)</label><input type="number" id="sb-psc-royalty" value="0" min="0" max="20" step="0.1" title="Royalty in PSC — most pure PSCs have 0% royalty (FTP substitutes). Some hybrid PSCs add a small royalty on top. W. Africa: typically 0–5%; SE Asia: 0–10%. If modeling a hybrid concession-PSC or a PSC with production levy, enter the royalty rate here. Pure PSC = 0%."></div>
           </div>
           <!-- v883 (T2): R-FACTOR LADDER. getDCFParams() loads tier_schedule for 51 of 185
                countries and dcfPSC() resolves the government profit-oil share off it year by
@@ -23932,10 +23932,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <div class="sb-section-hdr">TSC / RSC Service Contract Parameters</div>
           <div class="sb-row2">
             <div class="sb-control-group"><label>Contractor Fee ($/bbl)</label><input type="number" id="sb-fee" value="4.00" min="0.50" max="20" step="0.25" title="Contractor Fee ($/bbl) — fixed per-barrel remuneration paid by the government or NOC to the contractor. Contractor receives this fee and NOC retains all remaining production value. Iraq TSC range: $1.15–$4.40/bbl (Rumaila $1.15, West Qurna $1.50–$2.38). Higher fee = better contractor economics at high production; contractor is largely insulated from oil price movements."></div>
-            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-tsc-cit" value="35" min="0" max="60" step="1" title="CIT Rate on service contract fee income. Applied to the contractor fee net of allowable deductions. Iraq TSC: 15% CIT. Most service contracts: 25–35%. The NOC typically handles project financing and cost directly; CIT base = fee income less allowable local expenses."></div>
+            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-tsc-cit" value="35" min="0" max="60" step="0.1" title="CIT Rate on service contract fee income. Applied to the contractor fee net of allowable deductions. Iraq TSC: 15% CIT. Most service contracts: 25–35%. The NOC typically handles project financing and cost directly; CIT base = fee income less allowable local expenses."></div>
           </div>
           <div class="sb-row2">
-            <div class="sb-control-group"><label>Excess Profits Tax (%)</label><input type="number" id="sb-ept" value="0" min="0" max="50" step="1" title="EPT (Excess Profits Tax) — supplemental tax on contractor income above a defined profit threshold in service-contract-adjacent regimes. Modeled as an additional rate on contractor fee income above a normal return threshold. Set 0 for standard TSC/RSC without EPT mechanism. UK North Sea: UK RFCT = 10% on ring-fence profits."></div>
+            <div class="sb-control-group"><label>Excess Profits Tax (%)</label><input type="number" id="sb-ept" value="0" min="0" max="50" step="0.1" title="EPT (Excess Profits Tax) — supplemental tax on contractor income above a defined profit threshold in service-contract-adjacent regimes. Modeled as an additional rate on contractor fee income above a normal return threshold. Set 0 for standard TSC/RSC without EPT mechanism. UK North Sea: UK RFCT = 10% on ring-fence profits."></div>
           </div>
         </div>
 
@@ -67581,25 +67581,33 @@ function ddOpenScenarioBuilder(country) {
   if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): keep the basis line in step with the country pre-fill
 
   // Pre-fill form values
+  // v1068 (T2): ONE rounding rule for every pre-filled rate, at the precision the rest of the
+  // platform prints. The Concession branch kept one decimal (v776) but only for _recordKeys;
+  // the PSC and TSC branches rounded every rate to a whole percent. So the Scenario Builder
+  // banner said "royalty 2.6% from Angola's record" and the form it had just filled held 3,
+  // and the run the analyst reads came off the 3. Same page, same country, same Deepwater
+  // profile, same $75: the Live DCF panel returned 61.3% / $903M / 41.7% IRR and this modal
+  // returned 61.4% / $889M / 41.1%, with no statement anywhere that they were different runs.
+  // 41 countries diverged -- 39 PSC plus Norway (state equity 33.4 -> 33) and the USA, whose
+  // 12.5% federal royalty loaded as 13.
+  // One decimal is EXACT here, not a nicer approximation: across every PSC-family rate on the
+  // platform, 231 values need no decimal and 59 need exactly one. None needs two. So the form
+  // now reproduces the engine rather than approximating it.
+  const _sbRate = v => Math.round((v || 0) * 1000) / 10;
   if (mechEl && mechEl.value === 'Concession') {
-    const r = v => Math.round((v || 0) * 100);
     const el = id => document.getElementById(id);
-    // v776 (T2): a rate read from the record keeps one decimal (Brazil royalty 14.9, not 15), so the
-    // form, the strip above it and the Country Profile print the same figure.
-    const rk = Array.isArray(params._recordKeys) ? params._recordKeys : [];
-    const rv = (k, v) => rk.indexOf(k) !== -1 ? Math.round((v || 0) * 1000) / 10 : r(v);
-    if (el('sb-royalty')) el('sb-royalty').value = rv('royalty_rate', params.royalty_rate);
-    if (el('sb-cit')) el('sb-cit').value = rv('cit_rate', params.cit_rate);
-    if (el('sb-spt')) el('sb-spt').value = rv('spt_rate', params.spt_rate || 0);
-    if (el('sb-state-eq')) el('sb-state-eq').value = r(params.state_equity_pct || 0);
-    if (el('sb-windfall')) el('sb-windfall').value = r(params.windfall_rate || 0);
+    if (el('sb-royalty')) el('sb-royalty').value = _sbRate(params.royalty_rate);
+    if (el('sb-cit')) el('sb-cit').value = _sbRate(params.cit_rate);
+    if (el('sb-spt')) el('sb-spt').value = _sbRate(params.spt_rate || 0);
+    if (el('sb-state-eq')) el('sb-state-eq').value = _sbRate(params.state_equity_pct || 0);
+    if (el('sb-windfall')) el('sb-windfall').value = _sbRate(params.windfall_rate || 0);
   } else if (mechEl && mechEl.value === 'PSC') {
     const el = id => document.getElementById(id);
-    if (el('sb-cr-cap')) el('sb-cr-cap').value = Math.round((params.cost_recovery_cap || 0.6) * 100);
-    if (el('sb-ftp')) el('sb-ftp').value = Math.round((params.ftp_rate || 0) * 100);
-    if (el('sb-po-govt')) el('sb-po-govt').value = Math.round((params.profit_oil_govt_pct || 0.6) * 100);
-    if (el('sb-psc-cit')) el('sb-psc-cit').value = Math.round((params.cit_rate || 0) * 100);
-    if (el('sb-psc-royalty')) el('sb-psc-royalty').value = Math.round((params.royalty_rate || 0) * 100);
+    if (el('sb-cr-cap')) el('sb-cr-cap').value = _sbRate(params.cost_recovery_cap || 0.6);
+    if (el('sb-ftp')) el('sb-ftp').value = _sbRate(params.ftp_rate || 0);
+    if (el('sb-po-govt')) el('sb-po-govt').value = _sbRate(params.profit_oil_govt_pct || 0.6);
+    if (el('sb-psc-cit')) el('sb-psc-cit').value = _sbRate(params.cit_rate || 0);
+    if (el('sb-psc-royalty')) el('sb-psc-royalty').value = _sbRate(params.royalty_rate || 0);
     // v883 (T2): carry this country's R-factor ladder into the modal. Without it the flat box
     // above was the whole profit-oil term, which is the figure Country Profile explicitly says
     // the engine does not read -- and the modal is where that page sends the analyst.
@@ -67610,8 +67618,8 @@ function ddOpenScenarioBuilder(country) {
   } else if (mechEl && mechEl.value === 'TSC') {
     const el = id => document.getElementById(id);
     if (el('sb-fee')) el('sb-fee').value = params.fee_per_bbl || 4;
-    if (el('sb-tsc-cit')) el('sb-tsc-cit').value = Math.round((params.cit_rate || 0) * 100);
-    if (el('sb-ept')) el('sb-ept').value = Math.round((params.ept_rate || 0) * 100);
+    if (el('sb-tsc-cit')) el('sb-tsc-cit').value = _sbRate(params.cit_rate || 0);
+    if (el('sb-ept')) el('sb-ept').value = _sbRate(params.ept_rate || 0);
   }
 
   // v964 (T2): mark which of the PSC inputs are this country's and which are the platform
