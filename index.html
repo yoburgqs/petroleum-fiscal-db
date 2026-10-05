@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1068</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1069</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -56719,7 +56719,10 @@ function _rrTakeBlock(country, takeTxt) {
 }
 
 function _rrVerdictHead(title, mb) {
-  var head = '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:' + mb + 'px;">' + title + '</div>';
+  // v1069 (T4): the heading carries an id because it is no longer only a heading on screen --
+  // _rrVerdictPayload() has to be able to ADDRESS it. It used to take root.children[0], which is
+  // this div only when no back control is rendered above it. See the note in _rrVerdictPayload().
+  var head = '<div id="rr-verdict-title" style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:' + mb + 'px;">' + title + '</div>';
   var r = window._rrReturn;
   if (!r) return head;
   // v812 (T4): drilled from the rankings further down THIS tab -- the control returns to that row,
@@ -57380,7 +57383,36 @@ function _rrVerdictPayload() {
   function tx(e) { return e ? String(e.innerText || e.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
 
   var kids = [].slice.call(root.children);
-  var title = tx(kids[0]);
+
+  // ── v1069 (T4): the pasted IC memo was headed by a navigation arrow ───────────────────────
+  // The title was root.children[0]. That is the heading div ONLY when the analyst picked the
+  // country from the "Check one country" dropdown. On every drill-in path _rrVerdictHead()
+  // prepends a back control above the heading, so children[0] is the back button's wrapper and
+  // the heading -- the one line naming the jurisdiction -- was never read at all. What pasted
+  // into the committee document, as the bold first line, measured on the live build:
+  //     Fiscal Compare Stability cell  -> "← Fiscal Compare"
+  //     Country Profile sidebar        -> "← Country Profile"
+  //     Side-by-Side reform row        -> "← Side-by-Side"
+  //     Home reform card               -> "← Home"
+  //     this tab's own ranked table    -> "← Back to the rankings"
+  // and the country name then did not appear until character ~1,600, mid-sentence inside a
+  // cohort-rank caveat. So the block an IC reads had no statement of which jurisdiction it was
+  // about -- in a memo that compares three countries, unattributable -- and announced itself as
+  // scraped UI. It is the drill-in paths that break, which is why this survived: the obvious
+  // test (pick a country, click Copy) is the one path that renders no back control.
+  // The back control is .no-print, so print was never affected; only the clipboard read it.
+  var titleEl = root.querySelector('#rr-verdict-title');
+  if (!titleEl) {
+    // Defensive: address by id, else take the first child that is not an affordance wrapper.
+    // Same convention as the .rr-noclip strip below -- a button is not a finding.
+    for (var ti = 0; ti < kids.length; ti++) {
+      var k = kids[ti];
+      if (k.classList && k.classList.contains('no-print')) continue;
+      if (k.querySelector && k.querySelector('button') && !tx(k).replace(/[←→\s]/g, '')) continue;
+      titleEl = k; break;
+    }
+  }
+  var title = tx(titleEl);
   if (!title) return null;
 
   // The verdict prose. #rr-ic-action on the 21 scoreable jurisdictions; #rr-verdict-lead plus
