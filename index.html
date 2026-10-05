@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1071</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1072</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -56306,6 +56306,39 @@ function _rrOpenLocal(country, el) {
 }
 window._rrOpenLocal = _rrOpenLocal;
 
+// ── v1072 (T4): the snapshot's three group counts are controls, not prose ────────────────
+// The Reform Risk Snapshot is the first block on the tab and, for an analyst with 20 minutes,
+// often the only one read in full. It now partitions the sourced set into the SAME three
+// groups the cards 4,000px below partition it into, and each count is a button that scrolls
+// its card into view and outlines it for a moment, so "13 quiet, 9 of them with a take rise
+// on record" can be checked against the roster in one click instead of a hunt down the page.
+function _rrJumpCard(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  // 'start', not 'center': the QUIET card is ~1,290px tall against a 900px viewport, so
+  // centring it puts its own heading -- and the "9 of 13 raised take" badge the snapshot
+  // just promised -- above the fold. Offset clears the sticky nav.
+  var _nav = document.querySelector('.tab-bar, nav, header');
+  var _off = (_nav && getComputedStyle(_nav).position === 'sticky') ? _nav.getBoundingClientRect().height + 10 : 12;
+  window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - _off), behavior: 'smooth' });
+  el.style.transition = 'outline-color .25s';
+  el.style.outline = '2px solid var(--accent)';
+  el.style.outlineOffset = '2px';
+  setTimeout(function () { el.style.outline = ''; el.style.outlineOffset = ''; }, 1800);
+}
+window._rrJumpCard = _rrJumpCard;
+
+// The count itself, rendered as the control. Inherits the snapshot's own type so it reads as
+// a number in a sentence, not as a button bolted into one.
+function _rrSnapCount(n, id, label) {
+  return '<button type="button" onclick="_rrJumpCard(\'' + id + '\')" title="' + label + '"'
+    // 24px tall is the directive's floor; the horizontal padding is because a bare "2" is an
+    // 8px-wide tap target on a phone. The dotted rule under it is what marks it as a control.
+    + ' style="background:none;border:none;border-bottom:1px dotted currentColor;padding:0 5px 1px;margin:0 -2px;'
+    + 'font:inherit;font-weight:700;color:inherit;cursor:pointer;min-height:24px;min-width:24px;">' + n + '</button>';
+}
+window._rrSnapCount = _rrSnapCount;
+
 // v514: jump from a Country Profile with no sourced reform log straight to the Reform
 // Risk tab with that country already selected. The lookup <select> is filled by
 // _rrPopulateLookup(), which only runs once REFORM_HISTORY has landed, so poll briefly
@@ -58973,7 +59006,7 @@ function renderReformRisk() {
       + '</div>';
   }
 
-  var midCard = '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:10px;padding:16px;">'
+  var midCard = '<div id="rr-card-mid" style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:10px;padding:16px;">'
     + '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Reformed Twice Since 2010 <span style="color:var(--muted);">(' + midList.length + ')</span></div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Exactly 2 sourced fiscal law changes since 2010 \u2014 one below the Actively Reforming <em>frequency</em> bar of 3. That bar is the only thing they clear. '
     + (midRaisedInWindow
@@ -59015,7 +59048,8 @@ function renderReformRisk() {
       + '</div>'
     : '';
   var stabVol = '<div style="display:grid;grid-template-columns:1.15fr 1fr .8fr;gap:16px;margin-bottom:20px;align-items:start;">'
-    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid ' + quietAccent + ';border-radius:10px;padding:16px;">'
+    // v1072 (T4): ids so the snapshot's three group counts can land on the card they count.
+    + '<div id="rr-card-quiet" style="background:var(--card);border:1px solid var(--border);border-left:3px solid ' + quietAccent + ';border-radius:10px;padding:16px;">'
     + '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-bottom:8px;">'
     + '<span style="font-size:11px;font-weight:700;color:' + quietAccent + ';text-transform:uppercase;letter-spacing:.06em;">Quiet Since 2010 <span style="color:var(--muted);">(' + quiet.length + ')</span></span>'
     + (quietRises
@@ -59035,7 +59069,7 @@ function renderReformRisk() {
     + quietArtefact.map(function(r){ return _quietRow(r, 'artefact'); }).join('')
     + '</div>'
     + midCard
-    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:10px;padding:16px;">'
+    + '<div id="rr-card-active" style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:10px;padding:16px;">'
     + '<div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Actively Reforming <span style="color:var(--muted);">(' + activeList.length + ')</span></div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">3+ sourced fiscal law changes since 2010. Terms are being rewritten inside a normal project sanction-to-first-oil window — assume renegotiation risk over a 25-year life.</div>'
     + (activeList.length
@@ -59305,21 +59339,68 @@ function renderReformRisk() {
     + '</div>';
 
   // v467: Global reform summary sentence — headline context before the section blocks
-  var activeReformers = withScore.filter(r => r.since2010 >= 2).length;
-  var highFreq = withScore.filter(r => r.since2010 >= 4).length;
-  // v966 (T4): the snapshot reported the 2+ and 4+ counts and never the 3+ one, which is
-  // the only threshold this tab's stated IC rule uses. An analyst reading "1 had 4+"
-  // concluded one jurisdiction needs the premium. Two do -- United Kingdom and Brazil.
-  // Counted through _rrWacc() rather than `since2010 >= 3` so the headline number and the
-  // line drawn in the table below it cannot disagree.
+  // v966 (T4), kept: the first group is also counted through _rrWacc() -- the same predicate
+  // that draws the orange line in the ranked table -- so the headline number and that line
+  // cannot disagree. activeList is `since2010 >= 3`, which is what the ACTIVELY REFORMING card
+  // renders from. On the live data both are 2. If they ever part, say so rather than print a
+  // partition that does not hold.
   var waccCarriers = withScore.filter(_rrWacc);
+  var _waccSplit = (waccCarriers.length !== activeList.length)
+    ? ' <strong style="color:var(--orange);">(only ' + waccCarriers.length + ' of them sits above the orange line in the ranked table \u2014 the two tests have parted; read the table)</strong>'
+    : '';
+  // v1072 (T4): the snapshot's partition of the sourced set did not partition it.
+  //
+  // It read: "2 clear the WACC-premium bar ... A further 6 had 2 changes, which does not reach
+  // that bar; 1 had 4+." Three figures in parallel clauses, which an analyst sums: 2 + 6 + 1 = 9
+  // of 21, with 12 unaccounted for. They do not sum. The "1 had 4+" is the United Kingdom at 5
+  // changes, which is ALREADY one of the 2 named in the same sentence -- `highFreq` is
+  // `since2010 >= 4`, a SUBSET of `waccCarriers`, printed as though it were a fourth group.
+  //
+  // Worse than the double-count is what the sentence left out. The largest group -- the 13 at
+  // 0-1 changes -- was never mentioned, so the snapshot's reading was "2 need a premium, 6 are
+  // close, nothing else is on the board." That is the exact conclusion the rest of this tab
+  // exists to refute: the QUIET card below carries a "9 OF 13 RAISED TAKE" badge, of which 2
+  // raised take INSIDE the window (Russia +15pp in 2022 is the largest quantified in-window
+  // rise on the platform) and 7 score clean only because the window opens in 2010 (Venezuela
+  // +15pp 2007, Algeria +10pp 2005, Kazakhstan +8pp 2007, Libya +35pp 1971 ...). An analyst
+  // who reads the first block and goes to their meeting carried none of that.
+  //
+  // The snapshot now states the same three-way split the cards 4,000px below state -- quiet /
+  // reformed twice / actively reforming -- with the take-rise counts attached, and each count
+  // is a control that scrolls to its card. No new threshold and no new arithmetic: `quiet`,
+  // `quietRises`, `quietInWindow`, `quietArtefact`, `midList`, `midRaisedInWindow` and
+  // `activeList` are the same variables the cards render from, computed above.
+  var _snapParts = [
+    _rrSnapCount(activeList.length, 'rr-card-active',
+      'Actively Reforming: 3 or more sourced fiscal law changes since 2010. Click to jump to the card.')
+      + ' actively reforming'
+      + (activeList.length
+          ? ' (' + activeList.map(function (r) { return _rrEsc(r.country) + ' ' + r.since2010; }).join(', ')
+            + ') — the only ones this tab’s WACC-premium bar of <strong>3+ fiscal law changes since 2010</strong> reaches,'
+            + ' and the top rows of the ranked table below, above the orange line' + _waccSplit
+          : ''),
+    _rrSnapCount(midList.length, 'rr-card-mid',
+      'Reformed Twice: exactly 2 sourced fiscal law changes since 2010, one short of the premium bar. Click to jump to the card.')
+      + ' reformed twice, one short of that bar'
+      + (midRaisedInWindow ? ' — <strong style="color:var(--orange);">' + midRaisedInWindow + ' of them raised take inside the window anyway</strong>' : ''),
+    _rrSnapCount(quiet.length, 'rr-card-quiet',
+      'Quiet Since 2010: 0-1 sourced fiscal law changes. A frequency band, not a finding that the regime is safe. Click to jump to the card.')
+      + ' quiet at 0–1 changes'
+      + (quietRises
+          ? ' — but <strong style="color:var(--orange);">' + quietRises + ' of those ' + quiet.length
+            + ' have a take-raising event on record</strong>, ' + quietInWindow.length + ' dated 2010 or later and '
+            + quietArtefact.length + ' scoring clean only because the window opens in 2010'
+          : ' and none with a take-raising event on record')
+  ];
   // v585 (T4): "net-tightening overall" was a majority of 27 vs 10 taken while 35 fiscal
   // changes sat unmeasured in the third bucket. The claim is now made only if it survives them.
   var _sTilt = _rrTilt(globalSplit);
   var tiltLabel = '<span style="color:' + (_sTilt.color === 'var(--red)' ? 'var(--negative)' : _sTilt.color) + ';font-weight:700;">' + _sTilt.word + '</span>';
   var summaryBar = '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:8px;padding:12px 18px;margin-bottom:18px;font-size:12px;color:var(--text);line-height:1.7;">'
     + '<strong style="font-size:13px;">Reform Risk Snapshot:</strong> '
-    + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + waccCarriers.length + '</strong> clear this tab\u2019s WACC-premium bar of <strong>3+ fiscal law changes since 2010</strong> \u2014 ' + (waccCarriers.length ? waccCarriers.map(function(r){return r.country;}).join(' and ') + ' \u2014 they are the top rows of the ranked table below, above the orange line' : 'none') + '. A further <strong>' + Math.max(0, activeReformers - waccCarriers.length) + '</strong> had 2 changes, which does not reach that bar; <strong>' + highFreq + '</strong> had 4+. '
+    + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history \u2014 the rankings below are drawn from those ' + countries.length + ' only. They split three ways, and the three add back to ' + countries.length + ': '
+    + _snapParts.join('; ') + '. '
+    + '<strong>A count below the bar is not a finding of no exposure</strong> \u2014 the premium rule reads frequency and never magnitude, so a +15pp rupture and a 1pp administrative tweak move the score by the same 15 points. '
     + (function(){
         var _ctx = withScore.reduce(function(a, r){ return a + (r.contextIn ? r.contextIn.length : 0); }, 0);
         return _ctx
