@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1072</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1073</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -76247,14 +76247,14 @@ function copyFCForIC(btn) {
         : '')
     + '. Use the $50/bbl contractor NPV column as the downside test.';
   var warn = '';
-  if (nGeneric) warn += nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. '
+  if (nGeneric) warn += '\u0001' + ('Model basis: GENERIC DEFAULT (' + nGeneric + ' row' + (nGeneric === 1 ? '' : 's') + ')') + '\u0002' + nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. '
     + (_isShortlist
         ? 'Those rows are not ranked at all: they carry \u201c\u2014\u201d in the # column. Do not read their position in this list as a placing. '
         : 'Since v563 those rows are not ranked: they carry \u201c\u2014\u201d in the # column and sit at the end of the table, after the ' + (N - nGeneric - nMono) + ' countries modelled on their own fiscal terms. Do not read their position as a placing. ');
   // v968 (T5): placed with the GENERIC DEFAULT sentence because it is the same axis — whether the
   // model columns on a row are that country's terms — and read before the fee-basis and sign-flip
   // notes, one of which (Iraq) is caused by an override this block names.
-  if (nEngOvr) warn += nEngOvr + ' of the ' + N + ' rows were modelled on a HARD-CODED ENGINE '
+  if (nEngOvr) warn += '\u0001' + ('Model basis: HARD-CODED ENGINE OVERRIDE (' + nEngOvr + ' row' + (nEngOvr === 1 ? '' : 's') + ')') + '\u0002' + nEngOvr + ' of the ' + N + ' rows were modelled on a HARD-CODED ENGINE '
     + 'OVERRIDE: the DCF carries a country table that replaces some fiscal terms, and on these rows '
     + 'at least one of those hard-coded rates contradicts the figure ORCA\u2019s own record holds \u2014 '
     + engOvrNames.join('; ') + (nEngOvr > engOvrNames.length ? '; and ' + (nEngOvr - engOvrNames.length) + ' more' : '')
@@ -76265,35 +76265,35 @@ function copyFCForIC(btn) {
   // the artifact that leaves the tab. Placed with the engine-override note because all three answer
   // the same question — whether a figure on this row may be cited — and read before the
   // comparability notes below, which are about whether rows may be ranked against each other.
-  if (_nCD) warn += _nCD + ' of the ' + N + ' rows grade C or D on EVIDENCE — '
+  if (_nCD) warn += '\u0001' + ('Evidence: grade C or D (' + _nCD + ' row' + (_nCD === 1 ? '' : 's') + ')') + '\u0002' + _nCD + ' of the ' + N + ' rows grade C or D on EVIDENCE — '
     + cdNames.join(', ') + (_nCD > cdNames.length ? ' and ' + (_nCD - cdNames.length) + ' more' : '')
     + '. The grade is the worse of primary-law share and fact depth, and it grades the fact base rather '
     + 'than the model. This platform’s stated rule is that a C is screening-only and a D does not belong '
     + 'in a recommendation document until the terms are established from the country’s own petroleum act. '
     + 'See the Evidence tier column, which carries the rule per row. ';
-  if (_anyRf && _nRfNotClean) warn += _nRfNotClean + ' of the ' + N + ' rows carry a reform verdict that '
+  if (_anyRf && _nRfNotClean) warn += '\u0001' + ('Reform verdict: not a clean record (' + _nRfNotClean + ' row' + (_nRfNotClean === 1 ? '' : 's') + ')') + '\u0002' + _nRfNotClean + ' of the ' + N + ' rows carry a reform verdict that '
     + 'is NOT a clean record — ' + rfNames.join(', ')
     + (_nRfNotClean > rfNames.length ? ' and ' + (_nRfNotClean - rfNames.length) + ' more' : '')
     + '. Read each token in its own unit: a WACC verdict is points on the discount rate, a TAKE verdict is '
     + 'points of government take already raised inside the 2010 window, and SIZE UNKNOWN means the terms '
     + 'were rewritten and the take effect was never quantified. Do not convert the change count into a '
     + 'premium yourself — it is a count and is blind to magnitude. See the Reform verdict column. ';
-  if (_anyRf && (N - _nRfLog) > 0) warn += 'ORCA holds a sourced fiscal-reform event log for 21 of 185 '
+  if (_anyRf && (N - _nRfLog) > 0) warn += '\u0001' + ('Reform coverage: outside the sourced event log (' + (N - _nRfLog) + ' row' + ((N - _nRfLog) === 1 ? '' : 's') + ')') + '\u0002' + 'ORCA holds a sourced fiscal-reform event log for 21 of 185 '
     + 'jurisdictions, and ' + (N - _nRfLog) + ' of these ' + N + ' rows ' + ((N - _nRfLog) === 1 ? 'is' : 'are')
     + ' outside it, reading n/c. That is missing coverage, not a clean record and not a Reform Frequency '
     + 'Score of 100: do not carry a reform premium of zero into the memo on that basis. Th'
     + ((N - _nRfLog) === 1 ? 'at row needs' : 'ose rows need') + ' an external check — the national '
     + 'petroleum law, IMF Article IV, or operator annual reports — before the premium is defensible. ';
-  if (!_anyRf) warn += 'NONE of the ' + N + ' rows has a sourced fiscal-reform event log: ORCA holds one for '
+  if (!_anyRf) warn += '\u0001' + 'Reform coverage: no sourced event log on any row here' + '\u0002' + 'NONE of the ' + N + ' rows has a sourced fiscal-reform event log: ORCA holds one for '
     + '21 of 185 jurisdictions and this shortlist contains none of them, so no Reform verdict column is '
     + 'carried. That is missing coverage, not a clean record — do not read the absence of the column as a '
     + 'reform premium of zero. Each of these rows needs an external check (the national petroleum law, IMF '
     + 'Article IV, operator annual reports) before an IC memo carries one. ';
-  if (nMono) warn += nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
+  if (nMono) warn += '\u0001' + ('State monopoly: 100% government take (' + nMono + ' row' + (nMono === 1 ? '' : 's') + ')') + '\u0002' + nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
   // v596 (T5): the PROXY count, on this view, with the rule stated. The omission was biased —
   // low take and no production evidence are the same rows, so the head of an ascending shortlist
   // is where the unweighted countries collect.
-  if (nProxy) warn += nProxy + ' of the ' + N + ' rows carry a PROXY data basis: ORCA holds no verified '
+  if (nProxy) warn += '\u0001' + ('Data basis: PROXY, not production-weighted (' + nProxy + ' row' + (nProxy === 1 ? '' : 's') + ')') + '\u0002' + nProxy + ' of the ' + N + ' rows carry a PROXY data basis: ORCA holds no verified '
     + 'block-level production for them, so their take is the simple average of statutory terms and is '
     + 'not production-weighted. ORCA’s stated IC rule is that a PROXY take is directional (±5–15pp '
     + 'against block-level economics) and must not be cited as definitive without cross-checking the '
@@ -76306,7 +76306,7 @@ function copyFCForIC(btn) {
   // is emitted at Iraq's 50.7pp and at Azerbaijan's 1.0pp, and nothing is emitted where the
   // correction does not change the number at printed precision (Russia holds 1 fee-basis
   // contract of 1,247 and _scFeeCmpAt().diverges already suppresses it).
-  if (nFee) warn += nFee + ' of the ' + N + ' rows blend fee-basis contracts (TSC / RSC / Buy-back), '
+  if (nFee) warn += '\u0001' + ('Comparability: fee-basis contracts blended (' + nFee + ' row' + (nFee === 1 ? '' : 's') + ')') + '\u0002' + nFee + ' of the ' + N + ' rows blend fee-basis contracts (TSC / RSC / Buy-back), '
     + 'where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside — so '
     + 'government take% on those rows measures the contract structure, not how hard the terms are: '
     + feeNames.join(', ') + (nFee > feeNames.length ? ' and ' + (nFee - feeNames.length) + ' more' : '')
@@ -76321,7 +76321,7 @@ function copyFCForIC(btn) {
   // v955 (T5): the contractor-side half of the same rule. Stated separately from the take
   // sentence because it is the one an IC reader is most likely to trip over: a corrected take
   // beside an uncorrected NPV reads as a broken row, not as a caveat.
-  if (nNpvFix) warn += 'The contractor NPV on th' + (nNpvFix === 1 ? 'at row is' : 'ose rows is')
+  if (nNpvFix) warn += '\u0001' + ('Comparability: contractor NPV corrected (' + nNpvFix + ' row' + (nNpvFix === 1 ? '' : 's') + ')') + '\u0002' + 'The contractor NPV on th' + (nNpvFix === 1 ? 'at row is' : 'ose rows is')
     + ' corrected on the same basis: it is the NPV across the country\u2019s PSC/Concession contracts '
     + 'alone, so it can be read in one sentence with the take beside it and ranked against the other '
     + 'rows. The published all-contract NPV \u2014 an unweighted mean that includes the fee-basis '
@@ -76330,17 +76330,53 @@ function copyFCForIC(btn) {
     + npvFixNames.join(', ') + (nNpvFix > npvFixNames.length ? ' and ' + (nNpvFix - npvFixNames.length) + ' more' : '')
     + ' ($M). Quoting the blended NPV beside the like-for-like take states a low government take '
     + 'against a value the country does not have. ';
-  if (_g1Missing.length) warn += 'ORCA holds no PSC/Concession-only contractor NPV at $' + P + '/bbl for '
+  if (_g1Missing.length) warn += '\u0001' + ('Comparability: no PSC/Concession-only NPV held (' + _g1Missing.length + ' row' + (_g1Missing.length === 1 ? '' : 's') + ')') + '\u0002' + 'ORCA holds no PSC/Concession-only contractor NPV at $' + P + '/bbl for '
     + _g1Missing.join(', ') + ', so th' + (_g1Missing.length === 1 ? 'at row keeps its' : 'ose rows keep their')
     + ' published all-contract NPV in the like-for-like column and the reference column is blank. '
     + 'Do not rank th' + (_g1Missing.length === 1 ? 'at figure' : 'ose figures') + ' against the corrected rows. ';
-  if (nSignFlip) warn += 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
+  if (nSignFlip) warn += '\u0001' + ('NPV sign conflict: database vs model (' + nSignFlip + ' row' + (nSignFlip === 1 ? '' : 's') + ')') + '\u0002' + 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
     + flipNames.join(', ') + (nSignFlip > flipNames.length ? ' and ' + (nSignFlip - flipNames.length) + ' more' : '')
     + '. Cite the database column and do not quote the model figure for these rows without saying which basis it is on. ';
-  if (typeof CP_IRR_NOTE === 'string' && CP_IRR_NOTE) warn += CP_IRR_NOTE;
+  if (typeof CP_IRR_NOTE === 'string' && CP_IRR_NOTE) warn += '\u0001' + 'IRR: not reported at country level' + '\u0002' + CP_IRR_NOTE;
+  // -- v1073 (T5) -- THE CAVEAT BLOCK WAS ONE PARAGRAPH, AND IT IS TWELVE CAVEATS ---------
+  // Measured on this build, 185 rows, copied and read back off the clipboard: the block above
+  // arrived in the text/html flavour Word consumes as a SINGLE 5,986-character <p> -- about a
+  // page and a half of justified grey prose -- carrying twelve independent caveats, each scoped
+  // to a DIFFERENT subset of rows (117 generic-default, 6 engine-override, 78 C/D evidence,
+  // 21 reform, 164 outside the reform log, 163 proxy, 10 fee-basis, 3 sign-flip, 3 monopoly).
+  // An analyst cannot answer "which of these applies to the three countries in my memo?"
+  // without reading all of it, and cannot delete the ones that do not apply without rewriting
+  // the paragraph by hand -- so in a 20-minute window the whole block goes, and the
+  // comparability rule (MECHANIC_COMPARABILITY.md, 2026-08-26) goes out with it.
+  // Every caveat now carries a label naming its axis and its live row count, and each is
+  // emitted as its OWN paragraph in the HTML flavour and its OWN numbered line in the TSV.
+  // No wording is changed and nothing is dropped. The two sentinels are inserted at each
+  // `warn +=` site above and consumed here, so they never reach the clipboard.
+  var _warnItems = [];
+  if (warn) {
+    var _wParts = warn.split('\u0001');
+    for (var _wi = 0; _wi < _wParts.length; _wi++) {
+      var _wp = _wParts[_wi];
+      if (!_wp) continue;
+      var _wc = _wp.indexOf('\u0002');
+      if (_wc < 0) {
+        if (_wp.trim()) _warnItems.push({ l: '', b: _wp.trim() });
+        continue;
+      }
+      _warnItems.push({ l: _wp.slice(0, _wc).trim(), b: _wp.slice(_wc + 1).trim() });
+    }
+  }
+  // The TSV flavour: one numbered line per caveat, label first, so the Excel / plain-text
+  // paste is scannable on the same axis as the Word paste.
+  var _warnTsv = _warnItems.length
+    ? 'Caveats \u2014 ' + _warnItems.length + ', each scoped to the rows it names:\n'
+      + _warnItems.map(function (it, i) {
+          return (i + 1) + '. ' + (it.l ? it.l + ' \u2014 ' : '') + it.b;
+        }).join('\n')
+    : '';
   var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/';
 
-  var tsv = caption + '\n' + assump + '\n' + (warn ? warn + '\n' : '') + '\n'
+  var tsv = caption + '\n' + assump + '\n' + (_warnTsv ? _warnTsv + '\n' : '') + '\n'
     + matrix.map(function(row){ return row.join('\t'); }).join('\n')
     + '\n\n' + srcLine;
 
@@ -76433,7 +76469,15 @@ function copyFCForIC(btn) {
     + '<p style="font-size:8.5pt;font-weight:bold;margin:8px 0 3px;">Notes</p>'
     + _noteHtml
     + '<p style="font-size:8pt;color:#555;margin:6px 0 3px;">' + esc(assump) + '</p>'
-    + (warn ? '<p style="font-size:8pt;color:#8a4b00;margin:0 0 3px;">' + esc(warn) + '</p>' : '')
+    + (_warnItems.length
+        ? '<p style="font-size:8pt;color:#8a4b00;margin:0 0 2px;font-weight:700;">Caveats \u2014 '
+            + _warnItems.length + ', each scoped to the rows it names</p>'
+          + _warnItems.map(function (it, i) {
+              return '<p style="font-size:8pt;color:#8a4b00;margin:0 0 3px;">'
+                + (it.l ? '<b>' + (i + 1) + '. ' + esc(it.l) + '</b> \u2014 ' : '')
+                + esc(it.b) + '</p>';
+            }).join('')
+        : '')
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
 
