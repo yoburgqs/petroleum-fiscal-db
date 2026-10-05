@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1073</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1074</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -4257,6 +4257,13 @@ window.copyPlatformCitation = function(btn) {
         </div>
       </div>
     </div>
+    <!-- v1074 (T1) — the preset/region scope strip. applyScreenerPreset() used to reset
+         #sc-region to "" for every preset, so an analyst who scoped to their mandate region
+         and THEN loaded a screen silently got a global list. The region is now kept when the
+         preset defines no geography of its own, and this strip says which of the two happened.
+         Hidden unless a region was actually kept or actually replaced; cleared by Reset All,
+         by clearing the preset, and by any hand change to the region select. -->
+    <div id="sc-preset-scope" style="display:none;margin-top:10px;font-size:11.5px;line-height:1.55;border-radius:6px;padding:9px 12px;"></div>
     <div class="slider-row">
       <div class="slider-group">
         <label title="Maximum government take at the selected price deck. The counter beside it is live: how many clear this ceiling, and how many of those have verified field production. The denominator is the set this screen is SCOPED to &mdash; region, fiscal mechanic, operator presence, reform record, named country set and the two data-basis boxes all narrow it, and the counter says &ldquo;in scope&rdquo; when they have. It is not narrowed by the take, NPV, evidence or retention thresholds: those are the bars being measured, so each is still counted on its own. The amber-inert grey is a ratio against that same scoped set, so it means &ldquo;this ceiling is doing no work on the countries you are actually looking at&rdquo;. Counted on the basis the ceiling actually tests — comparable take while the checkbox below is ticked, published blend when it is not. The counter greys amber when the ceiling is removing fewer than a tenth of the set, i.e. when it is doing no work.">Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span><span class="sc-axis-n" id="sc-take-n"></span></label>
@@ -37103,6 +37110,9 @@ function applyScreenerPreset(preset) {
   // sensitivity, the rest by the v507 evidence-first order. So loading one clears any column sort
   // the analyst had clicked, rather than letting a stale sort silently override the preset's own.
   _scSortKey = null; _scSortDir = null;
+  // ── v1074 (T1) — the analyst's own region scope, captured before the reset below wipes it.
+  // 'reset' is the Clear-preset / Reset-All path and must genuinely clear everything.
+  var _rgnBefore = (preset === 'reset') ? '' : ((document.getElementById('sc-region') || {}).value || '');
   const setSlider = (id, val) => {
     const el = document.getElementById(id);
     const lbl = document.getElementById('sv-' + id.replace('sl-',''));
@@ -37419,6 +37429,25 @@ function applyScreenerPreset(preset) {
       _activePresetCriteriaText = null;
     }
   })();
+  // ── v1074 (T1) — keep the analyst's region unless the preset brings its own geography ──
+  // Runs BEFORE the v718 baseline below, so a kept region is part of the preset's own baseline
+  // and does not immediately paint the chip MODIFIED.
+  (function () {
+    var scRgnK = document.getElementById('sc-region');
+    _scPresetScope = null;
+    if (!scRgnK || !_activePresetName) { _scRenderPresetScope(); return; }
+    var presetRegion = scRgnK.value || '';                 // pscafrica sets this
+    var presetSet    = _screenerCountrySet ? _screenerCountrySet.length : 0;  // deepwater / atlanticfrontier / frontiermarkets
+    if (!_rgnBefore) { _scRenderPresetScope(); return; }
+    if (!presetRegion && !presetSet) {
+      scRgnK.value = _rgnBefore;                           // the preset has no geography — keep theirs
+      _scPresetScope = { mode: 'kept', region: _rgnBefore, key: preset, name: _activePresetName };
+    } else {
+      _scPresetScope = { mode: 'replaced', region: _rgnBefore, key: preset, name: _activePresetName,
+                         by: presetRegion || (presetSet + ' named countries') };
+    }
+    _scRenderPresetScope();
+  })();
   // v718: capture the control state the preset just set, AFTER every control is written and
   // BEFORE the render, so runScreener() diffs the analyst's edits against the preset's own
   // baseline rather than against a hand-maintained copy of the criteria that can drift from it.
@@ -37660,6 +37689,103 @@ function _scSetDeck(v) {
 //
 // The strip states the diff, names the entrants with their take at both decks, and offers the
 // screen the analyst was actually trying to build: the countries that pass at BOTH decks.
+// ── v1074 (T1) — "I scoped to my region and the preset threw it away." ─────────────────
+//
+// Walked T1 cold at 1440x900, storage cleared. An analyst with a regional mandate does the
+// obvious thing: Advanced Filters -> Region -> Africa (54 of 185), then loads the flagship
+// IOC Capital Screen from the preset menu. Measured on the pre-change build, the screen came
+// back with 15 countries of which exactly ONE (Angola) is African, because
+// applyScreenerPreset()'s "Reset all to defaults first" block set #sc-region = '' for every
+// preset and only pscafrica put one back. Nothing on screen said the scope had gone: the
+// preset chip names take, NPV and data basis but never geography, the count line reports a
+// bare "15 countries match at $75/bbl", and Advanced Filters is collapsed by default (v371/
+// v373), so the select that had just snapped back to All Regions was not even on screen.
+// The analyst had no reason to re-check a filter they had set thirty seconds earlier.
+//
+// Ordering was the whole workaround: load the preset FIRST, then set the region. That works
+// and is undiscoverable, and it paints the chip MODIFIED for a scope the preset never had.
+//
+// Now the region survives any preset that does not define a geography of its own, and the
+// strip states which of the two things happened. A kept filter that nobody announced is the
+// same trap in the other direction, so the kept case is announced too, with the one-click
+// escape next to it.
+var _scPresetScope = null;
+
+function _scPresetScopeClear() {
+  _scPresetScope = null;
+  var h = document.getElementById('sc-preset-scope');
+  if (h) { h.style.display = 'none'; h.innerHTML = ''; }
+}
+window._scPresetScopeClear = _scPresetScopeClear;
+
+// How many of the 185 sit in a region, counted the way runScreener() matches it: the roll-ups
+// (Asia Pacific, Americas) are the sum of their granular members.
+function _scRegionCount(r) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !r) return null;
+  var members = { 'Asia Pacific': ['Asia', 'Oceania', 'Asia Pacific'],
+                  'Americas':     ['North America', 'Latin America', 'Americas'] }[r] || [r];
+  var n = 0;
+  for (var i = 0; i < COUNTRY_DATA.length; i++) if (members.indexOf(COUNTRY_DATA[i].region) >= 0) n++;
+  return n;
+}
+
+function _scRenderPresetScope() {
+  var h = document.getElementById('sc-preset-scope');
+  if (!h) return;
+  var sc = _scPresetScope;
+  if (!sc) { h.style.display = 'none'; h.innerHTML = ''; return; }
+  var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var btn = 'background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;'
+          + 'color:var(--accent);cursor:pointer;font-size:11px;font-weight:700;padding:3px 9px;'
+          + 'line-height:1.4;min-height:24px;white-space:nowrap;';
+  var html;
+  if (sc.mode === 'kept') {
+    var n = _scRegionCount(sc.region);
+    h.style.background  = 'rgba(176,104,0,.06)';
+    h.style.border      = '1px solid rgba(176,104,0,.28)';
+    html = '<div style="color:var(--text);font-weight:700;margin-bottom:3px;">Your region filter was kept &mdash; this screen is scoped to '
+         + esc(sc.region) + (n ? ' (' + n + ' of ' + (COUNTRY_DATA ? COUNTRY_DATA.length : 185) + ')' : '') + '</div>'
+         + '<div style="color:var(--muted);">' + esc(sc.name) + ' sets thresholds, not a geography, so it screens <strong>inside</strong> '
+         + esc(sc.region) + ' rather than across all countries. Every count below is within that scope.</div>'
+         + '<div style="margin-top:7px;"><button type="button" style="' + btn + '" onclick="_scPresetScopeDrop()" '
+         + 'title="Reload ' + esc(sc.name) + ' with no region filter, across every country in the database">'
+         + 'Run ' + esc(sc.name) + ' across all countries instead</button></div>';
+  } else {
+    h.style.background  = 'rgba(176,104,0,.06)';
+    h.style.border      = '1px solid rgba(176,104,0,.28)';
+    html = '<div style="color:var(--text);font-weight:700;margin-bottom:3px;">Your ' + esc(sc.region)
+         + ' region filter was replaced</div>'
+         + '<div style="color:var(--muted);">' + esc(sc.name) + ' brings its own geography (' + esc(sc.by)
+         + '), so it defines the scope and your filter was dropped rather than stacked on top of it.</div>'
+         + '<div style="margin-top:7px;"><button type="button" style="' + btn + '" onclick="_scPresetScopeReapply()" '
+         + 'title="Apply this screen\u2019s thresholds inside ' + esc(sc.region) + ' as well">'
+         + 'Narrow it to ' + esc(sc.region) + ' as well</button></div>';
+  }
+  h.innerHTML = html;
+  h.style.display = 'block';
+}
+window._scRenderPresetScope = _scRenderPresetScope;
+
+// Reload the preset from a clean slate, so the chip returns to its unmodified baseline.
+function _scPresetScopeDrop() {
+  var sc = _scPresetScope; if (!sc) return;
+  var el = document.getElementById('sc-region'); if (el) el.value = '';
+  applyScreenerPreset(sc.key);          // _rgnBefore reads '' now, so nothing is restored
+  _scPresetScopeClear();
+}
+window._scPresetScopeDrop = _scPresetScopeDrop;
+
+// Stack the analyst's region back on top of the preset's own scope. This IS a departure from
+// the preset, so the chip is left to mark itself MODIFIED by the v718 drift check.
+function _scPresetScopeReapply() {
+  var sc = _scPresetScope; if (!sc) return;
+  var el = document.getElementById('sc-region'); if (!el) return;
+  el.value = sc.region;
+  _scPresetScopeClear();
+  if (typeof runScreener === 'function') runScreener();
+}
+window._scPresetScopeReapply = _scPresetScopeReapply;
+
 function _scDeckDeltaClear() {
   var h = document.getElementById('sc-deck-delta');
   if (h) { h.style.display = 'none'; h.innerHTML = ''; }
@@ -80095,7 +80221,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // sc-region select in Screener
   var scRegion = document.getElementById('sc-region');
-  if (scRegion) scRegion.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  if (scRegion) scRegion.addEventListener('change', function() {
+    // v1074 (T1): the strip describes what a preset load did to the region. A hand edit makes
+    // that statement stale, so it retires rather than sitting there describing an older screen.
+    if (typeof _scPresetScopeClear === 'function') _scPresetScopeClear();
+    if (typeof runScreener === 'function') runScreener();
+  });
   // v662: sc-reform (reform record) select in Screener
   var scReform = document.getElementById('sc-reform');
   if (scReform) scReform.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
