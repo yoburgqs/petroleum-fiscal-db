@@ -75609,3 +75609,16 @@ contract with the ceiling object, which is wider than one moment.
 no tab-order change, no rubric work, no version sweep as the deliverable. Nothing in STILL LOCKED
 is touched — the v612 mobile layer and `#reference-panel` are not in this code path; v451, v452,
 v449, v430, v489 and v371/v373 are unchanged.
+
+---
+## Cycle 1046 Log — 2026-10-05 18:30
+- Test before: 551 PASS / 1 FAIL
+- Test after: 552 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — v1080 pushed, mirror synced, suite green.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest in the committed rotation: 1039 was T2, 1033 T3, 1032 T6, 1031 T1, 1030 T5)
+
+## Friction
+Country Profile, the Fiscal Predictability block — `_cpApplyObsSpread()`'s v1006 branch, `index.html` ~75821. On the 41 countries whose own contract table refutes their predictability basis, the badge reads `≤52 · LOW  ≥29.6pp obs   stored: 7̶6̶ ▲ withdrawn`, and the o
