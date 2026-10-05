@@ -74654,3 +74654,127 @@ sentence that judges it.
 The page's **first line** — the Fiscal character verdict (`_cpFiscalVerdict470`, `index.html:50182`, branch `take <= 55 && downSolid`).
 
 Six sibling branches of that if-chain have been rebuilt one at a time (v663, v931, v9
+
+---
+## Cycle 1029 Log — 2026-10-04 22:5x — T4 — v1072
+- Test before: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors — suite **RUN this cycle**, number read
+  from its own TOTAL line, served at the Pages path `/petroleum-fiscal-db/`.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in rotation: 1028 was
+T2, 1027 T3, 1024 T6, 1023 T1, 1019/1020 T5; T4 last ran at 1013.
+
+## Friction
+The **Reform Risk Snapshot** — `renderReformRisk()`, `index.html` ~59393. It is the first block
+on the tab, above the fold, and for an analyst with 20 minutes it is often the only one read in
+full.
+
+It read:
+
+> Of them, **2** clear this tab's WACC-premium bar of **3+ fiscal law changes since 2010** —
+> United Kingdom and Brazil … A further **6** had 2 changes, which does not reach that bar;
+> **1** had 4+.
+
+Three counts in parallel clauses. An analyst sums them: 2 + 6 + 1 = 9 of 21, with 12
+unaccounted for. **They do not sum.** `highFreq` is `withScore.filter(r => r.since2010 >= 4)` —
+a *subset* of the two already named in the same sentence (the United Kingdom, at 5 changes) —
+printed as though it were a fourth, disjoint group.
+
+The omission was worse than the double count. The **largest** group — the 13 jurisdictions at
+0–1 changes — was never mentioned at all, so the snapshot's plain reading was *"2 need a
+premium, 6 are close, nothing else is on the board."* That is precisely the conclusion the rest
+of this tab exists to refute. Four thousand pixels down, the QUIET SINCE 2010 card carries a
+**⚠ 9 OF 13 RAISED TAKE** badge, a "Take was raised inside the window" strip and a "Below the
+line — quiet only because the window starts in 2010" strip:
+
+| | |
+|---|---|
+| raised take **inside** the window, still below the bar | Russia +15pp 2022 (largest quantified in-window rise on the platform), Ecuador +5pp 2010 |
+| score clean **only** because the window opens in 2010 | Venezuela +15pp 2007, Libya +35pp 1971, Algeria +10pp 2005, Kazakhstan +8pp 2007, Canada +3pp 2009, Colombia +3pp 2007, USA +3pp 2007 |
+| no take-raising event on record at all | Ghana, Guyana, Iraq, India |
+
+An analyst who read the snapshot and went to their meeting carried none of that.
+
+## Change
+1. The snapshot now states the **same three-way split the three cards below state**, and says
+   the three add back to 21:
+   - **2** actively reforming (United Kingdom 5, Brazil 3) — the only ones the WACC-premium bar
+     reaches, and the top rows of the ranked table, above the orange line;
+   - **6** reformed twice, one short of that bar — **3 of them raised take inside the window
+     anyway**;
+   - **13** quiet at 0–1 changes — but **9 of those 13 have a take-raising event on record**,
+     2 dated 2010 or later and 7 scoring clean only because the window opens in 2010.
+   Followed by: *"A count below the bar is not a finding of no exposure — the premium rule reads
+   frequency and never magnitude, so a +15pp rupture and a 1pp administrative tweak move the
+   score by the same 15 points."*
+2. **"1 had 4+" is deleted.** `activeReformers` and `highFreq` were its only consumers and are
+   gone with it.
+3. **Each of the three counts is now a control**, not prose. `_rrSnapCount()` renders it as an
+   inline button with a dotted rule; `_rrJumpCard()` scrolls the matching card to the top of the
+   viewport under the sticky nav and outlines it in accent for 1.8s. New ids `rr-card-quiet`,
+   `rr-card-mid`, `rr-card-active`. `block:'start'` with a nav offset rather than `'center'` —
+   the QUIET card is ~1,290px tall against a 900px viewport, so centring it puts its own heading
+   and the "9 of 13" badge above the fold.
+
+**No new threshold and no new arithmetic.** `quiet`, `quietClean`, `quietRises`,
+`quietInWindow`, `quietArtefact`, `midList`, `midRaisedInWindow` and `activeList` are the
+identical variables the three cards already render from, computed at lines 58781–59027, well
+before the snapshot is built. v966's tie to `_rrWacc()` is **kept**: the first group is still
+cross-checked against the predicate that draws the orange line in the ranked table, and if the
+two ever part the snapshot prints that fact rather than a partition that does not hold.
+
+### Verified, after
+
+| | before | after |
+|---|---|---|
+| groups named | 2 / 6 / 1 — sums to 9, double-counts UK | 2 / 6 / 13 — sums to 21, disjoint |
+| the 13 quiet | never mentioned | named, with 9 / 2 / 7 take-rise breakdown |
+| "1 had 4+" | printed as a fourth group | removed |
+| counts | static text | buttons → scroll + 1.8s outline on the matching card |
+| card jump landing | n/a | card top at y=12 (desktop), y=72 (390px), heading visible |
+
+## Walked, found working, not touched
+Per-country lookup (186 options, two optgroups, 21 scoreable / 164 not); the scored verdict
+(Brazil, Kazakhstan, Nigeria, Guyana, UK, Russia) and the unscored verdict with its statute card
+and dead-link handling (sampled 14 of the 164 — all 14 carry a citation); `_rrModelPremium()` →
+Scenario Builder (opens the modal, sets `sb-discount` to 13, writes the reform note with the
+13%/15%/back-to-10% controls); `_rrOpenLocal()` from both the ranked table and the heatmap;
+`rr-copy-verdict` on scored and unscored countries (both carry the Metric/Value/Basis table and
+the ORCA source stamp); the Country Profile reform section and its ceiling-corrected Fiscal
+Predictability (Nigeria ≤46 · LOW, Kazakhstan ≤53 · LOW, Brazil ≤59 · LOW — all three agree with
+the Reform Risk card, no drift); Fiscal Compare's REFORM VERDICT column; the IOC Portfolio
+REFORM EXPOSURE tile (2 WACC 13% · 10 flagged 80% · 19 n/c 7% — sums to 31 jurisdictions and
+100%); the heatmap's colour key (amber=1 `rgb(161,98,7)`, orange=2 `rgb(194,65,12)`, red=3+
+`rgb(185,28,28)` — measured, consistent on all 27 lit cells). None of these needed work, so none
+was invented.
+
+## Not done, deliberately
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation re-wording,
+no tab-order change, no rubric work. Nothing in STILL LOCKED is touched: the v612 mobile layer
+and `#reference-panel` are not in this code path; the v451 two-zone CP headline, the v449 tier
+colouring, the removed Govt NPV column and the v430 FC guide are unchanged. The version badge
+went v1071 → v1072 at one location at the end and is not an improvement.
+
+## Mobile
+390 × 844 `hasTouch`, storage cleared: `scrollWidth 390 = clientWidth` on the Reform Risk tab
+before and after tapping a count. The three new controls render **24 × 24** under
+`pointer: coarse` (a bare "2" was an 8px-wide target before the horizontal padding went on).
+Tapping lands the card heading at y=72, clear of the nav. Zero page errors.
+
+## Verification
+- JS syntax gate: **PASS** — all 11 inline script blocks extracted, `node --check`.
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Reconciles to the 551 baseline exactly.
+- Horizontal scroll swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs:
+  **none**, 0 console and 0 page errors at every viewport.
+
+## Result
+An analyst who reads only the first block of the Reform Risk tab — which is what 20 minutes
+buys — now leaves knowing that **9 of the 21 sourced jurisdictions have raised government take
+despite sitting below the premium bar**, that 7 of those score clean purely because the window
+opens in 2010, and that the three groups account for all 21. Before, the same reader got three
+numbers that summed to 9 of 21, one of which was the United Kingdom counted twice, and no
+mention at all of the group their country was most likely to be in. The roster behind each
+count is now one click away instead of a 4,000px hunt.
