@@ -75457,3 +75457,155 @@ control was added, moved or resized.
 - The pre-change defect was measured the same way before patching: the baseline strip was captured
   verbatim on all three monopolies and Denmark, and the $4.26B / "downside verdict holds" sentence
   confirmed on each.
+
+---
+## Cycle 1040 Log — 2026-10-05 — T4 — v1080
+
+- Test before: **552 PASS / 0 FAIL / 0 WARN / 0 JS errors**, suite RUN this cycle against the
+  local tree served at the Pages path, number read from its own TOTAL line.
+- Test after: **552 PASS / 0 FAIL / 0 WARN / 0 JS errors** — identical. This change moves the
+  suite by zero.
+- The 551 PASS / **1 FAIL** the cycle was handed is the LIVE site, which the suite targets by
+  default (`TEST_URL` unset → `https://yoburgqs.github.io/petroleum-fiscal-db/`). See the
+  shipping note at the end: the live site was at v1077 and the fix for that FAIL had been sitting
+  uncommitted in the tree.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in the committed
+rotation (1039 T2, 1033 T3, 1032 T6, 1031 T1, 1030 T5; T4 last logged at 1029).
+
+## Friction
+**Country Profile → the Fiscal Predictability block.** `_cpApplyObsSpread()`, the v1006 branch,
+`index.html` ~75821. This is the single-country page a T4 analyst lands on.
+
+On the 41 countries whose own contract table refutes the one-term basis their predictability
+score was built on, the header strip reads:
+
+```
+Fiscal predictability:  ≤52 · LOW   ≥29.6pp obs    stored: 7̶6̶ ▲ withdrawn
+```
+
+and the orange-bordered paragraph immediately beneath it — the paragraph whose entire job is to
+withdraw the cohort rank — read:
+
+> No cohort rank for Norway. Its place among the 132 one-term regimes is computed from the
+> printed **76 · HIGH**, and that cohort is defined as the one the take-spread penalty never
+> touches …
+
+`printedBand` is `_fpBandLabel(stored)` — the **numeric** band of the stored score. On this
+branch the cohort is the one-term one, where `renderStabilityBadge()` withholds the band
+outright (`label = single ? 'UNGRADED' : _fpBandLabel(score)`), so `printedBand` is a band no
+surface on this platform has ever rendered for these countries. Worse, **HIGH** is the band this
+same page's badge tooltip says is never awarded here — *"all the scores that would fall in the
+HIGH band belong to one-term regimes … and NOT ONE of the measured ones reaches it"*.
+
+So the paragraph that exists to withdraw a number reinstated it **and promoted it**, six inches
+under a badge that had struck it through.
+
+Swept live across `COUNTRY_DATA`, not asserted: **all 41** one-term ceilings take this branch,
+and **9 of them re-grade to HIGH** —
+
+| | | |
+|---|---|---|
+| Norway 76 → ≤52 LOW | Netherlands 84 → ≤59 LOW | Uzbekistan 89 → ≤49 LOW |
+| Albania 81 → ≤49 LOW | Lebanon 81 → ≤49 LOW | Thailand 80 → ≤51 LOW |
+| Namibia 77 → ≤60 MODERATE | Papua New Guinea 78 → ≤66 MODERATE | USA 91 → ≤82 HIGH |
+
+Norway, Indonesia, Angola, Colombia, Ecuador and Libya are among the 21 jurisdictions that carry
+a reform log, so this is the T4 stability paragraph on the tab's own headline countries.
+
+The v1006 comment above the block claims *"same gate and same wording as v982, off the same
+`_fpObsCeiling()` object, so the two surfaces cannot hand the analyst two different ranks."* The
+wording was **not** the same. `rr-fp-cohort` on Reform Risk prints `'the printed ' + fp` with no
+band at all — verified on screen this cycle for Venezuela, Norway and Philippines. One surface
+withdrew the score; the other re-graded it.
+
+## Change
+1. **The stored score is named the way the badge names it.** "computed from the printed
+   `76 · UNGRADED` — a score this platform does not band at all, because the take-spread penalty
+   that earns a band was never charged against it, so there is no band to rank on." The reason is
+   stated rather than implied, because the reason is the finding.
+2. **The paragraph now answers the question it raises.** "No cohort rank" withdrew a rank and
+   handed over no replacement — on the countries whose ceiling clears the measured top the
+   closing clause was only *"rank it on ≤N, not on the printed N"*. The rank at the ceiling is
+   derivable from the cohort list already on screen: the spread term IS charged at the bound, so
+   the comparison set is the measured cohort. Counted, not thresholded, and stated as a **best
+   case** because the bound is an upper bound and a lower true score can only rank worse:
+   > Ranked on that bound instead, Norway sits **20th or lower of the 28** countries ORCA can
+   > measure — a best case, because the true score is at or below 52 and a lower one can only
+   > rank worse.
+3. **Where the bound sits ABOVE the measured cohort's own top, no rank is handed over.** USA's
+   ≤82 against Turkmenistan's 74 would arithmetically be "1st of 28" and that is a false reading:
+   > Ranked on that bound instead, USA would sit above **all 28** countries ORCA can measure —
+   > but 82 is itself above their own ceiling of 74 (Turkmenistan), so no regime with a measured
+   > spread has scored this high. A bound is doing that work, not a measurement.
+
+**No new threshold and no new gate.** `material`, the 5-point rule and the measured-cohort branch
+fifty lines below are untouched — the measured branch keeps `printedBand`, which is correct
+there, because on that cohort the printed band IS the band on screen. India (52 → ≤51, measured,
+immaterial) keeps the original `_fpCohortLine()` paragraph unchanged, verified on screen.
+
+### Verified, after
+| | before | after |
+|---|---|---|
+| one-term withdrawn score | `printed 76 · HIGH` (9 of 41 re-grade to HIGH) | `printed 76 · UNGRADED`, with the reason |
+| rank after withdrawal | none given | `20th or lower of 28`, named a best case |
+| bound above measured top (5 countries) | `rank it on ≤82` and nothing | states no measured regime scored that high |
+| CP vs Reform Risk wording | CP re-grades, RR does not | both withdraw without re-grading |
+| measured cohort (India, Nigeria, Qatar) | — | unchanged |
+
+Swept on 21 countries end to end in the real DOM — 17 one-term material, Oman (one term, not
+refuted), India (measured immaterial), Nigeria and Qatar (measured material): **21 OK / 0 BAD**,
+0 console errors, 0 page errors.
+
+## Mobile
+390 × 844 `hasTouch: true`, storage cleared, Country Profile with Norway loaded:
+`scrollWidth 390 = clientWidth 390`. The paragraph measures 310 × 300px with **0** children
+overflowing the viewport. No control was added, moved or resized — the change is content inside
+an existing flow container, so the 24px floor is not in play.
+
+## Verification
+- **JS syntax gate: PASS** — all 11 inline script blocks extracted and `node --check`ed, after
+  each patch and again after the version bump.
+- **Suite RUN this cycle**, before and after, against the local tree at the Pages path:
+  **552 / 0 / 0**, 0 JS errors, both times. Serving at `/petroleum-fiscal-db/` resolves `sw.js`,
+  so there is no local-only ConsoleErrors WARN this cycle.
+- **Horizontal scroll** swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs
+  plus Country Profile with a refuted country loaded: **0 overflowing screens**, 0 errors at
+  every viewport.
+- The pre-change defect was measured the same way before patching — the paragraph captured
+  verbatim on Norway, Venezuela and Philippines, and the `printed 76 · HIGH` string confirmed.
+
+## Shipping note — v1078 and v1079 had never been pushed
+Recorded because it is the "stable but wrong" failure in a form nothing was watching. On entering
+this cycle the working tree held **493 lines of uncommitted index.html work** labelled v1078 and
+v1079, the badge read v1079, and `HEAD` was v1077. The deployed site was v1077. Neither cycle
+ever committed, so:
+
+- The suite's **one live FAIL** (`CP-FPCEIL Philippines (material)`) was not a defect in the
+  fixture. The fixture was correct and the fix was in the tree, unshipped. `runtime_comprehensive.js`
+  was likewise modified and uncommitted in `~/office`.
+- Both were verified working before shipping, not assumed:
+  **v1078** — `_fpObsCeilingFrom()` now computes `bandMoves` against the band actually rendered
+  (`oneTerm ? 'UNGRADED' : printedBand`). Measured: 41 of 41 one-term ceilings are now material,
+  5 newly so on band authority alone (Algeria 72→69, Mozambique 63→61, Niger 70→66, Philippines
+  70→69, Venezuela 73→69), and the measured-cohort 5-point gate survives — India 52→51 stays
+  immaterial. Reform Risk renders the ceiling headline and withdrawn rank cleanly on all five.
+  **v1079** — the Scenario Builder premium strip was driven end to end from the Reform Risk
+  verdict button for the United Kingdom: `#sb-premium-cost` renders *"CONTRACTOR NPV AT 10%
+  $1.10B · AT 13% $842M · COST OF THE PREMIUM −$257M (−23.4%) · AT 15% (+5PP) $711M, −$388M vs
+  10%"* and the memo line *"the whole +3–5pp band costs $257M–$388M (−23.4% to −35.3%)"*. 0 page
+  errors.
+- All three versions are in one commit, attributed. Badge v1079 → v1080 at one location at the
+  end, which is bookkeeping and not an improvement.
+
+**Open, not fixed:** USA's ceiling renders `≤82 · HIGH` — a graded HIGH awarded to a bound, on a
+platform that states no regime reaches HIGH and that the ceiling among the measured cohort is 74.
+The spread term IS charged at the bound, so a band is arguably earned there, but it reads against
+every other statement on the page. One country; changing it means touching `_fpBandLabel()`'s
+contract with the ceiling object, which is wider than one moment.
+
+**Not done, and not a cycle:** no tooltip, no FAQ, no changelog catch-up, no citation re-wording,
+no tab-order change, no rubric work, no version sweep as the deliverable. Nothing in STILL LOCKED
+is touched — the v612 mobile layer and `#reference-panel` are not in this code path; v451, v452,
+v449, v430, v489 and v371/v373 are unchanged.
