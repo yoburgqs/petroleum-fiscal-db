@@ -74920,3 +74920,119 @@ production-weighted. That is four decision-relevant facts in about eight seconds
 that previously yielded them only to someone who read 2,000 characters of prose. And because
 each caveat is now its own paragraph, the ones that do apply survive the edit that removes the
 ones that do not — which is the only way a caveat ever reaches an investment committee.
+
+---
+## Cycle 1031 Log — 2026-10-05 (v1074)
+- Test before: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RUN this cycle, read from its own TOTAL line)
+
+## Task
+**T1** — *"Which countries should even be on my screening list?"* Stalest in rotation
+(1030 was T5, 1029 T4, 1028 T2, 1027 T3, 1024 T6; T1 last ran at 1023). Walked cold at
+1440×900 and 390×844 with both storages cleared, served under the real
+`/petroleum-fiscal-db/` path prefix — the harness note from cycle 1030 is correct and was
+followed; serving at a server root 404s `sw.js` and produces a phantom WARN.
+
+## Friction
+`applyScreenerPreset()` — `index.html` ~37144 — set `#sc-region = ''` inside its
+**"Reset all to defaults first"** block for *every* preset, and only `pscafrica` put one
+back afterwards. The measured walk: an analyst with a regional mandate opens Advanced
+Filters → Region → **Africa** (54 of 185 after the v661 M49 re-filing), then loads the
+flagship **IOC Capital Screen** from the preset menu — the screen the Home headline points
+at and the one the directive's own T1 example names.
+
+Pre-change result: **15 countries, of which exactly one (Angola) is African**, and Angola
+sits at rank 12. Nothing on screen said the scope had been discarded:
+
+| surface | what it said | geography named? |
+|---|---|---|
+| preset chip | "◆ IOC Capital Screen: verified production · Take ≤65% · NPV ≥0 @$75 AND @$50" | no |
+| count line | "IOC Capital Screen · 15 countries match at $75/bbl" | no |
+| `#sc-region` | silently back at All Regions | **inside a `<details>` collapsed by default (v371/v373)** |
+
+So the one control that would have revealed the loss was not on screen, and the analyst
+had set it thirty seconds earlier and had no reason to re-check it. The workaround was
+ordering — load the preset **first**, then set the region. That works, is undiscoverable,
+and paints the chip `MODIFIED: region all → Africa` for a scope the preset never had.
+
+## Change
+The analyst's region now survives any preset that defines no geography of its own. The
+restore runs **before** the v718 `_activePresetBase` capture, so a kept region is part of
+the preset's own baseline and does not falsely mark the chip MODIFIED. A new
+`#sc-preset-scope` strip (same visual language and lifecycle as the v981 deck-delta strip,
+hidden unless it applies) states which of the two things happened and carries the escape:
+
+| case | strip | action button |
+|---|---|---|
+| preset brings no geography | "Your region filter was kept — this screen is scoped to **Africa** (54 of 185)" | *Run IOC Capital Screen across all countries instead* |
+| preset brings its own | "Your **Middle East** region filter was replaced — PSC Africa brings its own geography (Africa)" | *Narrow it to Middle East as well* |
+
+A preset carrying an explicit country set — Offshore & Deepwater (24), Atlantic Frontier
+(6), Frontier Markets — counts as bringing its own geography and reports as *replaced*.
+`'reset'` is excluded, so Clear-preset and Reset All still genuinely clear everything. The
+strip retires on a hand change to `#sc-region`, on Reset All, and on clearing the preset —
+a stale strip describing an older screen is the same defect in miniature.
+
+## Measured, all five paths, zero console/page errors
+| path | region after | rows | strip |
+|---|---|---|---|
+| Africa → IOC Capital Screen | Africa (kept) | **1** (Angola) | kept |
+| then *across all countries* | '' | 15 | hidden, chip clean (not MODIFIED) |
+| Middle East → PSC Africa | Africa (preset wins) | 34 | replaced |
+| then *narrow to Middle East* | Middle East | 6 | hidden, chip `MODIFIED: region Africa → Middle East` |
+| Africa → Atlantic Frontier | '' (named set) | 6 | replaced, "6 named countries" |
+| Reset All | '' | 185 | hidden |
+| IOC → then Africa (legacy order) | Africa | 1 | hidden, chip MODIFIED — unchanged behaviour |
+| Europe → Low Take · Positive NPV, then hand-change to Asia | Asia | 17 | strip retires on the hand change |
+
+## Walked, found working, not touched
+The v981 price-deck delta strip (IOC @$75 → $50 renders "shortlist 15 → 18 (+3 in)", names
+Kazakhstan 69.9%→63.4%, Libya 71.1%→64.3%, Norway 68.0%→59.3%, and offers "keep only the 15
+that pass at both" — it fires correctly and is the right answer); the Home `_homeOpenICScreen()`
+CTA (lands on the Screener with the preset applied, 15 rows, five criteria lines); the preset
+menu's live per-deck hit counts; the v661 UN M49 region re-filing (applied once to COUNTRY_DATA
+at load, so Africa reads 54 not 49 and Middle East 17 not 14 — Republic of the Congo, Côte
+d'Ivoire, Abu Dhabi and Iraq-Kurdistan are all reachable by region on every tab); the
+zero/thin-result states (5 proxy-only rows arrive under their own "not defensible as a screening
+shortlist on its own" line); Explorer Browse, Map View (177 paths, and the 25 countries with no
+polygon named explicitly rather than shown as grey) and Bubble Chart. None needed work, so none
+was invented.
+
+*Noted, not fixed:* `#explorer-map-toggle` inside `#chip-row-mech` is unreachable because
+v371/v373 hides that chip row — but a second, visible **Map View** button in the controls-row
+calls the same `toggleExplorerMap()`, so the map is reachable and this is dead markup, not lost
+function. Left alone; the directive asks for one moment.
+
+## Not done, deliberately
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation
+re-wording, no tab-order change, no rubric work. Nothing in STILL LOCKED is touched: the
+v612 mobile layer and `#reference-panel` are not in this code path; the v451 two-zone CP
+headline and removed Govt NPV column, the v449 tier colouring, the v430 FC guide, the v371/
+v373 declutter (Advanced Filters stays collapsed; presets stay a dropdown) and the v489
+Reform Risk card are all unchanged. The version badge went v1073 → v1074 at one location at
+the end and is not an improvement.
+
+## Mobile
+390 × 844 `hasTouch: true`, storage cleared. `scrollWidth 390 = clientWidth 390` on the
+Screener before and after the strip renders. Strip measures 336 × 143; its action button
+renders **24 × 291** under `pointer: coarse`, meeting the 24px floor. Zero page errors.
+
+## Verification
+- JS syntax gate: **PASS** — all 11 inline script blocks extracted, `node --check`, run twice
+  (after the patch and after the version bump).
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Reconciles to the 551 baseline exactly.
+- Horizontal scroll swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across 9 tabs:
+  **0 overflowing screens**, 0 console and 0 page errors at every viewport.
+
+## Result
+An analyst whose mandate is a region — which is most of them — can now ask the platform's
+flagship question inside that region. Setting Region → Africa and loading the IOC Capital
+Screen returns **Angola**, the one African country that clears verified production, a 65%
+comparable-take ceiling and positive contractor NPV at both $75 and $50. Before, the same
+two clicks returned a 15-row global list that had quietly stopped being about Africa, with
+Angola at rank 12 — a list an analyst could reasonably have carried into a screening meeting
+as their African shortlist. And in the other direction, a screen that keeps a filter now says
+so, so the analyst who comes back to a loaded preset ten minutes later is never looking at a
+one-country result without being told which scope produced it.
