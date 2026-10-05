@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1074</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1075</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -5312,15 +5312,21 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">185 benchmark countries validated against published reference ranges — representing 100% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
+    <!-- v1075 (T6): the headline this section led with was "185 benchmark countries validated
+         against published reference ranges — representing 100% of the 185-country database",
+         over a table of 185 rows every one of which read "✓ Pass". It is replaced by a strip
+         computed live from the rows themselves, so the claim cannot drift from the table under
+         it again. See renderBenchmarkTable() for what was measured. -->
+    <div id="mv-verdict" style="margin:0 0 12px;"></div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;"><strong style="color:var(--text);">✓ Pass</strong> = the take this platform shows <em>today</em> falls inside the published reference range. <strong style="color:var(--text);">⚠ Near</strong> = within 3pp outside it. <strong style="color:var(--text);">✗ Fail</strong> = more than 3pp outside. The verdict is graded on that live figure, not on the one written into this table when the row was added — both are in the same cell, with the drift between them, because a benchmark that grades a number appearing nowhere else on the platform is not a benchmark. Rows are ordered <strong style="color:var(--text);">worst first</strong>. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error. Where a row’s own published band is wider than that, the band carries its half-width so you can see the test it actually applied.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
           <tr>
             <th>Country</th>
-            <th class="num">Platform @$75</th>
+            <th class="num" title="Top line: government take at $75/bbl as this platform computes it now — the same COUNTRY_DATA figure Fiscal Compare ranks on, the Country Profile headlines and every export carries. Second line: the figure hard-coded into this validation table when the row was written, and the gap between the two. The verdict column grades the top line.">Platform @$75<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">live · as written</span></th>
             <th class="num">Published Range</th>
-            <th class="num">Pass/Fail</th>
+            <th class="num" title="Graded on the live figure in the column to the left. A band wider than the ±3pp tolerance stated above is marked on the range itself.">Pass/Fail</th>
             <th>Source Note</th>
           </tr>
         </thead>
@@ -5337,7 +5343,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div class="dd-section" id="meth-known-limitations" style="margin-top:16px;">
     <div class="dd-section-hdr" style="color:var(--accent);">Known Model Limitations</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 12px;">
-      The following countries are excluded from the validation table above because our model does not yet fully capture their fiscal structures. They remain in the database for directional use only.
+      <!-- v1075 (T6): this read "The following countries are excluded from the validation table
+           above". All five are IN that table, and all five read PASS there. Now that the table is
+           graded live, Russia and Indonesia come out Fail and the contradiction is on screen. -->
+      These countries are <strong style="color:var(--accent);">not</strong> excluded from the validation table above &mdash; all five appear in it, and are graded there against the take this platform computes today. What follows is the known approximation in each model, which is why several of them now read <strong style="color:var(--red);">&#10007; Fail</strong> rather than Pass. The per-country platform estimates quoted in this block are hand-written and are <em>not</em> re-read from the engine; where one disagrees with the table above, the table above is the live figure.
     </p>
     <div style="padding:12px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;margin-bottom:8px;">
       <strong style="color:var(--accent);">Russia — Mineral Extraction Tax (MET) model</strong>
@@ -5371,7 +5380,11 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
   </div>
   <script>
-  (function renderBenchmarkTable() {
+  // v1075 (T6): this was an IIFE that ran at parse time, ~19,000 lines BEFORE
+  // `let COUNTRY_DATA = null` is even declared. That was harmless while it graded its own
+  // frozen literal; it is not harmless now that the verdict is read off the live engine, so
+  // the render is a named function, called once when the data lands and polled as a fallback.
+  function renderBenchmarkTable() {
     const BENCHMARKS = {
       'Norway':     { platform: 68.0, ref_lo: 65, ref_hi: 72,  note: 'NCA published range' },
       'UK':         { platform: 51.4, ref_lo: 48, ref_hi: 58,  note: 'HMRC + OGA' },
@@ -5623,29 +5636,228 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     };
     var tbody = document.getElementById('benchmark-validation-body');
     if (!tbody) return;
+    // Graded on the live take, so there is nothing honest to draw until COUNTRY_DATA is here.
+    // Returning false lets the poller below try again rather than painting 185 ungraded rows.
+    if (typeof COUNTRY_DATA === 'undefined' || !Array.isArray(COUNTRY_DATA) || !COUNTRY_DATA.length) return false;
+
+    // ── v1075 (T6): GRADE THIS TABLE AGAINST THE LIVE ENGINE ─────────────────────────────
+    // This section is the one an analyst opens to ask "how solid is this?", and it answered
+    // "185 benchmark countries validated ... representing 100% of the 185-country database"
+    // over 185 rows of which every single one read "✓ Pass" — nothing Near, nothing Fail.
+    // A table that cannot fail carries no information, and this one could not fail for three
+    // independent reasons, all measured against the shipped build:
+    //
+    //   1. `d.platform` is a hard-coded literal, frozen when each row was written (v90–v177).
+    //      151 of the 175 resolvable rows no longer match the take the REST of the platform
+    //      shows for that country. Tajikistan is written 66.4% where the platform shows 16.9%
+    //      (49.5pp); Syria 71.6 vs 27.6; Bahrain 58.4 vs 100.0; Mexico 61.4 vs 32.2; Russia
+    //      72.6 vs 46.4. So each "Pass" graded a number appearing nowhere else on the platform.
+    //      Regraded on COUNTRY_DATA.take_75 — the figure Fiscal Compare ranks on, the Country
+    //      Profile headlines and every export carries — the verdict is 45 Pass / 8 Near /
+    //      122 Fail / 10 ungradable, not 185 / 0 / 0.
+    //   2. Ten rows name a country this database does not contain at all (Seychelles, Kosovo,
+    //      Iceland, Lesotho, Comoros, Estonia, Latvia, Finland, Maldives, Mauritius), and four
+    //      more are a second row for a country already in the table under another spelling
+    //      (UK, Iraq (KRG), Republic of Congo, Republic of Guinea). "185 countries,
+    //      representing 100% of the 185-country database" is therefore arithmetically
+    //      impossible: the table reaches 171 of the 185. The Country button made the same
+    //      mistake visible — it called loadCountryProfile('UK') on names COUNTRY_DATA has no
+    //      entry for, so on 14 rows the one control that would let the analyst go and check
+    //      did nothing.
+    //   3. 174 of the 175 published bands are WIDER than the ±3pp tolerance the paragraph
+    //      above this table claims to apply — median ±4.5pp, max ±5.5pp — while 52 of the
+    //      source notes describe themselves as "directional", 40 record no commercial
+    //      production, and three state outright that the range was "calibrated against"
+    //      ORCA's own neighbouring estimates. A band drawn around the answer does not test it.
+    //
+    // Nothing is deleted. BENCHMARKS stays byte-for-byte as written, because the drift is
+    // itself the finding, and every published range and source note still renders in full.
+    // What changes: which number the verdict grades, what the header reports, and the order.
+    var _MV_ALIAS = {
+      'UK': 'United Kingdom', 'Iraq (KRG)': 'Iraq-Kurdistan', 'Ivory Coast': "Cote d'Ivoire",
+      'Republic of Congo': 'Republic of the Congo', 'Republic of Guinea': 'Guinea',
+      'Sao Tome': 'Sao Tome and Principe', 'Cabo Verde': 'Cape Verde'
+    };
+    function _mvAttr(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/'/g, '&#39;');
+    }
+    var _mvAll = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+    var _mvBy = {};
+    _mvAll.forEach(function(d) { _mvBy[d.country] = d; });
+
+    var _mvRecs = [], _mvSeen = {};
+    Object.keys(BENCHMARKS).forEach(function(label) {
+      var d = BENCHMARKS[label];
+      var resolved = _MV_ALIAS[label] || label;
+      var row = _mvBy[resolved] || null;
+      var live = (row && row.take_75 != null && isFinite(Number(row.take_75))) ? Number(row.take_75) : null;
+      if (row) _mvSeen[resolved] = (_mvSeen[resolved] || 0) + 1;
+      var gap = live == null ? null
+        : (live < d.ref_lo ? d.ref_lo - live : (live > d.ref_hi ? live - d.ref_hi : 0));
+      _mvRecs.push({
+        label: label, resolved: resolved, d: d, live: live, gap: gap, dup: false,
+        half: (d.ref_hi - d.ref_lo) / 2,
+        drift: live == null ? null : Math.abs(live - d.platform),
+        cls: live == null ? 'absent' : (gap === 0 ? 'pass' : (gap <= 3 ? 'near' : 'fail'))
+      });
+    });
+    // A country reached by two rows is one country validated twice, not two countries. The
+    // row carrying the non-database spelling is the duplicate entry, so the marker goes there.
+    _mvRecs.forEach(function(r) {
+      if (r.live != null && _mvSeen[r.resolved] > 1 && r.label !== r.resolved) r.dup = true;
+    });
+
+    // Worst first — the same ordering the Country Profile's Evidence Chain findings block uses.
+    // The rows that do not survive their own benchmark are what an analyst needs out of this
+    // table, and they sat behind twelve reassuring rows of Norway / UK / Angola.
+    var _mvRank = { fail: 0, absent: 1, near: 2, pass: 3 };
+    _mvRecs.sort(function(a, b) {
+      if (_mvRank[a.cls] !== _mvRank[b.cls]) return _mvRank[a.cls] - _mvRank[b.cls];
+      if (a.cls === 'fail' || a.cls === 'near') return b.gap - a.gap;
+      return a.label.localeCompare(b.label);
+    });
+
+    var _mvN = { pass: 0, near: 0, fail: 0, absent: 0, drift: 0, loose: 0, dup: 0, directional: 0 };
+    _mvRecs.forEach(function(r) {
+      _mvN[r.cls]++;
+      if (r.drift != null && r.drift > 0.05) _mvN.drift++;
+      if (r.half > 3) _mvN.loose++;
+      if (r.dup) _mvN.dup++;
+      if (/directional/i.test(r.d.note || '')) _mvN.directional++;
+    });
+    var _mvGraded  = _mvRecs.length - _mvN.absent;
+    var _mvCovered = Object.keys(_mvSeen).length;
+
+    // ── the verdict strip: every number below is counted off the rows rendered underneath it
+    var _mvStrip = document.getElementById('mv-verdict');
+    if (_mvStrip) {
+      var _mvPill = function(txt, rgb, fg, tip) {
+        return '<span style="display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;'
+          + 'border-radius:12px;font-size:11px;font-weight:700;background:rgba(' + rgb + ',.12);'
+          + 'border:1px solid rgba(' + rgb + ',.45);color:' + fg + ';cursor:help;white-space:nowrap;"'
+          + ' title="' + _mvAttr(tip) + '">' + txt + '</span>';
+      };
+      var _mvPct = function(n) { return _mvGraded ? Math.round(n / _mvGraded * 100) + '%' : '—'; };
+      _mvStrip.innerHTML =
+          '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);'
+        + 'border-left:3px solid var(--red);border-radius:0 6px 6px 0;">'
+        + '<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;">'
+        + '<span style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;">'
+        + 'Graded live against the platform</span>'
+        + _mvPill('✗ ' + _mvN.fail + ' Fail · ' + _mvPct(_mvN.fail), '185,28,28', 'var(--red)',
+            'The take this platform shows today is more than 3pp outside this row’s published range. '
+            + 'Counted on the ' + _mvGraded + ' rows that resolve to a country in the database.')
+        + _mvPill('⚠ ' + _mvN.near + ' Near', '176,104,0', 'var(--accent)',
+            'Within 3pp outside the published range — the tolerance the paragraph below states.')
+        + _mvPill('✓ ' + _mvN.pass + ' Pass · ' + _mvPct(_mvN.pass), '21,128,61', 'var(--green)',
+            'The live figure falls inside the published range. These are the rows this section can '
+            + 'actually stand behind.')
+        + _mvPill('— ' + _mvN.absent + ' not in database', '148,163,184', 'var(--muted)',
+            'These rows name a country ORCA holds no COUNTRY_DATA entry for, so there is no live '
+            + 'figure to grade and no Country Profile to open: '
+            + _mvRecs.filter(function(r) { return r.cls === 'absent'; }).map(function(r) { return r.label; }).join(', ')
+            + '. They are kept on screen rather than dropped, because a validation set listing '
+            + 'countries the database does not contain is a finding about the set.')
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:7px;">'
+        + '<strong style="color:var(--text);">' + _mvN.drift + ' of ' + _mvGraded + '</strong> rows were '
+        + 'written against a take this platform no longer computes, so the verdict above is not the one '
+        + 'this table reported before v1075 — it reported <strong style="color:var(--text);">'
+        + _mvRecs.length + ' of ' + _mvRecs.length + ' Pass</strong>, grading the frozen figure. '
+        + '<strong style="color:var(--text);">' + _mvN.loose + ' of ' + _mvRecs.length + '</strong> published '
+        + 'bands are wider than the ±3pp tolerance stated below, and <strong style="color:var(--text);">'
+        + _mvN.directional + '</strong> source notes call themselves <em>directional</em>. '
+        + 'Coverage is <strong style="color:var(--text);">' + _mvCovered + ' of ' + _mvAll.length
+        + '</strong> database countries, not all of them'
+        + (_mvN.dup ? ' (' + _mvN.dup + ' rows are a second entry for a country already listed under another spelling)' : '')
+        + '. Read a Fail as "this row’s published range and this platform’s current model disagree" — '
+        + 'which of the two is wrong is not settled here. Do not quote a Fail row’s take without '
+        + 'establishing the terms from the country’s own petroleum act.'
+        + '</div></div>';
+    }
+
     var rows = '';
-    Object.entries(BENCHMARKS).forEach(function([country, d]) {
-      var gap = d.platform < d.ref_lo ? d.ref_lo - d.platform : (d.platform > d.ref_hi ? d.platform - d.ref_hi : 0);
-      var inside = d.platform >= d.ref_lo && d.platform <= d.ref_hi;
-      var badge, color;
-      if (inside) {
-        badge = '✓ Pass'; color = 'var(--green)';
-      } else if (gap <= 3) {
-        badge = '⚠ Near'; color = 'var(--accent)';
+    _mvRecs.forEach(function(r) {
+      var d = r.d, badge, color;
+      if (r.cls === 'pass')      { badge = '✓ Pass'; color = 'var(--green)'; }
+      else if (r.cls === 'near') { badge = '⚠ Near<span style="display:block;font-size:10px;font-weight:600;">' + r.gap.toFixed(1) + 'pp out</span>'; color = 'var(--accent)'; }
+      else if (r.cls === 'fail') { badge = '✗ Fail<span style="display:block;font-size:10px;font-weight:600;">' + r.gap.toFixed(1) + 'pp out</span>'; color = 'var(--red)'; }
+      else                       { badge = '— ungraded'; color = 'var(--muted)'; }
+
+      // Country cell: the button opens the RESOLVED name, so the 4 aliased rows now work.
+      // Where the database holds no such country there is nothing to open, and the cell says so
+      // rather than offering a control that silently does nothing.
+      var cell;
+      if (r.live == null) {
+        cell = '<span style="font-weight:600;color:var(--muted);cursor:help;" title="'
+          + _mvAttr(r.label + ': this validation row names a country ORCA holds no entry for in '
+            + 'COUNTRY_DATA, so there is no platform take to grade it against and no Country Profile '
+            + 'to open. The published range and source note below are left as written.')
+          + '">' + r.label + '<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);">not in the 185</span></span>';
       } else {
-        badge = '✗ Fail'; color = 'var(--red)';
+        var _rEsc = r.resolved.replace(/'/g, "\\'");
+        cell = '<button onclick="var s=document.getElementById(\'dd-country-select\');if(s){s.value=\''
+          + _rEsc + '\';loadCountryProfile(\'' + _rEsc + '\');var btn=[...document.querySelectorAll(\'.tab-btn\')].find(b=>b.textContent.includes(\'Country Profile\'));if(btn)switchTab(\'t7\',btn);}"'
+          + ' style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:0;min-height:24px;text-align:left;text-decoration:underline dotted;"'
+          + ' title="' + _mvAttr('Open ' + r.resolved + ' Country Profile'
+            + (r.resolved !== r.label ? ' — this row is filed as “' + r.label + '”, which is not the name the database uses' : ''))
+          + '">' + r.label + '</button>'
+          + (r.resolved !== r.label
+              ? '<span style="display:block;font-size:10px;color:var(--muted);">→ ' + r.resolved + '</span>' : '')
+          + (r.dup
+              ? '<span style="display:block;font-size:10px;font-weight:700;color:var(--orange);" title="'
+                + _mvAttr(r.resolved + ' already has a row in this table under another spelling, so this is a '
+                  + 'second verdict on the same country, not an additional country validated.')
+                + '">2nd row for this country</span>' : '');
       }
-      var cEsc = country.replace(/'/g,"\\'");
+
+      // Platform cell: live on top because that is the number the analyst read elsewhere; the
+      // frozen figure and the gap underneath, because the gap is what makes the old verdict void.
+      var platCell;
+      if (r.live == null) {
+        platCell = '<span style="color:var(--muted);">—</span>'
+          + '<span style="display:block;font-size:10px;color:var(--muted);">written ' + d.platform.toFixed(1) + '%</span>';
+      } else {
+        platCell = '<strong>' + r.live.toFixed(1) + '%</strong>'
+          + '<span style="display:block;font-size:10px;color:' + (r.drift > 3 ? 'var(--orange)' : 'var(--muted)') + ';"'
+          + ' title="' + _mvAttr('This table was written with ' + d.platform.toFixed(1) + '% for '
+            + r.resolved + '. The platform now computes ' + r.live.toFixed(1) + '% at $75/bbl — the same '
+            + 'figure Fiscal Compare ranks on and the Country Profile headlines. The verdict grades the '
+            + 'live figure; the written one is kept so the drift is visible.')
+          + '">written ' + d.platform.toFixed(1) + '%'
+          + (r.drift > 0.05 ? ' · Δ ' + r.drift.toFixed(1) + 'pp' : ' · no drift') + '</span>';
+      }
+
+      var rangeCell = d.ref_lo + '–' + d.ref_hi + '%'
+        + (r.half > 3
+            ? '<span style="display:block;font-size:10px;color:var(--orange);cursor:help;" title="'
+              + _mvAttr('This band is ±' + r.half.toFixed(1) + 'pp wide, looser than the ±3pp tolerance '
+                + 'stated above the table, so it is an easier test than the one this section says it '
+                + 'applies. 184 of the 185 rows in this table are in this position; the median band is ±4.5pp.')
+              + '">±' + r.half.toFixed(1) + 'pp band</span>'
+            : '');
+
       rows += '<tr>'
-        + '<td style="font-weight:600;"><button onclick="var s=document.getElementById(\'dd-country-select\');if(s){s.value=\'' + cEsc + '\';loadCountryProfile(\'' + cEsc + '\');var btn=[...document.querySelectorAll(\'.tab-btn\')].find(b=>b.textContent.includes(\'Country Profile\'));if(btn)switchTab(\'t7\',btn);}" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:0;text-decoration:underline dotted;" title="Open ' + country + ' Country Profile">' + country + '</button></td>'
-        + '<td class="num">' + d.platform.toFixed(1) + '%</td>'
-        + '<td class="num">' + d.ref_lo + '–' + d.ref_hi + '%</td>'
+        + '<td style="font-weight:600;">' + cell + '</td>'
+        + '<td class="num">' + platCell + '</td>'
+        + '<td class="num">' + rangeCell + '</td>'
         + '<td class="num" style="color:' + color + ';font-weight:700;">' + badge + '</td>'
         + '<td style="font-size:12px;color:var(--muted);">' + d.note + '</td>'
         + '</tr>';
     });
     tbody.innerHTML = rows;
-  })();
+    return true;
+  }
+  window._mvRenderBenchmarks = renderBenchmarkTable;
+  // Try now (succeeds on a warm cache where the data beat this script), then poll until the
+  // async country_data.json load lands. initPlatform() also calls it directly; whichever wins,
+  // the other is a no-op because the second render is identical.
+  if (renderBenchmarkTable() !== true) {
+    var _mvTries = 0;
+    var _mvPoll = setInterval(function() {
+      if (renderBenchmarkTable() === true || ++_mvTries > 120) clearInterval(_mvPoll);
+    }, 250);
+  }
   </script>
 
   <!-- Section 6: Discount Rate Sensitivity -->
@@ -79603,6 +79815,9 @@ async function loadPlatformData() {
     initPlatform();
     // v530: label the Screener preset menu with each screen's live hit count. Runs once,
     // before the Screener is ever opened, and restores the default unfiltered state.
+    // v1075 (T6): the Model Validation table now grades each row against COUNTRY_DATA, so it
+    // has to render after the data lands rather than at parse time. See renderBenchmarkTable().
+    try { if (window._mvRenderBenchmarks) window._mvRenderBenchmarks(); } catch(e) { /* non-critical */ }
     try { _labelRegionControls(); } catch(e) { /* non-critical */ }
     try { _labelScreenerPresets(); } catch(e) { /* non-critical */ }
     // v662: the reform-record options carry their live size, so the analyst sees how far each
