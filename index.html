@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1076</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1077</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -60551,26 +60551,46 @@ function downloadTornadoPng(country) {
   // $75. It is now read from the state the chart itself recorded when it was built.
   var st = (window._TORN951 || {})[slug] || null;
   var P = st ? String(st.price) : ((typeof getPriceKey === 'function') ? (getPriceKey() || '75') : '75');
+  // ── v1077 (T2): and the PNG said it twice — "held at this country's modelled terms" and
+  // "run through this country's fiscal terms" — on the 4 countries where the engine holds none.
+  // The on-screen strip now names the template; the bitmap has to leave the building with the
+  // same statement on it, because this is the artefact that reaches the IC memo.
+  var _pTmpl = !!(st && st.tmpl), _pMono = !!(st && st.mono);
+  var _pMech = (st && st.tmplMech) || '';
+  var _pOwner = _pTmpl
+    ? 'the platform\u2019s generic ' + _pMech + ' template — NOT ' + (country || '') + '\u2019s terms, '
+      + 'which ORCA\u2019s engine does not hold for it'
+    : 'this country\u2019s fiscal terms';
+  var _pWithdraw = _pMono
+    ? ' NOT CITABLE FOR ' + String(country || '').toUpperCase() + ' — it is a state monopoly: the acreage is '
+      + 'closed to contractor entry and ORCA publishes no contractor NPV for it at any price. These bars are a '
+      + 'hypothetical opening of that acreage on template terms. Fiscal Compare, Side-by-Side and the Screener '
+      + 'all leave it unranked for the same reason.'
+    : _pTmpl
+      ? ' The ordering and magnitudes are a property of that template, not of ' + (country || '') + '.'
+      : '';
+
   var lines = [
     { bold: true, text: 'Fiscal sensitivity — ' + (country || '') + ' @$' + P + '/bbl. Each bar is the swing in '
-      + 'contractor NPV from moving ONE parameter with every other held at this country’s modelled terms'
-      + (st ? ', around a base case of ' + _tornAbs951(st.base) : '') + '.' },
+      + 'contractor NPV from moving ONE parameter with every other held at ' + _pOwner
+      + (st ? ', around a base case of ' + _tornAbs951(st.base) : '') + '.' + _pWithdraw },
     { bold: true, text: st
       ? 'Basis — one ' + st.profileName + (/project$/i.test(st.profileName) ? '' : ' project')
-        + ' run through this country’s fiscal terms: ' + st.terms
+        + ' run through ' + _pOwner + ': ' + st.terms
         + '. This is the Live DCF panel’s project, NOT the stored engine project behind the NPV this '
         + 'platform cites, ranks and exports ('
         + ((typeof ENGINE_BASIS !== 'undefined') ? ENGINE_BASIS.short : 'a different project')
         + '). The ranking of the bars is a property of THIS project, not of the country: a different '
         + 'capex/opex profile reorders them. Re-run it on your own assumptions in Scenario Builder '
         + 'before carrying the ordering into a recommendation.'
-      : 'Basis — one standardized project run through this country’s fiscal terms: '
+      : 'Basis — one standardized project run through ' + _pOwner + ': '
         + ((typeof _sbsBasisTerms === 'function') ? _sbsBasisTerms() : 'ORCA standardized reference project')
         + '. The ranking of the bars is a property of THIS project, not of the country.' },
     _orcaPngSourceLine()
   ];
   var n = _orcaSaveCaptionedPng(canvas,
-    'ORCA_sensitivity_' + slug + '_$' + P + '_' + _orcaPngDateStamp() + '.png', lines);
+    'ORCA_sensitivity_' + (_pMono ? 'TEMPLATE-not-' + slug : _pTmpl ? 'template_' + slug : slug)
+      + '_$' + P + '_' + _orcaPngDateStamp() + '.png', lines);  // v1077 (T2): legible from the filename alone
   if (n && typeof showCopyToast === 'function') showCopyToast('Saved ' + n);
 }
 
@@ -65753,13 +65773,47 @@ function _tornPaintBasis951(country, slug, profile, profileKey, basePrice, base,
   var pName = (bd && bd.profileName) || profile.name || 'Deepwater';
   var pWord = /project$/i.test(pName) ? '' : ' project';
 
+  // ── v1077 (T2) — whose terms the bars are actually computed on. ──────────────────────────
+  // This strip asserted "on <Country>'s fiscal terms" unconditionally, for every one of the 185.
+  // On 4 of them the engine holds no terms at all and the run is the platform's generic template
+  // -- and the Live DCF panel DIRECTLY ABOVE this strip already detects that and says so, in
+  // orange, naming the template. So on Saudi Arabia the page read: "no figure in it is citable
+  // for Saudi Arabia" (panel), then immediately "one Deepwater project on Saudi Arabia's fiscal
+  // terms", base case $4.26B, with a downloadable PNG beside it. The panel's withdrawal and the
+  // chart's claim came from the same template run.
+  // Provenance is read from _ldcfProvenance() -- the SAME call the panel above gates on -- so the
+  // two surfaces cannot drift apart again. The 181 countries on a record/db basis are untouched.
+  var _pv1077 = null;
+  try { _pv1077 = (typeof _ldcfProvenance === 'function') ? _ldcfProvenance(country) : null; } catch (e) {}
+  var _tmpl1077 = !!(_pv1077 && _pv1077.generic);          // engine holds nothing for this country
+  var _mono1077 = !!(_pv1077 && _pv1077.monopoly);         // ...and the acreage is closed as well
+  var _tMech1077 = (_pv1077 && _pv1077.mechanic) || '';
+
+  // The price stays attached to the project, and the template disclaimer is its own sentence --
+  // folding it into the "on X's terms at $Y/bbl" clause made the price modify the wrong noun.
+  var _termsOwner1077 = _tmpl1077
+    ? 'the platform\u2019s generic <strong style="color:var(--orange);">' + _tMech1077
+      + '</strong> template'
+    : country + '\u2019s fiscal terms';
+
   var html =
     '<div style="font-size:11px;color:var(--text);line-height:1.5;">'
       + '<strong style="color:var(--text);">Base case ' + _tornAbs951(base) + '</strong>'
       + ' — one <strong style="color:var(--text);">' + pName + '</strong>' + pWord + ' on '
-      + country + '’s fiscal terms at <strong style="color:var(--text);">$' + basePrice
+      + _termsOwner1077 + ' at <strong style="color:var(--text);">$' + basePrice
       + '/bbl</strong>, the two settings in the Live DCF panel above. Move either and every bar '
       + 'below moves with it.'
+      + (_tmpl1077
+          ? ' <strong style="color:var(--orange);">These are not ' + country + '\u2019s terms.</strong> '
+            + 'ORCA\u2019s engine holds no ' + _tMech1077 + ' parameters for ' + country
+            + ', so the run falls to the template, and the ordering and magnitudes below are a '
+            + 'property of that template rather than of ' + country + '.'
+          : '')
+      + (_mono1077
+          ? ' <strong style="color:var(--orange);">' + country + ' is also a state monopoly</strong> \u2014 '
+            + 'the acreage is closed to contractor entry, so these bars describe a hypothetical '
+            + 'opening of it on those template terms. Not one of them is citable for ' + country + '.'
+          : '')
     + '</div>'
     + (terms ? '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:2px;">Chart basis: '
         + terms + '.</div>' : '');
@@ -65775,7 +65829,31 @@ function _tornPaintBasis951(country, slug, profile, profileKey, basePrice, base,
   var cited50 = d ? Number(d.npv_50) : NaN;
   var oilRow = (vars || []).filter(function (v) { return /Oil Price/.test(v.label); })[0];
 
-  if (isFinite(cited) && basePrice === 75) {
+  // ── v1077 (T2) — a state monopoly's $0M is an ABSENT contractor NPV, not a positive one. ──
+  // The flip test below is `(oilRow.low >= 0) !== (cited50 >= 0)`. On a monopoly cited50 is 0,
+  // the placeholder the DCF solver writes when there is no contractor cash flow to model, so
+  // `cited50 >= 0` is TRUE, the chart's +$2.10B is TRUE, no flip is detected, and the strip
+  // printed: "At $50/bbl both land on the same side of zero -- $2.10B on this chart against the
+  // $0M this page publishes -- so the downside verdict holds on either project." That reconciles
+  // a withdrawn number against a modelled one and reports agreement, then issues a favourable
+  // downside verdict, for a country with no contractor position at any price. It is the single
+  // worst sentence on this page: it is exactly what a T2 analyst is on this page to find.
+  // Reconciliation is therefore refused outright where there is nothing to reconcile to.
+  if (_mono1077 && basePrice === 75) {
+    html += '<div style="margin-top:6px;padding:7px 10px;border:1px solid rgba(194,65,12,.3);'
+      + 'background:rgba(194,65,12,.06);border-radius:5px;font-size:11px;color:var(--text);line-height:1.5;">'
+      + '<strong style="color:var(--orange);">Nothing to reconcile this chart to.</strong> '
+      + 'ORCA publishes no contractor NPV for ' + country + ' at any price. The $0M this page shows '
+      + 'at $75 and at $50 is the placeholder the DCF solver writes for &ldquo;no contractor position&rdquo; '
+      + '\u2014 an absent number, not a zero one \u2014 so it cannot be read as agreeing or disagreeing with '
+      + 'the ' + _tornAbs951(base) + ' above'
+      + ((oilRow && isFinite(oilRow.low)) ? ' or the ' + _tornAbs951(oilRow.low) + ' this chart reaches at $50/bbl' : '')
+      + '. This chart carries <strong>no downside verdict for ' + country + '</strong>: a $25/bbl break '
+      + 'cannot be survived or failed by a position that does not exist. What is real on this page is the '
+      + 'published terms \u2014 contract count, mechanic, evidence tier \u2014 and Fiscal Compare, '
+      + 'Side-by-Side and the Screener all leave ' + country + ' unranked for the same reason.'
+      + '</div>';
+  } else if (isFinite(cited) && basePrice === 75) {
     var gap = base - cited;
     var ratio = (Math.abs(cited) > 1) ? (base / cited) : null;
     // Only state a multiple when it is one: 713 against 745 rounds to "1.0x smaller", which
@@ -65828,7 +65906,8 @@ function _tornPaintBasis951(country, slug, profile, profileKey, basePrice, base,
 
   // The PNG that leaves the tool has to carry the project it was actually run on.
   window._TORN951 = window._TORN951 || {};
-  window._TORN951[slug] = { base: base, price: basePrice, profileName: pName, terms: terms, country: country };
+  window._TORN951[slug] = { base: base, price: basePrice, profileName: pName, terms: terms, country: country,
+                            tmpl: _tmpl1077, mono: _mono1077, tmplMech: _tMech1077 };  // v1077 (T2): travels into the PNG
 }
 
 
