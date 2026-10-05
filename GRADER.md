@@ -75036,3 +75036,16 @@ Angola at rank 12 — a list an analyst could reasonably have carried into a scr
 as their African shortlist. And in the other direction, a screen that keeps a filter now says
 so, so the analyst who comes back to a loaded preset ten minutes later is never looking at a
 one-country result without being told which scope produced it.
+
+---
+## Cycle 1031 Log — 2026-10-05 01:16
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Both commits pushed, mirror synced.
+
+## Cycle 1031 — v1074
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* Stalest in rotation (1030 was T5, 1029 T4, 1028 T2, 1027 T3, 1024 T6; T1 last ran at 1023).
+
+**Friction:** `applyScreenerPreset()` (`index.html` ~37144) set `#sc-region = ''` inside its "Reset all to defaults first" block for *every* preset — only `pscafrica` put one back. Walked cold at 1440×900: an analyst with a regional mandate opens Advanced
