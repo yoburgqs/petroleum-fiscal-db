@@ -74346,3 +74346,152 @@ two sections away.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (last cycle was T1)
 
 **Friction.** I walked T6 cold at 1440×900 and 390×844 with touch, storage cleared before each pass. Most of the T6 surface is genuinely finished — the per-term Evidence Chain answers it completely (I checked the hard cases: Vanuatu, Tuvalu, Russia), and all five exports fire, parse, and carry their own sourcing and comparability blocks.
+
+---
+## Cycle 1027 — v1070
+
+**Task:** T3 — "How do these three countries compare side by side?" (last cycle was T4;
+T3 last run at cycle 1021.)
+
+**Also landed this cycle:** cycle 1026's T4 work, which was complete in the working tree but
+timed out before it could commit. `_rrVerdictPayload()` read `root.children[0]` as the title;
+that is the heading div only on the dropdown path, so on every drill-in path the bold first
+line of the pasted reform verdict was `← Home` / `← Fiscal Compare` / `← Side-by-Side` and the
+jurisdiction was not named until ~char 1,600, mid-caveat. Verified on the local tree before
+committing: drill-in title now reads `Nigeria — reform exposure` on all four countries tested,
+dropdown path unchanged, 5 metrics and the event log intact. Committed as `20f6213`.
+
+### Friction
+
+Walked T3 cold at 1440x900 and 390x844 `hasTouch`, both storages cleared before each pass, and
+deliberately used the analyst's OWN trio rather than the seeded UK/Norway/Nigeria example.
+
+Most of this surface is genuinely finished, and I checked the hard cases rather than assuming:
+mixed-basis sets (Angola prod-wtd + Ghana/Mozambique proxy) refuse to rank across the basis and
+offer `sbsKeepBasis()` as a working escape hatch — clicking it really does reduce the set to
+`["Ghana","Mozambique"]` and rewrite the hash to `#/compare/ghana+mozambique`. Fee-basis columns
+re-base correctly (Iraq ranked at 34.1% PSC/Conc, not the published 84.8%). All three deep links
+restore. The `fcOpenSbs()` handoff from Fiscal Compare carries the ticked rows and the deck.
+Both charts render with statutory columns dashed and hollow at both viewports. No page errors.
+
+The friction is at the very first interaction, in the search box — `#cmp-search`, placeholder
+**"Type a country, press Enter…"**, handler at the `keydown`/`Enter` branch below
+`_cmpRenderDrop()`.
+
+A three-country comparison is three names typed fast with Enter after each. That is what the
+placeholder instructs. On a **typo**, the substring match in `_cmpRenderDrop()` returns nothing
+and the function falls through to the Levenshtein `_cmpFuzzy()` "Did you mean?" branch — which
+fills `_cmpOpts` **exactly as the real-match branch does**, and then hits the shared line
+
+    _cmpFocus = _cmpOpts.length ? 0 : -1;
+
+so Enter was pre-armed on a *guess* with the same confidence as on an exact match. Enter then
+committed a country the analyst had never typed: `_cmpPick()` cleared the input, closed the
+list, and **said nothing**. A new column simply appeared in the grid.
+
+Measured on the live build: typing `narnia` put **Armenia** into the comparison — 16.1% take,
+low enough to take first place in `GOVT TAKE @$75, LOWEST FIRST`, which is the one line the
+analyst reads and the one the IC-memo paste carries. The headline of their comparison would have
+named a jurisdiction that entered by typo.
+
+The asymmetry is the point: every other refusal on this tab announces itself — v501 wrote
+*"a refusal is always announced instead of being a silent no-op"*, and `addToCompare()` toasts
+the example clear, the already-present case and the cap. This was the one path that
+**substituted** rather than refused, and the only one that said nothing at all.
+
+### Measured before changing anything
+
+Blocking Enter on the fuzzy branch was the obvious fix and would have been wrong. Against 25
+plausible misspellings of real petroleum jurisdictions, `_cmpFuzzy()` is good:
+
+| typed | commits | margin over runner-up | right? |
+|---|---|---|---|
+| `kazakstan` | Kazakhstan 0.90 | 0.30 | yes |
+| `turkmenistn` | Turkmenistan 0.92 | single | yes |
+| `mozambiqe` | Mozambique 0.90 | 0.34 | yes |
+| `azerbijan` | Azerbaijan 0.90 | 0.34 | yes |
+| `indonesa` | Indonesia 0.89 | 0.29 | yes |
+| `columbia` | Colombia 0.88 | single | yes |
+| `guyanna` / `angolla` / `algeia` / `vietnem` / `norwey` / `brasil` / `qatarr` | correct | 0.23–0.29 | yes |
+| `ecaudor` | Ecuador 0.71 | single | yes |
+| **`nigera`** | **Nigeria 0.86** | **0.03** (Niger 0.83) | coin flip |
+| **`lybia`** | **Libya 0.60** | **0.00** (Syria 0.60) | coin flip |
+| **`narnia`** | **Armenia 0.57** | **0.00** (Namibia 0.57) | **no** |
+
+22 of 25 resolve with a clear margin. The three that do not are **ties**, where array sort
+order — not the query — picked the winner. `nigera` is the expensive one: Nigeria is
+production-weighted at 81.1% and Niger is a statutory proxy, so the two do not even rank
+against each other, and a silent pick between them changes what the verdict strip is allowed
+to say.
+
+### Change
+
+Three things, all in the `#cmp-search` picker. Behaviour, not text.
+
+1. **Every fuzzy substitution is now announced.** New `_cmpFzTop` / `_cmpFzAlt` / `_cmpFzTie`
+   state, non-null only while the open list is a guess list — captured in the Enter handler
+   *before* `_cmpPick()`, which runs `_cmpCloseDrop()` and clears it. On commit:
+   `Nothing is spelled "Kazakstan" — added Kazakhstan, the closest match; next closest was
+   Tajikistan. Wrong country? ✕ on its chip drops it.` (6s hold.) The fast path is unchanged.
+   It is no longer silent, and the recovery route — the ✕ already on every chip — is named.
+2. **Enter is not pre-armed on a tie.** `_cmpFocus = (_cmpOpts.length && !_cmpFzTie) ? 0 : -1`,
+   with `CMP_FZ_MARGIN = 0.05` — chosen off the table above, so it disarms exactly `lybia`,
+   `narnia` and `nigera` and leaves the other 22 on the fast path. Enter adds nothing and says
+   why. `↓`-then-Enter, hover-then-Enter, and click all still commit, so the explicit route
+   costs one keystroke.
+3. **The "Did you mean?" header now names the stake.** It said only `Did you mean?` — correct
+   as a question, but this is the one list on the tab where the row Enter commits is spelled
+   differently from what is in the box, so the header was the only place that could report
+   which way the guess went. Now `Did you mean? — nothing is spelled "kazakstan"; Enter adds
+   Kazakhstan.` or, on a tie, `Did you mean? — Nigeria and Niger are too close to call on
+   "nigera", so Enter adds nothing. Pick one.` Named top-then-alt so the sentence reads in the
+   same order as the rows beneath it, and "too close to call" rather than "the same distance"
+   because the margin also catches the 0.03 near-tie.
+
+### Verified, after
+
+| typed | header | Enter armed | result | announced |
+|---|---|---|---|---|
+| `Kazakstan` | `…Enter adds Kazakhstan.` | yes (`focus=0`) | Kazakhstan added | yes |
+| `Narnia` | `Armenia and Namibia are too close to call…` | **no** (`focus=-1`) | **nothing added**, box keeps `Narnia` | yes |
+| `Nigera` | `Nigeria and Niger are too close to call…` | **no** | **nothing added** | yes |
+| `Lybia` | `Libya and Syria are too close to call…` | **no** | **nothing added** | yes |
+| `Zach` | `No country matches "zach"…` | no | nothing added | unchanged |
+| `Guyana` | (no header — real match) | yes | Guyana added | no toast — nothing was substituted |
+| `Narnia` + `↓` + Enter | tie header | explicit | Armenia added | yes |
+
+### Not done, deliberately
+
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation re-wording,
+no tab-order change. Nothing in STILL LOCKED is touched — the v612 mobile layer and
+`#reference-panel` are not in this code path, and the verdict strip, the basis gate, the
+`take_asc` default order and the v908 select are all unchanged. The version badge went v1069 →
+v1070 silently at the end and is not an improvement.
+
+### Mobile
+
+390x844 `hasTouch`, storage cleared, all three typo classes: `scrollWidth 390 = clientWidth`
+every time. Dropdown right edge 354 against a 390 viewport; the longer header wraps to two
+lines at 42px rather than widening the panel; option rows 34px, above the 24px floor. Tapping a
+guess row commits and announces, same as click. Zero page errors.
+
+### Verification
+
+- JS syntax gate: **PASS** (all 11 inline script blocks extracted, `node --check`).
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`, the copy the
+  cycle actually grades) **RUN this cycle** against the local tree:
+  **550 PASS / 0 FAIL / 1 WARN**. The single WARN and all 15 captured JS errors are
+  `[ConsoleErrors]` for the service worker registered at the hardcoded
+  `/petroleum-fiscal-db/sw.js` Pages path, which 404s when the tree is served from repo root —
+  confirmed by `curl` returning 200 for `/sw.js` and 404 for the Pages path. Against the live
+  URL that check passes, which reconciles to the 551 PASS baseline exactly.
+
+### Result
+
+An analyst typing three country names fast can no longer end up comparing a country they never
+named. A mistyped name that ORCA can resolve confidently still resolves on one keystroke, but
+now says so and names the runner-up and the way out. A mistyped name where the top two guesses
+are a coin flip — `nigera` between Nigeria and Niger, which are not even on the same basis —
+stops and asks instead of picking, so the jurisdiction in the comparison is always one the
+analyst chose. And the `GOVT TAKE @$75, LOWEST FIRST` headline, which is the line that gets
+pasted into the memo, can no longer be led by a column that entered the set by accident.
