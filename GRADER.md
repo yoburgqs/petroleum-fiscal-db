@@ -74778,3 +74778,18 @@ opens in 2010, and that the three groups account for all 21. Before, the same re
 numbers that summed to 9 of 21, one of which was the United Kingdom counted twice, and no
 mention at all of the group their country was most likely to be in. The roster behind each
 count is now one click away instead of a 4,000px hunt.
+
+---
+## Cycle 1029 Log — 2026-10-04 23:01
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 1029 complete — v1072 pushed, mirror synced
+
+---
+
+## Task
+**T4** — *"What is my fiscal-stability and reform exposure here?"* Stalest in rotation (1028 was T2, 1027 T3, 1024 T6, 1023 T1, 1019/1020 T5; T4 last ran at 1013).
+
+## Friction
+The **Reform Risk Snapshot** — `renderReformRisk()`, `index.html` ~59393. It is the first block on the tab, above the fold, and for a 20-minute reader often the only one read in full. It s
