@@ -75049,3 +75049,167 @@ one-country result without being told which scope produced it.
 **Task:** T1 — *"Which countries should even be on my screening list?"* Stalest in rotation (1030 was T5, 1029 T4, 1028 T2, 1027 T3, 1024 T6; T1 last ran at 1023).
 
 **Friction:** `applyScreenerPreset()` (`index.html` ~37144) set `#sc-region = ''` inside its "Reset all to defaults first" block for *every* preset — only `pscafrica` put one back. Walked cold at 1440×900: an analyst with a regional mandate opens Advanced
+
+---
+## Cycle 1032 Log — 2026-10-05 (v1075)
+- Test before: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 551 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RUN this cycle, read from its own TOTAL line)
+
+## Task
+**T6** — *"Where did this number come from and how solid is the evidence?"* Stalest in
+rotation (1031 was T1, 1030 T5, 1029 T4, 1028 T2, 1027 T3; T6 last ran at 1024). Walked cold
+at 1440×900 and 390×844 with both storages cleared, served under the real
+`/petroleum-fiscal-db/` path prefix per the cycle 1030 harness note.
+
+## Friction
+**Methodology → `#meth-validation`, "Model Validation — Regression Benchmarks".** The one
+section on the platform whose entire job is to answer T6 led with *"185 benchmark countries
+validated against published reference ranges — representing 100% of the 185-country database"*
+over a table of 185 rows, **every single one of which read `✓ Pass`**. Nothing Near, nothing
+Fail, no row the analyst was warned about.
+
+A table that cannot fail carries no information. `renderBenchmarkTable()` (`index.html` ~5374)
+graded `d.platform` — a **hard-coded literal frozen when each row was written, v90 to v177** —
+against a `ref_lo`/`ref_hi` band also written at the same time. It never read the engine.
+Regraded against live `COUNTRY_DATA.take_75`, the figure Fiscal Compare ranks on and the
+Country Profile headlines:
+
+| measure | the table reported | measured live |
+|---|---|---|
+| verdict | **185 Pass / 0 Near / 0 Fail** | **45 Pass / 8 Near / 122 Fail / 10 ungradable** |
+| rows whose frozen figure still matches the platform | implied all | **24 of 175** (151 have drifted) |
+| rows resolvable to a database country | "100% of the 185-country database" | **175 of 185** |
+| distinct database countries actually covered | 185 | **171 of 185** (4 rows are a 2nd entry under another spelling) |
+| bands within the stated ±3pp tolerance | "Why ±3pp?" | **1 of 185** (median ±4.5pp, max ±5.5pp) |
+
+Worst drifts: **Tajikistan written 66.4%, platform shows 16.9% (Δ49.5pp)** · Syria 71.6 → 27.6
+· Bahrain 58.4 → 100.0 · Djibouti 63.8 → 24.1 · Mexico 61.4 → 32.2 · Russia 72.6 → 46.4.
+So every `Pass` graded a number appearing **nowhere else on the platform**.
+
+Three further findings from the same walk, all on screen and all previously silent:
+
+1. **Ten rows name a country this database does not contain at all** — Seychelles, Kosovo,
+   Iceland, Lesotho, Comoros, Estonia, Latvia, Finland, Maldives, Mauritius. Four more are a
+   duplicate row for a country already in the table under a different spelling: `UK`,
+   `Iraq (KRG)`, `Republic of Congo`, `Republic of Guinea`. So the "100% of the 185-country
+   database" claim is arithmetically impossible. The row's Country button made the same
+   mistake reachable — it called `loadCountryProfile('UK')`, and `COUNTRY_DATA` has no such
+   entry, so on **14 rows the one control that would let the analyst go and check did nothing.**
+   `UK` and `United Kingdom` also carry two *different* published ranges (48–58% and 44–54%)
+   for the same jurisdiction, both Pass.
+2. **184 of 185 bands are looser than the tolerance the page states.** The paragraph directly
+   above the table explains *"Why ±3pp? This is the cross-country comparison tolerance used by
+   Wood Mackenzie and Rystad Energy"* — and then applies ±4.5pp median. The stated test is
+   stricter than the test performed.
+3. **52 source notes describe themselves as "directional"**, 40 record no commercial
+   production, and 3 state outright that the range was *"calibrated against"* ORCA's own
+   neighbouring estimates (Samoa against Fiji / Solomon Islands / Cook Islands, etc.). A band
+   drawn around the answer does not test the answer.
+
+This is the give-up point inverted, and worse for it: the analyst does not stop and squint,
+they **stop asking**. Everything careful the platform does elsewhere — LINK DEAD chips,
+`N of M terms cited`, the engine-override warning, the C/D tier rule — is undone by one
+headline on the provenance page saying everything checks out.
+
+## Change
+**The verdict is computed from the live engine.**
+
+- The **Platform @$75** column leads with the take the platform shows *today*, with the
+  written figure and the drift beneath it (`16.9%` / `written 66.4% · Δ 49.5pp`), the delta
+  turning orange past 3pp. Same column count, so nothing widened on a phone.
+- A **verdict strip** (`#mv-verdict`) above the table carries four pills — Fail / Near / Pass /
+  not-in-database — plus coverage, the drift count, the loose-band count and the directional
+  count. **Every number is counted off the rows rendered underneath it**, so the headline
+  cannot drift from the table again, and it names what it replaced (`it reported 185 of 185
+  Pass, grading the frozen figure`).
+- **Rows are ordered worst first**, the ordering the Country Profile's Evidence Chain findings
+  block already uses. The 122 failures now lead; previously they sat behind twelve reassuring
+  rows of Norway / UK / Angola / Nigeria.
+- **Aliased rows resolve** (`_MV_ALIAS`) so their Country button opens the real profile and
+  shows `→ United Kingdom`; they are marked `2nd row for this country`. Rows naming a country
+  outside the 185 read `not in the 185`, verdict `— ungraded`, and offer **no dead control**.
+- Bands wider than ±3pp print their half-width (`±4.5pp band`) on the range cell.
+- The render moved off parse-time. It was an IIFE running ~19,000 lines before
+  `let COUNTRY_DATA = null` is declared — harmless while it graded its own literal, fatal now
+  that it reads the engine. It is a named function called from the post-load hook beside
+  `_labelRegionControls()`, with a 250ms poll as a fallback, and returns `false` rather than
+  painting 185 ungraded rows if the data is not there.
+- The adjacent **Known Model Limitations** claim — *"The following countries are excluded from
+  the validation table above"* — was false for all five it names (Russia, Indonesia,
+  Kazakhstan, Azerbaijan, Nigeria are all in the table, all previously Pass). Corrected, and it
+  now says the hand-written estimates in that block are not re-read from the engine and the
+  table above wins. Russia and Indonesia read **Fail** there now.
+
+`BENCHMARKS` is left **byte-for-byte as written** — the drift is itself the finding — and every
+published range and source note still renders in full. Nothing is deleted.
+
+## Walked, found working, not touched
+The whole T6 click-through layer, which is in good shape and needed nothing: the
+`N of M terms cited` chip handoff to the Country Profile Evidence Chain from **all five**
+surfaces — Fiscal Compare, Explorer, Screener, IOC Portfolio and the Side-by-Side evidence
+floor line — each landing with the right country selected and the Evidence Chain heading at
+`top:15px` (measured). Country Profile's four headline chips (`3 of 4 model terms cited`,
+`⚠ engine ran 3 other rates`, `no source behind the model opens`, `81.1% govt take @$75
+sources ↓`). The Evidence Chain itself on Nigeria — 7 parameters split above/below the
+model-reads divider, `LINK DEAD` and `INDEX ONLY` chips, `⌕ find document` reroutes, and
+`4 FINDINGS · WORST FIRST` naming the engine override that runs royalty 5% / CIT 30% /
+SPT 50% against a statute stating 20% / 65.75% / 30%. The Cost Profile Assumptions block and
+its explicit reconciliation of the two profiles both named "Deepwater". Home's `Sourcing
+A 28 · B 79 · C 43 · D 35` strip and `393 of 802 model terms cited`. The Breakeven Map's
+"coverage is 67 of 185, and that axis does not rank them" framing.
+
+**One thing I read wrong mid-walk and corrected:** the IOC Portfolio rendered its terms chip
+on only 18 of Shell's 37 rows, blank on the rest — including Iraq (D, 98.5% take), Russia (D)
+and Oman (−$1.80B). I read that as a lost T6 control. It is not: `_iocHydrateTermChipsIn()`
+hydrates lazily off an IntersectionObserver rooted on the inner `.tbl-wrap`, and all 37 fill
+on scroll (measured 18 → 37). My harness had simply never scrolled. The product was right and
+the test was wrong — the same mistake cycle 1030 recorded, so it is worth stating twice.
+
+## Not done, deliberately
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation
+re-wording, no tab-order change, no rubric work. Nothing in STILL LOCKED is touched: the v612
+mobile layer and `#reference-panel` are not in this code path; the v451 two-zone CP headline
+and removed Govt NPV column, the v449 tier colouring, the v430 FC guide, the v371/v373
+declutter and the v489 Reform Risk card are all unchanged. The version badge went v1074 →
+v1075 at one location at the end and is not an improvement.
+
+**Noted, not fixed —** the five hand-written platform estimates inside *Known Model
+Limitations* are still hand-written. Russia's reads "Platform estimate: 23.4%" against the
+table's live 46.4% and its own frozen 72.6% — three figures for one country's take on one
+page. They are now explicitly labelled as not engine-read and deferred to the table, but the
+right fix is to compute them, which is a second change to a second surface. **Also**: the
+`ref_lo`/`ref_hi` bands themselves remain as written. Re-deriving 185 published ranges is
+sourcing work, not a UX cycle, and inventing tighter bands to make the table pass would be
+the exact defect this cycle removed.
+
+## Mobile
+390 × 844 `hasTouch: true`, storage cleared. `scrollWidth 390 = clientWidth 390` on
+Methodology before and after the strip renders. Strip measures 336 × 319; **all 4 pills render
+exactly 24px** and **all 175 country buttons 24px** under `pointer: coarse` (`min-height:24px`
+added to the button, which previously had none). Zero page errors. The strip wraps rather than
+scrolls (`flex-wrap:wrap`), and no column was added to the table.
+
+## Verification
+- JS syntax gate: **PASS** — all 11 inline script blocks extracted, `node --check`, run after
+  each of the four patches and again after the version bump.
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Reconciles to the 551 baseline exactly.
+- Horizontal scroll swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs:
+  **0 overflowing screens**, 0 console and 0 page errors at every viewport.
+- Aliased Country button re-tested end to end: clicking `UK` now lands on Country Profile with
+  `dd-country-select = "United Kingdom"`. Before the patch it called
+  `loadCountryProfile('UK')` and went nowhere.
+- Strip figures cross-checked against an independent measurement harness run before the patch
+  (45 / 8 / 122 / 10, 151 drifted, 171 covered, 184 loose) — the rendered strip reproduces all
+  seven counts.
+
+## Result
+An analyst who opens Methodology to defend a figure to an investment committee is now told,
+in the first screenful, that **122 of 175 benchmark rows disagree with their own published
+reference range**, that the table reaches **171 of 185** countries rather than all of them, and
+that **151 rows were written against a take this platform no longer computes** — Tajikistan at
+16.9% where the row says 66.4%. The 45 rows that do hold are named and reachable: Norway, USA,
+Venezuela, the United Kingdom. Before, the same page reported 185 of 185 Pass and 100%
+coverage, and the analyst's rational response was to stop asking — which is the worst possible
+outcome for the one surface on the platform built to answer "how solid is this?"
