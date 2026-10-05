@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1077</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1080</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -6184,22 +6184,42 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         A18. How do I interpret the Fiscal Reform Risk and Stability Score when comparing regimes?
       </div>
       <div class="meth-faq-a" id="faq-a18-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
-        The <strong style="color:var(--text);">Fiscal Predictability Score</strong> (0–100, shown in Explorer and Country Profile) combines three signals: reform frequency, reform direction (tightening vs. liberalizing), and IQR (within-country take variation across contract vintages). A higher score means more predictable terms — the government has historically changed rates rarely and within a narrow band.<br><br>
-        <strong style="color:var(--text);">Score interpretation guide:</strong>
-        <ul style="margin:8px 0 8px 20px;list-style:disc;">
-          <li><strong style="color:var(--text);">80–100 (green):</strong> Highly stable. Fewer than 2 reform events per decade, take variation &lt;10pp across vintages. Suitable for long-plateau projects with 15+ year capital commitment (e.g. Norway at 96, UAE at 91).</li>
-          <li><strong style="color:var(--text);">60–79 (amber):</strong> Moderate stability. Some reform activity but terms broadly consistent. Flag for scenario analysis: model a 5pp take increase as a downside case for capital allocation.</li>
-          <li><strong style="color:var(--text);">40–59 (orange):</strong> Elevated reform risk. Multiple reforms in the last decade, often in one direction (tightening). Use Scenario Builder to stress-test take at +10pp; verify that IRR still clears your hurdle at the stressed case.</li>
-          <li><strong style="color:var(--text);">0–39 (red):</strong> High reform risk. Regime has seen material tightening or reversals. Include a reform risk premium in your discount rate (recommended: +150–200bp above base). Do not rely on current take as indicative of terms at project peak production.</li>
-        </ul>
-        <strong style="color:var(--text);">Reform Risk tab workflow:</strong> Filter by country to see the full reform timeline — direction badges (Tightening / Liberalizing) and rate change columns show what changed and by how much. Cross-reference with the Stability Score: a country with 10 reform events that are all small and bidirectional may score higher than one with 3 large unidirectional tightenings.<br><br>
+        <!-- v1078 (T4): A18 is the only place on the platform that explains how to read the two stability
+             scores together, and it is titled with the T4 question verbatim. Walked T4 cold and measured it
+             against the live engine: every number and every causal claim in the old body was wrong.
+               * "combines three signals: reform frequency, reform direction, and IQR" — the score reads
+                 NONE of reform frequency or direction. getFiscalPredictabilityScore() charges three
+                 penalties: within-country IQR (−40), price swing $50→$125 (−30), mechanics beyond one
+                 (−8 each). Telling an analyst that reform exposure is already inside the predictability
+                 score is the one error that makes them NOT carry the WACC premium this tab exists to set.
+               * bands given as 80/60/40; _fpBandLabel() cuts at 75/60/45.
+               * "80–100 (green) ... e.g. Norway at 96, UAE at 91" — Norway scores 76 and UAE 90, both
+                 one-term and therefore UNGRADED and uncoloured on every rendered surface since v624; 91 is
+                 the USA. And among the 28 countries this column actually grades, the HIGH band is EMPTY —
+                 the ceiling is Turkmenistan at 74. The old guide handed the analyst a green band no graded
+                 score can reach, anchored on two numbers the platform does not print.
+               * "a country with 10 reform events that are all small and bidirectional may score higher than
+                 one with 3 large unidirectional tightenings" — exactly inverted. Reform Frequency Score is
+                 max(0, 100 − 15 × count), strictly decreasing in count and blind to magnitude: 10 changes
+                 scores 0, Brazil’s 3 scores 55. The highest count on file is 5 (United Kingdom).
+               * "direction badges (Tightening / Liberalizing)" — replaced at v585 by four states
+                 (↑ raised / ↓ cut / ? unmeasured / · context).
+             The guide is no longer typed. #faq-a18-live is BUILT from _fpBandLabel(), _fpCohortStats() and
+             REFORM_HISTORY at expand time, so the cut points, the band populations, the graded ceiling and
+             the count→score mapping are the same objects the badges render from and cannot drift again. -->
+        There are <strong style="color:var(--text);">two separate scores</strong> here and they share no inputs. The <strong style="color:var(--text);">Fiscal Predictability Score</strong> (0–100, shown in Explorer, Fiscal Compare, Country Profile and Side-by-Side) is built from this country’s own <em>contract set</em>: within-country take spread (IQR, up to −40 pts), take movement between $50 and $125/bbl (up to −30), and fiscal mechanics in force beyond the first (−8 each). The <strong style="color:var(--text);">Reform Frequency Score</strong> (0–100, on the Reform Risk tab) is built from the <em>legislative record</em>: 100 − 15 × sourced fiscal law changes since 2010.<br><br>
+        <strong style="color:var(--orange);">Reform frequency and reform direction are not inputs to the Fiscal Predictability Score.</strong> It measures how consistent the terms are across blocks and prices, never how often the law changed. So a high predictability reading is not a reform finding and does not price reform exposure — the WACC premium on the Reform Risk tab is a separate charge, and adding it is not double-counting. Conversely a reform premium does not cover block-to-block dispersion. You need both readings, and the lookup on the Reform Risk tab returns them side by side for one country.<br><br>
+        <div id="faq-a18-live" data-a18-state="pending" style="margin:10px 0 4px;"><div style="font-size:12px;color:var(--muted);">Reading the live score tables…</div></div>
+        <strong style="color:var(--text);">Reform Risk tab workflow:</strong> Open <strong>Reform Risk</strong> and use <em>Check one country</em>. The card returns the <strong>IC action</strong> line — which of the cases above applies and what premium to carry — then the score with its rank, the reforms-since-2010 count, the direction split, the predictability score with any ceiling correction, and the full sourced event log marked for whether each event scored. <em>⎘ Copy for IC Memo</em> pastes all of it as a table. <strong style="color:var(--orange);">Quote the IC action, not the score.</strong> The score is a count: it cannot tell you a +15pp windfall tax from a 1pp administrative tweak, and the IC action line is the only place the magnitude is read. For the 164 jurisdictions with no sourced log the card prints the statute ORCA read the terms from and says plainly that the record is unchecked — which is the correct memo line, not a premium of zero.<br><br>
         <strong style="color:var(--text);">Common analyst errors:</strong>
         <ul style="margin:8px 0 8px 20px;list-style:disc;">
-          <li>Treating a current low take as locked-in for a 20-year project. Low take + low Stability Score = the government has historically recaptured upside when prices rise. Nigeria (PIA 2021) and Angola (2020 PSC reform) are recent examples.</li>
-          <li>Ignoring IQR when comparing similar average takes. Iraq average ~84.8% masks TSC vs. PSC block variation of 20+pp — the average is not representative of any single contract.</li>
+          <li><strong style="color:var(--text);">Reading a high predictability score as a stable legislative record.</strong> Nigeria prints 73 · MODERATE and has had its fiscal law rewritten twice since 2010 (PIA 2021, implementation 2022). The two scores can point opposite ways on the same country, and neither is a correction of the other.</li>
+          <li><strong style="color:var(--text);">Reading a near-100 Reform Frequency Score as a track record.</strong> It usually means ORCA holds no sourced log at all (164 of 185), or that the country’s last take rise predates the 2010 window. The lookup card names which of the two it is.</li>
+          <li>Treating a current low take as locked-in for a 20-year project. Low take + a take-raising event on record = the government has historically recaptured upside when prices rise. Nigeria (PIA 2021) and Angola (2020 PSC reform) are recent examples.</li>
+          <li>Ignoring IQR when comparing similar average takes. Iraq average ~84.8% masks TSC vs. PSC block variation of 20+pp — the average is not representative of any single contract. This is the dispersion the predictability score is charged on, and Iraq is graded 47 · LOW for it.</li>
           <li>Using reform direction alone without controlling for oil price context. Most 2014–2016 liberalizations were responses to low oil prices; 2021–2023 tightenings tracked the post-COVID price recovery. Check the reform year against the oil price cycle before inferring regime intent.</li>
         </ul>
-        <em>Rule of thumb: Stability Score &lt;60 adds one required stress-test iteration to any IC submission. Score &lt;40 requires a formal country risk premium in the IRR hurdle.</em>
+        <em>Rule of thumb: carry the <strong style="color:var(--text);">Fiscal Predictability</strong> reading only if it is graded (or carry its ceiling where one supersedes it), and carry the <strong style="color:var(--text);">Reform Risk IC action</strong> line separately. A graded LOW or VERY LOW on predictability adds a stress-test iteration on block selection; the reform premium is set by the IC action, not by the score it sits beside.</em>
       </div>
     </div>
 
@@ -57694,11 +57714,46 @@ function _fpObsCeilingFrom(d, obs, u) {
   var cost    = Math.min(40, obs.spread * 0.8);   // what the observed dispersion costs
   var bound   = Math.max(0, Math.round(fp + charged - cost));
   var band = _fpBandLabel(bound), printedBand = _fpBandLabel(fp);
-  var bandMoves = (band !== printedBand);
+  // ── v1078 (T4): bandMoves compared against a band the card never printed ───────────
+  // printedBand is _fpBandLabel(fp) -- the NUMERIC band of the stored score. For the one-term
+  // cohort that is not what any surface displays. The score is printed UNGRADED there, because
+  // the take-spread penalty was never charged, and the renderers say so explicitly:
+  // _rrFpHeadlineCeiling() strikes through `cl.printed + (cl.oneTerm ? 'UNGRADED' : printedBand)`.
+  // So on a one-term country the ceiling always moves the displayed band from UNGRADED to a
+  // graded one, and bandMoves was testing MODERATE against MODERATE and returning false.
+  //
+  // That is not a cosmetic band. UNGRADED vs graded is THE ranking distinction on this platform,
+  // stated in orange on this same card: "a graded MODERATE outranks any UNGRADED score, however
+  // high its number". Walked T4 cold at 1440x900, Venezuela -- one of the 21 jurisdictions that
+  // carry a reform log, so a headline lookup for this tab:
+  //   Side-by-Side     <=69 . MODERATE      stored: 73 ^ withdrawn
+  //   Country Profile  73 . UNGRADED        -> carry <=69 . MODERATE
+  //   Reform Risk      73 UNGRADED ^ best case   / Carry <=69 . MODERATE, not 73.
+  // Two surfaces keep the withdrawn number as the headline AND label it with the weaker-authority
+  // band, while the comparison tab leads with the graded ceiling -- opposite authority readings of
+  // one signal, on one country, with nothing saying either is a correction of the other. The
+  // Reform Risk card also contradicts itself three lines apart: the bound paragraph is painted
+  // whenever a bound exists, while the headline (v784) and the cohort-rank withdrawal (v982) are
+  // both gated on `material`, so below materiality the card issues "Carry <=69, not 73" over a
+  // headline still reading 73.
+  //
+  // _sbsPaintObsSpread() already has the right rule, inline and in its own words -- "the one-term
+  // path keeps withdrawing on a single counterexample, because there it is the CLAIM ... that is
+  // refuted, not the size of the score" -- and bypasses cl.material to get it. This is that rule,
+  // moved into the one object all three surfaces read, so Side-by-Side stops being the only tab
+  // that applies it. No new threshold: the 5+ point test is untouched and still owns the measured
+  // cohort. oneTerm is derivable here from the zero bundled IQR the caller passes in (_fpObsCeiling
+  // and _rrPaintIqrUnderstated both patched it on afterwards), so it is returned rather than left
+  // for each call site to re-assert.
+  var oneTerm = !(u.iqr > 0.05);
+  var bandMoves = (band !== (oneTerm ? 'UNGRADED' : printedBand));
   return { obs: obs, iqr: u.iqr, excess: u.excess, printed: fp, printedBand: printedBand,
            bound: bound, band: band, charged: charged, cost: cost, bandMoves: bandMoves,
+           oneTerm: oneTerm,
            // Same materiality rule v719 stated: a 1-point correction dressed like Nigeria's
-           // 27-point one is what trains an analyst to skip the line.
+           // 27-point one is what trains an analyst to skip the line. It still governs the
+           // measured cohort, where the printed band IS the band on screen (India: 52 LOW ->
+           // <=51 LOW, a 1-point correction inside one band, stays below materiality).
            material: bandMoves || (fp - bound) >= 5 };
 }
 // Resolves the sample from the v559 cache. Returns null where no sample is loaded for this
@@ -67082,14 +67137,227 @@ function _sbRenderCiteLeg944() {
 }
 window._sbRenderCiteLeg944 = _sbRenderCiteLeg944;
 
+// ── v1078 (T4): the premium had no cost ───────────────────────────────────────────────────
+// Walked T4 ("what is my fiscal-stability and reform exposure here?") cold on the United
+// Kingdom. The verdict card prescribes "add a 3-5pp WACC premium", and v953 gave that sentence
+// a button -- "Model this premium in Scenario Builder" -- which loads the country's own terms
+// and sets the rate to 13%. What then lands is ONE number: contractor NPV $842M at 13%.
+//
+// The figure an IC memo needs is what the premium COST, and that is a subtraction this page
+// refused to do. Measured on the live build: _rrModelPremium() opens the builder,
+// ddOpenScenarioBuilder() auto-runs the DCF at 10%, and 260ms later the premium is applied and
+// the run repeated at 13% -- so the $1.10B baseline IS computed, and is then overwritten by the
+// 13% card before the analyst ever sees it. The cost of the UK premium is $257M of contractor
+// NPV, 23.4%, and it appeared nowhere on the platform.
+//
+// Worse, the page states the right method and then will not carry it out. _sbOriginNote()
+// prints, in prose, underneath the very card that hides it: "Set the field back to 10% to
+// compare like with like -- a reform premium is read as the move BETWEEN your own two runs, not
+// against a published number computed on a different rate." Doing that by hand is four steps
+// (note $842M, click Back to 10%, re-run, subtract) and step three REPAINTS the output card, so
+// the figure being subtracted from is gone from the screen at the moment it is needed. Twenty
+// minutes before a screening meeting, that is where this walk stops.
+//
+// The baseline is free. profile.discountRate is the only thing the rate touches, every engine
+// reads it off the cloned profile, and the engines are pure -- verified by running identical
+// params twice and getting byte-identical take / NPV / IRR, and by confirming that forcing
+// 0.10 moves NPV alone (UK: take 43.102% and IRR 60.8% identical at both rates). So the same
+// scenario is re-run at ORCA's published 10% and the delta printed at the head of the results.
+// No existing figure is recomputed, reworded or moved.
+function _sbDispatch(mech, params, price, profile) {
+  if (mech === 'PSC' || mech === 'Revenue Share' || mech === 'Gross Split') return dcfPSC(params, price, profile);
+  if (mech === 'TSC' || mech === 'RSC') return dcfTSC(params, price, profile);
+  if (mech === 'PRRT') return dcfPRRT(params, price, profile);
+  if (mech === 'Buy-back' || mech === 'Buyback') return dcfBuyback(params, price, profile);
+  return dcfConcession(params, price, profile);
+}
+window._sbDispatch = _sbDispatch;
+
+// Sits at the top of the results card whenever the run is NOT at ORCA's 10%, which is exactly
+// the condition under which _sbRenderDiscountNote() already declares the run non-comparable.
+// Where the builder was opened from a country whose reform record classifies as a WACC premium,
+// the strip names that verdict; where the analyst simply typed a rate, it costs the rate without
+// attributing it to anything. Returns '' in every other case, including a rate below 10% being
+// no premium at all -- that branch reads as a gain, not a cost, and says so.
+// v1079 (T4): one scenario re-run at a different discount rate, with everything else held.
+// `profile` is cloned shallow because discountRate is the only field touched; `params` is deep
+// cloned because the engines mutate the params object they are handed.
+function _sbRunAtRate(mech, params, price, profile, ratePct) {
+  try {
+    var pro = {}; for (var k in profile) pro[k] = profile[k];
+    pro.discountRate = ratePct / 100;
+    var out = _sbDispatch(mech, JSON.parse(JSON.stringify(params)), price, pro);
+    return (out && out.npv != null && isFinite(out.npv)) ? out : null;
+  } catch (e) { return null; }
+}
+window._sbRunAtRate = _sbRunAtRate;
+
+function _sbPremiumCostStrip(mech, params, profile, price, result) {
+  try {
+    if (!profile || !result || result.npv == null) return '';
+    var r = profile.discountRate;
+    if (r == null || !isFinite(r) || Math.abs(r - 0.10) < 0.0001) return '';
+
+    var basePro = {}; for (var k in profile) basePro[k] = profile[k];
+    basePro.discountRate = 0.10;
+    var base = _sbDispatch(mech, JSON.parse(JSON.stringify(params)), price, basePro);
+    if (!base || base.npv == null || !isFinite(base.npv)) return '';
+
+    var dPp   = (r * 100) - 10;
+    var up    = dPp > 0;
+    var dTxt  = (up ? '+' : '−') + (Math.abs(Math.abs(dPp) - Math.round(Math.abs(dPp))) < 0.05
+                  ? Math.round(Math.abs(dPp)) : Math.abs(dPp).toFixed(1)) + 'pp';
+    var move  = result.npv - base.npv;                 // $M. Negative when the premium costs NPV.
+    var moveT = fmtNpvShared(Math.abs(move));
+    // Percentage only where the baseline is a positive NPV -- "23% of -$40M" is not a reading.
+    var pctT  = base.npv > 0.01 ? (Math.abs(move) / base.npv * 100).toFixed(1) + '%' : null;
+
+    var o       = window._sbOrigin;
+    var country = (o && o.country) ? o.country : null;
+    var prem    = (typeof _sbReformPremium === 'function') ? _sbReformPremium(country) : null;
+    // Only claim the reform attribution where the rate actually sits inside this jurisdiction's
+    // own band. A typed 22% on a country carrying WACC +3-5pp is not that country's premium.
+    var isReform = !!(prem && up && (r * 100) >= 10 + prem.lo - 0.05 && (r * 100) <= 10 + prem.hi + 0.05);
+
+    var esc = (typeof _sbEscP === 'function') ? _sbEscP : function (v) { return String(v == null ? '' : v); };
+
+    // ── v1079 (T4): the verdict prescribes a BAND and the strip priced one point of it ─────
+    // v1078 put the 10% baseline beside the premium run, so the analyst finally reads what the
+    // premium COST rather than a bare NPV at 13%. Walked T4 cold again on the United Kingdom and
+    // the walk stops one step later, for the same reason it stopped before.
+    //
+    // The IC action is not "13%". It is WACC +3–5pp, and _sbRenderDiscountNote() says so in its
+    // own words — "these two buttons are the band's endpoints, and any rate between them is
+    // defensible". An IC memo carries the RANGE. The strip priced only the end the analyst
+    // happened to land on (_rrModelPremium always opens at the low end, 13%) and closed by
+    // telling them to go and press `Run at 15%` for the other one. Measured on the live build:
+    // _sbApplyReformPremium(15) → runCustomScenario() REPAINTS #sb-output, so the $842M and the
+    // −$257M they were about to write down are gone from the screen at the instant the second
+    // figure appears. Reading the band is four steps and two of them are from memory — which is
+    // exactly the defect v1078 removed for the baseline and left standing for the band.
+    //
+    // Both ends are run here instead. Same pure path v1078 proved: profile.discountRate is the
+    // only input the rate touches, the engines are pure, and take and IRR come back identical at
+    // every rate. The run already on screen is reused wherever it IS one of the endpoints, so a
+    // 13% arrival costs one extra engine call and nothing on screen is recomputed or moved.
+    //
+    // Only where the run IS this jurisdiction's premium (isReform) and the band has two distinct
+    // ends. A typed rate, a single-point band and a no-premium verdict get the v1078 strip
+    // unchanged — there is no band to price.
+    var loRun = null, hiRun = null, atLo = false, atHi = false;
+    if (isReform && prem.lo !== prem.hi) {
+      var loR = 10 + prem.lo, hiR = 10 + prem.hi;
+      atLo = Math.abs((r * 100) - loR) < 0.05;
+      atHi = Math.abs((r * 100) - hiR) < 0.05;
+      loRun = atLo ? result : _sbRunAtRate(mech, params, price, profile, loR);
+      hiRun = atHi ? result : _sbRunAtRate(mech, params, price, profile, hiR);
+      if (!loRun || !hiRun) { loRun = hiRun = null; }
+    }
+
+    // ── Sign is read off `move`, never off the rate direction ────────────────────────────────
+    // Caught in this cycle's own branch sweep, before commit: on a contractor cash flow that is
+    // net NEGATIVE, discounting harder SHRINKS the loss, so a higher rate raises NPV. The UK
+    // Buy-back run at $75 goes -$1.90B at 10% to -$1.58B at 13%, and the TSC/RSC runs and every
+    // $25/bbl run do the same. Keying the word and the colour on `up` labelled that +$318M
+    // improvement as a red cost of -$318M -- the premium reading inverted on exactly the runs
+    // where the base case is the finding. `worse` is the only thing that may decide either.
+    var worse = move < 0;
+    var head = isReform
+      ? (worse ? 'Reform premium — what ' + esc(country) + '’s ' + esc(prem.token) + ' costs'
+               : 'Reform premium — ' + esc(country) + '’s ' + esc(prem.token) + ' on a negative base case')
+      : 'Discount rate — what ' + dTxt + ' off ORCA’s 10% ' + (worse ? 'costs' : 'adds');
+
+    var verb = worse ? (up ? 'Cost of the premium' : 'Cost of the lower rate')
+                     : (up ? 'NPV rose — see below' : 'Added by the lower rate');
+    var col  = worse ? 'var(--negative, var(--red))' : 'var(--green)';
+
+    function cell(lbl, val, note, c) {
+      return '<div style="min-width:120px;">'
+        + '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:2px;">' + lbl + '</div>'
+        + '<div style="font-size:17px;font-weight:800;color:' + (c || 'var(--text)') + ';">' + val + '</div>'
+        + '<div style="font-size:10px;color:var(--muted);line-height:1.35;">' + note + '</div></div>';
+    }
+
+    return '<div id="sb-premium-cost" style="margin-bottom:12px;padding:10px 12px;border:1px solid var(--border);'
+      + 'border-left:3px solid ' + col + ';border-radius:5px;background:var(--surface2);">'
+      + '<div style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">'
+      + head + '</div>'
+      + '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">'
+      + cell('Contractor NPV at 10%', fmtNpvShared(base.npv), 'ORCA’s published basis', null)
+      + cell('At ' + _sbDiscTxt(r), fmtNpvShared(result.npv), '10% ' + dTxt + ' · the run on screen', null)
+      + cell(verb, (worse ? '−' : '+') + moveT, pctT ? (worse ? '−' : '+') + pctT + ' of the 10% NPV' : 'baseline NPV is not positive — no percentage stated', col)
+      // v1079: the band's ends, priced here rather than behind a button that repaints the card.
+      // Each carries its OWN sign, read off its own move — on a base case that does not pay back
+      // the two ends can sit on opposite sides of zero, so neither may borrow `worse`.
+      + ((loRun && hiRun)
+          ? [[prem.lo, loRun, atLo], [prem.hi, hiRun, atHi]].map(function (e) {
+              if (e[2]) return '';   // this end is the run on screen; it already has a column
+              var mv = e[1].npv - base.npv;
+              return cell('At ' + (10 + e[0]) + '% (+' + e[0] + 'pp)', fmtNpvShared(e[1].npv),
+                          (e[0] === prem.lo ? 'low' : 'high') + ' end of the band · '
+                            + (mv < 0 ? '−' : '+') + fmtNpvShared(Math.abs(mv)) + ' vs 10%',
+                          mv < 0 ? 'var(--negative, var(--red))' : 'var(--green)');
+            }).join('')
+          : '')
+      + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);line-height:1.55;margin-top:8px;">'
+      + 'Same project, same terms, same $' + price + '/bbl — the rate is the only difference, so '
+      + '<strong style="color:var(--text);">government take (' + result.take.toFixed(1) + '%) and IRR are identical in both runs</strong>: '
+      + 'a WACC ' + (up ? 'premium' : 'reduction') + ' is a discount-rate ' + (up ? 'add' : 'cut') + ', and it moves NPV and nothing else. '
+      + (up && !worse
+          ? '<strong style="color:var(--text);">The higher rate RAISED NPV here, which is not an error:</strong> this '
+            + 'contractor cash flow is net negative at $' + price + '/bbl, and discounting a loss harder shrinks it. '
+            + 'A premium cannot be priced against a base case that does not pay back — the base case is the finding, '
+            + 'and the ' + fmtNpvShared(base.npv) + ' at 10% is the number to read. '
+          : '')
+      + (isReform
+          ? 'This is the move between your own two runs that ' + esc(country) + '’s reform verdict asks for, and '
+            + (prem.lo === prem.hi ? 'it is the whole band.'
+               : (loRun && hiRun)
+                 // Both ends are on screen, so the memo line is the RANGE — and it is computed
+                 // from the two ENDPOINT runs, never from the run on screen, so a rate typed
+                 // inside the band cannot narrow the band it is quoted against.
+                 ? (function () {
+                     var mA = loRun.npv - base.npv, mB = hiRun.npv - base.npv;
+                     var worstM = Math.min(mA, mB), bestM = Math.max(mA, mB);
+                     var bandT = '+' + prem.lo + '–' + prem.hi + 'pp';
+                     if (bestM < 0) {
+                       var pA = base.npv > 0.01
+                         ? ' (−' + (Math.abs(bestM) / base.npv * 100).toFixed(1)
+                           + '% to −' + (Math.abs(worstM) / base.npv * 100).toFixed(1) + '%)' : '';
+                       return 'the whole <strong style="color:var(--text);">' + bandT + ' band costs '
+                            + fmtNpvShared(Math.abs(bestM)) + '–' + fmtNpvShared(Math.abs(worstM)) + pA
+                            + '</strong> of contractor NPV — both ends are in the row above, so that range is the '
+                            + 'memo line and neither figure has to be re-run to read it. The field is still at '
+                            + _sbDiscTxt(r) + '; use the <em>Run at</em> buttons above only if you want an end’s '
+                            + 'take, breakeven and cashflow as well.';
+                     }
+                     return 'across the whole ' + bandT + ' band the move against the 10% base runs '
+                          + (worstM < 0 ? '−' : '+') + fmtNpvShared(Math.abs(worstM)) + ' to '
+                          + (bestM < 0 ? '−' : '+') + fmtNpvShared(Math.abs(bestM)) + ' — '
+                          + (worstM >= 0 ? 'a rise at both ends of the band, so it carries no cost reading at all'
+                                         : 'a cost at one end and a rise at the other, so it carries no single cost reading')
+                          + '. The ' + fmtNpvShared(base.npv) + ' at 10% is the finding, not the premium.';
+                   })()
+                 : 'it is the ' + prem.lo + 'pp end of a ' + prem.lo + '–' + prem.hi + 'pp band — use the Run at '
+                   + (10 + prem.hi) + '% button above for the other end.')
+          // Caught in this cycle's own 32-run sweep (8 mechanics x {$75,$25} x {13%,10%,6%}):
+          // this closing clause was unconditional, so a 6% run that ADDED $1.75B of contractor
+          // NPV closed by calling it "the cost of departing from" 10%, three inches under a green
+          // "+$1.75B" cell. The cell was right and the sentence contradicted it. `worse` already
+          // decides every other word in this strip; it decides this one too.
+          : (worse ? 'ORCA publishes every figure at 10%, so this is the cost of departing from it.'
+                   : 'ORCA publishes every figure at 10%, so this is what departing from it is worth — '
+                     + 'it is not a figure ORCA publishes, and the 10% column is the one to quote.'))
+      + ' The comparison below, against the published country figure, is a different one and is not this.'
+      + '</div></div>';
+  } catch (e) { return ''; }
+}
+window._sbPremiumCostStrip = _sbPremiumCostStrip;
+
 function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
-  let result;
-  if (mech === 'PSC' || mech === 'Revenue Share' || mech === 'Gross Split') result = dcfPSC(params, price, profile);
-  else if (mech === 'TSC' || mech === 'RSC') result = dcfTSC(params, price, profile);
-  else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
-  else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
-  else result = dcfConcession(params, price, profile);
+  let result = _sbDispatch(mech, params, price, profile);
   // Built BEFORE _sbHurdleLine(), which reads window._sbPriceDeck to put the downside and the
   // swing into the copied IC line. One source, so the screen and the clipboard cannot drift.
   window._sbPriceDeck = _sbBuildDeck(mech, params, profile, price, result);
@@ -67162,6 +67430,7 @@ function runCustomScenario() {
   document.getElementById('sb-output').innerHTML = `
 ${takeClampWarning}<div class="sb-result-header">${mech} · ${DCF_PROFILES[profileKey].name} · $${price}/bbl</div>
 ${_sbOriginNote(result, price, profileKey)}
+${_sbPremiumCostStrip(mech, params, profile, price, result)}
 <div class="sb-results-3">
   <div class="sb-result-card">
     <div class="sb-result-label">Govt Take</div>
@@ -75557,14 +75826,63 @@ function _cpApplyObsSpread(country) {
       var _nM1006  = (_k1006 && _k1006.measured) ? _k1006.measured.length : 28;
       var _esc1006 = (typeof _rrEsc === 'function') ? _rrEsc : function (v) { return String(v == null ? '' : v); };
       var _below1006 = !!(_top1006 && _cl1006.bound < _top1006.s);
+      // ── v1080 (T4): the withdrawal paragraph re-graded the score it was withdrawing ─────
+      // This sentence printed `_cl1006.printed + ' · ' + _cl1006.printedBand` — the NUMERIC band of
+      // the stored score. On this branch the cohort is the one-term one, where renderStabilityBadge()
+      // withholds the band entirely (`label = single ? 'UNGRADED' : _fpBandLabel(score)`), so
+      // printedBand is a band no surface on this platform has ever rendered for these countries.
+      // Six inches above this paragraph the badge reads `≤' + bound + ' · ' + band` with
+      // `stored: N ▲ withdrawn` beside it; the paragraph then reinstated the number AND awarded it
+      // a grade. Walked T4 cold at 1440x900 on Country Profile:
+      //   badge      ≤52 · LOW   ≥29.6pp obs   stored: 76 ▲ withdrawn
+      //   paragraph  "computed from the printed 76 · HIGH"
+      // HIGH is the band this page's own badge tooltip says is never awarded here — "all the scores
+      // that would fall in the HIGH band belong to one-term regimes ... and NOT ONE of the measured
+      // ones reaches it". Swept live across COUNTRY_DATA: all 41 one-term ceilings take this branch,
+      // and 9 of them re-grade to HIGH — Norway 76→≤52, Netherlands 84→≤59, Uzbekistan 89→≤49,
+      // Albania and Lebanon 81→≤49, Thailand 80→≤51, Namibia 77→≤60, Papua New Guinea 78→≤66,
+      // USA 91→≤82. Norway, Indonesia, Angola, Colombia, Ecuador and Libya are among the 21 that
+      // carry a reform log, so this is the T4 stability paragraph on the tab's headline jurisdictions.
+      // The v1006 comment above claims "same wording as v982" and it was not: rr-fp-cohort prints
+      // "the printed 76" with no band, so one surface withdrew the score and the other re-graded it.
+      // The score is now named the way the badge names it, and the reason is stated rather than
+      // implied: in this cohort there is no band to rank on.
+      //
+      // And the paragraph now answers the question it raises. "No cohort rank" told the analyst to
+      // stop using a rank and gave no replacement — on the 5 countries whose ceiling clears the
+      // measured top (USA among them) the closing clause was only "rank it on ≤N, not on the printed
+      // N". The rank at the ceiling is derivable from the cohort list already on screen: the spread
+      // term IS charged at the bound, so the comparison set is the measured cohort. Counted, not
+      // thresholded — and stated as a BEST case, because the bound is an upper bound and a lower
+      // true score can only rank worse.
+      var _mL1080 = (_k1006 && _k1006.measured) ? _k1006.measured : [];
+      var _ab1080 = 0;
+      for (var _i1080 = 0; _i1080 < _mL1080.length; _i1080++)
+        if (_mL1080[_i1080].s > _cl1006.bound) _ab1080++;
+      var _rk1080 = (typeof _fpOrd === 'function') ? _fpOrd(_ab1080 + 1) : String(_ab1080 + 1);
+      var _rank1080 = !_mL1080.length ? ''
+        : _below1006
+          ? ' Ranked on that bound instead, ' + _esc1006(country) + ' sits <strong>' + _rk1080
+            + ' or lower of the ' + _mL1080.length + '</strong> countries ORCA can measure \u2014 a best case, '
+            + 'because the true score is at or below ' + _cl1006.bound + ' and a lower one can only rank worse.'
+          // Bound above the measured cohort's own top. "1st of 28" would be true arithmetic and a
+          // false reading: the figure doing the ranking is a bound, and no regime whose spread ORCA
+          // measured has ever scored that high. Say that instead of handing over a rank.
+          : ' Ranked on that bound instead, ' + _esc1006(country) + ' would sit above <strong>all '
+            + _mL1080.length + '</strong> countries ORCA can measure \u2014 but ' + _cl1006.bound
+            + ' is itself above their own ceiling of ' + (_top1006 ? _top1006.s : 74)
+            + (_top1006 ? ' (' + _esc1006(_top1006.c) + ')' : '') + ', so no regime with a measured spread '
+            + 'has scored this high. A bound is doing that work, not a measurement.';
       _coh1006.innerHTML =
         '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
         + 'border-left:2px solid var(--orange);max-width:640px;">'
         + '<strong style="color:var(--orange);">No cohort rank for ' + _esc1006(country) + '.</strong> '
         + 'Its place among the ' + _nS1006 + ' one-term regimes is computed from the printed '
-        + _cl1006.printed + ' \u00b7 ' + _cl1006.printedBand + ', and that cohort is defined as the one the '
-        + 'take-spread penalty never touches \u2014 the basis this country\u2019s own contract table has just '
-        + 'refuted (\u2265' + _cl1006.obs.spread.toFixed(1) + 'pp across its ' + _cl1006.obs.n
+        + _cl1006.printed + ' \u00b7 UNGRADED \u2014 a score this platform does not band at all, because the '
+        + 'take-spread penalty that earns a band was never charged against it, so there is no band to '
+        + 'rank on. That cohort is defined as the one the spread penalty never touches \u2014 the basis '
+        + 'this country\u2019s own contract table has just refuted (\u2265'
+        + _cl1006.obs.spread.toFixed(1) + 'pp across its ' + _cl1006.obs.n
         + ' largest producing contracts). '
         + (_below1006
             ? 'At \u2264' + _cl1006.bound + ' \u00b7 ' + _cl1006.band + ' the spread term IS charged, on the same '
@@ -75574,7 +75892,9 @@ function _cpApplyObsSpread(country) {
               + '\u2014 does not arise: at its ceiling ' + _esc1006(country) + ' is not above one.'
             : 'Rank it on \u2264' + _cl1006.bound + ' \u00b7 ' + _cl1006.band + ', the bound the spread term puts '
               + 'on it, and not on the printed ' + _cl1006.printed + '.')
-        + ' Same withdrawal the Reform Risk card and the IC-memo clipboard print for this country.</div>';
+        + _rank1080
+        + ' Same withdrawal the Reform Risk card and the IC-memo clipboard print for this country; the '
+        + 'ceiling rank is computed here.</div>';
     }
   }
 
@@ -80539,6 +80859,149 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// ── v1078 (T4): FAQ A18's score guide is computed, not typed ────────────────────────────
+// A18 is titled "How do I interpret the Fiscal Reform Risk and Stability Score when comparing
+// regimes?" — the T4 question verbatim, and the only surface on the platform that explains the
+// two scores together. Its guide was hard-typed in 2026 and had drifted off the engine on every
+// number it quoted (see the comment on the A18 body). Typing them again would only reset the
+// clock, so the band table, the band populations, the graded ceiling and the count-to-score
+// mapping are now read from the same functions the badges render from: _fpBandLabel() for the
+// cut points, _fpCohortStats() for who is graded, REFORM_HISTORY + _rrCountScored() for the
+// legislative record. If the band function moves or a reform event is added, this block moves
+// with it.
+var _A18_SIG = null;
+
+// Cut points are derived from _fpBandLabel itself rather than restated, so a change to the band
+// function cannot leave this table asserting the old boundaries.
+function _a18BandRanges() {
+  if (typeof _fpBandLabel !== 'function') return [];
+  var out = [], cur = null;
+  for (var s = 100; s >= 0; s--) {
+    var b = _fpBandLabel(s);
+    if (!cur || cur.band !== b) { cur = { band: b, hi: s, lo: s }; out.push(cur); }
+    else cur.lo = s;
+  }
+  return out;
+}
+function _a18BandColor(b) {
+  return b === 'HIGH' ? 'var(--green)' : b === 'MODERATE' ? 'var(--yellow)'
+       : b === 'LOW'  ? 'var(--orange)' : 'var(--red)';
+}
+function _a18Esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function _a18List(arr, n) {
+  var a = arr.slice(0, n).map(function (x) { return _a18Esc(x.c) + ' ' + x.s; });
+  if (arr.length > n) a.push('+' + (arr.length - n) + ' more');
+  return a.join(' · ');
+}
+
+// The 21-jurisdiction legislative record, grouped by the count the score is a function of.
+function _a18ReformRows() {
+  if (typeof REFORM_HISTORY === 'undefined' || !REFORM_HISTORY) return null;
+  var keys = Object.keys(REFORM_HISTORY);
+  if (!keys.length) return null;
+  var byCount = {};
+  keys.forEach(function (k) {
+    var ev = (REFORM_HISTORY[k] && REFORM_HISTORY[k].events) || REFORM_HISTORY[k] || [];
+    var n = (typeof _rrCountScored === 'function') ? _rrCountScored(ev) : 0;
+    (byCount[n] = byCount[n] || []).push(k);
+  });
+  return { n: keys.length, rows: Object.keys(byCount).map(Number).sort(function (a, b) { return a - b; })
+    .map(function (n) { return { n: n, score: Math.max(0, 100 - 15 * n), cc: byCount[n].sort() }; }) };
+}
+
+function _a18Build() {
+  var host = document.getElementById('faq-a18-live');
+  if (!host) return;
+  var k = (typeof _fpCohortStats === 'function') ? _fpCohortStats() : null;
+  var rr = _a18ReformRows();
+  if (!k || !rr) {                                     // data not landed yet — say so, retry on next expand
+    host.setAttribute('data-a18-state', 'pending');
+    host.innerHTML = '<div style="font-size:12px;color:var(--muted);">The two score tables below are read from the live dataset, which has not finished loading. Reopen this answer in a moment.</div>';
+    return;
+  }
+  var sig = k.measured.length + '/' + k.single.length + '/' + (k.measuredTop ? k.measuredTop.s : 0) + '/' + rr.n;
+  if (host.getAttribute('data-a18-state') === sig) return;   // already current
+
+  var cnt = (typeof _fpCnt === 'function') ? _fpCnt() : { nMeas: k.measured.length, nSingle: k.single.length, nNone: 0, nHigh: 0, ceil: 0 };
+  var band = function (s) { return _fpBandLabel(s); };
+  var measBy = {}, singBy = {};
+  k.measured.forEach(function (x) { (measBy[band(x.s)] = measBy[band(x.s)] || []).push(x); });
+  k.single.forEach(function (x) { (singBy[band(x.s)] = singBy[band(x.s)] || []).push(x); });
+
+  var th = 'text-align:left;padding:5px 8px;font-size:10px;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border);font-weight:700;';
+  var td = 'padding:6px 8px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:top;';
+
+  // ── Table 1: Fiscal Predictability bands, with the population the platform actually grades ──
+  var h = '<div style="font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--accent);margin:4px 0 6px;">FISCAL PREDICTABILITY SCORE &mdash; BANDS, AND WHO IS IN THEM</div>'
+    + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:520px;"><thead><tr>'
+    + '<th style="' + th + '">BAND</th><th style="' + th + '">GRADED COUNTRIES IN IT (of ' + cnt.nMeas + ')</th>'
+    + '<th style="' + th + '">WHAT TO DO</th></tr></thead><tbody>';
+
+  var action = {
+    'HIGH':     'Terms are consistent across blocks and prices. Screen on the country figure.',
+    'MODERATE': 'Broadly consistent. Check the contract range in Country Profile before sizing a single block.',
+    'LOW':      'Block selection changes the fiscal outcome materially. Do not screen on the country average &mdash; take the specific block into Scenario Builder.',
+    'VERY LOW': 'The country average is not representative of any contract. Model the block, not the country.'
+  };
+  _a18BandRanges().forEach(function (b) {
+    var m = measBy[b.band] || [], s = singBy[b.band] || [];
+    var pop = m.length
+      ? '<strong style="color:' + _a18BandColor(b.band) + ';">' + m.length + '</strong> &mdash; ' + _a18List(m, 4)
+      : '<strong style="color:var(--muted);">none</strong>';
+    if (!m.length && s.length) {
+      pop += '<div style="font-size:11px;color:var(--orange);margin-top:3px;">No graded country reaches this band. '
+          + s.length + ' one-term score' + (s.length === 1 ? '' : 's') + ' would fall here and ' + (s.length === 1 ? 'is' : 'are')
+          + ' rendered <strong>UNGRADED</strong> and uncoloured instead &mdash; the IQR penalty that would shorten them was never charged.</div>';
+    } else if (s.length) {
+      pop += '<div style="font-size:11px;color:var(--muted);margin-top:3px;">+ ' + s.length + ' one-term UNGRADED score'
+          + (s.length === 1 ? '' : 's') + ' in this range, not comparable to the graded ones.</div>';
+    }
+    // Advice for a band nobody is in is advice the analyst cannot act on. Say that instead.
+    var act = m.length ? (action[b.band] || '')
+      : 'Does not arise on this platform &mdash; no graded country sits here, so no screening decision can rest on this band.';
+    h += '<tr><td style="' + td + '"><strong style="color:' + _a18BandColor(b.band) + ';">' + b.lo + '&ndash;' + b.hi
+       + ' &middot; ' + b.band + '</strong></td><td style="' + td + '">' + pop + '</td><td style="' + td + 'color:'
+       + (m.length ? 'var(--muted)' : 'var(--orange)') + ';">' + act + '</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  h += '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin:6px 0 14px;">'
+     + 'A band and a colour are awarded only where ORCA measured a take spread across the country&rsquo;s own contracts &mdash; <strong style="color:var(--text);">' + cnt.nMeas + ' of 185</strong>. '
+     + cnt.nSingle + ' price to a single statutory term (IQR exactly 0, so the score&rsquo;s largest penalty was never charged) and render <strong>UNGRADED</strong>; '
+     + cnt.nNone + ' hold no contract-level distribution at all and render <strong>n/c</strong>; 3 state monopolies are not scored, because a 100% take leaves no contractor position to be stable about. '
+     + 'The highest graded score on the platform is <strong style="color:var(--text);">' + (k.measuredTop ? _a18Esc(k.measuredTop.c) + ' at ' + k.measuredTop.s : 'n/a') + '</strong>, and '
+     + cnt.nHigh + ' one-term scores sit above it. <strong style="color:var(--orange);">A one-term 90 is not a steadier regime than a graded ' + (k.measuredTop ? k.measuredTop.s : 74)
+     + '</strong> &mdash; it is the one ORCA holds less contract evidence against. Where a country&rsquo;s own contract table refutes its one-term basis, the surfaces print a ceiling (&ldquo;&le;46 &middot; LOW&rdquo;); carry the ceiling.'
+     + '</div>';
+
+  // ── Table 2: the Reform Frequency Score is a count. Shown as one, not asserted as one. ──
+  h += '<div style="font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--accent);margin:4px 0 6px;">REFORM FREQUENCY SCORE &mdash; THE WHOLE SCALE, AS IT STANDS ON THE ' + rr.n + ' SOURCED JURISDICTIONS</div>'
+    + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:520px;"><thead><tr>'
+    + '<th style="' + th + '">FISCAL LAW CHANGES SINCE 2010</th><th style="' + th + '">SCORE</th>'
+    + '<th style="' + th + '">JURISDICTIONS</th><th style="' + th + '">PREMIUM</th></tr></thead><tbody>';
+  rr.rows.forEach(function (r) {
+    var over = r.n >= 3;
+    h += '<tr><td style="' + td + '"><strong style="color:var(--text);">' + r.n + '</strong></td>'
+       + '<td style="' + td + 'font-family:\'IBM Plex Mono\',monospace;"><strong style="color:' + (over ? 'var(--red)' : 'var(--text)') + ';">' + r.score + '</strong>/100</td>'
+       + '<td style="' + td + '">' + r.cc.map(_a18Esc).join(' · ') + '</td>'
+       + '<td style="' + td + (over ? 'color:var(--red);font-weight:600;' : 'color:var(--muted);') + '">'
+       + (over ? (r.score <= 20 ? '5&ndash;8pp WACC + probability-weighted NPV' : '3&ndash;5pp WACC') : 'no frequency premium &mdash; read the IC action')
+       + '</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  var maxN = rr.rows.length ? rr.rows[rr.rows.length - 1].n : 0;
+  h += '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin:6px 0 4px;">'
+     + 'Score = max(0, 100 &minus; 15 &times; count). <strong style="color:var(--orange);">It is strictly decreasing in the count and blind to magnitude</strong> &mdash; more events can never score higher, and a +15pp windfall tax costs exactly the 15 points a 1pp administrative change costs. '
+     + 'The highest count on file is <strong style="color:var(--text);">' + maxN + '</strong>, so every score below ' + Math.max(0, 100 - 15 * maxN) + ' on this scale is currently unoccupied; a jurisdiction with 7 or more changes would score 0. '
+     + 'The ' + rr.n + ' rows above are the entire scoreable universe: the other 164 jurisdictions have no sourced log and <strong style="color:var(--orange);">are not a score of 100</strong>.'
+     + '</div>';
+
+  host.innerHTML = h;
+  host.setAttribute('data-a18-state', sig);
+}
+window._a18Build = _a18Build;
+
 // v107/v108/v109: FAQ accordion — accessible toggle for A12–A17 (role=button, aria-expanded, keyboard support)
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.meth-faq-q[aria-expanded]').forEach(function(q) {
@@ -80548,6 +81011,11 @@ document.addEventListener('DOMContentLoaded', function() {
       var expanded = q.getAttribute('aria-expanded') === 'true';
       q.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       body.style.display = expanded ? 'none' : 'block';
+      // v1078 (T4): A18's two score tables are computed from the live engine on expand, so they
+      // cannot drift off _fpBandLabel()/_fpCohortStats()/REFORM_HISTORY the way the typed guide did.
+      if (!expanded && body.id === 'faq-a18-body' && typeof _a18Build === 'function') {
+        try { _a18Build(); } catch (e) { /* never block the accordion on the guide */ }
+      }
     }
     q.addEventListener('click', function() { toggleFaq(this); });
     q.addEventListener('keydown', function(e) {
