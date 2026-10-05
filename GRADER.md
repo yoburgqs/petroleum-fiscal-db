@@ -74639,3 +74639,18 @@ as a green "Commercially attractive" that an IC memo can quote as settled, and t
 genuinely are production-weighted say so, so the green badge now carries information instead of
 being the default. The one country on 5 contracts and 25 facts states both numbers in the
 sentence that judges it.
+
+---
+## Cycle 1028 Log — 2026-10-04 21:47
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 1028 complete — v1071 pushed, mirror synced, tree clean apart from the runner's own `CYCLE_STATE.json`/`cycle_log.txt`.
+
+## Task
+**T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* Last cycle was T3; T2 was the stalest in rotation.
+
+## Friction
+The page's **first line** — the Fiscal character verdict (`_cpFiscalVerdict470`, `index.html:50182`, branch `take <= 55 && downSolid`).
+
+Six sibling branches of that if-chain have been rebuilt one at a time (v663, v931, v9
