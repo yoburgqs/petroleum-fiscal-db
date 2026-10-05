@@ -75356,3 +75356,104 @@ exported bitmap only, so there is no new layout surface.
 **Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation (1027 T3, 1028 T2, 1029 T4, 1030 T5, 1031 T1, 1032 T6).
 
 **Friction.** Side-by-Side drops columns the analyst explicitly picked — state monopolies from both charts, PRRT cash-flow columns from the take chart. Both exclusions are correct, and both are stated clearly *on screen* in a notice sitting directly above the plot. Neither
+
+## Cycle 1039 — v1077
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest in
+rotation (1033 T3, 1032 T6, 1031 T1, 1030 T5, 1029 T4, 1028 T2).
+
+**Friction.** Walked T2 from a cold load — storage cleared, Country Profile, dropdown. The page is
+dense and mostly excellent; Indonesia survived the whole walk. The defect is on the countries an
+analyst screens *out*, which is half of what T2 is for.
+
+Country Profile → Saudi Arabia. `renderLiveDCFPanel()` correctly detects that ORCA holds no Saudi
+Arabia fiscal parameters, prints the withdrawal in orange — *"There are no Saudi Arabia fiscal terms
+in the engine … It is **not** Saudi Arabia's economics and no figure in it is citable for Saudi
+Arabia"* — and closes with *"Which number goes in the IC memo? **Neither.**"*
+
+The **Sensitivity Analysis** strip immediately beneath it (`_tornPaintBasis951`, `index.html`) then
+printed, off that same template run:
+
+> *"Base case **$4.26B** — one Deepwater project **on Saudi Arabia's fiscal terms** at $75/bbl …
+> At $50/bbl both land on the same side of zero — $2.10B on this chart against the $0M this page
+> publishes — **so the downside verdict holds on either project**, though not the value."*
+
+Two defects, both load-bearing:
+
+1. The strip asserted `country + '’s fiscal terms'` unconditionally, for all 185. On **4** the
+   engine holds nothing and the run is the generic template: **Saudi Arabia, Kuwait, Bahrain**
+   (Concession) and **Denmark** (PRRT). Measured, not assumed — `_ldcfProvenance()` over
+   `COUNTRY_DATA`: 116 record basis, 65 db basis, 4 generic.
+2. The reconciliation's flip test is `(oilRow.low >= 0) !== (cited50 >= 0)`. On a state monopoly
+   `cited50` is **0** — the placeholder the DCF solver writes for "no contractor position", an
+   *absent* number. `0 >= 0` is true, the chart's +$2.10B is true, no flip fires, and the page
+   reported the two as **agreeing** and issued a favourable **downside verdict** for acreage that
+   is closed to contractor entry. A withdrawn figure was reconciled against a modelled one and
+   the reader was told the project survives a $25 break.
+
+And a `↓ PNG` button sits beside it. The caption carried the claim twice — *"held at this country's
+modelled terms"*, *"run through this country's fiscal terms"* — on a bitmap filed as
+`ORCA_sensitivity_Saudi_Arabia_$75_*.png`. This is the artefact that reaches the IC memo.
+
+**Change.** Provenance is read from `_ldcfProvenance()` — the **same call the panel above gates
+on** — so the chart and the panel cannot state opposite things about one template run again.
+
+- Template countries: the strip names *the platform's generic `<Mechanic>` template* instead of the
+  country, and adds **"These are not `<Country>`'s terms."** with the reason.
+- Monopolies additionally get: the acreage is closed, these bars are a hypothetical opening of it,
+  **not one of them is citable**.
+- The $75 reconciliation is **refused** for monopolies — replaced by *"Nothing to reconcile this
+  chart to"*, which states that $0M is an absent number rather than a zero one, and that the chart
+  **carries no downside verdict**: a $25/bbl break cannot be survived or failed by a position that
+  does not exist.
+- The PNG caption carries the same statement, and the filename says it too:
+  `ORCA_sensitivity_TEMPLATE-not-Saudi_Arabia_$75_2026-10-05.png`, `template_Denmark_*` for the
+  non-monopoly case. Norway exports byte-identically to before.
+
+This is the directive's fifth finalization test — *every export opens, parses, and carries the
+assumptions behind its numbers* — failing on the one assumption that decides whether the figure
+may be quoted at all.
+
+**Result.** An analyst screening Saudi Arabia, Kuwait, Bahrain or Denmark can no longer read a
+$4.26B base case and a cleared $50/bbl downside off a chart carrying the country's name, two inches
+below a panel that withdrew both — and cannot export one into an IC memo. The chart now says whose
+terms produced it.
+
+**Not done, and not a cycle:** no tooltip, no FAQ, no changelog catch-up, no citation re-wording, no
+tab-order change, no rubric work, no version sweep as the deliverable. Nothing in STILL LOCKED is
+touched — the v612 mobile layer and `#reference-panel` are not in this code path; v451, v449, v430,
+v371/v373 and v489 are unchanged. Badge v1076 → v1077 at one location at the end.
+
+**Noted, not fixed —** the Live DCF panel's own withdrawal and this strip's now say the same thing
+in two different vocabularies a few lines apart. Merging them is a layout change to a locked panel
+and was out of scope for one cycle.
+
+### Mobile
+390 × 844 `hasTouch: true`, storage cleared, on all three monopolies and Denmark:
+`scrollWidth 390 = clientWidth 390` — no sideways scroll. The `↓ PNG` button measures **44px**
+under `pointer: coarse` (floor 24). **0** elements under 24px and **0** overflowing elements inside
+the sensitivity panel. 0 page errors. The change adds text to an existing flow container; no
+control was added, moved or resized.
+
+### Verification
+- **JS syntax gate: PASS** — all 11 inline script blocks extracted and `node --check`ed, after each
+  patch and again after the version bump.
+- **Graded suite RUN this cycle** (`office/tools/petroleum/tests/runtime_comprehensive.js`) against
+  the local tree: **550 PASS / 0 FAIL / 1 WARN**, read from the suite's own TOTAL line. The same
+  suite was then run against the **pre-change** file on an identical local server and returned
+  **550 PASS / 0 FAIL / 1 WARN**, check-by-check **identical** — so this change moves the suite by
+  **zero**. The gap to the 551 live baseline is environmental and was traced, not assumed: the
+  service worker registers at the hard-coded Pages path `/petroleum-fiscal-db/sw.js`, which 404s
+  under a local document root, producing the 15 console errors and the one `ConsoleErrors` WARN.
+  That path resolves on the deployed site.
+- **Regression:** tornado strip innerText captured before and after across 24 countries —
+  **20 byte-identical**, and exactly the 4 intended ones changed (Saudi Arabia, Kuwait, Bahrain,
+  Denmark). Norway, Indonesia, Iraq, Guyana, Brazil, Angola, Nigeria, UAE, Australia, Qatar and 10
+  more are untouched.
+- **Horizontal scroll** swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs *plus*
+  the Country Profile with a monopoly loaded: **0 overflowing screens**, 0 errors at every viewport.
+- **Export tested end to end** — the real `download` event was captured, the PNG saved and decoded
+  (2700 × 672), and the caption read back off the rendered bitmap.
+- The pre-change defect was measured the same way before patching: the baseline strip was captured
+  verbatim on all three monopolies and Denmark, and the $4.26B / "downside verdict holds" sentence
+  confirmed on each.
