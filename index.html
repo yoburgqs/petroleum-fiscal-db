@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1075</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1076</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -34896,6 +34896,48 @@ function renderCompare() {
     + ' “not ranked · statutory terms”. Read '
     + (_cmpChartStat.length === 1 ? 'it' : 'them') + ' against other statutory-basis columns, or state the proxy basis in the memo.</div>');
   _monopolyNoticeEl.innerHTML = _cmpNotices.join('');
+
+  /* ── v1076 (T3) ─ THE EXPORTED CHART NOW SAYS WHICH COUNTRY IS NOT ON IT ─────────────
+     Walked "how do these three countries compare side by side?" cold at 1440x900, both
+     storages cleared, and took the exit this platform's own documentation prescribes:
+     FAQ A37 and the IC-pack recipe both say "Export the Side-by-Side chart as PNG for
+     direct insertion into your IC presentation deck."
+
+     Two charts on this tab DROP columns the analyst explicitly chose, for good reasons,
+     and say so clearly ON SCREEN in #cmp-monopoly-notice directly above the plot. None of
+     that reaches the PNG, which is the one artifact of this tab seen by people who never
+     open ORCA. Measured on the shipped build:
+
+       Norway + Saudi Arabia + Kuwait   ->  ORCA_govt-take_Norway-Saudi-Arabia-Kuwait.png
+                                            ONE line in the bitmap. Norway.
+       Norway + Iraq + Saudi Arabia     ->  ORCA_govt-take_Iraq-Norway-Saudi-Arabia.png
+                                            two lines. No Saudi Arabia, nothing saying so.
+       Norway + Guyana + Australia      ->  take PNG has 2 series, NPV PNG has 3, and BOTH
+                                            files are named ...Norway-Guyana-Australia.png
+
+     _cmpPngName() built the filename from compareList - everything SELECTED - while the
+     datasets are mapped from chartCountries / npvCountries - everything DRAWN. So the
+     filename asserted a country the picture does not contain, and the v743 caption band
+     opened "Basis - every column is run on one standardized profile" over a bitmap that
+     was missing two of its three columns. A slide captioned for three countries showing
+     one is not a chart with a caveat missing; it is a different chart.
+
+     Fixed on both channels: the filename names only what is plotted, and the caption band
+     names every omitted column and why. Both are read from the SAME arrays that build the
+     on-screen notice above - monopolyCountries and _cmpBandExcluded - so the picture and
+     the page cannot drift apart. Stashed at render time rather than re-derived at export
+     time because isStateMonopoly's companions _cmpMixStat/_cmpHasProd are locals of
+     renderCompare and a second derivation is exactly how v660's label went stale.
+
+     Nothing on screen changes: this writes two globals and composes text onto the exported
+     bitmap only. No element, no Chart.js option and no geometry is touched, so there is no
+     pixel-gate surface and nothing for the v612 mobile layer to collide with. */
+  window._cmpChartOmitted = {
+    take: monopolyCountries.map(function(d){ return { country: d.country, why: 'state monopoly \u2014 no contractor access, so there is no take to plot' }; })
+      .concat(_cmpBandExcluded.map(function(d){ return { country: d.country, why: 'PRRT cash-flow basis \u2014 its take% only triggers above an uplift threshold and is not a rate that can be carried across a price band' }; })),
+    npv: monopolyCountries.map(function(d){ return { country: d.country, why: 'state monopoly \u2014 no contractor position, so there is no contractor NPV to plot' }; })
+  };
+  window._cmpChartDrawn = { take: [], npv: [] };
   if (cmpChart) cmpChart.destroy();
   // v501: 5th colour added with the 5-country cap. The NPV chart indexed colors[i]
   // without a modulo, so a 5th series rendered with backgroundColor "undefined88".
@@ -34919,6 +34961,9 @@ function renderCompare() {
     chartWrap.style.display = 'none';
   } else {
     chartWrap.style.display='block';
+    // v1076 (T3): the exact array the datasets below are mapped from — the filename and the
+    // caption band are built off this, never off compareList.
+    window._cmpChartDrawn.take = chartCountries.map(function(d){ return d.country; });
     const ctx = document.getElementById('cmp-chart').getContext('2d');
     const hasRFactor = chartCountries.some(d => d.has_r_factor_tiers);
     // v606 (T3): _cmpChartRebased holds the columns whose plotted line is the Group-1 subset. The
@@ -35136,6 +35181,7 @@ function renderCompare() {
   const _npvStatN = Object.keys(_npvStatSet).length;
   if (hasNpv && npvChartWrap) {
     npvChartWrap.style.display = 'block';
+    window._cmpChartDrawn.npv = npvCountries.map(function(d){ return d.country; });   // v1076 (T3)
     if (window._cmpNpvChart) window._cmpNpvChart.destroy();
     const npvCtx = document.getElementById('cmp-npv-chart').getContext('2d');
     window._cmpNpvChart = new Chart(npvCtx, {
@@ -60079,9 +60125,16 @@ var _CMP_PNG_TARGETS = {
 
 // Filename carries the metric and the set, so two exports from this tab can never collide and a
 // file found later still says which exhibit it is.
-function _cmpPngName(slug) {
-  var names = (typeof compareList !== 'undefined' && compareList && compareList.length)
-    ? compareList.slice(0, 5).map(function(c) {
+function _cmpPngName(slug, drawn) {
+  // v1076 (T3): `drawn` is the country list THIS chart actually plotted. It used to fall straight
+  // through to compareList, so a set containing a state monopoly or a PRRT column produced
+  // ORCA_govt-take_Norway-Saudi-Arabia-Kuwait.png over a bitmap holding a single line, and named
+  // the take and NPV exports identically on a set where they plot different countries. The file
+  // now names the picture; the caption band names what was left out of it.
+  var src = (drawn && drawn.length) ? drawn
+    : ((typeof compareList !== 'undefined' && compareList) ? compareList : []);
+  var names = (src && src.length)
+    ? src.slice(0, 5).map(function(c) {
         return String(c).replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       }).filter(Boolean)
     : [];
@@ -60133,13 +60186,38 @@ function _cmpPngName(slug) {
    there is no pixel-gate surface and nothing for the v612 mobile layer to collide
    with. Text is read from #cmp-profile-terms and #hdr-meta at export time rather
    than hard-coded, so the caption cannot drift from what the page says. */
+/* v1076 (T3): the columns the analyst selected that this chart does not contain, with the
+   reason, read from the stash renderCompare() builds alongside the on-screen notice. Returns
+   null whenever the picture holds everything that was picked, which is the common case. */
+function _cmpOmittedPngLine(key) {
+  var om = (window._cmpChartOmitted && window._cmpChartOmitted[key]) || [];
+  var drawn = (window._cmpChartDrawn && window._cmpChartDrawn[key]) || [];
+  if (!om.length) return null;
+  var n = om.length, total = n + drawn.length;
+  return { bold: true, text: 'NOT ON THIS CHART — ' + n + ' of the ' + total
+    + ' countries selected ' + (n === 1 ? 'is' : 'are') + ' omitted, and '
+    + (n === 1 ? 'its line was' : 'their lines were') + ' never drawn: '
+    + om.map(function(o){ return o.country + ' (' + o.why + ')'; }).join('; ')
+    + '. ' + (n === 1 ? 'That column is' : 'Those columns are')
+    + ' kept in the comparison grid in ORCA, where the take, contract and evidence rows are real — '
+    + (n === 1 ? 'it is' : 'they are') + ' excluded here because drawing a line would assert a'
+    + ' comparison this basis does not support. Read this figure as covering '
+    + drawn.join(', ') + ' only.' };
+}
+
 function _cmpPngCaptionLines(key) {
   var lines = [];
   var terms = '';
   var el = document.getElementById('cmp-profile-terms');
   if (el) terms = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
   if (!terms) terms = _sbsBasisTerms();   // v835: was a hard literal naming the wrong project
-  lines.push({ bold: true, text: 'Basis — every column is run on one standardized profile: ' + terms
+  // v1076 (T3): leads the band when anything was dropped. It goes FIRST because it changes what
+  // the picture IS, not how to read it, and because the line below it used to open 'every column'
+  // over a bitmap that was missing two of its three.
+  var _om = _cmpOmittedPngLine(key);
+  if (_om) lines.push(_om);
+  lines.push({ bold: true, text: 'Basis — ' + (_om ? 'every column drawn above' : 'every column')
+    + ' is run on one standardized profile: ' + terms
     + '. These are not country properties; a different capex/opex profile gives different numbers.' });
   if (key === 'npv') {
     lines.push({ text: 'Contractor NPV is an unweighted mean of every contract result at each price, with production ignored. '
@@ -60265,7 +60343,8 @@ function _cmpSavePng(key) {
   // A hidden wrap means the chart is not part of the current comparison (no NPV data, or the
   // set was cleared). Exporting a stale canvas would be the same silent-wrong-file failure.
   if (wrap && getComputedStyle(wrap).display === 'none') return null;
-  var name = _cmpPngName(t.slug);
+  // v1076 (T3): name the file after what this chart plotted, not after everything selected.
+  var name = _cmpPngName(t.slug, (window._cmpChartDrawn && window._cmpChartDrawn[key]) || null);
   var a = document.createElement('a');
   a.download = name;
   a.href = _cmpCanvasPngCaptioned(canvas, _cmpPngCaptionLines(key));
