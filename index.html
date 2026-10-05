@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1070</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1071</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -50180,13 +50180,70 @@ function loadCountryProfile(country) {
         charColor = 'var(--green)';
       }
     } else if (take <= 55 && downSolid) {
+      // ── v1071 (T2): the last branch in this chain still on the raw v648 string — and the ────
+      // only one that paints GREEN. v663 / v999 / v931 / v946 / v986 / v993 each rebuilt a branch
+      // of this chain for exactly one defect: a verdict that ranks a country's take against the
+      // production-weighted producer set without saying whether that take is MEASURED or MODELLED.
+      // Every one of those six now carries the clause — "No verified block-level production is
+      // held here, so the take is a statutory model over N contracts — directional, not realised".
+      // This branch never got it, because it sits in the middle of the chain and reads green, so
+      // no cycle hunting for a wrong-looking verdict ever stopped on it.
+      //
+      // Counted live against country_data.json, `40 < take <= 55 && downSolid` fires for 33
+      // countries and THIRTY of them hold prod_coverage_pct = 0. Only Angola (7.2%), Ecuador
+      // (1.8%) and the United Kingdom (37.6%) are production-weighted. So on 30 of 33 profiles
+      // the page's FIRST line — the one v760 promoted to sit directly under the country name
+      // precisely because it is this page's one direct answer to "is this attractive at $75?" —
+      // read "Commercially attractive — moderate take; 10 of the 21 production-weighted producers
+      // take less at $75/bbl", in green, on a figure ORCA models from statute and never measured.
+      //
+      // The cohort is not obscure; it is the frontier list an IC screens hardest. Guyana (54.1%,
+      // 143 contracts), Mozambique (54.0%), Suriname (54.2%), Timor-Leste, Uganda, Ghana, Egypt,
+      // Tunisia, Trinidad, Namibia's neighbours — and at the thin end Mali on 5 contracts and 25
+      // facts, and Russia at Evidence 3.8% primary law. Namibia, one band lower at 37.0%, already
+      // prints v999's yellow statutory-model verdict on the same evidence state; Guyana at 54.1%
+      // printed green. Thinner basis, friendlier verdict, and the only thing that moved was the
+      // take landing one band higher — the same inversion v999 found and fixed.
+      //
+      // It is also the placement error v999 named in words: ranking a modelled term inside a
+      // distribution of realised ones "is not the same as sitting inside the band an IOC allocates
+      // capital across". The page does say "not production-weighted" further down, in a 10px rank
+      // pill and in the peer section — but not in the line that delivers the verdict.
+      //
+      // No new threshold. The split is _noProd663, the same quantity the other six branches key
+      // on; the figures are d.n, d.n_facts and _posClause648, all already on screen; the colour is
+      // v999's yellow for the identical evidence state. The three producing countries keep the
+      // green verdict and now say what it is measured on, so green and yellow mean something.
       _posInLabel648 = _hasPos648;
-      charLabel = _hasPos648
-        ? 'Commercially attractive — moderate take; ' + _posClause648
+      if (_noProd663) {
+        var _nf1071 = Number(d.n_facts || 0);
+        charLabel = 'Moderate take (' + take.toFixed(1) + '%) on a statutory model, not on realised '
+          + 'economics — ORCA holds no verified block-level production for ' + country
+          + ', so this figure is an average over ' + _nStr663 + ' and ' + _nf1071.toLocaleString()
+          + ' fact' + (_nf1071 === 1 ? '' : 's') + '.'
+          + (_hasPos648
+              ? ' ' + _posClause648 + ', but that places a modelled term inside a distribution of '
+                + 'realised ones — a position in a table, not a place inside the band an IOC '
+                + 'allocates capital across.'
+              : '')
+          + ' Contractor NPV clears the 10% WACC at the $50/bbl downside, and so do ' + _dsClear648
+          + ' of ' + _dsTot648 + ' regimes here, so that leg separates nothing either. Establish the '
+          + 'terms against this jurisdiction’s own petroleum act before it goes on a '
+          + 'capital-allocation list.';
+        charColor = 'var(--yellow)';
+      } else {
+        charLabel = 'Commercially attractive — moderate take of ' + take.toFixed(1) + '%, weighted '
+          + 'against verified field production (' + Number(d.prod_coverage_pct).toFixed(1)
+          + '% of ' + _nStr663 + ' carry production on file) rather than modelled from statute'
+          + (_hasPos648
+              ? ', and ' + _posClause648 + ' — so this is a realised figure sitting inside the band '
+                + 'an IOC allocates capital across'
+              : '')
           + '. Contractor NPV also clears the 10% WACC at the $50/bbl downside, but so do '
-          + _dsClear648 + ' of ' + _dsTot648 + ' regimes here, so that leg is not what makes this one attractive'
-        : 'Commercially attractive — moderate take, and contractor NPV stays positive through the $50/bbl downside case';
-      charColor = 'var(--green)';
+          + _dsClear648 + ' of ' + _dsTot648 + ' regimes here, so that leg is not what makes this '
+          + 'one attractive — the evidential basis is.';
+        charColor = 'var(--green)';
+      }
     } else if (take <= 55 && downFragile) {
       _posInLabel648 = _hasPos648;
       charLabel = 'Marginal at $75 — moderate take, but contractor NPV goes negative at $50/bbl, which only '
