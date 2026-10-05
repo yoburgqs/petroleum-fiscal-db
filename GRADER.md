@@ -75343,3 +75343,16 @@ exported bitmap only, so there is no new layout surface.
 - The pre-change defect was measured the same way before patching — the baseline
   `ORCA_govt-take_Iraq-Norway-Saudi-Arabia.png` was downloaded and confirmed to contain two
   lines and no mention of Saudi Arabia.
+
+---
+## Cycle 1038 Log — 2026-10-05 09:26
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Both commits pushed, mirror synced.
+
+## Cycle 1033 — v1076
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation (1027 T3, 1028 T2, 1029 T4, 1030 T5, 1031 T1, 1032 T6).
+
+**Friction.** Side-by-Side drops columns the analyst explicitly picked — state monopolies from both charts, PRRT cash-flow columns from the take chart. Both exclusions are correct, and both are stated clearly *on screen* in a notice sitting directly above the plot. Neither
