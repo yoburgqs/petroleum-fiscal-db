@@ -74508,3 +74508,134 @@ pasted into the memo, can no longer be led by a column that entered the set by a
 **Task:** T3 — "How do these three countries compare side by side?" (last cycle was T4)
 
 **Friction.** I walked T3 cold at 1440×900 and 390×844 with touch, storage cleared, using an analyst's *own* trio rather than the seeded UK/Norway/Nigeria example. Most of the surface held up under real probing — mixed-basis sets refuse to rank across the basis and the "Compare the 2 sta
+
+---
+## Cycle 1028 Log — 2026-10-04 21:15
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL / 0 WARN
+- JS errors: 0
+
+## Cycle 1028 — v1071
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (last cycle
+was T3; T2 was the stalest in rotation.)
+
+**Friction.** Walked T2 cold at 1440×900 and 390×844 with touch, both storages cleared, on the
+analyst's own frontier shortlist rather than the seeded Indonesia example — Guyana, Mozambique,
+Suriname, Namibia, Senegal, Qatar, Iraq.
+
+The friction is in the page's FIRST line: the Fiscal character verdict,
+`_cpFiscalVerdict470`, `index.html:50182`, branch `take <= 55 && downSolid`. v760 promoted that
+line to sit directly under the country name precisely because it is this page's one direct answer
+to the T2 question.
+
+This if-chain has been rebuilt branch by branch — v663, v931, v946, v986, v993, v999 — for a
+single defect: a verdict that ranks a country's take against the **production-weighted producer
+set** without stating whether that take is **measured or modelled**. All six now carry the clause
+*"No verified block-level production is held here, so the take is a statutory model over N
+contracts — directional, not realised."* This branch never got it. It sits in the middle of the
+chain and it reads **green**, so no cycle hunting for a wrong-*looking* verdict ever stopped on it.
+
+Counted live against `COUNTRY_DATA` on the comparable take, `40 < take ≤ 55 && downSolid` fires
+for **33 countries, and 30 of them hold `prod_coverage_pct = 0`.** Only Angola (7.2%), Ecuador
+(1.8%) and the United Kingdom (37.6%) are production-weighted.
+
+| country | take @$75 | contracts | facts | basis | verdict before |
+|---|---|---|---|---|---|
+| Guyana | 54.1% | 143 | 1,051 | no verified production | **green — "Commercially attractive"** |
+| Mozambique | 54.0% | 198 | 1,378 | no verified production | **green** |
+| Suriname | 54.2% | 109 | 367 | no verified production | **green** |
+| Mali | 54.2% | **5** | **25** | no verified production | **green** |
+| Russia | 46.4% | 1,247 | 3,929 | no verified production, 3.8% primary law | **green** |
+| Denmark, Egypt, Ghana, Tunisia, Trinidad, Timor-Leste, Uganda, Brunei, PNG, Philippines, Georgia, Morocco, Madagascar, Cambodia, Cameroon, Cuba, DRC, Bangladesh, Benin, Togo, Laos, Uruguay, Mongolia, Sierra Leone, South Sudan | 40.7–54.3% | 18–343 | — | no verified production | **green** |
+| United Kingdom | 49.2% | 4,211 | — | **37.6% production-weighted** | green |
+| Angola | 53.0% | 460 | — | **7.2% production-weighted** | green |
+
+So on 30 of 33 profiles the line read *"Commercially attractive — moderate take; 10 of the 21
+production-weighted producers take less at $75/bbl"* in green, on a figure ORCA models from
+statute and has never measured. It is the placement error v999 named in words — ranking a
+modelled term inside a distribution of realised ones "is not the same as sitting inside the band
+an IOC allocates capital across" — committed in the one place that renders it as an endorsement.
+
+It also **inverted against the branch v999 did fix.** Namibia, 37.0% on 125 contracts, prints
+v999's yellow *"on a statutory model, not on realised economics … Establish the terms against
+this jurisdiction's own petroleum act."* Guyana, 54.1% on 143 contracts, printed **green**. Same
+evidence state, thinner nowhere, and the only thing that moved was the take landing one band
+higher.
+
+The page is not silent about the basis elsewhere — Guyana carries `#139 of 185 · not
+production-weighted`, an "Equal-weighted avg … (no verified production data — fiscal terms
+comparison only)" line, and a peer section that says the two sides are not on the same evidential
+footing. But none of that is in the line that delivers the verdict, and the 10px grey rank pill
+is not what gets read in 20 minutes before a screening meeting.
+
+**Change.** The branch splits on `_noProd663`, the same quantity its six siblings already key on.
+
+1. **The 30 modelled jurisdictions render YELLOW, not green** — `var(--yellow)`, so the text and
+   the 3px left border of the page's first line both change state. They open with what the figure
+   *is*: `Moderate take (54.1%) on a statutory model, not on realised economics — ORCA holds no
+   verified block-level production for Guyana, so this figure is an average over 143 contracts and
+   1,051 facts.` The producer position is **kept** but qualified — *"but that places a modelled
+   term inside a distribution of realised ones — a position in a table, not a place inside the
+   band an IOC allocates capital across"* — and the self-disowning downside leg now says so
+   plainly (`so that leg separates nothing either`) and ends on v999's capital-allocation caution.
+2. **Angola, Ecuador and the United Kingdom keep the green verdict and now name what it is
+   weighted on:** `moderate take of 49.2%, weighted against verified field production (37.6% of
+   4,211 contracts carry production on file) rather than modelled from statute … the evidential
+   basis is.` Green and yellow now mean something on this line instead of being the same verdict
+   twice.
+3. The CTA is untouched. `cpScreenLowerTake()` already restricts to production-weighted producers,
+   which is the defensible set — v999's re-route was needed because the `take ≤ 40` path opened a
+   plain Screener full of statutory models. Nothing to fix, so nothing invented.
+
+No new threshold: the split is `_noProd663`, the figures are `d.n`, `d.n_facts`,
+`d.prod_coverage_pct` and `_posClause648`, all already rendered on the page, and the yellow is
+v999's for the identical evidence state.
+
+### Verified, after
+
+| country | basis | colour | opens |
+|---|---|---|---|
+| Guyana | modelled | `rgb(161,98,7)` yellow | "…on a statutory model, not on realised economics" |
+| Mozambique | modelled | yellow | same, 198 contracts / 1,378 facts |
+| Suriname | modelled | yellow | same, 109 / 367 |
+| Mali | modelled | yellow | same, **5 contracts / 25 facts** stated on screen |
+| Russia | modelled | yellow | same, 1,247 / 3,929 |
+| Denmark, Egypt | modelled | yellow | same |
+| United Kingdom | 37.6% prod | `rgb(21,128,61)` green | "weighted against verified field production (37.6% of 4,211…)" |
+| Angola | 7.2% prod | green | "…(7.2% of 460 contracts carry production on file)" |
+
+### Not done, deliberately
+
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation re-wording,
+no tab-order change, no rubric work. Nothing in STILL LOCKED is touched — the v612 mobile layer
+and `#reference-panel` are not in this code path; the CP two-zone headline, the tier colouring,
+the Govt NPV removal and the v430 FC guide are all unchanged. The version badge went v1070 →
+v1071 at one location at the end and is not an improvement.
+
+### Mobile
+
+390×844 `hasTouch`, storage cleared, both branches: `scrollWidth 390 = clientWidth` on every
+country tested. Verdict block right edge 376 against a 390 viewport; it wraps to 221px (yellow,
+longer sentence) and 188px (green) rather than widening the page. No control was added or
+touched, so the 24px `pointer: coarse` floor is unaffected. Zero page errors.
+
+### Verification
+
+- JS syntax gate: **PASS** (all 11 inline script blocks extracted, `node --check`).
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Served at the Pages path (`/petroleum-fiscal-db/`) rather than repo
+  root, which resolves `sw.js` and clears the 15 `[ConsoleErrors]` entries and the single WARN
+  cycle 1027 had to reconcile by hand. Reconciles to the 551 baseline exactly.
+
+### Result
+
+An analyst with 20 minutes before a screening meeting can now tell, from the first line of a
+Country Profile, whether its 54% government take was measured against verified field production
+or modelled from the statute book. The 30 frontier jurisdictions where ORCA holds no production —
+Guyana, Mozambique, Suriname, Timor-Leste, Uganda, Ghana, Egypt and the rest — no longer present
+as a green "Commercially attractive" that an IC memo can quote as settled, and the three that
+genuinely are production-weighted say so, so the green badge now carries information instead of
+being the default. The one country on 5 contracts and 25 facts states both numbers in the
+sentence that judges it.
