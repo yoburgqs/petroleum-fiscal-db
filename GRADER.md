@@ -75226,3 +75226,120 @@ outcome for the one surface on the platform built to answer "how solid is this?"
 **Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (stalest in rotation; 1031 was T1, T6 last ran at 1024).
 
 **Friction:** The Methodology tab's **Model Validation — Regression Benchmarks** section — the one surface on the platform whose entire job is to answer T6 — led with *"185 benchmark countries validated against published reference ranges — representing 100% of the 185-country dat
+
+---
+## Cycle 1033 Log — 2026-10-05
+- Test before: 551 PASS / 0 FAIL / 0 WARN
+- Test after: 551 PASS / 0 FAIL / 0 WARN
+- JS errors: 0
+- Summary: T3. The two Side-by-Side chart PNGs named countries they did not contain. Fixed on both channels — filename and caption band.
+
+## Cycle 1033 — v1076
+
+**Task:** T3 — *"How do these three countries compare side by side?"* Stalest in rotation
+(1027 was T3, 1028 T2, 1029 T4, 1030 T5, 1031 T1, 1032 T6).
+
+Walked cold at 1440x900 with both storages cleared, over a local server mounted at the real
+`/petroleum-fiscal-db/` path prefix so the service worker resolves — serving the repo at `/`
+404s `sw.js` and turns the suite's ConsoleErrors check into a WARN that has nothing to do with
+the page. Built the analyst's own trios rather than the seeded UK/Norway/Nigeria example, then
+followed the exit this platform's own documentation prescribes.
+
+**What was already right, and was not touched.** The entry path is sound: the search box
+resolves aliases (`UK`, `Holland`, `Burma`, `KRG`, `Emirates` all land, each announcing
+"Showing results for …"), `Ivory` correctly refuses rather than guessing, and the 5-country cap
+reports itself in the count badge. The v929 `Rank at` control is fully wired — set it to $100
+and the verdict strip, the column order, the `Order columns` option labels and the `Reading:`
+footer all re-state themselves at $100; none of them is left hard-coded at $75. The on-screen
+exclusion notice (`#cmp-monopoly-notice`) is inserted directly above the chart by
+`chartWrap.parentNode.insertBefore`, measured at y=1896 against the chart's y=2064, and names
+every dropped column and why. None of that is the friction.
+
+**Friction.** Side-by-Side drops columns the analyst *explicitly selected*:
+
+```js
+const chartCountries = selected.filter(d => !isStateMonopoly(d.take_75) && !_cmpMixStat(d).prrt);
+const npvCountries   = selected.filter(d => !isStateMonopoly(d.take_75));
+```
+
+Both exclusions are correct — a state monopoly has no contractor position to plot, and PRRT is a
+cash-flow base that cannot be carried across a price band. Both are stated on screen. **Neither
+reached the PNG**, which is the one artifact of this tab seen by people who never open ORCA, and
+which FAQ A37 and the IC-pack recipe both instruct the analyst to paste into an IC deck.
+
+`_cmpPngName()` (index.html:60082) built the filename from `compareList` — everything
+**selected** — while the datasets are mapped from `chartCountries` / `npvCountries` —
+everything **drawn**. `_cmpPngCaptionLines()` (index.html:60186) never mentioned the gap.
+Measured on the shipped build, downloads captured and decoded:
+
+| selected | file written | lines in the bitmap |
+|---|---|---|
+| Norway + Saudi Arabia + Kuwait | `ORCA_govt-take_Norway-Saudi-Arabia-Kuwait.png` | **1** — Norway |
+| Norway + Iraq + Saudi Arabia | `ORCA_govt-take_Iraq-Norway-Saudi-Arabia.png` | 2 |
+| Norway + Guyana + Australia | take and NPV **both** `…Norway-Guyana-Australia.png` | take 2, NPV 3 |
+
+The third row is the quiet one: on a PRRT set the two exports carry *identical* country lists in
+their filenames over *different* country sets, so two files in a Downloads folder cannot be told
+apart by what they contain. And the v743 caption band opened **"Basis — every column is run on
+one standardized profile"** across a bitmap missing two of its three columns. A slide captioned
+for three countries that shows one is not a chart with a caveat missing; it is a different chart,
+and it is argued over in a committee months later with no path back to the run that produced it.
+
+**Change.** Both channels now report the picture rather than the selection.
+
+- `window._cmpChartOmitted` / `window._cmpChartDrawn` are stashed in `renderCompare()` beside the
+  on-screen notice, built from the **same** `monopolyCountries` and `_cmpBandExcluded` arrays
+  that notice is built from, and from the exact arrays the datasets are mapped from. Stashed at
+  render time rather than re-derived at export time because `_cmpMixStat` / `_cmpHasProd` are
+  locals of `renderCompare`, and a second derivation is precisely how v660's label went stale.
+- `_cmpPngName(slug, drawn)` names only what was plotted.
+- `_cmpOmittedPngLine(key)` leads the caption band with **"NOT ON THIS CHART — N of the M
+  countries selected are omitted"**, naming each country and its reason, and the Basis line
+  below it now reads "every column **drawn above**" when anything was dropped.
+
+**Result.** The export of Norway + Saudi Arabia + Kuwait is now `ORCA_govt-take_Norway.png`, and
+the bitmap's first caption line reads: *"NOT ON THIS CHART — 2 of the 3 countries selected are
+omitted, and their lines were never drawn: Saudi Arabia (state monopoly — no contractor access,
+so there is no take to plot); Kuwait (…). … Read this figure as covering Norway only."* The
+Australia set now writes `ORCA_govt-take_Norway-Guyana.png` against
+`ORCA_contractor-npv_Norway-Guyana-Australia.png`, so the asymmetry between the two charts is
+legible from the filenames alone. A set with nothing excluded — Norway / United Kingdom /
+Netherlands — exports byte-identically to before, caption and filename.
+
+This is the directive's fifth finalization test — *every export opens, parses, and carries the
+assumptions behind its numbers* — and the chart PNG was failing it on the one assumption that
+changes what the figure is rather than how to read it.
+
+**Not done, and not a cycle:** no version sweep as the deliverable, no tooltip, no FAQ, no
+changelog catch-up, no citation re-wording, no tab-order change, no rubric work. Nothing in
+STILL LOCKED is touched — the v612 mobile layer and `#reference-panel` are not in this code
+path; the v451 two-zone CP headline and removed Govt NPV column, the v449 tier colouring, the
+v430 FC guide, the v371/v373 declutter and the v489 Reform Risk card are all unchanged. The
+version badge went v1075 → v1076 at one location at the end and is not an improvement.
+
+**Noted, not fixed —** the Methodology/FAQ prose still tells the analyst the PNG "shows country
+name, take at each price, and the cross-over point", which is written as though every selected
+country appears. It is now contradicted by the exported file itself rather than by nothing, but
+the prose is a second surface and rewording it alone would have been a text-only change.
+
+## Mobile
+390 x 844 `hasTouch: true`, storage cleared. `scrollWidth 390 = clientWidth 390` on Side-by-Side
+both before and after building the excluded set. Both chart PNG buttons measure **44px** tall
+under `pointer: coarse` (floor is 24). The exclusion stash and the corrected filename behave
+identically on the phone (`ORCA_govt-take_Norway.png`, omitted `["Saudi Arabia","Kuwait"]`).
+Zero page errors. No element was added, moved or resized — the band is composed onto the
+exported bitmap only, so there is no new layout surface.
+
+## Verification
+- JS syntax gate: **PASS** — all 11 inline script blocks extracted and `node --check`ed, run
+  after each patch and again after the version bump.
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Reconciles to the 551 baseline exactly.
+- Horizontal scroll swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs:
+  **0 overflowing screens**, 0 console and 0 page errors at every viewport.
+- Export re-tested end to end on four sets covering both exclusion reasons, one mixed case and
+  one clean case; the real `download` event was captured and the PNG decoded and read back.
+- The pre-change defect was measured the same way before patching — the baseline
+  `ORCA_govt-take_Iraq-Norway-Saudi-Arabia.png` was downloaded and confirmed to contain two
+  lines and no mention of Saudi Arabia.
