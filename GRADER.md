@@ -74793,3 +74793,130 @@ count is now one click away instead of a 4,000px hunt.
 
 ## Friction
 The **Reform Risk Snapshot** — `renderReformRisk()`, `index.html` ~59393. It is the first block on the tab, above the fold, and for a 20-minute reader often the only one read in full. It s
+
+---
+## Cycle 1030 Log — 2026-10-05 — T5 — v1073
+
+## Task
+**T5** — *"Give me something I can paste straight into an IC memo."* Stalest in rotation
+(1029 was T4, 1028 T2, 1027 T3, 1024 T6, 1023 T1; T5 last ran at 1020).
+
+## Friction
+`copyFCForIC()`, `index.html` ~76249–76341. Fiscal Compare is the centerpiece and the tab an
+analyst is most likely to paste from. Its **⎘ Copy for IC Memo** built the caveat block by
+concatenating **twelve independent `warn +=` branches into one flat string**, then emitted that
+string as a **single `<p>`** in the `text/html` flavour Word consumes and a **single line** in
+the TSV Excel consumes.
+
+Measured off the clipboard on this build, 185 rows, read back with
+`navigator.clipboard.read()` rather than inferred:
+
+| | |
+|---|---|
+| total paste | 77,725 chars |
+| preamble before the first table row | 8,154 chars in **3** paragraphs |
+| the caveat paragraph alone | **5,986 chars, one `<p>`** |
+
+Those 5,986 characters are twelve caveats, each scoped to a **different** subset of rows:
+117 generic-default · 6 hard-coded engine override · 78 grade C/D evidence · 21 non-clean
+reform verdict · 164 outside the reform event log · 3 state monopoly · 163 proxy data basis ·
+10 fee-basis blended · 10 contractor-NPV corrected · 3 NPV sign conflict · IRR withheld.
+
+Two consequences, and the second is the one that matters. The analyst cannot answer *"which of
+these applies to the three countries actually going in my memo?"* without reading a page and a
+half of justified grey prose. And they cannot delete the ten that do not apply without
+rewriting the paragraph by hand — so in a 20-minute window the rational move is to delete the
+whole block, which takes the mechanic comparability rule (`MECHANIC_COMPARABILITY.md`,
+2026-08-26) out with it. The caveats were self-defeating at that length and density.
+
+## Change
+Each caveat now carries a **heading naming its axis and its live row count**, and each is
+emitted as **its own paragraph** — bold-led in the HTML flavour, numbered in the TSV — under a
+`Caveats — N, each scoped to the rows it names` lead line.
+
+| | before | after |
+|---|---|---|
+| HTML flavour caveat block | 1 `<p>`, 5,986 chars | **11 bold-headed `<p>`**, longest 1,056 chars |
+| TSV flavour caveat block | 1 line | 1 lead line + **11 numbered lines** |
+| scanning unit | none | heading + row count per caveat |
+| deleting one caveat | rewrite the paragraph | select the paragraph, delete |
+
+Mechanism: a `LABEL` sentinel is inserted at each of the 13 `warn +=` sites and
+consumed by a new parser just above `srcLine`, which splits `warn` into `_warnItems[]`. Both
+flavours are derived from that array. **No wording is changed and nothing is dropped** — the
+twelve proven caveat strings are byte-identical, only their framing and delimiting changed.
+Verified 0 occurrences of U+0001 and U+0002 in both clipboard flavours, so no sentinel reaches
+the analyst.
+
+Headings as they render: `Model basis: GENERIC DEFAULT (117 rows)` · `Model basis: HARD-CODED
+ENGINE OVERRIDE (6 rows)` · `Evidence: grade C or D (78 rows)` · `Reform verdict: not a clean
+record (21 rows)` · `Reform coverage: outside the sourced event log (164 rows)` · `State
+monopoly: 100% government take (3 rows)` · `Data basis: PROXY, not production-weighted (163
+rows)` · `Comparability: fee-basis contracts blended (10 rows)` · `Comparability: contractor
+NPV corrected (10 rows)` · `NPV sign conflict: database vs model (3 rows)` · `IRR: not reported
+at country level`. Two further branches (`Reform coverage: no sourced event log on any row
+here`, `Comparability: no PSC/Concession-only NPV held`) are tagged and fire on the views that
+produce them.
+
+## Walked, found working, not touched
+The arm/confirm guard on every bulk copy (`_icArmBulkCopy` — first click arms with a measured
+page count, `⚠ Copy all 185 rows · 22 pages — confirm`, disarms after ~20s; it fires correctly
+on Fiscal Compare and on the Screener). The two-flavour clipboard write
+(`ClipboardItem` with `text/html` + `text/plain`, `writeText` fallback) on all nine IC copy
+surfaces. Country Profile `dd-ic-summary-btn` (904-char preamble, 7 numbered notes already
+emitted as `<li>` — this is the shape the FC block now has). Side-by-Side
+`cmp-copy-table-btn` (1,370-char preamble, 2 `<li>`). Screener `screener-copy-ic-btn`
+(arms, confirms, writes the shortlist). IOC Portfolio `ioc-copy-ic-btn`. Shortlist ranks
+carried as rendered (`=12`, `—`, `n/c`) rather than renumbered 1..N.
+
+**One thing I got wrong mid-walk and corrected:** my first harness clicked the Screener's copy
+button a second time 1.5s after the first, while the label still read `Reading sources… 156`
+rather than `confirm`, so the confirm click was never delivered and the clipboard kept the
+previous tab's payload. I read that as a silent-failure bug. It is not — on the honest path
+(wait for the arm, then click) the Screener writes its shortlist in under 400ms. Re-tested with
+a sentinel on the clipboard to prove it. The product was right and the test was wrong.
+
+## Not done, deliberately
+No new tab, no tooltip as the deliverable, no FAQ, no changelog catch-up, no citation
+re-wording, no tab-order change, no rubric work. Nothing in STILL LOCKED is touched: the v612
+mobile layer and `#reference-panel` are not in this code path; the v451 two-zone CP headline
+and removed Govt NPV column, the v449 tier colouring, the v430 FC guide and the v371/v373
+declutter are all unchanged. The version badge went v1072 → v1073 at one location at the end
+and is not an improvement. The IOC Portfolio carries the same defect at 4,818 chars in one
+paragraph — **left for a later cycle**, because the directive asks for one moment, and Fiscal
+Compare is both the worse instance and the more-trafficked surface.
+
+## Mobile
+390 × 844 `hasTouch: true`, storage cleared. `fc-copy-ic-btn` renders **44 × 129** under
+`pointer: coarse` (≥24px). `scrollWidth 390 = clientWidth 390` on Fiscal Compare before and
+after the copy. The phone paste carries all 11 numbered caveat lines, 78,285 chars. Zero page
+errors. No control was added or resized by this change — it alters clipboard output only — and
+the sweep below confirms no layout moved.
+
+## Verification
+- JS syntax gate: **PASS** — all 11 inline script blocks extracted, `node --check`, run twice
+  (after the patch and after the version bump).
+- Graded Playwright suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) **RUN this
+  cycle** against the local tree: **551 PASS / 0 FAIL / 0 WARN, 0 JS errors**, read from the
+  suite's own TOTAL line. Reconciles to the 551 baseline exactly.
+  - *Harness note:* a first run scored 550 PASS / 1 WARN with 15 console errors. The cause was
+    my serving path, not the build — `index.html:47` registers the service worker at the
+    absolute `/petroleum-fiscal-db/sw.js`, which 404s when the tree is served at a server root.
+    Re-served under the real `/petroleum-fiscal-db/` prefix and the WARN and all 15 errors
+    disappeared. Recorded because the next cycle will hit it too: **serve under the path
+    prefix, or the suite reports a phantom WARN.**
+- Horizontal scroll swept at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 10 tabs:
+  **0 overflowing screens**, 0 console and 0 page errors at every viewport.
+- Clipboard read back with `navigator.clipboard.read()` on both flavours, full table and
+  3-country shortlist, desktop and phone.
+
+## Result
+An analyst pasting Fiscal Compare into an IC memo used to land one 5,986-character paragraph
+and had to choose between reading all of it and deleting all of it. On the real T5 path — a
+3-country shortlist, Guyana / Norway / Nigeria — the paste now carries **5 headed caveats**, and
+reading only the bold lead-ins tells them that 1 row was modelled on an engine override, 1
+grades C on evidence, all 3 carry a non-clean reform verdict, and 1 is proxy-based rather than
+production-weighted. That is four decision-relevant facts in about eight seconds, from a block
+that previously yielded them only to someone who read 2,000 characters of prose. And because
+each caveat is now its own paragraph, the ones that do apply survive the edit that removes the
+ones that do not — which is the only way a caveat ever reaches an investment committee.
