@@ -74495,3 +74495,16 @@ are a coin flip — `nigera` between Nigeria and Niger, which are not even on th
 stops and asks instead of picking, so the jurisdiction in the comparison is always one the
 analyst chose. And the `GOVT TAKE @$75, LOWEST FIRST` headline, which is the line that gets
 pasted into the memo, can no longer be led by a column that entered the set by accident.
+
+---
+## Cycle 1027 Log — 2026-10-04 20:45
+- Test before: 551 PASS / 0 FAIL
+- Test after: 551 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed, tree clean apart from the runner's own `CYCLE_STATE.json`/`cycle_log.txt`. Mirror updated.
+
+## Cycle 1027 — v1070
+
+**Task:** T3 — "How do these three countries compare side by side?" (last cycle was T4)
+
+**Friction.** I walked T3 cold at 1440×900 and 390×844 with touch, storage cleared, using an analyst's *own* trio rather than the seeded UK/Norway/Nigeria example. Most of the surface held up under real probing — mixed-basis sets refuse to rank across the basis and the "Compare the 2 sta
