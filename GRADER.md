@@ -75733,3 +75733,16 @@ No tooltip, no FAQ, no changelog catch-up, no citation re-wording, no tab-order 
 work, no version sweep as the deliverable. Nothing in STILL LOCKED is touched — the v612 mobile
 layer and `#reference-panel` are not in this code path; v371/v373, v430, v449, v451, v452 and v489
 are unchanged. Badge v1080 → v1081 at one location at the end, which is bookkeeping.
+
+---
+## Cycle 1047 Log — 2026-10-05 19:46
+- Test before: 552 PASS / 0 FAIL
+- Test after: 552 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 1047 complete and pushed as v1081.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in the rotation (1046/1040 were T4, 1039 T2, 1033 T3, 1032 T6, 1031 T1, 1030 T5).
+
+## Friction
+The IOC Portfolio tab is the one the platform built an XLSX and a clipboard paste for specifically so it could be *"the fiscal exposure annex"* of an IC memo. I printed every data tab to PDF and read the text back **out of the PDF** rather than off the screen. The IOC annex came 
