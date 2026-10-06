@@ -75622,3 +75622,114 @@ v449, v430, v489 and v371/v373 are unchanged.
 
 ## Friction
 Country Profile, the Fiscal Predictability block — `_cpApplyObsSpread()`'s v1006 branch, `index.html` ~75821. On the 41 countries whose own contract table refutes their predictability basis, the badge reads `≤52 · LOW  ≥29.6pp obs   stored: 7̶6̶ ▲ withdrawn`, and the o
+
+---
+## Cycle 1047 Log — 2026-10-05 — T5 — v1081
+- Test before: **552 PASS / 0 FAIL / 0 WARN / 0 JS errors** (suite RUN this cycle, local tree)
+- Test after: **552 PASS / 0 FAIL / 0 WARN / 0 JS errors** (suite RUN again after the patch)
+- JS syntax gate: PASS — 11 inline blocks, after the patch and again after the version bump
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in the committed
+rotation: 1046 and 1040 were T4, 1039 T2, 1033 T3, 1032 T6, 1031 T1, 1030 T5.
+
+Method note, because it is what found this: the walk did not stop at the clipboard. Every data
+tab was printed to Letter PDF and the text was read back **out of the PDF** with `pypdf`, rather
+than off the screen or out of `innerText`. That distinction mattered twice — once to find the
+defect, and once to kill a false one (`innerText` on this tab returns all 1,561 `<option>` labels
+of the operator selector, which looks like a catastrophic print leak; the real PDF contains 0 of
+them, so it was never reported).
+
+## Friction
+`index.html` ~44576 — the IOC Portfolio `disclosureBanner`.
+
+IOC Portfolio is the tab v637 built an XLSX and a clipboard paste for precisely so it could be
+"the fiscal exposure annex" of an IC memo. Measured on the printed artifact:
+
+| probe | IOC_Portfolio.pdf, before |
+|---|---|
+| pages / contractor-NPV figures / take percentages | 10 / **67** / 134 |
+| `50k bbl/d` | **0** |
+| `10% WACC` | **0** |
+| `standardized` | **0** |
+| `all-in capex` | **0** |
+| `Deepwater` | **0** |
+
+Four of the six data tabs carry the standardized project into their PDF (Fiscal Compare, Country
+Profile, Screener, Side-by-Side). This one did not, because on this tab the basis existed **only
+inside a `title=` tooltip**. A tooltip does not print and does not exist under `pointer: coarse`,
+so the annex reached the committee with 67 NPVs and no project to rebuild them on, and a phone
+user could never reach it at all.
+
+Both of this tab's **exports were already right** — `_iocExportXLSX()`'s Basis sheet and
+`copyIOCPortfolio()`'s header paragraph both call `_icEngineBasis()`. v834 fixed seven artifacts
+this way and listed "the IOC Portfolio workbook and its header paragraph" among them; the
+*screen* those two are generated from was never part of that pass. So the one route that dropped
+the basis was the one that renders — which is also the only route that reaches print and mobile.
+
+The misread is specific, not hypothetical. The Reform exposure tile on this same page prints
+`2 WACC 13%`, where the count is **jurisdictions** carrying a reform-frequency premium and 13% is
+the **share of this book's contracts** they hold. Neither is a rate. On the printed page that was
+the only percentage anywhere near the word WACC, and the real discount rate appeared nowhere — so
+a committee reader hunting for the discount rate behind 67 NPVs finds 13%.
+
+## Change
+The banner gains a two-part basis block beneath its existing note:
+
+1. **"Basis of every NPV on this page:"** — the full standardized Deepwater project, derived from
+   `_icEngineBasis({warn:false, wi:false})` at render time, and a statement that it is the same
+   basis the XLSX Basis sheet and Copy for IC Memo carry, so the annex and the page agree.
+2. **"The discount rate behind these NPVs is 10%."** — in orange, with an explicit reading of the
+   Reform exposure tile: the count is jurisdictions, the percentage is share of book, neither is a
+   discount rate, and no reform premium has been added to any NPV on the page. The rate is read
+   from `ENGINE_BASIS.discountRate`, not typed.
+
+No new tooltip — this moves hover-only content into rendered text, which is the opposite move.
+
+## Result
+An analyst who prints the IOC Portfolio tab into an IC pack, or opens it on a phone, can now state
+the project behind every NPV in the annex and cannot mistake the reform premium for the discount
+rate. Before, that basis was reachable only by hovering a desktop mouse over one element.
+
+## Verification
+- **IOC PDF re-measured after the patch:** all six probes **0 → 1** occurrence; still **10 pages**.
+  The printed line now reads in full, ending *"…10% WACC, 100% working interest. Scale NPV by your
+  working interest. … The discount rate behind these NPVs is 10%. The Reform exposure tile above
+  reads e.g. "2 WACC 13%" — there the count is jurisdictions…"*
+- **Screen vs clipboard basis string: byte-identical.** Both grabbed from the live page in one
+  run and compared; they derive from one function, so they cannot drift.
+- **Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs, storages cleared
+  each time: **0 overflowing screens, 0 errors** at every viewport.
+- **Mobile 390x844 `hasTouch`:** the basis and the 10% line are visible with no hover; **0
+  controls under 24px** on all 10 panes.
+- The pre-change state was measured the same way before patching, not inferred from the changelog.
+
+## Also walked and found sound — recorded so a later cycle does not re-audit them
+Every other T5 artifact was exercised cold and came back clean. None of this needed changing:
+- **FC Copy for IC Memo** — HTML flavour uses `headShort` + footnote markers (14 short headers,
+  not the 600-char prose headers the TSV carries), so Word gets a clean table. Nothing-ticked
+  copy is guarded by a real two-step confirm (*"⚠ Copy all 185 rows · 22 pages — confirm"*).
+  Toolbar and dock buttons produce byte-identical output.
+- **Selection honouring** — FC `Export XLSX (3)` writes a 4-row sheet and renames the file
+  `…_shortlist-3_…`; Screener `⬇ Excel (3)` writes 4 rows and the CSV 18 lines. Content is correct
+  on both. *Open, minor:* the Screener filename does **not** change with the selection, so a
+  3-row shortlist and the full 185-row export land in Downloads under the same name. FC solved
+  this; Screener did not. Not taken this cycle — it is smaller than the defect above.
+- **Exports all parse** — FC (186x31 + Methodology 153x2), Screener (186x39 + Screen & Basis),
+  Country Profile (4 sheets), IOC (operator in filename); Screener CSV carries a full basis footer.
+- **Reform Risk** verdict copy works for all five verdict families including the no-coverage case
+  (Somalia, 1,455 chars, *"not a score of 100"*).
+- **Side-by-Side** print is guarded by `_sbsExportable()` (v1050); its paste carries 24 metric rows
+  plus comparability notes.
+- **Country Profile** three IC buttons each do a distinct job and the long summary carries all 7
+  notes, including the retrievability caveat.
+- **A caption I suspected and cleared:** the FC header's *"Breakeven is populated for N of these M
+  rows"* is arithmetically correct — measured 1-of-3 on Norway/Brazil/Angola against the rendered
+  Breakeven column. The "0 of 3" phrasing seen on a different trio is awkward English, not a wrong
+  count, and is text-only either way.
+
+## Not done, and not a cycle
+No tooltip, no FAQ, no changelog catch-up, no citation re-wording, no tab-order change, no rubric
+work, no version sweep as the deliverable. Nothing in STILL LOCKED is touched — the v612 mobile
+layer and `#reference-panel` are not in this code path; v371/v373, v430, v449, v451, v452 and v489
+are unchanged. Badge v1080 → v1081 at one location at the end, which is bookkeeping.
