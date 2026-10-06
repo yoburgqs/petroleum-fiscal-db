@@ -3211,7 +3211,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1080</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v1081</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -44573,8 +44573,52 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       ${_iocDownsideCell(r.country)}
       </tr>`;}).join('')}</tbody>
   </table></div>`;
+  // ── v1081 (T5) — the project behind this tab's NPVs now renders, instead of only hovering ──
+  //
+  // Walked T5 cold at 1440x900 and 390x844, both storages cleared, then printed every data tab
+  // to Letter PDF and read the text back out of the PDF rather than off the screen. Measured on
+  // the IOC Portfolio tab, which is the tab v637 built the XLSX and the clipboard for precisely
+  // so it could be "the fiscal exposure annex" of an IC memo:
+  //
+  //     IOC_Portfolio.pdf   10 pages   67 contractor-NPV figures   134 take percentages
+  //       "50k bbl/d"            0 occurrences
+  //       "10% WACC"             0 occurrences
+  //       "standardized"         0 occurrences
+  //       "capex"                0 occurrences
+  //       "Deepwater"            0 occurrences
+  //
+  // Four of the six data tabs print the standardized project (Fiscal Compare, Country Profile,
+  // Screener, Side-by-Side all carry "50k bbl/d" into their PDF). This one did not, because on
+  // this tab the basis existed ONLY inside a `title=` tooltip. A tooltip does not print and does
+  // not exist under `pointer: coarse`, so the annex reached the committee with 67 NPVs and no
+  // project to rebuild them on. Its own two EXPORTS were already correct — _iocExportXLSX()'s
+  // Basis sheet and copyIOCPortfolio()'s header paragraph both call _icEngineBasis(). v834 fixed
+  // seven artifacts this way and listed "the IOC Portfolio workbook and its header paragraph"
+  // among them; the screen the two are generated from was never part of that pass, so the only
+  // route that dropped the basis was the one that renders.
+  //
+  // The misread is specific, not hypothetical. The Reform exposure tile on this same page prints
+  // `2 WACC 13%`, where 13% is the share of THIS BOOK's contracts held by the two jurisdictions
+  // carrying a reform premium — not a rate. On the printed page that was the only percentage
+  // anywhere near the word WACC, and the actual discount rate behind all 67 NPVs appeared
+  // nowhere. A committee reader looking for the discount rate finds 13%.
+  //
+  // Derived from _icEngineBasis() at render time, like the workbook and the paste, so the screen
+  // and the two artifacts generated from it cannot state different projects. No new tooltip.
+  const _iocBasisTxt = (typeof _icEngineBasis === 'function')
+    ? _icEngineBasis({ warn: false, wi: false })
+    : 'ORCA standardized reference project, 10% WACC, 100% working interest.';
+  const _iocWacc = (typeof ENGINE_BASIS !== 'undefined' && ENGINE_BASIS.discountRate != null)
+    ? (ENGINE_BASIS.discountRate * 100).toFixed(0) + '%'
+    : '10%';
   const disclosureBanner = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--muted);">
   <strong style="color:var(--accent);">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. IRR is not shown: ORCA&rsquo;s contract IRR is an average of per-contract IRRs, not a project return &mdash; open a row, then <em>Model in Scenario Builder</em>. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
+  <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+    <strong style="color:var(--text);">Basis of every NPV on this page:</strong> ${_iocBasisTxt} Scale NPV by your working interest. This is the project to state in the memo &mdash; the same basis the <strong>&#8595; XLSX</strong> Basis sheet and <strong>&#x2398; Copy for IC Memo</strong> carry, so the annex and the page agree.
+    <div style="margin-top:6px;">
+      <strong style="color:var(--orange);">The discount rate behind these NPVs is ${_iocWacc}.</strong> The <em>Reform exposure</em> tile above reads e.g. &ldquo;2 WACC 13%&rdquo; &mdash; there the count is <em>jurisdictions</em> carrying a reform-frequency premium and the percentage is the <em>share of this book&rsquo;s contracts</em> they hold. Neither figure is a discount rate, and no reform premium has been added to any NPV here.
+    </div>
+  </div>
   </div>`;
 
   // ── v599 (T6): the provenance block. "Where did this number come from?" on this tab means
